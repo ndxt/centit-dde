@@ -11,9 +11,9 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import com.centit.support.utils.DatetimeOpt;
-import com.centit.support.utils.FileSystemOpt;
-import com.centit.support.utils.ZipCompressor;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.ZipCompressor;
+import com.centit.support.file.FileSystemOpt;
 
 public class ExchangeFileReader {
     public static final Log loger = LogFactory.getLog(ExchangeFileReader.class);

@@ -33,8 +33,8 @@ import com.centit.dde.transfer.TransferManagerImpl;
 import com.centit.dde.util.ConnPool;
 import com.centit.dde.util.ItemValue;
 import com.centit.dde.util.TaskConsoleWriteUtils;
-import com.centit.support.utils.DatetimeOpt;
-import com.centit.sys.util.SysParametersUtils;
+import com.centit.framework.common.SysParametersUtils;
+import com.centit.support.algorithm.DatetimeOpt;
 
 public class ExportDataImpl implements ExportData, CallWebService {
     private static final Log logger = LogFactory.getLog(ExportDataImpl.class);

@@ -6,9 +6,9 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.centit.core.dao.BaseDaoImpl;
-import com.centit.core.dao.CodeBook;
 import com.centit.dde.po.DataOptStep;
+import com.centit.framework.core.dao.CodeBook;
+import com.centit.framework.hibernate.dao.BaseDaoImpl;
 
 public class DataOptStepDao extends BaseDaoImpl<DataOptStep> {
     private static final long serialVersionUID = 1L;

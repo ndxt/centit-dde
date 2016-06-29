@@ -6,17 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.JSONArray;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.struts2.ServletActionContext;
 import org.springframework.util.StringUtils;
 
-import com.centit.core.action.BaseEntityDwzAction;
-import com.centit.core.dao.SQLUtils;
-import com.centit.core.utils.DwzTableUtils;
-import com.centit.core.utils.PageDesc;
+import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.ExchangeMapinfo;
 import com.centit.dde.po.MapinfoDetail;
@@ -24,6 +18,7 @@ import com.centit.dde.po.MapinfoDetailId;
 import com.centit.dde.service.DatabaseInfoManager;
 import com.centit.dde.service.ExchangeMapinfoManager;
 import com.centit.dde.service.MapinfoDetailManager;
+import com.centit.framework.core.dao.PageDesc;
 import com.centit.support.compiler.Lexer;
 
 
