@@ -1,4 +1,4 @@
-package com.centit.dde.action;
+package com.centit.dde.controller;
 
 import java.io.IOException;
 import java.io.StringReader;
