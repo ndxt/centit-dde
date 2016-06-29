@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.centit.product</groupId>
-	<artifactId>centit-dde</artifactId>
+	<artifactId>centit-dde3</artifactId>
 	<version>3.0.1-SNAPSHOT</version>
 	<name>centit-dde3</name>
 	<packaging>war</packaging>
