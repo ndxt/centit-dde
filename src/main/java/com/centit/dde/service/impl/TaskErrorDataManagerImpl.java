@@ -1,0 +1,39 @@
+package com.centit.dde.service.impl;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.centit.core.service.BaseEntityManagerImpl;
+import com.centit.dde.dao.TaskErrorDataDao;
+import com.centit.dde.po.TaskErrorData;
+import com.centit.dde.service.TaskErrorDataManager;
+
+public class TaskErrorDataManagerImpl extends BaseEntityManagerImpl<TaskErrorData>
+        implements TaskErrorDataManager {
+    private static final long serialVersionUID = 1L;
+    public static final Log log = LogFactory.getLog(TaskErrorDataManager.class);
+
+    //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
+
+    private TaskErrorDataDao taskErrorDataDao;
+
+    public void setTaskErrorDataDao(TaskErrorDataDao baseDao) {
+        this.taskErrorDataDao = baseDao;
+        setBaseDao(this.taskErrorDataDao);
+    }
+
+    public Long getTaskErrorId() {
+        return this.taskErrorDataDao.getTaskErrorId();
+    }
+
+    public void saveTaskErrorData(TaskErrorData taskErrorData) {
+        this.taskErrorDataDao.saveTaskErrorData(taskErrorData);
+    }
+
+
+    @Override
+    public void flush() {
+        taskErrorDataDao.flush();
+    }
+}
+

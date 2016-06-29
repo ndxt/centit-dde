@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE exchange [
+	<!ELEMENT exchange (metadata?,data)>
+	<!ATTLIST exchange id CDATA #REQUIRED>
+	<!ATTLIST exchange ddeid CDATA #REQUIRED>
+	<!ATTLIST exchange taskid CDATA #REQUIRED>
+	<!ATTLIST exchange operator CDATA #REQUIRED>
+	<!-- 导出时间 格式为 yyyy-MM-dd HH:mm:ss  -->
+	<!ATTLIST exchange exporttime CDATA #REQUIRED>
+		
+	<!ELEMENT metadata (pretreatment?,post_processing?,receipt?)>
+	<!ELEMENT pretreatment (sql*,call*)>
+	<!ELEMENT post_processing (sql*,call*)>
+	<!ELEMENT receipt ANY>
+	
+	<!ELEMENT data (table+)>
+	<!ELEMENT table (row*)>
+	<!ATTLIST table name CDATA #REQUIRED>
+	<!ATTLIST table mapinfoid CDATA #REQUIRED>
+	<!-- 表可以是一个单独文件存储，也可以在这个文件中 -->
+	<!ATTLIST table store (infile|embedded ) "embedded">
+	<!ATTLIST table sourceosid CDATA #IMPLIED>
+	<!ATTLIST table sourcedatabase CDATA #IMPLIED>
+	<!ATTLIST table exportdesc CDATA #IMPLIED>
+	<!ATTLIST table sql CDATA #IMPLIED>
+	
+	<!ELEMENT row (item+)>
+	<!ELEMENT item (#PCDATA)>
+	<!ATTLIST item name CDATA #REQUIRED>
+	<!ATTLIST item type (text|date|datetime|number|blob|clob) "text">
+	<!-- 如果type为blob、clob这个字段才有效 -->
+	<!ATTLIST item store (infile|embedded ) "embedded">
+	<!-- type 为date是 这个format为日期的格式，默认为"YYYY-DD-MM"； type为blob时这个格式为 plain 或则base64，clob默认为 plain， blob默认为base64 -->
+	<!ATTLIST item format CDATA #IMPLIED>	
+
+]>
+<exchange id="exp-001" operator="admin" taskid="0001" ddeid="dde-01" exporttime="2014-06-17 14:40:11">
+
+	<metadata>
+		<pretreatment><!-- 数据导入前的工作 -->
+			<sql>
+				create table sample_table(
+					id varchar2(8) not null primary key,
+					name varchar2(20) not null,
+					email varchar2(50),
+					resume blob
+				);
+			</sql>
+			<call>
+				begin
+					an_procedure;
+				end;
+			</call>
+		</pretreatment>
+		<post_processing><!--数据导入成功后的工作 ，和   pretreatment 有 sql 和代码块  -->
+		
+		</post_processing> 
+ 		<receipt><!-- 要返回给调用的内容  默认的回复为 成功和失败的条数，以表名为键值的列表-->
+ 			<!-- 这一部分暂时不知道如何设计，后面添加 -->
+ 		</receipt>
+	</metadata>
+	<data>
+		<table name="sample_table"  mapinfoid="optid-1" sourceosid="epower" sourcedatabase="epowerdb"
+			 > 
+			<!-- transaction 事务类型，是每条记录（each-row）一个事务还是 整体作为（ whole）一个事务  ；
+			  conflict 主键冲突解决方法，是替换（replace） 还是放弃（abandon） -->
+			<row>
+				<item name="id">0001</item>
+				<item name="name">peter</item>
+				<item name="email">peter@gmail.com</item>
+				<!-- 文件路径一般为 "表名/字段名/主键.dat",多字段主键的可以用多个字段通过下划线连接起来（注意冲突）；
+				当然开发人员也可指自己指定路劲的格式，只要是相对路径并且唯一就可以。 -->
+				<item name="resume" type="blob" store="infile">
+				  sample_table/resume/0001.dat
+				</item>
+				<item name="photo" type="blob">
+					<![CDATA[BASE64_CODE]]>
+				</item>
+				<item name="describe" type="clob">
+					<![CDATA[CLOB TEXT]]>
+				</item>
+			</row>
+		</table>
+	</data>
+</exchange>

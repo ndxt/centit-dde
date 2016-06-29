@@ -1,0 +1,43 @@
+@charset "utf-8";
+
+/* 主菜单Tree */
+/* #sidebar .tree div div { background:url(./images/tree/tree2.png) no-repeat;}
+#sidebar .tree .folder_collapsable, #sidebar .tree .folder_expandable, #sidebar .tree .file { background:url(./images/tree/folder.png) no-repeat;}
+#sidebar .tree .checked, #sidebar .tree .unchecked, #sidebar .tree .indeterminate { background:url(./images/tree/check.png) no-repeat;} */
+
+/* 首页窗口 */
+.dashboard-container .window {background:url(./images/dashboard/bg01.png);}
+.dashboard-container .window .content {background:url(./images/dashboard/bg02.png) left bottom no-repeat;}
+.dashboard-container .window .content .right-side {background:url(./images/dashboard/bg01.png) right bottom no-repeat;}
+.dashboard-container .window .content .right-side .top {background:url(./images/dashboard/bg01.png) right top no-repeat;}
+.dashboard-container .window .title { color:#000; }
+.dashboard-container .window .d-btn { background:url(./images/dialog/dialogpanel_icon.png) no-repeat; }
+/* .dashboard-container .window.hover .content { background-color:black; } */
+
+/* 首页表格 */
+.dashboard-table thead td,.dashboard-table thead th{ background-color:#DEF0FE; }
+.dashboard-table.yellow thead td,.dashboard-table.yellow thead th{ background-color:#FCE59F; }
+
+.dashboard-table tr.even td{ background-color:#F7FBFE; }
+.dashboard-table.yellow tr.even td{ background-color:#FEF9E6; }
+
+/* 首页切换按钮 */
+ul.dashboard { border-left: solid 1px #E5E5E5; }
+ul.dashboard li { border-top:solid 1px #E5E5E5; border-right:solid 1px #E5E5E5; border-bottom:solid 1px #E5E5E5; background-color:#EEEEEE; color:#0088CC;}
+ul.dashboard li.hover { color:#27576E; }
+ul.dashboard li.show { background-color:#E9E9E9; color:#777777; }
+
+/* .unitBox { background-color:#red; }
+.dashboard-container { background-color:#A3A3A3; } */
+#header .logo { background:url(./images/logo1.png);}
+
+div.deng.red, span.deng.red {background:url(./images/deng/red.png);}
+div.deng.yellow, span.deng.yellow {background:url(./images/deng/yellow.png);}
+div.deng.green, span.deng.green {background:url(./images/deng/green.png);}
+
+/*颜色定义*/
+.yellow {background-color:yellow;}
+.red {background-color:red;}
+
+.chartsBtn.next { background-image:url(./images/charts/right2.png); }
+.chartsBtn.prev { background-image:url(./images/charts/left2.png); }

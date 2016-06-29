@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+       default-lazy-init="false">
+    <bean name="mapinfoDetailAction" scope="request" class="com.centit.dde.action.MapinfoDetailAction">
+        <property name="mapinfoDetailManager" ref="mapinfoDetailManager"/>
+        <property name="exchangeMapinfoManager" ref="exchangeMapinfoManager"/>
+        <property name="databaseInfoManager" ref="databaseInfoManager"/>
+    </bean>
+    <bean name="mapinfoTriggerAction" scope="request" class="com.centit.dde.action.MapinfoTriggerAction">
+        <property name="mapinfoTriggerManager" ref="mapinfoTriggerManager"/>
+    </bean>
+    <bean name="exchangeMapinfoAction" scope="request" class="com.centit.dde.action.ExchangeMapinfoAction">
+        <property name="exchangeMapinfoManager" ref="exchangeMapinfoManager"/>
+        <property name="exchangeTaskdetailManager" ref="exchangeTaskdetailManager"/>
+    </bean>
+
+    <bean name="exchangeMapinfoNewAction" scope="request" class="com.centit.dde.action.ExchangeMapinfoNewAction">
+        <property name="exchangeMapinfoManager" ref="exchangeMapinfoManager"/>
+        <property name="exchangeTaskdetailManager" ref="exchangeTaskdetailManager"/>
+        <property name="databaseInfoManager" ref="databaseInfoManager"/>
+    </bean>
+
+    <bean name="databaseInfoAction" scope="request" class="com.centit.dde.action.DatabaseInfoAction">
+        <property name="databaseInfoManager" ref="databaseInfoManager"/>
+        <property name="osInfoManager" ref="osInfoManager"/>
+    </bean>
+
+    <bean name="exchangeTaskAction" scope="request" class="com.centit.dde.action.ExchangeTaskAction">
+        <property name="exchangeTaskManager" ref="exchangeTaskManager"/>
+        <property name="exchangeMapinfoManager" ref="exchangeMapinfoManager"/>
+        <property name="exchangeTaskdetailManager" ref="exchangeTaskdetailManager"/>
+        <property name="mapinfoDetailManager" ref="mapinfoDetailManager"/>
+        <property name="mapinfoTriggerManager" ref="mapinfoTriggerManager"/>
+        <property name="databaseInfoManager" ref="databaseInfoManager"/>
+        <property name="taskErrorDataManager" ref="taskErrorDataManager"/>
+        <property name="taskLogManager" ref="taskLogManager"/>
+        <property name="exportSqlManager" ref="exportSqlManager"/>
+    </bean>
+
+    <bean name="exchangeTaskdetailAction" scope="request" class="com.centit.dde.action.ExchangeTaskdetailAction">
+        <property name="exchangeTaskdetailManager" ref="exchangeTaskdetailManager"/>
+    </bean>
+
+    <bean name="taskErrorDataAction" scope="request" class="com.centit.dde.action.TaskErrorDataAction">
+        <property name="taskErrorDataManager" ref="taskErrorDataManager"/>
+    </bean>
+    <bean name="taskLogAction" scope="request" class="com.centit.dde.action.TaskLogAction">
+        <property name="taskLogManager" ref="taskLogManager"/>
+        <property name="exchangeTaskManager" ref="exchangeTaskManager"/>
+    </bean>
+ 
+    <bean name="transferAction" scope="request" class="com.centit.dde.transfer.TransferAction">
+        <property name="transferManager" ref="transferManager"/>
+        <property name="exportData" ref="exportData"/>
+        <property name="importData" ref="importData"/>
+        <property name="callWebService" ref="exportData" />
+    </bean>
+    <bean name="taskDetailLogAction" scope="request" class="com.centit.dde.action.TaskDetailLogAction">
+        <property name="taskDetailLogManager" ref="taskDetailLogManager"/>
+        <property name="exchangeMapinfoManager" ref="exchangeMapinfoManager"/>
+    </bean>
+
+    <bean name="exportSqlAction" scope="request" class="com.centit.dde.action.ExportSqlAction">
+        <property name="exportSqlManager" ref="exportSqlManager"/>
+        <property name="databaseInfoManager" ref="databaseInfoManager"/>
+        <property name="osInfoManager" ref="osInfoManager"/>
+    </bean>
+
+    <bean name="dataOptInfoAction" scope="request" class="com.centit.dde.action.DataOptInfoAction">
+        <property name="dataOptInfoManager" ref="dataOptInfoManager"/>
+        <property name="osInfoManager" ref="osInfoManager"/>
+        <property name="importOptManager" ref="importOptManager"/>
+    </bean>
+    <bean name="osInfoAction" scope="request" class="com.centit.dde.action.OsInfoAction">
+        <property name="osInfoManager" ref="osInfoManager"/>
+    </bean>
+    <bean name="importOptAction" scope="request" class="com.centit.dde.action.ImportOptAction">
+        <property name="importOptManager" ref="importOptManager"/>
+        <property name="databaseInfoManager" ref="databaseInfoManager"/>
+        <property name="osInfoManager" ref="osInfoManager"/>
+    </bean>
+
+    <bean name="userDataOptIdAction" scope="request" class="com.centit.dde.action.UserDataOptIdAction">
+        <property name="userDataOptIdManager" ref="userDataOptIdManager" />
+    </bean>
+</beans>

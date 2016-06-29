@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.7.0
+Implementation-Vendor: Adobe Systems Inc.
+Implementation-Title: BlazeDS - BlazeDS Application
+Implementation-Version: 3.0.0.544
+Sealed: false
+Created-By: 1.5.0_13-b05 (Sun Microsystems Inc.)
+
