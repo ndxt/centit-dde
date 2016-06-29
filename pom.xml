@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.centit.product</groupId>
@@ -9,12 +10,54 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring-springframework-version>3.0.5.RELEASE</spring-springframework-version>
-		<spring-security-version>3.0.5.RELEASE</spring-security-version>
-		<struts.version>2.3.24</struts.version>
+		<spring.version>4.2.5.RELEASE</spring.version>
+		<hibernate.version>4.3.11.Final</hibernate.version>
+		<!-- 3.2.7.RELEASE 4.0.1.RELEASE-->
+		<spring.security.version>4.0.4.RELEASE</spring.security.version>
+		<ehcache.version>2.8.3</ehcache.version>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.centit.framework</groupId>
+			<artifactId>framework-staticsystem</artifactId>
+			<version>3.0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.centit.framework</groupId>
+			<artifactId>framework-hibernate</artifactId>
+			<version>3.0.1-SNAPSHOT</version>
+		</dependency>
+		
+	 	<dependency>
+			<groupId>com.centit.framework</groupId>
+			<artifactId>framework-base-view-easyui</artifactId>
+			<version>3.0.1-SNAPSHOT</version>
+		</dependency>
+	     <dependency>
+		  <groupId>org.springframework</groupId>
+		  <artifactId>spring-orm</artifactId>
+		  <version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.2.4.Final</version>
+		</dependency>	
 		<!-- cxf -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
@@ -38,192 +81,17 @@
 			<scope>runtime</scope>
 			<version>1.0</version>
 		</dependency>
+		
 		<dependency>
-			<groupId>net.sourceforge.jtds</groupId>
-			<artifactId>jtds</artifactId>
-			<version>1.2.4</version>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.38</version>
 		</dependency>
+	
 		<dependency>
-			<groupId>org.apache.ant</groupId>
-			<artifactId>ant</artifactId>
-			<version>1.8.4</version>
-		</dependency>
-		<dependency>
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
-			<version>1.4.7</version>
-		</dependency>
-		<!-- <dependency> <groupId>org.samba.jcifs</groupId> <artifactId>jcifs</artifactId> 
-			<version>1.2.19</version> </dependency> -->
-		<!-- Spring family -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-aop</artifactId>
-			<version>${spring-springframework-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-expression</artifactId>
-			<version>${spring-springframework-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context-support</artifactId>
-			<version>${spring-springframework-version}</version>
-		</dependency>
-
-		<!-- Spring security family -->
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-config</artifactId>
-			<version>${spring-security-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-web</artifactId>
-			<version>${spring-security-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-ldap</artifactId>
-			<version>${spring-security-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-cas-client</artifactId>
-			<version>${spring-security-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-taglibs</artifactId>
-			<version>${spring-security-version}</version>
-		</dependency>
-		<!-- struts family -->
-		<dependency>
-			<groupId>org.apache.struts</groupId>
-			<artifactId>struts2-spring-plugin</artifactId>
-			<version>${struts.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.jgeppert.struts2.jquery</groupId>
-			<artifactId>struts2-jquery-plugin</artifactId>
-			<version>3.7.1</version>
-		</dependency>
-		<!-- hibernate family -->
-
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.0</version>
-		</dependency>
-		<!-- JSON -->
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-			<version>1.1.40</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-core-asl</artifactId>
-			<version>1.9.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.9.2</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.json-lib</groupId>
-			<artifactId>json-lib</artifactId>
-			<version>2.4</version>
-			<classifier>jdk15</classifier>
-		</dependency>
-		<!-- for dom4j xpath -->
-		<dependency>
-			<groupId>jaxen</groupId>
-			<artifactId>jaxen</artifactId>
-			<version>1.1.6</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-email</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<!-- OTHERS -->
-		<dependency>
-			<groupId>jstl</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>jxl</groupId>
-			<artifactId>jxl</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-			<version>1.2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>opensymphony</groupId>
-			<artifactId>quartz-all</artifactId>
-			<version>1.6.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>1.7.2</version>
-		</dependency>
-
-		<!-- 系统包中确实的依赖 -->
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.9</version>
-		</dependency>
-		<!-- 内部项目 -->
-		<dependency>
-			<groupId>com.centit.framework</groupId>
-			<artifactId>framework-core</artifactId>
-			<version>1.2.2</version>
-		</dependency>
-		<!-- <dependency> <groupId>com.centit.framework</groupId> <artifactId>framework-sys</artifactId> 
-			<version>0.0.3-SNAPSHOT</version> </dependency> -->
-		<!--向cas-server webservice同步数据 -->
-		<dependency>
-			<groupId>com.centit.support</groupId>
-			<artifactId>cas-webservice-clent</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-
-
-		<!--脚手架可以在demo工程中统一运行，这样可以节省空间 <dependency> <groupId>com.centit.support</groupId> 
-			<artifactId>centit-scaffold</artifactId> <version>0.1.1-SNAPSHOT</version> 
-			</dependency> -->
-		<!-- 全文检索选项 -->
-		<dependency>
-			<groupId>com.centit.support</groupId>
-			<artifactId>centit-searcher</artifactId>
-			<version>0.1.1-SNAPSHOT</version>
+		  <groupId>org.quartz-scheduler</groupId>
+		  <artifactId>quartz</artifactId>
+		  <version>2.2.2</version>
 		</dependency>
 
 		<!-- server runtime library -->
@@ -233,36 +101,13 @@
 			<scope>provided</scope>
 			<version>2.4</version>
 		</dependency>
-
-		<dependency>
-			<groupId>javax.servlet.jsp</groupId>
-			<artifactId>javax.servlet.jsp-api</artifactId>
-			<scope>provided</scope>
-			<version>2.2.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.sun</groupId>
-			<artifactId>tools</artifactId>
-			<version>1.6.0</version>
-			<scope>system</scope>
-			<!-- <systemPath>/opt/jdk/jdk1.6.0_45/lib/tools.jar</systemPath> -->
-			<systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
-			<!-- <systemPath>C:/develop/jvm/jdk1_6_0_45/lib/tools.jar</systemPath> -->
-		</dependency>
-
+		
 		<!-- test library -->
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-mock</artifactId>
-			<scope>test</scope>
-			<version>2.0.8</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<version>${spring-springframework-version}</version>
+			<version>${spring.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -270,42 +115,10 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 			<version>4.9</version>
-		</dependency>
-		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib-nodep</artifactId>
-			<version>2.2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>DBstep</groupId>
-			<artifactId>DBstep</artifactId>
-			<version>1.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>jmimemagic</groupId>
-			<artifactId>jmimemagic</artifactId>
-			<version>0.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.pinyin4j</groupId>
-			<artifactId>pinyin4j</artifactId>
-			<version>5.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.directwebremoting</groupId>
-			<artifactId>dwr</artifactId>
-			<version>3.0.0.rc1</version>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.37</version>
-		</dependency>
+		</dependency>		
+		
 	</dependencies>
-
-
+	
 	<build>
 		<!-- maven 打包时包含Hibernate配置文件 -->
 		<resources>
