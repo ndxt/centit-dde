@@ -79,7 +79,7 @@ public class UploadDataImpl implements UploadData {
         taskLog.setRunner("ws");
         taskLogManager.saveObject(taskLog);
 
-        TxtLogFile.writeLog(SysParametersUtils.getValue("wsdata") + "/ws" + taskLogId + ".xml", tableData);
+        TxtLogFile.writeLog(SysParametersUtils.getStringValue("wsdata") + "/ws" + taskLogId + ".xml", tableData);
         TableFileReader tr = new TableFileReader();
         tr.readTableInfoFromXML(tableData);
         

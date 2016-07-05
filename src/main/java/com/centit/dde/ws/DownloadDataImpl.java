@@ -6,6 +6,8 @@ import com.centit.dde.dao.ExportSqlDao;
 import com.centit.dde.datafile.TableFileWriter;
 import com.centit.dde.dataio.ExportData;
 import com.centit.dde.po.ExportSql;
+import com.centit.framework.components.CodeRepositoryUtil;
+import com.centit.framework.model.basedata.IUserInfo;
 
 @WebService(endpointInterface = "com.centit.dde.ws.DownloadData")
 public class DownloadDataImpl implements DownloadData {
@@ -15,8 +17,6 @@ public class DownloadDataImpl implements DownloadData {
 
     private ExportData exportData;
 
-    private SysUserManager sysUserManager;
-
     private ValidatorWs validatorWs;
 
     public void setExportSqlDao(ExportSqlDao exportSqlDao) {
@@ -25,10 +25,6 @@ public class DownloadDataImpl implements DownloadData {
 
     public void setExportData(ExportData exportData) {
         this.exportData = exportData;
-    }
-
-    public void setSysUserManager(SysUserManager sysUserManager) {
-        this.sysUserManager = sysUserManager;
     }
 
     public void setValidatorWs(ValidatorWs validatorWs) {
@@ -42,7 +38,7 @@ public class DownloadDataImpl implements DownloadData {
         if (null != validator) {
             return validator;
         }
-        FUserinfo userInfo = sysUserManager.getUserByLoginname(userName);
+        IUserInfo userInfo = CodeRepositoryUtil.getUserInfoByLoginName(userName);
 
         //解决在WebService环境下集合对象延迟加载问题
         ExportSql exportSql = exportSqlDao.fetchObjectById(exportId);
@@ -61,7 +57,7 @@ public class DownloadDataImpl implements DownloadData {
         }
         tableWriter.prepareMemoryWriter();
 
-        int nRes = exportData.doExportSql(exportSql, tableWriter, userInfo.getUsercode(), null);
+        int nRes = exportData.doExportSql(exportSql, tableWriter, userInfo.getUserCode(), null);
 
 
         String xmlData = tableWriter.getMemoryDataXML();//.toString();
