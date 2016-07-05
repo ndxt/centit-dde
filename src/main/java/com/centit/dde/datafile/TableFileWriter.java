@@ -14,9 +14,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.centit.support.utils.DatetimeOpt;
-import com.centit.support.utils.FileSystemOpt;
-import com.centit.support.utils.xml.XmlUtils;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.file.FileSystemOpt;
 
 public class TableFileWriter {
     public static final Log loger = LogFactory.getLog(TableFileWriter.class);

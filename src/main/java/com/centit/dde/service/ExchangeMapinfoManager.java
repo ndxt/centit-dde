@@ -3,11 +3,10 @@ package com.centit.dde.service;
 import java.util.List;
 import java.util.Map;
 
-import com.centit.core.service.BaseEntityManager;
-import com.centit.core.utils.PageDesc;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExchangeMapinfo;
-import com.centit.sys.security.FUserDetail;
+import com.centit.framework.core.dao.PageDesc;
+import com.centit.framework.core.service.BaseEntityManager;
 
 public interface ExchangeMapinfoManager extends BaseEntityManager<ExchangeMapinfo> {
     public List<String> listDatabaseName();

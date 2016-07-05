@@ -2,11 +2,10 @@ package com.centit.dde.service;
 
 import java.util.List;
 
-import com.centit.core.service.BaseEntityManager;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportSql;
-import com.centit.sys.security.FUserDetail;
+import com.centit.framework.core.service.BaseEntityManager;
 
 public interface ExportSqlManager extends BaseEntityManager<ExportSql> {
 

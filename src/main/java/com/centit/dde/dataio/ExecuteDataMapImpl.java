@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.DataAccessException;
@@ -19,7 +18,6 @@ import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobCreator;
 import org.springframework.jdbc.support.lob.LobHandler;
 
-import com.centit.core.dao.SQLUtils;
 import com.centit.dde.dao.DataOptInfoDao;
 import com.centit.dde.dao.DatabaseInfoDao;
 import com.centit.dde.dao.ImportOptDao;
@@ -45,9 +43,9 @@ import com.centit.dde.util.TaskConsoleWriteUtils;
 import com.centit.dde.ws.UploadData;
 import com.centit.dde.ws.WebServiceTransferClient;
 import com.centit.dde.ws.WsDataException;
-import com.centit.support.utils.DatetimeOpt;
-import com.centit.support.utils.StringBaseOpt;
-import com.centit.sys.util.SysParametersUtils;
+import com.centit.framework.common.SysParametersUtils;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 
 public class ExecuteDataMapImpl implements ExecuteDataMap {
     private static final Log logger = LogFactory.getLog(ExecuteDataMapImpl.class);

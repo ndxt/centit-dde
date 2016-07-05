@@ -6,11 +6,11 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.centit.core.service.BaseEntityManagerImpl;
 import com.centit.dde.dao.ExchangeTaskdetailDao;
 import com.centit.dde.po.ExchangeTaskdetail;
 import com.centit.dde.po.ExchangeTaskdetailId;
 import com.centit.dde.service.ExchangeTaskdetailManager;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
 public class ExchangeTaskdetailManagerImpl extends BaseEntityManagerImpl<ExchangeTaskdetail> implements
         ExchangeTaskdetailManager {

@@ -5,14 +5,12 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.centit.dde.po.DatabaseInfo;
-import com.centit.support.database.config.DBType;
-import com.centit.support.database.config.DirectConnDB;
-import com.centit.support.utils.StringBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.database.DBType;
 
 public class ConnPool {
     /**

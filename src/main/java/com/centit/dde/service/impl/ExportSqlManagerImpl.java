@@ -9,8 +9,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 
-import com.centit.core.dao.SQLUtils;
-import com.centit.core.service.BaseEntityManagerImpl;
 import com.centit.dde.dao.ExportSqlDao;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.DatabaseInfo;
@@ -22,7 +20,7 @@ import com.centit.dde.po.ExportTriggerId;
 import com.centit.dde.service.DatabaseInfoManager;
 import com.centit.dde.service.ExportFieldManager;
 import com.centit.dde.service.ExportSqlManager;
-import com.centit.sys.security.FUserDetail;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
 public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql> implements ExportSqlManager {
     private static final long serialVersionUID = 1L;

@@ -11,8 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.centit.core.dao.SQLUtils;
-import com.centit.core.service.BaseEntityManagerImpl;
 import com.centit.dde.dao.DatabaseInfoDao;
 import com.centit.dde.dao.ImportOptDao;
 import com.centit.dde.exception.SqlResolveException;
@@ -23,7 +21,7 @@ import com.centit.dde.po.ImportOpt;
 import com.centit.dde.po.ImportTrigger;
 import com.centit.dde.po.ImportTriggerId;
 import com.centit.dde.service.ImportOptManager;
-import com.centit.sys.security.FUserDetail;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
 public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt> implements ImportOptManager {
     private static final long serialVersionUID = 1L;

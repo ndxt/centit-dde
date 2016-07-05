@@ -15,10 +15,10 @@ import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.service.TaskLogManager;
 import com.centit.dde.util.TaskConsoleWriteUtils;
-import com.centit.support.utils.DatetimeOpt;
-import com.centit.support.utils.FileSystemOpt;
-import com.centit.support.utils.ZipCompressor;
-import com.centit.sys.util.SysParametersUtils;
+import com.centit.framework.common.SysParametersUtils;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.ZipCompressor;
+import com.centit.support.file.FileSystemOpt;
 
 public class ImportDataImpl implements ImportData {
     public static final Log logger = LogFactory.getLog(ImportDataImpl.class);

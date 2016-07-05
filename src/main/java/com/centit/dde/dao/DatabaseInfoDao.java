@@ -4,16 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Repository;
 
 import com.centit.dde.po.DatabaseInfo;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
-
-public class DatabaseInfoDao extends BaseDaoImpl<DatabaseInfo> {
-    private static final long serialVersionUID = 1L;
-    public static final Log log = LogFactory.getLog(DatabaseInfoDao.class);
+import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.support.database.DataSourceDescription;
+@Repository
+public class DatabaseInfoDao extends BaseDaoImpl<DatabaseInfo,String> {
 
     public Map<String, String> getFilterField() {
         if (filterField == null) {
@@ -44,14 +43,19 @@ public class DatabaseInfoDao extends BaseDaoImpl<DatabaseInfo> {
     }
 
     public boolean connectionTest(DatabaseInfo databaseInfo) {
-        return DirectConn.testConn(
-                new DirectConnDB(
-                        databaseInfo.getDatabaseUrl(),
-                        databaseInfo.getUsername(),
-                        databaseInfo.getPassword()));
+        return DataSourceDescription.testConntect(new DataSourceDescription(
+                databaseInfo.getDatabaseUrl(),
+                databaseInfo.getUsername(),
+                databaseInfo.getPassword()));
+    }
+    
+	@SuppressWarnings("unchecked")
+	public List<Object> listDatabase() {
+        return (List<Object>) DatabaseOptUtils.findObjectsByHql(this,"select t.databaseName from DatabaseInfo t");
     }
 
-    public List<Object> listDatabase() {
-        return (List<Object>) this.findObjectsByHql("select t.databaseName from DatabaseInfo t");
-    }
+	public DatabaseInfo getDatabaseInfoById(String databaseCode) {
+		DatabaseInfo dbi=this.getObjectById(databaseCode);
+		return dbi;
+	}
 }

@@ -1,7 +1,7 @@
 package com.centit.dde.service;
 
-import com.centit.core.service.BaseEntityManager;
 import com.centit.dde.po.TaskDetailLog;
+import com.centit.framework.core.service.BaseEntityManager;
 
 /**
  * create by scaffold

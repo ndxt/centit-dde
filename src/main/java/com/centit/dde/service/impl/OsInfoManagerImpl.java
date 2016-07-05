@@ -1,25 +1,25 @@
 package com.centit.dde.service.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.annotation.Resource;
 
-import com.centit.core.service.BaseEntityManagerImpl;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.centit.dde.dao.OsInfoDao;
 import com.centit.dde.po.OsInfo;
 import com.centit.dde.service.OsInfoManager;
-
-public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo>
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+@Service
+@Transactional
+public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo,String,OsInfoDao>
         implements OsInfoManager {
-    private static final long serialVersionUID = 1L;
-    public static final Log log = LogFactory.getLog(OsInfoManager.class);
-
+ 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
 
-    private OsInfoDao osInfoDao;
-
-    public void setOsInfoDao(OsInfoDao baseDao) {
-        this.osInfoDao = baseDao;
-        setBaseDao(this.osInfoDao);
+    @Override
+    @Resource(name = "osInfoDao")
+    public void setBaseDao(OsInfoDao baseDao) {
+        super.baseDao = baseDao;
     }
 
 }

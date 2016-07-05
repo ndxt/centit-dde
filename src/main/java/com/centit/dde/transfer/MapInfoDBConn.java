@@ -4,8 +4,7 @@ import java.sql.Connection;
 
 import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.util.ConnPool;
-import com.centit.support.database.config.DirectConnDB;
-import com.centit.support.utils.StringBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 
 public class MapInfoDBConn {
     private DirectConnDB leftDBC;

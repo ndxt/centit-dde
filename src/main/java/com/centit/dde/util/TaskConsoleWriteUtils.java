@@ -2,8 +2,7 @@ package com.centit.dde.util;
 
 import org.springframework.web.context.ContextLoaderListener;
 
-import com.centit.sys.util.IInstantMsg;
-import com.centit.sys.util.SysParametersUtils;
+import com.centit.framework.common.SysParametersUtils;
 
 /**
  * Created with IntelliJ IDEA.

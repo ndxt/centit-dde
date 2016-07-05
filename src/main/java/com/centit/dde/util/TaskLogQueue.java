@@ -10,9 +10,6 @@ import org.quartz.JobExecutionException;
 
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.service.TaskLogManager;
-import com.centit.sys.service.IQuartzJobBean;
-import com.centit.sys.service.SchedulerManager;
-import com.centit.sys.util.WebStartupLinstener;
 
 /**
  * Created by sx on 2015/1/20.

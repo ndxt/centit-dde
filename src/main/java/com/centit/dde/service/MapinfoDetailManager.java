@@ -3,9 +3,9 @@ package com.centit.dde.service;
 import java.util.List;
 import java.util.Map;
 
-import com.centit.core.service.BaseEntityManager;
 import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.MapinfoDetail;
+import com.centit.framework.core.service.BaseEntityManager;
 
 public interface MapinfoDetailManager extends BaseEntityManager<MapinfoDetail> {
     public List<Map<String, String>> getGoalTableStruct(DatabaseInfo DatabaseInfo, String tableName);

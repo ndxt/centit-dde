@@ -5,10 +5,10 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.centit.core.service.BaseEntityManagerImpl;
 import com.centit.dde.dao.MapinfoTriggerDao;
 import com.centit.dde.po.MapinfoTrigger;
 import com.centit.dde.service.MapinfoTriggerManager;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
 public class MapinfoTriggerManagerImpl extends BaseEntityManagerImpl<MapinfoTrigger>
         implements MapinfoTriggerManager {

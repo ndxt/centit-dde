@@ -9,12 +9,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.util.WebUtils;
 
-import com.centit.core.action.BaseEntityDwzAction;
-import com.centit.core.utils.DwzResultParam;
 import com.centit.dde.dataio.CallWebService;
 import com.centit.dde.dataio.ExportData;
 import com.centit.dde.dataio.ImportData;
-import com.centit.sys.po.FUserinfo;
 
 public class TransferAction extends BaseEntityDwzAction<Object> {
 

@@ -3,10 +3,10 @@ package com.centit.dde.service.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.centit.core.service.BaseEntityManagerImpl;
 import com.centit.dde.dao.ExportFieldDao;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.service.ExportFieldManager;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
 public class ExportFieldManagerImpl extends BaseEntityManagerImpl<ExportField>
         implements ExportFieldManager {

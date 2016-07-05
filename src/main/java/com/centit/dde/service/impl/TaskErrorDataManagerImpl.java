@@ -3,10 +3,10 @@ package com.centit.dde.service.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.centit.core.service.BaseEntityManagerImpl;
 import com.centit.dde.dao.TaskErrorDataDao;
 import com.centit.dde.po.TaskErrorData;
 import com.centit.dde.service.TaskErrorDataManager;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
 public class TaskErrorDataManagerImpl extends BaseEntityManagerImpl<TaskErrorData>
         implements TaskErrorDataManager {

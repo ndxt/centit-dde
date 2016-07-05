@@ -9,9 +9,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 
-import com.centit.core.dao.SQLUtils;
-import com.centit.core.service.BaseEntityManagerImpl;
-import com.centit.core.utils.PageDesc;
 import com.centit.dde.dao.ExchangeMapinfoDao;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.DatabaseInfo;
@@ -22,7 +19,8 @@ import com.centit.dde.po.MapinfoTrigger;
 import com.centit.dde.po.MapinfoTriggerId;
 import com.centit.dde.service.DatabaseInfoManager;
 import com.centit.dde.service.ExchangeMapinfoManager;
-import com.centit.sys.security.FUserDetail;
+import com.centit.framework.core.dao.PageDesc;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
 public class ExchangeMapinfoManagerImpl extends BaseEntityManagerImpl<ExchangeMapinfo> implements
         ExchangeMapinfoManager {

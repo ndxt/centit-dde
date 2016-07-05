@@ -6,13 +6,12 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.centit.core.service.BaseEntityManagerImpl;
 import com.centit.dde.dao.DataOptInfoDao;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.DataOptInfo;
 import com.centit.dde.po.DataOptStep;
 import com.centit.dde.service.DataOptInfoManager;
-import com.centit.sys.security.FUserDetail;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
 public class DataOptInfoManagerImpl extends BaseEntityManagerImpl<DataOptInfo> implements DataOptInfoManager {
     private static final long serialVersionUID = 1L;

@@ -10,7 +10,6 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xerces.impl.dv.util.Base64;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -19,8 +18,8 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import com.centit.dde.util.ItemValue;
-import com.centit.support.utils.DatetimeOpt;
-import com.centit.support.utils.StringRegularOpt;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.StringRegularOpt;
 
 public class TableFileReader {
 

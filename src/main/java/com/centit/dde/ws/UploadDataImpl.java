@@ -6,8 +6,8 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -17,10 +17,10 @@ import com.centit.dde.dataio.ImportDataImpl;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.service.TaskLogManager;
+import com.centit.framework.common.SysParametersUtils;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.file.TxtLogFile;
-import com.centit.support.utils.DatetimeOpt;
-import com.centit.support.utils.StringBaseOpt;
-import com.centit.sys.util.SysParametersUtils;
 
 @WebService(endpointInterface = "com.centit.dde.ws.UploadData")
 public class UploadDataImpl implements UploadData {
@@ -155,7 +155,7 @@ public class UploadDataImpl implements UploadData {
         TableFileReader tr = new TableFileReader();
         try {
             tr.readTableInfo(new ByteArrayInputStream(tableData));
-            TxtLogFile.writeLog(SysParametersUtils.getValue("wsdata") + "/ws" + taskLogId + ".xml", tr.getXML());
+            TxtLogFile.writeLog(SysParametersUtils.getStringValue("wsdata") + "/ws" + taskLogId + ".xml", tr.getXML());
         } catch (Exception e) {
             taskLog.setRunEndTime(DatetimeOpt.currentSqlDate());
             taskLog.setOtherMessage("-4:" + e.getMessage());
@@ -238,7 +238,7 @@ public class UploadDataImpl implements UploadData {
             else
                 executeDataMap.updateLobField(database, tableName, columnName, keyDesc, lobData);
         } catch (WsDataException e) {
-            return SysParametersUtils.getValue(e.getErrorcode());
+            return SysParametersUtils.getStringValue(String.valueOf(e.getErrorcode()));            
         }
         return "0:ok";
     }
@@ -275,7 +275,7 @@ public class UploadDataImpl implements UploadData {
                     lobData);
         } catch (WsDataException e) {
             LOGGER.error(e.getMessage(), e);
-            return SysParametersUtils.getValue(e.getErrorcode());
+            return SysParametersUtils.getStringValue(String.valueOf(e.getErrorcode()));
         }
         return "0:ok";
     }

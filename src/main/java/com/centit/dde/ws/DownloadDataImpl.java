@@ -6,8 +6,6 @@ import com.centit.dde.dao.ExportSqlDao;
 import com.centit.dde.datafile.TableFileWriter;
 import com.centit.dde.dataio.ExportData;
 import com.centit.dde.po.ExportSql;
-import com.centit.sys.po.FUserinfo;
-import com.centit.sys.service.SysUserManager;
 
 @WebService(endpointInterface = "com.centit.dde.ws.DownloadData")
 public class DownloadDataImpl implements DownloadData {

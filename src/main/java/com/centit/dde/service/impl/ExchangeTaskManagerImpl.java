@@ -10,7 +10,6 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 
-import com.centit.core.service.BaseEntityManagerImpl;
 import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.dataio.ExportData;
 import com.centit.dde.dataio.ImportData;
@@ -18,8 +17,7 @@ import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.service.ExchangeTaskManager;
 import com.centit.dde.transfer.TransferManager;
-import com.centit.sys.service.IQuartzJobBean;
-import com.centit.sys.service.SchedulerManager;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
 public class ExchangeTaskManagerImpl extends BaseEntityManagerImpl<ExchangeTask> 
     implements ExchangeTaskManager,

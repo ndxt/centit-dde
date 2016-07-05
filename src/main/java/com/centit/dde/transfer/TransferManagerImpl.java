@@ -24,7 +24,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
-import com.centit.core.dao.SQLUtils;
 import com.centit.dde.dao.DatabaseInfoDao;
 import com.centit.dde.dao.ExchangeMapinfoDao;
 import com.centit.dde.dao.ExchangeTaskDao;
@@ -43,7 +42,7 @@ import com.centit.dde.service.TaskDetailLogManager;
 import com.centit.dde.service.TaskErrorDataManager;
 import com.centit.dde.service.TaskLogManager;
 import com.centit.dde.util.TaskConsoleWriteUtils;
-import com.centit.support.utils.DatetimeOpt;
+import com.centit.support.algorithm.DatetimeOpt;
 
 public class TransferManagerImpl implements TransferManager {
     private static final Log logger = LogFactory.getLog(TransferManager.class);

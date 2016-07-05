@@ -3,16 +3,13 @@ package com.centit.dde.dao;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Repository;
 
-import com.centit.core.dao.BaseDaoImpl;
-import com.centit.core.dao.CodeBook;
 import com.centit.dde.po.OsInfo;
-
-public class OsInfoDao extends BaseDaoImpl<OsInfo> {
-    private static final long serialVersionUID = 1L;
-    public static final Log log = LogFactory.getLog(OsInfoDao.class);
+import com.centit.framework.core.dao.CodeBook;
+import com.centit.framework.hibernate.dao.BaseDaoImpl;
+@Repository
+public class OsInfoDao extends BaseDaoImpl<OsInfo,String> {
 
     public Map<String, String> getFilterField() {
         if (filterField == null) {

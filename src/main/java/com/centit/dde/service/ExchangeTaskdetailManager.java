@@ -2,8 +2,8 @@ package com.centit.dde.service;
 
 import java.util.List;
 
-import com.centit.core.service.BaseEntityManager;
 import com.centit.dde.po.ExchangeTaskdetail;
+import com.centit.framework.core.service.BaseEntityManager;
 
 public interface ExchangeTaskdetailManager extends BaseEntityManager<ExchangeTaskdetail> {
     public List<Long> getMapinfoIdUsed(Long taskId);

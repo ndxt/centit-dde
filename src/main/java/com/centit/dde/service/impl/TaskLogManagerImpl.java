@@ -5,10 +5,10 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.centit.core.service.BaseEntityManagerImpl;
 import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.service.TaskLogManager;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
 public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog>
         implements TaskLogManager {

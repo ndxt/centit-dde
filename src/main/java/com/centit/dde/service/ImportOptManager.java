@@ -1,9 +1,8 @@
 package com.centit.dde.service;
 
-import com.centit.core.service.BaseEntityManager;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ImportOpt;
-import com.centit.sys.security.FUserDetail;
+import com.centit.framework.core.service.BaseEntityManager;
 
 public interface ImportOptManager extends BaseEntityManager<ImportOpt> {
 

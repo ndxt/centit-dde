@@ -6,11 +6,11 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.centit.core.service.BaseEntityManagerImpl;
 import com.centit.dde.dao.MapinfoDetailDao;
 import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.MapinfoDetail;
 import com.centit.dde.service.MapinfoDetailManager;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
 public class MapinfoDetailManagerImpl extends BaseEntityManagerImpl<MapinfoDetail>
         implements MapinfoDetailManager {
