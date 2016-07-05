@@ -1,7 +1,5 @@
 package com.centit.dde.util;
 
-import org.springframework.web.context.ContextLoaderListener;
-
 import com.centit.framework.common.SysParametersUtils;
 
 /**
@@ -38,17 +36,13 @@ public class TaskConsoleWriteUtils {
         pushAll("TASKLOG.stop", String.valueOf(taskId));
     }
 
-    private static IInstantMsg getInstantMsg() {
-        return ContextLoaderListener.getCurrentWebApplicationContext().getBean("instantMsg", IInstantMsg.class);
-    }
-
     public static void pushAll(String script, String... params) {
         if (isDevelopDebug()) {
-            getInstantMsg().pushAll(script, params);
+            //getInstantMsg().pushAll(script, params);
         }
     }
 
     private static boolean isDevelopDebug() {
-        return "1".equals(SysParametersUtils.getValue("task.console.output"));
+        return "1".equals(SysParametersUtils.getStringValue("task.console.output"));
     }
 }
