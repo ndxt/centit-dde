@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.file.FileSystemOpt;
+import com.centit.support.xml.XmlUtils;
 
 public class TableFileWriter {
     public static final Log loger = LogFactory.getLog(TableFileWriter.class);

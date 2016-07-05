@@ -17,9 +17,11 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
+import com.alibaba.fastjson.util.Base64;
 import com.centit.dde.util.ItemValue;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringRegularOpt;
+import com.centit.support.file.FileIOOpt;
 
 public class TableFileReader {
 
@@ -217,8 +219,7 @@ public class TableFileReader {
                         // }
                         // reader.close();
                         // item.setStrValue(sb.toString());
-
-                        item.setStrValue(FileUtils.readFileToString(new File(filePath + "/" + sValue)));
+                        item.setStrValue(FileIOOpt.readStringFromFile(filePath + "/" + sValue));
 
                     } catch (IOException err) {
                         LOGGER.error("读取clob文件:" + filePath + "/" + sValue + " 错误：" + err.getMessage());
@@ -227,7 +228,7 @@ public class TableFileReader {
                 } else {
                     String sFormat = e.attributeValue("format");
                     if ("base64".equals(sFormat))
-                        item.setStrValue(new String(Base64.decode(sValue)));
+                        item.setStrValue(new String(Base64.decodeFast(sValue)));
                     else
                         item.setStrValue(sValue);
                 }
@@ -254,7 +255,7 @@ public class TableFileReader {
                         // e.printStackTrace();
                     }
                 } else {
-                    item.setBlobValue(Base64.decode(sValue));
+                    item.setBlobValue(Base64.decodeFast(sValue));
                 }
 
             } else {
