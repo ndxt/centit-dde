@@ -1,10 +1,11 @@
 package com.centit.test.datafile;
 
-import com.centit.support.database.config.DirectConnDB;
-
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+
+import com.centit.support.database.DataSourceDescription;
+import com.centit.support.database.DbcpConnectPools;
 
 /**
  * Created by sx on 2014/12/11.
@@ -12,10 +13,10 @@ import java.sql.ResultSet;
 public class TestJdbc {
 
     static Connection getConnection() throws Exception {
-        DirectConnDB db = new DirectConnDB("jdbc:sqlserver://192.168.132.76:1433;databaseName=BSDFW2", "sqlser", "abc#A123");
+        DataSourceDescription dataSource = 
+                new DataSourceDescription("jdbc:sqlserver://192.168.132.76:1433;databaseName=BSDFW2", "sqlser", "abc#A123");
 
-
-        return db.getConn();
+        return DbcpConnectPools.getDbcpConnect(dataSource);
     }
 
     static void getTables() throws Exception {

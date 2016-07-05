@@ -3,7 +3,7 @@ package com.centit.test.datafile;
 import com.centit.dde.ws.DownloadData;
 import com.centit.dde.ws.UploadData;
 import com.centit.dde.ws.WebServiceTransferClient;
-import com.centit.support.utils.StringBaseOpt;
+import com.centit.support.security.DESSecurityUtils;
 
 public class TestWebService {
 
@@ -30,7 +30,7 @@ public class TestWebService {
      * @param pwd
      */
     static void encrypwd(String pwd) {
-        System.out.println(StringBaseOpt.encryptDesBase64(pwd));
+        System.out.println(DESSecurityUtils.encryptAndBase64(pwd,"password"));
 
         //System.out.println(Thread.currentThread().getStackTrace()[1].getMethodName());
 
