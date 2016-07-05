@@ -2,54 +2,66 @@ package com.centit.dde.po;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 
-/**
- * create by scaffold
- *
- * @author codefan@hotmail.com
- */
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
+
+import com.centit.support.security.DESSecurityUtils;
+
+
+@Entity
+@Table(name = "D_DATABASE_INFO")
 public class DatabaseInfo implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    // 数据库别名
+    public static String DESKEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF"; 
+    // 数据库名
+    @Id
+    @Column(name = "DATABASE_CODE")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
+    private String databaseCode;
+    
+    @Column(name = "DATABASE_NAME")
     private String databaseName;
 
-    // 数据库名
+	// 数据库别名
+    @Column(name = "DATABASE_NAMES")
+    @Length(max = 100, message = "字段长度不能大于{max}")
     private String databaseNames;
-
+    @Column(name = "DATABASE_TYPE")
+    @NotBlank(message = "字段不能为空")
     private String databaseType;
-
+    @Column(name = "HOSTPORT")
+    @Length(max = 100, message = "字段长度不能大于{max}")
     private String hostPort;
-
+    @Column(name = "DATABASE_URL")
+    @Length(max = 1000, message = "字段长度不能大于{max}")
     private String databaseUrl;
-
+    @Column(name = "USERNAME")
+    @Length(max = 100, message = "字段长度不能大于{max}")
     private String username;
-
+    @Column(name = "PASSWORD")
+    @Length(max = 100, message = "字段长度不能大于{max}")
     private String password;
-
+    @Column(name = "DATA_DESC")
+    @Length(max = 100, message = "字段长度不能大于{max}")
     private String dataDesc;
-
-    private String sourceDatabaseName;
-
-    private String goalDatabaseName;
-
+    @Column(name = "CREATED")    
     private String created;
-
+    @Column(name = "CREATE_TIME")
     private Date createTime;
-
+    @Column(name = "SOURCE_OS_ID")
     private String sourceOsId;
-    private OsInfo osInfo;
 
-    public OsInfo getOsInfo() {
-        return osInfo;
-    }
-
-    public void setOsInfo(OsInfo osInfo) {
-        this.osInfo = osInfo;
-    }
-
+    
+    
     public String getSourceOsId() {
         return sourceOsId;
     }
@@ -57,7 +69,13 @@ public class DatabaseInfo implements Serializable {
     public void setSourceOsId(String sourceOsId) {
         this.sourceOsId = sourceOsId;
     }
+    public String getDatabaseCode() {
+		return databaseCode;
+	}
 
+	public void setDatabaseCode(String databaseCode) {
+		this.databaseCode = databaseCode;
+	}
     public String getDatabaseNames() {
         return databaseNames;
     }
@@ -90,52 +108,9 @@ public class DatabaseInfo implements Serializable {
         this.createTime = createTime;
     }
 
-    // 区分源数据和目标数据
-    private String type;
+    
+   
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    private Set<ExchangeMapinfo> exchangeMapinfosources = null;
-
-    private Set<ExchangeMapinfo> exchangeMapinfodests = null;
-
-    public String getSourceDatabaseName() {
-        return sourceDatabaseName;
-    }
-
-    public void setSourceDatabaseName(String sourceDatabaseName) {
-        this.sourceDatabaseName = sourceDatabaseName;
-    }
-
-    public String getGoalDatabaseName() {
-        return goalDatabaseName;
-    }
-
-    public void setGoalDatabaseName(String goalDatabaseName) {
-        this.goalDatabaseName = goalDatabaseName;
-    }
-
-    public Set<ExchangeMapinfo> getExchangeMapinfosources() {
-        return exchangeMapinfosources;
-    }
-
-    public void setExchangeMapinfosources(Set<ExchangeMapinfo> exchangeMapinfosources) {
-        this.exchangeMapinfosources = exchangeMapinfosources;
-    }
-
-    public Set<ExchangeMapinfo> getExchangeMapinfodests() {
-        return exchangeMapinfodests;
-    }
-
-    public void setExchangeMapinfodests(Set<ExchangeMapinfo> exchangeMapinfodests) {
-        this.exchangeMapinfodests = exchangeMapinfodests;
-    }
 
     // Constructors
 
@@ -223,13 +198,7 @@ public class DatabaseInfo implements Serializable {
      * 替换子类对象数组，这个函数主要是考虑hibernate中的对象的状态，以避免对象状态不一致的问题
      */
 
-    public ExchangeMapinfo newExchangeMapinfo() {
-        ExchangeMapinfo res = new ExchangeMapinfo();
 
-        res.setSourceDatabaseName(this.getDatabaseName());
-
-        return res;
-    }
 
     /**
      * 替换子类对象数组，这个函数主要是考虑hibernate中的对象的状态，以避免对象状态不一致的问题
@@ -283,6 +252,11 @@ public class DatabaseInfo implements Serializable {
     public String toString() {
         return "DatabaseInfo [databaseName=" + databaseName + ", databaseUrl=" + databaseUrl + ", username=" + username
                 + ", sourceOsId=" + sourceOsId + "]";
+    }
+    
+    public String getClearPassword(){
+    	return DESSecurityUtils.decryptBase64String(
+    			getPassword(),DatabaseInfo.DESKEY);
     }
 
 }

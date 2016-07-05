@@ -2,25 +2,48 @@ package com.centit.dde.po;
 
 import java.util.Date;
 
-/**
- * create by scaffold
- *
- * @author codefan@hotmail.com
- */
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
+
+@Entity
+@Table(name = "D_OS_INFO")
 
 public class OsInfo implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-
+    @Id
+    @Column(name = "OS_ID")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String osId;
-
+    @Column(name = "OS_NAME")
+    @Length(max = 200, message = "字段长度不能大于{max}")
     private String osName;
+    @Column(name = "HAS_INTERFACE")
+    @NotBlank(message = "字段不能为空")
     private String hasInterface;
+    @Column(name = "INTERFACE_URL")
+    @Length(max = 200, message = "字段长度不能大于{max}")
     private String interfaceUrl;
+    @Column(name = "CREATED")
+    @Length(max = 8, message = "字段长度不能大于{max}")
     private String created;
+    @Column(name = "OS_USER")
+    @Length(max = 20, message = "字段长度不能大于{max}")
     private String osUser;
+    @Column(name = "OS_PASSWORD")
+    @Length(max = 100, message = "字段长度不能大于{max}")
     private String osPassword;
+    @Column(name = "LAST_UPDATE_TIME")
     private Date lastUpdateTime;
+    @Column(name = "CREATE_TIME")
     private Date createTime;
 
 

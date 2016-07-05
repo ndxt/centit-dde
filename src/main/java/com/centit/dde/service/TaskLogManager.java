@@ -26,7 +26,7 @@ import com.centit.framework.core.service.BaseEntityManager;
  *
  * @author codefan@hotmail.com
  */
-public interface TaskLogManager extends BaseEntityManager<TaskLog> {
+public interface TaskLogManager extends BaseEntityManager<TaskLog,Long> {
     public Long getTaskLogId();
     public List<String[]> taskLogStat(String sType,Object o);
     void flush();
