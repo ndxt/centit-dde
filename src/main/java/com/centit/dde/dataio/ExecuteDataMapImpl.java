@@ -45,6 +45,7 @@ import com.centit.dde.ws.WsDataException;
 import com.centit.framework.common.SysParametersUtils;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.database.QueryUtils;
 
 public class ExecuteDataMapImpl implements ExecuteDataMap {
     private static final Log logger = LogFactory.getLog(ExecuteDataMapImpl.class);
@@ -417,7 +418,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         } else {
             PreparedStatement pSouce = null;
             try {
-                List<String> sqlParameters = SQLUtils.getSqlNamedParameters(sql);
+                List<String> sqlParameters = QueryUtils.getSqlNamedParameters(sql).getRight();
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("执行触发器的sql语句为 = " + sql + " 解析参数结果 = " + sqlParameters);

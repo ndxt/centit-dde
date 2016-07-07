@@ -25,7 +25,7 @@ public class ImportDataImpl implements ImportData {
 
     private static boolean debugEnabled = logger.isDebugEnabled();
 
-    private static final String IMPORT = SysParametersUtils.getValue("import");
+    private static final String IMPORT = SysParametersUtils.getStringValue("import");
 
     private ExecuteDataMap executeDataMap;
 

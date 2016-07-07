@@ -19,6 +19,13 @@ public class ConnPool {
         dbc.setPassword(dbInfo.getClearPassword());        
         return DbcpConnectPools.getDbcpConnect(dbc);
     }
+    
+    
+    public static DbcpConnect getConn(DataSourceDescription dbInfo) throws SQLException {
+     
+        return DbcpConnectPools.getDbcpConnect(dbInfo);
+    }
+    
 
     public static boolean testConn(DatabaseInfo dbinfo){
         DataSourceDescription dbc = new DataSourceDescription();

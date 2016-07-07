@@ -4,11 +4,12 @@ import java.sql.Connection;
 
 import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.util.ConnPool;
-import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.database.DataSourceDescription;
+import com.centit.support.database.DbcpConnect;
 
 public class MapInfoDBConn {
-    private DirectConnDB leftDBC;
-    private DirectConnDB rightDBC;
+    private DataSourceDescription leftDBC;
+    private DataSourceDescription rightDBC;
 
     public MapInfoDBConn() {
 
@@ -17,17 +18,15 @@ public class MapInfoDBConn {
     public void loadDBConfig(DatabaseInfo sourceDatabaseInfo,
                              DatabaseInfo desDatabaseInfo) {
         try {
-            leftDBC = new DirectConnDB();
-            rightDBC = new DirectConnDB();
-            leftDBC.praiseConnUrl(sourceDatabaseInfo.getDatabaseUrl());
-            leftDBC.setUser(sourceDatabaseInfo.getUsername());
-            leftDBC.setPassword(StringBaseOpt
-                    .decryptBase64Des(sourceDatabaseInfo.getPassword()));
+            leftDBC = new DataSourceDescription();
+            rightDBC = new DataSourceDescription();
+            leftDBC.setConnUrl(sourceDatabaseInfo.getDatabaseUrl());
+            leftDBC.setUsername(sourceDatabaseInfo.getUsername());
+            leftDBC.setPassword(sourceDatabaseInfo.getClearPassword());
 
-            rightDBC.praiseConnUrl(desDatabaseInfo.getDatabaseUrl());
-            rightDBC.setUser(desDatabaseInfo.getUsername());
-            rightDBC.setPassword(StringBaseOpt.decryptBase64Des(desDatabaseInfo
-                    .getPassword()));
+            rightDBC.setConnUrl(desDatabaseInfo.getDatabaseUrl());
+            rightDBC.setUsername(desDatabaseInfo.getUsername());
+            rightDBC.setPassword(desDatabaseInfo.getClearPassword());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,27 +40,27 @@ public class MapInfoDBConn {
         ConnPool.closeConn(conn);
     }
 
-    public Connection getLeftDBConn() throws Exception {
+    public DbcpConnect getLeftDBConn() throws Exception {
         return ConnPool.getConn(leftDBC);
     }
 
-    public Connection getRightDBConn() throws Exception {
+    public DbcpConnect getRightDBConn() throws Exception {
         return ConnPool.getConn(rightDBC);
     }
 
-    public DirectConnDB getLeftDBC() {
+    public DataSourceDescription getLeftDBC() {
         return leftDBC;
     }
 
-    public void setLeftDBC(DirectConnDB leftDBC) {
+    public void setLeftDBC(DataSourceDescription leftDBC) {
         this.leftDBC = leftDBC;
     }
 
-    public DirectConnDB getRightDBC() {
+    public DataSourceDescription getRightDBC() {
         return rightDBC;
     }
 
-    public void setRightDBC(DirectConnDB rightDBC) {
+    public void setRightDBC(DataSourceDescription rightDBC) {
         this.rightDBC = rightDBC;
     }
 

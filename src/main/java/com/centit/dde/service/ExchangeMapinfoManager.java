@@ -7,8 +7,9 @@ import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExchangeMapinfo;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.core.service.BaseEntityManager;
+import com.centit.framework.model.basedata.IUserInfo;
 
-public interface ExchangeMapinfoManager extends BaseEntityManager<ExchangeMapinfo> {
+public interface ExchangeMapinfoManager extends BaseEntityManager<ExchangeMapinfo,Long> {
     public List<String> listDatabaseName();
 
     public List<ExchangeMapinfo> listImportExchangeMapinfo(List<Long> mapinfoId);
@@ -28,7 +29,7 @@ public interface ExchangeMapinfoManager extends BaseEntityManager<ExchangeMapinf
      * @param userDetail
      * @throws SqlResolveException
      */
-    void saveObject(ExchangeMapinfo object, FUserDetail userDetail) throws SqlResolveException;
+    void saveObject(ExchangeMapinfo object, IUserInfo userDetail) throws SqlResolveException;
 
     List<ExchangeMapinfo> listObjectExcludeUsed(Map<String, Object> filterMap, PageDesc pageDesc);
 }

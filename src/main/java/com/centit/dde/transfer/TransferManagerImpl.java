@@ -43,6 +43,7 @@ import com.centit.dde.service.TaskErrorDataManager;
 import com.centit.dde.service.TaskLogManager;
 import com.centit.dde.util.TaskConsoleWriteUtils;
 import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.database.QueryUtils;
 
 public class TransferManagerImpl implements TransferManager {
     private static final Log logger = LogFactory.getLog(TransferManager.class);
@@ -273,7 +274,7 @@ public class TransferManagerImpl implements TransferManager {
         } else {
             PreparedStatement pSouce = null;
             try {
-                List<String> sqlParameters = SQLUtils.getSqlNamedParameters(sql);
+                List<String> sqlParameters = QueryUtils.getSqlNamedParameters(sql);
                 pSouce = souce.prepareStatement(sqlParameters.get(sqlParameters.size() - 1));
                 for (int i = 1; i <= pSouce.getParameterMetaData().getParameterCount(); i++) {
                     String sPN = sqlParameters.get(i - 1);
