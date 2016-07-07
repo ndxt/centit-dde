@@ -8,11 +8,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.centit.dde.po.MapinfoTrigger;
+import com.centit.dde.po.MapinfoTriggerId;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
+import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 
-public class MapinfoTriggerDao extends BaseDaoImpl<MapinfoTrigger> {
-    private static final long serialVersionUID = 1L;
+public class MapinfoTriggerDao extends BaseDaoImpl<MapinfoTrigger,MapinfoTriggerId> {
+
     public static final Log log = LogFactory.getLog(MapinfoTriggerDao.class);
 
     public Map<String, String> getFilterField() {
@@ -51,6 +53,6 @@ public class MapinfoTriggerDao extends BaseDaoImpl<MapinfoTrigger> {
     }
 
     public Long getTriggerId() {
-        return this.getNextLongSequence("D_TRIGGERID");
+        return DatabaseOptUtils.getNextLongSequence(this,"D_TRIGGERID");
     }
 }

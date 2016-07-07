@@ -62,17 +62,17 @@ public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask,Long> {
         return this.getHibernateTemplate().getSessionFactory().openSession().createSQLQuery(sql).list();
     }
     */
-    public List<List<Object>> getSqlValues(DatabaseInfo DatabaseInfo, String sql) {
+    public List<List<Object>> getSqlValues(DatabaseInfo databaseInfo, String sql) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         ResultSetMetaData rsmd = null;
 
         DataSourceDescription dbc = new DataSourceDescription();
-        dbc.setDatabaseCode(DatabaseInfo.getDatabaseCode());
-        dbc.setConnUrl(DatabaseInfo.getDatabaseUrl());
-        dbc.setUsername(DatabaseInfo.getUsername());
-        dbc.setPassword(DatabaseInfo.getClearPassword());    
+        dbc.setDatabaseCode(databaseInfo.getDatabaseCode());
+        dbc.setConnUrl(databaseInfo.getDatabaseUrl());
+        dbc.setUsername(databaseInfo.getUsername());
+        dbc.setPassword(databaseInfo.getClearPassword());    
         
         List<List<Object>> datas = new ArrayList<List<Object>>();
 
@@ -108,7 +108,7 @@ public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask,Long> {
         return datas;
     }
 
-    public List<Object> insertDatas(DatabaseInfo DatabaseInfo, String sql, List<List<Object>> datas) {
+    public List<Object> insertDatas(DatabaseInfo databaseInfo, String sql, List<List<Object>> datas) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         String errorMessage = "成功添加记录";
@@ -117,10 +117,10 @@ public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask,Long> {
         List<Object> logTemp = new ArrayList<Object>();
 
         DataSourceDescription dbc = new DataSourceDescription();
-        dbc.setDatabaseCode(DatabaseInfo.getDatabaseCode());
-        dbc.setConnUrl(DatabaseInfo.getDatabaseUrl());
-        dbc.setUsername(DatabaseInfo.getUsername());
-        dbc.setPassword(DatabaseInfo.getClearPassword());
+        dbc.setDatabaseCode(databaseInfo.getDatabaseCode());
+        dbc.setConnUrl(databaseInfo.getDatabaseUrl());
+        dbc.setUsername(databaseInfo.getUsername());
+        dbc.setPassword(databaseInfo.getClearPassword());
         
         try {
             conn = DbcpConnectPools.getDbcpConnect(dbc);

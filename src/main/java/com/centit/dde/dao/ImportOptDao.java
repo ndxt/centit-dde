@@ -12,17 +12,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.CollectionUtils;
 
-import com.centit.core.dao.BaseDaoImpl;
-import com.centit.core.dao.CodeBook;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.ImportOpt;
-import com.centit.dde.util.ConnPool;
-import com.centit.support.database.config.DirectConnDB;
-import com.centit.support.utils.StringBaseOpt;
+import com.centit.framework.core.dao.CodeBook;
+import com.centit.framework.hibernate.dao.BaseDaoImpl;
+import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.support.database.DataSourceDescription;
+import com.centit.support.database.DbcpConnectPools;
 
-public class ImportOptDao extends BaseDaoImpl<ImportOpt> {
-    private static final long serialVersionUID = 1L;
+public class ImportOptDao extends BaseDaoImpl<ImportOpt,Long> {
 
     public static final Log log = LogFactory.getLog(ImportOptDao.class);
 
@@ -58,11 +57,13 @@ public class ImportOptDao extends BaseDaoImpl<ImportOpt> {
     }
 
     public Long getNextLongSequence() {
-        return getNextLongSequence("D_MAPINFOID");
+        return DatabaseOptUtils.getNextLongSequence(this,"D_MAPINFOID");
     }
     public String getMapinfoName(Long mapinfoId) {
         String hql = "select t.importName from ImportOpt t where t.importId=?" ;
-        List<String> listObjects = getHibernateTemplate().find(hql, mapinfoId);
+        @SuppressWarnings("unchecked")
+        List<String> listObjects = (List<String>)DatabaseOptUtils.findObjectsByHql(
+                this,hql, new Object[]{mapinfoId});
 
         if (!CollectionUtils.isEmpty(listObjects)) {
             return listObjects.get(0).toString();
@@ -71,7 +72,7 @@ public class ImportOptDao extends BaseDaoImpl<ImportOpt> {
 
     }
     public void flush() {
-        getHibernateTemplate().flush();
+        DatabaseOptUtils.flush(this.getCurrentSession());
 
     }
 
@@ -100,16 +101,17 @@ public class ImportOptDao extends BaseDaoImpl<ImportOpt> {
         } catch (SQLException e) {
             throw e;
         } finally {
-            ConnPool.closeConn(conn);
+            conn.close();
         }
         return false;
     }
 
-    private Connection getConn(DatabaseInfo dbinfo) throws SQLException {
-        DirectConnDB connDb = new DirectConnDB();
-        connDb.praiseConnUrl(dbinfo.getDatabaseUrl());
-        connDb.setUser(dbinfo.getUsername());
-        connDb.setPassword(StringBaseOpt.decryptBase64Des(dbinfo.getPassword()));
-        return ConnPool.getConn(connDb);
+    private static Connection getConn(DatabaseInfo dbinfo) throws SQLException {
+        DataSourceDescription dbc = new DataSourceDescription();
+        dbc.setDatabaseCode(dbinfo.getDatabaseCode());
+        dbc.setConnUrl(dbinfo.getDatabaseUrl());
+        dbc.setUsername(dbinfo.getUsername());
+        dbc.setPassword(dbinfo.getClearPassword());        
+        return DbcpConnectPools.getDbcpConnect(dbc);
     }
 }

@@ -1,23 +1,19 @@
 package com.centit.dde.dao;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.springframework.orm.hibernate3.HibernateCallback;
 
-import com.centit.core.dao.BaseDaoImpl;
-import com.centit.core.dao.CodeBook;
 import com.centit.dde.po.TaskLog;
+import com.centit.framework.core.dao.CodeBook;
+import com.centit.framework.hibernate.dao.BaseDaoImpl;
+import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 
-public class TaskLogDao extends BaseDaoImpl<TaskLog> {
-    private static final long serialVersionUID = 1L;
+public class TaskLogDao extends BaseDaoImpl<TaskLog,Long> {
+
     public static final Log logger = LogFactory.getLog(TaskLogDao.class);
 
     public Map<String, String> getFilterField() {
@@ -54,28 +50,10 @@ public class TaskLogDao extends BaseDaoImpl<TaskLog> {
     }
 
     public Long getTaskLogId() {
-        return this.getNextLongSequence("D_TASKLOGID");
+        return DatabaseOptUtils.getNextLongSequence(this,"D_TASKLOGID");
     }
 
-
-    @Override
-    public void saveObject(final TaskLog o) {
-        getHibernateTemplate().execute(new HibernateCallback<TaskLog>() {
-            @Override
-            public TaskLog doInHibernate(Session session) throws HibernateException, SQLException {
-                Transaction tx = session.beginTransaction();
-                try {
-                    session.saveOrUpdate(o);
-                    tx.commit();
-                } catch (HibernateException e) {
-                    logger.error(e);
-
-                    tx.rollback();
-                }
-                return o;
-            }
-        });
-    }
+  @SuppressWarnings("unchecked")
   public List<String[]> taskLogStat(String sType,Object o){
       String sql ="";
       if (sType.equals("year")){
@@ -94,10 +72,7 @@ public class TaskLogDao extends BaseDaoImpl<TaskLog> {
                   "where to_char(trunc(a.run_begin_time,'mm'),'yyyymm')=? "+
                   "GROUP BY to_char(trunc(a.run_begin_time),'yyyy-mm-dd')";
       }
-      return (List<String[]>)this.findObjectsBySql(sql,o);
+      return (List<String[]>)DatabaseOptUtils.findObjectsBySql(this,sql,new Object[]{o});
   }
-    public void flush() {
-        getHibernateTemplate().flush();
-        getHibernateTemplate().clear();
-    }
+
 }

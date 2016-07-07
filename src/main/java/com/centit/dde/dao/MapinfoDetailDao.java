@@ -2,7 +2,6 @@ package com.centit.dde.dao;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -14,19 +13,20 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.transform.Transformers;
 
-import com.centit.core.dao.BaseDaoImpl;
-import com.centit.core.dao.CodeBook;
-import com.centit.core.dao.HQLUtils;
-import com.centit.core.dao.SQLQueryCallBack;
+import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.MapinfoDetail;
-import com.centit.support.utils.StringBaseOpt;
+import com.centit.dde.po.MapinfoDetailId;
+import com.centit.dde.util.ConnPool;
+import com.centit.framework.core.dao.CodeBook;
+import com.centit.framework.hibernate.dao.BaseDaoImpl;
+import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.support.database.DbcpConnect;
+import com.centit.support.database.QueryUtils;
 
-public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
-    private static final long serialVersionUID = 1L;
-
+public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId> {
+    
     public static final Log log = LogFactory.getLog(MapinfoDetailDao.class);
 
 	/*
@@ -73,31 +73,16 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
      * @return 查询数据库中的所有表
      * @throws SQLException
      */
-    public List<String> getTables(DatabaseInfo DatabaseInfo, String dataBaseType) {
+    public List<String> getTables(DatabaseInfo databaseInfo, String dataBaseType) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSetMetaData rsmd = null;
         ResultSet rs = null;
         String sql = null;
         List<String> datas = new ArrayList<String>();
-        if (dataBaseType.equals("1")) {
-            sql = "select name from sysobjects t where xtype in ('U','V')";
-            try {
-                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else if (dataBaseType.equals("2")) {
-            sql = "select table_name from user_tables";
-            try {
-                Class.forName("oracle.jdbc.driver.OracleDriver");
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+       
         try {
-            conn = DriverManager.getConnection(DatabaseInfo.getDatabaseUrl(), DatabaseInfo.getUsername(),
-                    StringBaseOpt.decryptBase64Des(DatabaseInfo.getPassword()));
+            conn = ConnPool.getConn(databaseInfo);
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
             rsmd = pstmt.getMetaData();
@@ -129,7 +114,7 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
         return datas;
     }
 
-    public List<Object> getTable(DatabaseInfo DatabaseInfo, String dataBaseType) {
+    public List<Object> getTable(DatabaseInfo databaseInfo, String dataBaseType) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSetMetaData rsmd = null;
@@ -137,24 +122,9 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
         String sql = null;
 
         List<Object> datas = new ArrayList<Object>();
-        if (dataBaseType.equals("1")) {
-            sql = "select name from sysobjects where xtype='U'and name not like '$%' order by name ";
-            try {
-                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else if (dataBaseType.equals("2")) {
-            sql = "select t.table_name from user_tables t union select v.view_name from user_views v";
-            try {
-                Class.forName("oracle.jdbc.driver.OracleDriver");
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+       
         try {
-            conn = DriverManager.getConnection(DatabaseInfo.getDatabaseUrl(), DatabaseInfo.getUsername(),
-                    StringBaseOpt.decryptBase64Des(DatabaseInfo.getPassword()));
+            conn = ConnPool.getConn(databaseInfo);
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
             rsmd = pstmt.getMetaData();
@@ -190,54 +160,39 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
      * @return 获取源表的字段，字段类型等信息
      */
     public List<Map<String, String>> getSourceTableStruct(DatabaseInfo sourceDatabaseInfo, String sourcetableName) {
-        Connection connSource = null;
+        DbcpConnect connSource = null;
         PreparedStatement pstmtSource = null;
         ResultSet rsSource = null;
         ResultSetMetaData rsmdSource = null;
         List<Map<String, String>> datas = new ArrayList<Map<String, String>>();
         ArrayList<String> keyList = new ArrayList<String>();
-        String sql1 = "select top 1 * from " + sourcetableName;
-        String sql2 = "select * from " + sourcetableName;
+
         try {
-            // SQLServer 数据库连接
-            if (sourceDatabaseInfo.getDatabaseType().equals("1")) {
-                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-				/*
-				 * connGoal =
-				 * DriverManager.getConnection(goalDatabaseInfo.getDatabaseUrl
-				 * (),
-				 * goalDatabaseInfo.getUsername(),goalDatabaseInfo.getPassword
-				 * ());
-				 */
-            }
-            // Oracle数据库连接
-            if (sourceDatabaseInfo.getDatabaseType().equals("2")) {
-                Class.forName("oracle.jdbc.driver.OracleDriver");
-            }
-            connSource = DriverManager.getConnection(sourceDatabaseInfo.getDatabaseUrl(),
-                    sourceDatabaseInfo.getUsername(), StringBaseOpt.decryptBase64Des(sourceDatabaseInfo.getPassword()));
-            DatabaseMetaData meta = DriverManager.getConnection(sourceDatabaseInfo.getDatabaseUrl(),
-                    sourceDatabaseInfo.getUsername(), StringBaseOpt.decryptBase64Des(sourceDatabaseInfo.getPassword()))
-                    .getMetaData();
+          
+            connSource =ConnPool.getConn(sourceDatabaseInfo);
+            DatabaseMetaData meta = connSource.getMetaData();
             ResultSet rsKey = meta.getPrimaryKeys(null, null, sourcetableName);
             while (rsKey.next()) {
                 keyList.add(rsKey.getString(4));
             }
-            if (sourceDatabaseInfo.getDatabaseType().equals("1")) {
-                pstmtSource = connSource.prepareStatement(sql1);
-				/*
-				 * connGoal =
-				 * DriverManager.getConnection(goalDatabaseInfo.getDatabaseUrl
-				 * (),
-				 * goalDatabaseInfo.getUsername(),goalDatabaseInfo.getPassword
-				 * ());
-				 */
+            switch(connSource.getDatabaseType()){
+            case SqlServer:
+                pstmtSource = connSource.prepareStatement( "select top 1 * from " + sourcetableName);
+                break;
+            case Oracle:
+                pstmtSource = connSource.prepareStatement( "select * from " + sourcetableName+" where rownum<2");
+                break;
+            case MySql:
+                pstmtSource = connSource.prepareStatement( "select * from " + sourcetableName+" limit 1");
+                break;
+            case DB2:
+                pstmtSource = connSource.prepareStatement( "select * from " + sourcetableName+" fetch first 1 row only");
+                break;
+            default:
+                pstmtSource = connSource.prepareStatement( "select * from " + sourcetableName);
+                break;				
             }
-            // Oracle数据库连接
-            if (sourceDatabaseInfo.getDatabaseType().equals("2")) {
-                pstmtSource = connSource.prepareStatement(sql2);
-            }
-			/* pstmtSource = connSource.prepareStatement(sql); */
+          
             rsSource = pstmtSource.executeQuery();
             rsmdSource = pstmtSource.getMetaData();
             int columnCount = rsmdSource.getColumnCount();
@@ -261,8 +216,6 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
 
         } catch (SQLException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         } finally {
             try {
                 if (rsSource != null)
@@ -279,30 +232,25 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
         return datas;
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Map<String, String>> getSourceTableStructFromDatabase(Long mapinfoId) {
+
+    public JSONArray getSourceTableStructFromDatabase(Long mapinfoId) {
         String sql = "select t.source_field_name as ColumnName,t.source_field_type as ColumnType,t.source_field_sentence as SOURCECOLUMNSENTENCE from D_MAPINFO_DETAIL t where t.mapinfo_id="
                 + mapinfoId + " order by t.column_no";
-        SQLQueryCallBack sqlQuery = new SQLQueryCallBack(sql);
-        sqlQuery.setTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-        return (List<Map<String, String>>) this.findObjectsBySqlQuery(sqlQuery);
+        return  DatabaseOptUtils.findObjectsAsJSonBySql(this, sql);
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Map<String, String>> getGoalTableStructFromDatabase(Long mapinfoId) {
+    public JSONArray getGoalTableStructFromDatabase(Long mapinfoId) {
         String sql = "select t.dest_field_name as ColumnName,t.dest_field_type as ColumnType,t.is_pk as isPk,t.is_null as isNullable,t.dest_field_default as destfielddefault from D_MAPINFO_DETAIL "
                 + "t where t.mapinfo_id=" + mapinfoId + " order by t.column_no";
 
-        SQLQueryCallBack sqlQuery = new SQLQueryCallBack(sql);
-        sqlQuery.setTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-        return (List<Map<String, String>>) this.findObjectsBySqlQuery(sqlQuery);
+        return  DatabaseOptUtils.findObjectsAsJSonBySql(this, sql);
     }
 
     /**
      * @param
      * @return 获取目标表的字段，字段类型等信息
      */
-    public List<Map<String, String>> getGoalTableStruct(DatabaseInfo GoalDatabaseInfo, String GoaltableName) {
+    public List<Map<String, String>> getGoalTableStruct(DatabaseInfo goalDatabaseInfo, String GoaltableName) {
         Connection connGoal = null;
         PreparedStatement pstmtGoal = null;
         ResultSet rsGoal = null;
@@ -311,26 +259,9 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
         ArrayList<String> keyList = new ArrayList<String>();
         String sql = "select * from " + GoaltableName;
         try {
-            // SQLServer 数据库连接
-            if (GoalDatabaseInfo.getDatabaseType().equals("1")) {
-                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-				/*
-				 * connGoal =
-				 * DriverManager.getConnection(goalDatabaseInfo.getDatabaseUrl
-				 * (),
-				 * goalDatabaseInfo.getUsername(),goalDatabaseInfo.getPassword
-				 * ());
-				 */
-            }
-            // Oracle数据库连接
-            if (GoalDatabaseInfo.getDatabaseType().equals("2")) {
-                Class.forName("oracle.jdbc.driver.OracleDriver");
-            }
-            connGoal = DriverManager.getConnection(GoalDatabaseInfo.getDatabaseUrl(), GoalDatabaseInfo.getUsername(),
-                    StringBaseOpt.decryptBase64Des(GoalDatabaseInfo.getPassword()));
-            DatabaseMetaData meta = DriverManager.getConnection(GoalDatabaseInfo.getDatabaseUrl(),
-                    GoalDatabaseInfo.getUsername(), StringBaseOpt.decryptBase64Des(GoalDatabaseInfo.getPassword()))
-                    .getMetaData();
+           
+            connGoal = ConnPool.getConn(goalDatabaseInfo);
+            DatabaseMetaData meta = connGoal.getMetaData();
             ResultSet rsKey = meta.getPrimaryKeys(null, null, GoaltableName);
             // String keyColumn = null;
             while (rsKey.next()) {
@@ -359,8 +290,6 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             try {
@@ -412,7 +341,7 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
 
         String hql = "delete from MapinfoDetail d where d.cid.mapinfoId = ?";
 
-        super.doExecuteHql(hql, mapinfoId);
+        DatabaseOptUtils.doExecuteHql(this,hql, mapinfoId);
     }
 
     /**
@@ -420,10 +349,10 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
      */
     public void updateExchangeMapinfo(Long mapinfoId, String soueceTableName, String goalTableName, String createSql) {
         String sql = "update D_EXCHANGE_MAPINFO t set t.source_tablename="
-                + HQLUtils.buildHqlStringForSQL(soueceTableName) + ",t.dest_tablename="
-                + HQLUtils.buildHqlStringForSQL(goalTableName) + ",t.QUERY_SQL="
-                + HQLUtils.buildHqlStringForSQL(createSql) + " where t.mapinfo_id=" + mapinfoId;
-        this.doExecuteSql(sql);
+                + QueryUtils.buildStringForQuery(soueceTableName) + ",t.dest_tablename="
+                + QueryUtils.buildStringForQuery(goalTableName) + ",t.QUERY_SQL="
+                + QueryUtils.buildStringForQuery(createSql) + " where t.mapinfo_id=" + mapinfoId;
+        DatabaseOptUtils.doExecuteHql(this,sql);
     }
 
     @SuppressWarnings("unchecked")
@@ -436,10 +365,10 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
             int i = 0;
             while (i < length) {
                 String sql = "update d_mapinfo_detail t set t.source_field_sentence="
-                        + HQLUtils.buildHqlStringForSQL(sFieldDescs.get(i)) + ",t.source_field_name="
-                        + HQLUtils.buildHqlStringForSQL(sStrs.get(i)) + "  where t.column_no=" + (i + 1)
+                        + QueryUtils.buildStringForQuery(sFieldDescs.get(i)) + ",t.source_field_name="
+                        + QueryUtils.buildStringForQuery(sStrs.get(i)) + "  where t.column_no=" + (i + 1)
                         + " and t.mapinfo_id=" + mapinfoId;
-                this.doExecuteSql(sql);
+                DatabaseOptUtils.doExecuteHql(this,sql);
                 i++;
             }
             while (i >= length && i < sStrs.size()) {
@@ -448,10 +377,10 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
                         + ","
                         + (i + 1)
                         + ","
-                        + HQLUtils.buildHqlStringForSQL(sFieldDescs.get(i))
+                        + QueryUtils.buildStringForQuery(sFieldDescs.get(i))
                         + ","
-                        + HQLUtils.buildHqlStringForSQL(sStrs.get(i)) + ")";
-                this.doExecuteSql(sql);
+                        + QueryUtils.buildStringForQuery(sStrs.get(i)) + ")";
+                DatabaseOptUtils.doExecuteHql(this,sql);
                 i++;
             }
 
@@ -462,10 +391,10 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
                     sStrs.add(j, null);
                 }
                 String sql = "update d_mapinfo_detail t set t.source_field_sentence="
-                        + HQLUtils.buildHqlStringForSQL(sFieldDescs.get(i)) + ",t.source_field_name="
-                        + HQLUtils.buildHqlStringForSQL(sStrs.get(i)) + " where t.column_no=" + (i + 1)
+                        + QueryUtils.buildStringForQuery(sFieldDescs.get(i)) + ",t.source_field_name="
+                        + QueryUtils.buildStringForQuery(sStrs.get(i)) + " where t.column_no=" + (i + 1)
                         + " and t.mapinfo_id=" + mapinfoId;
-                this.doExecuteSql(sql);
+                DatabaseOptUtils.doExecuteHql(this,sql);
             }
         }
     }
@@ -473,25 +402,24 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail> {
     private long countSourceField() {
         String hql = "select count(t.sourceFieldName) as length from MapinfoDetail t";
 
-        return this.getSingleIntByHql(hql);
+        return DatabaseOptUtils.getSingleIntByHql(this,hql);
     }
 
     public Long getMapinfoId() {
-        return this.getNextLongSequence("D_MAPINFOID");
+        return DatabaseOptUtils.getNextLongSequence(this,"D_MAPINFOID");
     }
 
     @SuppressWarnings("unchecked")
     public List<String> getGoalColumnStrut(Long mapinfoId) {
         String sql = "select t.dest_field_name from D_MAPINFO_DETAIL t where t.mapinfo_id=" + mapinfoId
                 + " order by t.column_no";
-        return (List<String>) this.findObjectsBySql(sql);
+        return (List<String>) DatabaseOptUtils.findObjectsBySql(this,sql);
 
     }
 
     public void saveMapinfoDetails(MapinfoDetail mapinfoDetail) {
-        this.getHibernateTemplate().flush();
-        this.getHibernateTemplate().clear();
-        this.save(mapinfoDetail);
+        DatabaseOptUtils.flush(this.getCurrentSession());
+        this.saveObject(mapinfoDetail);
     }
 
 }
