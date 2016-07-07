@@ -37,7 +37,6 @@ import com.centit.dde.po.TaskLog;
 import com.centit.dde.service.TaskDetailLogManager;
 import com.centit.dde.service.TaskErrorDataManager;
 import com.centit.dde.service.TaskLogManager;
-import com.centit.dde.util.ConnPool;
 import com.centit.dde.util.ItemValue;
 import com.centit.dde.util.TaskConsoleWriteUtils;
 import com.centit.dde.ws.UploadData;

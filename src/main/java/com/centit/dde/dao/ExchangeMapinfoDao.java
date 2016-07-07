@@ -1,24 +1,20 @@
 package com.centit.dde.dao;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.springframework.orm.hibernate3.HibernateCallback;
 
-import com.centit.core.dao.BaseDaoImpl;
-import com.centit.core.dao.CodeBook;
-import com.centit.core.utils.PageDesc;
 import com.centit.dde.po.ExchangeMapinfo;
+import com.centit.framework.core.dao.CodeBook;
+import com.centit.framework.core.dao.PageDesc;
+import com.centit.framework.hibernate.dao.BaseDaoImpl;
+import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.support.database.QueryUtils;
 
-public class ExchangeMapinfoDao extends BaseDaoImpl<ExchangeMapinfo> {
-    private static final long serialVersionUID = 1L;
+public class ExchangeMapinfoDao extends BaseDaoImpl<ExchangeMapinfo,Long> {
     public static final Log log = LogFactory.getLog(ExchangeMapinfoDao.class);
 
     public Map<String, String> getFilterField() {
@@ -50,8 +46,10 @@ public class ExchangeMapinfoDao extends BaseDaoImpl<ExchangeMapinfo> {
         return filterField;
     }
 
+    @SuppressWarnings("unchecked")
     public List<String> listDatabaseName() {
-        return (List<String>) this.findObjectsByHql("select t.databaseName from DatabaseInfo t");
+        return (List<String>) DatabaseOptUtils.findObjectsByHql(this,
+                "select t.databaseName from DatabaseInfo t");
         //return this.getHibernateTemplate().getSessionFactory().openSession().createSQLQuery("select t.databaseName from DatabaseInfo t").list();
     }
 
@@ -64,37 +62,27 @@ public class ExchangeMapinfoDao extends BaseDaoImpl<ExchangeMapinfo> {
     }
 
     public Long getNextLongSequence() {
-        return getNextLongSequence("D_MAPINFOID");
+        return DatabaseOptUtils.getNextLongSequence(this,"D_MAPINFOID");
     }
 
 
     public void flush() {
-        getHibernateTemplate().flush();
-        getHibernateTemplate().clear();
+        DatabaseOptUtils.flush(this.getCurrentSession());
+        //getHibernateTemplate().clear();
     }
 
 
+    @SuppressWarnings("unchecked")
     public List<ExchangeMapinfo> listObjectExcludeUsed(final Map<String, Object> filterMap, final PageDesc pageDesc) {
         final String hql = "from ExchangeMapinfo ma where not exists (select m.mapinfoId from ExchangeMapinfo m, ExchangeTask t " +
                 " join m.exchangeTaskdetails etd " +
                 " where ma.mapinfoId = m.mapinfoId and etd.cid.mapinfoId = m.mapinfoId and etd.cid.taskId = t.taskId" +
                 " and etd.cid.taskId = :taskId )";
-
-
-        return getHibernateTemplate().executeFind(new HibernateCallback<List<ExchangeMapinfo>>() {
-            @Override
-            public List<ExchangeMapinfo> doInHibernate(Session session) throws HibernateException, SQLException {
-                Query query = session.createQuery("select count(ma.mapinfoId) " + hql);
-                query.setParameter("taskId", filterMap.get("taskId"));
-                pageDesc.setTotalRows(((Long) query.uniqueResult()).intValue());
-
-
-                query = session.createQuery("select ma " + hql).setParameter("taskId", filterMap.get("taskId"))
-                        .setFirstResult(pageDesc.getRowStart()).setMaxResults(pageDesc.getPageSize());
-
-                return query.list();
-            }
-        });
-
+       /* pageDesc.setTotalRows( Long.valueOf( DatabaseOptUtils.getSingleIntByHql(this,
+                "select count(ma.mapinfoId) " + hql)).intValue()
+                );*/
+        return (List<ExchangeMapinfo>)DatabaseOptUtils.findObjectsByHql(this, "select ma " + hql,  
+                QueryUtils.createSqlParamsMap(
+                        "taskId", filterMap.get("taskId")) , pageDesc);
     }
 }

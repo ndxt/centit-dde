@@ -10,8 +10,7 @@ import com.centit.dde.po.DataOptStep;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 
-public class DataOptStepDao extends BaseDaoImpl<DataOptStep> {
-    private static final long serialVersionUID = 1L;
+public class DataOptStepDao extends BaseDaoImpl<DataOptStep,Long> {
     public static final Log log = LogFactory.getLog(DataOptStepDao.class);
 
     public Map<String, String> getFilterField() {

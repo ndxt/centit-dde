@@ -7,13 +7,14 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.centit.core.dao.BaseDaoImpl;
-import com.centit.core.dao.CodeBook;
 import com.centit.dde.po.DataOptInfo;
 import com.centit.dde.po.DataOptStep;
+import com.centit.framework.core.dao.CodeBook;
+import com.centit.framework.hibernate.dao.BaseDaoImpl;
+import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.support.database.QueryUtils;
 
-public class DataOptInfoDao extends BaseDaoImpl<DataOptInfo> {
-    private static final long serialVersionUID = 1L;
+public class DataOptInfoDao extends BaseDaoImpl<DataOptInfo,String> {
 
     public static final Log log = LogFactory.getLog(DataOptInfoDao.class);
 
@@ -36,11 +37,11 @@ public class DataOptInfoDao extends BaseDaoImpl<DataOptInfo> {
     }
 
     public void flush() {
-        getHibernateTemplate().flush();
+        DatabaseOptUtils.flush(this.getCurrentSession());
     }
 
     public Long getNextLongSequence() {
-        return getNextLongSequence("D_MAPINFOID");
+        return DatabaseOptUtils.getNextLongSequence(this,"D_MAPINFOID");
     }
 
     @SuppressWarnings("unchecked")
@@ -49,6 +50,8 @@ public class DataOptInfoDao extends BaseDaoImpl<DataOptInfo> {
                 + "from DataOptStep dos, ImportOpt io, DataOptInfo doi "
                 + "where dos.importId = io.importId and dos.dataOptId = doi.dataOptId and doi.dataOptId = :dataOptId order by dos.mapinfoOrder";
 
-        return getHibernateTemplate().findByNamedParam(hql, "dataOptId", object.getDataOptId());
+        return (List<DataOptStep>) DatabaseOptUtils.findObjectsByHql(this,hql, 
+                QueryUtils.createSqlParamsMap(
+                        "dataOptId", object.getDataOptId()));
     }
 }

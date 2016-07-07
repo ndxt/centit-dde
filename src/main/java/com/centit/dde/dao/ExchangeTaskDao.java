@@ -1,7 +1,6 @@
 package com.centit.dde.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -15,14 +14,15 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.centit.core.dao.BaseDaoImpl;
-import com.centit.core.dao.CodeBook;
 import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.ExchangeTask;
-import com.centit.support.utils.StringBaseOpt;
+import com.centit.framework.core.dao.CodeBook;
+import com.centit.framework.hibernate.dao.BaseDaoImpl;
+import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.support.database.DataSourceDescription;
+import com.centit.support.database.DbcpConnectPools;
 
-public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask> {
-    private static final long serialVersionUID = 1L;
+public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask,Long> {
     public static final Log log = LogFactory.getLog(ExchangeTaskDao.class);
 
     public Map<String, String> getFilterField() {
@@ -68,22 +68,16 @@ public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask> {
         ResultSet rs = null;
         ResultSetMetaData rsmd = null;
 
+        DataSourceDescription dbc = new DataSourceDescription();
+        dbc.setDatabaseCode(DatabaseInfo.getDatabaseCode());
+        dbc.setConnUrl(DatabaseInfo.getDatabaseUrl());
+        dbc.setUsername(DatabaseInfo.getUsername());
+        dbc.setPassword(DatabaseInfo.getClearPassword());    
+        
         List<List<Object>> datas = new ArrayList<List<Object>>();
-        if (DatabaseInfo.getDatabaseType().equals("1")) {
-            try {
-                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else if (DatabaseInfo.getDatabaseType().equals("2")) {
-            try {
-                Class.forName("oracle.jdbc.driver.OracleDriver");
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+
         try {
-            conn = DriverManager.getConnection(DatabaseInfo.getDatabaseUrl(), DatabaseInfo.getUsername(), StringBaseOpt.decryptBase64Des(DatabaseInfo.getPassword()));
+            conn = DbcpConnectPools.getDbcpConnect(dbc);
             pstmt = conn.prepareStatement(sql);
             rsmd = pstmt.getMetaData();
             rs = pstmt.executeQuery();
@@ -122,21 +116,14 @@ public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask> {
         List<Object> logs = new ArrayList<Object>();
         List<Object> logTemp = new ArrayList<Object>();
 
-        if (DatabaseInfo.getDatabaseType().equals("1")) {
-            try {
-                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else if (DatabaseInfo.getDatabaseType().equals("2")) {
-            try {
-                Class.forName("oracle.jdbc.driver.OracleDriver");
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+        DataSourceDescription dbc = new DataSourceDescription();
+        dbc.setDatabaseCode(DatabaseInfo.getDatabaseCode());
+        dbc.setConnUrl(DatabaseInfo.getDatabaseUrl());
+        dbc.setUsername(DatabaseInfo.getUsername());
+        dbc.setPassword(DatabaseInfo.getClearPassword());
+        
         try {
-            conn = DriverManager.getConnection(DatabaseInfo.getDatabaseUrl(), DatabaseInfo.getUsername(), StringBaseOpt.decryptBase64Des(DatabaseInfo.getPassword()));
+            conn = DbcpConnectPools.getDbcpConnect(dbc);
             pstmt = conn.prepareStatement(sql);
         } catch (SQLException e1) {
             e1.printStackTrace();
@@ -176,7 +163,7 @@ public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask> {
 
     public String getMapinfoName(Long mapinfoId) {
         String hql = "select t.mapinfoName from ExchangeMapinfo t where t.mapinfoId=" + mapinfoId;
-        Object o = this.getSingleObjectByHql(hql);
+        Object o = DatabaseOptUtils.getSingleObjectByHql(this,hql);
         if (o == null)
             return "";
         return o.toString();
@@ -184,7 +171,7 @@ public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask> {
     }
 
     public Long getNewTaskId() {
-        return this.getNextLongSequence("D_TASK_ID");
+        return DatabaseOptUtils.getNextLongSequence(this,"D_TASK_ID");
     }
 
 

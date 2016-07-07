@@ -107,11 +107,6 @@ public class DatabaseInfo implements Serializable {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
-
-    
-   
-
-
     // Constructors
 
     /**
