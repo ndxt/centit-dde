@@ -16,7 +16,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.CollectionUtils;
 
 import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportFieldId;
 import com.centit.dde.po.ExportSql;

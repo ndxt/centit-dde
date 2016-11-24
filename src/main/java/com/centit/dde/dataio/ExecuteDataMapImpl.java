@@ -19,18 +19,14 @@ import org.springframework.jdbc.support.lob.LobCreator;
 import org.springframework.jdbc.support.lob.LobHandler;
 
 import com.centit.dde.dao.DataOptInfoDao;
-import com.centit.dde.dao.DatabaseInfoDao;
 import com.centit.dde.dao.ImportOptDao;
-import com.centit.dde.dao.OsInfoDao;
 import com.centit.dde.datafile.TableFileReader;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.DataOptInfo;
 import com.centit.dde.po.DataOptStep;
-import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.ImportField;
 import com.centit.dde.po.ImportOpt;
 import com.centit.dde.po.ImportTrigger;
-import com.centit.dde.po.OsInfo;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskErrorData;
 import com.centit.dde.po.TaskLog;

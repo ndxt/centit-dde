@@ -11,13 +11,11 @@ import org.springframework.util.StringUtils;
 
 import com.centit.dde.dao.ExportSqlDao;
 import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportFieldId;
 import com.centit.dde.po.ExportSql;
 import com.centit.dde.po.ExportTrigger;
 import com.centit.dde.po.ExportTriggerId;
-import com.centit.dde.service.DatabaseInfoManager;
 import com.centit.dde.service.ExportFieldManager;
 import com.centit.dde.service.ExportSqlManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;

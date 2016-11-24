@@ -11,13 +11,11 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.centit.dde.dao.DatabaseInfoDao;
 import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.dao.ExchangeTaskdetailDao;
 import com.centit.dde.dao.ExportSqlDao;
 import com.centit.dde.datafile.ExchangeFileWriter;
 import com.centit.dde.datafile.TableFileWriter;
-import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.po.ExchangeTaskdetail;
 import com.centit.dde.po.ExportField;

@@ -23,13 +23,9 @@ import com.centit.core.action.BaseEntityDwzAction;
 import com.centit.core.utils.DwzResultParam;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.DataOptStep;
-import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.ImportField;
 import com.centit.dde.po.ImportOpt;
-import com.centit.dde.po.OsInfo;
-import com.centit.dde.service.DatabaseInfoManager;
 import com.centit.dde.service.ImportOptManager;
-import com.centit.dde.service.OsInfoManager;
 import com.centit.sys.security.FUserDetail;
 import com.centit.sys.util.SysParametersUtils;
 

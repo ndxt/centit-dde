@@ -24,13 +24,11 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
-import com.centit.dde.dao.DatabaseInfoDao;
 import com.centit.dde.dao.ExchangeMapinfoDao;
 import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.dao.ExchangeTaskdetailDao;
 import com.centit.dde.dao.MapinfoTriggerDao;
 import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.ExchangeMapinfo;
 import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.po.ExchangeTaskdetail;

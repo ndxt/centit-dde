@@ -3,7 +3,6 @@ package com.centit.dde.dataio;
 import com.centit.dde.datafile.TableFileReader;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ImportOpt;
-import com.centit.dde.po.OsInfo;
 import com.centit.dde.ws.WsDataException;
 
 public interface ExecuteDataMap {

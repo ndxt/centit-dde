@@ -13,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.CollectionUtils;
 
 import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.ImportOpt;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;

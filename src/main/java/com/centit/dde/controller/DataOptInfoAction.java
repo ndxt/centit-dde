@@ -13,10 +13,8 @@ import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.DataOptInfo;
 import com.centit.dde.po.DataOptStep;
 import com.centit.dde.po.ImportOpt;
-import com.centit.dde.po.OsInfo;
 import com.centit.dde.service.DataOptInfoManager;
 import com.centit.dde.service.ImportOptManager;
-import com.centit.dde.service.OsInfoManager;
 import com.centit.sys.security.FUserDetail;
 import com.centit.sys.util.SysParametersUtils;
 

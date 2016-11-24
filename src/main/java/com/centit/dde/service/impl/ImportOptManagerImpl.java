@@ -11,10 +11,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.centit.dde.dao.DatabaseInfoDao;
 import com.centit.dde.dao.ImportOptDao;
 import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.ImportField;
 import com.centit.dde.po.ImportFieldId;
 import com.centit.dde.po.ImportOpt;

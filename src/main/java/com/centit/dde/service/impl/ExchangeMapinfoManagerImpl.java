@@ -11,13 +11,11 @@ import org.springframework.util.StringUtils;
 
 import com.centit.dde.dao.ExchangeMapinfoDao;
 import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.ExchangeMapinfo;
 import com.centit.dde.po.MapinfoDetail;
 import com.centit.dde.po.MapinfoDetailId;
 import com.centit.dde.po.MapinfoTrigger;
 import com.centit.dde.po.MapinfoTriggerId;
-import com.centit.dde.service.DatabaseInfoManager;
 import com.centit.dde.service.ExchangeMapinfoManager;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;

@@ -2,7 +2,6 @@ package com.centit.dde.transfer;
 
 import java.sql.Connection;
 
-import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.util.ConnPool;
 import com.centit.support.database.DataSourceDescription;
 import com.centit.support.database.DbcpConnect;

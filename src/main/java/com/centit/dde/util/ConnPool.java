@@ -3,7 +3,6 @@ package com.centit.dde.util;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import com.centit.dde.po.DatabaseInfo;
 import com.centit.support.database.DBType;
 import com.centit.support.database.DataSourceDescription;
 import com.centit.support.database.DbcpConnect;

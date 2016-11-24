@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.common.util.CollectionUtils;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 
-import com.centit.dde.po.DatabaseInfo;
 import com.centit.dde.po.UserDataOptId;
 import com.centit.dde.service.UserDataOptIdManager;
 import com.centit.framework.common.SysParametersUtils;
