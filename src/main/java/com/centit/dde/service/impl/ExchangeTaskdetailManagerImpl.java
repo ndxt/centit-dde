@@ -1,6 +1,5 @@
 package com.centit.dde.service.impl;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -12,9 +11,9 @@ import com.centit.dde.po.ExchangeTaskdetailId;
 import com.centit.dde.service.ExchangeTaskdetailManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
-public class ExchangeTaskdetailManagerImpl extends BaseEntityManagerImpl<ExchangeTaskdetail> implements
-        ExchangeTaskdetailManager {
-    private static final long serialVersionUID = 1L;
+public class ExchangeTaskdetailManagerImpl
+        extends BaseEntityManagerImpl<ExchangeTaskdetail,ExchangeTaskdetailId,ExchangeTaskdetailDao>
+        implements ExchangeTaskdetailManager {
 
     public static final Log log = LogFactory.getLog(ExchangeTaskdetailManager.class);
 
@@ -50,7 +49,7 @@ public class ExchangeTaskdetailManagerImpl extends BaseEntityManagerImpl<Exchang
     }
 
     @Override
-    public void deleteObjectById(Serializable id) {
+    public void deleteObjectById(ExchangeTaskdetailId id) {
         ExchangeTaskdetail dbObject = getObjectById(id);
         Long mapinfoOrder = dbObject.getMapinfoOrder();
         exchangeTaskdetailDao.updateDetailOrder(dbObject.getTaskId(), mapinfoOrder);

@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 
 import com.centit.dde.dao.ExchangeTaskDao;
@@ -17,10 +18,11 @@ import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.service.ExchangeTaskManager;
 import com.centit.dde.transfer.TransferManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 
-public class ExchangeTaskManagerImpl extends BaseEntityManagerImpl<ExchangeTask> 
-    implements ExchangeTaskManager,
-        IQuartzJobBean {
+public class ExchangeTaskManagerImpl
+        extends BaseEntityManagerImpl<ExchangeTask,Long,ExchangeTaskDao>
+        implements ExchangeTaskManager, org.quartz.Job {
     private static final long serialVersionUID = 1L;
 
     public static final Log logger = LogFactory.getLog(ExchangeTaskManager.class);
@@ -94,8 +96,9 @@ public class ExchangeTaskManagerImpl extends BaseEntityManagerImpl<ExchangeTask>
         return this.exchangeTaskDao.getNewTaskId();
     }
 
-    @Override
-    public void executeInternal(JobExecutionContext jobexecutioncontext) {
+
+    public void execute(JobExecutionContext jobexecutioncontext) {
+
         Long taskId = jobexecutioncontext.getJobDetail().getJobDataMap().getLong(EXCHANGE_TASK_ID);
 
         // 判断启用禁用

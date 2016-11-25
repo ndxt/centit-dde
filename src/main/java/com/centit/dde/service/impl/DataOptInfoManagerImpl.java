@@ -3,6 +3,7 @@ package com.centit.dde.service.impl;
 import java.util.Date;
 import java.util.List;
 
+import com.centit.framework.model.basedata.IUserInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -13,8 +14,9 @@ import com.centit.dde.po.DataOptStep;
 import com.centit.dde.service.DataOptInfoManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
-public class DataOptInfoManagerImpl extends BaseEntityManagerImpl<DataOptInfo> implements DataOptInfoManager {
-    private static final long serialVersionUID = 1L;
+public class DataOptInfoManagerImpl
+        extends BaseEntityManagerImpl<DataOptInfo,String,DataOptInfoDao>
+        implements DataOptInfoManager {
 
     public static final Log log = LogFactory.getLog(DataOptInfoManager.class);
 
@@ -29,10 +31,10 @@ public class DataOptInfoManagerImpl extends BaseEntityManagerImpl<DataOptInfo> i
     }
 
     @Override
-    public void saveObject(DataOptInfo object, FUserDetail userDetail) throws SqlResolveException {
-        DataOptInfo dbObject = getObject(object);
+    public void saveObject(DataOptInfo object, IUserInfo userDetail) throws SqlResolveException {
+        DataOptInfo dbObject = dataOptInfoDao.getObjectById(object.getDataOptId());
         if (null == dbObject) {
-            object.setCreated(userDetail.getUsercode());
+            object.setCreated(userDetail.getUserCode());
             object.setCreateTime(new Date());
 
             setDataOptStep(object);

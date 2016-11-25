@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.support.database.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
@@ -19,10 +21,11 @@ import com.centit.dde.po.MapinfoTriggerId;
 import com.centit.dde.service.ExchangeMapinfoManager;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 
-public class ExchangeMapinfoManagerImpl extends BaseEntityManagerImpl<ExchangeMapinfo> implements
+public class ExchangeMapinfoManagerImpl
+        extends BaseEntityManagerImpl<ExchangeMapinfo,Long,ExchangeMapinfoDao> implements
         ExchangeMapinfoManager {
-    private static final long serialVersionUID = 1L;
 
     public static final Log log = LogFactory.getLog(ExchangeMapinfoManager.class);
 
@@ -33,12 +36,6 @@ public class ExchangeMapinfoManagerImpl extends BaseEntityManagerImpl<ExchangeMa
     public void setExchangeMapinfoDao(ExchangeMapinfoDao baseDao) {
         this.exchangeMapinfoDao = baseDao;
         setBaseDao(this.exchangeMapinfoDao);
-    }
-
-    private DatabaseInfoManager databaseInfoManager;
-
-    public void setDatabaseInfoManager(DatabaseInfoManager databaseInfoManager) {
-        this.databaseInfoManager = databaseInfoManager;
     }
 
     public List<String> listDatabaseName() {
@@ -75,7 +72,7 @@ public class ExchangeMapinfoManagerImpl extends BaseEntityManagerImpl<ExchangeMa
             triggerSql = triggerSql.toUpperCase();
             et.setTriggerSql(triggerSql);
 
-            List<String> names = SQLUtils.getSqlNamedParameters(triggerSql);
+            List<String> names = QueryUtils.getSqlNamedParameters(triggerSql);
             if (1 == names.size()) {
                 continue;
             }
@@ -125,8 +122,8 @@ public class ExchangeMapinfoManagerImpl extends BaseEntityManagerImpl<ExchangeMa
     }
 
     @Override
-    public void saveObject(ExchangeMapinfo object, FUserDetail userDetail) throws SqlResolveException {
-        ExchangeMapinfo dbObject = getObject(object);
+    public void saveObject(ExchangeMapinfo object, IUserInfo userDetail) throws SqlResolveException {
+        ExchangeMapinfo dbObject = exchangeMapinfoDao.getObjectById(object.getMapinfoId());
         if (null == dbObject) {
             object.setMapinfoId(exchangeMapinfoDao.getNextLongSequence());
             setFieldTriggerCid(object);

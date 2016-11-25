@@ -6,8 +6,9 @@ import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportSql;
 import com.centit.framework.core.service.BaseEntityManager;
+import com.centit.framework.model.basedata.IUserInfo;
 
-public interface ExportSqlManager extends BaseEntityManager<ExportSql> {
+public interface ExportSqlManager extends BaseEntityManager<ExportSql,Long> {
 
     /**
      * 验证Sql有效性
@@ -24,7 +25,7 @@ public interface ExportSqlManager extends BaseEntityManager<ExportSql> {
      * @param userDetail
      * @throws SqlResolveException
      */
-    void saveObject(ExportSql object, FUserDetail userDetail) throws SqlResolveException;
+    void saveObject(ExportSql object, IUserInfo userDetail) throws SqlResolveException;
 
     /**
      * 根据 querysql 检查sql语句的有效性并且返回字段信息

@@ -23,6 +23,7 @@ import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.support.database.DbcpConnect;
 import com.centit.support.database.QueryUtils;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 
 public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId> {
     

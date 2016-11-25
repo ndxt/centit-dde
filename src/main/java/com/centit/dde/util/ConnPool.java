@@ -7,6 +7,7 @@ import com.centit.support.database.DBType;
 import com.centit.support.database.DataSourceDescription;
 import com.centit.support.database.DbcpConnect;
 import com.centit.support.database.DbcpConnectPools;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 
 public class ConnPool {
   

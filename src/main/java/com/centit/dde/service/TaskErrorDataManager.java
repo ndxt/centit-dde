@@ -24,7 +24,7 @@ import com.centit.framework.core.service.BaseEntityManager;
  *
  * @author codefan@hotmail.com
  */
-public interface TaskErrorDataManager extends BaseEntityManager<TaskErrorData> {
+public interface TaskErrorDataManager extends BaseEntityManager<TaskErrorData,Long> {
     public Long getTaskErrorId();
 
     public void saveTaskErrorData(TaskErrorData taskErrorData);

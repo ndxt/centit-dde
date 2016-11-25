@@ -47,12 +47,6 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql> imple
         setBaseDao(this.exportSqlDao);
     }
 
-    private DatabaseInfoManager databaseInfoManager;
-
-    public void setDatabaseInfoManager(DatabaseInfoManager databaseInfoManager) {
-        this.databaseInfoManager = databaseInfoManager;
-    }
-
     @Override
     public void validator(ExportSql object) throws SqlResolveException {
         if (!StringUtils.hasText(object.getQuerySql())) {

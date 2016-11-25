@@ -19,6 +19,7 @@ import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.support.database.DataSourceDescription;
 import com.centit.support.database.DbcpConnectPools;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 
 public class ImportOptDao extends BaseDaoImpl<ImportOpt,Long> {
 

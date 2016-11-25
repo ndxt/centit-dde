@@ -4,8 +4,9 @@ import java.util.List;
 
 import com.centit.dde.po.ExchangeTask;
 import com.centit.framework.core.service.BaseEntityManager;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 
-public interface ExchangeTaskManager extends BaseEntityManager<ExchangeTask> {
+public interface ExchangeTaskManager extends BaseEntityManager<ExchangeTask,Long> {
     public List<List<Object>> getSqlValues(DatabaseInfo DatabaseInfo, String sql);
 
     public List<Object> insertDatas(DatabaseInfo DatabaseInfo, String sql, List<List<Object>> datas);

@@ -24,7 +24,7 @@ import com.centit.framework.core.service.BaseEntityManager;
  *
  * @author codefan@hotmail.com
  */
-public interface TaskDetailLogManager extends BaseEntityManager<TaskDetailLog> {
+public interface TaskDetailLogManager extends BaseEntityManager<TaskDetailLog,Long> {
     public Long getTaskDetailLogId();
 
     void flush();

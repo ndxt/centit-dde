@@ -1,25 +1,17 @@
 package com.centit.dde.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.centit.dde.po.ExchangeTask;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.support.database.DataSourceDescription;
 import com.centit.support.database.DbcpConnectPools;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
 
 public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask,Long> {
     public static final Log log = LogFactory.getLog(ExchangeTaskDao.class);

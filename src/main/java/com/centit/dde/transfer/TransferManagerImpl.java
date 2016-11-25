@@ -42,6 +42,7 @@ import com.centit.dde.service.TaskLogManager;
 import com.centit.dde.util.TaskConsoleWriteUtils;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.QueryUtils;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 
 public class TransferManagerImpl implements TransferManager {
     private static final Log logger = LogFactory.getLog(TransferManager.class);
@@ -50,9 +51,7 @@ public class TransferManagerImpl implements TransferManager {
 
     private ExchangeMapinfoDao exchangeMapinfoDao;
 
-    private DatabaseInfoDao databaseInfoDao;
-
-    private ExchangeTaskDao exchangeTaskDao;
+     private ExchangeTaskDao exchangeTaskDao;
 
     private ExchangeTaskdetailDao exchangeTaskdetailDao;
 
@@ -90,10 +89,6 @@ public class TransferManagerImpl implements TransferManager {
 
     public void setExchangeMapinfoDao(ExchangeMapinfoDao exchangeMapinfoDao) {
         this.exchangeMapinfoDao = exchangeMapinfoDao;
-    }
-
-    public void setDatabaseInfoDao(DatabaseInfoDao databaseInfoDao) {
-        this.databaseInfoDao = databaseInfoDao;
     }
 
     private static void setAdoParameter(PreparedStatement souce, int pn, int sn, ResultSet rs) throws SQLException {

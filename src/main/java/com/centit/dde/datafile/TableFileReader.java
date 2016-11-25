@@ -1,27 +1,22 @@
 package com.centit.dde.datafile;
 
+import org.apache.commons.codec.binary.Base64;
+import com.centit.dde.util.ItemValue;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.StringRegularOpt;
+import com.centit.support.file.FileIOOpt;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.*;
+import org.dom4j.io.SAXReader;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-
-import com.alibaba.fastjson.util.Base64;
-import com.centit.dde.util.ItemValue;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.StringRegularOpt;
-import com.centit.support.file.FileIOOpt;
 
 public class TableFileReader {
 
@@ -228,7 +223,7 @@ public class TableFileReader {
                 } else {
                     String sFormat = e.attributeValue("format");
                     if ("base64".equals(sFormat))
-                        item.setStrValue(new String(Base64.decodeFast(sValue)));
+                        item.setStrValue(new String(Base64.decodeBase64(sValue)));
                     else
                         item.setStrValue(sValue);
                 }
@@ -255,7 +250,7 @@ public class TableFileReader {
                         // e.printStackTrace();
                     }
                 } else {
-                    item.setBlobValue(Base64.decodeFast(sValue));
+                    item.setBlobValue(Base64.decodeBase64(sValue));
                 }
 
             } else {
