@@ -8,7 +8,6 @@ import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 public class UserDataOptIdManagerImpl extends BaseEntityManagerImpl<UserDataOptId
     ,Long,UserDataOptIdDao>
         implements UserDataOptIdManager {
-    private static final long serialVersionUID = 1L;
 
     private UserDataOptIdDao userDataOptIdDao;
 

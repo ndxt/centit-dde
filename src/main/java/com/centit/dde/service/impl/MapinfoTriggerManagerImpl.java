@@ -2,6 +2,7 @@ package com.centit.dde.service.impl;
 
 import java.util.List;
 
+import com.centit.dde.po.MapinfoTriggerId;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -10,9 +11,8 @@ import com.centit.dde.po.MapinfoTrigger;
 import com.centit.dde.service.MapinfoTriggerManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
-public class MapinfoTriggerManagerImpl extends BaseEntityManagerImpl<MapinfoTrigger>
+public class MapinfoTriggerManagerImpl extends BaseEntityManagerImpl<MapinfoTrigger,MapinfoTriggerId,MapinfoTriggerDao>
         implements MapinfoTriggerManager {
-    private static final long serialVersionUID = 1L;
     public static final Log log = LogFactory.getLog(MapinfoTriggerManager.class);
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();

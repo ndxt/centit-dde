@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.support.database.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.CollectionUtils;
@@ -20,9 +23,11 @@ import com.centit.dde.po.ImportTrigger;
 import com.centit.dde.po.ImportTriggerId;
 import com.centit.dde.service.ImportOptManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 
-public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt> implements ImportOptManager {
-    private static final long serialVersionUID = 1L;
+import javax.annotation.Resource;
+
+public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,ImportOptDao> implements ImportOptManager {
 
     public static final Log log = LogFactory.getLog(ImportOptManager.class);
 
@@ -31,11 +36,8 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt> imple
 
     private ImportOptDao importOptDao;
 
-    private DatabaseInfoDao databaseInfoDao;
-
-    public void setDatabaseInfoDao(DatabaseInfoDao databaseInfoDao) {
-        this.databaseInfoDao = databaseInfoDao;
-    }
+    @Resource
+    protected StaticEnvironmentManager platformEnvironment;
 
     public void setImportOptDao(ImportOptDao baseDao) {
         this.importOptDao = baseDao;
@@ -47,7 +49,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt> imple
     }
     @Override
     public void validator(ImportOpt object) throws SqlResolveException {
-        DatabaseInfo dbinfo = databaseInfoDao.getObjectById(object.getDestDatabaseName());
+        DatabaseInfo dbinfo = platformEnvironment.getDatabaseInfo(object.getDestDatabaseName());
         if (null == dbinfo) {
             throw new SqlResolveException(10002);
         }
@@ -66,7 +68,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt> imple
             triggerSql = triggerSql.toUpperCase();
             et.setTriggerSql(triggerSql);
 
-            List<String> names = SQLUtils.getSqlNamedParameters(triggerSql);
+            List<String> names = QueryUtils.getSqlNamedParameters(triggerSql);
             if (1 == names.size()) {
                 continue;
             }
@@ -125,12 +127,12 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt> imple
     }
 
     @Override
-    public void saveObject(ImportOpt object, FUserDetail userDetail) throws SqlResolveException {
+    public void saveObject(ImportOpt object, IUserInfo userDetail) throws SqlResolveException {
         // 判断导入的表是否存在
 
-        DatabaseInfo databaseInfo = databaseInfoDao.getObjectById(object.getDestDatabaseName());
+        DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(object.getDestDatabaseName());
 
-        object.setSourceOsId(databaseInfo.getSourceOsId());
+        object.setSourceOsId(databaseInfo.getOsId());
         //将表名转换为大写
         object.setTableName(object.getTableName().toUpperCase());
 
@@ -143,9 +145,9 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt> imple
         }
 
         // save exportsql
-        ImportOpt dbObject = getObject(object);
+        ImportOpt dbObject = importOptDao.getObjectById(object.getImportId());
         if (null == dbObject) {
-            object.setCreated(userDetail.getUsercode());
+            object.setCreated(userDetail.getUserCode());
             object.setCreateTime(new Date());
 
             object.setImportId(importOptDao.getNextLongSequence());

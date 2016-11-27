@@ -3,6 +3,8 @@ package com.centit.dde.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONArray;
+import com.centit.dde.po.MapinfoDetailId;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -10,10 +12,10 @@ import com.centit.dde.dao.MapinfoDetailDao;
 import com.centit.dde.po.MapinfoDetail;
 import com.centit.dde.service.MapinfoDetailManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 
-public class MapinfoDetailManagerImpl extends BaseEntityManagerImpl<MapinfoDetail>
+public class MapinfoDetailManagerImpl extends BaseEntityManagerImpl<MapinfoDetail,MapinfoDetailId,MapinfoDetailDao>
         implements MapinfoDetailManager {
-    private static final long serialVersionUID = 1L;
     public static final Log log = LogFactory.getLog(MapinfoDetailManager.class);
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
@@ -49,11 +51,11 @@ public class MapinfoDetailManagerImpl extends BaseEntityManagerImpl<MapinfoDetai
         mapinfoDetailDao.updateExchangeMapinfo(mapinfoId, soueceTableName, goalTableName, createSql);
     }
 
-    public List<Map<String, String>> getSourceTableStructFromDatabase(Long mapinfoId) {
+    public JSONArray getSourceTableStructFromDatabase(Long mapinfoId) {
         return mapinfoDetailDao.getSourceTableStructFromDatabase(mapinfoId);
     }
 
-    public List<Map<String, String>> getGoalTableStructFromDatabase(Long mapinfoId) {
+    public JSONArray getGoalTableStructFromDatabase(Long mapinfoId) {
         return mapinfoDetailDao.getGoalTableStructFromDatabase(mapinfoId);
     }
 

@@ -8,9 +8,9 @@ import com.centit.dde.po.TaskErrorData;
 import com.centit.dde.service.TaskErrorDataManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
-public class TaskErrorDataManagerImpl extends BaseEntityManagerImpl<TaskErrorData>
+public class TaskErrorDataManagerImpl extends BaseEntityManagerImpl<TaskErrorData,Long,TaskErrorDataDao>
         implements TaskErrorDataManager {
-    private static final long serialVersionUID = 1L;
+
     public static final Log log = LogFactory.getLog(TaskErrorDataManager.class);
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();

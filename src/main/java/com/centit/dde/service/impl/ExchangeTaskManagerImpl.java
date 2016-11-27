@@ -4,11 +4,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
-import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 
 import com.centit.dde.dao.ExchangeTaskDao;
@@ -20,10 +20,11 @@ import com.centit.dde.transfer.TransferManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 
+import javax.annotation.Resource;
+
 public class ExchangeTaskManagerImpl
         extends BaseEntityManagerImpl<ExchangeTask,Long,ExchangeTaskDao>
         implements ExchangeTaskManager, org.quartz.Job {
-    private static final long serialVersionUID = 1L;
 
     public static final Log logger = LogFactory.getLog(ExchangeTaskManager.class);
 
@@ -34,8 +35,6 @@ public class ExchangeTaskManagerImpl
     private static final String JOB_GROUP_EXCHANGETASK = "JOB_GROUP_EXCHANGETASK";
 
     private ExchangeTaskDao exchangeTaskDao;
-
-    private SchedulerManager schedulerManager;
 
     private TransferManager transferManager;
 
@@ -55,9 +54,8 @@ public class ExchangeTaskManagerImpl
         this.transferManager = transferManager;
     }
 
-    public void setSchedulerManager(SchedulerManager schedulerManager) {
-        this.schedulerManager = schedulerManager;
-    }
+    @Resource
+    protected StaticEnvironmentManager platformEnvironment;
 
     public void setExchangeTaskDao(ExchangeTaskDao baseDao) {
         this.exchangeTaskDao = baseDao;
@@ -76,7 +74,6 @@ public class ExchangeTaskManagerImpl
         return this.exchangeTaskDao.getMapinfoName(mapinfoId);
     }
 
-    @Override
     public void initTimerTask() {
         // 初始化时加载所有任务
         List<ExchangeTask> exchangeTasks = exchangeTaskDao.listObjects();
@@ -144,20 +141,21 @@ public class ExchangeTaskManagerImpl
 
     @Override
     public void saveNewTimerTask(ExchangeTask exchangeTask) {
-        JobDetail jobDetail = schedulerManager.getJobDetail(JOB_NAME_PREFIX + exchangeTask.getTaskId(),
-                JOB_GROUP_EXCHANGETASK);
+        //JobDetail jobDetail = schedulerManager.getJobDetail(JOB_NAME_PREFIX + exchangeTask.getTaskId(),
+        //        JOB_GROUP_EXCHANGETASK);
         // 设置回调
-        jobDetail.getJobDataMap().put(IQuartzJobBean.QUARTZ_JOB_BEAN_KEY, this);
+        //jobDetail.getJobDataMap().put(QuartzJobBean.QUARTZ_JOB_BEAN_KEY, this);
 
-        jobDetail.getJobDataMap().put(EXCHANGE_TASK_ID, exchangeTask.getTaskId());
-        schedulerManager.schedule(jobDetail, "Trigger_ExchangeTask_" + exchangeTask.getTaskId(),
-                JOB_GROUP_EXCHANGETASK, exchangeTask.getTaskCron());
+        //jobDetail.getJobDataMap().put(EXCHANGE_TASK_ID, exchangeTask.getTaskId());
+        //schedulerManager.schedule(jobDetail, "Trigger_ExchangeTask_" + exchangeTask.getTaskId(),
+        //       JOB_GROUP_EXCHANGETASK, exchangeTask.getTaskCron());
 
     }
 
     @Override
     public boolean delTimerTask(ExchangeTask exchangeTask) {
-        return schedulerManager.deleteJob(JOB_NAME_PREFIX + exchangeTask.getTaskId(), JOB_GROUP_EXCHANGETASK);
+        return false;
+        //return schedulerManager.deleteJob(JOB_NAME_PREFIX + exchangeTask.getTaskId(), JOB_GROUP_EXCHANGETASK);
     }
 
     @Override

@@ -10,9 +10,8 @@ import com.centit.dde.po.TaskLog;
 import com.centit.dde.service.TaskLogManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
-public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog>
+public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog,Long,TaskLogDao>
         implements TaskLogManager {
-    private static final long serialVersionUID = 1L;
     public static final Log log = LogFactory.getLog(TaskLogManager.class);
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();

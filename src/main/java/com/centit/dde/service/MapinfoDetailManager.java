@@ -3,6 +3,7 @@ package com.centit.dde.service;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.po.MapinfoDetail;
 import com.centit.dde.po.MapinfoDetailId;
 import com.centit.framework.core.service.BaseEntityManager;
@@ -19,9 +20,9 @@ public interface MapinfoDetailManager extends BaseEntityManager<MapinfoDetail,Ma
 
     public void updateExchangeMapinfo(Long mapinfoId, String soueceTableName, String goalTableName, String createSql);
 
-    public List<Map<String, String>> getSourceTableStructFromDatabase(Long mapinfoId);
+    public JSONArray getSourceTableStructFromDatabase(Long mapinfoId);
 
-    public List<Map<String, String>> getGoalTableStructFromDatabase(Long mapinfoId);
+    public JSONArray getGoalTableStructFromDatabase(Long mapinfoId);
 
     public void updateSourceColumnSentence(Map<String, Object> structs, String mapinfoId);
 

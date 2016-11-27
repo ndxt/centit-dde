@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.support.database.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
@@ -19,9 +22,12 @@ import com.centit.dde.po.ExportTriggerId;
 import com.centit.dde.service.ExportFieldManager;
 import com.centit.dde.service.ExportSqlManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 
-public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql> implements ExportSqlManager {
-    private static final long serialVersionUID = 1L;
+import javax.annotation.Resource;
+
+public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,ExportSqlDao>
+        implements ExportSqlManager {
 
     public static final Log log = LogFactory.getLog(ExportSqlManager.class);
 
@@ -31,6 +37,9 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql> imple
     private ExportSqlDao exportSqlDao;
 
     private ExportFieldManager exportFieldManager;
+
+    @Resource
+    protected StaticEnvironmentManager platformEnvironment;
 
     public ExportFieldManager getExportFieldManager() {
         return exportFieldManager;
@@ -54,7 +63,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql> imple
         }
         object.setQuerySql(object.getQuerySql().toUpperCase());
 
-        DatabaseInfo dbinfo = databaseInfoManager.getObjectById(object.getSourceDatabaseName());
+        DatabaseInfo dbinfo =  platformEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
         if (null == dbinfo) {
             throw new SqlResolveException(10002);
         }
@@ -76,7 +85,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql> imple
             triggerSql = triggerSql.toUpperCase();
             et.setTriggerSql(triggerSql);
 
-            List<String> names = SQLUtils.getSqlNamedParameters(triggerSql);
+            List<String> names = QueryUtils.getSqlNamedParameters(triggerSql);
             if (1 == names.size()) {
                 continue;
             }
@@ -115,14 +124,14 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql> imple
     }
 
     @Override
-    public void saveObject(ExportSql object, FUserDetail userDetail) throws SqlResolveException {
-        DatabaseInfo dbinfo = databaseInfoManager.getObjectById(object.getSourceDatabaseName());
-        object.setSourceOsId(dbinfo.getSourceOsId());
+    public void saveObject(ExportSql object, IUserInfo userDetail) throws SqlResolveException {
+        DatabaseInfo dbinfo =  platformEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
+        object.setSourceOsId(dbinfo.getOsId());
 
         // save exportsql
-        ExportSql dbObject = getObject(object);
+        ExportSql dbObject = exportSqlDao.getObjectById(object.getExportId());
         if (null == dbObject) {
-            object.setCreated(userDetail.getUsercode());
+            object.setCreated(userDetail.getUserCode());
             object.setCreateTime(new Date());
 
             object.setExportId(exportSqlDao.getNextLongSequence());
@@ -173,7 +182,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql> imple
 
     @Override
     public List<ExportField> listExportFieldsByQuerysql(ExportSql object) throws SqlResolveException {
-        DatabaseInfo dbinfo = databaseInfoManager.getObjectById(object.getSourceDatabaseName());
+        DatabaseInfo dbinfo =  platformEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
 
         exportSqlDao.validateSql(object.getQuerySql(), dbinfo);
 

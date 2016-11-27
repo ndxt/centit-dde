@@ -8,9 +8,9 @@ import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.service.TaskDetailLogManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 
-public class TaskDetailLogManagerImpl extends BaseEntityManagerImpl<TaskDetailLog>
+public class TaskDetailLogManagerImpl extends BaseEntityManagerImpl<TaskDetailLog,Long,TaskDetailLogDao>
         implements TaskDetailLogManager {
-    private static final long serialVersionUID = 1L;
+
     public static final Log log = LogFactory.getLog(TaskDetailLogManager.class);
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
