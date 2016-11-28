@@ -7,16 +7,12 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
-import com.centit.core.action.BaseEntityDwzAction;
-import com.centit.core.utils.DwzResultParam;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.DataOptInfo;
 import com.centit.dde.po.DataOptStep;
 import com.centit.dde.po.ImportOpt;
 import com.centit.dde.service.DataOptInfoManager;
 import com.centit.dde.service.ImportOptManager;
-import com.centit.sys.security.FUserDetail;
-import com.centit.sys.util.SysParametersUtils;
 
 public class DataOptInfoAction extends BaseEntityDwzAction<DataOptInfo> {
     private static final Log log = LogFactory.getLog(DataOptInfoAction.class);
@@ -38,13 +34,7 @@ public class DataOptInfoAction extends BaseEntityDwzAction<DataOptInfo> {
 
     private DataOptInfoManager dataOptInfoMag;
 
-    private OsInfoManager osInfoManager;
-
     private ImportOptManager importOptManager;
-
-    public void setOsInfoManager(OsInfoManager osInfoManager) {
-        this.osInfoManager = osInfoManager;
-    }
 
     public void setImportOptManager(ImportOptManager importOptManager) {
         this.importOptManager = importOptManager;

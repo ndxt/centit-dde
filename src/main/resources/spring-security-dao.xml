@@ -1,92 +1,134 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:security="http://www.springframework.org/schema/security"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-	    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-	    http://www.springframework.org/schema/security
-	    http://www.springframework.org/schema/security/spring-security-3.0.xsd"
-       default-lazy-init="true">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+					http://www.springframework.org/schema/beans/spring-beans.xsd
+					http://www.springframework.org/schema/security
+					http://www.springframework.org/schema/security/spring-security.xsd">
 
-    <security:http auto-config="true" access-denied-page="/sys/mainFrame!login.do">
+    <security:http use-expressions="false" auto-config="false" entry-point-ref="authenticationEntryPoint">
+ 		<security:port-mappings>  
+            <security:port-mapping http="8180" https="8543"/>  
+        </security:port-mappings>  
 
-        <security:anonymous enabled="false"/>
-        <security:intercept-url pattern="/sys/mainFrame!login.do" filters="none"/>
-        <security:intercept-url pattern="/sys/userDef!register.do" filters="none"/>
-        <security:intercept-url pattern="/sys/userDef!captchaimage.do" filters="none"/>
-        <!-- <security:form-login login-page="/sys/mainFrame!login.do"
-            authentication-failure-url="/sys/mainFrame!login.do?error=true"
-            default-target-url="/sys/mainFrame!showMain.do" /> -->
+        <!-- <security:intercept-url pattern="/system/mainframe/index" requires-channel="http"/>   -->
+ 		<security:intercept-url pattern="/system/mainframe/login"  requires-channel="https" access="IS_AUTHENTICATED_ANONYMOUSLY" /> 
+		<security:intercept-url pattern="/login"  requires-channel="https"/>
+		<security:intercept-url pattern="/**"  requires-channel="http"/>
+		<security:intercept-url pattern="/system/mainframe/csrf"  access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:access-denied-handler error-page="/system/exception/accessDenied"/>
 
-        <security:logout logout-success-url="/index.do"/>
-        <security:session-management invalid-session-url="/"/>
-
-        <security:http-basic/>
-        <!-- 增加一个filter，这点与Acegi是不一样的，不能修改默认的filter了，这个filter位于FILTER_SECURITY_INTERCEPTOR之前 -->
-        <security:custom-filter before="FORM_LOGIN_FILTER"
-                                ref="validateCodeAuthenticationFilter"/>
-        <security:custom-filter before="FILTER_SECURITY_INTERCEPTOR"
-                                ref="centitPowerFilter"/>
-
+		
+		<security:custom-filter ref="pretreatmentAuthenticationProcessingFilter" position="FORM_LOGIN_FILTER" />
+		<security:custom-filter ref="centitPowerFilter" before="FILTER_SECURITY_INTERCEPTOR" />
+		<security:custom-filter ref="logoutFilter" position="LOGOUT_FILTER" />
+		
+		<!-- token-repository-ref="csrfTokenRepository" -->
+		<security:csrf disabled="true" />
     </security:http>
 
-    <!-- 一个自定义的filter，必须包含authenticationManager,accessDecisionManager,securityMetadataSource三个属性，
-           我们的所有控制将在这三个类中实现，解释详见具体配置 -->
-    <bean id="centitPowerFilter" class="com.centit.sys.security.DaoFilterSecurityInterceptor">
-        <property name="authenticationManager"
-                  ref="authenticationManager"/>
-        <property name="accessDecisionManager"
-                  ref="centitAccessDecisionManagerBean"/>
-        <property name="securityMetadataSource"
-                  ref="centitSecurityMetadataSource"/>
+   <!--   filters="concurrentSessionFilter,securityContextPersistenceFilter,
+     logoutFilter,usernamePasswordAuthenticationFilter,rememberMeAuthenticationFilter,
+     sessionManagementFilter,anonymousAuthFilter,exceptionTranslationFilter,
+     filterSecurityInterceptor" 生成HttpSessionSecurityContextRepository  
+       -->
+	<!-- <bean id="securityContextFilter"  
+        class="org.springframework.security.web.context.SecurityContextPersistenceFilter">  
+        <property name="securityContextRepository"  
+            ref="securityContextRepository" />  
+    </bean>    
+    <bean id="securityContextRepository"  
+        class="org.springframework.security.web.context.HttpSessionSecurityContextRepository">  
+        <property name="allowSessionCreation" value="true" />  
+        <property name="disableUrlRewriting" value="false" />  
+    </bean>   -->   
+    
+	<bean id="authenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">  
+    	<constructor-arg index="0" value="/system/mainframe/login" />
+	</bean>
+
+	<bean id="centitAccessDecisionManagerBean"
+		 class="com.centit.framework.security.DaoAccessDecisionManager">
+	</bean>
+	
+	<bean id="centitSecurityMetadataSource"
+		 class="com.centit.framework.security.DaoInvocationSecurityMetadataSource">
+	</bean>
+	
+    <!-- 一个自定义的filter，必须包含authenticationManager,accessDecisionManager,securityMetadataSource三个属性， 我们的所有控制将在这三个类中实现，解释详见具体配置 -->
+    <bean id="centitPowerFilter"
+    	 class="com.centit.framework.security.DaoFilterSecurityInterceptor">
+        <property name="authenticationManager" ref="authenticationManager" />
+        <!-- centitAccessDecisionManagerBean hostIpFilterDecisionManagerBean -->
+        <property name="accessDecisionManager" ref="centitAccessDecisionManagerBean" />
+        <!-- centitSecurityMetadataSource hostIpSecurityMetadataSource -->
+        <property name="securityMetadataSource" ref="centitSecurityMetadataSource" />
     </bean>
 
-    <!-- 访问决策器，决定某个用户具有的角色，是否有足够的权限去访问某个资源 -->
-    <bean id="centitAccessDecisionManagerBean"
-          class="com.centit.sys.security.DaoAccessDecisionManager">
+ 	<security:authentication-manager alias="authenticationManager" erase-credentials="false" >        
+		<security:authentication-provider ref="authenticationProvider"/>
+	</security:authentication-manager>
+	
+	<bean id="userDetailsService"
+		 class="com.centit.framework.staticsystem.service.impl.UserDetailsServiceImpl">
+		 <property name="platformEnvironment" ref="platformEnvironment" />
+	</bean>
+	
+	<bean id="authenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+		<property name="hideUserNotFoundExceptions" value="false" />
+		<property name="userDetailsService" ref="userDetailsService" />
+		<property name="passwordEncoder" ref="passwordEncoder" />  
+		<property name="saltSource" ref="saltSource" />  
+	</bean>
+	
+ 	<bean id="saltSource" class="org.springframework.security.authentication.dao.ReflectionSaltSource">  
+	    <property name="userPropertyToUse" value="userCode"/>  
+	</bean>  
+	
+	<!-- 前置校验 -->
+	<bean id="pretreatmentAuthenticationProcessingFilter"
+		class="com.centit.framework.security.PretreatmentAuthenticationProcessingFilter">
+		<property name="authenticationManager" ref="authenticationManager" />		
+		<property name="checkCaptcha" value="false" /><!-- 是否校验验证码  -->
+		<property name="maxTryTimes" value="0" /><!-- 允许最大尝试次数，0 表示没有限制  -->
+		<property name="checkTimeTnterval" value="3" /><!-- 校验时间间隔单位为分钟，超过这个时间前面的尝试清零  -->
+		<property name="checkType" value="loginName" /><!-- 建议依据登录名或者ip地址loginName hostIp-->
+		<property name="lockMinites" value="3" /><!-- 锁定时间 单位分钟-->
+		<property name="continueChainBeforeSuccessfulAuthentication" value="false" /> <!-- 验证成功后继续做系统的验证-->
+		<property name="authenticationFailureHandler"
+			ref="ajaxFailureHandler"/>
+		<property name="authenticationSuccessHandler" ref="ajaxSuccessHandler"/>
+	</bean>	
+	
+	<bean id="ajaxFailureHandler" class="com.centit.framework.security.AjaxAuthenticationFailureHandler">
+		<property name="defaultFailureUrl" value="/system/mainframe/login/error"/>
+		<property name="writeLog" value="false" />
     </bean>
-
-    <!-- 资源源数据定义，即定义某一资源可以被哪些角色访问 -->
-    <bean id="centitSecurityMetadataSource"
-          class="com.centit.sys.security.DaoInvocationSecurityMetadataSource">
-        <property name="functionDao" ref="functionDao"/>
-        <property name="optRunRecDao" ref="optRunRecDao"/>
+     
+    <bean id="ajaxSuccessHandler" class="com.centit.framework.security.AjaxAuthenticationSuccessHandler">
+    	<property name="writeLog" value="true" />
     </bean>
-
-    <!-- 认证管理器，实现用户认证的入口，主要实现UserDetailsService接口即可 -->
-    <security:authentication-manager alias="authenticationManager">
-        <security:authentication-provider user-service-ref="sysUserManager">
-            <security:password-encoder ref="passwordEncoder">
-                <security:salt-source user-property="usercode"/>
-            </security:password-encoder>
-        </security:authentication-provider>
-    </security:authentication-manager>
-
-
-    <bean id="validateCodeAuthenticationFilter"
-          class="com.centit.sys.security.CodeAuthenticationProcessingFilter">
-        <property name="authenticationManager" ref="authenticationManager"/>
-        <!-- 		<property name="filterProcessesUrl" value="/sys/mainFrame!login.do"></property>
-         -->
-        <property name="authenticationSuccessHandler"
-                  ref="loginLogAuthenticationSuccessHandler"></property>
-        <property name="authenticationFailureHandler"
-                  ref="simpleUrlAuthenticationFailureHandler"></property>
-    </bean>
-
-    <bean id="loginLogAuthenticationSuccessHandler"
-          class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
-        <property name="defaultTargetUrl" value="/sys/mainFrame!showMain.do"></property>
-        <!-- /sys/mainFrame!showMain.do /page/frame/firstPage.jsp /sys/mainFrame!otherPage.do-->
-    </bean>
-    <bean id="simpleUrlAuthenticationFailureHandler"
-          class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
-        <property name="defaultFailureUrl" value="/sys/mainFrame!loginWithRanKey.do?error=true"></property>
-    </bean>
-
-    <bean id="authenticationProcessingFilterEntryPoint"
-          class="org.springframework.security.web.authentication.AuthenticationProcessingFilterEntryPoint">
-        <property name="loginFormUrl" value="/sys/mainFrame!loginWithRanKey.do"></property>
-    </bean>
-
+ 
+	<!--登出拦截器-->
+	<bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+		<constructor-arg index="0" value="/system/mainframe/login" />
+		<constructor-arg index="1">
+			<list>				
+				<bean class="org.springframework.security.web.csrf.CsrfLogoutHandler" >
+					<constructor-arg index="0" ref="csrfTokenRepository" />
+				</bean>
+				<bean class="org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler">
+					<constructor-arg index="0">
+						<array>
+							<value>JSESSIONID</value>
+							<value>remember-me</value>
+						</array>
+					</constructor-arg>
+				</bean>
+				<bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+			</list>
+		</constructor-arg>
+	</bean>
+	 
 </beans>

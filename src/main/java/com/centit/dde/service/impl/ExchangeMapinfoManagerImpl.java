@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.centit.support.database.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,9 +24,14 @@ import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 
+import javax.annotation.Resource;
+
 public class ExchangeMapinfoManagerImpl
         extends BaseEntityManagerImpl<ExchangeMapinfo,Long,ExchangeMapinfoDao> implements
         ExchangeMapinfoManager {
+
+    @Resource
+    protected StaticEnvironmentManager platformEnvironment;
 
     public static final Log log = LogFactory.getLog(ExchangeMapinfoManager.class);
 
@@ -53,7 +59,7 @@ public class ExchangeMapinfoManagerImpl
         }
         object.setQuerySql(object.getQuerySql().toUpperCase());
 
-        DatabaseInfo dbinfo = databaseInfoManager.getObjectById(object.getSourceDatabaseName());
+        DatabaseInfo dbinfo = platformEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
         if (null == dbinfo) {
             throw new SqlResolveException(10002);
         }

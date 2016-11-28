@@ -1,108 +1,123 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:security="http://www.springframework.org/schema/security"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
 	    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 	    http://www.springframework.org/schema/security
 	    http://www.springframework.org/schema/security/spring-security-3.0.xsd"
-       default-lazy-init="true">
+	default-lazy-init="true">
 
-    <security:http auto-config="true" access-denied-page="/sys/mainFrame!login.do">
-
-        <security:anonymous granted-authority="R_G-anonymous" username="noname"/>
-        <security:intercept-url pattern="/sys/mainFrame!login.do" filters="none"/>
-        <security:intercept-url pattern="/sys/userDef!register.do" filters="none"/>
-        <!--  -->
-        <security:form-login login-page="/sys/mainFrame!login.do"
-                             authentication-failure-url="/sys/mainFrame!loginError.do"
-                             default-target-url="/sys/mainFrame!loginSuccess.do"/>
-        <security:logout logout-success-url="/index.do"/>
-
-        <security:http-basic/>
-        <security:custom-filter before="FILTER_SECURITY_INTERCEPTOR"
-                                ref="centitPowerFilter"/>
-        <security:remember-me key="bsdfw2"/>
-    </security:http>
-
-    <bean id="centitPowerFilter" class="com.centit.sys.security.DaoFilterSecurityInterceptor">
+	<security:http auto-config="true" >
+		<security:access-denied-handler error-page="/service/exception/accessDenied"/>
+		<security:anonymous granted-authority="R_G-anonymous" username="noname"  />
+		<security:intercept-url pattern="/sys/mainFrame!login.do" filters="none" />
+		<security:intercept-url pattern="/sys/userDef!register.do" filters="none" />
+		<!--  -->
+		<security:form-login login-page="/page/frame/login.jsp"
+			authentication-failure-url="/sys/mainFrame!loginError.do"
+			default-target-url="/sys/mainFrame!loginSuccess.do" />
+		<security:logout logout-success-url="/page/frame/login.jsp" />
+		
+		<security:http-basic />
+ 		<security:custom-filter before="FILTER_SECURITY_INTERCEPTOR"
+             ref="centitPowerFilter" />
+        <security:remember-me key="bsdfw2" />         
+	</security:http>
+	
+    <bean id="centitPowerFilter" class="com.centit.framework.security.DaoFilterSecurityInterceptor">
         <property name="authenticationManager"
-                  ref="authenticationManager"/>
+             ref="authenticationManager" />
         <property name="accessDecisionManager"
-                  ref="centitAccessDecisionManagerBean"/>
+             ref="centitAccessDecisionManagerBean" />
         <property name="securityMetadataSource"
-                  ref="centitSecurityMetadataSource"/>
+             ref="centitSecurityMetadataSource" />
     </bean>
-
+   
     <!-- 访问决策器，决定某个用户具有的角色，是否有足够的权限去访问某个资源 -->
+<!-- 
     <bean id="centitAccessDecisionManagerBean"
-          class="com.centit.sys.security.DaoAccessDecisionManager">
+         class="com.centit.framework.security.DaoAccessDecisionManager">
     </bean>
+ -->    
+ 	<!-- 资源源数据定义，即定义某一资源可以被哪些角色访问 -->
+<!--
+     <bean id="centitSecurityMetadataSource"
+         class="com.centit.framework.security.DaoInvocationSecurityMetadataSource" >
+         <property name="functionDao" ref="functionDao"/>
+         <property name="optRunRecDao" ref="optRunRecDao" />
+    </bean> 
+-->
+    
+	<!-- 认证管理器，实现用户认证的入口，主要实现UserDetailsService接口即可 -->
+ 
+	<bean id="contextSource"
+	        class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+	  <constructor-arg value="ldap://192.168.1.5:389/CN=Users,DC=centit,DC=com"/>
+	  <property name="userDn" value="accounts"/>
+	  <property name="password" value="yhs@yhs1"/>
+	</bean>
+	
+<!--
+ 	<bean id="userDetailsService"
+         class="com.centit.framework.security.userdetails.DaoUserDetailsService">
+         	<property name="sysuserDao" ref="sysUserDao" />
+			<property name="sysunitDao" ref="sysUnitDao" />
+			<property name="userRoleDao" ref="userRoleDao" />
+    </bean> 
+-->
+		
+ 	<bean id="daoLdapAuthoritiesPopulator" 
+		class="com.centit.framework.security.DaoLdapAuthoritiesPopulator">
+		<property name="userDetailsService" ref="userDetailsService" />
+	</bean>
+			
+	<bean id="userSearch"
+	    class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
+	  <constructor-arg index="0" value=""/>
+	  <constructor-arg index="1" value="(sAMAccountName={0})"/>
+	  <constructor-arg index="2" ref="contextSource" />
+	</bean> 
+	
+	<bean id="authenticator"
+			class="org.springframework.security.ldap.authentication.BindAuthenticator">
+			<constructor-arg ref="contextSource"/>
+		     <property name="userDnPatterns">
+		       <list><value>sAMAccountName={0},CN=Users,DC=centit,DC=com</value></list>
+		     </property>
+		     <property name="userSearch">
+  				<ref local="userSearch" /> 
+ 			 </property>		     
+	</bean>
 
-    <!-- 资源源数据定义，即定义某一资源可以被哪些角色访问 -->
-    <bean id="centitSecurityMetadataSource"
-          class="com.centit.sys.security.DaoInvocationSecurityMetadataSource">
-        <property name="functionDao" ref="functionDao"/>
-        <property name="optRunRecDao" ref="optRunRecDao"/>
-    </bean>
+	<bean id="userDetailsService"
+		  class="com.centit.framework.staticsystem.service.impl.UserDetailsServiceImpl">
+		<property name="platformEnvironment" ref="platformEnvironment" />
+	</bean>
 
-    <!-- 认证管理器，实现用户认证的入口，主要实现UserDetailsService接口即可 -->
-
-    <bean id="contextSource"
-          class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
-        <constructor-arg value="ldap://192.168.1.5:389/CN=Users,DC=centit,DC=com"/>
-        <property name="userDn" value="accounts"/>
-        <property name="password" value="yhs@yhs1"/>
-    </bean>
-
-    <bean id="daoPopulator"
-          class="com.centit.sys.security.DaoAuthoritiesPopulator">
-        <property name="userDetailsService" ref="sysUserManager"/>
-    </bean>
-
-    <bean id="userSearch"
-          class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
-        <constructor-arg index="0" value=""/>
-        <constructor-arg index="1" value="(sAMAccountName={0})"/>
-        <constructor-arg index="2" ref="contextSource"/>
-    </bean>
-
-    <bean id="authenticator"
-          class="org.springframework.security.ldap.authentication.BindAuthenticator">
-        <constructor-arg ref="contextSource"/>
-        <property name="userDnPatterns">
-            <list>
-                <value>sAMAccountName={0},CN=Users,DC=centit,DC=com</value>
-            </list>
-        </property>
-        <property name="userSearch">
-            <ref local="userSearch"/>
-        </property>
-    </bean>
-
-    <bean id="userDetialsMapper"
-          class="com.centit.sys.security.AdUserDetailsContextMapper">
-        <property name="userDetailsService" ref="sysUserManager"/>
-    </bean>
-
-    <bean id="ldapAuthProvider"
-          class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
-        <constructor-arg ref="authenticator"/>
-        <constructor-arg ref="daoPopulator"/>
-        <property name="userDetailsContextMapper" ref="userDetialsMapper"/>
-    </bean>
-
-    <security:authentication-manager alias="authenticationManager">
-        <security:authentication-provider ref="ldapAuthProvider"/>
-    </security:authentication-manager>
-    <!--
-    <security:ldap-server  url="ldap://192.168.1.5:389"  root="CN=Users,DC=centit,DC=com"
-        manager-dn="accounts" manager-password="yhs@yhs1" id="centitldap" />
-    <security:authentication-manager  alias="authenticationManager" >
-        <security:ldap-authentication-provider server-ref="centitldap"
-            user-search-base="CN=Users,DC=centit,DC=com"
-            user-search-filter="sAMAccountName={0}" >
-        </security:ldap-authentication-provider>
-     </security:authentication-manager>
-     -->
+	<bean id="userDetialsMapper"
+			class="com.centit.framework.security.AdUserDetailsContextMapper">
+		<property name="userDetailsService" ref="userDetailsService" />
+	</bean>
+	
+	<bean id="ldapAuthProvider"
+	    class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
+	 <constructor-arg ref="authenticator" />
+	 <constructor-arg ref="daoLdapAuthoritiesPopulator" />
+	 <property  name="userDetailsContextMapper" ref="userDetialsMapper" />
+	</bean>
+    
+ 	<security:authentication-manager alias="authenticationManager">
+		<security:authentication-provider ref="ldapAuthProvider" /> 
+	 </security:authentication-manager> 
+	<!-- 
+	<security:ldap-server  url="ldap://192.168.1.5:389"  root="CN=Users,DC=centit,DC=com" 
+		manager-dn="accounts" manager-password="yhs@yhs1" id="centitldap" />
+	<security:authentication-manager  alias="authenticationManager" >
+		<security:ldap-authentication-provider server-ref="centitldap"
+			user-search-base="CN=Users,DC=centit,DC=com"
+	    	user-search-filter="sAMAccountName={0}" >
+		</security:ldap-authentication-provider>
+	 </security:authentication-manager>	
+	 --> 
 </beans>

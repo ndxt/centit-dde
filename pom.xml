@@ -128,26 +128,14 @@
 	</dependencies>
 	
 	<build>
-		<!-- maven 打包时包含Hibernate配置文件 -->
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<includes>
-					<include>**/*.hbm.xml</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 					<encoding>UTF-8</encoding>
 					<compilerArguments>
 						<verbose />
@@ -156,6 +144,5 @@
 				</configuration>
 			</plugin>
 		</plugins>
-
 	</build>
 </project>

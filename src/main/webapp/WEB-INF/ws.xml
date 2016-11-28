@@ -8,30 +8,6 @@
 
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
 
-	<bean id="validatorWs" class="com.centit.dde.ws.ValidatorWsImpl">
-        <property name="userDataOptIdManager" ref="userDataOptIdManager" />
-        <property name="sysUserManager" ref="sysUserManager" />
-        <property name="sysUnitManager" ref="sysUnitManager" />
-    </bean>
-    
-    <bean name="uploadDataBean" class="com.centit.dde.ws.UploadDataImpl">
-        <property name="executeDataMap" ref="executeDataMap"/>
-        <property name="taskLogManager" ref="taskLogManager"/>
-        <property name="validatorWs" ref="validatorWs" />
-    </bean>
-
-    <bean name="downloadDataBean" class="com.centit.dde.ws.DownloadDataImpl">
-        <property name="sysUserManager" ref="sysUserManager" />
-        <property name="exportData" ref="exportData" />
-        <property name="exportSqlDao" ref="exportSqlDao" />
-        <property name="validatorWs" ref="validatorWs" />
-    </bean>
-
-    <bean name="taskCallerBean" class="com.centit.dde.ws.TaskCallerImpl">
-		<property name="exchangeTaskManager" ref="exchangeTaskManager"/>
-        <property name="validatorWs" ref="validatorWs" />
-    </bean>
-
     <jaxws:endpoint id="uploadData" serviceName="uploadData" implementor="#uploadDataBean" address="/uploadData" >
     </jaxws:endpoint>
     
