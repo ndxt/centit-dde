@@ -7,33 +7,48 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-
+@Entity
+@Table(name="D_IMPORT_OPT")
 public class ImportOpt implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Column(name="IMPORTID")
     private Long importId;
 
+    @Column(name="DESTDATABASENAME")
     private String destDatabaseName;
 
+    @Column(name="SOURCEOSID")
     private String sourceOsId;
 
+    @Column(name="IMPORTNAME")
     private String importName;
 
+    @Column(name="TABLENAME")
     private String tableName;
 
+    @Column(name="CREATED")
     private String created;
 
+    @Column(name="IMPORTDESC")
     private String importDesc;
 
+    @Column(name="LASTUPDATETIME")
     private Date lastUpdateTime;
 
+    @Column(name="CREATETIME")
     private Date createTime;
 
+    @Column(name="RECORDOPERATE")
     private String recordOperate;
 
     private List<ImportTrigger> importTriggers = null;

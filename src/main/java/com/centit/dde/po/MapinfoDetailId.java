@@ -1,17 +1,24 @@
 package com.centit.dde.po;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 
 /**
  * FAddressBook entity.
  *
  * @author codefan@hotmail.com
  */
-
+@Embeddable
 public class MapinfoDetailId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Column(name="MAPINFOID")
     private Long mapinfoId;
 
+    @Column(name="COLUMNNO")
     private Long columnNo;
 
     // Constructors

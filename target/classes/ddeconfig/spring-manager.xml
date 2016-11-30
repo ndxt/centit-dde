@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd    http://www.springframework.org/schema/context     http://www.springframework.org/schema/context/spring-context.xsd"
+	default-lazy-init="false">
+	<bean id="mapinfoDetailManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.MapinfoDetailManagerImpl">
+				<property name="mapinfoDetailDao" ref="mapinfoDetailDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="mapinfoTriggerManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.MapinfoTriggerManagerImpl">
+				<property name="mapinfoTriggerDao" ref="mapinfoTriggerDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="exchangeMapinfoManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.ExchangeMapinfoManagerImpl">
+				<property name="exchangeMapinfoDao" ref="exchangeMapinfoDao" />
+				<property name="databaseInfoManager" ref="databaseInfoManager" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="databaseInfoManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.DatabaseInfoManagerImpl">
+				<property name="databaseInfoDao" ref="databaseInfoDao" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="exchangeTaskManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.ExchangeTaskManagerImpl" init-method="initTimerTask">
+			<!-- <bean class="com.centit.dde.service.impl.ExchangeTaskManagerImpl"> -->
+				<property name="exchangeTaskDao" ref="exchangeTaskDao" />
+				<property name="schedulerManager" ref="schedulerManager" />
+				<property name="transferManager" ref="transferManager" />
+				<property name="exportData" ref="exportData" />
+				<property name="importData" ref="importData" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="exchangeTaskdetailManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.ExchangeTaskdetailManagerImpl">
+				<property name="exchangeTaskdetailDao" ref="exchangeTaskdetailDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="taskErrorDataManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.TaskErrorDataManagerImpl">
+				<property name="taskErrorDataDao" ref="taskErrorDataDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="taskLogManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.TaskLogManagerImpl">
+				<property name="taskLogDao" ref="taskLogDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="transferManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.transfer.TransferManagerImpl">
+				<property name="exchangeMapinfoDao" ref="exchangeMapinfoDao" />
+				<property name="databaseInfoDao" ref="databaseInfoDao" />
+				<property name="exchangeTaskDao" ref="exchangeTaskDao" />
+				<property name="exchangeTaskdetailDao" ref="exchangeTaskdetailDao" />
+				<property name="mapinfoTriggerDao" ref="mapinfoTriggerDao" />
+				<property name="taskErrorDataManager" ref="taskErrorDataManager" />
+				<property name="taskLogManager" ref="taskLogManager" />
+				<property name="taskDetailLogManager" ref="taskDetailLogManager" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="taskDetailLogManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.TaskDetailLogManagerImpl">
+				<property name="taskDetailLogDao" ref="taskDetailLogDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="exportSqlManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.ExportSqlManagerImpl">
+				<property name="exportSqlDao" ref="exportSqlDao" />
+				<property name="databaseInfoManager" ref="databaseInfoManager" />
+				<property name="exportFieldManager" ref="exportFieldManager" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="exportFieldManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.ExportFieldManagerImpl">
+				<property name="exportFieldDao" ref="exportFieldDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="dataOptInfoManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.DataOptInfoManagerImpl">
+				<property name="dataOptInfoDao" ref="dataOptInfoDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="osInfoManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.OsInfoManagerImpl">
+				<property name="osInfoDao" ref="osInfoDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="importOptManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.ImportOptManagerImpl">
+				<property name="importOptDao" ref="importOptDao" />
+				<property name="databaseInfoDao" ref="databaseInfoDao" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="executeDataMap" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.dataio.ExecuteDataMapImpl">
+				<property name="dataOptInfoDao" ref="dataOptInfoDao" />
+				<property name="osInfoDao" ref="osInfoDao" />
+				<property name="importOptDao" ref="importOptDao" />
+				<property name="taskErrorDataManager" ref="taskErrorDataManager" />
+				<property name="taskDetailLogManager" ref="taskDetailLogManager" />
+				<property name="databaseInfoDao" ref="databaseInfoDao" />
+                <property name="taskLogManager" ref="taskLogManager" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="exportData" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.dataio.ExportDataImpl">
+				<property name="exportSqlDao" ref="exportSqlDao" />
+				<property name="databaseInfoDao" ref="databaseInfoDao" />
+				<property name="exchangeTaskDao" ref="exchangeTaskDao" />
+				<property name="exchangeTaskdetailDao" ref="exchangeTaskdetailDao" />
+				<property name="taskLogManager" ref="taskLogManager" />
+				<property name="taskDetailLogManager" ref="taskDetailLogManager" />
+				<property name="taskErrorDataManager" ref="taskErrorDataManager" />
+				<property name="executeDataMap" ref="executeDataMap" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="importData" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.dataio.ImportDataImpl">
+				<property name="executeDataMap" ref="executeDataMap" />
+				<property name="taskLogManager" ref="taskLogManager" />
+				<property name="exchangeTaskDao" ref="exchangeTaskDao" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="userDataOptIdManager" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.service.impl.UserDataOptIdManagerImpl">
+
+				<property name="userDataOptIdDao" ref="userDataOptIdDao" />
+			</bean>
+		</property>
+	</bean>
+	
+
+	
+	<!-- <bean id="uploadData" parent="baseTransactionProxy">
+		<property name="target">
+			<bean class="com.centit.dde.ws.UploadDataImpl">
+				<property name="executeDataMap" ref="executeDataMap" />
+				<property name="taskLogManager" ref="taskLogManager" />
+			</bean>
+		</property>
+	</bean> -->
+	
+	
+</beans>

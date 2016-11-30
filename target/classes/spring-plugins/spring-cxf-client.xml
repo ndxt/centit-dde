@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+
+
+    <!--<jaxws:endpoint-->
+    <!--id="userUnitProvider"-->
+    <!--implementor="com.centit.cas.sys.service.impl.UserUnitProviderImpl"-->
+    <!--address="/userUnitProvider"/>-->
+
+
+    <bean id="casWebClient" class="com.centit.cas.sys.service.ICasWebClient" factory-bean="clientFactory"
+          factory-method="create"/>
+    <bean id="clientFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+        <property name="serviceClass" value="com.centit.cas.sys.service.IUserUnitProvider"/>
+        <property name="address" value="http://ProductSvr:8080/cas/support/service/userUnitProvider?wsdl"/>
+    </bean>
+</beans>

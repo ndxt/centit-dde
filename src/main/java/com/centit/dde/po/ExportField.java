@@ -1,28 +1,41 @@
 package com.centit.dde.po;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-
+@Entity
+@Table(name="D_EXPORT_FIELD")
 public class ExportField implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Column(name="CID")
     private ExportFieldId cid;
 
+    @Column(name="fieldName")
     private String fieldName;
 
+    @Column(name="FIELDSENTENCE")
     private String fieldSentence;
 
+    @Column(name="FIELDTYPE")
     private String fieldType;
 
+    @Column(name="FIELDFORMAT")
     private String fieldFormat;
 
+    @Column(name="FIELDSTORETYPE")
     private String fieldStoreType;
 
+    @Column(name="ISPK")
     private String isPk;
 
+    @Column(name="ISNULL")
     private String isNull;
 
     // Constructors

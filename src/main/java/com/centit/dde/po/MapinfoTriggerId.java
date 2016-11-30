@@ -1,17 +1,26 @@
 package com.centit.dde.po;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+
 
 /**
  * FAddressBook entity.
  *
  * @author codefan@hotmail.com
  */
-
+@Embeddable
 public class MapinfoTriggerId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
-
+    
+    @Column(name="TRIGGERID")
     private Long triggerId;
 
+    @Column(name="MAPINFOID")
     private Long mapinfoId;
 
     // Constructors

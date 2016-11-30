@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+       default-lazy-init="true">
+
+    <!--上传文件 -->
+    <bean name="publicinfoAction" class="com.centit.app.action.PublicinfoAction" scope="request">
+        <property name="publicinfoManager" ref="publicinfoManager"/>
+        <property name="fileinfoManager" ref="fileinfoManager"/>
+    </bean>
+
+    <!--上传文件 -->
+    <bean name="fileAction" class="com.centit.app.action.FileinfoAction" scope="request">
+        <property name="FileinfoMag" ref="fileinfoManager"/>
+    </bean>
+
+    <!--全文检索 -->
+    <bean name="searcherAction" class="com.centit.app.action.SearchAction" scope="request"/>
+    <bean name="innermsgAction" class="com.centit.app.action.InnermsgAction" scope="request">
+        <property name="innermsgManager" ref="innermsgManager"/>
+        <property name="userMailConfigManager" ref="userMailConfigManager"/>
+        <property name="fileinfoManager" ref="fileinfoManager"/>
+    </bean>
+    <bean name="innermsgRecipientAction" scope="request" class="com.centit.app.action.InnermsgRecipientAction">
+        <property name="innermsgRecipientManager" ref="innermsgRecipientManager"/>
+    </bean>
+    <bean name="dashboardAction" class="com.centit.app.action.DashboardAction" scope="request">
+        <property name="innermsgManager" ref="innermsgManager"/>
+        <!-- <property name="flowManager" ref="flowManager" /> -->
+        <property name="userSettingMgr" ref="userSettingManager"/>
+    </bean>
+    <bean name="calendarAction" class="com.centit.app.action.CalendarAction" scope="request">
+        <property name="oaWorkDayManager" ref="oaWorkDayManager"/>
+        <property name="workCalendar" ref="workCalendar"/>
+    </bean>
+
+    <bean name="oaForumAction" class="com.centit.app.action.OaForumAction">
+        <property name="oaForumManager" ref="oaForumManager"/>
+    </bean>
+    <bean name="oaReplyAction" class="com.centit.app.action.OaReplyAction">
+        <property name="oaReplyManager" ref="oaReplyManager"/>
+    </bean>
+
+    <bean name="oaThreadAction" class="com.centit.app.action.OaThreadAction">
+        <property name="oaThreadManager" ref="oaThreadManager"/>
+    </bean>
+    <bean name="userMailAction" class="com.centit.app.action.UserMailAction">
+        <property name="userMailManager" ref="userMailManager"/>
+    </bean>
+    <bean name="userMailConfigAction" scope="request" class="com.centit.app.action.UserMailConfigAction">
+        <property name="userMailConfigManager" ref="userMailConfigManager"/>
+
+    </bean>
+</beans>

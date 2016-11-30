@@ -1,20 +1,27 @@
 package com.centit.dde.po;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-
+@Entity
+@Table(name="D_TASK_ERROR_DATA")
 public class TaskErrorData implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-
+    @Column(name="DATAID")
     private Long dataId;
 
+    @Column(name="LOGDETAILID")
     private Long logDetailId;
 
+    
     public Long getLogDetailId() {
         return logDetailId;
     }

@@ -1,17 +1,26 @@
 package com.centit.dde.po;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.validator.constraints.EAN;
+
 
 /**
  * FAddressBook entity.
  *
  * @author codefan@hotmail.com
  */
-
+@Embeddable
 public class ExportFieldId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Column(name="EXPORTID")
     private Long exportId;
 
+    @Column(name="COLUMNNO")
     private Long columnNo;
 
     // Constructors

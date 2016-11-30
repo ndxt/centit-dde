@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	    http://www.springframework.org/schema/security
+	    http://www.springframework.org/schema/security/spring-security-3.0.xsd"
+       default-lazy-init="true">
+
+    <security:http entry-point-ref="casEntryPoint" access-denied-page="/page/common/NoPermit.jsp">
+        <!-- security:anonymous key="doesNotMater" username="codefan" / -->
+        <security:anonymous granted-authority="R_G-anonymous" username="noname"/>
+        <security:logout logout-success-url="/index.do"/>
+        <security:custom-filter position="FORM_LOGIN_FILTER" ref="casFilter"/>
+        <security:custom-filter before="FILTER_SECURITY_INTERCEPTOR" ref="centitPowerFilter"/>
+    </security:http>
+
+    <bean id="casFilter" class="org.springframework.security.cas.web.CasAuthenticationFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+    </bean>
+
+    <bean id="casEntryPoint"
+          class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
+        <!-- [https://developer.centit.com:8443] 为cas服务器部署域名地址及端口 -->
+        <property name="loginUrl" value="https://productsvr.centit.com:8443/cas/login"/>
+        <property name="serviceProperties" ref="casServiceProperties"/>
+    </bean>
+
+    <bean id="casServiceProperties" class="org.springframework.security.cas.ServiceProperties">
+        <!-- [http://192.168.129.140:18080/oa] 应用部署IP地址及端口 -->
+        <property name="service" value="http://productsvr.centit.com:8880/dde/j_spring_cas_security_check"/>
+        <property name="sendRenew" value="false"/>
+    </bean>
+
+
+    <bean id="casAuthenticationProvider"
+          class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+        <property name="authenticationUserDetailsService" ref="sysUserManager"/>
+        <property name="serviceProperties" ref="casServiceProperties"/>
+        <property name="ticketValidator">
+            <bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+                <constructor-arg index="0" value="https://productsvr.centit.com:8443/cas"/>
+                <!--
+                property name="proxyGrantingTicketStorage" ref="proxyGrantingTicketStorage"
+                 -->
+
+            </bean>
+        </property>
+        <property name="key" value="centit"/>
+    </bean>
+    <!-- an_id_for_this_auth_provider_only
+    <bean id="proxyGrantingTicketStorage" class="org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl" />
+     -->
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider ref="casAuthenticationProvider"/>
+    </security:authentication-manager>
+
+    <bean id="centitPowerFilter" class="com.centit.sys.security.DaoFilterSecurityInterceptor">
+        <property name="authenticationManager"
+                  ref="authenticationManager"/>
+        <property name="accessDecisionManager"
+                  ref="centitAccessDecisionManagerBean"/>
+        <property name="securityMetadataSource"
+                  ref="centitSecurityMetadataSource"/>
+    </bean>
+
+    <!-- 访问决策器，决定某个用户具有的角色，是否有足够的权限去访问某个资源 -->
+    <bean id="centitAccessDecisionManagerBean"
+          class="com.centit.sys.security.DaoAccessDecisionManager">
+    </bean>
+
+    <!-- 资源源数据定义，即定义某一资源可以被哪些角色访问 -->
+    <bean id="centitSecurityMetadataSource"
+          class="com.centit.sys.security.DaoInvocationSecurityMetadataSource">
+        <property name="functionDao" ref="functionDao"/>
+        <property name="optRunRecDao" ref="optRunRecDao"/>
+    </bean>
+
+</beans>

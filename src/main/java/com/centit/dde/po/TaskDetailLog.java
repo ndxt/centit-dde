@@ -7,26 +7,48 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-
+@Entity
+@Table(name="D_TASK_DETAIL_LOG")
 public class TaskDetailLog implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-
+    @Column(name="LOGDETAILID")
     private Long logDetailId;
 
+    @Column(name="LOGID")
     private Long logId;
+    
+    @Column(name="LOGID")
     private Date runBeginTime;
+    
+    @Column(name="RUNENDTIME")
     private Date runEndTime;
+    
+    @Column(name="MAPINFOID")
     private Long mapinfoId;
+    
+    @Column(name="OPTTYPE")
     private String optType;
+    
+    @Column(name="OSID")
     private String osId;
+    
+    @Column(name="SUCCESSPIECES")
     private Long successPieces;
+    
+    @Column(name="ERRORPIECES")
     private Long errorPieces;
+    
+    @Column(name="OTHERMESSAGE")
     private String otherMessage;
     private Set<TaskErrorData> taskErrorDatas = null;// new ArrayList<TaskErrorData>();
     private String mapinfoName;

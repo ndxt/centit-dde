@@ -7,6 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 /**
  * create by scaffold
  * <p/>
@@ -28,18 +32,33 @@ import java.util.Set;
  *
  * @author codefan@hotmail.com
  */
+@Entity
+@Table(name="D_TASK_LOG")
 public class TaskLog implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-
+    @Column(name="LOGID")
     private Long logId;
 
+    @Column(name="TASKID")
     private Long taskId;
+    
+    @Column(name="RUNBEGINTIME")
     private Date runBeginTime;
+    
+    @Column(name="runEndTime")
     private Date runEndTime;
+    
+    @Column(name="RUNTYPE")
     private String runType;
+    
+    @Column(name="RUNNER")
     private String runner;
+    
+    @Column(name="OTHERMESSAGE")
     private String otherMessage;
+    
+    @Column(name="TASKTYPE")
     private String taskType;
     private Set<TaskDetailLog> taskDetailLogs = null;// new ArrayList<TaskDetailLog>();
 

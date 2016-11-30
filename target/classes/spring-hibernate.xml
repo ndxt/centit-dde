@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+       default-lazy-init="true">
+
+    <util:properties id="systemProperties" location="classpath:system.properties"/>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="#{systemProperties['jdbc.driver']}"/>
+        <property name="url" value="#{systemProperties['jdbc.url']}"/>
+        <property name="username" value="#{systemProperties['jdbc.user']}"/>
+        <property name="password" value="#{systemProperties['jdbc.password']}"/>
+        <property name="maxActive" value="#{systemProperties['jdbc.maxActive']}"/>
+        <property name="maxIdle" value="#{systemProperties['jdbc.maxIdle']}"/>
+        <property name="maxWait" value="#{systemProperties['jdbc.maxWait']}"/>
+
+        <property name="defaultAutoCommit" value="#{systemProperties['jdbc.defaultAutoCommit']}"/>
+        <property name="removeAbandoned" value="#{systemProperties['jdbc.removeAbandoned']}"/>
+        <property name="removeAbandonedTimeout" value="#{systemProperties['jdbc.removeAbandonedTimeout']}"/>
+        <property name="validationQuery" value="#{systemProperties['jdbc.validationQuery']}"/>
+    </bean>
+
+    <!-- org.hibernate.dialect.OracleDialect -->
+    <!-- <bean id="sqlDataSource" class="org.apache.commons.dbcp.BasicDataSource"> <property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+        /> <property name="url" value="jdbc:sqlserver://192.168.1.12:1433;databaseName=cs3l" /> <property name="username" value="sa"
+        /> <property name="password" value="2centit13" /> <property name="maxActive" value="100" /> <property name="maxIdle" value="30"
+        /> <property name="maxWait" value="1000" /> <property name="defaultAutoCommit" value="true" /> <property name="removeAbandoned"
+        value="true" /> <property name="removeAbandonedTimeout" value="60" /> <property name="validationQuery" value="select top
+        1 1 from syscolumns" /> </bean> -->
+    <!-- org.hibernate.dialect.SQLServerDialect -->
+    <!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"> <property name="driverClassName" value="com.ibm.db2.jcc.DB2Driver"
+        /> <property name="url" value="jdbc:db2://192.168.1.14:50000/ourproj" /> <property name="username" value="db2inst1" /> <property
+        name="password" value="db2inst1" /> <property name="maxActive" value="100" /> <property name="maxIdle" value="30" /> <property
+        name="maxWait" value="1000" /> <property name="defaultAutoCommit" value="true" /> <property name="removeAbandoned" value="true"
+        /> <property name="removeAbandonedTimeout" value="60" /> <property name="validationQuery" value="select 1 from sysibm.sysdummy1"
+        /> </bean> -->
+    <!-- org.hibernate.dialect.DB2Dialect -->
+    <!--定义了Hibernate的SessionFactory -->
+    <!--<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean"> -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">
+                    org.hibernate.dialect.Oracle10gDialect
+                </prop>
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.format_sql">true</prop>
+            </props>
+        </property>
+
+        <!-- <property name="mappingJarLocations"> <list> <value>WEB-INF/lib/framework-sys-*.jar</value> </list> </property> -->
+        <!-- <property name="mappingLocations"> <list> <value>classpath*:/com/centit/sys/po/*.hbm.xml</value> </list> </property> -->
+        <property name="mappingDirectoryLocations">
+            <list>
+                <value>classpath:/com/centit/dde/po</value>
+                <value>classpath:/com/centit/app/po</value>
+                <value>classpath:/com/centit/sys/po</value>
+            </list>
+        </property>
+        <property name="lobHandler" ref="lobHandler">
+        </property>
+    </bean>
+
+    <!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- Transaction template for Managers -->
+    <bean id="baseTransactionProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+          abstract="true">
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="preInterceptors">
+            <list>
+                <ref bean="hibernateInterceptor"/>
+            </list>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="list*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="save*">PROPAGATION_REQUIRED</prop>
+                <prop key="set*">PROPAGATION_REQUIRED</prop>
+                <prop key="update*">PROPAGATION_REQUIRED</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED</prop>
+                <prop key="renew*">PROPAGATION_REQUIRED</prop>
+                <prop key="disable*">PROPAGATION_REQUIRED</prop>
+                <prop key="reset*">PROPAGATION_REQUIRED</prop>
+                <prop key="submit*">PROPAGATION_REQUIRED</prop>
+                <prop key="stop*">PROPAGATION_REQUIRED</prop>
+                <prop key="suspend*">PROPAGATION_REQUIRED</prop>
+                <prop key="awake*">PROPAGATION_REQUIRED</prop>
+                <prop key="submit*">PROPAGATION_REQUIRED</prop>
+                <prop key="publish*">PROPAGATION_REQUIRED</prop>
+                <prop key="assign*">PROPAGATION_REQUIRED</prop>
+                <prop key="rollback*">PROPAGATION_REQUIRED</prop>
+                <prop key="store*">PROPAGATION_REQUIRED</prop>
+                <prop key="run*">PROPAGATION_REQUIRED</prop>
+                <prop key="do*">PROPAGATION_REQUIRED</prop>
+                <prop key="enable*">PROPAGATION_REQUIRED</prop>
+                <prop key="record*">PROPAGATION_REQUIRED</prop>
+                <prop key="create*">PROPAGATION_REQUIRED</prop>
+                <prop key="activize*">PROPAGATION_REQUIRED</prop>
+                <prop key="execute*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="hibernateInterceptor" class="org.springframework.orm.hibernate3.HibernateInterceptor">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <!-- 给事务添加的属性 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!-- propagation表示的是事务的传播特性，使用required时，是当检测到add开头的方法时，就看此时有没有开启的事务，如果有则将方法放进事务中去，如果没有，则新建一个事务。然后将方法放进去。 -->
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="submit*" propagation="REQUIRED"/>
+            <!-- 如果检测到其它的方法，则给其只读数据库的属性。即当本方法在读时，其它的方法不能再去写了。保证一个事务的完整性。 -->
+            <tx:method name="*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+    <!-- <aop:config proxy-target-class="true"> <aop:pointcut id="allManagerMethod" expression="execution(* com.centit.yxxk.action.ExercisePermitAction.*(..))"
+        /> -->
+    <!-- 调用上面配置的事务属性，可以将它给本aop pointcut。 -->
+    <!-- <aop:advisor advice-ref="txAdvice" pointcut-ref="allManagerMethod" /> -->
+    <!-- 如果还有其它的定义，则可以再加上pointcut、advisor来定义本切面点的事务逻辑。 -->
+    <!-- </aop:config> -->
+    <bean id="nativeJdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.C3P0NativeJdbcExtractor"
+          lazy-init="true"/>
+
+
+    <bean id="lobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler" lazy-init="true">
+        <property name="nativeJdbcExtractor">
+            <ref bean="nativeJdbcExtractor"/>
+        </property>
+
+    </bean>
+    <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"/>
+
+</beans>

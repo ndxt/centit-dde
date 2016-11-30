@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+       default-lazy-init="false">
+    <bean id="roleDefAction" class="com.centit.sys.action.RoleDefAction"
+          scope="request">
+        <property name="sysRoleManager" ref="sysRoleManager"/>
+        <property name="codeRepositoryManager" ref="codeRepositoryManager"/>
+
+        <property name="roleSecurityMetadata" ref="centitSecurityMetadataSource"/>
+    </bean>
+
+    <bean id="optDefAction" class="com.centit.sys.action.OptDefAction"
+          scope="request">
+        <property name="functionManager" ref="functionManager"/>
+        <property name="optdefManager" ref="optdefManager"/>
+        <property name="codeRepositoryManager" ref="codeRepositoryManager"/>
+    </bean>
+
+    <bean id="optInfoAction" class="com.centit.sys.action.OptInfoAction"
+          scope="request">
+        <property name="functionManager" ref="functionManager"/>
+        <property name="codeRepositoryManager" ref="codeRepositoryManager"/>
+    </bean>
+
+    <bean id="userDefAction" class="com.centit.sys.action.UserDefAction"
+          scope="request">
+        <property name="sysUnitManager" ref="sysUnitManager"/>
+        <property name="sysUserMgr" ref="sysUserManager"/>
+        <property name="codeRepositoryManager" ref="codeRepositoryManager"/>
+    </bean>
+
+    <bean id="unitAction" class="com.centit.sys.action.UnitAction"
+          scope="request">
+        <property name="sysUnitManager" ref="sysUnitManager"/>
+        <property name="sysRoleManager" ref="sysRoleManager"/>
+        <property name="codeRepositoryManager" ref="codeRepositoryManager"/>
+        <!-- <property name="addressBookManager" ref="addressBookManager" /> -->
+        <property name="sysUserMgr" ref="sysUserManager"/>
+    </bean>
+
+    <bean id="deptManagerAction" class="com.centit.sys.action.DeptManagerAction"
+          scope="request">
+        <property name="codeRepositoryManager" ref="codeRepositoryManager"/>
+        <property name="sysUnitManager" ref="sysUnitManager"/>
+        <property name="sysRoleManager" ref="sysRoleManager"/>
+        <property name="sysUserManager" ref="sysUserManager"/>
+
+    </bean>
+
+    <bean id="mainFrameAction" class="com.centit.sys.action.MainFrameAction"
+          scope="request">
+        <property name="functionMgr" ref="functionManager"/>
+    </bean>
+
+    <bean id="dictionaryAction" class="com.centit.sys.action.DictionaryAction"
+          scope="request">
+        <property name="dictManger" ref="dictionaryManager"/>
+        <property name="codeRepoManager" ref="codeRepositoryManager"/>
+    </bean>
+
+    <bean name="userSettingAction" class="com.centit.sys.action.UserSettingAction"
+          scope="request">
+        <property name="functionMgr" ref="functionManager"/>
+        <property name="sysUserMgr" ref="sysUserManager"/>
+        <property name="userSettingMgr" ref="userSettingManager"/>
+
+    </bean>
+
+
+    <bean name="optRunRecAction" class="com.centit.sys.action.OptRunRecAction"
+          scope="request">
+        <property name="optRunRecManager" ref="optRunRecManager"/>
+    </bean>
+    <bean name="optVariableAction" class="com.centit.sys.action.OptVariableAction"
+          scope="request">
+        <property name="optVariableManager" ref="optVariableManager"/>
+    </bean>
+    <bean name="optLogAction" class="com.centit.sys.action.OptLogAction"
+          scope="request">
+        <property name="optLogManager" ref="optLogManager"/>
+    </bean>
+
+    <bean name="dataSyncAction" class="com.centit.sys.action.DataSyncAction" scope="request">
+        <property name="dataSyncManager" ref="dataSyncManager"/>
+        <property name="codeRepositoryManager" ref="codeRepositoryManager"/>
+    </bean>
+    <!-- <bean name="staffcertificateAction" scope="request"
+        class="com.centit.sys.action.StaffcertificateAction">
+        <property name="staffcertificateManager" ref="staffcertificateManager" />
+    </bean>
+    <bean name="staffeducationAction" scope="request"
+        class="com.centit.sys.action.StaffeducationAction">
+        <property name="staffeducationManager" ref="staffeducationManager" />
+    </bean>
+    <bean name="staffworkAction" scope="request"
+        class="com.centit.sys.action.StaffworkAction">
+        <property name="staffworkManager" ref="staffworkManager" />
+    </bean>
+    <bean name="supplierinfoAction" scope="request"
+        class="com.centit.sys.action.SupplierinfoAction">
+        <property name="supplierinfoManager" ref="supplierinfoManager" />
+    </bean>
+    <bean name="userdefgroupAction" scope="request"
+        class="com.centit.sys.action.UserdefgroupAction">
+        <property name="userdefgroupManager" ref="userdefgroupManager" />
+    </bean>
+    <bean name="groupuserAction" scope="request"
+        class="com.centit.sys.action.GroupuserAction">
+        <property name="groupuserManager" ref="groupuserManager" />
+        <property name="addressBookManager" ref="addressBookManager" />
+    </bean> -->
+</beans>

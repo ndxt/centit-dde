@@ -1,23 +1,38 @@
 package com.centit.dde.po;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-
+@Entity
+@Table(name="D_IMPORT_TRIGGER")
 public class ImportTrigger implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
+    @Column(name="CID")
     private ImportTriggerId cid;
 
-
+    @Column(name="TRIGGERSQL")
     private String triggerSql;
+    
+    @Column(name="TRIGGERDESC")
     private String triggerDesc;
+    
+    @Column(name="TRIGGERTYPE")
     private String triggerType;
+    
+    @Column(name="TRIGGERTIME")
     private String triggerTime;
 
+    @Column(name="TIGGERORDER")
     private Long tiggerOrder;
+    
+    @Column(name="ISPROCEDURE")
     private String isprocedure;
 
     /**
