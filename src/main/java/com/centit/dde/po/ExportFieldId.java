@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.constraints.NotBlank;
 
 
 /**
@@ -18,9 +19,11 @@ public class ExportFieldId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     @Column(name="EXPORTID")
+    @NotBlank(message = "字段不能为空")
     private Long exportId;
 
     @Column(name="COLUMNNO")
+    @NotBlank(message = "字段不能为空")
     private Long columnNo;
 
     // Constructors

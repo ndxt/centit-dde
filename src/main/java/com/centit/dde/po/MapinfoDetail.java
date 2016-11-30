@@ -2,14 +2,20 @@ package com.centit.dde.po;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 
 @Entity
 @Table(name="D_MAPINFO_DETAIL")
 public class MapinfoDetail implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
+    
     @Column(name="CID")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private MapinfoDetailId cid;
 
     @Column(name="SOURCEFIELDNAME")

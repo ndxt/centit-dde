@@ -4,7 +4,10 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,7 +20,10 @@ import javax.persistence.Table;
 @Table(name="DATASIMPLEACCESS")
 public class DataSimpleAccess implements Serializable {
     private static final long serialVersionUID = 6776496325081845118L;
+    
     @Column(name = "TABLE")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String table;
     
     @Column(name = "FIELD")

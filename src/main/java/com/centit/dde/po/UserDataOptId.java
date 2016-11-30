@@ -12,6 +12,7 @@ import javax.persistence.Table;
  * Created by sx on 2014/12/10.
  */
 @Embeddable
+@Table(name="D_USER_DATAOPTID")
 public class UserDataOptId implements Serializable {
 
     private static final long serialVersionUID = 1L;

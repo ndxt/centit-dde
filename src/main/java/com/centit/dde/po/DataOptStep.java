@@ -2,7 +2,10 @@ package com.centit.dde.po;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  * create by scaffold
@@ -16,6 +19,8 @@ public class DataOptStep implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     
     @Column(name = "OPTSTEPID")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long optStepId;
     
     @Column(name = "IMPORTID")
