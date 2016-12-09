@@ -8,8 +8,10 @@ import java.util.Set;
 import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.centit.support.database.QueryUtils;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.centit.dde.dao.ExportSqlDao;
@@ -25,7 +27,8 @@ import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 
 import javax.annotation.Resource;
-
+import javax.validation.constraints.NotNull;
+@Service
 public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,ExportSqlDao>
         implements ExportSqlManager {
 
@@ -33,7 +36,8 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
 
     // private static final SysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog();
-
+    @Resource(name="exportSqlDao")
+    @NotNull
     private ExportSqlDao exportSqlDao;
 
     private ExportFieldManager exportFieldManager;
@@ -44,6 +48,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
     public ExportFieldManager getExportFieldManager() {
         return exportFieldManager;
     }
+    
     public String getMapinfoName(Long mapinfoId) {
         return this.exportSqlDao.getMapinfoName(mapinfoId);
     }

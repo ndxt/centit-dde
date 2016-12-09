@@ -1,26 +1,44 @@
 package com.centit.dde.po;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-
+@Entity
+@Table(name="D_IMPORT_FIELD")
 public class ImportField implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    
+    @Column(name="CID")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private ImportFieldId cid;
 
+    @Column(name="SOURCEFIELDNAME")
     private String sourceFieldName;
 
+    @Column(name="DESTFIELDNAME")
     private String destFieldName;
 
+    @Column(name="DESTFIELDTYPE")
     private String destFieldType;
 
+    @Column(name="ISPK")
     private String isPk;
 
+    @Column(name="DESTFIELDDEFAULT")
     private String destFieldDefault;
 
+    @Column(name="ISNULL")
     private String isNull;
 
     // Constructors

@@ -9,11 +9,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.scheduling.support.CronSequenceGenerator;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.WebUtils;
 
 import com.centit.core.action.BaseEntityDwzAction;
@@ -36,6 +42,8 @@ import com.centit.dde.service.MapinfoDetailManager;
 import com.centit.dde.service.MapinfoTriggerManager;
 import com.centit.dde.service.TaskErrorDataManager;
 import com.centit.dde.service.TaskLogManager;
+import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.core.common.ResponseData;
 import com.centit.support.utils.HtmlFormUtils;
 import com.centit.support.utils.StringRegularOpt;
 import com.centit.sys.po.FUserinfo;
@@ -44,8 +52,10 @@ import com.centit.sys.service.CodeRepositoryUtil;
 import com.centit.sys.service.SysUserManager;
 import com.centit.sys.util.SysParametersUtils;
 
-public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
-    private static final Log log = LogFactory.getLog(ExchangeTaskAction.class);
+@Controller
+@RequestMapping("/exchangetask")
+public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
+    private static final Log log = LogFactory.getLog(ExchangeTaskController.class);
 
     // private static final ISysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog("optid");
@@ -177,7 +187,8 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
     }
     private String s_isvalid;
     @SuppressWarnings("unchecked")
-    public String list() {
+    @RequestMapping(value="/list" , method = {RequestMethod.GET})
+    public void list( HttpServletRequest request,HttpServletResponse response) {
         try {
             Map<Object, Object> paramMap = request.getParameterMap();
             resetPageParam(paramMap);
@@ -221,16 +232,21 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
             }
 
             setTaskTypeToPage();
-
             this.pageDesc = pageDesc;
-            return LIST;
+            ResponseData resData = new ResponseData();
+            resData.addResponseData("OBJLIST", objList);
+            resData.addResponseData("PAGE_DESC", pageDesc);
+            JsonResultUtils.writeResponseDataAsJson(resData, response);
+//            return LIST;
         } catch (Exception e) {
             e.printStackTrace();
-            return ERROR;
+//            return ERROR;
+            JsonResultUtils.writeErrorMessageJson("error", response);
         }
     }
 
-    public String save() {
+    @RequestMapping(value="/save", method = {RequestMethod.PUT})
+    public void save(HttpServletRequest request ,HttpServletResponse response) {
         object.setTaskName(StringUtils.trim(object.getTaskName()));
         try {
             ExchangeTask dbObject = exchangeTaskMag.getObject(object);
@@ -248,7 +264,8 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
                 List<ExchangeTask> listObjects = exchangeTaskMag.listObjects(filterMap);
                 if (!org.springframework.util.CollectionUtils.isEmpty(listObjects)) {
                     dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, "任务名称已存在");
-                    return SUCCESS;
+//                    return SUCCESS;
+                    JsonResultUtils.writeSuccessJson(response);
                 }
 
 
@@ -276,7 +293,9 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
                 } catch (Exception e) {
                     saveError("定时任务表达式不正确");
 
-                    return ERROR;
+//                    return ERROR;
+                    JsonResultUtils.writeErrorMessageJson("XXXXX", response);
+                    return;
                 }
             }
 
@@ -285,16 +304,19 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
             // forward至列表页面
             dwzResultParam = new DwzResultParam("/dde/exchangeTask!list.do?s_taskType=" + object.getTaskType());
 
-            return SUCCESS;
+//            return SUCCESS;
+            JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("保存交换对应关系："+ e.getMessage(), e);
             saveError("保存交换对应关系："+ e.getMessage());
-            return ERROR;
+//            return ERROR;
+            JsonResultUtils.writeErrorMessageJson("XXXXX", response);
         }
     }
 
-    public String editAndsave() {
+    @RequestMapping(value="/editAndsave" , method = {RequestMethod.PUT})
+    public void editAndsave(HttpServletRequest request,HttpServletResponse response) {
         try {
             object.setTaskName(StringUtils.trim(object.getTaskName()));
 
@@ -304,7 +326,9 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
             if (!org.springframework.util.CollectionUtils.isEmpty(listObjects)) {
                 if (1 < listObjects.size() || !listObjects.get(0).getTaskId().equals(object.getTaskId())) {
                     dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, "任务名称已存在");
-                    return SUCCESS;
+//                    return SUCCESS;
+                    JsonResultUtils.writeSuccessJson(response);
+                    return;
                 }
             }
 
@@ -331,7 +355,9 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
                 } catch (Exception e) {
                     saveError("定时任务表达式不正确");
 
-                    return "editAndsave";
+//                    return "editAndsave";
+                    JsonResultUtils.writeBlankJson(response);
+                    return;
                 }
             } else {
                 object.setNextRunTime(null);
@@ -351,20 +377,25 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
             baseEntityManager.saveObject(object);
 
             if ("3".equals(object.getTaskType())) {
-                return "editAndsaveDialog";
+//                return "editAndsaveDialog";
+                JsonResultUtils.writeBlankJson(response);
             }
             dwzResultParam = new DwzResultParam("/dde/exchangeTask!list.do?s_taskType=" + object.getTaskType() + "&s_isvalid=1");
             dwzResultParam.setCallbackType("closeCurrent");
-            return "editAndsave";
+//            return "editAndsave";
+            JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             log.error("编辑交换对应关系："+ e.getMessage(), e);
             saveError("编辑交换对应关系："+ e.getMessage());
-            return ERROR;
+//            return ERROR;
+            JsonResultUtils.writeErrorMessageJson("XXXX", response);
         }
     }
 
-    public String edit() {
+    @RequestMapping(value="/edit" , method = {RequestMethod.PUT})
+    public  void edit(HttpServletRequest request ,HttpServletResponse response) {
         String view = EDIT;
+//        /page/dde/exchangeTaskForm.jsp
         try {
             if (object == null) {
                 object = getEntityClass().newInstance();
@@ -397,6 +428,8 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
                         getExportSql(exchangeTaskdetails);
                     } else if ("3".equals(taskType)) {
                         view = "editMonitor";
+//                        /page/dde/exchangeTaskMonitorForm.jsp
+                        
                     }
 
                 }
@@ -405,14 +438,17 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
 
             setTaskTypeToPage();
 
-            return view;
+//            return view;
+            JsonResultUtils.writeBlankJson(response);
         } catch (Exception e) {
             e.printStackTrace();
-            return ERROR;
+//            return ERROR;
+            JsonResultUtils.writeErrorMessageJson("error", response);
         }
     }
 
-    private void getExchangeMapinfo(List<ExchangeTaskdetail> exchangeTaskdetails) {
+    @RequestMapping(value="/getExchangeMapinfo" , method = {RequestMethod.GET})
+    private void getExchangeMapinfo(List<ExchangeTaskdetail> exchangeTaskdetails,HttpServletResponse response) {
         List<ExchangeMapinfo> echangeMapInfoList = new ArrayList<ExchangeMapinfo>();
 
         for (ExchangeTaskdetail etd : exchangeTaskdetails) {
@@ -423,10 +459,12 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
             }
         }
 
-        request.setAttribute("echangeMapInfoList", echangeMapInfoList);
+//        request.setAttribute("echangeMapInfoList", echangeMapInfoList);
+        JsonResultUtils.writeSingleDataJson(echangeMapInfoList, response);
     }
 
-    private void getExportSql(List<ExchangeTaskdetail> exchangeTaskdetails) {
+    @RequestMapping(value="/getExportSql", method = {RequestMethod.GET})
+    private void getExportSql(List<ExchangeTaskdetail> exchangeTaskdetails,HttpServletResponse response) {
         List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
 
         for (ExchangeTaskdetail etd : exchangeTaskdetails) {
@@ -437,10 +475,12 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
             }
         }
 
-        request.setAttribute("exportSqlList", exportSqlList);
+//        request.setAttribute("exportSqlList", exportSqlList);
+        JsonResultUtils.writeSingleDataJson(exportSqlList, response);
     }
 
-    public String add() {
+    @RequestMapping(value="/add", method = {RequestMethod.PUT})
+    public void add(HttpServletRequest request,HttpServletResponse response) {
         try {
             if (object == null) {
                 object = getEntityClass().newInstance();
@@ -451,24 +491,32 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
                     baseEntityManager.copyObject(object, o);
                 else
                     baseEntityManager.clearObjectProperties(object);
-                object.setTaskType(s_taskType);
+                    object.setTaskType(s_taskType);
             }
-            return "add";
+//            return "add";
+//            /page/dde/addExchangeTaskForm.jsp
+            JsonResultUtils.writeSingleDataJson(object, response);
         } catch (Exception e) {
             e.printStackTrace();
-            return ERROR;
+//            return ERROR;
+            JsonResultUtils.writeErrorMessageJson("error", response);
         }
     }
 
     /**
      * 查看明细
      */
-    public String view() {
+    @RequestMapping(value="/view" , method = {RequestMethod.GET})
+    public void view(HttpServletRequest request,HttpServletResponse response) {
         try {
             ExchangeTask o = baseEntityManager.getObject(object);
             if (object == null) {
-
-                return LIST;
+//                /page/dde/mapinfoTriggerList.jsp
+//                return LIST;
+                ResponseData resData = new ResponseData();
+                resData.addResponseData("OBJLIST", objList);
+                resData.addResponseData("PAGE_DESC", pageDesc);
+                JsonResultUtils.writeResponseDataAsJson(resData, response);
             }
             if (o != null)
                 baseEntityManager.copyObject(object, o);
@@ -487,7 +535,8 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
                 filterMap.put("task_Id", object.getTaskId());
                 // filterMap.put("order by", "mapinfo_order");
                 List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
-
+                JsonResultUtils.writeSingleDataJson(exchangeTaskdetails, response);
+                
                 if ("1".equals(taskType)) {
                     getExchangeMapinfo(exchangeTaskdetails);
                 } else if ("2".equals(taskType)) {
@@ -497,28 +546,34 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
 
             setTaskTypeToPage();
 
-            return VIEW;
+            /*return VIEW;*/
+            JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             log.error("查看交换对应关系："+ e.getMessage());
-            return ERROR;
+//            return ERROR;
+            JsonResultUtils.writeErrorMessageJson("error", response);
         }
     }
 
-    public String delete() {
+    @RequestMapping(value="/delete", method = {RequestMethod.DELETE})
+    public void delete(HttpServletRequest request,HttpServletResponse response) {
         try {
             exchangeTaskMag.delTimerTask(object);
             baseEntityManager.deleteObject(object);
             deletedMessage();
-            return "delete";
+//            return "delete";
+            JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             log.error("删除交换对应关系："+ e.getMessage(), e);
             saveError(e.getMessage());
-            return ERROR;
+//            return ERROR;
+            JsonResultUtils.writeErrorMessageJson("error", response);
         }
 
     }
 
-    public String saveSequence() {
+    @RequestMapping(value="/saveSequence" , method = {RequestMethod.PUT})
+    public String saveSequence(HttpServletRequest request,HttpServletResponse response) {
         // 返回页面
         String returnPage = request.getParameter("inputPage");
 
@@ -547,14 +602,16 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
         } else if ("edit".equals(returnPage)) {
             return edit();
         } else {
-            return ERROR;
+//            return ERROR;
+            JsonResultUtils.writeErrorMessageJson("error", response);
         }
 
         // return returnPage;
     }
 
     @SuppressWarnings("unchecked")
-    public String listExchangeMapInfo() {
+    @RequestMapping(value="/listExchangeMapInfo", method = {RequestMethod.GET})
+    public void listExchangeMapInfo(HttpServletRequest request,HttpServletResponse response) {
         // List<String> mapinfoIds = new ArrayList<String>();
         Map<Object, Object> paramMap = request.getParameterMap();
         resetPageParam(paramMap);
@@ -572,22 +629,28 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
         request.setAttribute("taskType", taskType);
 
         if ("1".equals(taskType)) {
-            return listExchangeMapinfo(filterMap, pageDesc);
+//            return listExchangeMapinfo(filterMap, pageDesc);
+            JsonResultUtils.writeSingleDataJson(filterMap, response, pageDesc);
+            return;
         }
 
         if ("2".equals(taskType) || "4".equals(taskType)) {
-            return listExportSql(filterMap, pageDesc);
+//            return listExportSql(filterMap, pageDesc);
+            JsonResultUtils.writeSingleDataJson(filterMap, response, pageDesc);
+            return;
         }
 
-        return null;
+//        return null;
+        JsonResultUtils.writeBlankJson(response);
     }
 
-    private String listExchangeMapinfo(Map<String, Object> filterMap, PageDesc pageDesc) {
+    @RequestMapping(value="/listExchangeMapinfo", method = {RequestMethod.GET})
+    private void listExchangeMapinfo(Map<String, Object> filterMap, PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
 
         List<ExchangeMapinfo> exchangeMapinfos = exchangeMapinfoManager.listObjectExcludeUsed(filterMap, pageDesc);
 
 
-        request.setAttribute("exchangeMapinfos", exchangeMapinfos);
+//        request.setAttribute("exchangeMapinfos", exchangeMapinfos);
         // ServletActionContext.getContext().put("taskId",
         // filterMap.get("taskId"));
 
@@ -599,7 +662,8 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
 
         this.pageDesc = pageDesc;
 
-        return "listExchangeMapInfo";
+//        return "listExchangeMapInfo";
+        JsonResultUtils.writeSingleDataJson(exchangeMapinfos, response);
     }
 
     /**
@@ -607,21 +671,24 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
      *
      * @return
      */
-    private String listExportSql(Map<String, Object> filterMap, PageDesc pageDesc) {
+    @RequestMapping(value="/listExportSql", method = {RequestMethod.GET})
+    private void listExportSql(Map<String, Object> filterMap, PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
         List<ExportSql> exportSqls = exportSqlManager.listObjects(filterMap, pageDesc);
 
         List<Long> used = exchangeTaskdetailManager.getMapinfoIdUsed((Long) filterMap.get("taskId"));
 
         // 已存在的导出任务ID
-        request.setAttribute("used", used);
-        request.setAttribute("exportSqls", exportSqls);
+       /* request.setAttribute("used", used);
+        request.setAttribute("exportSqls", exportSqls);*/
         this.pageDesc = pageDesc;
 
-        return "listExportSql";
+//        return "listExportSql";
+        JsonResultUtils.writeSingleDataJson(used,exportSqls, response);
     }
 
     @SuppressWarnings("unchecked")
-    public String importExchangeMapinfo() {
+    @RequestMapping(value="/importExchangeMapinfo", method = {RequestMethod.GET})
+    public void importExchangeMapinfo(HttpServletRequest request,HttpServletResponse response) {
         Map<Object, Object> paramMap = request.getParameterMap();
 
         String taskParamId = HtmlFormUtils.getParameterString(paramMap.get("taskId"));
@@ -636,19 +703,23 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
 
         exchangeTaskdetailManager.saveObject(taskId, new ArrayList<Long>(ids));
 
-        return "ImportExchangeMapinfo";
+//        return "ImportExchangeMapinfo";
+        JsonResultUtils.writeSuccessJson(response);
     }
 
-    public String executeTask() {
+    @RequestMapping(value="/executeTask", method = {RequestMethod.GET})
+    public void executeTask(HttpServletRequest request,HttpServletResponse response) {
         String sTaskId = request.getParameter("s_taskId");
         Long taskId = Long.valueOf(sTaskId);
         List<Long> mapinfoAndOrders = exchangeTaskdetailManager.getMapinfoIdUsed(taskId);
         for (int i = 0; i < mapinfoAndOrders.size(); i++) {
             executeMapinfo(mapinfoAndOrders.get(i), taskId);
         }
-        return "executeTask";
+//        return "executeTask";
+        JsonResultUtils.writeSuccessJson(response);
     }
 
+    @RequestMapping(value="/executeMapinfo", method = {RequestMethod.GET})
     private void executeMapinfo(Long mapinfoId, Long taskId) {
         ExchangeMapinfo exchangeMapinfo = this.exchangeMapinfoManager.getObjectById(Long.valueOf(mapinfoId));
         String sql = exchangeMapinfo.getQuerySql();
@@ -679,6 +750,7 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
     }
 
     /* 生成插入语句 */
+    @RequestMapping(value="/generateInsertSql", method = {RequestMethod.GET})
     private String generateInsertSql(Long mapinfoId) {
         MapinfoDetail mapinfoDetail = mapinfoDetailManager.getObjectById(Long.valueOf(mapinfoId));
         ExchangeMapinfo exchangeMapinfo = this.exchangeMapinfoManager.getObjectById(Long.valueOf(mapinfoId));
@@ -706,6 +778,7 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
     }
 
     /* 生成日志记录 */
+    @RequestMapping(value="/generateTaskLog")
     private TaskLog generateTaskLog(List<Object> logs, FUserinfo userDetails, Long taskId) {
         TaskLog taskLog = new TaskLog();
         taskLog.setLogId(taskLogManager.getTaskLogId());
@@ -722,6 +795,7 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
     }
 
     /* 添加错误日志记录 */
+    @RequestMapping(value="/saveTaskErrorData")
     private void saveTaskErrorData(List<Object> logs, Long logId) {
         List<Object> alogs = (List<Object>) logs.get(4);
         for (int i = 0; i < alogs.size(); i++) {
@@ -752,7 +826,8 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
 	 * } return tableOperateSql.toString(); }
 	 */
 
-    private String generateCreateTableSql(List<Map<String, String>> sourceTableStrutsDatas, String sourceTablename) {
+    @RequestMapping(value="/generateCreateTableSql")
+    private String generateCreateTableSql(List<Map<String, String>> sourceTableStrutsDatas, String sourceTablename,HttpServletRequest request,HttpServletResponse response) {
         String generateCreateTableSql = "create table" + sourceTablename + "(";
         for (int i = 0; i < sourceTableStrutsDatas.size(); i++) {
             generateCreateTableSql = generateCreateTableSql + sourceTableStrutsDatas.get(i).get("COLUMNNAME") + " ";
@@ -764,13 +839,14 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
                 generateCreateTableSql = generateCreateTableSql + " ";
             }
         }
-        return null;
+       return null;
     }
-
-    public String generateCronExpression() {
-
-        return "cronExpression";
-    }
+//页面之间的跳转
+//    @RequestMapping(value="/generateCronExpression")
+//    public String generateCronExpression() {
+//
+//        return "cronExpression";
+//    } 
 
 
     /**
@@ -778,14 +854,17 @@ public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
      *
      * @return
      */
-    public String console() {
-
-        return "console";
-    }
+//    @RequestMapping(value="/console",method = {RequestMethod.GET})
+//    public String console() {
+//
+//        return "console";
+////        /page/dde/exchangeTaskConsole.jsp 页面之间跳转
+//    }
 
     /**
      * 将任务类型设置至页面，多个页面均要使用
      */
+    @RequestMapping(value="/setTaskTypeToPage")
     void setTaskTypeToPage() {
         Map<String, String> taskType = new HashMap<String, String>();
         taskType.put("1", "直接交换");

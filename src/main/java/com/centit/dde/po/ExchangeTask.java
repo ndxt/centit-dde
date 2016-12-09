@@ -7,25 +7,54 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-
+@Entity
+@Table(name="D_EXCHANGE_TASK")
 public class ExchangeTask implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    
+    @Column(name="TASKID")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long taskId;
 
+    @Column(name="TASKNAME")
     private String taskName;
+    
+    @Column(name="TASKCRON")
     private String taskCron;
+
+    @Column(name="TASKDESC")
     private String taskDesc;
+
+    @Column(name="LASTRUNTIME")
     private Date lastRunTime;
+    
+    @Column(name="NEXTRUNTIME")
     private Date nextRunTime;
+    
+    @Column(name="ISVALID")
     private String isvalid;
+    
+    @Column(name="CREATETIME")
     private Date createTime;
+    
+    @Column(name="CREATED")
     private String created;
+    
+    @Column(name="CREATEDNAME")
     private String createdName;
     /**
      * '1: 直接交换 2 :导出离线文件 3：监控文件夹导入文件 4：调用接口 5:接口事件';

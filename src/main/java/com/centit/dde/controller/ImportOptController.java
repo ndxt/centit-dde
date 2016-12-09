@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileUploadException;
@@ -15,8 +16,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.struts2.ServletActionContext;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.WebUtils;
 
 import com.centit.core.action.BaseEntityDwzAction;
@@ -26,11 +30,14 @@ import com.centit.dde.po.DataOptStep;
 import com.centit.dde.po.ImportField;
 import com.centit.dde.po.ImportOpt;
 import com.centit.dde.service.ImportOptManager;
+import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.sys.security.FUserDetail;
 import com.centit.sys.util.SysParametersUtils;
 
-public class ImportOptAction extends BaseEntityDwzAction<ImportOpt> {
-    private static final Log log = LogFactory.getLog(ImportOptAction.class);
+@Controller
+@RequestMapping("/importopt")
+public class ImportOptController extends BaseEntityDwzAction<ImportOpt> {
+    private static final Log log = LogFactory.getLog(ImportOptController.class);
 
     // private static final ISysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog("optid");
@@ -82,13 +89,15 @@ public class ImportOptAction extends BaseEntityDwzAction<ImportOpt> {
         this.importFields = importFields;
     }
 
-    public String defDataSource() {
+    @RequestMapping(value="/defDataSource",method = {RequestMethod.GET})
+    public String defDataSource(HttpServletRequest request,HttpServletResponse response) {
 
         List<DatabaseInfo> dbList = databaseInfoManager.listObjects();
 
-        request.setAttribute("dbList", dbList);
-
-        return "defDataSource";
+//        request.setAttribute("dbList", dbList);
+//
+//        return "defDataSource";
+        JsonResultUtils.writeSingleDataJson(dbList, response);
     }
 
     /**
@@ -96,7 +105,8 @@ public class ImportOptAction extends BaseEntityDwzAction<ImportOpt> {
      *
      * @return
      */
-    public String listField() {
+    @RequestMapping(value="/listField",method = {RequestMethod.GET})
+    public void listField(HttpServletRequest request,HttpServletResponse response) {
         object = baseEntityManager.getObject(object);
         if (null == object) {
             //
@@ -108,21 +118,24 @@ public class ImportOptAction extends BaseEntityDwzAction<ImportOpt> {
 
         // 业务系统
         List<OsInfo> osinfoList = osInfoManager.listObjects();
-        request.setAttribute("osinfoList", osinfoList);
-
-        return "listField";
+//        request.setAttribute("osinfoList", osinfoList);
+//
+//        return "listField";
+        JsonResultUtils.writeSingleDataJson(osinfoList,dbList, response);
     }
 
-    public String formField() {
-        return "formField";
-    }
+//    @RequestMapping(value="/formField")
+//    public String formField() {
+//        return "formField";
+//    }
 
-
-    public String formTrigger() {
-        return "formTrigger";
-    }
-
-    public String save() {
+//    @RequestMapping(value="/formTrigger")
+//    public String formTrigger() {
+//        return "formTrigger";
+//    }
+    
+    @RequestMapping(value="/save",method = {RequestMethod.PUT})
+    public void save(HttpServletRequest request,HttpServletResponse response) {
         dwzResultParam = new DwzResultParam();
         dwzResultParam.setNavTabId(tabid);
 
@@ -143,26 +156,20 @@ public class ImportOptAction extends BaseEntityDwzAction<ImportOpt> {
             if (null == importDB) {
                 dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, message);
 
-                return SUCCESS;
+//                return SUCCESS;
+                JsonResultUtils.writeSuccessJson(response);
+                return;
             } else {
                 if (1 < listObjects.size() || !importDB.getImportId().equals(listObjects.get(0)
                         .getImportId())) {
                     dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, message);
 
-                    return SUCCESS;
+//                    return SUCCESS;
+                JsonResultUtils.writeSuccessJson(response);
+                return;
                 }
             }
         }
-
-
-
-
-
-
-
-
-
-
 
         try {
             importOptMag.validator(object);
@@ -172,15 +179,18 @@ public class ImportOptAction extends BaseEntityDwzAction<ImportOpt> {
             dwzResultParam.setStatusCode(DwzResultParam.STATUS_CODE_300);
             dwzResultParam.setMessage(SysParametersUtils.getValue(String.valueOf(e.getErrorcode())));
 
-            return SUCCESS;
+//            return SUCCESS;
+            JsonResultUtils.writeSuccessJson(response);
+            return;
         }
 
         dwzResultParam.setForwardUrl("/dde/importOpt!list.do");
-        return SUCCESS;
+//        return SUCCESS;
+        JsonResultUtils.writeSuccessJson(response);
     }
 
-    @Override
-    public String edit() {
+    @RequestMapping(value="/edit",method = {RequestMethod.PUT})
+    public void edit(HttpServletRequest request,HttpServletResponse response) {
         ImportOpt importOpt = importOptMag.getObject(object);
         if (null != importOpt) {
             baseEntityManager.copyObject(object, importOpt);
@@ -196,15 +206,16 @@ public class ImportOptAction extends BaseEntityDwzAction<ImportOpt> {
 
         List<DatabaseInfo> dbList = databaseInfoManager.listObjects();
 
-        request.setAttribute("dbList", dbList);
+//        request.setAttribute("dbList", dbList);
 
         // 业务系统
         List<OsInfo> osinfoList = osInfoManager.listObjects();
-        request.setAttribute("osinfoList", osinfoList);
+//        request.setAttribute("osinfoList", osinfoList);
 
         //return EDIT;
 
-        return "editTab";
+        JsonResultUtils.writeSingleDataJson(dbList,osinfoList, response);
+//        return "editTab"; /page/dde/importFieldTabList.jsp
     }
 
     private File uploadify;
@@ -214,6 +225,7 @@ public class ImportOptAction extends BaseEntityDwzAction<ImportOpt> {
      *
      * @throws IOException
      */
+    @RequestMapping(value="/uploadify")
     public void uploadify() throws IOException, FileUploadException {
         HttpServletResponse response = ServletActionContext.getResponse();
 
@@ -228,10 +240,12 @@ public class ImportOptAction extends BaseEntityDwzAction<ImportOpt> {
     }
 
 
-    public String delete() {
+    @RequestMapping(value="/delete",method = {RequestMethod.DELETE})
+    public void delete(HttpServletRequest request,HttpServletResponse response) {
         super.delete();
 
-        return "delete";
+//        return "delete";
+        JsonResultUtils.writeSuccessJson(response);
     }
 
 

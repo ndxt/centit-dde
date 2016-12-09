@@ -3,23 +3,29 @@ package com.centit.dde.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
+
 import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.po.MapinfoDetailId;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Service;
 
 import com.centit.dde.dao.MapinfoDetailDao;
 import com.centit.dde.po.MapinfoDetail;
 import com.centit.dde.service.MapinfoDetailManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
-
+@Service
 public class MapinfoDetailManagerImpl extends BaseEntityManagerImpl<MapinfoDetail,MapinfoDetailId,MapinfoDetailDao>
         implements MapinfoDetailManager {
     public static final Log log = LogFactory.getLog(MapinfoDetailManager.class);
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
-
+    @Resource(name="mapinfoDetailDao")
+    @NotNull
     private MapinfoDetailDao mapinfoDetailDao;
 
     public void setMapinfoDetailDao(MapinfoDetailDao baseDao) {

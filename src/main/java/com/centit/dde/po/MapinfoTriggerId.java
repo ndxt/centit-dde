@@ -1,17 +1,30 @@
 package com.centit.dde.po;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.validator.constraints.NotBlank;
+
 
 /**
  * FAddressBook entity.
  *
  * @author codefan@hotmail.com
  */
-
+@Embeddable
 public class MapinfoTriggerId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
-
+    
+    
+    @Column(name="TRIGGERID")
+    @NotBlank(message = "字段不能为空")
     private Long triggerId;
 
+    @Column(name="MAPINFOID")
+    @NotBlank(message = "字段不能为空")
     private Long mapinfoId;
 
     // Constructors

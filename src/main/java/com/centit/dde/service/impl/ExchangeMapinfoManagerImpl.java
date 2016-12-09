@@ -5,11 +5,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
+
 import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.centit.support.database.QueryUtils;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.centit.dde.dao.ExchangeMapinfoDao;
@@ -24,8 +29,7 @@ import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 
-import javax.annotation.Resource;
-
+@Service
 public class ExchangeMapinfoManagerImpl
         extends BaseEntityManagerImpl<ExchangeMapinfo,Long,ExchangeMapinfoDao> implements
         ExchangeMapinfoManager {
@@ -37,7 +41,10 @@ public class ExchangeMapinfoManagerImpl
 
     // private static final SysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog();
+    @Resource(name = "exchangeMapinfoDao")
+    @NotNull
     private ExchangeMapinfoDao exchangeMapinfoDao;
+
 
     public void setExchangeMapinfoDao(ExchangeMapinfoDao baseDao) {
         this.exchangeMapinfoDao = baseDao;

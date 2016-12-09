@@ -11,12 +11,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpRequest;
 import org.apache.struts2.ServletActionContext;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.centit.core.action.BaseEntityDwzAction;
 import com.centit.core.dao.CodeBook;
@@ -29,10 +35,14 @@ import com.centit.dde.service.ExchangeTaskManager;
 import com.centit.dde.service.ExportSqlManager;
 import com.centit.dde.service.ImportOptManager;
 import com.centit.dde.service.TaskLogManager;
+import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.core.common.ResponseData;
 import com.centit.sys.util.SysParametersUtils;
 
-public class TaskLogAction extends BaseEntityDwzAction<TaskLog> {
-    private static final Log log = LogFactory.getLog(TaskLogAction.class);
+@Controller
+@RequestMapping(name="tasklog")
+public class TaskLogController extends BaseEntityDwzAction<TaskLog> {
+    private static final Log log = LogFactory.getLog(TaskLogController.class);
 
     //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");
 
@@ -86,7 +96,9 @@ private InputStream inputSteam;
         this.setBaseEntityManager(taskLogMag);
     }
  private String fileName;
-public String downFile(){
+
+ @RequestMapping(value="/downFile",method = {RequestMethod.GET})
+public String downFile(HttpServletRequest request,HttpServletResponse response){
     String export = SysParametersUtils.getValue("export");
     String logname ="";
     try {
@@ -113,8 +125,8 @@ public String downFile(){
     }
     return "download";
 }
-    @Override
-    public String edit() {
+    @RequestMapping(value="/edit",method = {RequestMethod.GET})
+    public void edit(HttpServletRequest request,HttpServletResponse response) {
         try {
             if (object == null) {
                 object = getEntityClass().newInstance();
@@ -140,15 +152,16 @@ public String downFile(){
             if (object.getTaskId() != null) {
                 ServletActionContext.getContext().put("exchangeTask", exchangeTaskManager.getObjectById(object.getTaskId()));
             }
-            return EDIT;
+//            return EDIT;
+            JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             e.printStackTrace();
-            return ERROR;
+            JsonResultUtils.writeErrorMessageJson("error", response);
         }
     }
     
-    public String list() {
-
+    @RequestMapping(value="/list",method = {RequestMethod.GET})
+    public void list(HttpServletRequest request,HttpServletResponse response) {
 //	    super.list();
         Map<Object, Object> paramMap = request.getParameterMap();
         resetPageParam(paramMap);
@@ -175,16 +188,19 @@ public String downFile(){
 
 
         ExchangeTask exchangeTask = exchangeTaskManager.getObjectById((Long) filterMap.get("taskId"));
-        request.setAttribute("exchangeTask", exchangeTask);
-        return LIST;
+//        request.setAttribute("exchangeTask", exchangeTask);
+//        return LIST;
+        ResponseData resData = new ResponseData();
+        resData.addResponseData("OBJLIST", objList);
+        resData.addResponseData("PAGE_DESC", pageDesc);
+        JsonResultUtils.writeResponseDataAsJson(resData,response);
     }
-    public String listall() throws ParseException {
+    @RequestMapping(value="/listall",method = {RequestMethod.PUT})
+    public void listall(HttpServletRequest request,HttpServletResponse response) throws ParseException {
 
 //      super.list();
         Map<Object, Object> paramMap = request.getParameterMap();
         resetPageParam(paramMap);
-
-        
 
         Map<String, Object> filterMap = convertSearchColumn(paramMap);
         filterMap.remove("isvalid");
@@ -213,9 +229,6 @@ public String downFile(){
             else {filterMap.remove("runBeginTime2");}
         }
         PageDesc pageDesc = makePageDesc();
-
-        
-
         objList = baseEntityManager.listObjects(filterMap, pageDesc);
         totalRows = pageDesc.getTotalRows();
         exchangeTasklist = exchangeTaskManager.listObjects();
@@ -228,10 +241,16 @@ public String downFile(){
         setbackSearchColumn(filterMap);
         
         this.pageDesc = pageDesc;
-        return "listall";
+//        return "listall";
+        ResponseData resData = new ResponseData();
+        resData.addResponseData("OBJLIST", objList);
+        resData.addResponseData("PAGE_DESC", pageDesc);
+        JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
+    
     @SuppressWarnings("unchecked")
-    public String listStat(){        
+    @RequestMapping(value="/listStat" ,method = {RequestMethod.GET})
+    public void listStat(HttpServletRequest request,HttpServletResponse response){        
         Map<Object, Object> paramMap = request.getParameterMap();
         resetPageParam(paramMap);
         Map<String, Object> filterMap = convertSearchColumn(paramMap);
@@ -244,19 +263,26 @@ public String downFile(){
             taskLogStat = taskLogMag.taskLogStat("year", filterMap.get("year"));
         }
         setbackSearchColumn(filterMap);
-        return "listStat";
+//        return "listStat";
+        JsonResultUtils.writeSingleDataJson(taskLogStat, response);
     }
-    public String save() {
+    
+    
+    @RequestMapping(value="/save",method = {RequestMethod.PUT})
+    public void save(HttpServletRequest request,HttpServletResponse response) {
         object.replaceTaskDetailLogs(taskDetailLogs);
-
-        return super.save();
+        super.save();
+        
+        JsonResultUtils.writeSuccessJson(response);
     }
 
 
-    public String delete() {
+    @RequestMapping(value="/delete",method = {RequestMethod.DELETE})
+    public String delete(HttpServletRequest request,HttpServletResponse response) {
         super.delete();
 
-        return "delete";
+//        return "delete";
+        JsonResultUtils.writeSuccessJson(response);
     }
 
     public List<ExchangeTask> getExchangeTasklist() {

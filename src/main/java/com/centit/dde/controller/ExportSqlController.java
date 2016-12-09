@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
@@ -17,8 +18,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.struts2.ServletActionContext;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.WebUtils;
 
 import com.centit.core.action.BaseEntityDwzAction;
@@ -28,13 +32,18 @@ import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportSql;
 import com.centit.dde.service.ExportSqlManager;
+import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.staticsystem.po.OsInfo;
 import com.centit.sys.po.FDatadictionary;
 import com.centit.sys.security.FUserDetail;
 import com.centit.sys.service.CodeRepositoryUtil;
 import com.centit.sys.util.SysParametersUtils;
 
-public class ExportSqlAction extends BaseEntityDwzAction<ExportSql> {
-    private static final Log log = LogFactory.getLog(ExportSqlAction.class);
+@Controller
+@RequestMapping("/exportsql")
+public class ExportSqlController extends BaseEntityDwzAction<ExportSql> {
+    private static final Log log = LogFactory.getLog(ExportSqlController.class);
 
     // private static final ISysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog("optid");
@@ -70,8 +79,8 @@ public class ExportSqlAction extends BaseEntityDwzAction<ExportSql> {
         this.setBaseEntityManager(exportSqlMag);
     }
 
-    @Override
-    public String save() {
+    @RequestMapping(value="/save",method = {RequestMethod.PUT})
+    public void save( HttpServletRequest request,HttpServletResponse response) {
         dwzResultParam = new DwzResultParam();
         dwzResultParam.setNavTabId(tabid);
 
@@ -91,13 +100,17 @@ public class ExportSqlAction extends BaseEntityDwzAction<ExportSql> {
             if (null == exportDB) {
                 dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, message);
 
-                return SUCCESS;
+//                return SUCCESS;
+                JsonResultUtils.writeSuccessJson(response);
+                return;
             } else {
                 if (1 < listObjects.size() || !exportDB.getExportId().equals(listObjects.get(0)
                         .getExportId())) {
                     dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, message);
 
-                    return SUCCESS;
+//                    return SUCCESS;
+                    JsonResultUtils.writeSuccessJson(response);
+                  return;
                 }
             }
         }
@@ -118,21 +131,24 @@ public class ExportSqlAction extends BaseEntityDwzAction<ExportSql> {
 
             dwzResultParam.setMessage(message);
 
-            return SUCCESS;
+            JsonResultUtils.writeSuccessJson(response);
+            return;
         }
 
         dwzResultParam.setForwardUrl("/dde/exportSql!list.do");
-        return SUCCESS;
+        JsonResultUtils.writeSuccessJson(response);
     }
 
-    public String delete() {
+    @RequestMapping(value="/delete" ,method = {RequestMethod.DELETE})
+    public void delete(HttpServletRequest request,HttpServletResponse response) {
         super.delete();
 
-        return "delete";
+//        return "delete";
+        JsonResultUtils.writeSuccessJson(response);
     }
 
-    @Override
-    public String edit() {
+    @RequestMapping(value="/edit" ,method = {RequestMethod.PUT})
+    public void edit(HttpServletRequest request,HttpServletResponse response) {
         ExportSql exportSql = exportSqlMag.getObject(object);
         if (null != exportSql) {
             baseEntityManager.copyObject(object, exportSql);
@@ -147,9 +163,10 @@ public class ExportSqlAction extends BaseEntityDwzAction<ExportSql> {
 
         // 业务系统
         List<OsInfo> osinfoList = osInfoManager.listObjects();
-        request.setAttribute("osinfoList", osinfoList);
+//        request.setAttribute("osinfoList", osinfoList);
 
-        return EDIT;
+        JsonResultUtils.writeSingleDataJson(osinfoList, response);
+//        return EDIT;
     }
 
     /**
@@ -157,7 +174,8 @@ public class ExportSqlAction extends BaseEntityDwzAction<ExportSql> {
      *
      * @return
      */
-    public String listField() {
+    @RequestMapping(value="/listField" ,method = {RequestMethod.GET})
+    public void listField(HttpServletRequest request,HttpServletResponse response) {
         object = baseEntityManager.getObject(object);
         if (null == object) {
             //
@@ -169,27 +187,34 @@ public class ExportSqlAction extends BaseEntityDwzAction<ExportSql> {
 
         // 业务系统
         List<OsInfo> osinfoList = osInfoManager.listObjects();
-        request.setAttribute("osinfoList", osinfoList);
-
-        return "listField";
+//        request.setAttribute("osinfoList", osinfoList);
+//
+//        return "listField";
+        JsonResultUtils.writeSingleDataJson(osinfoList, response);
     }
-
-    public String defDataSource() {
+    
+    @RequestMapping(value="/defDataSource" ,method = {RequestMethod.GET})
+    public void defDataSource(HttpServletRequest request,HttpServletResponse response) {
 
         List<DatabaseInfo> dbList = databaseInfoManager.listObjects();
 
-        request.setAttribute("dbList", dbList);
-
-        return "defDataSource";
+//        request.setAttribute("dbList", dbList);
+//
+//        return "defDataSource";
+        JsonResultUtils.writeSingleDataJson(dbList, response);
     }
 
-    public String formField() {
-        return "formField";
-    }
+//页面跳转/page/dde/importFieldNewForm.jsp
+//    @RequestMapping(value="/formField")
+//    public String formField() {
+//        return "formField";
+//    }
 
-    public String formTrigger() {
-        return "formTrigger";
-    }
+//    页面跳转/page/dde/exchangeMapinfoTrigger.jsp
+//    @RequestMapping(value="/formTrigger")
+//    public String formTrigger() {
+//        return "formTrigger";
+//    }
 
 
     /**
@@ -197,6 +222,7 @@ public class ExportSqlAction extends BaseEntityDwzAction<ExportSql> {
      *
      * @throws IOException
      */
+    @RequestMapping(value="/resolveQuerySql")
     public void resolveQuerySql() throws IOException {
         PrintWriter writer = ServletActionContext.getResponse().getWriter();
         String jsonResult = null;
@@ -233,6 +259,7 @@ public class ExportSqlAction extends BaseEntityDwzAction<ExportSql> {
      *
      * @throws IOException
      */
+    @RequestMapping(value="/splitQuerySql")
     public void splitQuerySql() throws IOException {
         PrintWriter writer = ServletActionContext.getResponse().getWriter();
         String jsonResult = null;
@@ -251,6 +278,7 @@ public class ExportSqlAction extends BaseEntityDwzAction<ExportSql> {
      *
      * @throws IOException
      */
+    @RequestMapping(value="/analyissDataType")
     public void analyissDataType() throws IOException {
         PrintWriter writer = ServletActionContext.getResponse().getWriter();
 
@@ -279,6 +307,7 @@ public class ExportSqlAction extends BaseEntityDwzAction<ExportSql> {
     /**
      * 导出源字段
      */
+    @RequestMapping(value="/exportSourceField")
     public void exportSourceField() throws IOException {
         HttpServletResponse response = ServletActionContext.getResponse();
         ServletOutputStream output = response.getOutputStream();

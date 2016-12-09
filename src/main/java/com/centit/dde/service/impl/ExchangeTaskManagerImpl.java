@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.TimeZone;
 
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.support.CronSequenceGenerator;
+import org.springframework.stereotype.Service;
 
 import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.dataio.ExportData;
@@ -21,7 +23,8 @@ import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 
 import javax.annotation.Resource;
-
+import javax.validation.constraints.NotNull;
+@Service
 public class ExchangeTaskManagerImpl
         extends BaseEntityManagerImpl<ExchangeTask,Long,ExchangeTaskDao>
         implements ExchangeTaskManager, org.quartz.Job {
@@ -33,7 +36,9 @@ public class ExchangeTaskManagerImpl
     private static final String JOB_NAME_PREFIX = "Job_ExchangeTask_";
 
     private static final String JOB_GROUP_EXCHANGETASK = "JOB_GROUP_EXCHANGETASK";
-
+    
+    @Resource(name = "exchangeTaskDao")
+    @NotNull
     private ExchangeTaskDao exchangeTaskDao;
 
     private TransferManager transferManager;
@@ -54,7 +59,6 @@ public class ExchangeTaskManagerImpl
         this.transferManager = transferManager;
     }
 
-    @Resource
     protected StaticEnvironmentManager platformEnvironment;
 
     public void setExchangeTaskDao(ExchangeTaskDao baseDao) {

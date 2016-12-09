@@ -2,6 +2,13 @@ package com.centit.dde.po;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
 /**
  * Created with IntelliJ IDEA.
  * User: sx
@@ -9,13 +16,29 @@ import java.io.Serializable;
  * Time: 下午3:10
  * To change this template use File | Settings | File Templates.
  */
+@Entity
+@Table(name="DATASIMPLEACCESS")
 public class DataSimpleAccess implements Serializable {
     private static final long serialVersionUID = 6776496325081845118L;
-
+    
+    
+    
+    
+    @Column(name = "TABLE")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String table;
+    
+    @Column(name = "FIELD")
     private String field;
+    
+    @Column(name = "WHERE")
     private String where;
+    
+    @Column(name = "ORDER")
     private String order;
+    
+    @Column(name = "PAGINATION")
     private String pagination;
 
 

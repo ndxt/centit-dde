@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Repository;
 
 import com.centit.dde.po.ExchangeMapinfo;
 import com.centit.framework.core.dao.CodeBook;
@@ -14,9 +15,10 @@ import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.support.database.QueryUtils;
 
+@Repository
 public class ExchangeMapinfoDao extends BaseDaoImpl<ExchangeMapinfo,Long> {
     public static final Log log = LogFactory.getLog(ExchangeMapinfoDao.class);
-
+    @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {
             filterField = new HashMap<String, String>();

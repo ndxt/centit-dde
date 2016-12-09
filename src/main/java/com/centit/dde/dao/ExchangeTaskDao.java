@@ -6,16 +6,21 @@ import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.support.database.DataSourceDescription;
 import com.centit.support.database.DbcpConnectPools;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Repository;
+
 import com.centit.framework.staticsystem.po.DatabaseInfo;
+
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
 
+@Repository
 public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask,Long> {
     public static final Log log = LogFactory.getLog(ExchangeTaskDao.class);
-
+    @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {
             filterField = new HashMap<String, String>();

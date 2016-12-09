@@ -5,16 +5,18 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Repository;
 
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 
+@Repository
 public class TaskDetailLogDao extends BaseDaoImpl<TaskDetailLog,Long> {
 
     public static final Log logger = LogFactory.getLog(TaskDetailLogDao.class);
-
+    @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {
             filterField = new HashMap<String, String>();

@@ -1,26 +1,44 @@
 package com.centit.dde.po;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
 
+@Entity
+@Table(name="D_DATA_OPT_STEP")
 public class DataOptStep implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
-
+   
+    @Column(name = "OPTSTEPID")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long optStepId;
-
+    
+    @Column(name = "IMPORTID")
     private Long importId;
 
+    @Column(name = "OPTTYPE")
     private String optType;
 
+    @Column(name = "DATAOPTID")
     private String dataOptId;
 
+    @Column(name = "OSID")
     private String osId;
 
+    @Column(name = "MAPINFOORDER")
     private Long mapinfoOrder;
 
+    @Column(name = "IMPORTNAME")
     private String importName;
 
     // Constructors
