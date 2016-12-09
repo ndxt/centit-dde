@@ -24,6 +24,7 @@ import org.hibernate.annotations.GenericGenerator;
 public class ExchangeTask implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    
     @Column(name="TASKID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")

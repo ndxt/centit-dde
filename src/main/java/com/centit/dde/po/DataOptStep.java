@@ -17,7 +17,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name="D_DATA_OPT_STEP")
 public class DataOptStep implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
-    
+   
     @Column(name = "OPTSTEPID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")

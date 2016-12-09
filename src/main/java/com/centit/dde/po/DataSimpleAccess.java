@@ -21,6 +21,9 @@ import org.hibernate.annotations.GenericGenerator;
 public class DataSimpleAccess implements Serializable {
     private static final long serialVersionUID = 6776496325081845118L;
     
+    
+    
+    
     @Column(name = "TABLE")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")

@@ -17,6 +17,7 @@ import org.hibernate.validator.constraints.NotBlank;
 public class ExchangeTaskdetailId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    
     @Column(name="MAPINFOID")
     @NotBlank(message = "字段不能为空")
     private Long mapinfoId;

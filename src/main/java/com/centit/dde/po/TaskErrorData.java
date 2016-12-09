@@ -18,6 +18,7 @@ import org.hibernate.annotations.GenericGenerator;
 public class TaskErrorData implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    
     @Column(name="DATAID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")

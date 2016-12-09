@@ -24,6 +24,7 @@ import org.hibernate.annotations.GenericGenerator;
 public class ImportOpt implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    
     @Column(name="IMPORTID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")

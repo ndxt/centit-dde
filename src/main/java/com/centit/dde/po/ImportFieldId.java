@@ -16,6 +16,7 @@ import org.hibernate.validator.constraints.NotBlank;
 public class ImportFieldId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    
     @Column(name="COLUMNNO")
     @NotBlank(message = "字段不能为空")
     private Long columnNo;

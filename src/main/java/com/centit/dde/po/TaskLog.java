@@ -40,6 +40,7 @@ import org.hibernate.annotations.GenericGenerator;
 public class TaskLog implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    
     @Column(name="LOGID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
