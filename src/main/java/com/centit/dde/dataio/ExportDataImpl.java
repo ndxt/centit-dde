@@ -8,6 +8,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -34,14 +36,17 @@ import com.centit.dde.util.TaskConsoleWriteUtils;
 import com.centit.framework.common.SysParametersUtils;
 import com.centit.support.algorithm.DatetimeOpt;
 
+import javax.annotation.Resource;
+
 public class ExportDataImpl implements ExportData, CallWebService {
     private static final Log logger = LogFactory.getLog(ExportDataImpl.class);
 
     private static boolean debugEnabled = logger.isDebugEnabled();
 
-    private ExportSqlDao exportSqlDao;
+    @Resource
+    protected StaticEnvironmentManager platformEnvironment;
 
-    private DatabaseInfoDao databaseInfoDao;
+    private ExportSqlDao exportSqlDao;
 
     private ExchangeTaskDao exchangeTaskDao;
 
@@ -57,10 +62,6 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
     public void setExportSqlDao(ExportSqlDao exportSqlDao) {
         this.exportSqlDao = exportSqlDao;
-    }
-
-    public void setDatabaseInfoDao(DatabaseInfoDao databaseInfoDao) {
-        this.databaseInfoDao = databaseInfoDao;
     }
 
     public void setExchangeTaskDao(ExchangeTaskDao exchangeTaskDao) {
@@ -109,7 +110,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
             List<ExportTrigger> exportTriggers = exportSql.getExportTriggers();
 
-            DatabaseInfo dbInfo = databaseInfoDao.getObjectById(exportSql.getSourceDatabaseName());
+            DatabaseInfo dbInfo = platformEnvironment.getDatabaseInfo(exportSql.getSourceDatabaseName());
             Connection conn = ConnPool.getConn(dbInfo);
 
             // 交换前事件
@@ -381,9 +382,9 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
         ExchangeFileWriter ef = new ExchangeFileWriter();
 
-        String export = SysParametersUtils.getValue("export");
-        String ddeId = SysParametersUtils.getValue("dde_id");
-        String filePath = SysParametersUtils.getValue("app.home") + "/export/temp";
+        String export = SysParametersUtils.getStringValue("export");
+        String ddeId = SysParametersUtils.getStringValue("dde_id");
+        String filePath = SysParametersUtils.getStringValue("app.home") + "/export/temp";
 
         TaskConsoleWriteUtils.write(taskID, "导出文件目录 = " + export);
 
