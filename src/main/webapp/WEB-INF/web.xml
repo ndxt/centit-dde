@@ -21,8 +21,8 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            /WEB-INF/classes/spring-config.xml,
-            /WEB-INF/classes/spring-security-dao.xml
+            classpath:spring-config.xml,
+            classpath:spring-security-dao.xml
         </param-value>
     </context-param>
 
