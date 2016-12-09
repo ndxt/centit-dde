@@ -2,16 +2,18 @@ package com.centit.dde.controller;
 
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.WebUtils;
 
 import com.centit.dde.exception.SqlResolveException;
@@ -22,11 +24,12 @@ import com.centit.dde.service.DataOptInfoManager;
 import com.centit.dde.service.ImportOptManager;
 import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.staticsystem.po.OsInfo;
 
 @Controller
 @RequestMapping("/dataoptinfo")
-public class DataOptInfoController extends BaseEntityDwzAction<DataOptInfo> {
+public class DataOptInfoController extends BaseController {
     private static final Log log = LogFactory.getLog(DataOptInfoController.class);
 
     // private static final ISysOptLog sysOptLog =
@@ -44,24 +47,17 @@ public class DataOptInfoController extends BaseEntityDwzAction<DataOptInfo> {
         this.tabid = tabid;
     }
 
+    @Resource
+    @NotNull
     private DataOptInfoManager dataOptInfoMag;
 
-    private OsInfoManager osInfoManager;
+/*    @Resource
+    @NotNull
+    private OsInfoManager osInfoManager;*/
 
+    @Resource
+    @NotNull
     private ImportOptManager importOptManager;
-
-    public void setOsInfoManager(OsInfoManager osInfoManager) {
-        this.osInfoManager = osInfoManager;
-    }
-
-    public void setImportOptManager(ImportOptManager importOptManager) {
-        this.importOptManager = importOptManager;
-    }
-
-    public void setDataOptInfoManager(DataOptInfoManager basemgr) {
-        dataOptInfoMag = basemgr;
-        this.setBaseEntityManager(dataOptInfoMag);
-    }
 
     private List<DataOptStep> dataOptSteps;
 
@@ -72,32 +68,33 @@ public class DataOptInfoController extends BaseEntityDwzAction<DataOptInfo> {
     public void setNewDataOptSteps(List<DataOptStep> dataOptSteps) {
         this.dataOptSteps = dataOptSteps;
     }
-    @RequestMapping(value="/save",method = {RequestMethod.PUT})
-    public void save(HttpServletRequest request,HttpServletResponse response) {
-        dwzResultParam = new DwzResultParam();
-        dwzResultParam.setNavTabId(tabid);
+    @RequestMapping(value="/save/{{tabid}}",method = {RequestMethod.PUT})
+    public void save(@PathVariable String tabid,DataOptInfo object,
+            HttpServletRequest request,HttpServletResponse response) {
+//        dwzResultParam = new DwzResultParam();
+//        dwzResultParam.setNavTabId(tabid);
         try {
-            dataOptInfoMag.saveObject(object, (FUserDetail) getLoginUser());
+            dataOptInfoMag.saveObject(object, getLoginUser(request));
         } catch (SqlResolveException e) {
-            dwzResultParam.setStatusCode(DwzResultParam.STATUS_CODE_300);
-            dwzResultParam.setMessage(SysParametersUtils.getValue(String.valueOf(e.getErrorcode())));
+//            dwzResultParam.setStatusCode(DwzResultParam.STATUS_CODE_300);
+//            dwzResultParam.setMessage(SysParametersUtils.getValue(String.valueOf(e.getErrorcode())));
 
 //            return SUCCESS;
             JsonResultUtils.writeSuccessJson(response);
             return;
         }
 
-        dwzResultParam.setForwardUrl("/dde/dataOptInfo!list.do");
+//        dwzResultParam.setForwardUrl("/dde/dataOptInfo!list.do");
 //        return SUCCESS;
         JsonResultUtils.writeSuccessJson(response);
     }
 
     
-    @RequestMapping(value="/edit",method = {RequestMethod.GET})
-    public void edit(HttpServletRequest request,HttpServletResponse response) {
-        DataOptInfo dataOptInfo = dataOptInfoMag.getObject(object);
+    @RequestMapping(value="/edit/{{dataOptId}}",method = {RequestMethod.GET})
+    public void edit(@PathVariable String dataOptId,HttpServletRequest request,DataOptInfo object,HttpServletResponse response) {
+        DataOptInfo dataOptInfo = dataOptInfoMag.getObjectById(dataOptId);
         if (null != dataOptInfo) {
-            baseEntityManager.copyObject(object, dataOptInfo);
+            dataOptInfoMag.copyObjectNotNullProperty(object, dataOptInfo);
         }
 
         object.setDataOptSteps(dataOptInfoMag.listDataOptStepByDataOptInfo(object));
@@ -109,18 +106,19 @@ public class DataOptInfoController extends BaseEntityDwzAction<DataOptInfo> {
             
         }
 
-        // 业务系统
+/*        // 业务系统
         List<OsInfo> osinfoList = osInfoManager.listObjects();
-        request.setAttribute("osinfoList", osinfoList);
+        request.setAttribute("osinfoList", osinfoList);*/
 
 //        return EDIT;
-        JsonResultUtils.writeSingleDataJson(osinfoList, response);
+//        JsonResultUtils.writeSingleDataJson(osinfoList, response);
+        JsonResultUtils.writeSuccessJson(response);
     }
 
     
-    @RequestMapping(value="/delete",method = {RequestMethod.DELETE})
-    public void delete(HttpServletRequest request,HttpServletResponse response) {
-        super.delete();
+    @RequestMapping(value="/delete/{{dataOptId}}",method = {RequestMethod.DELETE})
+    public void delete(@PathVariable String dataOptId,HttpServletRequest request,HttpServletResponse response) {
+        dataOptInfoMag.deleteObjectById(dataOptId);
 //        return "delete";
         JsonResultUtils.writeSuccessJson(response);
     }
@@ -130,10 +128,11 @@ public class DataOptInfoController extends BaseEntityDwzAction<DataOptInfo> {
         List<ImportOpt> importOpts = importOptManager.listObjects();
         request.setAttribute("importOpts", importOpts);
 
-        List<OsInfo> osInfos = osInfoManager.listObjects();
+//        List<OsInfo> osInfos = osInfoManager.listObjects();
 //        request.setAttribute("osInfos", osInfos);
 //        return "formField";
-        JsonResultUtils.writeSingleDataJson(osInfos, response);
+//        JsonResultUtils.writeSingleDataJson(osInfos, response);
+        JsonResultUtils.writeSuccessJson(response);
     }
 
 }
