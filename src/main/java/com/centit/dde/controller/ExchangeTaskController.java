@@ -54,8 +54,8 @@ import com.centit.sys.util.SysParametersUtils;
 
 @Controller
 @RequestMapping("/exchangetask")
-public class ExchangeTaskAction extends BaseEntityDwzAction<ExchangeTask> {
-    private static final Log log = LogFactory.getLog(ExchangeTaskAction.class);
+public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
+    private static final Log log = LogFactory.getLog(ExchangeTaskController.class);
 
     // private static final ISysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog("optid");

@@ -41,8 +41,8 @@ import com.centit.sys.util.SysParametersUtils;
 
 @Controller
 @RequestMapping(name="tasklog")
-public class TaskLogAction extends BaseEntityDwzAction<TaskLog> {
-    private static final Log log = LogFactory.getLog(TaskLogAction.class);
+public class TaskLogController extends BaseEntityDwzAction<TaskLog> {
+    private static final Log log = LogFactory.getLog(TaskLogController.class);
 
     //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");
 

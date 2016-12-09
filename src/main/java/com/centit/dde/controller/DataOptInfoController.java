@@ -26,8 +26,8 @@ import com.centit.framework.staticsystem.po.OsInfo;
 
 @Controller
 @RequestMapping("/dataoptinfo")
-public class DataOptInfoAction extends BaseEntityDwzAction<DataOptInfo> {
-    private static final Log log = LogFactory.getLog(DataOptInfoAction.class);
+public class DataOptInfoController extends BaseEntityDwzAction<DataOptInfo> {
+    private static final Log log = LogFactory.getLog(DataOptInfoController.class);
 
     // private static final ISysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog("optid");

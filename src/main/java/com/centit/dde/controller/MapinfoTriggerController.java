@@ -22,8 +22,8 @@ import com.centit.framework.core.common.ResponseData;
 
 @Controller
 @RequestMapping("/mapinfotrigger")
-public class MapinfoTriggerAction extends BaseEntityDwzAction<MapinfoTrigger> {
-    private static final Log log = LogFactory.getLog(MapinfoTriggerAction.class);
+public class MapinfoTriggerController extends BaseEntityDwzAction<MapinfoTrigger> {
+    private static final Log log = LogFactory.getLog(MapinfoTriggerController.class);
 
     //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");
 
