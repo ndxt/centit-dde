@@ -25,9 +25,9 @@ import com.centit.framework.core.common.ResponseData;
 
 @Controller
 @RequestMapping("/exchangemapinfo")
-public class ExchangeMapinfoAction extends BaseEntityDwzAction<ExchangeMapinfo> {
+public class ExchangeMapinfoController extends BaseEntityDwzAction<ExchangeMapinfo> {
     private static final Log log = LogFactory
-            .getLog(ExchangeMapinfoAction.class);
+            .getLog(ExchangeMapinfoController.class);
 
     // private static final ISysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog("optid");

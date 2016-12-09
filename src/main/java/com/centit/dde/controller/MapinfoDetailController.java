@@ -29,7 +29,7 @@ import com.centit.support.compiler.Lexer;
 
 @Controller
 @RequestMapping("/mapinfodetail")
-public class MapinfoDetailAction extends BaseEntityDwzAction<MapinfoDetail> {
+public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> {
     private static final Log log = LogFactory.getLog(MapinfoDetailAction.class);
 
     //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");

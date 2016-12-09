@@ -36,8 +36,8 @@ import com.centit.sys.util.SysParametersUtils;
 
 @Controller
 @RequestMapping("/importopt")
-public class ImportOptAction extends BaseEntityDwzAction<ImportOpt> {
-    private static final Log log = LogFactory.getLog(ImportOptAction.class);
+public class ImportOptController extends BaseEntityDwzAction<ImportOpt> {
+    private static final Log log = LogFactory.getLog(ImportOptController.class);
 
     // private static final ISysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog("optid");

@@ -17,8 +17,8 @@ import com.centit.dde.service.UserDataOptIdManager;
 import com.centit.framework.core.common.JsonResultUtils;
 @Controller
 @RequestMapping(name="userdataoptid")
-public class UserDataOptIdAction extends BaseEntityDwzAction<UserDataOptId> {
-    private static final Log log = LogFactory.getLog(UserDataOptIdAction.class);
+public class UserDataOptIdController extends BaseEntityDwzAction<UserDataOptId> {
+    private static final Log log = LogFactory.getLog(UserDataOptIdController.class);
 
     private static final long serialVersionUID = 1L;
 

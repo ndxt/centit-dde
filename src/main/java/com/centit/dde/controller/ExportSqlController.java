@@ -42,8 +42,8 @@ import com.centit.sys.util.SysParametersUtils;
 
 @Controller
 @RequestMapping("/exportsql")
-public class ExportSqlAction extends BaseEntityDwzAction<ExportSql> {
-    private static final Log log = LogFactory.getLog(ExportSqlAction.class);
+public class ExportSqlController extends BaseEntityDwzAction<ExportSql> {
+    private static final Log log = LogFactory.getLog(ExportSqlController.class);
 
     // private static final ISysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog("optid");

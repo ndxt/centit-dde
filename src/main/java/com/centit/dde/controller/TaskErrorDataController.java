@@ -16,8 +16,8 @@ import com.centit.framework.core.common.JsonResultUtils;
 
 @Controller
 @RequestMapping(name="taskerrordata")
-public class TaskErrorDataAction extends BaseEntityDwzAction<TaskErrorData> {
-    private static final Log log = LogFactory.getLog(TaskErrorDataAction.class);
+public class TaskErrorDataController extends BaseEntityDwzAction<TaskErrorData> {
+    private static final Log log = LogFactory.getLog(TaskErrorDataController.class);
 
     //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");
 

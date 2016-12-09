@@ -38,8 +38,8 @@ import com.centit.sys.util.SysParametersUtils;
 
 @Controller
 @RequestMapping("/exchangemapinfonew")
-public class ExchangeMapinfoNewAction extends BaseEntityDwzAction<ExchangeMapinfo> {
-    private static final Log log = LogFactory.getLog(ExchangeMapinfoNewAction.class);
+public class ExchangeMapinfoNewController extends BaseEntityDwzAction<ExchangeMapinfo> {
+    private static final Log log = LogFactory.getLog(ExchangeMapinfoNewController.class);
 
     // private static final ISysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog("optid");

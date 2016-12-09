@@ -19,8 +19,8 @@ import com.centit.framework.core.common.JsonResultUtils;
 
 @Controller
 @RequestMapping("/TaskDetailLog")
-public class TaskDetailLogAction extends BaseEntityDwzAction<TaskDetailLog> {
-    private static final Log log = LogFactory.getLog(TaskDetailLogAction.class);
+public class TaskDetailLogController extends BaseEntityDwzAction<TaskDetailLog> {
+    private static final Log log = LogFactory.getLog(TaskDetailLogController.class);
 
     //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");
 
