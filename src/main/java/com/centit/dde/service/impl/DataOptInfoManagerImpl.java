@@ -3,9 +3,14 @@ package com.centit.dde.service.impl;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
+
 import com.centit.framework.model.basedata.IUserInfo;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Service;
 
 import com.centit.dde.dao.DataOptInfoDao;
 import com.centit.dde.exception.SqlResolveException;
@@ -13,7 +18,7 @@ import com.centit.dde.po.DataOptInfo;
 import com.centit.dde.po.DataOptStep;
 import com.centit.dde.service.DataOptInfoManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
-
+@Service
 public class DataOptInfoManagerImpl
         extends BaseEntityManagerImpl<DataOptInfo,String,DataOptInfoDao>
         implements DataOptInfoManager {
@@ -23,8 +28,11 @@ public class DataOptInfoManagerImpl
     // private static final SysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog();
 
+    @Resource(name = "dataOptInfoDao")
+    @NotNull
     private DataOptInfoDao dataOptInfoDao;
 
+    
     public void setDataOptInfoDao(DataOptInfoDao baseDao) {
         this.dataOptInfoDao = baseDao;
         setBaseDao(this.dataOptInfoDao);

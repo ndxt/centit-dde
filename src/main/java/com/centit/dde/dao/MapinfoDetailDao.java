@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Repository;
 
 import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.po.MapinfoDetail;
@@ -21,10 +22,11 @@ import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.support.database.DbcpConnect;
 import com.centit.support.database.QueryUtils;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
 
+@Repository
 public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId> {
     
     public static final Log log = LogFactory.getLog(MapinfoDetailDao.class);
@@ -37,7 +39,7 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId>
 	 * rsGoal = null ; private ResultSetMetaData rsmdSource = null ; private
 	 * ResultSetMetaData rsmdGoal = null ;
 	 */
-
+    @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {
             filterField = new HashMap<String, String>();

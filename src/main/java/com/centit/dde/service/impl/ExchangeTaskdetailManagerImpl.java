@@ -2,15 +2,19 @@ package com.centit.dde.service.impl;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Service;
 
 import com.centit.dde.dao.ExchangeTaskdetailDao;
 import com.centit.dde.po.ExchangeTaskdetail;
 import com.centit.dde.po.ExchangeTaskdetailId;
 import com.centit.dde.service.ExchangeTaskdetailManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
-
+@Service
 public class ExchangeTaskdetailManagerImpl
         extends BaseEntityManagerImpl<ExchangeTaskdetail,ExchangeTaskdetailId,ExchangeTaskdetailDao>
         implements ExchangeTaskdetailManager {
@@ -19,7 +23,8 @@ public class ExchangeTaskdetailManagerImpl
 
     // private static final SysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog();
-
+    @Resource(name = "exchangeTaskdetailDao")
+    @NotNull
     private ExchangeTaskdetailDao exchangeTaskdetailDao;
 
     public void setExchangeTaskdetailDao(ExchangeTaskdetailDao baseDao) {

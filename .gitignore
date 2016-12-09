@@ -1,11 +1,19 @@
-target/
+target
+/
 *.iml
+
 .externalToolBuilders
+
 .idea
 .settings
+
 .checkstyle
+
 .classpath
 .pmd
+
 .project
 
+
+.xml
 /bin/

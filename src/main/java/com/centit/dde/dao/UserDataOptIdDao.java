@@ -5,15 +5,18 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Repository;
 
 import com.centit.dde.po.UserDataOptId;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 
+@Repository
 public class UserDataOptIdDao extends BaseDaoImpl<UserDataOptId,Long> {
     public static final Log log = LogFactory.getLog(UserDataOptId.class);
 
+    @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {
             filterField = new HashMap<String, String>();

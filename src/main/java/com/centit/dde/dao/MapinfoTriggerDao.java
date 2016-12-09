@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Repository;
 
 import com.centit.dde.po.MapinfoTrigger;
 import com.centit.dde.po.MapinfoTriggerId;
@@ -13,10 +14,11 @@ import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 
+@Repository
 public class MapinfoTriggerDao extends BaseDaoImpl<MapinfoTrigger,MapinfoTriggerId> {
 
     public static final Log log = LogFactory.getLog(MapinfoTriggerDao.class);
-
+    @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {
             filterField = new HashMap<String, String>();

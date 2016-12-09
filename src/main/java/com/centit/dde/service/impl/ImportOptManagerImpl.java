@@ -9,8 +9,10 @@ import java.util.Set;
 import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.centit.support.database.QueryUtils;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -26,7 +28,9 @@ import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 
 import javax.annotation.Resource;
-
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+@Service
 public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,ImportOptDao> implements ImportOptManager {
 
     public static final Log log = LogFactory.getLog(ImportOptManager.class);
@@ -34,6 +38,8 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
     // private static final SysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog();
 
+    @Resource(name="importOptDao")
+    @NotNull
     private ImportOptDao importOptDao;
 
     @Resource
