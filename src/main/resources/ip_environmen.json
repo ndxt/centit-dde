@@ -1,0 +1,24 @@
+{
+  "osInfos": [
+    {
+      "osId": "CONTRACT",
+      "osName": "公司经营数据管理",
+      "osUrl": "http://productsvr.centit.com:8080/contract",
+      "ddeSyncUrl": "http://productsvr.centit.com:8080/contract/datasync",
+      "sysDataPushOption": "NONE",
+      "created": "u0000000"
+    }
+  ],
+  "databaseInfos": [
+    {
+      "databaseCode": "0000000081",
+      "osId": "CONTRACT",
+      "databaseName": "公司经营数据管理数据库",
+      "databaseUrl": "jdbc:oracle:thin:@192.168.131.81:1521:ORCL",
+      "username": "fdemo2",
+      "password": "Q1etJ4PqbSg=",
+      "databaseDesc": "公司经营数据管理数据库",
+      "created": "u0000000"
+    }
+  ]
+}

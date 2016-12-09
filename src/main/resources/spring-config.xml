@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xsi:schemaLocation="http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/cache 
+        http://www.springframework.org/schema/cache/spring-cache.xsd
+	    http://www.springframework.org/schema/mvc
+	    http://www.springframework.org/schema/mvc/spring-mvc.xsd"
+    default-lazy-init="true">
+
+	<bean id="initialEnvironment" init-method="initialEnvironment"
+		 class="com.centit.framework.listener.InitialWebRuntimeEnvironment" 
+		 lazy-init="false" >
+	</bean>
+	
+	<bean id="operationLogWriter" init-method="init"
+		 class="com.centit.framework.staticsystem.service.impl.TextOperationLogWriterImpl" 
+		 lazy-init="false">
+	</bean>
+	<!-- 使用json静态配置系统管理信息 -->
+	<bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" />
+	<!-- json 文本配置  -->
+	<bean id="platformEnvironment" init-method="init"
+		 class="com.centit.framework.staticsystem.service.impl.StaticSystemConfigImpl" 
+		 lazy-init="false" >
+		 <property name="passwordEncoder" ref="passwordEncoder" />
+	</bean>
+	<!-- 使用集成平台的系统管理信息 -->
+	<!-- <bean id="platformEnvironment" init-method="init"
+		 class="com.centit.framework.staticsystem.service.impl.IPClientSystemConfigImpl" 
+		 lazy-init="false" 
+		 scope="singleton">
+		 <property name="platServerUrl" value="${centit.ip.home}" />
+		 <property name="topOptId" value="${centit.ip.topoptid}" />
+	</bean> -->
+
+	<bean id="notificationCenter" init-method="initMsgSenders"
+		 class="com.centit.framework.components.impl.NotificationCenterImpl" 
+		 lazy-init="false">
+	</bean>	
+
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+	
+	
+	<cache:annotation-driven cache-manager="cacheManager" />
+
+	<!-- cacheManager工厂类，指定ehcache.xml的位置 -->
+	<bean id="cacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" p:configLocation="classpath:ehcache.xml" />
+	<!-- 声明cacheManager -->
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager" p:cacheManager-ref="cacheManagerFactory" />
+	
+	
+	<!-- 声明csrf -->
+	<bean id="csrfTokenRepository" class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository" />
+
+	<context:annotation-config />
+	<mvc:annotation-driven >
+		<mvc:message-converters>  
+			<!-- class="
+			com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter
+			org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" -->
+	         <bean 
+	             class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+	             <property name="objectMapper">  
+	                 <bean class="com.fasterxml.jackson.databind.ObjectMapper">  
+	                     <property name="dateFormat">  
+	                     	<!-- <bean class="java.text.SimpleDateFormat">   -->
+	                         <bean class="com.centit.framework.core.controller.SmartDateFormat">  
+	                             <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />  
+	                         </bean>  
+	                     </property>  
+	                 </bean>  
+	             </property>  
+	         </bean>  
+	     </mvc:message-converters>  
+    </mvc:annotation-driven>
+
+    <aop:aspectj-autoproxy />
+</beans>
