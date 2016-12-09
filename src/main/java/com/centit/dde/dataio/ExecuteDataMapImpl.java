@@ -1,14 +1,27 @@
 package com.centit.dde.dataio;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-
+import com.centit.dde.dao.DataOptInfoDao;
+import com.centit.dde.dao.ImportOptDao;
+import com.centit.dde.datafile.TableFileReader;
+import com.centit.dde.exception.SqlResolveException;
+import com.centit.dde.po.*;
+import com.centit.dde.service.TaskDetailLogManager;
+import com.centit.dde.service.TaskErrorDataManager;
+import com.centit.dde.service.TaskLogManager;
+import com.centit.dde.util.ConnPool;
+import com.centit.dde.util.ItemValue;
+import com.centit.dde.util.TaskConsoleWriteUtils;
+import com.centit.dde.ws.UploadData;
+import com.centit.dde.ws.WebServiceTransferClient;
+import com.centit.dde.ws.WsDataException;
+import com.centit.framework.common.SysParametersUtils;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.staticsystem.po.OsInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.database.DbcpConnect;
+import com.centit.support.database.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.DataAccessException;
@@ -18,47 +31,27 @@ import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobCreator;
 import org.springframework.jdbc.support.lob.LobHandler;
 
-import com.centit.dde.dao.DataOptInfoDao;
-import com.centit.dde.dao.ImportOptDao;
-import com.centit.dde.datafile.TableFileReader;
-import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.DataOptInfo;
-import com.centit.dde.po.DataOptStep;
-import com.centit.dde.po.ImportField;
-import com.centit.dde.po.ImportOpt;
-import com.centit.dde.po.ImportTrigger;
-import com.centit.dde.po.TaskDetailLog;
-import com.centit.dde.po.TaskErrorData;
-import com.centit.dde.po.TaskLog;
-import com.centit.dde.service.TaskDetailLogManager;
-import com.centit.dde.service.TaskErrorDataManager;
-import com.centit.dde.service.TaskLogManager;
-import com.centit.dde.util.ItemValue;
-import com.centit.dde.util.TaskConsoleWriteUtils;
-import com.centit.dde.ws.UploadData;
-import com.centit.dde.ws.WebServiceTransferClient;
-import com.centit.dde.ws.WsDataException;
-import com.centit.framework.common.SysParametersUtils;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.database.QueryUtils;
+import javax.annotation.Resource;
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.List;
+import java.util.Map;
 
 public class ExecuteDataMapImpl implements ExecuteDataMap {
+
     private static final Log logger = LogFactory.getLog(ExecuteDataMapImpl.class);
 
+    @Resource
+    protected StaticEnvironmentManager platformEnvironment;
     //private static boolean debugEnabled = logger.isDebugEnabled();
 
     private DataOptInfoDao dataOptInfoDao;
-
-    private OsInfoDao osInfoDao;
 
     private ImportOptDao importOptDao;
 
     private TaskErrorDataManager taskErrorDataManager;
 
     private TaskDetailLogManager taskDetailLogManager;
-
-    private DatabaseInfoDao databaseInfoDao;
 
     private TaskLogManager taskLogManager;
 
@@ -74,11 +67,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         this.taskErrorDataManager = taskErrorDataManager;
     }
 
-    public void setOsInfoDao(OsInfoDao osInfoDao) {
-        this.osInfoDao = osInfoDao;
-    }
-
-    public void setImportOptDao(ImportOptDao importOptDao) {
+     public void setImportOptDao(ImportOptDao importOptDao) {
         this.importOptDao = importOptDao;
     }
 
@@ -86,11 +75,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         this.dataOptInfoDao = dataOptInfoDao;
     }
 
-    public void setDatabaseInfoDao(DatabaseInfoDao databaseInfoDao) {
-        this.databaseInfoDao = databaseInfoDao;
-    }
-
-    /**
+     /**
      * @param xmlData
      * @param usercode
      * @param runType  1:手动 0：系统自动 2:WebService接口
@@ -160,7 +145,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
                 msg = "执行WebService接口导入操作...";
                 logger.info(msg);
                 TaskConsoleWriteUtils.write(taskId, msg);
-                OsInfo osInfo = osInfoDao.getObjectById(optStep.getOsId());
+                OsInfo osInfo = platformEnvironment.getOsInfo(optStep.getOsId());
                 if (osInfo != null) {
                     doCallWebService(xmlData, osInfo, taskLogId);
                 } else {
@@ -191,9 +176,10 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         Long taskId = taskLog.getTaskId();
         String msg = null;
 
-        UploadData dataIterface = WebServiceTransferClient.getWSDLInterface(osInfo.getInterfaceUrl(), UploadData.class);
+        UploadData dataIterface = WebServiceTransferClient.getWSDLInterface(
+                osInfo.getDdeSyncUrl(), UploadData.class);
 
-        msg = "WebService接口地址URL = " + osInfo.getInterfaceUrl();
+        msg = "WebService接口地址URL = " + osInfo.getDdeSyncUrl();
         logger.info(msg);
         TaskConsoleWriteUtils.write(taskId, msg);
 
@@ -203,8 +189,8 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
             TaskConsoleWriteUtils.writeError(taskId, msg);
             return -2;
         }
-        String res = dataIterface.uploadTableAsXml(osInfo.getOsUser(),
-                StringBaseOpt.decryptBase64Des(osInfo.getOsPassword()), xmlData.getXML());
+        String res = "res";// dataIterface.uploadTableAsXml(osInfo.
+                //StringBaseOpt.decryptBase64Des(osInfo.getOsPassword()), xmlData.getXML());
 
         Date endTime = DatetimeOpt.currentSqlDate();
         taskDetailLog.setRunEndTime(endTime);
@@ -414,7 +400,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         } else {
             PreparedStatement pSouce = null;
             try {
-                List<String> sqlParameters = QueryUtils.getSqlNamedParameters(sql).getRight();
+                List<String> sqlParameters = QueryUtils.getSqlNamedParameters(sql);//.getRight();
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("执行触发器的sql语句为 = " + sql + " 解析参数结果 = " + sqlParameters);
@@ -469,7 +455,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         String sLastErrorMsg = "";
         Date endTime = null;
 
-        DatabaseInfo dbInfo = databaseInfoDao.getObjectById(importOpt.getDestDatabaseName());
+        DatabaseInfo dbInfo = platformEnvironment.getDatabaseInfo(importOpt.getDestDatabaseName());
 
         SQLException se = null;
         try {
@@ -666,7 +652,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
     public int doExecute(String xmlData, String usercode, String runType, Long taskLogId) {
         //TODO 因此通常来说，0x00-0x20 都会引起一定的问题，又因为这些字符不可见，因此用通常的编辑器进行编辑的时候找不到问题所在。
         //文本过大的时候会不会影响效率???
-        String xmlTableData = xmlData.replaceAll("[\\x00-\\x08\\x0b-\\x0c\\x0e-\\x1f]", "");
+        String xmlTableData = xmlData;//.replaceAll("[\\x00-\\x0c\\x0e-\\x1f]","");
 
         TableFileReader table = new TableFileReader();
         table.readTableInfoFromXML(xmlTableData);
@@ -723,9 +709,9 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
                     + columnName + " keyDesc = " + keyDesc);
         }
 
-        DatabaseInfo dbInfo = databaseInfoDao.getObjectById(database);
+        DatabaseInfo dbInfo = platformEnvironment.getDatabaseInfo(database);
         if (null == dbInfo) {
-            logger.error(SysParametersUtils.getValue(20002));
+            logger.error(SysParametersUtils.getStringValue("ERR-20002","ERR-20002"));
             throw new WsDataException(20002, null);
         }
 
@@ -733,7 +719,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
             logger.debug("DatabaseInfo 参数为 " + dbInfo);
         }
 
-        BasicDataSource ds = null;
+        DataSource ds = null;
         try {
             ds = ConnPool.getDataSource(dbInfo);
         } catch (SQLException e) {

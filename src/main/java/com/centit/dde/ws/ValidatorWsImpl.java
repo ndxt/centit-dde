@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.common.util.CollectionUtils;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
@@ -46,7 +47,7 @@ public class ValidatorWsImpl implements ValidatorWs {
             return "1：用户名密码不匹配";
         }
 
-        String password = DESSecurityUtils.decryptBase64String(userPin,DatabaseInfo.DESKEY);
+        String password = DESSecurityUtils.decryptBase64String(userPin, DatabaseInfo.DESKEY);
 
         if (!userInfo.getUserPin().equals(passwordEncoder.encodePassword(password, userInfo.getUserCode()))) {
             return "1：用户名密码不匹配";
