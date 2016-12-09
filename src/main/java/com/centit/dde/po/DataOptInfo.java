@@ -7,27 +7,44 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-
+@Entity
+@Table(name="D_DATA_OPT_INFO")
 public class DataOptInfo implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
-
+    
+    
+    @Column(name = "DATAOPTID")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String dataOptId;// mapinfoID
-
+    
+    @Column(name = "optName")
     private String optName;
-
+    
+    @Column(name = "OPTDESC")
     private String optDesc;
-
+    
+    @Column(name = "CREATED")
     private String created;
-
+    
+    @Column(name = "LASTUPDATETIME")
     private Date lastUpdateTime;
-
+    
+    @Column(name = "CREATETIME")
     private Date createTime;
-
+    
     private List<DataOptStep> dataOptSteps = null;// new
     // ArrayList<DataOptStep>();
 

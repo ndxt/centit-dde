@@ -2,6 +2,7 @@ package com.centit.dde.service;
 
 import java.util.List;
 
+
 import com.centit.dde.po.MapinfoTrigger;
 import com.centit.dde.po.MapinfoTriggerId;
 import com.centit.framework.core.service.BaseEntityManager;

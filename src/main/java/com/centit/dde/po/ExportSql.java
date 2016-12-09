@@ -7,40 +7,65 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-
+@Entity
+@Table(name="D_EXPORT_SQL")
 public class ExportSql implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    
+    @Column(name="EXPORTID")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long exportId;
 
+    @Column(name="SOURCEDATABASENAME")
     private String sourceDatabaseName;
 
+    @Column(name="SOURCEOSID")
     private String sourceOsId;
 
+    @Column(name="EXPORTNAME")
     private String exportName;
 
+    @Column(name="QUERYSQL")
     private String querySql;
 
+    @Column(name="CREATED")
     private String created;
 
+    @Column(name="AFTERSQLBLOCK")
     private String afterSqlBlock;
 
+    @Column(name="EXPORTDESC")
     private String exportDesc;
 
+    @Column(name="LASTUPDATETIME")
     private Date lastUpdateTime;
 
+    @Column(name="CREATETIME")
     private Date createTime;
 
+    @Column(name="BEFORESQLBLOCK")
     private String beforeSqlBlock;
 
+    @Column(name="DATAOPTID")
     private String dataOptId;
 
+    @Column(name="TABLESTORETYPE")
     private String tableStoreType;
+    
     private List<ExportTrigger> exportTriggers = null;
     private List<ExportField> exportFields = null;// new
     // ArrayList<ExportField>();

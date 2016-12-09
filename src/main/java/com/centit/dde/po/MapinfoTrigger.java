@@ -1,23 +1,48 @@
 package com.centit.dde.po;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
 
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-
+@Entity
+@Table(name="D_IMPORT_TRIGGER")
 public class MapinfoTrigger implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
+    
+    
+    @Column(name="CID")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private MapinfoTriggerId cid;
 
-
+    @Column(name="TRIGGERSQL")
     private String triggerSql;
+    
+    @Column(name="TRIGGERDESC")
     private String triggerDesc;
+    
+    @Column(name="TRIGGERTYPE")
     private String triggerType;
+    
+    @Column(name="TRIGGERTIME")
     private String triggerTime;
+    
+    @Column(name="TRIGGERDATABASE")
     private String triggerDatabase;
+    
+    @Column(name="TIGGERORDER")
     private Long tiggerOrder;
+    
+    @Column(name="ISPROCEDURE")
     private String isprocedure;
 
     /**

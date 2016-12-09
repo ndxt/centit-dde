@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
 import com.centit.dde.exception.SqlResolveException;
@@ -17,14 +18,15 @@ import com.centit.dde.po.ImportOpt;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.support.database.DataSourceDescription;
 import com.centit.support.database.DbcpConnectPools;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
 
+@Repository
 public class ImportOptDao extends BaseDaoImpl<ImportOpt,Long> {
 
     public static final Log log = LogFactory.getLog(ImportOptDao.class);
-
+    @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {
             filterField = new HashMap<String, String>();

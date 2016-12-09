@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Repository;
 
 import com.centit.dde.po.DataOptInfo;
 import com.centit.dde.po.DataOptStep;
@@ -14,10 +15,11 @@ import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.support.database.QueryUtils;
 
+@Repository
 public class DataOptInfoDao extends BaseDaoImpl<DataOptInfo,String> {
 
     public static final Log log = LogFactory.getLog(DataOptInfoDao.class);
-
+    @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {
             filterField = new HashMap<String, String>();

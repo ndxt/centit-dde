@@ -3,37 +3,60 @@ package com.centit.dde.po;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-
+@Entity
+@Table(name="D_EXCHANGE_MAPINFO")
 public class ExchangeMapinfo implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
-
+    
+    
+    @Column(name="MAPINFOID")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long mapinfoId;
-
+    
+    @Column(name="DESTDATABASENAME")
     private String destDatabaseName;
-
+    
+    @Column(name="MAPINFONAME")
     private String mapinfoName;
-
+    
+    @Column(name="QUERYSQL")
     private String querySql;
-
+    
+    @Column(name="SOURCEDATABASENAME")
     private String sourceDatabaseName;
 
+    @Column(name="SOURCETABLENAME")
     private String sourceTablename;
 
+    @Column(name="DESTTABLENAME")
     private String destTablename;
 
+    @Column(name="ISREPEAT")
     private String isRepeat;
 
+    @Column(name="MAPINFODESC")
     private String mapinfoDesc;
 
+    @Column(name="RECORDOPERATE")
     private String recordOperate;
 
+    @Column(name="MAPINFOORDER")
     private Long mapinfoOrder;
 
+    
     private List<MapinfoDetail> mapinfoDetails = null;
 
     private List<MapinfoTrigger> mapinfoTriggers = null;

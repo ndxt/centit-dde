@@ -1,23 +1,58 @@
 package com.centit.dde.po;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Table;
 
+import org.hibernate.annotations.GenericGenerator;
+
+
+@Entity
+@Table(name="D_MAPINFO_DETAIL")
 public class MapinfoDetail implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
+    
+    
+    @Column(name="CID")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private MapinfoDetailId cid;
 
-
+    @Column(name="SOURCEFIELDNAME")
     private String sourceFieldName;
+    
+    @Column(name="DESTFIELDNAME")
     private String destFieldName;
+    
+    @Column(name="SOURCEFIELDSENTENCE")
     private String sourceFieldSentence;
+    
+    @Column(name="SOURCEFIELDTYPE")
     private String sourceFieldType;
+    
+    @Column(name="DESTFIELDTYPE")
     private String destFieldType;
+    
+    @Column(name="ISPK")
     private String isPk;
+    
+    @Column(name="DESTFIELDDEFAULT")
     private String destFieldDefault;
+    
+    @Column(name="ISNULL")
     private String isNull;
 
+    @Column(name="SOUECETABLENAME")
     private String soueceTableName;
+    
+    @Column(name="GOALTABLENAME")
     private String goalTableName;
+    
+    @Column(name="SOURCEURL")
     private String sourceUrl;
+    
+    @Column(name="GOALURL")
     private String goalUrl;
 
     public String getSourceUrl() {

@@ -3,24 +3,40 @@ package com.centit.dde.po;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 /**
  * Created by sx on 2014/12/10.
  */
+@Embeddable
+@Table(name="D_USER_DATAOPTID")
 public class UserDataOptId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    
+    @Column(name="UDID")
     private Long udId;
 
+    @Column(name="USERCODE")
     private String usercode;
 
+    @Column(name="DATAOPTID")
     private String dataOptId;
 
+    @Column(name="CREATEDATE")
     private Date createDate;
 
+    @Column(name="LASTMODIFYDATE")
     private Date lastModifyDate;
 
+    @Column(name="DESCRIBE")
     private String describe;
+    
+    @Column(name="DATAOPTTYPE")
     private String dataoptType;
 
     public String getDataoptType() {
