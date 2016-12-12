@@ -1,7 +1,9 @@
 package com.centit.dde.controller;
 
+import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,45 +13,39 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.centit.core.action.BaseEntityDwzAction;
-import com.centit.core.utils.DwzTableUtils;
-import com.centit.core.utils.PageDesc;
 import com.centit.dde.po.MapinfoTrigger;
 import com.centit.dde.service.MapinfoTriggerManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.dao.PageDesc;
+import com.sun.istack.Nullable;
 
 
 @Controller
 @RequestMapping("/mapinfotrigger")
-public class MapinfoTriggerController extends BaseEntityDwzAction<MapinfoTrigger> {
+public class MapinfoTriggerController extends BaseController {
     private static final Log log = LogFactory.getLog(MapinfoTriggerController.class);
 
     //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");
 
     private static final long serialVersionUID = 1L;
+    @Resource
+    @Nullable
     private MapinfoTriggerManager mapinfoTriggerMag;
 
-    public void setMapinfoTriggerManager(MapinfoTriggerManager basemgr) {
-        mapinfoTriggerMag = basemgr;
-        this.setBaseEntityManager(mapinfoTriggerMag);
-    }
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value="/list",method = {RequestMethod.GET})
-    public void list(HttpServletRequest request,HttpServletResponse response) {
+    public void list(PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
         try {
-            Map<Object, Object> paramMap = request.getParameterMap();
-            resetPageParam(paramMap);
-
-            Map<String, Object> filterMap = convertSearchColumn(paramMap);
+            Map<String, Object> searchColumn = convertSearchColumn(request);
             
-            PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
-            filterMap.put("cid.mapinfoId", filterMap.get("mapinfoId"));
-            objList = mapinfoTriggerMag.listTrigger(Long.valueOf((String) filterMap.get("mapinfoId")));
+            searchColumn.put("cid.mapinfoId", searchColumn.get("mapinfoId"));
+            List<MapinfoTrigger> objList = mapinfoTriggerMag.listTrigger(Long.valueOf((String) searchColumn.get("mapinfoId")));
 
             pageDesc.setTotalRows(objList.size());
-            this.pageDesc = pageDesc;
+//            this.pageDesc = pageDesc;
 //            return LIST;
             ResponseData resData = new ResponseData();
             resData.addResponseData("OBJLIST", objList);
@@ -63,18 +59,19 @@ public class MapinfoTriggerController extends BaseEntityDwzAction<MapinfoTrigger
     }
 
     @RequestMapping(value="/list_add",method = {RequestMethod.PUT})
-    public void list_add(HttpServletRequest request,HttpServletResponse response) {
+    public void list_add(PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
         try {
-            Map<Object, Object> paramMap = request.getParameterMap();
-            resetPageParam(paramMap);
-
-            Map<String, Object> filterMap = convertSearchColumn(paramMap);
-            PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
-            filterMap.put("cid.mapinfoId", filterMap.get("mapinfoId"));
-            objList = mapinfoTriggerMag.listTrigger(Long.valueOf((String) filterMap.get("mapinfoId")));
+//            Map<Object, Object> paramMap = request.getParameterMap();
+//            resetPageParam(paramMap);
+//
+//            Map<String, Object> filterMap = convertSearchColumn(paramMap);
+//            PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
+            Map<String, Object> searchColumn = convertSearchColumn(request);
+            searchColumn.put("cid.mapinfoId", searchColumn.get("mapinfoId"));
+            List<MapinfoTrigger> objList = mapinfoTriggerMag.listTrigger(Long.valueOf((String) searchColumn.get("mapinfoId")));
 
             pageDesc.setTotalRows(objList.size());
-            this.pageDesc = pageDesc;
+//            this.pageDesc = pageDesc;
 //            return "list_add"; /page/dde/mapinfoTriggerList_add.jsp
             ResponseData resData = new ResponseData();
             resData.addResponseData("OBJLIST", objList);
@@ -89,17 +86,17 @@ public class MapinfoTriggerController extends BaseEntityDwzAction<MapinfoTrigger
     }
 
     @RequestMapping(value="/edit",method = {RequestMethod.PUT})
-    public void edit(HttpServletRequest request,HttpServletResponse response) {
+    public void edit(MapinfoTrigger object ,HttpServletRequest request,HttpServletResponse response) {
         //MapinfoTriggerId cid = new MapinfoTriggerId();
         try {
             if (object == null) {
-                object = getEntityClass().newInstance();
+//                object = getEntityClass().newInstance();
             } else {
-                MapinfoTrigger o = baseEntityManager.getObject(object);
+                MapinfoTrigger o = mapinfoTriggerMag.getObjectById(object.getCid());
                 if (o != null)
-                    baseEntityManager.copyObject(object, o);
+                    mapinfoTriggerMag.copyObject(object, o);
                 else
-                    baseEntityManager.clearObjectProperties(object);
+                    mapinfoTriggerMag.clearObjectProperties(object);
             }
 //            return EDIT;
             JsonResultUtils.writeSuccessJson(response);
@@ -111,17 +108,17 @@ public class MapinfoTriggerController extends BaseEntityDwzAction<MapinfoTrigger
     }
 
     @RequestMapping(value="/edit_add",method = {RequestMethod.GET})
-    public void edit_add(HttpServletRequest request,HttpServletResponse response) {
+    public void edit_add(MapinfoTrigger object,HttpServletRequest request,HttpServletResponse response) {
         //MapinfoTriggerId cid = new MapinfoTriggerId();
         try {
             if (object == null) {
-                object = getEntityClass().newInstance();
+//                object = getEntityClass().newInstance();
             } else {
-                MapinfoTrigger o = baseEntityManager.getObject(object);
+                MapinfoTrigger o = mapinfoTriggerMag.getObjectById(object.getCid());
                 if (o != null)
-                    baseEntityManager.copyObject(object, o);
+                    mapinfoTriggerMag.copyObject(object, o);
                 else
-                    baseEntityManager.clearObjectProperties(object);
+                    mapinfoTriggerMag.clearObjectProperties(object);
             }
 //            return "edit_add"; /page/dde/editMapinfoDetailForm_add.jsp
             JsonResultUtils.writeSingleDataJson(object, response);
@@ -133,47 +130,47 @@ public class MapinfoTriggerController extends BaseEntityDwzAction<MapinfoTrigger
     }
 
     @RequestMapping(value="/saveTrigger",method = {RequestMethod.PUT})
-    public void saveTrigger(HttpServletRequest request,HttpServletResponse response) {
+    public void saveTrigger(MapinfoTrigger object,HttpServletRequest request,HttpServletResponse response) {
         try {
-            MapinfoTrigger dbObject = baseEntityManager.getObject(object);
+            MapinfoTrigger dbObject = mapinfoTriggerMag.getObjectById(object.getCid());
             if (dbObject != null) {
-                baseEntityManager.copyObjectNotNullProperty(dbObject, object);
+                mapinfoTriggerMag.copyObjectNotNullProperty(dbObject, object);
                 object = dbObject;
             }
             if (object.getCid().getTriggerId() == null) {
                 object.getCid().setTriggerId(
                         this.mapinfoTriggerMag.getTriggerId());
             }
-            baseEntityManager.saveObject(object);
-            savedMessage();
+            mapinfoTriggerMag.saveObject(object);
+//            savedMessage();
 //            return "saveTrigger";
             JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            saveError(e.getMessage());
+//            saveError(e.getMessage());
             JsonResultUtils.writeErrorMessageJson("error", response);
         }
     }
 
     @RequestMapping(value="/addAndsaveTrigger",method = {RequestMethod.PUT})
-    public void addAndsaveTrigger(HttpServletRequest request,HttpServletResponse response) {
+    public void addAndsaveTrigger(MapinfoTrigger object,HttpServletRequest request,HttpServletResponse response) {
         try {
-            MapinfoTrigger dbObject = baseEntityManager.getObject(object);
+            MapinfoTrigger dbObject = mapinfoTriggerMag.getObjectById(object.getCid());
             if (dbObject != null) {
-                baseEntityManager.copyObjectNotNullProperty(dbObject, object);
+                mapinfoTriggerMag.copyObjectNotNullProperty(dbObject, object);
                 object = dbObject;
             }
             if (object.getCid().getTriggerId() == null) {
                 object.getCid().setTriggerId(
                         this.mapinfoTriggerMag.getTriggerId());
             }
-            baseEntityManager.saveObject(object);
-            savedMessage();
+            mapinfoTriggerMag.saveObject(object);
+//            savedMessage();
 //            return "addAndsaveTrigger";
             JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            saveError(e.getMessage());
+//            saveError(e.getMessage());
             JsonResultUtils.writeErrorMessageJson("error", response);
         }
     }
@@ -190,17 +187,17 @@ public class MapinfoTriggerController extends BaseEntityDwzAction<MapinfoTrigger
 
 
     @RequestMapping(value="/delete",method = {RequestMethod.DELETE})
-    public void delete(HttpServletRequest request,HttpServletResponse response) {
-        super.delete();
+    public void delete(MapinfoTrigger object,HttpServletRequest request,HttpServletResponse response) {
+        mapinfoTriggerMag.deleteObjectById(object.getCid());
 
 //        return "delete";
         JsonResultUtils.writeSuccessJson(response);
     }
 
     @RequestMapping(value="/delete_add",method = {RequestMethod.PUT})
-    public void delete_add(HttpServletRequest request,HttpServletResponse response) {
-        super.delete();
-
+    public void delete_add(MapinfoTrigger object,HttpServletRequest request,HttpServletResponse response) {
+//        super.delete();
+        mapinfoTriggerMag.deleteObjectById(object.getCid());
 //        return "delete_add";
         JsonResultUtils.writeSuccessJson(response);
     }

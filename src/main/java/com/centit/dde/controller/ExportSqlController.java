@@ -8,41 +8,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
+
+
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.struts2.ServletActionContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.WebUtils;
 
-import com.centit.core.action.BaseEntityDwzAction;
-import com.centit.core.dao.SQLUtils;
-import com.centit.core.utils.DwzResultParam;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportSql;
 import com.centit.dde.service.ExportSqlManager;
+import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.po.OsInfo;
-import com.centit.sys.po.FDatadictionary;
-import com.centit.sys.security.FUserDetail;
-import com.centit.sys.service.CodeRepositoryUtil;
-import com.centit.sys.util.SysParametersUtils;
+import com.sun.istack.Nullable;
 
 @Controller
 @RequestMapping("/exportsql")
-public class ExportSqlController extends BaseEntityDwzAction<ExportSql> {
+public class ExportSqlController extends BaseController {
     private static final Log log = LogFactory.getLog(ExportSqlController.class);
 
     // private static final ISysOptLog sysOptLog =
@@ -52,41 +52,27 @@ public class ExportSqlController extends BaseEntityDwzAction<ExportSql> {
 
     private String tabid;
 
-    public String getTabid() {
-        return tabid;
-    }
-
-    public void setTabid(String tabid) {
-        this.tabid = tabid;
-    }
-
+    @Resource
+    @Nullable
     private ExportSqlManager exportSqlMag;
 
+    @Resource
+    @Nullable
     private DatabaseInfoManager databaseInfoManager;
 
+    @Resource
+    @Nullable
     private OsInfoManager osInfoManager;
 
-    public void setOsInfoManager(OsInfoManager osInfoManager) {
-        this.osInfoManager = osInfoManager;
-    }
 
-    public void setDatabaseInfoManager(DatabaseInfoManager databaseInfoManager) {
-        this.databaseInfoManager = databaseInfoManager;
-    }
-
-    public void setExportSqlManager(ExportSqlManager basemgr) {
-        exportSqlMag = basemgr;
-        this.setBaseEntityManager(exportSqlMag);
-    }
-
-    @RequestMapping(value="/save",method = {RequestMethod.PUT})
-    public void save( HttpServletRequest request,HttpServletResponse response) {
-        dwzResultParam = new DwzResultParam();
-        dwzResultParam.setNavTabId(tabid);
+    @RequestMapping(value="/save/{{tabid}}/{{exportId}}",method = {RequestMethod.PUT})
+    public void save(@PathVariable Long exportId,ExportSql object, HttpServletRequest request,HttpServletResponse response) {
+//        dwzResultParam = new DwzResultParam();
+//        dwzResultParam.setNavTabId(tabid);
 
 
         //判断名称的唯一性
-        object.setExportName(org.apache.commons.lang.StringUtils.trim(object.getExportName()));
+        object.setExportName(object.getExportName().trim());
 
         Map<String, Object> filterMap = new HashMap<String, Object>();
         filterMap.put("eqExportName", object.getExportName());
@@ -95,10 +81,11 @@ public class ExportSqlController extends BaseEntityDwzAction<ExportSql> {
 
 
         if (!CollectionUtils.isEmpty(listObjects)) {
-            ExportSql exportDB = exportSqlMag.getObject(object);
+//            ExportSql exportDB = exportSqlMag.getObjectById(object.getExportId());
+            ExportSql exportDB = exportSqlMag.getObjectById(exportId);
             String message = "导出名称已存在";
             if (null == exportDB) {
-                dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, message);
+//                dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, message);
 
 //                return SUCCESS;
                 JsonResultUtils.writeSuccessJson(response);
@@ -106,7 +93,7 @@ public class ExportSqlController extends BaseEntityDwzAction<ExportSql> {
             } else {
                 if (1 < listObjects.size() || !exportDB.getExportId().equals(listObjects.get(0)
                         .getExportId())) {
-                    dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, message);
+//                    dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, message);
 
 //                    return SUCCESS;
                     JsonResultUtils.writeSuccessJson(response);
@@ -119,39 +106,39 @@ public class ExportSqlController extends BaseEntityDwzAction<ExportSql> {
         try {
             exportSqlMag.validator(object);
 
-            exportSqlMag.saveObject(object, (FUserDetail) getLoginUser());
+            exportSqlMag.saveObject(object, getLoginUser(request));
         } catch (SqlResolveException e) {
-            dwzResultParam.setStatusCode(DwzResultParam.STATUS_CODE_300);
+//            dwzResultParam.setStatusCode(DwzResultParam.STATUS_CODE_300);
             String message = null;
             if (0 == e.getErrorcode()) {
                 message = e.getMessage();
             } else {
-                message = SysParametersUtils.getValue(String.valueOf(e.getErrorcode()));
+//                message = SysParametersUtils.getValue(String.valueOf(e.getErrorcode()));
             }
 
-            dwzResultParam.setMessage(message);
+//            dwzResultParam.setMessage(message);
 
             JsonResultUtils.writeSuccessJson(response);
             return;
         }
 
-        dwzResultParam.setForwardUrl("/dde/exportSql!list.do");
+//        dwzResultParam.setForwardUrl("/dde/exportSql!list.do");
         JsonResultUtils.writeSuccessJson(response);
     }
 
-    @RequestMapping(value="/delete" ,method = {RequestMethod.DELETE})
-    public void delete(HttpServletRequest request,HttpServletResponse response) {
-        super.delete();
-
+    @RequestMapping(value="/delete/{{exportId}}" ,method = {RequestMethod.DELETE})
+    public void delete(@PathVariable Long exportId,HttpServletRequest request,HttpServletResponse response) {
+        exportSqlMag.deleteObjectById(exportId);
 //        return "delete";
         JsonResultUtils.writeSuccessJson(response);
     }
 
-    @RequestMapping(value="/edit" ,method = {RequestMethod.PUT})
-    public void edit(HttpServletRequest request,HttpServletResponse response) {
-        ExportSql exportSql = exportSqlMag.getObject(object);
+    @RequestMapping(value="/edit/{{exportId}}" ,method = {RequestMethod.PUT})
+    public void edit(ExportSql object,@PathVariable Long exportId,HttpServletRequest request,HttpServletResponse response) {
+//        ExportSql exportSql = exportSqlMag.getObjectById(object.getExportId());
+        ExportSql exportSql = exportSqlMag.getObjectById(object.getExportId());
         if (null != exportSql) {
-            baseEntityManager.copyObject(object, exportSql);
+            exportSqlMag.copyObject(object, exportSql);
         }
 
         // copy
@@ -175,22 +162,25 @@ public class ExportSqlController extends BaseEntityDwzAction<ExportSql> {
      * @return
      */
     @RequestMapping(value="/listField" ,method = {RequestMethod.GET})
-    public void listField(HttpServletRequest request,HttpServletResponse response) {
-        object = baseEntityManager.getObject(object);
+    public void listField(ExportSql object,HttpServletRequest request,HttpServletResponse response) {
+        object = exportSqlMag.getObjectById(object.getExportId());
         if (null == object) {
             //
         }
 
         List<DatabaseInfo> dbList = databaseInfoManager.listObjects();
 
-        request.setAttribute("dbList", dbList);
+//        request.setAttribute("dbList", dbList);
 
         // 业务系统
         List<OsInfo> osinfoList = osInfoManager.listObjects();
 //        request.setAttribute("osinfoList", osinfoList);
 //
 //        return "listField";
-        JsonResultUtils.writeSingleDataJson(osinfoList, response);
+        ResponseData resData = new ResponseData();
+        resData.addResponseData("dbList", dbList);
+        resData.addResponseData("osinfoList", osinfoList);
+        JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
     
     @RequestMapping(value="/defDataSource" ,method = {RequestMethod.GET})
@@ -223,7 +213,7 @@ public class ExportSqlController extends BaseEntityDwzAction<ExportSql> {
      * @throws IOException
      */
     @RequestMapping(value="/resolveQuerySql")
-    public void resolveQuerySql() throws IOException {
+    public void resolveQuerySql(ExportSql object) throws IOException {
         PrintWriter writer = ServletActionContext.getResponse().getWriter();
         String jsonResult = null;
         Map<String, Object> params = new HashMap<String, Object>();
@@ -242,7 +232,7 @@ public class ExportSqlController extends BaseEntityDwzAction<ExportSql> {
 
             //未通过sql验证，简单验证语法
             params.put("simple", 1);
-            params.put("message", SysParametersUtils.getValue(String.valueOf(e.getErrorcode())));
+            params.put("message", SysParametersUtils.getStringValue(String.valueOf(e.getErrorcode())));
         }
 
         params.put("splitsql", SQLUtils.splitSqlByFields(object.getQuerySql()));
@@ -308,10 +298,10 @@ public class ExportSqlController extends BaseEntityDwzAction<ExportSql> {
      * 导出源字段
      */
     @RequestMapping(value="/exportSourceField")
-    public void exportSourceField() throws IOException {
+    public void exportSourceField(ExportSql object) throws IOException {
         HttpServletResponse response = ServletActionContext.getResponse();
         ServletOutputStream output = response.getOutputStream();
-        ExportSql exportSql = exportSqlMag.getObject(object);
+        ExportSql exportSql = exportSqlMag.getObjectById(object.getExportId());
 
 
         List<ExportField> exportFields = exportSql.getExportFields();

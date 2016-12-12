@@ -3,29 +3,30 @@ package com.centit.dde.controller;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.struts2.ServletActionContext;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.centit.core.action.BaseEntityDwzAction;
-import com.centit.core.utils.DwzTableUtils;
-import com.centit.core.utils.PageDesc;
 import com.centit.dde.po.ExchangeMapinfo;
 import com.centit.dde.service.ExchangeMapinfoManager;
 import com.centit.dde.service.ExchangeTaskdetailManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.dao.PageDesc;
+import com.sun.istack.Nullable;
 
 @Controller
 @RequestMapping("/exchangemapinfo")
-public class ExchangeMapinfoController extends BaseEntityDwzAction<ExchangeMapinfo> {
+public class ExchangeMapinfoController extends BaseController {
     private static final Log log = LogFactory
             .getLog(ExchangeMapinfoController.class);
 
@@ -33,35 +34,27 @@ public class ExchangeMapinfoController extends BaseEntityDwzAction<ExchangeMapin
     // SysOptLogFactoryImpl.getSysOptLog("optid");
 
     private static final long serialVersionUID = 1L;
+    
+    @Resource
+    @Nullable
     private ExchangeMapinfoManager exchangeMapinfoMag;
+    @Resource
+    @Nullable
     private ExchangeTaskdetailManager exchangeTaskdetailManager;
 
 
-    public ExchangeTaskdetailManager getExchangeTaskdetailManager() {
-        return exchangeTaskdetailManager;
-    }
-
-    public void setExchangeTaskdetailManager(
-            ExchangeTaskdetailManager exchangeTaskdetailManager) {
-        this.exchangeTaskdetailManager = exchangeTaskdetailManager;
-    }
-
-    public void setExchangeMapinfoManager(ExchangeMapinfoManager basemgr) {
-        exchangeMapinfoMag = basemgr;
-        this.setBaseEntityManager(exchangeMapinfoMag);
-    }
-
     @SuppressWarnings("unchecked")
     @RequestMapping(value="/list" ,method = {RequestMethod.GET})
-    public void list( HttpServletRequest request, HttpServletResponse response) {
+    public void list(PageDesc pageDesc,HttpServletRequest request, HttpServletResponse response) {
         try {
-            Map<Object, Object> paramMap = request.getParameterMap();
-            resetPageParam(paramMap);
-
-            Map<String, Object> filterMap = convertSearchColumn(paramMap);
-            PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
-            objList = baseEntityManager.listObjects(filterMap, pageDesc);
-            this.pageDesc = pageDesc;
+//            Map<Object, Object> paramMap = request.getParameterMap();
+////            resetPageParam(paramMap);
+//
+//            Map<String, Object> filterMap = convertSearchColumn(paramMap);
+//            PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
+//            List<ExchangeMapinfo> objList = exchangeMapinfoMag.listObjects(filterMap, pageDesc);
+            Map<String, Object> searchColumn = convertSearchColumn(request);
+            List<ExchangeMapinfo> objList = exchangeMapinfoMag.listObjects(searchColumn, pageDesc);
             ResponseData resData = new ResponseData();
             resData.addResponseData("OBJLIST", objList);
             resData.addResponseData("PAGE_DESC", pageDesc);
@@ -74,18 +67,22 @@ public class ExchangeMapinfoController extends BaseEntityDwzAction<ExchangeMapin
     }
 
 
+    @SuppressWarnings("unused")
     @RequestMapping(value="/add" ,method = {RequestMethod.PUT})
-    public void add(HttpServletRequest request,HttpServletResponse response) {
+    public void add(ExchangeMapinfo object,HttpServletRequest request,HttpServletResponse response) {
+        Long mapinfoId = object.getMapinfoId();
         try {
             if (object == null) {
-                object = getEntityClass().newInstance();
+//                object = getEntityClass().newInstance();
+                JsonResultUtils.writeBlankJson(response);
+                return;
             } else {
-                ExchangeMapinfo o = baseEntityManager.getObject(object);
+                ExchangeMapinfo o = exchangeMapinfoMag.getObjectById(mapinfoId);;
                 if (o != null)
                     // 将对象o copy给object，object自己的属性会保留
-                    baseEntityManager.copyObject(object, o);
+                    exchangeMapinfoMag.copyObject(object, o);
                 else
-                    baseEntityManager.clearObjectProperties(object);
+                    exchangeMapinfoMag.clearObjectProperties(object);
             }
             List<String> DatabaseNames = exchangeMapinfoMag.listDatabaseName();
             /*ServletActionContext.getContext().put("DatabaseNames", DatabaseNames);
@@ -97,18 +94,20 @@ public class ExchangeMapinfoController extends BaseEntityDwzAction<ExchangeMapin
         }
     }
 
-    @RequestMapping(value="/edit",method = {RequestMethod.PUT})
-    public void edit(HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/edit/{{mapinfoId}}",method = {RequestMethod.PUT})
+    public void edit(@PathVariable Long mapinfoId,ExchangeMapinfo object, HttpServletRequest request,HttpServletResponse response) {
         try {
             if (object == null) {
-                object = getEntityClass().newInstance();
+//                object = getEntityClass().newInstance();
+                JsonResultUtils.writeBlankJson(response);
+                return;
             } else {
-                ExchangeMapinfo o = baseEntityManager.getObject(object);
+                ExchangeMapinfo o = exchangeMapinfoMag.getObjectById(mapinfoId);
                 if (o != null)
                     // 将对象o copy给object，object自己的属性会保留
-                    baseEntityManager.copyObject(object, o);
+                    exchangeMapinfoMag.copyObject(object, o);
                 else
-                    baseEntityManager.clearObjectProperties(object);
+                    exchangeMapinfoMag.clearObjectProperties(object);
             }
             List<String> DatabaseNames = exchangeMapinfoMag.listDatabaseName();
             /*ServletActionContext.getContext().put("DatabaseNames", DatabaseNames);
@@ -121,31 +120,31 @@ public class ExchangeMapinfoController extends BaseEntityDwzAction<ExchangeMapin
         }
     }
 
-    @RequestMapping(value="/save" ,method = {RequestMethod.PUT})
-    public void save(HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/save/{{mapinfoId}}" ,method = {RequestMethod.PUT})
+    public void save(@PathVariable Long mapinfoId,ExchangeMapinfo object, HttpServletRequest request,HttpServletResponse response) {
         try {
-            ExchangeMapinfo dbObject = baseEntityManager.getObject(object);
+            ExchangeMapinfo dbObject = exchangeMapinfoMag.getObjectById(mapinfoId);
             if (dbObject != null) {
-                baseEntityManager.copyObjectNotNullProperty(dbObject, object);
+                exchangeMapinfoMag.copyObjectNotNullProperty(dbObject, object);
                 object = dbObject;
             }
-            baseEntityManager.saveObject(object);
-            savedMessage();
+            exchangeMapinfoMag.saveObject(object);
+//            savedMessage();
 //            return SUCCESS;
             JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            saveError(e.getMessage());
+//            saveError(e.getMessage());
 //            return ERROR;
             JsonResultUtils.writeErrorMessageJson("error", response);
         }
     }
-    @RequestMapping(value="/delete" ,method = {RequestMethod.PUT})
-    public void delete(HttpServletRequest request,HttpServletResponse response) {
-
-        baseEntityManager.deleteObject(object);
-        exchangeTaskdetailManager.deleteDetailsByMapinfoId(object.getMapinfoId());
-        deletedMessage();
+    @RequestMapping(value="/delete/{{mapinfoId}}" ,method = {RequestMethod.PUT})
+    public void delete(@PathVariable Long mapinfoId, HttpServletRequest request,HttpServletResponse response) {
+        ExchangeMapinfo object = exchangeMapinfoMag.getObjectById(mapinfoId);
+        exchangeMapinfoMag.deleteObject(object);
+        exchangeTaskdetailManager.deleteDetailsByMapinfoId(mapinfoId);
+//        deletedMessage();
 //        return "delete";
         JsonResultUtils.writeSuccessJson(response);
     }

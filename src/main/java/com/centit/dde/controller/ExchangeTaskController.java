@@ -9,24 +9,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.WebUtils;
 
-import com.centit.core.action.BaseEntityDwzAction;
-import com.centit.core.dao.CodeBook;
-import com.centit.core.utils.DwzResultParam;
-import com.centit.core.utils.DwzTableUtils;
-import com.centit.core.utils.PageDesc;
 import com.centit.dde.po.ExchangeMapinfo;
 import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.po.ExchangeTaskdetail;
@@ -42,19 +38,21 @@ import com.centit.dde.service.MapinfoDetailManager;
 import com.centit.dde.service.MapinfoTriggerManager;
 import com.centit.dde.service.TaskErrorDataManager;
 import com.centit.dde.service.TaskLogManager;
+import com.centit.framework.common.SysParametersUtils;
+import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
-import com.centit.support.utils.HtmlFormUtils;
-import com.centit.support.utils.StringRegularOpt;
-import com.centit.sys.po.FUserinfo;
-import com.centit.sys.security.FUserDetail;
-import com.centit.sys.service.CodeRepositoryUtil;
-import com.centit.sys.service.SysUserManager;
-import com.centit.sys.util.SysParametersUtils;
+import com.centit.framework.core.controller.BaseController;
+import com.sun.istack.Nullable;
+import com.centit.framework.core.dao.CodeBook;
+import com.centit.framework.core.dao.PageDesc;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.support.algorithm.StringRegularOpt;
+import com.centit.support.network.HtmlFormUtils;
 
 @Controller
 @RequestMapping("/exchangetask")
-public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
+public class ExchangeTaskController extends BaseController {
     private static final Log log = LogFactory.getLog(ExchangeTaskController.class);
 
     // private static final ISysOptLog sysOptLog =
@@ -62,109 +60,48 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
 
     private static final long serialVersionUID = 1L;
 
+    @Resource
+    @Nullable
     private ExchangeTaskManager exchangeTaskMag;
 
+    @Resource
+    @Nullable
     private SysUserManager sysUserMgr;
 
+    @Resource
+    @Nullable
     private ExchangeMapinfoManager exchangeMapinfoManager;
 
+    @Resource
+    @Nullable
     private ExchangeTaskdetailManager exchangeTaskdetailManager;
 
+    @Resource
+    @Nullable
     private MapinfoDetailManager mapinfoDetailManager;
 
+    @Resource
+    @Nullable
     private MapinfoTriggerManager mapinfoTriggerManager;
 
+    @Resource
+    @Nullable
     private DatabaseInfoManager databaseInfoManager;
 
+    @Resource
+    @Nullable
     private TaskErrorDataManager taskErrorDataManager;
 
+    @Resource
+    @Nullable
     private TaskLogManager taskLogManager;
 
+    @Resource
+    @Nullable
     private ExportSqlManager exportSqlManager;
 
-    public void setExportSqlManager(ExportSqlManager exportSqlManager) {
-        this.exportSqlManager = exportSqlManager;
-    }
 
     private String s_taskType;
-   
-
-    public String getS_taskType() {
-        return s_taskType;
-    }
-
-    public void setS_taskType(String s_taskType) {
-        this.s_taskType = s_taskType;
-    }
-
-    public TaskErrorDataManager getTaskErrorDataManager() {
-        return taskErrorDataManager;
-    }
-
-    public void setTaskErrorDataManager(TaskErrorDataManager taskErrorDataManager) {
-        this.taskErrorDataManager = taskErrorDataManager;
-    }
-
-    public TaskLogManager getTaskLogManager() {
-        return taskLogManager;
-    }
-
-    public void setTaskLogManager(TaskLogManager taskLogManager) {
-        this.taskLogManager = taskLogManager;
-    }
-
-    public DatabaseInfoManager getDatabaseInfoManager() {
-        return databaseInfoManager;
-    }
-
-    public void setDatabaseInfoManager(DatabaseInfoManager databaseInfoManager) {
-        this.databaseInfoManager = databaseInfoManager;
-    }
-
-    public MapinfoTriggerManager getMapinfoTriggerManager() {
-        return mapinfoTriggerManager;
-    }
-
-    public void setMapinfoTriggerManager(MapinfoTriggerManager mapinfoTriggerManager) {
-        this.mapinfoTriggerManager = mapinfoTriggerManager;
-    }
-
-    public MapinfoDetailManager getMapinfoDetailManager() {
-        return mapinfoDetailManager;
-    }
-
-    public void setMapinfoDetailManager(MapinfoDetailManager mapinfoDetailManager) {
-        this.mapinfoDetailManager = mapinfoDetailManager;
-    }
-
-    public ExchangeTaskdetailManager getExchangeTaskdetailManager() {
-        return exchangeTaskdetailManager;
-    }
-
-    public void setExchangeTaskdetailManager(ExchangeTaskdetailManager exchangeTaskdetailManager) {
-        this.exchangeTaskdetailManager = exchangeTaskdetailManager;
-    }
-
-    public ExchangeMapinfoManager getExchangeMapinfoManager() {
-        return exchangeMapinfoManager;
-    }
-
-    public void setExchangeMapinfoManager(ExchangeMapinfoManager exchangeMapinfoManager) {
-        this.exchangeMapinfoManager = exchangeMapinfoManager;
-    }
-
-    public void setExchangeTaskManager(ExchangeTaskManager basemgr) {
-        exchangeTaskMag = basemgr;
-        this.setBaseEntityManager(exchangeTaskMag);
-    }
-
-    public SysUserManager getSysUserMgr() {
-        return sysUserMgr;
-    }
-
-    public void setSysUserMgr(SysUserManager sysUserMgr) {
-        this.sysUserMgr = sysUserMgr;
-    }
 
     private List<ExchangeTaskdetail> exchangeTaskdetails;
 
@@ -186,41 +123,43 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
         this.taskLogs = taskLogs;
     }
     private String s_isvalid;
+    
     @SuppressWarnings("unchecked")
     @RequestMapping(value="/list" , method = {RequestMethod.GET})
-    public void list( HttpServletRequest request,HttpServletResponse response) {
+    public void list(PageDesc pageDesc, HttpServletRequest request,HttpServletResponse response) {
         try {
             Map<Object, Object> paramMap = request.getParameterMap();
-            resetPageParam(paramMap);
+//            resetPageParam(paramMap);
 
             String orderField = request.getParameter("orderField");
             String orderDirection = request.getParameter("orderDirection");
 
-            Map<String, Object> filterMap = convertSearchColumn(paramMap);
+//            Map<String, Object> filterMap = convertSearchColumn(paramMap);
+            Map<String, Object> searchColumn = convertSearchColumn(request); 
 
-            if (!filterMap.containsKey("isvalid")) {
-                filterMap.put("isvalid", "1");
+            if (!searchColumn.containsKey("isvalid")) {
+                searchColumn.put("isvalid", "1");
             }
             //包含禁用
-            if ("T".equals(filterMap.get("isvalid"))) {
-                filterMap.remove("isvalid");
-                filterMap.put("isvalid","1");
+            if ("T".equals(searchColumn.get("isvalid"))) {
+                searchColumn.remove("isvalid");
+                searchColumn.put("isvalid","1");
             }
-            if ("0".equals(filterMap.get("isvalid"))) {
-                filterMap.remove("isvalid");
+            if ("0".equals(searchColumn.get("isvalid"))) {
+                searchColumn.remove("isvalid");
             }
-            s_isvalid =(String)filterMap.get("isvalid");
+            s_isvalid =(String)searchColumn.get("isvalid");
             if (null==s_isvalid)
                 s_isvalid="0";
-            if (!StringUtils.isBlank(orderField) && !StringUtils.isBlank(orderDirection)) {
+            if (!orderField.equals(null) && !orderDirection.equals(null)) {
 
-                filterMap.put(CodeBook.SELF_ORDER_BY, orderField + " " + orderDirection);
+                searchColumn.put(CodeBook.SELF_ORDER_BY, orderField + " " + orderDirection);
 
                 // request.setAttribute("orderDirection", orderDirection);
                 // request.setAttribute("orderField", orderField);
             }
-            PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
-            objList = baseEntityManager.listObjects(filterMap, pageDesc);
+//            pageDesc = DwzTableUtils.makePageDesc(request);
+            List<ExchangeTask>  objList = exchangeTaskMag.listObjects(searchColumn, pageDesc);
 
             for (int i = 0; i < objList.size(); i++) {
                 ExchangeTask exchangeTask = objList.get(i);
@@ -232,7 +171,7 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
             }
 
             setTaskTypeToPage();
-            this.pageDesc = pageDesc;
+//            this.pageDesc = pageDesc;
             ResponseData resData = new ResponseData();
             resData.addResponseData("OBJLIST", objList);
             resData.addResponseData("PAGE_DESC", pageDesc);
@@ -245,11 +184,11 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
         }
     }
 
-    @RequestMapping(value="/save", method = {RequestMethod.PUT})
-    public void save(HttpServletRequest request ,HttpServletResponse response) {
-        object.setTaskName(StringUtils.trim(object.getTaskName()));
+    @RequestMapping(value="/save/{{taskId}}", method = {RequestMethod.PUT})
+    public void save(ExchangeTask object,@PathVariable Long taskId ,HttpServletRequest request ,HttpServletResponse response) {
+        object.setTaskName(object.getTaskName().trim());
         try {
-            ExchangeTask dbObject = exchangeTaskMag.getObject(object);
+            ExchangeTask dbObject = exchangeTaskMag.getObjectById(taskId);
             if (dbObject != null) {
                 dbObject.copyNotNullProperty(object);
                 // baseEntityManager.copyObjectNotNullProperty(dbObject,
@@ -263,7 +202,7 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
                 filterMap.put("taskNameEq", object.getTaskName());
                 List<ExchangeTask> listObjects = exchangeTaskMag.listObjects(filterMap);
                 if (!org.springframework.util.CollectionUtils.isEmpty(listObjects)) {
-                    dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, "任务名称已存在");
+//                    dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, "任务名称已存在");
 //                    return SUCCESS;
                     JsonResultUtils.writeSuccessJson(response);
                 }
@@ -273,25 +212,25 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
                 object.setCreateTime(new Date());
                 object.setIsvalid("1");
                 // 获取登录用户
-                FUserDetail uinfo = ((FUserDetail) getLoginUser());
+                FUserDetail uinfo = (getLoginUser(request));
                 if (uinfo != null) {
                     object.setCreated(uinfo.getUsercode());
                 }
-                saveMessage("添加交换任务成功！");
+//                saveMessage("添加交换任务成功！");
             } else {
-                saveMessage("编辑交换任务成功！");
+//                saveMessage("编辑交换任务成功！");
             }
-            if (StringUtils.isNotBlank(object.getTaskCron())) {
+            if (!object.getTaskCron().equals(null)) {
                 exchangeTaskMag.saveNewTimerTask(object);
             }
 
             //更新下次执行时间
-            if (StringUtils.isNotBlank(object.getTaskCron())) {
+            if (object.getTaskCron().equals(null)) {
                 try {
                     CronSequenceGenerator generator = new CronSequenceGenerator(object.getTaskCron(), TimeZone.getDefault());
                     object.setNextRunTime(generator.next(new Date()));
                 } catch (Exception e) {
-                    saveError("定时任务表达式不正确");
+//                    saveError("定时任务表达式不正确");
 
 //                    return ERROR;
                     JsonResultUtils.writeErrorMessageJson("XXXXX", response);
@@ -299,33 +238,32 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
                 }
             }
 
-            baseEntityManager.saveObject(object);
+            exchangeTaskMag.saveObject(object);
 
             // forward至列表页面
-            dwzResultParam = new DwzResultParam("/dde/exchangeTask!list.do?s_taskType=" + object.getTaskType());
+//            dwzResultParam = new DwzResultParam("/dde/exchangeTask!list.do?s_taskType=" + object.getTaskType());
 
 //            return SUCCESS;
             JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("保存交换对应关系："+ e.getMessage(), e);
-            saveError("保存交换对应关系："+ e.getMessage());
+//            saveError("保存交换对应关系："+ e.getMessage());
 //            return ERROR;
             JsonResultUtils.writeErrorMessageJson("XXXXX", response);
         }
     }
 
-    @RequestMapping(value="/editAndsave" , method = {RequestMethod.PUT})
-    public void editAndsave(HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/editAndsave/{{taskId}}" , method = {RequestMethod.PUT})
+    public void editAndsave(ExchangeTask object,HttpServletRequest request,HttpServletResponse response) {
         try {
-            object.setTaskName(StringUtils.trim(object.getTaskName()));
-
+            object.setTaskName(object.getTaskName().trim());
             Map<String, Object> filterMap = new HashMap<String, Object>();
             filterMap.put("taskNameEq", object.getTaskName());
             List<ExchangeTask> listObjects = exchangeTaskMag.listObjects(filterMap);
             if (!org.springframework.util.CollectionUtils.isEmpty(listObjects)) {
                 if (1 < listObjects.size() || !listObjects.get(0).getTaskId().equals(object.getTaskId())) {
-                    dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, "任务名称已存在");
+//                    dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, "任务名称已存在");
 //                    return SUCCESS;
                     JsonResultUtils.writeSuccessJson(response);
                     return;
@@ -335,7 +273,7 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
 
             // 判断taskCron字段是否修改，修改了为true
             boolean taskCron = false;
-            ExchangeTask dbObject = baseEntityManager.getObject(object);
+            ExchangeTask dbObject = exchangeTaskMag.getObjectById(object.getTaskId());
             if (dbObject.getTaskCron() != null && object.getTaskCron() != null) {
                 if (!dbObject.getTaskCron().equals(object.getTaskCron())) {
                     taskCron = true;
@@ -344,16 +282,16 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
                 taskCron = true;
             }
             if (dbObject != null) {
-                baseEntityManager.copyObjectNotNullProperty(dbObject, object);
+                exchangeTaskMag.copyObjectNotNullProperty(dbObject, object);
                 object = dbObject;
             }
             //更新下次执行时间
-            if (StringUtils.isNotBlank(object.getTaskCron())) {
+            if (!object.getTaskCron().equals(null)) {
                 try {
                     CronSequenceGenerator generator = new CronSequenceGenerator(object.getTaskCron(), TimeZone.getDefault());
                     object.setNextRunTime(generator.next(new Date()));
                 } catch (Exception e) {
-                    saveError("定时任务表达式不正确");
+//                    saveError("定时任务表达式不正确");
 
 //                    return "editAndsave";
                     JsonResultUtils.writeBlankJson(response);
@@ -363,7 +301,7 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
                 object.setNextRunTime(null);
             }
 
-            saveMessage("编辑交换任务成功！");
+//            saveMessage("编辑交换任务成功！");
 
             if (taskCron) {
                 if (object.getTaskCron().equals("")) {
@@ -374,43 +312,43 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
             }
 
 
-            baseEntityManager.saveObject(object);
+            exchangeTaskMag.saveObject(object);
 
             if ("3".equals(object.getTaskType())) {
 //                return "editAndsaveDialog";
                 JsonResultUtils.writeBlankJson(response);
             }
-            dwzResultParam = new DwzResultParam("/dde/exchangeTask!list.do?s_taskType=" + object.getTaskType() + "&s_isvalid=1");
-            dwzResultParam.setCallbackType("closeCurrent");
+//            dwzResultParam = new DwzResultParam("/dde/exchangeTask!list.do?s_taskType=" + object.getTaskType() + "&s_isvalid=1");
+//            dwzResultParam.setCallbackType("closeCurrent");
 //            return "editAndsave";
             JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             log.error("编辑交换对应关系："+ e.getMessage(), e);
-            saveError("编辑交换对应关系："+ e.getMessage());
+//            saveError("编辑交换对应关系："+ e.getMessage());
 //            return ERROR;
             JsonResultUtils.writeErrorMessageJson("XXXX", response);
         }
     }
 
-    @RequestMapping(value="/edit" , method = {RequestMethod.PUT})
-    public  void edit(HttpServletRequest request ,HttpServletResponse response) {
-        String view = EDIT;
+    @RequestMapping(value="/edit/{{taskId}}" , method = {RequestMethod.PUT})
+    public  String edit(ExchangeTask object,@PathVariable Long taskId, HttpServletRequest request ,HttpServletResponse response) {
+        String view = "EDIT";
 //        /page/dde/exchangeTaskForm.jsp
         try {
             if (object == null) {
-                object = getEntityClass().newInstance();
+//                object = getEntityClass().newInstance();
             } else {
-                ExchangeTask o = baseEntityManager.getObject(object);
+                ExchangeTask o = exchangeTaskMag.getObjectById(taskId);
                 if (o != null)
                     // 将对象o copy给object，object自己的属性会保留
-                    baseEntityManager.copyObject(object, o);
+                    exchangeTaskMag.copyObject(object, o);
                 else
-                    baseEntityManager.clearObjectProperties(object);
+                    exchangeTaskMag.clearObjectProperties(object);
 
                 // 是否为任务编辑，如果为任务编辑则添加创建人姓名
                 if (null != object.getTaskId() && !"".equals(object.getTaskId())) {
                     // 调用sysconfig下的manager 通过id查询创建人姓名
-                    FUserinfo usesInfo = CodeRepositoryUtil.getUserInfoByCode(o.getCreated());
+                    UserInfo usesInfo = CodeRepositoryUtil.getUserInfoByCode(o.getCreated());
                     if (usesInfo != null) {
                         object.setCreatedName(usesInfo.getUsername());
                     }
@@ -423,9 +361,9 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
                     List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
 
                     if ("1".equals(taskType)) {
-                        getExchangeMapinfo(exchangeTaskdetails);
+                        getExchangeMapinfo(exchangeTaskdetails, response);
                     } else if ("2".equals(taskType) || "4".equals(taskType)) {
-                        getExportSql(exchangeTaskdetails);
+                        getExportSql(exchangeTaskdetails, response);
                     } else if ("3".equals(taskType)) {
                         view = "editMonitor";
 //                        /page/dde/exchangeTaskMonitorForm.jsp
@@ -479,18 +417,18 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
         JsonResultUtils.writeSingleDataJson(exportSqlList, response);
     }
 
-    @RequestMapping(value="/add", method = {RequestMethod.PUT})
-    public void add(HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/add/{{taskId}}", method = {RequestMethod.PUT})
+    public void add(@PathVariable Long taskId,ExchangeTask object, HttpServletRequest request,HttpServletResponse response) {
         try {
             if (object == null) {
-                object = getEntityClass().newInstance();
+//                object = getEntityClass().newInstance();
             } else {
-                ExchangeTask o = baseEntityManager.getObject(object);
+                ExchangeTask o = exchangeTaskMag.getObjectById(taskId);
                 if (o != null)
                     // 将对象o copy给object，object自己的属性会保留
-                    baseEntityManager.copyObject(object, o);
+                    exchangeTaskMag.copyObject(object, o);
                 else
-                    baseEntityManager.clearObjectProperties(object);
+                    exchangeTaskMag.clearObjectProperties(object);
                     object.setTaskType(s_taskType);
             }
 //            return "add";
@@ -506,25 +444,28 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
     /**
      * 查看明细
      */
-    @RequestMapping(value="/view" , method = {RequestMethod.GET})
-    public void view(HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/view/{{taskId}}" , method = {RequestMethod.GET})
+    public String view(PageDesc pageDesc,ExchangeTask object,@PathVariable Long taskId,HttpServletRequest request,HttpServletResponse response) {
         try {
-            ExchangeTask o = baseEntityManager.getObject(object);
+            ExchangeTask o = exchangeTaskMag.getObjectById(taskId);
+            Map<String, Object> searchColumn = convertSearchColumn(request);
+            List<ExchangeTask> objList = exchangeTaskMag.listObjects(searchColumn, pageDesc);
             if (object == null) {
 //                /page/dde/mapinfoTriggerList.jsp
 //                return LIST;
+                
                 ResponseData resData = new ResponseData();
                 resData.addResponseData("OBJLIST", objList);
                 resData.addResponseData("PAGE_DESC", pageDesc);
                 JsonResultUtils.writeResponseDataAsJson(resData, response);
             }
             if (o != null)
-                baseEntityManager.copyObject(object, o);
+                exchangeTaskMag.copyObject(object, o);
 
             // 是否为任务编辑，如果为任务编辑则添加创建人姓名
             if (null != object.getTaskId() && !"".equals(object.getTaskId())) {
                 // 调用sysconfig下的manager 通过id查询创建人姓名
-                FUserinfo usesInfo = CodeRepositoryUtil.getUserInfoByCode(o.getCreated());
+                UserInfo usesInfo = CodeRepositoryUtil.getUserInfoByCode(o.getCreated());
                 if (usesInfo != null) {
                     object.setCreatedName(usesInfo.getUsername());
                 }
@@ -538,9 +479,9 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
                 JsonResultUtils.writeSingleDataJson(exchangeTaskdetails, response);
                 
                 if ("1".equals(taskType)) {
-                    getExchangeMapinfo(exchangeTaskdetails);
+                    getExchangeMapinfo(exchangeTaskdetails, response);
                 } else if ("2".equals(taskType)) {
-                    getExportSql(exchangeTaskdetails);
+                    getExportSql(exchangeTaskdetails, response);
                 }
             }
 
@@ -555,25 +496,26 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
         }
     }
 
-    @RequestMapping(value="/delete", method = {RequestMethod.DELETE})
-    public void delete(HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/delete/{{taskId}}", method = {RequestMethod.DELETE})
+    public void delete(@PathVariable Long taskId,ExchangeTask object,HttpServletRequest request,HttpServletResponse response) {
+        ExchangeTask exchangeTask = exchangeTaskMag.getObjectById(taskId);
         try {
-            exchangeTaskMag.delTimerTask(object);
-            baseEntityManager.deleteObject(object);
-            deletedMessage();
+            exchangeTaskMag.delTimerTask(exchangeTask);
+            exchangeTaskMag.deleteObjectById(taskId);
+//            deletedMessage();
 //            return "delete";
             JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             log.error("删除交换对应关系："+ e.getMessage(), e);
-            saveError(e.getMessage());
+//            saveError(e.getMessage());
 //            return ERROR;
             JsonResultUtils.writeErrorMessageJson("error", response);
         }
 
     }
 
-    @RequestMapping(value="/saveSequence" , method = {RequestMethod.PUT})
-    public String saveSequence(HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/saveSequence/{{taskId}}" , method = {RequestMethod.PUT})
+    public String saveSequence(@PathVariable Long taskId, ExchangeTask object,HttpServletRequest request,HttpServletResponse response) {
         // 返回页面
         String returnPage = request.getParameter("inputPage");
 
@@ -595,12 +537,12 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
             }
 
         }
-        saveMessage("顺序保存成功！");
+//        saveMessage("顺序保存成功！");
 
         if ("view".equals(returnPage)) {
-            return view();
+            return view(null, object, taskId, request, response);
         } else if ("edit".equals(returnPage)) {
-            return edit();
+            return edit(object, taskId, request, response);
         } else {
 //            return ERROR;
             JsonResultUtils.writeErrorMessageJson("error", response);
@@ -611,32 +553,40 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value="/listExchangeMapInfo", method = {RequestMethod.GET})
-    public void listExchangeMapInfo(HttpServletRequest request,HttpServletResponse response) {
+    public void listExchangeMapInfo(PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
         // List<String> mapinfoIds = new ArrayList<String>();
-        Map<Object, Object> paramMap = request.getParameterMap();
-        resetPageParam(paramMap);
-
-        Map<String, Object> filterMap = convertSearchColumn(paramMap);
-        PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
+//        Map<Object, Object> paramMap = request.getParameterMap();
+//        resetPageParam(paramMap);
+//
+//        Map<String, Object> filterMap = convertSearchColumn(paramMap);
+//        PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
+        Map<String, Object> searchColumn = convertSearchColumn(request);
+        List<ExchangeMapinfo> objList = exchangeMapinfoManager.listObjects(searchColumn, pageDesc);
 
         // filterMap.put("mapinfoIdNot", (String)filterMap.get("taskId"));
-        filterMap.put("taskId", Long.valueOf(((String) filterMap.get("taskId"))));
-        request.setAttribute("taskId", filterMap.get("taskId"));
+        searchColumn.put("taskId", Long.valueOf(((String) searchColumn.get("taskId"))));
+        request.setAttribute("taskId", searchColumn.get("taskId"));
 
         setTaskTypeToPage();
 
-        String taskType = (String) filterMap.get("taskType");
+        String taskType = (String) searchColumn.get("taskType");
         request.setAttribute("taskType", taskType);
+        
+        ResponseData resData = new ResponseData();
+        resData.addResponseData(OBJLIST, objList);
+        resData.addResponseData(PAGE_DESC, pageDesc);
+        resData.addResponseData("searchColumn", searchColumn);
+        resData.addResponseData("taskType", taskType);
 
         if ("1".equals(taskType)) {
 //            return listExchangeMapinfo(filterMap, pageDesc);
-            JsonResultUtils.writeSingleDataJson(filterMap, response, pageDesc);
+            JsonResultUtils.writeResponseDataAsJson(resData, response);
             return;
         }
 
         if ("2".equals(taskType) || "4".equals(taskType)) {
 //            return listExportSql(filterMap, pageDesc);
-            JsonResultUtils.writeSingleDataJson(filterMap, response, pageDesc);
+            JsonResultUtils.writeResponseDataAsJson(resData, response);
             return;
         }
 
@@ -660,7 +610,7 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
         //request.setAttribute("used", used);
 
 
-        this.pageDesc = pageDesc;
+//        this.pageDesc = pageDesc;
 
 //        return "listExchangeMapInfo";
         JsonResultUtils.writeSingleDataJson(exchangeMapinfos, response);
@@ -680,10 +630,13 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
         // 已存在的导出任务ID
        /* request.setAttribute("used", used);
         request.setAttribute("exportSqls", exportSqls);*/
-        this.pageDesc = pageDesc;
+//        this.pageDesc = pageDesc;
 
 //        return "listExportSql";
-        JsonResultUtils.writeSingleDataJson(used,exportSqls, response);
+        ResponseData resData = new ResponseData();
+        resData.addResponseData("exportSqls", exportSqls);
+        resData.addResponseData("used", used);
+        JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
 
     @SuppressWarnings("unchecked")
@@ -713,14 +666,14 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
         Long taskId = Long.valueOf(sTaskId);
         List<Long> mapinfoAndOrders = exchangeTaskdetailManager.getMapinfoIdUsed(taskId);
         for (int i = 0; i < mapinfoAndOrders.size(); i++) {
-            executeMapinfo(mapinfoAndOrders.get(i), taskId);
+            executeMapinfo(mapinfoAndOrders.get(i), taskId, request, response);
         }
 //        return "executeTask";
         JsonResultUtils.writeSuccessJson(response);
     }
 
     @RequestMapping(value="/executeMapinfo", method = {RequestMethod.GET})
-    private void executeMapinfo(Long mapinfoId, Long taskId) {
+    private void executeMapinfo(Long mapinfoId, Long taskId,HttpServletRequest request,HttpServletResponse response) {
         ExchangeMapinfo exchangeMapinfo = this.exchangeMapinfoManager.getObjectById(Long.valueOf(mapinfoId));
         String sql = exchangeMapinfo.getQuerySql();
         DatabaseInfo databaseInfoSource = databaseInfoManager.getObjectById(exchangeMapinfo.getSourceDatabaseName());
@@ -733,7 +686,7 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
 
         List<List<Object>> datas = this.exchangeTaskMag.getSqlValues(databaseInfoSource, sql);
         String insertSql = generateInsertSql(mapinfoId);
-        FUserinfo userDetails = (FUserinfo) this.getLoginUser();
+        FUserinfo userDetails = getLoginUser(request);
         List<Object> logs = exchangeTaskMag.insertDatas(databaseInfoGoal, insertSql, datas);
 
         TaskLog TaskLog = this.generateTaskLog(logs, userDetails, taskId);
@@ -742,9 +695,9 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
         this.saveTaskErrorData(logs, TaskLog.getLogId());
 
         if (Integer.valueOf((logs.get(2)).toString()) < datas.size()) {
-            this.saveError("任务执行有误，请查看任务日志");
+//            this.saveError("任务执行有误，请查看任务日志");
         } else {
-            this.saveMessage("任务已经执行");
+//            this.saveMessage("任务已经执行");
         }
 
     }
@@ -752,7 +705,7 @@ public class ExchangeTaskController extends BaseEntityDwzAction<ExchangeTask> {
     /* 生成插入语句 */
     @RequestMapping(value="/generateInsertSql", method = {RequestMethod.GET})
     private String generateInsertSql(Long mapinfoId) {
-        MapinfoDetail mapinfoDetail = mapinfoDetailManager.getObjectById(Long.valueOf(mapinfoId));
+//        MapinfoDetail mapinfoDetail = mapinfoDetailManager.getObjectById(Long.valueOf(mapinfoId));方法需要重新写
         ExchangeMapinfo exchangeMapinfo = this.exchangeMapinfoManager.getObjectById(Long.valueOf(mapinfoId));
         List<String> GoalColumnStrut = this.mapinfoDetailManager.getGoalColumnStrut(mapinfoId);
         StringBuffer sql = new StringBuffer();

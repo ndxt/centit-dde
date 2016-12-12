@@ -2,6 +2,7 @@ package com.centit.dde.controller;
 
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,32 +17,23 @@ import com.centit.dde.po.TaskErrorData;
 import com.centit.dde.service.ExchangeMapinfoManager;
 import com.centit.dde.service.TaskDetailLogManager;
 import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.core.controller.BaseController;
+import com.sun.istack.Nullable;
 
 @Controller
 @RequestMapping("/TaskDetailLog")
-public class TaskDetailLogController extends BaseEntityDwzAction<TaskDetailLog> {
+public class TaskDetailLogController extends BaseController {
     private static final Log log = LogFactory.getLog(TaskDetailLogController.class);
 
     //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");
 
     private static final long serialVersionUID = 1L;
+    @Resource
+    @Nullable
     private TaskDetailLogManager taskDetailLogMag;
+    @Resource
+    @Nullable
     private ExchangeMapinfoManager exchangeMapinfoManager;
-
-
-    public ExchangeMapinfoManager getExchangeMapinfoManager() {
-        return exchangeMapinfoManager;
-    }
-
-    public void setExchangeMapinfoManager(
-            ExchangeMapinfoManager exchangeMapinfoManager) {
-        this.exchangeMapinfoManager = exchangeMapinfoManager;
-    }
-
-    public void setTaskDetailLogManager(TaskDetailLogManager basemgr) {
-        taskDetailLogMag = basemgr;
-        this.setBaseEntityManager(taskDetailLogMag);
-    }
 
     private List<TaskErrorData> taskErrorDatas;
 
@@ -55,20 +47,20 @@ public class TaskDetailLogController extends BaseEntityDwzAction<TaskDetailLog> 
 
 
     @RequestMapping(value="edit",method = {RequestMethod.PUT})
-    public void edit(HttpServletRequest request,HttpServletResponse response) {
+    public void edit(TaskDetailLog object ,HttpServletRequest request,HttpServletResponse response) {
         try {
             if (object == null) {
-                object = getEntityClass().newInstance();
+//                object = getEntityClass().newInstance();
             } else {
-                TaskDetailLog o = baseEntityManager.getObject(object);
+                TaskDetailLog o = taskDetailLogMag.getObjectById(object.getLogDetailId());
                 if (o != null)
                     // 将对象o copy给object，object自己的属性会保留
-                    baseEntityManager.copyObject(object, o);
+                    taskDetailLogMag.copyObject(object, o);
                 else
-                    baseEntityManager.clearObjectProperties(object);
+                    taskDetailLogMag.clearObjectProperties(object);
             }
             if (null != object.getMapinfoId()) {
-                ServletActionContext.getContext().put("exchangeMapinfo", exchangeMapinfoManager.getObjectById(object.getMapinfoId()));
+//                ServletActionContext.getContext().put("exchangeMapinfo", exchangeMapinfoManager.getObjectById(object.getMapinfoId()));
             }
 //            return EDIT;
             JsonResultUtils.writeSingleDataJson(object, response);
@@ -80,9 +72,10 @@ public class TaskDetailLogController extends BaseEntityDwzAction<TaskDetailLog> 
     }
 
     @RequestMapping(value="save",method = {RequestMethod.PUT})
-    public void save(HttpServletRequest request,HttpServletResponse response) {
+    public void save(TaskDetailLog object ,HttpServletRequest request,HttpServletResponse response) {
         object.replaceTaskErrorDatas(taskErrorDatas);
-        super.save();
+//        super.save();
+        taskDetailLogMag.saveObject(object);
         
 //        return super.save();
         JsonResultUtils.writeSuccessJson(response);
@@ -90,8 +83,8 @@ public class TaskDetailLogController extends BaseEntityDwzAction<TaskDetailLog> 
 
 
     @RequestMapping(value="delete",method = {RequestMethod.DELETE})
-    public String delete(HttpServletRequest request,HttpServletResponse response) {
-        super.delete();
+    public void delete(TaskDetailLog object ,HttpServletRequest request,HttpServletResponse response) {
+        taskDetailLogMag.deleteObjectById(object.getLogDetailId());
 
 //        return "delete";
         JsonResultUtils.writeSuccessJson(response);
