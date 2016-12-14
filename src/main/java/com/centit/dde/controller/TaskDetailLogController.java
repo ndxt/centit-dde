@@ -81,7 +81,6 @@ public class TaskDetailLogController extends BaseController {
         JsonResultUtils.writeSuccessJson(response);
     }
 
-
     @RequestMapping(value="delete",method = {RequestMethod.DELETE})
     public void delete(TaskDetailLog object ,HttpServletRequest request,HttpServletResponse response) {
         taskDetailLogMag.deleteObjectById(object.getLogDetailId());

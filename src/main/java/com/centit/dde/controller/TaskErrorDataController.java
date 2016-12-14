@@ -28,7 +28,6 @@ public class TaskErrorDataController extends BaseController {
     @Nullable
     private TaskErrorDataManager taskErrorDataMag;
 
-
     @RequestMapping(value="/delete",method = {RequestMethod.PUT})
     public void delete(TaskErrorData object,HttpServletRequest request,HttpServletResponse response) {
         taskErrorDataMag.deleteObjectById(object.getDataId());;
