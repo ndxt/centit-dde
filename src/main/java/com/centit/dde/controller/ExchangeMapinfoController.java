@@ -65,6 +65,7 @@ public class ExchangeMapinfoController extends BaseController {
             JsonResultUtils.writeErrorMessageJson("XXXXX", response);
         }
     }
+    
 
 
     @SuppressWarnings("unused")

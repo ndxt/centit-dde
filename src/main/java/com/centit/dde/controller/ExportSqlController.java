@@ -254,7 +254,6 @@ public class ExportSqlController extends BaseController {
         PrintWriter writer = ServletActionContext.getResponse().getWriter();
         String jsonResult = null;
         Map<String, Object> params = new HashMap<String, Object>();
-
         params.put("splitsql", SQLUtils.splitSqlByFields(object.getQuerySql()));
         params.put("sqlfields", SQLUtils.getSqlFileds(object.getQuerySql()));
 

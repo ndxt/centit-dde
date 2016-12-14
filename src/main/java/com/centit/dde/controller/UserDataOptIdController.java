@@ -28,7 +28,6 @@ public class UserDataOptIdController extends BaseController {
     @Nullable
     private UserDataOptIdManager userDataOptIdManager;
 
-
     @RequestMapping(value="/save",method = {RequestMethod.PUT})
     public void save(UserDataOptId object,HttpServletRequest request,HttpServletResponse response) {
         if (null == object.getUdId()) {

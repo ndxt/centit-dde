@@ -59,7 +59,6 @@ public class ImportOptController extends BaseController {
     @Nullable
     private OsInfoManager osInfoManager;
 
-
     private List<DataOptStep> dataOptSteps;
 
     public List<DataOptStep> getNewDataOptSteps() {
