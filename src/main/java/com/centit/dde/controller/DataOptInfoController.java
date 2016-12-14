@@ -26,6 +26,7 @@ import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.staticsystem.po.OsInfo;
+import com.sun.istack.Nullable;
 
 @Controller
 @RequestMapping("/dataoptinfo")
@@ -46,9 +47,8 @@ public class DataOptInfoController extends BaseController {
     public void setTabid(String tabid) {
         this.tabid = tabid;
     }
-
     @Resource
-    @NotNull
+    @Nullable
     private DataOptInfoManager dataOptInfoMag;
 
 /*    @Resource
@@ -57,6 +57,10 @@ public class DataOptInfoController extends BaseController {
 
     @Resource
     @NotNull
+    private OsInfoManager osInfoManager;
+    
+    @Resource
+    @Nullable
     private ImportOptManager importOptManager;
 
     private List<DataOptStep> dataOptSteps;
@@ -91,10 +95,12 @@ public class DataOptInfoController extends BaseController {
 
     
     @RequestMapping(value="/edit/{{dataOptId}}",method = {RequestMethod.GET})
-    public void edit(@PathVariable String dataOptId,HttpServletRequest request,DataOptInfo object,HttpServletResponse response) {
+    public void edit(@PathVariable String dataOptId,DataOptInfo object,HttpServletRequest request,HttpServletResponse response) {
         DataOptInfo dataOptInfo = dataOptInfoMag.getObjectById(dataOptId);
         if (null != dataOptInfo) {
             dataOptInfoMag.copyObjectNotNullProperty(object, dataOptInfo);
+//            baseEntityManager.copyObject(object, dataOptInfo);
+            dataOptInfoMag.copyObjectNotNullProperty(object, dataOptInfo);;
         }
 
         object.setDataOptSteps(dataOptInfoMag.listDataOptStepByDataOptInfo(object));
@@ -117,8 +123,8 @@ public class DataOptInfoController extends BaseController {
 
     
     @RequestMapping(value="/delete/{{dataOptId}}",method = {RequestMethod.DELETE})
-    public void delete(@PathVariable String dataOptId,HttpServletRequest request,HttpServletResponse response) {
-        dataOptInfoMag.deleteObjectById(dataOptId);
+    public void delete(@PathVariable String dataOptId, DataOptInfo object,HttpServletRequest request,HttpServletResponse response) {
+        dataOptInfoMag.deleteObjectById(dataOptId);;
 //        return "delete";
         JsonResultUtils.writeSuccessJson(response);
     }

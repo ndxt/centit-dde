@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,19 +25,28 @@ import com.centit.dde.service.ExchangeMapinfoManager;
 import com.centit.dde.service.MapinfoDetailManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.support.compiler.Lexer;
+import com.sun.istack.Nullable;
 
 @Controller
 @RequestMapping("/mapinfodetail")
-public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> {
-    private static final Log log = LogFactory.getLog(MapinfoDetailAction.class);
+public class MapinfoDetailController extends BaseController {
+    private static final Log log = LogFactory.getLog(MapinfoDetailController.class);
 
     //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");
 
     private static final long serialVersionUID = 1L;
+    @Resource
+    @Nullable
     private MapinfoDetailManager mapinfoDetailMag;
+    @Resource
+    @Nullable
     private ExchangeMapinfoManager exchangeMapinfoManager;
+    @Resource
+    @Nullable
     private DatabaseInfoManager databaseInfoManager;
     private String[] sourceColumnName;
     private String[] SourceColumnSentence;
@@ -56,190 +66,27 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
     private String recordOperate;
     private String mapinfoName;
 
-    public String getIsRepeat() {
-        return isRepeat;
-    }
-
-    public void setIsRepeat(String isRepeat) {
-        this.isRepeat = isRepeat;
-    }
-
-    public String getMapinfoDesc() {
-        return mapinfoDesc;
-    }
-
-    public void setMapinfoDesc(String mapinfoDesc) {
-        this.mapinfoDesc = mapinfoDesc;
-    }
 
 
-    public String getRecordOperate() {
-        return recordOperate;
-    }
-
-    public void setRecordOperate(String recordOperate) {
-        this.recordOperate = recordOperate;
-    }
-
-    public String getMapinfoName() {
-        return mapinfoName;
-    }
-
-    public void setMapinfoName(String mapinfoName) {
-        this.mapinfoName = mapinfoName;
-    }
-
-    public String getNoInitfirst() {
-        return noInitfirst;
-    }
-
-    public void setNoInitfirst(String noInitfirst) {
-        this.noInitfirst = noInitfirst;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public String[] getSourceColumnSentence() {
-        return SourceColumnSentence;
-    }
-
-    public void setSourceColumnSentence(String[] sourceColumnSentence) {
-        SourceColumnSentence = sourceColumnSentence;
-    }
-
-    public String[] getGoalFieldDefault() {
-        return GoalFieldDefault;
-    }
-
-    public void setGoalFieldDefault(String[] goalFieldDefault) {
-        GoalFieldDefault = goalFieldDefault;
-    }
-
-    public String getS_columnNo() {
-        return s_columnNo;
-    }
-
-    public void setS_columnNo(String s_columnNo) {
-        this.s_columnNo = s_columnNo;
-    }
-
-    public String getS_mapinfoId() {
-        return s_mapinfoId;
-    }
-
-    public void setS_mapinfoId(String s_mapinfoId) {
-        this.s_mapinfoId = s_mapinfoId;
-    }
-
-    public MapinfoDetailManager getMapinfoDetailMag() {
-        return mapinfoDetailMag;
-    }
-
-    public void setMapinfoDetailMag(MapinfoDetailManager mapinfoDetailMag) {
-        this.mapinfoDetailMag = mapinfoDetailMag;
-    }
-
-    public String[] getSourceColumnType() {
-        return SourceColumnType;
-    }
-
-    public void setSourceColumnType(String[] sourceColumnType) {
-        SourceColumnType = sourceColumnType;
-    }
-
-    public String[] getGoalColumnName() {
-        return GoalColumnName;
-    }
-
-    public void setGoalColumnName(String[] goalColumnName) {
-        GoalColumnName = goalColumnName;
-    }
-
-    public String[] getGoalColumnType() {
-        return GoalColumnType;
-    }
-
-    public void setGoalColumnType(String[] goalColumnType) {
-        GoalColumnType = goalColumnType;
-    }
-
-    public String[] getGoalisPk() {
-        return GoalisPk;
-    }
-
-    public void setGoalisPk(String[] goalisPk) {
-        GoalisPk = goalisPk;
-    }
-
-    public String[] getGoalisNullable() {
-        return GoalisNullable;
-    }
-
-    public void setGoalisNullable(String[] goalisNullable) {
-        GoalisNullable = goalisNullable;
-    }
-
-    public String[] getSourceColumnName() {
-        return sourceColumnName;
-    }
-
-    public void setSourceColumnName(String[] sourceColumnName) {
-        this.sourceColumnName = sourceColumnName;
-    }
-
-    public DatabaseInfoManager getDatabaseInfoManager() {
-        return databaseInfoManager;
-    }
-
-    public void setDatabaseInfoManager(DatabaseInfoManager databaseInfoManager) {
-        this.databaseInfoManager = databaseInfoManager;
-    }
-
-    public ExchangeMapinfoManager getExchangeMapinfoManager() {
-        return exchangeMapinfoManager;
-    }
-
-    public void setExchangeMapinfoManager(
-            ExchangeMapinfoManager exchangeMapinfoManager) {
-        this.exchangeMapinfoManager = exchangeMapinfoManager;
-    }
-
-    public void setMapinfoDetailManager(MapinfoDetailManager basemgr) {
-        mapinfoDetailMag = basemgr;
-        this.setBaseEntityManager(mapinfoDetailMag);
-    }
 
     @RequestMapping(value="/showMapinfoDetail",method = {RequestMethod.GET})
-    public void showMapinfoDetail(HttpServletRequest request,HttpServletResponse response) {
+    public void showMapinfoDetail(PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
         String soueceTableName = null;
         String goalTableName = null;
         Map<Object, Object> paramMap = request.getParameterMap();
 
-        Map<String, Object> filterMap = convertSearchColumn(paramMap);
-        PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
+//        Map<String, Object> filterMap = convertSearchColumn(paramMap);
+//        PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
+        Map<String, Object> searchColumn = convertSearchColumn(request);
 
         List<Map<String, String>> sourceTableStruct = new ArrayList<Map<String, String>>();
         List<Map<String, String>> goalTableStruct = new ArrayList<Map<String, String>>();
         List<Map<String, String>> length = new ArrayList<Map<String, String>>();
 
         ExchangeMapinfo exchangeMapinfo = new ExchangeMapinfo();
-        exchangeMapinfo.setMapinfoId(Long.parseLong(String.valueOf(filterMap.get("mapinfoId"))));
+        exchangeMapinfo.setMapinfoId(Long.parseLong(String.valueOf(searchColumn.get("mapinfoId"))));
 
-        exchangeMapinfo = exchangeMapinfoManager.getObject(exchangeMapinfo);
+        exchangeMapinfo = exchangeMapinfoManager.getObjectById(exchangeMapinfo.getMapinfoId());
         //TODO 这个地方逻辑混乱，需要重新整理 codefan@sina.com
         if (exchangeMapinfo == null){
 //          return ERROR;
@@ -253,24 +100,24 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
         if (exchangeMapinfo.getDestTablename() != null) {
             goalTableName = exchangeMapinfo.getDestTablename();
         }
-        if ((String) filterMap.get("soueceTableName") != null) {
-            soueceTableName = (String) filterMap.get("soueceTableName");
+        if ((String) searchColumn.get("soueceTableName") != null) {
+            soueceTableName = (String) searchColumn.get("soueceTableName");
         }
-        if ((String) filterMap.get("goalTableName") != null) {
-            goalTableName = (String) filterMap.get("goalTableName");
+        if ((String) searchColumn.get("goalTableName") != null) {
+            goalTableName = (String) searchColumn.get("goalTableName");
         }
 
-        if (filterMap.get("method") != null && filterMap.get("method").equals("save")) {
+        if (searchColumn.get("method") != null && searchColumn.get("method").equals("save")) {
             if (exchangeMapinfo == null) {
-                this.saveAndsaveMapinfoDetails(null, soueceTableName, goalTableName, exchangeMapinfo.getSourceDatabaseName(), exchangeMapinfo.getDestDatabaseName(), String.valueOf(filterMap.get("mapinfoId")), String.valueOf(filterMap.get("type")));
+                this.saveAndsaveMapinfoDetails(null, soueceTableName, goalTableName, exchangeMapinfo.getSourceDatabaseName(), exchangeMapinfo.getDestDatabaseName(), String.valueOf(searchColumn.get("mapinfoId")), String.valueOf(searchColumn.get("type")));
             } else if (StringUtils.hasText(exchangeMapinfo.getQuerySql())) {
-                this.saveAndsaveMapinfoDetails(exchangeMapinfo.getQuerySql(), soueceTableName, goalTableName, exchangeMapinfo.getSourceDatabaseName(), exchangeMapinfo.getDestDatabaseName(), String.valueOf(filterMap.get("mapinfoId")), String.valueOf(filterMap.get("type")));
+                this.saveAndsaveMapinfoDetails(exchangeMapinfo.getQuerySql(), soueceTableName, goalTableName, exchangeMapinfo.getSourceDatabaseName(), exchangeMapinfo.getDestDatabaseName(), String.valueOf(searchColumn.get("mapinfoId")), String.valueOf(searchColumn.get("type")));
             }
 
         }
-        if (filterMap.get("method") != null && filterMap.get("method").equals("updateSourceColumnSentence")) {
-            if (StringUtils.hasText((String) filterMap.get("querySql"))) {
-                this.updateSourceColumnSentence((String) filterMap.get("querySql"), (String) filterMap.get("querySqlsource"), String.valueOf(filterMap.get("mapinfoId")), soueceTableName, goalTableName);
+        if (searchColumn.get("method") != null && searchColumn.get("method").equals("updateSourceColumnSentence")) {
+            if (StringUtils.hasText((String) searchColumn.get("querySql"))) {
+                this.updateSourceColumnSentence((String) searchColumn.get("querySql"), (String) searchColumn.get("querySqlsource"), String.valueOf(searchColumn.get("mapinfoId")), soueceTableName, goalTableName);
             }
         }
 
@@ -279,15 +126,16 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
         
        /* sourceTableStruct = */
         //从数据库表中读取表结构
-        sourceTableStruct = mapinfoDetailMag.getSourceTableStructFromDatabase(Long.valueOf(s_mapinfoId));
-        if (sourceTableStruct.size() < 1 && sourceDatabaseInfo != null && StringUtils.hasText(soueceTableName) && (((String) filterMap.get("type")).equals("reinitsource"))) {
+//        sourceTableStruct = mapinfoDetailMag.getSourceTableStructFromDatabase(Long.valueOf(s_mapinfoId));
+        JSONArray sts = mapinfoDetailMag.getSourceTableStructFromDatabase(Long.valueOf(s_mapinfoId));
+        if (!sts.isEmpty()) {
             //初始化表结构
             sourceTableStruct = mapinfoDetailMag.getSourceTableStruct(sourceDatabaseInfo, soueceTableName);
         }
 
-        goalTableStruct = mapinfoDetailMag.getGoalTableStructFromDatabase(Long.valueOf(s_mapinfoId));
+        JSONArray sts1 = mapinfoDetailMag.getGoalTableStructFromDatabase(Long.valueOf(s_mapinfoId));
 
-        if (goalTableStruct.size() < 1 && goalDatabaseInfo != null && StringUtils.hasText(goalTableName) && (((String) filterMap.get("type")).equals("reinitgoal"))) {
+        if (!sts1.isEmpty()) {
             //初始化表结构
             goalTableStruct = mapinfoDetailMag.getGoalTableStruct(goalDatabaseInfo, goalTableName);
         }
@@ -302,7 +150,7 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
         }
 
         ResponseData resData = new ResponseData();
-        if (((String) filterMap.get("type")).equals("initcopy4")) {
+        if (((String) searchColumn.get("type")).equals("initcopy4")) {
             resData.addResponseData("h_mapinfoId",mapinfoDetailMag.getMapinfoId());
         }
         resData.addResponseData("SOURCETABLESTRUCT", sourceTableStruct);
@@ -323,16 +171,16 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
             resData.addResponseData("mapinfoDesc", exchangeMapinfo.getMapinfoDesc());
             resData.addResponseData("recordOperate", exchangeMapinfo.getRecordOperate());
         }
-            resetPageParam(paramMap);
-        if (((String) filterMap.get("type")).equals("initinner")) {
+//            resetPageParam(paramMap);
+        if (((String) searchColumn.get("type")).equals("initinner")) {
 //            return "mapInfo4Details";页面跳转
             JsonResultUtils.writeResponseDataAsJson(resData, response);
             return;
-        } else if (((String) filterMap.get("type")).equals("initcopy")) {
+        } else if (((String) searchColumn.get("type")).equals("initcopy")) {
 //            return "copyMapinfoDetail";
             JsonResultUtils.writeResponseDataAsJson(resData, response);
             return;
-        } else if (((String) filterMap.get("type")).equals("initcopy4")) {
+        } else if (((String) searchColumn.get("type")).equals("initcopy4")) {
 //            return "copyMapInfo4Details";
             JsonResultUtils.writeResponseDataAsJson(resData, response);
             return;
@@ -344,20 +192,22 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
     }
 
     @RequestMapping(value="/addAndsaveMapinfoDatails",method = {RequestMethod.GET})
-    public void addAndsaveMapinfoDatails(HttpServletRequest request,HttpServletResponse response) {
+    public void addAndsaveMapinfoDatails(PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
         String soueceTableName = null;
         String goalTableName = null;
         String sourcedatabaseName = null;
         String goaldatabaseName = null;
         Map<Object, Object> paramMap = request.getParameterMap();
 
-        Map<String, Object> filterMap = convertSearchColumn(paramMap);
-        PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
+//        Map<String, Object> filterMap = convertSearchColumn(paramMap);
+//        PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
+        Map<String, Object> searchColumn = convertSearchColumn(request);
+//        List<ExchangeMapinfo> objList = exchangeMapinfoManager.listObjects(searchColumn, pageDesc);
 
         ExchangeMapinfo exchangeMapinfo = new ExchangeMapinfo();
-        if ((String) filterMap.get("mapinfoId") != null) {
-            exchangeMapinfo.setMapinfoId(Long.parseLong(String.valueOf(filterMap.get("mapinfoId"))));
-            exchangeMapinfo = exchangeMapinfoManager.getObject(exchangeMapinfo);
+        if ((String) searchColumn.get("mapinfoId") != null) {
+            exchangeMapinfo.setMapinfoId(Long.parseLong(String.valueOf(searchColumn.get("mapinfoId"))));
+            exchangeMapinfo = exchangeMapinfoManager.getObjectById(exchangeMapinfo.getMapinfoId());
         }
 
         if (exchangeMapinfo != null && exchangeMapinfo.getSourceTablename() != null) {
@@ -367,34 +217,34 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
             goalTableName = exchangeMapinfo.getDestTablename();
         }
 
-        if ((String) filterMap.get("sourcedatabaseName") != null) {
-            sourcedatabaseName = (String) filterMap.get("sourcedatabaseName");
+        if ((String) searchColumn.get("sourcedatabaseName") != null) {
+            sourcedatabaseName = (String) searchColumn.get("sourcedatabaseName");
         }
-        if ((String) filterMap.get("goaldatabaseName") != null) {
-            goaldatabaseName = (String) filterMap.get("goaldatabaseName");
+        if ((String) searchColumn.get("goaldatabaseName") != null) {
+            goaldatabaseName = (String) searchColumn.get("goaldatabaseName");
         }
 
         List<Map<String, String>> sourceTableStruct = new ArrayList<Map<String, String>>();
         List<Map<String, String>> goalTableStruct = new ArrayList<Map<String, String>>();
         List<Map<String, String>> length = new ArrayList<Map<String, String>>();
 
-        if ((String) filterMap.get("soueceTableName") != null) {
-            soueceTableName = (String) filterMap.get("soueceTableName");
+        if ((String) searchColumn.get("soueceTableName") != null) {
+            soueceTableName = (String) searchColumn.get("soueceTableName");
         }
-        if ((String) filterMap.get("goalTableName") != null) {
-            goalTableName = (String) filterMap.get("goalTableName");
+        if ((String) searchColumn.get("goalTableName") != null) {
+            goalTableName = (String) searchColumn.get("goalTableName");
         }
 
-        if (filterMap.get("method") != null && filterMap.get("method").equals("save")) {
+        if (searchColumn.get("method") != null && searchColumn.get("method").equals("save")) {
             if (exchangeMapinfo == null) {
-                this.saveAndsaveMapinfoDetails(null, soueceTableName, goalTableName, sourcedatabaseName, goaldatabaseName, String.valueOf(filterMap.get("mapinfoId")), String.valueOf(filterMap.get("type")));
+                this.saveAndsaveMapinfoDetails(null, soueceTableName, goalTableName, sourcedatabaseName, goaldatabaseName, String.valueOf(searchColumn.get("mapinfoId")), String.valueOf(searchColumn.get("type")));
             } else if (StringUtils.hasText(exchangeMapinfo.getQuerySql())) {
-                this.saveAndsaveMapinfoDetails(exchangeMapinfo.getQuerySql(), soueceTableName, goalTableName, sourcedatabaseName, goaldatabaseName, String.valueOf(filterMap.get("mapinfoId")), String.valueOf(filterMap.get("type")));
+                this.saveAndsaveMapinfoDetails(exchangeMapinfo.getQuerySql(), soueceTableName, goalTableName, sourcedatabaseName, goaldatabaseName, String.valueOf(searchColumn.get("mapinfoId")), String.valueOf(searchColumn.get("type")));
             }
         }
-        if (filterMap.get("method") != null && filterMap.get("method").equals("updateSourceColumnSentence")) {
-            if (StringUtils.hasText((String) filterMap.get("querySql"))) {
-                this.updateSourceColumnSentence((String) filterMap.get("querySql"), (String) filterMap.get("querySqlsource"), String.valueOf(filterMap.get("mapinfoId")), soueceTableName, goalTableName);
+        if (searchColumn.get("method") != null && searchColumn.get("method").equals("updateSourceColumnSentence")) {
+            if (StringUtils.hasText((String) searchColumn.get("querySql"))) {
+                this.updateSourceColumnSentence((String) searchColumn.get("querySql"), (String) searchColumn.get("querySqlsource"), String.valueOf(searchColumn.get("mapinfoId")), soueceTableName, goalTableName);
             }
         }
         DatabaseInfo sourceDatabaseInfo = null;
@@ -404,7 +254,7 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
             sourceDatabaseInfo = databaseInfoManager.getObjectById(sourcedatabaseName);
         }
         if (goaldatabaseName != null) {
-            goalDatabaseInfo = databaseInfoManager.getObjectById(goaldatabaseName);
+            goalDatabaseInfo = databaseInfoManager.gestObjectById(goaldatabaseName);
         }
         if (exchangeMapinfo != null && exchangeMapinfo.getSourceDatabaseName() != null) {
             sourceDatabaseInfo = databaseInfoManager.getObjectById(exchangeMapinfo.getSourceDatabaseName());
@@ -414,11 +264,7 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
         }
 
         if (s_mapinfoId != null) {
-
-            if (sourceDatabaseInfo != null
-                    && StringUtils.hasText(soueceTableName)
-                    && (((String) filterMap.get("type")).equals("reinitsource") || mapinfoDetailMag
-                    .getSourceTableStructFromDatabase(
+            if (sourceDatabaseInfo != null && StringUtils.hasText(soueceTableName) && (((String) searchColumn.get("type")).equals("reinitsource") || mapinfoDetailMag.getSourceTableStructFromDatabase(
                             Long.valueOf(s_mapinfoId)).size() == 0)) {
                 // 初始化表结构
                 sourceTableStruct = mapinfoDetailMag.getSourceTableStruct(
@@ -426,13 +272,11 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
             } else if (mapinfoDetailMag.getSourceTableStructFromDatabase(
                     Long.valueOf(s_mapinfoId)).size() != 0) {
                 // 从数据库表中读取表结构
-                sourceTableStruct = mapinfoDetailMag
-                        .getSourceTableStructFromDatabase(Long
-                                .valueOf(s_mapinfoId));
+                sourceTableStruct = mapinfoDetailMag.getSourceTableStructFromDatabase(Long.valueOf(s_mapinfoId));
             }
             if (goalDatabaseInfo != null
                     && StringUtils.hasText(goalTableName)
-                    && (((String) filterMap.get("type")).equals("reinitgoal") || mapinfoDetailMag
+                    && (((String) searchColumn.get("type")).equals("reinitgoal") || mapinfoDetailMag
                     .getSourceTableStructFromDatabase(
                             Long.valueOf(s_mapinfoId)).size() == 0)) {
                 // 初始化表结构
@@ -457,7 +301,7 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
             length.addAll(goalTableStruct);
         }
         if (noInitfirst == null || !noInitfirst.equals("true")) {
-            if (((String) filterMap.get("type")).equals("initfirst")) {
+            if (((String) searchColumn.get("type")).equals("initfirst")) {
                 resData.addResponseData("s_mapinfoId",mapinfoDetailMag.getMapinfoId());
 //                ServletActionContext.getContext().put("s_mapinfoId",
 //                        mapinfoDetailMag.getMapinfoId());
@@ -483,8 +327,8 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
 //            /*ServletActionContext.getContext().put("tableOperate", exchangeMapinfo.getTableOperate());*/
 //            ServletActionContext.getContext().put("recordOperate", exchangeMapinfo.getRecordOperate());
         }
-        resetPageParam(paramMap);
-        if (((String) filterMap.get("type")).equals("initinner")) {
+//        resetPageParam(paramMap);
+        if (((String) searchColumn.get("type")).equals("initinner")) {
 //            return "mapInfo4Details_add";
             JsonResultUtils.writeResponseDataAsJson(resData, response);
             return;
@@ -496,20 +340,21 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
     }
     
     @RequestMapping(value="/copyAddAndsaveMapinfoDatails",method = {RequestMethod.GET})
-    public void copyAddAndsaveMapinfoDatails(HttpServletRequest request,HttpServletResponse response) {
+    public void copyAddAndsaveMapinfoDatails(PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
         String soueceTableName = null;
         String goalTableName = null;
         String sourcedatabaseName = null;
         String goaldatabaseName = null;
         Map<Object, Object> paramMap = request.getParameterMap();
 
-        Map<String, Object> filterMap = convertSearchColumn(paramMap);
-        PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
+//        Map<String, Object> filterMap = convertSearchColumn(paramMap);
+//        PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
+        Map<String, Object> searchColumn = convertSearchColumn(request);
 
         ExchangeMapinfo exchangeMapinfo = new ExchangeMapinfo();
-        if ((String) filterMap.get("mapinfoId") != null) {
-            exchangeMapinfo.setMapinfoId(Long.parseLong(String.valueOf(filterMap.get("mapinfoId"))));
-            exchangeMapinfo = exchangeMapinfoManager.getObject(exchangeMapinfo);
+        if ((String) searchColumn.get("mapinfoId") != null) {
+            exchangeMapinfo.setMapinfoId(Long.parseLong(String.valueOf(searchColumn.get("mapinfoId"))));
+            exchangeMapinfo = exchangeMapinfoManager.getObjectById(exchangeMapinfo.getMapinfoId());
         }
 
         if (exchangeMapinfo != null && exchangeMapinfo.getSourceTablename() != null) {
@@ -519,34 +364,37 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
             goalTableName = exchangeMapinfo.getDestTablename();
         }
 
-        if ((String) filterMap.get("sourcedatabaseName") != null) {
-            sourcedatabaseName = (String) filterMap.get("sourcedatabaseName");
+        if ((String) searchColumn.get("sourcedatabaseName") != null) {
+            sourcedatabaseName = (String) searchColumn.get("sourcedatabaseName");
         }
-        if ((String) filterMap.get("goaldatabaseName") != null) {
-            goaldatabaseName = (String) filterMap.get("goaldatabaseName");
+        if ((String) searchColumn.get("goaldatabaseName") != null) {
+            goaldatabaseName = (String) searchColumn.get("goaldatabaseName");
         }
 
-        List<Map<String, String>> sourceTableStruct = new ArrayList<Map<String, String>>();
-        List<Map<String, String>> goalTableStruct = new ArrayList<Map<String, String>>();
-        List<Map<String, String>> length = new ArrayList<Map<String, String>>();
+//        List<Map<String, String>> sourceTableStruct = new ArrayList<Map<String, String>>();
+//        List<Map<String, String>> goalTableStruct = new ArrayList<Map<String, String>>();
+//        List<Map<String, String>> length = new ArrayList<Map<String, String>>();
+        List<Object> sourceTableStruct = null;
+        List<Object> goalTableStruct = null;
+        List<Object> length = null;
 
-        if ((String) filterMap.get("soueceTableName") != null) {
-            soueceTableName = (String) filterMap.get("soueceTableName");
+        if ((String) searchColumn.get("soueceTableName") != null) {
+            soueceTableName = (String) searchColumn.get("soueceTableName");
         }
-        if ((String) filterMap.get("goalTableName") != null) {
-            goalTableName = (String) filterMap.get("goalTableName");
+        if ((String) searchColumn.get("goalTableName") != null) {
+            goalTableName = (String) searchColumn.get("goalTableName");
         }
 
 //        if(filterMap.get("method")!=null&&filterMap.get("method").equals("save")){
 //            if(exchangeMapinfo==null){
-        this.saveAndsaveMapinfoDetails(null, soueceTableName, goalTableName, sourcedatabaseName, goaldatabaseName, String.valueOf(filterMap.get("mapinfoId")), String.valueOf(filterMap.get("type")));
+        this.saveAndsaveMapinfoDetails(null, soueceTableName, goalTableName, sourcedatabaseName, goaldatabaseName, String.valueOf(searchColumn.get("mapinfoId")), String.valueOf(searchColumn.get("type")));
 //            }else if(StringUtils.hasText(exchangeMapinfo.getQuerySql())){
 //                this.saveAndsaveMapinfoDetails(exchangeMapinfo.getQuerySql(),soueceTableName,goalTableName,sourcedatabaseName,goaldatabaseName,String.valueOf(filterMap.get("mapinfoId")),String.valueOf(filterMap.get("type")));                
 //            }
 //        }       
-        if (filterMap.get("method") != null && filterMap.get("method").equals("updateSourceColumnSentence")) {
-            if (StringUtils.hasText((String) filterMap.get("querySql"))) {
-                this.updateSourceColumnSentence((String) filterMap.get("querySql"), (String) filterMap.get("querySqlsource"), String.valueOf(filterMap.get("mapinfoId")), soueceTableName, goalTableName);
+        if (searchColumn.get("method") != null && searchColumn.get("method").equals("updateSourceColumnSentence")) {
+            if (StringUtils.hasText((String) searchColumn.get("querySql"))) {
+                this.updateSourceColumnSentence((String) searchColumn.get("querySql"), (String) searchColumn.get("querySqlsource"), String.valueOf(searchColumn.get("mapinfoId")), soueceTableName, goalTableName);
             }
         }
         DatabaseInfo sourceDatabaseInfo = null;
@@ -569,7 +417,7 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
 
             if (sourceDatabaseInfo != null
                     && StringUtils.hasText(soueceTableName)
-                    && (((String) filterMap.get("type")).equals("reinitsource") || mapinfoDetailMag
+                    && (((String) searchColumn.get("type")).equals("reinitsource") || mapinfoDetailMag
                     .getSourceTableStructFromDatabase(
                             Long.valueOf(s_mapinfoId)).size() == 0)) {
                 // 初始化表结构
@@ -584,7 +432,7 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
             }
             if (goalDatabaseInfo != null
                     && StringUtils.hasText(goalTableName)
-                    && (((String) filterMap.get("type")).equals("reinitgoal") || mapinfoDetailMag
+                    && (((String) searchColumn.get("type")).equals("reinitgoal") || mapinfoDetailMag
                     .getSourceTableStructFromDatabase(
                             Long.valueOf(s_mapinfoId)).size() == 0)) {
                 // 初始化表结构
@@ -609,7 +457,7 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
             length.addAll(goalTableStruct);
         }
         if (noInitfirst == null || !noInitfirst.equals("true")) {
-            if (((String) filterMap.get("type")).equals("initfirst")) {
+            if (((String) searchColumn.get("type")).equals("initfirst")) {
                 resData.addResponseData("s_mapinfoId",mapinfoDetailMag.getMapinfoId());
 //                ServletActionContext.getContext().put("s_mapinfoId",
 //                        mapinfoDetailMag.getMapinfoId());
@@ -648,21 +496,22 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
 //            /*ServletActionContext.getContext().put("tableOperate", exchangeMapinfo.getTableOperate());*/
 //            ServletActionContext.getContext().put("recordOperate", exchangeMapinfo.getRecordOperate());
         }
-        resetPageParam(paramMap);
-        addAndsaveMapinfoDatails();
+//        resetPageParam(paramMap);
+//        addAndsaveMapinfoDatails();
 //        return addAndsaveMapinfoDatails();
         JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
 
     @RequestMapping(value="/defSourceData",method = {RequestMethod.GET})
-    public void defSourceData() {
-        Map<Object, Object> paramMap = request.getParameterMap();
-        resetPageParam(paramMap);
+    public void defSourceData(HttpServletRequest request, HttpServletResponse response) {
+//        Map<Object, Object> paramMap = request.getParameterMap();
+//        resetPageParam(paramMap);
 
-        Map<String, Object> filterMap = convertSearchColumn(paramMap);
-        ExchangeMapinfo "SOURCEURL" = new ExchangeMapinfo();
-        exchangeMapinfo.setMapinfoId(Long.parseLong(String.valueOf(filterMap.get("mapinfoId"))));
-        exchangeMapinfo = exchangeMapinfoManager.getObject(exchangeMapinfo);
+//        Map<String, Object> filterMap = convertSearchColumn(paramMap);
+        Map<String, Object> searchColumn = convertSearchColumn(request);
+        ExchangeMapinfo exchangeMapinfo = new ExchangeMapinfo();
+        exchangeMapinfo.setMapinfoId(Long.parseLong(String.valueOf(searchColumn.get("mapinfoId"))));
+        exchangeMapinfo = exchangeMapinfoManager.getObjectById(exchangeMapinfo.getMapinfoId());
 
         DatabaseInfo sourceDatabaseInfo = databaseInfoManager.getObjectById(exchangeMapinfo.getSourceDatabaseName());
         DatabaseInfo goalDatabaseInfo = databaseInfoManager.getObjectById(exchangeMapinfo.getDestDatabaseName());
@@ -679,7 +528,7 @@ public class MapinfoDetailController extends BaseEntityDwzAction<MapinfoDetail> 
         resData.addResponseData("OBJLIST", sourceDatabaseInfo.getDatabaseUrl());
         resData.addResponseData("GOALURL", goalDatabaseInfo.getDatabaseUrl());
         resData.addResponseData("SQL", exchangeMapinfo.getQuerySql());
-        resData.addResponseData("sourceDatabaseName", (String) filterMap.get("sourceDatabaseName"));
+        resData.addResponseData("sourceDatabaseName", (String) searchColumn.get("sourceDatabaseName"));
         resData.addResponseData("DATABASE", databaseInfoManager.listDatabase());
         JsonResultUtils.writeResponseDataAsJson(resData, response);
 s    }
@@ -688,12 +537,13 @@ s    }
     @RequestMapping(value="/defSourceData_add",method = {RequestMethod.GET})
     public void defSourceData_add(HttpServletRequest request,HttpServletResponse response) {
         Map<Object, Object> paramMap = request.getParameterMap();
-        resetPageParam(paramMap);
-        Map<String, Object> filterMap = convertSearchColumn(paramMap);
+//        resetPageParam(paramMap);
+//        Map<String, Object> filterMap = convertSearchColumn(paramMap);
+        Map<String, Object> searchColumn = convertSearchColumn(request);
         ExchangeMapinfo exchangeMapinfo = new ExchangeMapinfo();
         exchangeMapinfo.setMapinfoId(Long.parseLong(s_mapinfoId));
         ResponseData resData = new ResponseData();
-        exchangeMapinfo = exchangeMapinfoManager.getObject(exchangeMapinfo);
+        exchangeMapinfo = exchangeMapinfoManager.getObjectById(exchangeMapinfo.getMapinfoId());
         if (exchangeMapinfo != null) {
             resData.addResponseData("SQL", exchangeMapinfo.getQuerySql());
 //            ServletActionContext.getContext().put("SQL", exchangeMapinfo.getQuerySql());
@@ -702,8 +552,8 @@ s    }
 //        ServletActionContext.getContext().put("DATABASE", databaseInfoManager.listDatabase());
 
         //database下面所有 的表
-        if (filterMap.containsKey("sourcedatabaseName") && StringUtils.hasText((String) filterMap.get("sourcedatabaseName"))) {
-            DatabaseInfo databaseInfo = databaseInfoManager.getObjectById((String) filterMap.get("sourcedatabaseName"));
+        if (searchColumn.containsKey("sourcedatabaseName") && StringUtils.hasText((String) searchColumn.get("sourcedatabaseName"))) {
+            DatabaseInfo databaseInfo = databaseInfoManager.getObjectById((String) searchColumn.get("sourcedatabaseName"));
             List<Object> tables = mapinfoDetailMag.getTable(databaseInfo, databaseInfo.getDatabaseType());
 
             resData.addResponseData("tables", tables);
@@ -721,12 +571,13 @@ s    }
 //        ServletActionContext.getContext().put("DATABASE", databaseInfoManager.listDatabase());
 
         //database下面所有 的表
-        Map<Object, Object> paramMap = request.getParameterMap();
-        resetPageParam(paramMap);
+//        Map<Object, Object> paramMap = request.getParameterMap();
+//        resetPageParam(paramMap);
 
-        Map<String, Object> filterMap = convertSearchColumn(paramMap);
-        if (filterMap.containsKey("goaldatabaseName") && StringUtils.hasText((String) filterMap.get("goaldatabaseName"))) {
-            DatabaseInfo databaseInfo = databaseInfoManager.getObjectById((String) filterMap.get("goaldatabaseName"));
+//        Map<String, Object> filterMap = convertSearchColumn(paramMap);
+        Map<String, Object> searchColumn = convertSearchColumn(request);
+        if (searchColumn.containsKey("goaldatabaseName") && StringUtils.hasText((String) searchColumn.get("goaldatabaseName"))) {
+            DatabaseInfo databaseInfo = databaseInfoManager.getObjectById((String) searchColumn.get("goaldatabaseName"));
             List<Object> tables = mapinfoDetailMag.getTable(databaseInfo, databaseInfo.getDatabaseType());
 
             resData.addResponseData("tables", tables);
@@ -751,12 +602,13 @@ s    }
 
     @RequestMapping(value="/defDestData",method = {RequestMethod.GET})
     public void defDestData(HttpServletRequest request,HttpServletResponse response) {
-        Map<Object, Object> paramMap = request.getParameterMap();
-        resetPageParam(paramMap);
-
-        Map<String, Object> filterMap = convertSearchColumn(paramMap);
+//        Map<Object, Object> paramMap = request.getParameterMap();
+////        resetPageParam(paramMap);
+//
+//        Map<String, Object> filterMap = convertSearchColumn(paramMap);
+        Map<String, Object> searchColumn = convertSearchColumn(request);
         ExchangeMapinfo exchangeMapinfo = new ExchangeMapinfo();
-        exchangeMapinfo.setMapinfoId(Long.parseLong(String.valueOf(filterMap.get("mapinfoId"))));
+        exchangeMapinfo.setMapinfoId(Long.parseLong(String.valueOf(searchColumn.get("mapinfoId"))));
 
         exchangeMapinfo = exchangeMapinfoManager.getObject(exchangeMapinfo);
 
@@ -767,7 +619,7 @@ s    }
         List<String> tables = mapinfoDetailMag.getTables(goalDatabaseInfo, goalDatabaseInfo.getDatabaseType());
         resData.addResponseData("GOALURL", goalDatabaseInfo.getDatabaseUrl());
         resData.addResponseData("SOURCEURL", sourceDatabaseInfo.getDatabaseUrl());
-        resData.addResponseData("goalDatabaseName", (String) filterMap.get("goalDatabaseName"));
+        resData.addResponseData("goalDatabaseName", (String) searchColumn.get("goalDatabaseName"));
         resData.addResponseData("DATABASE", databaseInfoManager.listDatabase());
         
         /*ServletActionContext.getContext().put("GOALURL", goalDatabaseInfo.getDatabaseUrl());

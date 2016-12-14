@@ -6,39 +6,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.struts2.ServletActionContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.centit.core.action.BaseEntityDwzAction;
-import com.centit.core.utils.DwzResultParam;
-import com.centit.core.utils.DwzTableUtils;
-import com.centit.core.utils.PageDesc;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExchangeMapinfo;
 import com.centit.dde.po.MapinfoDetail;
 import com.centit.dde.service.ExchangeMapinfoManager;
 import com.centit.dde.service.ExchangeTaskdetailManager;
+import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.sys.security.FUserDetail;
-import com.centit.sys.util.SysParametersUtils;
+import com.sun.istack.Nullable;
 
 @Controller
 @RequestMapping("/exchangemapinfonew")
-public class ExchangeMapinfoNewController extends BaseEntityDwzAction<ExchangeMapinfo> {
+public class ExchangeMapinfoNewController extends BaseController {
     private static final Log log = LogFactory.getLog(ExchangeMapinfoNewController.class);
 
     // private static final ISysOptLog sysOptLog =
@@ -46,40 +44,30 @@ public class ExchangeMapinfoNewController extends BaseEntityDwzAction<ExchangeMa
 
     private static final long serialVersionUID = 1L;
 
+    @Resource
+    @Nullable
     private ExchangeMapinfoManager exchangeMapinfoMag;
 
+    @Resource
+    @Nullable
     private ExchangeTaskdetailManager exchangeTaskdetailManager;
 
+    @Resource
+    @Nullable
     private DatabaseInfoManager databaseInfoManager;
 
-    public void setDatabaseInfoManager(DatabaseInfoManager databaseInfoManager) {
-        this.databaseInfoManager = databaseInfoManager;
-    }
-
-    public ExchangeTaskdetailManager getExchangeTaskdetailManager() {
-        return exchangeTaskdetailManager;
-    }
-
-    public void setExchangeTaskdetailManager(ExchangeTaskdetailManager exchangeTaskdetailManager) {
-        this.exchangeTaskdetailManager = exchangeTaskdetailManager;
-    }
-
-    public void setExchangeMapinfoManager(ExchangeMapinfoManager basemgr) {
-        exchangeMapinfoMag = basemgr;
-        this.setBaseEntityManager(exchangeMapinfoMag);
-    }
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value="/list" ,method = {RequestMethod.GET})
     public void list(PageDesc pageDesc,HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView mv = new ModelAndView("page/dde/exchangeMapinfoNewList");
         try {
-            Map<Object, Object> paramMap = request.getParameterMap();
-            resetPageParam(paramMap);
-
-            Map<String, Object> filterMap = convertSearchColumn(paramMap);
-            pageDesc = DwzTableUtils.makePageDesc(request);
-            objList = baseEntityManager.listObjects(filterMap, pageDesc);
+//            Map<Object, Object> paramMap = request.getParameterMap();
+////            resetPageParam(paramMap);
+//
+//            Map<String, Object> filterMap = convertSearchColumn(paramMap);
+//            pageDesc = DwzTableUtils.makePageDesc(request);
+            Map<String, Object> searchColumn = convertSearchColumn(request);
+            List<ExchangeMapinfo> objList = exchangeMapinfoMag.listObjects(searchColumn, pageDesc);
             ResponseData resData = new ResponseData();
             resData.addResponseData("OBJLIST", objList);
             resData.addResponseData("PAGE_DESC", pageDesc);
@@ -92,25 +80,28 @@ public class ExchangeMapinfoNewController extends BaseEntityDwzAction<ExchangeMa
         }
     }
 
-    @RequestMapping(value="/showMapinfoDetail" ,method = {RequestMethod.GET})
-    public void showMapinfoDetail(HttpServletRequest request,HttpServletResponse response) {
-        object = baseEntityManager.getObject(object);
+    @RequestMapping(value="/showMapinfoDetail/{{mapinfoId}}" ,method = {RequestMethod.GET})
+    public void showMapinfoDetail(@PathVariable Long mapinfoId ,ExchangeMapinfo object, HttpServletRequest request,HttpServletResponse response) {
+        object = exchangeMapinfoMag.getObjectById(mapinfoId);
         JsonResultUtils.writeSingleDataJson(object, response);
         /*return "showMapinfoDetail";*/
     }
     
     @RequestMapping(value="/add" ,method = {RequestMethod.GET})
-    public void add(HttpServletRequest request,HttpServletResponse response) {
+    public void add(ExchangeMapinfo object,HttpServletRequest request,HttpServletResponse response) {
+        Long mapinfoId = object.getMapinfoId();
         try {
             if (object == null) {
-                object = getEntityClass().newInstance();
+//              object = getEntityClass().newInstance();
+              JsonResultUtils.writeBlankJson(response);
+              return;
             } else {
-                ExchangeMapinfo o = baseEntityManager.getObject(object);
+                ExchangeMapinfo o = exchangeMapinfoMag.getObjectById(mapinfoId);;
                 if (o != null)
                     // 将对象o copy给object，object自己的属性会保留
-                    baseEntityManager.copyObject(object, o);
+                    exchangeMapinfoMag.copyObject(object, o);
                 else
-                    baseEntityManager.clearObjectProperties(object);
+                    exchangeMapinfoMag.clearObjectProperties(object);
             }
             List<String> DatabaseNames = exchangeMapinfoMag.listDatabaseName();
             /*ServletActionContext.getContext().put("DatabaseNames", DatabaseNames);
@@ -130,25 +121,27 @@ public class ExchangeMapinfoNewController extends BaseEntityDwzAction<ExchangeMa
      * @return
      */
     @RequestMapping(value="/copy" ,method = {RequestMethod.GET})
-    public void copy(HttpServletRequest request,HttpServletResponse response) {
-        object = baseEntityManager.getObject(object);
+    public void copy(ExchangeMapinfo object,HttpServletResponse response) {
+        object = exchangeMapinfoMag.getObjectById(object.getMapinfoId());
         object.setMapinfoId(null);
         JsonResultUtils.writeSingleDataJson(object, response);
         /*return "showMapinfoDetail";*/
     }
 
-    @RequestMapping(value="/edit",method = {RequestMethod.GET})
-    public void edit(HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/edit/{{mapinfoId}}",method = {RequestMethod.GET})
+    public void edit(@PathVariable Long mapinfoId,ExchangeMapinfo object,HttpServletRequest request,HttpServletResponse response) {
         try {
             if (object == null) {
-                object = getEntityClass().newInstance();
+//              object = getEntityClass().newInstance();
+              JsonResultUtils.writeBlankJson(response);
+              return;
             } else {
-                ExchangeMapinfo o = baseEntityManager.getObject(object);
+                ExchangeMapinfo o = exchangeMapinfoMag.getObjectById(mapinfoId);
                 if (o != null)
                     // 将对象o copy给object，object自己的属性会保留
-                    baseEntityManager.copyObject(object, o);
+                    exchangeMapinfoMag.copyObject(object, o);
                 else
-                    baseEntityManager.clearObjectProperties(object);
+                    exchangeMapinfoMag.clearObjectProperties(object);
             }
             List<String> DatabaseNames = exchangeMapinfoMag.listDatabaseName();
             /*ServletActionContext.getContext().put("DatabaseNames", DatabaseNames);
@@ -161,20 +154,20 @@ public class ExchangeMapinfoNewController extends BaseEntityDwzAction<ExchangeMa
         }
     }
 
-    @RequestMapping(value="/save",method = {RequestMethod.PUT})
-    public void save(HttpServletRequest request,HttpServletResponse response) {
-        dwzResultParam = new DwzResultParam();
+    @RequestMapping(value="/save/{{mapinfoId}}",method = {RequestMethod.PUT})
+    public void save(@PathVariable Long mapinfoId,ExchangeMapinfo object, HttpServletRequest request,HttpServletResponse response) {
+//        dwzResultParam = new DwzResultParam();
         // dwzResultParam.setNavTabId(tabid);
-        if (StringUtils.isBlank(object.getMapinfoName())) {
-            dwzResultParam.setStatusCode(DwzResultParam.STATUS_CODE_300);
-            dwzResultParam.setMessage("交换名称未填写");
+        if (object.getMapinfoName().equals(null)) {
+//            dwzResultParam.setStatusCode(DwzResultParam.STATUS_CODE_300);
+//            dwzResultParam.setMessage("交换名称未填写");
 
 //            return SUCCESS;
             JsonResultUtils.writeSuccessJson(response);
             return;
         }
 
-        object.setMapinfoName(StringUtils.trim(object.getMapinfoName()));
+        object.setMapinfoName(object.getMapinfoName().trim());
 
         //判断交换名称的唯一性
         Map<String, Object> filterMap = new HashMap<String, Object>();
@@ -184,10 +177,10 @@ public class ExchangeMapinfoNewController extends BaseEntityDwzAction<ExchangeMa
 
 
         if (!CollectionUtils.isEmpty(listObjects)) {
-            ExchangeMapinfo exchangeMapinfoDb = exchangeMapinfoMag.getObject(object);
+            ExchangeMapinfo exchangeMapinfoDb = exchangeMapinfoMag.getObjectById(mapinfoId);
             String message = "交换名称已存在";
             if (null == exchangeMapinfoDb) {
-                dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, message);
+//                dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, message);
 
 //                return SUCCESS;
                 JsonResultUtils.writeSuccessJson(response);
@@ -195,7 +188,7 @@ public class ExchangeMapinfoNewController extends BaseEntityDwzAction<ExchangeMa
             } else {
                 if (1 < listObjects.size() || !exchangeMapinfoDb.getMapinfoId().equals(listObjects.get(0)
                         .getMapinfoId())) {
-                    dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, message);
+//                    dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, message);
 
 //                    return SUCCESS;
                     JsonResultUtils.writeSuccessJson(response);
@@ -208,34 +201,34 @@ public class ExchangeMapinfoNewController extends BaseEntityDwzAction<ExchangeMa
         try {
             exchangeMapinfoMag.validator(object);
 
-            exchangeMapinfoMag.saveObject(object, (FUserDetail) getLoginUser());
+            exchangeMapinfoMag.saveObject(object, getLoginUser(request));
         } catch (SqlResolveException e) {
-            dwzResultParam.setStatusCode(DwzResultParam.STATUS_CODE_300);
+//            dwzResultParam.setStatusCode(DwzResultParam.STATUS_CODE_300);
             String message = null;
             if (0 == e.getErrorcode()) {
                 message = e.getMessage();
             } else {
-                message = SysParametersUtils.getValue(String.valueOf(e.getErrorcode()));
+                message = SysParametersUtils.getStringValue(String.valueOf(e.getErrorcode()));
             }
 
-            dwzResultParam.setMessage(message);
+//            dwzResultParam.setMessage(message);
 
 //            return SUCCESS;
             JsonResultUtils.writeSuccessJson(response);
             return;
         }
 
-        dwzResultParam.setForwardUrl("/dde/exchangeMapinfoNew!list.do");
+//        dwzResultParam.setForwardUrl("/dde/exchangeMapinfoNew!list.do");
 //        return SUCCESS;
         JsonResultUtils.writeSuccessJson(response);
     }
 
-    @RequestMapping(value="/delete", method = {RequestMethod.DELETE})
-    public void delete(HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/delete/{{mapinfoId}", method = {RequestMethod.DELETE})
+    public void delete(@PathVariable Long mapinfoId, HttpServletRequest request,HttpServletResponse response) {
 
-        baseEntityManager.deleteObject(object);
-        exchangeTaskdetailManager.deleteDetailsByMapinfoId(object.getMapinfoId());
-        deletedMessage();
+        exchangeMapinfoMag.deleteObjectById(mapinfoId);
+        exchangeTaskdetailManager.deleteDetailsByMapinfoId(mapinfoId);
+//        deletedMessage();
 
 //        return "delete";
         JsonResultUtils.writeSuccessJson(response);
@@ -288,10 +281,10 @@ public class ExchangeMapinfoNewController extends BaseEntityDwzAction<ExchangeMa
     
     //这里 新框架 有下载的功能 调用就好  不需要单独写
     @RequestMapping(value="/exportMapinfoDetail")
-    public void exportMapinfoDetail() throws IOException {
+    public void exportMapinfoDetail(ExchangeMapinfo object) throws IOException {
         HttpServletResponse response = ServletActionContext.getResponse();
         ServletOutputStream output = response.getOutputStream();
-        ExchangeMapinfo exportSql = exchangeMapinfoMag.getObject(object);
+        ExchangeMapinfo exportSql = exchangeMapinfoMag.getObjectById(object.getMapinfoId());
 
 
         List<MapinfoDetail> exportFields = exportSql.getMapinfoDetails();
