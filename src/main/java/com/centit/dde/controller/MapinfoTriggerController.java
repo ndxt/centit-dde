@@ -12,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
 import com.centit.dde.po.MapinfoTrigger;
 import com.centit.dde.service.MapinfoTriggerManager;
 import com.centit.framework.core.common.JsonResultUtils;

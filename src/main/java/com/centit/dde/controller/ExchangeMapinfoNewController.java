@@ -284,7 +284,6 @@ public class ExchangeMapinfoNewController extends BaseController {
         ServletOutputStream output = response.getOutputStream();
         ExchangeMapinfo exportSql = exchangeMapinfoMag.getObjectById(object.getMapinfoId());
 
-
         List<MapinfoDetail> exportFields = exportSql.getMapinfoDetails();
 
         Map<String, MapinfoDetail> values = new HashMap<String, MapinfoDetail>();

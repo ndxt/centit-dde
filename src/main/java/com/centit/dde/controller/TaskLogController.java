@@ -153,7 +153,6 @@ public class TaskLogController extends BaseController {
             JsonResultUtils.writeErrorMessageJson("error", response);
         }
     }
-
     @RequestMapping(value = "/list", method = { RequestMethod.GET })
     public void list(PageDesc pageDesc,HttpServletRequest request, HttpServletResponse response) {
         // super.list();

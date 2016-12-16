@@ -292,7 +292,6 @@ public class ExchangeTaskController extends BaseController {
                     object.setNextRunTime(generator.next(new Date()));
                 } catch (Exception e) {
 //                    saveError("定时任务表达式不正确");
-
 //                    return "editAndsave";
                     JsonResultUtils.writeBlankJson(response);
                     return;

@@ -22,7 +22,6 @@ public class ExchangeTaskdetailController extends BaseController {
     private static final Log log = LogFactory.getLog(ExchangeTaskdetailController.class);
 
     //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");
-
     private static final long serialVersionUID = 1L;
     @Resource
     @Nullable

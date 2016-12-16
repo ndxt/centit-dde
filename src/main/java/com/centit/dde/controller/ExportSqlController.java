@@ -251,16 +251,6 @@ public class ExportSqlController extends BaseController {
      */
     @RequestMapping(value="/splitQuerySql")
     public void splitQuerySql(ExportSql object,HttpServletResponse response) throws IOException {
-//        PrintWriter writer = ServletActionContext.getResponse().getWriter();
-//        String jsonResult = null;
-//        Map<String, Object> params = new HashMap<String, Object>();
-        
-//        params.put("splitsql", SQLUtils.splitSqlByFields(object.getQuerySql()));
-//        params.put("sqlfields", SQLUtils.getSqlFileds(object.getQuerySql()));
-//
-//        jsonResult = JSONObject.fromObject(params).toString();
-//        writer.print(jsonResult);
-        
         ResponseData resData = new ResponseData();
         resData.addResponseData("splitsql", SQLUtils.splitSqlByFields(object.getQuerySql()));
         resData.addResponseData("sqlfields", SQLUtils.getSqlFileds(object.getQuerySql()));

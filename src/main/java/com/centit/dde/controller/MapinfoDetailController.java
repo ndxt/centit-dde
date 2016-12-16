@@ -766,7 +766,6 @@ public class MapinfoDetailController extends BaseController {
         return structs;
     }
 
-
     @RequestMapping(value="/edit" ,method = {RequestMethod.GET})
     public void edit(String s_columnNo,String s_mapinfoId,
             HttpServletRequest request,HttpServletResponse response) {
