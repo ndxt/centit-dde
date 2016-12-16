@@ -2,7 +2,6 @@ package com.centit.dde.service;
 
 import java.util.List;
 
-
 import com.centit.dde.po.ExchangeTask;
 import com.centit.framework.core.service.BaseEntityManager;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
@@ -40,5 +39,7 @@ public interface ExchangeTaskManager extends BaseEntityManager<ExchangeTask,Long
     public boolean updateTimerTask(ExchangeTask exchangeTask);
     
     public boolean executeTask(Long taskID,String userCode,String runType);
+
+
 
 }

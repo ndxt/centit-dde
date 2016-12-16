@@ -25,6 +25,7 @@ import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.support.database.DbcpConnect;
 import com.centit.support.database.QueryUtils;
+import com.centit.support.database.transaction.Transactional;
 
 @Repository
 public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId> {
@@ -75,7 +76,7 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId>
      * @return 查询数据库中的所有表
      * @throws SQLException
      */
-    public List<String> getTables(DatabaseInfo databaseInfo, String dataBaseType) {
+    public List<String> getTables(DatabaseInfo databaseInfo) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSetMetaData rsmd = null;
@@ -116,7 +117,7 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId>
         return datas;
     }
 
-    public List<Object> getTable(DatabaseInfo databaseInfo, String dataBaseType) {
+    public List<Object> getTable(DatabaseInfo databaseInfo) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSetMetaData rsmd = null;
@@ -234,18 +235,20 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId>
         return datas;
     }
 
-
-    public JSONArray getSourceTableStructFromDatabase(Long mapinfoId) {
-        String sql = "select t.source_field_name as ColumnName,t.source_field_type as ColumnType,t.source_field_sentence as SOURCECOLUMNSENTENCE from D_MAPINFO_DETAIL t where t.mapinfo_id="
-                + mapinfoId + " order by t.column_no";
-        return  DatabaseOptUtils.findObjectsAsJSonBySql(this, sql);
+    @Transactional
+    public List<Map<String, String>> getSourceTableStructFromDatabase(Long mapinfoId) {
+        String sql = "select t.source_field_name as ColumnName,t.source_field_type as ColumnType,"
+                + "t.source_field_sentence as SOURCECOLUMNSENTENCE from D_MAPINFO_DETAIL t where t.mapinfo_id=?  order by t.column_no";
+        return  (List<Map<String, String>>)DatabaseOptUtils.findObjectsBySql(this, sql,new Object[]{mapinfoId});
     }
 
-    public JSONArray getGoalTableStructFromDatabase(Long mapinfoId) {
-        String sql = "select t.dest_field_name as ColumnName,t.dest_field_type as ColumnType,t.is_pk as isPk,t.is_null as isNullable,t.dest_field_default as destfielddefault from D_MAPINFO_DETAIL "
-                + "t where t.mapinfo_id=" + mapinfoId + " order by t.column_no";
+    @Transactional
+    public List<Map<String, String>> getGoalTableStructFromDatabase(Long mapinfoId) {
+        String sql = "select t.dest_field_name as ColumnName,t.dest_field_type as ColumnType,"
+                + "t.is_pk as isPk,t.is_null as isNullable,t.dest_field_default as destfielddefault from D_MAPINFO_DETAIL "
+                + "t where t.mapinfo_id=? order by t.column_no";
 
-        return  DatabaseOptUtils.findObjectsAsJSonBySql(this, sql);
+        return  (List<Map<String, String>>)DatabaseOptUtils.findObjectsBySql(this, sql,new Object[]{mapinfoId});
     }
 
     /**

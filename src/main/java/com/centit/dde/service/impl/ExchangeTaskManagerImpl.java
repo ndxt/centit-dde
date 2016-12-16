@@ -4,11 +4,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
@@ -21,9 +21,7 @@ import com.centit.dde.service.ExchangeTaskManager;
 import com.centit.dde.transfer.TransferManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
-
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 @Service
 public class ExchangeTaskManagerImpl
         extends BaseEntityManagerImpl<ExchangeTask,Long,ExchangeTaskDao>
@@ -66,12 +64,12 @@ public class ExchangeTaskManagerImpl
         setBaseDao(this.exchangeTaskDao);
     }
 
-    public List<List<Object>> getSqlValues(DatabaseInfo DatabaseInfo, String sql) {
-        return this.exchangeTaskDao.getSqlValues(DatabaseInfo, sql);
+    public List<List<Object>> getSqlValues(DatabaseInfo databaseInfo, String sql) {
+        return this.exchangeTaskDao.getSqlValues(databaseInfo, sql);
     }
 
-    public List<Object> insertDatas(DatabaseInfo DatabaseInfo, String sql, List<List<Object>> datas) {
-        return this.exchangeTaskDao.insertDatas(DatabaseInfo, sql, datas);
+    public List<Object> insertDatas(DatabaseInfo databaseInfo, String sql, List<List<Object>> datas) {
+        return this.exchangeTaskDao.insertDatas(databaseInfo, sql, datas);
     }
 
     public String getMapinfoName(Long mapinfoId) {

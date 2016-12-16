@@ -6,15 +6,14 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 
-import com.alibaba.fastjson.JSONArray;
-import com.centit.dde.po.MapinfoDetailId;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.dao.MapinfoDetailDao;
 import com.centit.dde.po.MapinfoDetail;
+import com.centit.dde.po.MapinfoDetailId;
 import com.centit.dde.service.MapinfoDetailManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
@@ -41,12 +40,12 @@ public class MapinfoDetailManagerImpl extends BaseEntityManagerImpl<MapinfoDetai
         return mapinfoDetailDao.getSourceTableStruct(DatabaseInfo, tableName);
     }
 
-    public List<String> getTables(DatabaseInfo databaseInfo, String dataBaseType) {
-        return mapinfoDetailDao.getTables(databaseInfo, dataBaseType);
+    public List<String> getTables(DatabaseInfo databaseInfo) {
+        return mapinfoDetailDao.getTables(databaseInfo);
     }
 
-    public List<Object> getTable(DatabaseInfo databaseInfo, String dataBaseType) {
-        return mapinfoDetailDao.getTable(databaseInfo, dataBaseType);
+    public List<Object> getTable(DatabaseInfo databaseInfo) {
+        return mapinfoDetailDao.getTable(databaseInfo);
     }
 
     public void deleteMapinfoDetails(Long mapinfoId) {
@@ -57,11 +56,11 @@ public class MapinfoDetailManagerImpl extends BaseEntityManagerImpl<MapinfoDetai
         mapinfoDetailDao.updateExchangeMapinfo(mapinfoId, soueceTableName, goalTableName, createSql);
     }
 
-    public JSONArray getSourceTableStructFromDatabase(Long mapinfoId) {
+    public List<Map<String, String>> getSourceTableStructFromDatabase(Long mapinfoId) {
         return mapinfoDetailDao.getSourceTableStructFromDatabase(mapinfoId);
     }
 
-    public JSONArray getGoalTableStructFromDatabase(Long mapinfoId) {
+    public List<Map<String, String>> getGoalTableStructFromDatabase(Long mapinfoId) {
         return mapinfoDetailDao.getGoalTableStructFromDatabase(mapinfoId);
     }
 

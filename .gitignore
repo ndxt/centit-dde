@@ -1,11 +1,9 @@
-target
-/
-*.iml
+target/*.iml
 
 .externalToolBuilders
 
 .idea
-.settings
+.settings/
 
 .checkstyle
 
@@ -14,6 +12,7 @@ target
 
 .project
 
-
 .xml
 /bin/
+
+

@@ -135,12 +135,19 @@ public class TaskLogController extends BaseController {
                             .getMapinfoName(taskDetailLog.getMapinfoId()));
                 }
             }
-            if (object.getTaskId() != null) {
+            /*if (object.getTaskId() != null) {
                 ServletActionContext.getContext().put("exchangeTask",
                         exchangeTaskManager.getObjectById(object.getTaskId()));
+            }*/
+            
+            ExchangeTask exchangeTask = null;
+            if (object.getTaskId() != null) {
+                
+                exchangeTask = exchangeTaskManager.getObjectById(object.getTaskId());
             }
+            JsonResultUtils.writeSingleDataJson(exchangeTask, response);
             // return EDIT;
-            JsonResultUtils.writeSuccessJson(response);
+//            JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             e.printStackTrace();
             JsonResultUtils.writeErrorMessageJson("error", response);
@@ -150,7 +157,7 @@ public class TaskLogController extends BaseController {
     @RequestMapping(value = "/list", method = { RequestMethod.GET })
     public void list(PageDesc pageDesc,HttpServletRequest request, HttpServletResponse response) {
         // super.list();
-        Map<Object, Object> paramMap = request.getParameterMap();
+//        Map<Object, Object> paramMap = request.getParameterMap();
 //        resetPageParam(paramMap);
 
         String orderField = request.getParameter("orderField");

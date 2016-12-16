@@ -32,6 +32,7 @@ import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.sun.istack.Nullable;
 
 @Controller
@@ -53,10 +54,8 @@ public class ExchangeMapinfoNewController extends BaseController {
     private ExchangeTaskdetailManager exchangeTaskdetailManager;
 
     @Resource
-    @Nullable
-    private DatabaseInfoManager databaseInfoManager;
-
-
+    protected StaticEnvironmentManager platformEnvironment;
+    
     @SuppressWarnings("unchecked")
     @RequestMapping(value="/list" ,method = {RequestMethod.GET})
     public void list(PageDesc pageDesc,HttpServletRequest request, HttpServletResponse response) {
@@ -237,7 +236,7 @@ public class ExchangeMapinfoNewController extends BaseController {
     @RequestMapping(value="/sourceDs", method = {RequestMethod.GET})
     public void sourceDs(HttpServletRequest request,HttpServletResponse response) {
         // 数据库连接
-        List<DatabaseInfo> databaseInfos = databaseInfoManager.listObjects();
+        List<DatabaseInfo> databaseInfos = platformEnvironment.listDatabaseInfo();
         /*request.setAttribute("databaseInfos", databaseInfos);
 
         return "sourceDs";*/
@@ -247,7 +246,7 @@ public class ExchangeMapinfoNewController extends BaseController {
     @RequestMapping(value="/destDs" , method = {RequestMethod.GET})
     public void destDs(HttpServletResponse response) {
         // 数据库连接
-        List<DatabaseInfo> databaseInfos = databaseInfoManager.listObjects();
+        List<DatabaseInfo> databaseInfos = platformEnvironment.listDatabaseInfo();
         /*request.setAttribute("databaseInfos", databaseInfos);
 
         return "destDs";*/
@@ -281,8 +280,7 @@ public class ExchangeMapinfoNewController extends BaseController {
     
     //这里 新框架 有下载的功能 调用就好  不需要单独写
     @RequestMapping(value="/exportMapinfoDetail")
-    public void exportMapinfoDetail(ExchangeMapinfo object) throws IOException {
-        HttpServletResponse response = ServletActionContext.getResponse();
+    public void exportMapinfoDetail(ExchangeMapinfo object,HttpServletResponse response) throws IOException {
         ServletOutputStream output = response.getOutputStream();
         ExchangeMapinfo exportSql = exchangeMapinfoMag.getObjectById(object.getMapinfoId());
 

@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -29,8 +30,11 @@ import com.centit.dde.po.ImportField;
 import com.centit.dde.po.ImportOpt;
 import com.centit.dde.service.ImportOptManager;
 import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.staticsystem.po.OsInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.sun.istack.Nullable;
 
 @Controller
@@ -52,13 +56,7 @@ public class ImportOptController extends BaseController {
 
 
     @Resource
-    @Nullable
-    private DatabaseInfoManager databaseInfoManager;
-
-    @Resource
-    @Nullable
-    private OsInfoManager osInfoManager;
-
+    protected StaticEnvironmentManager platformEnvironment;
 
     private List<DataOptStep> dataOptSteps;
 
@@ -81,9 +79,9 @@ public class ImportOptController extends BaseController {
     }
 
     @RequestMapping(value="/defDataSource",method = {RequestMethod.GET})
-    public String defDataSource(HttpServletRequest request,HttpServletResponse response) {
+    public void defDataSource(HttpServletRequest request,HttpServletResponse response) {
 
-        List<DatabaseInfo> dbList = databaseInfoManager.listObjects();
+        List<DatabaseInfo> dbList = platformEnvironment.listDatabaseInfo();
 
 //        request.setAttribute("dbList", dbList);
 //
@@ -103,16 +101,14 @@ public class ImportOptController extends BaseController {
             //
         }
 
-        List<DatabaseInfo> dbList = databaseInfoManager.listObjects();
-
-        request.setAttribute("dbList", dbList);
-
+        List<DatabaseInfo> dbList = platformEnvironment.listDatabaseInfo();
         // 业务系统
-        List<OsInfo> osinfoList = osInfoManager.listObjects();
-//        request.setAttribute("osinfoList", osinfoList);
-//
-//        return "listField";
-        JsonResultUtils.writeSingleDataJson(osinfoList,dbList, response);
+        List<OsInfo> osinfoList = platformEnvironment.listOsInfos();
+        ResponseData resData = new ResponseData();
+        resData.addResponseData("dbList", dbList);
+        resData.addResponseData("osinfoList",osinfoList);
+
+        JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
 
 //    @RequestMapping(value="/formField")
@@ -195,18 +191,16 @@ public class ImportOptController extends BaseController {
         }
 
 
-        List<DatabaseInfo> dbList = databaseInfoManager.listObjects();
-
-//        request.setAttribute("dbList", dbList);
+        List<DatabaseInfo> dbList = platformEnvironment.listDatabaseInfo();
 
         // 业务系统
-        List<OsInfo> osinfoList = osInfoManager.listObjects();
-//        request.setAttribute("osinfoList", osinfoList);
+        List<OsInfo> osinfoList = platformEnvironment.listOsInfos();
 
-        //return EDIT;
+        ResponseData resData = new ResponseData();
+        resData.addResponseData("dbList", dbList);
+        resData.addResponseData("osinfoList",osinfoList);
 
-        JsonResultUtils.writeSingleDataJson(dbList,osinfoList, response);
-//        return "editTab"; /page/dde/importFieldTabList.jsp
+        JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
 
     private File uploadify;
@@ -217,9 +211,7 @@ public class ImportOptController extends BaseController {
      * @throws IOException
      */
     @RequestMapping(value="/uploadify")
-    public void uploadify() throws IOException, FileUploadException {
-        HttpServletResponse response = ServletActionContext.getResponse();
-
+    public void uploadify(HttpServletResponse response) throws IOException, FileUploadException {
 
         StringWriter sw = new StringWriter();
         IOUtils.copy(new FileInputStream(uploadify), sw);

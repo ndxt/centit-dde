@@ -13,9 +13,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
-
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,12 +29,16 @@ import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportSql;
 import com.centit.dde.service.ExportSqlManager;
+import com.centit.dde.util.SQLUtils;
 import com.centit.framework.common.SysParametersUtils;
+import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.staticsystem.po.DataDictionary;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.po.OsInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.sun.istack.Nullable;
 
 @Controller
@@ -57,12 +58,7 @@ public class ExportSqlController extends BaseController {
     private ExportSqlManager exportSqlMag;
 
     @Resource
-    @Nullable
-    private DatabaseInfoManager databaseInfoManager;
-
-    @Resource
-    @Nullable
-    private OsInfoManager osInfoManager;
+    protected StaticEnvironmentManager platformEnvironment;
 
 
     @RequestMapping(value="/save/{{tabid}}/{{exportId}}",method = {RequestMethod.PUT})
@@ -149,7 +145,7 @@ public class ExportSqlController extends BaseController {
         }
 
         // 业务系统
-        List<OsInfo> osinfoList = osInfoManager.listObjects();
+        List<OsInfo> osinfoList = platformEnvironment.listOsInfos();
 //        request.setAttribute("osinfoList", osinfoList);
 
         JsonResultUtils.writeSingleDataJson(osinfoList, response);
@@ -168,12 +164,12 @@ public class ExportSqlController extends BaseController {
             //
         }
 
-        List<DatabaseInfo> dbList = databaseInfoManager.listObjects();
+        List<DatabaseInfo> dbList = platformEnvironment.listDatabaseInfo();
 
 //        request.setAttribute("dbList", dbList);
 
         // 业务系统
-        List<OsInfo> osinfoList = osInfoManager.listObjects();
+        List<OsInfo> osinfoList = platformEnvironment.listOsInfos();
 //        request.setAttribute("osinfoList", osinfoList);
 //
 //        return "listField";
@@ -186,7 +182,7 @@ public class ExportSqlController extends BaseController {
     @RequestMapping(value="/defDataSource" ,method = {RequestMethod.GET})
     public void defDataSource(HttpServletRequest request,HttpServletResponse response) {
 
-        List<DatabaseInfo> dbList = databaseInfoManager.listObjects();
+        List<DatabaseInfo> dbList = platformEnvironment.listDatabaseInfo();
 
 //        request.setAttribute("dbList", dbList);
 //
@@ -213,34 +209,38 @@ public class ExportSqlController extends BaseController {
      * @throws IOException
      */
     @RequestMapping(value="/resolveQuerySql")
-    public void resolveQuerySql(ExportSql object) throws IOException {
-        PrintWriter writer = ServletActionContext.getResponse().getWriter();
-        String jsonResult = null;
-        Map<String, Object> params = new HashMap<String, Object>();
+    public void resolveQuerySql(ExportSql object,HttpServletResponse response) throws IOException {
+//        PrintWriter writer = response.getWriter();
+//        String jsonResult = null;
+//        Map<String, Object> params = new HashMap<String, Object>();
         List<ExportField> efList = new ArrayList<ExportField>();
-
+        ResponseData resData = new ResponseData();
         try {
             efList = exportSqlMag.listExportFieldsByQuerysql(object);
         } catch (SqlResolveException e) {
 //            params.put("message", SysParametersUtils.getValue(String.valueOf(e.getErrorcode())));
 //            jsonResult = JSONObject.fromObject(params).toString();
 //            writer.print(jsonResult);
-//
-//
-//
 //            return;
-
             //未通过sql验证，简单验证语法
-            params.put("simple", 1);
-            params.put("message", SysParametersUtils.getStringValue(String.valueOf(e.getErrorcode())));
+            resData.addResponseData("simple", 1);
+            resData.addResponseData("message", SysParametersUtils.getStringValue(String.valueOf(e.getErrorcode())));
+//            params.put("simple", 1);
+//            params.put("message", SysParametersUtils.getStringValue(String.valueOf(e.getErrorcode())));
         }
 
-        params.put("splitsql", SQLUtils.splitSqlByFields(object.getQuerySql()));
-        params.put("sqlfields", SQLUtils.getSqlFileds(object.getQuerySql()));
-        params.put("efList", efList);
-
-        jsonResult = JSONObject.fromObject(params).toString();
-        writer.print(jsonResult);
+//        params.put("splitsql",SQLUtils.splitSqlByFields(object.getQuerySql()));
+//        params.put("sqlfields", SQLUtils.getSqlFileds(object.getQuerySql()));
+//        params.put("efList", efList);
+        
+        
+        resData.addResponseData("splitsql",SQLUtils.splitSqlByFields(object.getQuerySql()));
+        resData.addResponseData("sqlfields", SQLUtils.getSqlFileds(object.getQuerySql()));
+        resData.addResponseData("efList", efList);
+        JsonResultUtils.writeMapDataJson(resData, response);
+//        jsonResult = JSONObject.fromObject(params).toString();
+//        writer.print(jsonResult);
+        
 
     }
 
@@ -250,16 +250,21 @@ public class ExportSqlController extends BaseController {
      * @throws IOException
      */
     @RequestMapping(value="/splitQuerySql")
-    public void splitQuerySql() throws IOException {
-        PrintWriter writer = ServletActionContext.getResponse().getWriter();
-        String jsonResult = null;
-        Map<String, Object> params = new HashMap<String, Object>();
-
-        params.put("splitsql", SQLUtils.splitSqlByFields(object.getQuerySql()));
-        params.put("sqlfields", SQLUtils.getSqlFileds(object.getQuerySql()));
-
-        jsonResult = JSONObject.fromObject(params).toString();
-        writer.print(jsonResult);
+    public void splitQuerySql(ExportSql object,HttpServletResponse response) throws IOException {
+//        PrintWriter writer = ServletActionContext.getResponse().getWriter();
+//        String jsonResult = null;
+//        Map<String, Object> params = new HashMap<String, Object>();
+        
+//        params.put("splitsql", SQLUtils.splitSqlByFields(object.getQuerySql()));
+//        params.put("sqlfields", SQLUtils.getSqlFileds(object.getQuerySql()));
+//
+//        jsonResult = JSONObject.fromObject(params).toString();
+//        writer.print(jsonResult);
+        
+        ResponseData resData = new ResponseData();
+        resData.addResponseData("splitsql", SQLUtils.splitSqlByFields(object.getQuerySql()));
+        resData.addResponseData("sqlfields", SQLUtils.getSqlFileds(object.getQuerySql()));
+        JsonResultUtils.writeMapDataJson(resData, response);
 
     }
 
@@ -270,26 +275,29 @@ public class ExportSqlController extends BaseController {
      */
     @RequestMapping(value="/analyissDataType")
     public void analyissDataType() throws IOException {
-        PrintWriter writer = ServletActionContext.getResponse().getWriter();
+//        PrintWriter writer = ServletActionContext.getResponse().getWriter();
 
-        List<FDatadictionary> dataTypes = CodeRepositoryUtil.getDictionary("DATA_TYPE");
-        Map<String, List<String>> dataTypeMap = new HashMap<String, List<String>>();
+        List<DataDictionary> dataTypes = (List<DataDictionary>) CodeRepositoryUtil.getDictionary("DATA_TYPE");
+//        Map<String, List<String>> dataTypeMap = new HashMap<String, List<String>>();
+        
+        ResponseData resData = new ResponseData();
 
-        for (FDatadictionary dataType : dataTypes) {
-            if (!dataTypeMap.containsKey(dataType.getDatacode())) {
-                dataTypeMap.put(dataType.getDatacode(), new ArrayList<String>());
+        for (DataDictionary dataType : dataTypes) {
+            if (resData.getResponseData(dataType.getDataCode())==null) {
+                resData.addResponseData(dataType.getDataCode(), new ArrayList<String>());
             }
 
-            if (StringUtils.hasText(dataType.getDatavalue())) {
-                String[] dts = dataType.getDatavalue().split(",");
+            if (StringUtils.hasText(dataType.getDataValue())) {
+                String[] dts = dataType.getDataValue().split(",");
                 for (String dt : dts) {
-                    dataTypeMap.get(dataType.getDatacode()).add(dt);
+                    ArrayList<String> arr =  (ArrayList<String>) resData.getResponseData(dataType.getDataCode());
+                    arr.add(dt);
                 }
             }
 
         }
 
-        writer.print(JSONObject.fromObject(dataTypeMap).toString());
+//        writer.print(JSONObject.fromObject(dataTypeMap).toString());
 
     }
 
@@ -298,8 +306,8 @@ public class ExportSqlController extends BaseController {
      * 导出源字段
      */
     @RequestMapping(value="/exportSourceField")
-    public void exportSourceField(ExportSql object) throws IOException {
-        HttpServletResponse response = ServletActionContext.getResponse();
+    public void exportSourceField(ExportSql object,HttpServletResponse response) throws IOException {
+//        HttpServletResponse response = ServletActionContext.getResponse();
         ServletOutputStream output = response.getOutputStream();
         ExportSql exportSql = exportSqlMag.getObjectById(object.getExportId());
 

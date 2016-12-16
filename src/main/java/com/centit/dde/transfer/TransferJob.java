@@ -48,7 +48,7 @@ public class TransferJob {
 
     private static final long serialVersionUID = 1L;
 
-    public String doTransfer() {
+    /*public String doTransfer() {
 
         final IUserInfo userDetails = (IUserInfo) this.getLoginUser();
         final Long taskId = Long.valueOf(request.getParameter("id"));
@@ -85,7 +85,7 @@ public class TransferJob {
         s.add("");
         this.setActionMessages(s);
         return SUCCESS;
-    }
+    }*/
 
     public String transferExecute() {
         return "transferExecute";

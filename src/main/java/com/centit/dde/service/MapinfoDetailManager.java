@@ -15,19 +15,19 @@ public interface MapinfoDetailManager extends BaseEntityManager<MapinfoDetail,Ma
 
     public List<Map<String, String>> getSourceTableStruct(DatabaseInfo DatabaseInfo, String tableName);
 
-    public List<String> getTables(DatabaseInfo databaseInfo, String dataBaseType);
+    public List<String> getTables(DatabaseInfo databaseInfo);
 
     public void deleteMapinfoDetails(Long mapinfoId);
 
     public void updateExchangeMapinfo(Long mapinfoId, String soueceTableName, String goalTableName, String createSql);
 
-    public JSONArray getSourceTableStructFromDatabase(Long mapinfoId);
+    public List<Map<String, String>> getSourceTableStructFromDatabase(Long mapinfoId);
 
-    public JSONArray getGoalTableStructFromDatabase(Long mapinfoId);
+    public List<Map<String, String>> getGoalTableStructFromDatabase(Long mapinfoId);
 
     public void updateSourceColumnSentence(Map<String, Object> structs, String mapinfoId);
 
-    public List<Object> getTable(DatabaseInfo databaseInfo, String dataBaseType);
+    public List<Object> getTable(DatabaseInfo databaseInfo);
 
     public Long getMapinfoId();
 

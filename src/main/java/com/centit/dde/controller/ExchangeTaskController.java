@@ -26,8 +26,8 @@ import org.springframework.web.util.WebUtils;
 import com.centit.dde.po.ExchangeMapinfo;
 import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.po.ExchangeTaskdetail;
+import com.centit.dde.po.ExchangeTaskdetailId;
 import com.centit.dde.po.ExportSql;
-import com.centit.dde.po.MapinfoDetail;
 import com.centit.dde.po.TaskErrorData;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.service.ExchangeMapinfoManager;
@@ -43,12 +43,16 @@ import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
-import com.sun.istack.Nullable;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.core.dao.PageDesc;
+import com.centit.framework.core.service.BaseEntityManager;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.staticsystem.po.UserInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.network.HtmlFormUtils;
+import com.sun.istack.Nullable;
 
 @Controller
 @RequestMapping("/exchangetask")
@@ -63,10 +67,6 @@ public class ExchangeTaskController extends BaseController {
     @Resource
     @Nullable
     private ExchangeTaskManager exchangeTaskMag;
-
-    @Resource
-    @Nullable
-    private SysUserManager sysUserMgr;
 
     @Resource
     @Nullable
@@ -86,7 +86,7 @@ public class ExchangeTaskController extends BaseController {
 
     @Resource
     @Nullable
-    private DatabaseInfoManager databaseInfoManager;
+    private StaticEnvironmentManager platformEnvironment;
 
     @Resource
     @Nullable
@@ -128,7 +128,7 @@ public class ExchangeTaskController extends BaseController {
     @RequestMapping(value="/list" , method = {RequestMethod.GET})
     public void list(PageDesc pageDesc, HttpServletRequest request,HttpServletResponse response) {
         try {
-            Map<Object, Object> paramMap = request.getParameterMap();
+//            Map<Object, Object> paramMap = request.getParameterMap();
 //            resetPageParam(paramMap);
 
             String orderField = request.getParameter("orderField");
@@ -164,13 +164,13 @@ public class ExchangeTaskController extends BaseController {
             for (int i = 0; i < objList.size(); i++) {
                 ExchangeTask exchangeTask = objList.get(i);
 
-                FUserinfo usesInfo = CodeRepositoryUtil.getUserInfoByCode(exchangeTask.getCreated());
+                UserInfo usesInfo = (UserInfo)CodeRepositoryUtil.getUserInfoByCode(exchangeTask.getCreated());
                 if (usesInfo != null)
                     exchangeTask.setCreatedName(usesInfo.getUsername());
 
             }
 
-            setTaskTypeToPage();
+            setTaskTypeToPage(request);
 //            this.pageDesc = pageDesc;
             ResponseData resData = new ResponseData();
             resData.addResponseData("OBJLIST", objList);
@@ -212,9 +212,9 @@ public class ExchangeTaskController extends BaseController {
                 object.setCreateTime(new Date());
                 object.setIsvalid("1");
                 // 获取登录用户
-                FUserDetail uinfo = (getLoginUser(request));
+                CentitUserDetails uinfo = getLoginUser(request);
                 if (uinfo != null) {
-                    object.setCreated(uinfo.getUsercode());
+                    object.setCreated(uinfo.getUserCode());
                 }
 //                saveMessage("添加交换任务成功！");
             } else {
@@ -331,7 +331,7 @@ public class ExchangeTaskController extends BaseController {
     }
 
     @RequestMapping(value="/edit/{{taskId}}" , method = {RequestMethod.PUT})
-    public  String edit(ExchangeTask object,@PathVariable Long taskId, HttpServletRequest request ,HttpServletResponse response) {
+    public  void edit(ExchangeTask object,@PathVariable Long taskId, HttpServletRequest request ,HttpServletResponse response) {
         String view = "EDIT";
 //        /page/dde/exchangeTaskForm.jsp
         try {
@@ -348,7 +348,7 @@ public class ExchangeTaskController extends BaseController {
                 // 是否为任务编辑，如果为任务编辑则添加创建人姓名
                 if (null != object.getTaskId() && !"".equals(object.getTaskId())) {
                     // 调用sysconfig下的manager 通过id查询创建人姓名
-                    UserInfo usesInfo = CodeRepositoryUtil.getUserInfoByCode(o.getCreated());
+                    UserInfo usesInfo = (UserInfo)CodeRepositoryUtil.getUserInfoByCode(o.getCreated());
                     if (usesInfo != null) {
                         object.setCreatedName(usesInfo.getUsername());
                     }
@@ -374,7 +374,7 @@ public class ExchangeTaskController extends BaseController {
 
             }
 
-            setTaskTypeToPage();
+            setTaskTypeToPage(request);
 
 //            return view;
             JsonResultUtils.writeBlankJson(response);
@@ -445,7 +445,7 @@ public class ExchangeTaskController extends BaseController {
      * 查看明细
      */
     @RequestMapping(value="/view/{{taskId}}" , method = {RequestMethod.GET})
-    public String view(PageDesc pageDesc,ExchangeTask object,@PathVariable Long taskId,HttpServletRequest request,HttpServletResponse response) {
+    public void view(PageDesc pageDesc,ExchangeTask object,@PathVariable Long taskId,HttpServletRequest request,HttpServletResponse response) {
         try {
             ExchangeTask o = exchangeTaskMag.getObjectById(taskId);
             Map<String, Object> searchColumn = convertSearchColumn(request);
@@ -465,7 +465,7 @@ public class ExchangeTaskController extends BaseController {
             // 是否为任务编辑，如果为任务编辑则添加创建人姓名
             if (null != object.getTaskId() && !"".equals(object.getTaskId())) {
                 // 调用sysconfig下的manager 通过id查询创建人姓名
-                UserInfo usesInfo = CodeRepositoryUtil.getUserInfoByCode(o.getCreated());
+                UserInfo usesInfo = (UserInfo)CodeRepositoryUtil.getUserInfoByCode(o.getCreated());
                 if (usesInfo != null) {
                     object.setCreatedName(usesInfo.getUsername());
                 }
@@ -485,7 +485,7 @@ public class ExchangeTaskController extends BaseController {
                 }
             }
 
-            setTaskTypeToPage();
+            setTaskTypeToPage(request);
 
             /*return VIEW;*/
             JsonResultUtils.writeSuccessJson(response);
@@ -515,7 +515,7 @@ public class ExchangeTaskController extends BaseController {
     }
 
     @RequestMapping(value="/saveSequence/{{taskId}}" , method = {RequestMethod.PUT})
-    public String saveSequence(@PathVariable Long taskId, ExchangeTask object,HttpServletRequest request,HttpServletResponse response) {
+    public void saveSequence(@PathVariable Long taskId, ExchangeTask object,HttpServletRequest request,HttpServletResponse response) {
         // 返回页面
         String returnPage = request.getParameter("inputPage");
 
@@ -538,17 +538,7 @@ public class ExchangeTaskController extends BaseController {
 
         }
 //        saveMessage("顺序保存成功！");
-
-        if ("view".equals(returnPage)) {
-            return view(null, object, taskId, request, response);
-        } else if ("edit".equals(returnPage)) {
-            return edit(object, taskId, request, response);
-        } else {
-//            return ERROR;
-            JsonResultUtils.writeErrorMessageJson("error", response);
-        }
-
-        // return returnPage;
+        JsonResultUtils.writeErrorMessageJson("error", response);
     }
 
     @SuppressWarnings("unchecked")
@@ -567,7 +557,7 @@ public class ExchangeTaskController extends BaseController {
         searchColumn.put("taskId", Long.valueOf(((String) searchColumn.get("taskId"))));
         request.setAttribute("taskId", searchColumn.get("taskId"));
 
-        setTaskTypeToPage();
+        setTaskTypeToPage(request);
 
         String taskType = (String) searchColumn.get("taskType");
         request.setAttribute("taskType", taskType);
@@ -642,7 +632,8 @@ public class ExchangeTaskController extends BaseController {
     @SuppressWarnings("unchecked")
     @RequestMapping(value="/importExchangeMapinfo", method = {RequestMethod.GET})
     public void importExchangeMapinfo(HttpServletRequest request,HttpServletResponse response) {
-        Map<Object, Object> paramMap = request.getParameterMap();
+//        Map<String, String[]> paramMap = request.getParameterMap();
+        Map<String, Object> paramMap = convertSearchColumn(request);
 
         String taskParamId = HtmlFormUtils.getParameterString(paramMap.get("taskId"));
         Long taskId = Long.valueOf(taskParamId);
@@ -676,8 +667,8 @@ public class ExchangeTaskController extends BaseController {
     private void executeMapinfo(Long mapinfoId, Long taskId,HttpServletRequest request,HttpServletResponse response) {
         ExchangeMapinfo exchangeMapinfo = this.exchangeMapinfoManager.getObjectById(Long.valueOf(mapinfoId));
         String sql = exchangeMapinfo.getQuerySql();
-        DatabaseInfo databaseInfoSource = databaseInfoManager.getObjectById(exchangeMapinfo.getSourceDatabaseName());
-        DatabaseInfo databaseInfoGoal = databaseInfoManager.getObjectById(exchangeMapinfo.getDestDatabaseName());
+        DatabaseInfo databaseInfoSource = platformEnvironment.getDatabaseInfo(exchangeMapinfo.getSourceDatabaseName());
+        DatabaseInfo databaseInfoGoal = platformEnvironment.getDatabaseInfo(exchangeMapinfo.getDestDatabaseName());
 
 		/*
          * String tableOperateSql =
@@ -686,10 +677,10 @@ public class ExchangeTaskController extends BaseController {
 
         List<List<Object>> datas = this.exchangeTaskMag.getSqlValues(databaseInfoSource, sql);
         String insertSql = generateInsertSql(mapinfoId);
-        FUserinfo userDetails = getLoginUser(request);
+        CentitUserDetails userDetails = getLoginUser(request);
         List<Object> logs = exchangeTaskMag.insertDatas(databaseInfoGoal, insertSql, datas);
 
-        TaskLog TaskLog = this.generateTaskLog(logs, userDetails, taskId);
+        TaskLog TaskLog = this.generateTaskLog(logs, userDetails.getUserCode(), taskId);
         taskLogManager.saveObject(TaskLog);
 
         this.saveTaskErrorData(logs, TaskLog.getLogId());
@@ -706,8 +697,8 @@ public class ExchangeTaskController extends BaseController {
     @RequestMapping(value="/generateInsertSql", method = {RequestMethod.GET})
     private String generateInsertSql(Long mapinfoId) {
 //        MapinfoDetail mapinfoDetail = mapinfoDetailManager.getObjectById(Long.valueOf(mapinfoId));方法需要重新写
-        ExchangeMapinfo exchangeMapinfo = this.exchangeMapinfoManager.getObjectById(Long.valueOf(mapinfoId));
-        List<String> GoalColumnStrut = this.mapinfoDetailManager.getGoalColumnStrut(mapinfoId);
+        ExchangeMapinfo exchangeMapinfo = exchangeMapinfoManager.getObjectById(Long.valueOf(mapinfoId));
+        List<String> GoalColumnStrut = mapinfoDetailManager.getGoalColumnStrut(mapinfoId);
         StringBuffer sql = new StringBuffer();
         sql.append("insert into ");
         sql.append(exchangeMapinfo.getDestTablename());
@@ -731,15 +722,14 @@ public class ExchangeTaskController extends BaseController {
     }
 
     /* 生成日志记录 */
-    @RequestMapping(value="/generateTaskLog")
-    private TaskLog generateTaskLog(List<Object> logs, FUserinfo userDetails, Long taskId) {
+    private TaskLog generateTaskLog(List<Object> logs, String usercode, Long taskId) {
         TaskLog taskLog = new TaskLog();
         taskLog.setLogId(taskLogManager.getTaskLogId());
         taskLog.setTaskId(taskId);
         taskLog.setRunBeginTime((Date) logs.get(0));
         taskLog.setRunEndTime((Date) logs.get(1));
         taskLog.setRunType("1");
-        taskLog.setRunner(userDetails.getUsercode());
+        taskLog.setRunner(usercode);
         /*
          * taskLog.setSuccessPieces(Long.valueOf((logs.get(2)).toString()));
 		 * taskLog.setErrorPieces(Long.valueOf((logs.get(3)).toString()));
@@ -818,7 +808,7 @@ public class ExchangeTaskController extends BaseController {
      * 将任务类型设置至页面，多个页面均要使用
      */
     @RequestMapping(value="/setTaskTypeToPage")
-    void setTaskTypeToPage() {
+    private void setTaskTypeToPage(HttpServletRequest request) {
         Map<String, String> taskType = new HashMap<String, String>();
         taskType.put("1", "直接交换");
         taskType.put("2", "导出离线文件");

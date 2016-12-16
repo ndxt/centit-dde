@@ -113,11 +113,10 @@ public class MapinfoDetail implements java.io.Serializable {
     /**
      * full constructor
      */
-    public MapinfoDetail(MapinfoDetailId id
-
-            , Long orderNo, String sourceFieldName, String sourceFieldSentence, String sourceFieldType, String destFieldName, String destFieldType, String isPk, String destFieldDefault, String isNull, String querySql) {
+    public MapinfoDetail(MapinfoDetailId id, Long orderNo, String sourceFieldName, 
+            String sourceFieldSentence, String sourceFieldType, String destFieldName, 
+            String destFieldType, String isPk, String destFieldDefault, String isNull, String querySql) {
         this.cid = id;
-
 
         this.sourceFieldName = sourceFieldName;
         this.sourceFieldSentence = sourceFieldSentence;

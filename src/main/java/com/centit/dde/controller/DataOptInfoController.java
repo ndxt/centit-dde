@@ -5,7 +5,6 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,10 +21,10 @@ import com.centit.dde.po.DataOptStep;
 import com.centit.dde.po.ImportOpt;
 import com.centit.dde.service.DataOptInfoManager;
 import com.centit.dde.service.ImportOptManager;
-import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.staticsystem.po.OsInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.sun.istack.Nullable;
 
 @Controller
@@ -51,14 +50,9 @@ public class DataOptInfoController extends BaseController {
     @Nullable
     private DataOptInfoManager dataOptInfoMag;
 
-/*    @Resource
-    @NotNull
-    private OsInfoManager osInfoManager;*/
-
     @Resource
-    @NotNull
-    private OsInfoManager osInfoManager;
-    
+    protected StaticEnvironmentManager platformEnvironment;
+
     @Resource
     @Nullable
     private ImportOptManager importOptManager;
@@ -112,13 +106,11 @@ public class DataOptInfoController extends BaseController {
             
         }
 
-/*        // 业务系统
-        List<OsInfo> osinfoList = osInfoManager.listObjects();
-        request.setAttribute("osinfoList", osinfoList);*/
+        // 业务系统
+        List<OsInfo> osinfoList = platformEnvironment.listOsInfos();
+        request.setAttribute("osinfoList", osinfoList);
 
-//        return EDIT;
-//        JsonResultUtils.writeSingleDataJson(osinfoList, response);
-        JsonResultUtils.writeSuccessJson(response);
+        JsonResultUtils.writeSingleDataJson(osinfoList, response);
     }
 
     
@@ -134,11 +126,9 @@ public class DataOptInfoController extends BaseController {
         List<ImportOpt> importOpts = importOptManager.listObjects();
         request.setAttribute("importOpts", importOpts);
 
-//        List<OsInfo> osInfos = osInfoManager.listObjects();
-//        request.setAttribute("osInfos", osInfos);
-//        return "formField";
-//        JsonResultUtils.writeSingleDataJson(osInfos, response);
-        JsonResultUtils.writeSuccessJson(response);
+        List<OsInfo> osInfos = platformEnvironment.listOsInfos();
+        request.setAttribute("osInfos", osInfos);
+        JsonResultUtils.writeSingleDataJson(osInfos, response);
     }
 
 }
