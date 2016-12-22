@@ -1,6 +1,7 @@
 package com.centit.dde.controller;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -39,7 +40,7 @@ import com.centit.framework.core.dao.PageDesc;
 import com.sun.istack.Nullable;
 
 @Controller
-@RequestMapping(name = "tasklog")
+@RequestMapping("/tasklog")
 public class TaskLogController extends BaseController {
     private static final Log log = LogFactory.getLog(TaskLogController.class);
 
@@ -60,22 +61,25 @@ public class TaskLogController extends BaseController {
     @Nullable
     private ImportOptManager importOptManager;
 
-    private String s_taskType;
-
-    private InputStream inputSteam;
-    private List<TaskDetailLog> taskDetailLogs;
-    private List<ExchangeTask> exchangeTasklist;
-    private List<String[]> taskLogStat;
-
-    public List<TaskDetailLog> getTaskDetailLogs() {
-        return taskDetailLogs;
-    }
-
-    public void setTaskDetailLogs(List<TaskDetailLog> taskDetailLogs) {
-        this.taskDetailLogs = taskDetailLogs;
-    }
-
     private String fileName;
+
+    private FileInputStream inputSteam;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public FileInputStream getInputSteam() {
+        return inputSteam;
+    }
+
+    public void setInputSteam(FileInputStream inputSteam) {
+        this.inputSteam = inputSteam;
+    }
 
     @RequestMapping(value = "/downFile", method = { RequestMethod.GET })
     public String downFile(HttpServletRequest request,
@@ -102,7 +106,6 @@ public class TaskLogController extends BaseController {
             }
             fileName = logname + request.getParameter("logid") + ".zip";
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return "download";
@@ -233,7 +236,7 @@ public class TaskLogController extends BaseController {
 //        PageDesc pageDesc = makePageDesc();
         List<TaskLog> objList = taskLogMag.listObjects(searchColumn, pageDesc);
 //        totalRows = pageDesc.getTotalRows();
-        exchangeTasklist = exchangeTaskManager.listObjects();
+//        exchangeTasklist = exchangeTaskManager.listObjects();
         if (!"".equals(s)) {
             searchColumn.put("runBeginTime", s);
         }
@@ -259,6 +262,7 @@ public class TaskLogController extends BaseController {
 //        Map<String, Object> filterMap = convertSearchColumn(paramMap);
         Map<String, Object> searchColumn = convertSearchColumn(request);
         searchColumn.remove("isvalid");
+        List<String[]> taskLogStat;
         if (searchColumn.containsKey("isMonth")) {
             String s = String.format("%02d",
                     Integer.parseInt((String) searchColumn.get("month")));
@@ -273,59 +277,16 @@ public class TaskLogController extends BaseController {
     }
 
     @RequestMapping(value = "/save", method = { RequestMethod.PUT })
-    public void save(TaskLog object,HttpServletRequest request, HttpServletResponse response) {
+    public void save(TaskLog object,HttpServletRequest request, HttpServletResponse response, List<TaskDetailLog> taskDetailLogs) {
         object.replaceTaskDetailLogs(taskDetailLogs);
         taskLogMag.saveObject(object);
 
         JsonResultUtils.writeSuccessJson(response);
     }
 
-    @RequestMapping(value = "/delete", method = { RequestMethod.DELETE })
-    public void delete(TaskLog object,HttpServletRequest request,
-            HttpServletResponse response) {
-        taskLogMag.deleteObjectById(object.getLogId());
-
-        // return "delete";
+    @RequestMapping(value = "/delete/{{logId}}", method = { RequestMethod.DELETE })
+    public void delete(Long logId,HttpServletResponse response) {
+        taskLogMag.deleteObjectById(logId);
         JsonResultUtils.writeSuccessJson(response);
-    }
-
-    public List<ExchangeTask> getExchangeTasklist() {
-        return exchangeTasklist;
-    }
-
-    public void setExchangeTasklist(List<ExchangeTask> exchangeTasklist) {
-        this.exchangeTasklist = exchangeTasklist;
-    }
-
-    public ImportOptManager getImportOptManager() {
-        return importOptManager;
-    }
-
-    public void setImportOptManager(ImportOptManager importOptManager) {
-        this.importOptManager = importOptManager;
-    }
-
-    public List<String[]> getTaskLogStat() {
-        return taskLogStat;
-    }
-
-    public void setTaskLogStat(List<String[]> taskLogStat) {
-        this.taskLogStat = taskLogStat;
-    }
-
-    public InputStream getInputSteam() {
-        return inputSteam;
-    }
-
-    public void setInputSteam(InputStream inputSteam) {
-        this.inputSteam = inputSteam;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
     }
 }

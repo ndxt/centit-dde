@@ -7,10 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -40,7 +37,7 @@ import org.hibernate.annotations.GenericGenerator;
 public class TaskLog implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-    
+    @Id
     @Column(name="LOGID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")

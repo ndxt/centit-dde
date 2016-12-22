@@ -32,12 +32,6 @@ public class DataOptInfoManagerImpl
     @NotNull
     private DataOptInfoDao dataOptInfoDao;
 
-    
-    public void setDataOptInfoDao(DataOptInfoDao baseDao) {
-        this.dataOptInfoDao = baseDao;
-        setBaseDao(this.dataOptInfoDao);
-    }
-
     @Override
     public void saveObject(DataOptInfo object, IUserInfo userDetail) throws SqlResolveException {
         DataOptInfo dbObject = dataOptInfoDao.getObjectById(object.getDataOptId());

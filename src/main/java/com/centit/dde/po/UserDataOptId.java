@@ -1,12 +1,11 @@
 package com.centit.dde.po;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Created by sx on 2014/12/10.
@@ -17,8 +16,10 @@ public class UserDataOptId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    
+    @Id
     @Column(name="UDID")
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long udId;
 
     @Column(name="USERCODE")

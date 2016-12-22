@@ -1,9 +1,6 @@
 package com.centit.dde.po;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -13,7 +10,7 @@ import org.hibernate.annotations.GenericGenerator;
 public class MapinfoDetail implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     
-    
+    @EmbeddedId
     @Column(name="CID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")

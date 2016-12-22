@@ -7,10 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -24,7 +21,7 @@ import org.hibernate.annotations.GenericGenerator;
 public class ExchangeTask implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-    
+    @Id
     @Column(name="TASKID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
@@ -59,13 +56,19 @@ public class ExchangeTask implements java.io.Serializable {
     /**
      * '1: 直接交换 2 :导出离线文件 3：监控文件夹导入文件 4：调用接口 5:接口事件';
      */
-    private String taskType;// char(1) default '1'  not null 
-    private Date lastUpdateTime;//     date 
+    private String taskType;// char(1) default '1'  not null
+
+    private Date lastUpdateTime;//     date
+
     private String storeIsolation;//      char(1)
+
     private String monitorFolder;//       varchar2(200);
 
+    @Transient
     private Set<ExchangeTaskdetail> exchangeTaskdetails = null;// new
     // ArrayList<ExchangeTaskdetail>();
+
+    @OneToMany(mappedBy="taskId",orphanRemoval=true,fetch = FetchType.LAZY)
     private Set<TaskLog> taskLogs = null;// new ArrayList<TaskLog>();
 
     // Constructors

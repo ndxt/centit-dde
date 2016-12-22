@@ -51,8 +51,6 @@ public class ExportSqlController extends BaseController {
 
     private static final long serialVersionUID = 1L;
 
-    private String tabid;
-
     @Resource
     @Nullable
     private ExportSqlManager exportSqlMag;

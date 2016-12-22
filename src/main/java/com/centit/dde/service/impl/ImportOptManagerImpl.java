@@ -45,14 +45,11 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
     @Resource
     protected StaticEnvironmentManager platformEnvironment;
 
-    public void setImportOptDao(ImportOptDao baseDao) {
-        this.importOptDao = baseDao;
-        setBaseDao(this.importOptDao);
-    }
-
+    @Override
     public String getMapinfoName(Long mapinfoId) {
         return this.importOptDao.getMapinfoName(mapinfoId);
     }
+
     @Override
     public void validator(ImportOpt object) throws SqlResolveException {
         DatabaseInfo dbinfo = platformEnvironment.getDatabaseInfo(object.getDestDatabaseName());

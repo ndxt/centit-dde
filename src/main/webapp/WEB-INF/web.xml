@@ -199,7 +199,7 @@
         <servlet-class>com.centit.framework.core.controller.SimpleDispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>classpath*:springmvc-config/normal-servlet.xml</param-value>
+            <param-value>classpath*:springmvc-config/system-servlet.xml</param-value>
         </init-param>        
         <load-on-startup>1</load-on-startup>
         <async-supported>true</async-supported>
@@ -213,7 +213,7 @@
         <servlet-class>com.centit.framework.core.controller.SimpleDispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>classpath*:springmvc-config/system-servlet.xml</param-value>
+            <param-value>classpath*:springmvc-config/normal-servlet.xml</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
         <async-supported>true</async-supported>

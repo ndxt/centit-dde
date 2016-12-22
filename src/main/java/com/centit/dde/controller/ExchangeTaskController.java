@@ -1,18 +1,20 @@
 package com.centit.dde.controller;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.centit.dde.po.*;
+import com.centit.dde.service.*;
+import com.centit.framework.components.CodeRepositoryUtil;
+import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.dao.CodeBook;
+import com.centit.framework.core.dao.PageDesc;
+import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.staticsystem.po.UserInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.support.algorithm.StringRegularOpt;
+import com.centit.support.network.HtmlFormUtils;
+import com.sun.istack.Nullable;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,36 +25,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.WebUtils;
 
-import com.centit.dde.po.ExchangeMapinfo;
-import com.centit.dde.po.ExchangeTask;
-import com.centit.dde.po.ExchangeTaskdetail;
-import com.centit.dde.po.ExchangeTaskdetailId;
-import com.centit.dde.po.ExportSql;
-import com.centit.dde.po.TaskErrorData;
-import com.centit.dde.po.TaskLog;
-import com.centit.dde.service.ExchangeMapinfoManager;
-import com.centit.dde.service.ExchangeTaskManager;
-import com.centit.dde.service.ExchangeTaskdetailManager;
-import com.centit.dde.service.ExportSqlManager;
-import com.centit.dde.service.MapinfoDetailManager;
-import com.centit.dde.service.MapinfoTriggerManager;
-import com.centit.dde.service.TaskErrorDataManager;
-import com.centit.dde.service.TaskLogManager;
-import com.centit.framework.common.SysParametersUtils;
-import com.centit.framework.components.CodeRepositoryUtil;
-import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.common.ResponseData;
-import com.centit.framework.core.controller.BaseController;
-import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.core.dao.PageDesc;
-import com.centit.framework.core.service.BaseEntityManager;
-import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.po.UserInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
-import com.centit.support.algorithm.StringRegularOpt;
-import com.centit.support.network.HtmlFormUtils;
-import com.sun.istack.Nullable;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 @Controller
 @RequestMapping("/exchangetask")
@@ -82,10 +58,6 @@ public class ExchangeTaskController extends BaseController {
 
     @Resource
     @Nullable
-    private MapinfoTriggerManager mapinfoTriggerManager;
-
-    @Resource
-    @Nullable
     private StaticEnvironmentManager platformEnvironment;
 
     @Resource
@@ -101,29 +73,7 @@ public class ExchangeTaskController extends BaseController {
     private ExportSqlManager exportSqlManager;
 
 
-    private String s_taskType;
 
-    private List<ExchangeTaskdetail> exchangeTaskdetails;
-
-    public List<ExchangeTaskdetail> getNewExchangeTaskdetails() {
-        return this.exchangeTaskdetails;
-    }
-
-    public void setNewExchangeTaskdetails(List<ExchangeTaskdetail> exchangeTaskdetails) {
-        this.exchangeTaskdetails = exchangeTaskdetails;
-    }
-
-    private List<TaskLog> taskLogs;
-
-    public List<TaskLog> getNewTaskLogs() {
-        return this.taskLogs;
-    }
-
-    public void setNewTaskLogs(List<TaskLog> taskLogs) {
-        this.taskLogs = taskLogs;
-    }
-    private String s_isvalid;
-    
     @SuppressWarnings("unchecked")
     @RequestMapping(value="/list" , method = {RequestMethod.GET})
     public void list(PageDesc pageDesc, HttpServletRequest request,HttpServletResponse response) {
@@ -133,6 +83,7 @@ public class ExchangeTaskController extends BaseController {
 
             String orderField = request.getParameter("orderField");
             String orderDirection = request.getParameter("orderDirection");
+            String s_isvalid = (String)request.getParameter("s_isvalid");
 
 //            Map<String, Object> filterMap = convertSearchColumn(paramMap);
             Map<String, Object> searchColumn = convertSearchColumn(request); 
@@ -419,6 +370,7 @@ public class ExchangeTaskController extends BaseController {
     @RequestMapping(value="/add/{{taskId}}", method = {RequestMethod.PUT})
     public void add(@PathVariable Long taskId,ExchangeTask object, HttpServletRequest request,HttpServletResponse response) {
         try {
+            String s_taskType =request.getParameter("s_taskType");
             if (object == null) {
 //                object = getEntityClass().newInstance();
             } else {
@@ -817,18 +769,8 @@ public class ExchangeTaskController extends BaseController {
 
         request.setAttribute("taskTypeList", taskType);
 
-        request.setAttribute("consoleOutPut", "1".equals(SysParametersUtils.getValue("task.console.output")));
+    //    request.setAttribute("consoleOutPut", "1".equals(SysParametersUtils.getValue("task.console.output")));
     }
-
-    public String getS_isvalid() {
-        return s_isvalid;
-    }
-
-    public void setS_isvalid(String s_isvalid) {
-        this.s_isvalid = s_isvalid;
-    }
-
-  
 
     
 }

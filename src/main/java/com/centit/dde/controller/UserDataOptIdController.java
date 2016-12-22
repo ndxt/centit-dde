@@ -18,7 +18,7 @@ import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.sun.istack.Nullable;
 @Controller
-@RequestMapping(name="userdataoptid")
+@RequestMapping("/userdataoptid")
 public class UserDataOptIdController extends BaseController {
     private static final Log log = LogFactory.getLog(UserDataOptIdController.class);
 

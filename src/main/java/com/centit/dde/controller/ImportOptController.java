@@ -1,32 +1,6 @@
 package com.centit.dde.controller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.util.WebUtils;
-
 import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.DataOptStep;
-import com.centit.dde.po.ImportField;
 import com.centit.dde.po.ImportOpt;
 import com.centit.dde.service.ImportOptManager;
 import com.centit.framework.core.common.JsonResultUtils;
@@ -36,6 +10,27 @@ import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.po.OsInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.sun.istack.Nullable;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.util.WebUtils;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/importopt")
@@ -52,34 +47,12 @@ public class ImportOptController extends BaseController {
     private ImportOptManager importOptMag;
 
 
-    private String tabid;
-
-
     @Resource
     protected StaticEnvironmentManager platformEnvironment;
 
-    private List<DataOptStep> dataOptSteps;
-
-    public List<DataOptStep> getNewDataOptSteps() {
-        return this.dataOptSteps;
-    }
-
-    public void setNewDataOptSteps(List<DataOptStep> dataOptSteps) {
-        this.dataOptSteps = dataOptSteps;
-    }
-
-    private List<ImportField> importFields;
-
-    public List<ImportField> getNewImportFields() {
-        return this.importFields;
-    }
-
-    public void setNewImportFields(List<ImportField> importFields) {
-        this.importFields = importFields;
-    }
 
     @RequestMapping(value="/defDataSource",method = {RequestMethod.GET})
-    public void defDataSource(HttpServletRequest request,HttpServletResponse response) {
+    public void defDataSource(HttpServletResponse response) {
 
         List<DatabaseInfo> dbList = platformEnvironment.listDatabaseInfo();
 
@@ -95,7 +68,7 @@ public class ImportOptController extends BaseController {
      * @return
      */
     @RequestMapping(value="/listField",method = {RequestMethod.GET})
-    public void listField(ImportOpt object,HttpServletRequest request,HttpServletResponse response) {
+    public void listField(ImportOpt object,HttpServletResponse response) {
         object = importOptMag.getObjectById(object.getImportId());
         if (null == object) {
             //
@@ -178,7 +151,7 @@ public class ImportOptController extends BaseController {
 
     @RequestMapping(value="/edit/{{importid}}",method = {RequestMethod.PUT})
     public void edit(@PathVariable Long importid ,ImportOpt object,HttpServletRequest request,HttpServletResponse response) {
-        ImportOpt importOpt = importOptMag.getObjectById(object.getImportId());
+        ImportOpt importOpt = importOptMag.getObjectById(importid);
         if (null != importOpt) {
             importOptMag.copyObject(object, importOpt);
         }
@@ -211,7 +184,7 @@ public class ImportOptController extends BaseController {
      * @throws IOException
      */
     @RequestMapping(value="/uploadify")
-    public void uploadify(HttpServletResponse response) throws IOException, FileUploadException {
+    public void uploadify(HttpServletResponse response) throws Exception {
 
         StringWriter sw = new StringWriter();
         IOUtils.copy(new FileInputStream(uploadify), sw);
@@ -224,11 +197,8 @@ public class ImportOptController extends BaseController {
 
 
     @RequestMapping(value="/delete/{{importid}}",method = {RequestMethod.DELETE})
-    public void delete(@PathVariable Long importid,ImportOpt object,HttpServletRequest request,HttpServletResponse response) {
-//        importOptMag.deleteObjectById(importid);
-        importOptMag.deleteObjectById(object.getImportId());
-
-//        return "delete";
+    public void delete(@PathVariable Long importid,HttpServletResponse response) {
+        importOptMag.deleteObjectById(importid);
         JsonResultUtils.writeSuccessJson(response);
     }
 

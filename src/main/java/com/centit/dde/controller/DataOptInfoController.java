@@ -36,19 +36,8 @@ public class DataOptInfoController extends BaseController {
     // SysOptLogFactoryImpl.getSysOptLog("optid");
 
     private static final long serialVersionUID = 1L;
-
-    private String tabid;
-
-    public String getTabid() {
-        return tabid;
-    }
-
-    public void setTabid(String tabid) {
-        this.tabid = tabid;
-    }
     @Resource
-    @Nullable
-    private DataOptInfoManager dataOptInfoMag;
+    private DataOptInfoManager dataOptInfoManager;
 
     @Resource
     protected StaticEnvironmentManager platformEnvironment;
@@ -57,22 +46,13 @@ public class DataOptInfoController extends BaseController {
     @Nullable
     private ImportOptManager importOptManager;
 
-    private List<DataOptStep> dataOptSteps;
-
-    public List<DataOptStep> getNewDataOptSteps() {
-        return this.dataOptSteps;
-    }
-
-    public void setNewDataOptSteps(List<DataOptStep> dataOptSteps) {
-        this.dataOptSteps = dataOptSteps;
-    }
     @RequestMapping(value="/save/{{tabid}}",method = {RequestMethod.PUT})
     public void save(@PathVariable String tabid,DataOptInfo object,
             HttpServletRequest request,HttpServletResponse response) {
 //        dwzResultParam = new DwzResultParam();
 //        dwzResultParam.setNavTabId(tabid);
         try {
-            dataOptInfoMag.saveObject(object, getLoginUser(request));
+            dataOptInfoManager.saveObject(object, getLoginUser(request));
         } catch (SqlResolveException e) {
 //            dwzResultParam.setStatusCode(DwzResultParam.STATUS_CODE_300);
 //            dwzResultParam.setMessage(SysParametersUtils.getValue(String.valueOf(e.getErrorcode())));
@@ -90,14 +70,14 @@ public class DataOptInfoController extends BaseController {
     
     @RequestMapping(value="/edit/{{dataOptId}}",method = {RequestMethod.GET})
     public void edit(@PathVariable String dataOptId,DataOptInfo object,HttpServletRequest request,HttpServletResponse response) {
-        DataOptInfo dataOptInfo = dataOptInfoMag.getObjectById(dataOptId);
+        DataOptInfo dataOptInfo = dataOptInfoManager.getObjectById(dataOptId);
         if (null != dataOptInfo) {
-            dataOptInfoMag.copyObjectNotNullProperty(object, dataOptInfo);
+            dataOptInfoManager.copyObjectNotNullProperty(object, dataOptInfo);
 //            baseEntityManager.copyObject(object, dataOptInfo);
-            dataOptInfoMag.copyObjectNotNullProperty(object, dataOptInfo);;
+            dataOptInfoManager.copyObjectNotNullProperty(object, dataOptInfo);;
         }
 
-        object.setDataOptSteps(dataOptInfoMag.listDataOptStepByDataOptInfo(object));
+        object.setDataOptSteps(dataOptInfoManager.listDataOptStepByDataOptInfo(object));
         // copy
         if (StringUtils.hasText(WebUtils.findParameterValue(request, "type"))) {
             object.setDataOptId(null);
@@ -116,7 +96,7 @@ public class DataOptInfoController extends BaseController {
     
     @RequestMapping(value="/delete/{{dataOptId}}",method = {RequestMethod.DELETE})
     public void delete(@PathVariable String dataOptId, DataOptInfo object,HttpServletRequest request,HttpServletResponse response) {
-        dataOptInfoMag.deleteObjectById(dataOptId);;
+        dataOptInfoManager.deleteObjectById(dataOptId);;
 //        return "delete";
         JsonResultUtils.writeSuccessJson(response);
     }

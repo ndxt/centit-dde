@@ -17,7 +17,7 @@ import com.centit.framework.core.controller.BaseController;
 import com.sun.istack.Nullable;
 
 @Controller
-@RequestMapping(name="taskerrordata")
+@RequestMapping("/taskerrordata")
 public class TaskErrorDataController extends BaseController {
     private static final Log log = LogFactory.getLog(TaskErrorDataController.class);
 

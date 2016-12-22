@@ -2,10 +2,7 @@ package com.centit.dde.po;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -20,10 +17,8 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name="DATASIMPLEACCESS")
 public class DataSimpleAccess implements Serializable {
     private static final long serialVersionUID = 6776496325081845118L;
-    
-    
-    
-    
+
+    @Id
     @Column(name = "TABLE")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")

@@ -94,11 +94,11 @@ public class MapinfoDetailController extends BaseController {
         
         if (method!= null && method.equals("save")) {
             if (exchangeMapinfo == null) {
-                this.saveAndsaveMapinfoDetails(null, soueceTableName, goalTableName, exchangeMapinfo.getSourceDatabaseName(),
-                        exchangeMapinfo.getDestDatabaseName(),mapinfoId,type);
+//                this.saveAndsaveMapinfoDetails(null, soueceTableName, goalTableName, exchangeMapinfo.getSourceDatabaseName(),
+//                        exchangeMapinfo.getDestDatabaseName(),mapinfoId,type);
             } else if (StringUtils.hasText(exchangeMapinfo.getQuerySql())) {
-                this.saveAndsaveMapinfoDetails(exchangeMapinfo.getQuerySql(), soueceTableName, goalTableName, 
-                        exchangeMapinfo.getSourceDatabaseName(), exchangeMapinfo.getDestDatabaseName(),mapinfoId,type);
+//                this.saveAndsaveMapinfoDetails(exchangeMapinfo.getQuerySql(), soueceTableName, goalTableName,
+//                        exchangeMapinfo.getSourceDatabaseName(), exchangeMapinfo.getDestDatabaseName(),mapinfoId,type);
             }
 
         }
@@ -225,9 +225,9 @@ public class MapinfoDetailController extends BaseController {
         
         if (method!= null &&method.equals("save")) {
             if (exchangeMapinfo == null) {
-                this.saveAndsaveMapinfoDetails(null, soueceTableName, goalTableName, sourcedatabaseName, goaldatabaseName, mapinfoId, type);
+//                this.saveAndsaveMapinfoDetails(null, soueceTableName, goalTableName, sourcedatabaseName, goaldatabaseName, mapinfoId, type);
             } else if (StringUtils.hasText(exchangeMapinfo.getQuerySql())) {
-                this.saveAndsaveMapinfoDetails(exchangeMapinfo.getQuerySql(), soueceTableName, goalTableName, sourcedatabaseName,goaldatabaseName,mapinfoId, type);
+//                this.saveAndsaveMapinfoDetails(exchangeMapinfo.getQuerySql(), soueceTableName, goalTableName, sourcedatabaseName,goaldatabaseName,mapinfoId, type);
             }
         }
         if (method!= null &&method.equals("updateSourceColumnSentence")) {
@@ -345,7 +345,7 @@ public class MapinfoDetailController extends BaseController {
         List<Map<String, String>> goalTableStruct = new ArrayList<Map<String, String>>();
         List<Map<String, String>> length = new ArrayList<Map<String, String>>();
 
-        this.saveAndsaveMapinfoDetails(null, soueceTableName, goalTableName, sourcedatabaseName, goaldatabaseName, mapinfoId, type);
+//        this.saveAndsaveMapinfoDetails(null, soueceTableName, goalTableName, sourcedatabaseName, goaldatabaseName, mapinfoId, type);
         if (method!= null && method.equals("updateSourceColumnSentence")) {
             if (StringUtils.hasText(querySql)) {
                 this.updateSourceColumnSentence(querySql, querySqlsource,mapinfoId, soueceTableName, goalTableName);

@@ -35,16 +35,6 @@ public class TaskDetailLogController extends BaseController {
     @Nullable
     private ExchangeMapinfoManager exchangeMapinfoManager;
 
-    private List<TaskErrorData> taskErrorDatas;
-
-    public List<TaskErrorData> getNewTaskErrorDatas() {
-        return this.taskErrorDatas;
-    }
-
-    public void setNewTaskErrorDatas(List<TaskErrorData> taskErrorDatas) {
-        this.taskErrorDatas = taskErrorDatas;
-    }
-
 
     @RequestMapping(value="edit",method = {RequestMethod.PUT})
     public void edit(TaskDetailLog object ,HttpServletRequest request,HttpServletResponse response) {
@@ -72,7 +62,7 @@ public class TaskDetailLogController extends BaseController {
     }
 
     @RequestMapping(value="save",method = {RequestMethod.PUT})
-    public void save(TaskDetailLog object ,HttpServletRequest request,HttpServletResponse response) {
+    public void save(TaskDetailLog object ,HttpServletRequest request,HttpServletResponse response, List<TaskErrorData> taskErrorDatas) {
         object.replaceTaskErrorDatas(taskErrorDatas);
 //        super.save();
         taskDetailLogMag.saveObject(object);
