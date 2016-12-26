@@ -19,10 +19,11 @@ public class TaskErrorDataManagerImpl extends BaseEntityManagerImpl<TaskErrorDat
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
 
-    @Resource(name="taskErrorDataDao")
-    @NotNull
+    
     private TaskErrorDataDao taskErrorDataDao;
 
+    @Resource(name="taskErrorDataDao")
+    @NotNull
     public void setTaskErrorDataDao(TaskErrorDataDao baseDao) {
         this.taskErrorDataDao = baseDao;
         setBaseDao(this.taskErrorDataDao);

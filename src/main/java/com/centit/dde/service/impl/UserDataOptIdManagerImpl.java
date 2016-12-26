@@ -13,10 +13,11 @@ import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 public class UserDataOptIdManagerImpl extends BaseEntityManagerImpl<UserDataOptId
     ,Long,UserDataOptIdDao>
         implements UserDataOptIdManager {
-    @Resource(name="userDataOptIdDao")
-    @NotNull
+    
     private UserDataOptIdDao userDataOptIdDao;
 
+    @Resource(name="userDataOptIdDao")
+    @NotNull
     public void setUserDataOptIdDao(UserDataOptIdDao userDataOptIdDao) {
         this.userDataOptIdDao = userDataOptIdDao;
         setBaseDao(userDataOptIdDao);

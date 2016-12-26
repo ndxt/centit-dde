@@ -19,11 +19,12 @@ public class ExportFieldManagerImpl extends BaseEntityManagerImpl<ExportField,Ex
     public static final Log log = LogFactory.getLog(ExportFieldManager.class);
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
-    @Resource(name = "exportFieldDao")
-    @NotNull
+    
     private ExportFieldDao exportFieldDao;
     
    
+    @Resource(name = "exportFieldDao")
+    @NotNull
     public void setExportFieldDao(ExportFieldDao baseDao) {
         this.exportFieldDao = baseDao;
         setBaseDao(this.exportFieldDao);

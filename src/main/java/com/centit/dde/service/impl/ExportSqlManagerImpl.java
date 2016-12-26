@@ -36,8 +36,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
 
     // private static final SysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog();
-    @Resource(name="exportSqlDao")
-    @NotNull
+    
     private ExportSqlDao exportSqlDao;
 
     private ExportFieldManager exportFieldManager;
@@ -56,6 +55,8 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
         this.exportFieldManager = exportFieldManager;
     }
 
+    @Resource(name="exportSqlDao")
+    @NotNull
     public void setExportSqlDao(ExportSqlDao baseDao) {
         this.exportSqlDao = baseDao;
         setBaseDao(this.exportSqlDao);

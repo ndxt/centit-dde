@@ -3,6 +3,7 @@ package com.centit.dde.po;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -14,6 +15,7 @@ import org.hibernate.validator.constraints.NotBlank;
  * @author codefan@hotmail.com
  */
 @Embeddable
+@IdClass(ExportTrigger.class)
 public class ExportTriggerId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     

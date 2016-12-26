@@ -63,6 +63,8 @@ public class TaskLog implements java.io.Serializable {
     
     @Column(name="TASKTYPE")
     private String taskType;
+    
+    @OneToMany(mappedBy="logDetailId",orphanRemoval=true,fetch=FetchType.LAZY)
     private Set<TaskDetailLog> taskDetailLogs = null;// new ArrayList<TaskDetailLog>();
 
     // Constructors

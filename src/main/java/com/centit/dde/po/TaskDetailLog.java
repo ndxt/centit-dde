@@ -30,7 +30,7 @@ public class TaskDetailLog implements java.io.Serializable {
     @Column(name="LOGID")
     private Long logId;
     
-    @Column(name="LOGID")
+    @Column(name="RUNBEGINTIME")
     private Date runBeginTime;
     
     @Column(name="RUNENDTIME")
@@ -53,7 +53,11 @@ public class TaskDetailLog implements java.io.Serializable {
     
     @Column(name="OTHERMESSAGE")
     private String otherMessage;
+    
+    @OneToMany(mappedBy="logDetailId",orphanRemoval=true,fetch=FetchType.LAZY)
     private Set<TaskErrorData> taskErrorDatas = null;// new ArrayList<TaskErrorData>();
+    
+    @Transient
     private String mapinfoName;
 
     public String getMapinfoName() {

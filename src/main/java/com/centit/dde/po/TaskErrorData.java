@@ -33,7 +33,10 @@ public class TaskErrorData implements java.io.Serializable {
         this.logDetailId = logDetailId;
     }
 
+    @Column(name="DATACONTENT")
     private String dataContent;
+    
+    @Column(name="ERRORMESSAGE")
     private String errorMessage;
 
     // Constructors

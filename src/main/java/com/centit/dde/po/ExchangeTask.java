@@ -56,12 +56,16 @@ public class ExchangeTask implements java.io.Serializable {
     /**
      * '1: 直接交换 2 :导出离线文件 3：监控文件夹导入文件 4：调用接口 5:接口事件';
      */
+    @Column(name="TASKTYPE")
     private String taskType;// char(1) default '1'  not null
 
+    @Column(name="LASTUPDATETIME")
     private Date lastUpdateTime;//     date
 
+    @Column(name="STOREISOLATION")
     private String storeIsolation;//      char(1)
 
+    @Column(name="MONITORFOLDER")
     private String monitorFolder;//       varchar2(200);
 
     @Transient
