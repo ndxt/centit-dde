@@ -19,10 +19,11 @@ public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog,Long,TaskL
     public static final Log log = LogFactory.getLog(TaskLogManager.class);
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
-    @Resource(name="taskLogDao")
-    @NotNull
+    
     private TaskLogDao taskLogDao;
 
+    @Resource(name="taskLogDao")
+    @NotNull
     public void setTaskLogDao(TaskLogDao baseDao) {
         this.taskLogDao = baseDao;
         setBaseDao(this.taskLogDao);

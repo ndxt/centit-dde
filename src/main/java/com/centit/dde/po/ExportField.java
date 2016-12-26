@@ -38,7 +38,7 @@ public class ExportField implements java.io.Serializable {
     @Column(name="ISPK")
     private String isPk;
 
-    @Column(name="ISNULL")
+    @Transient
     private String isNull;
 
     // Constructors

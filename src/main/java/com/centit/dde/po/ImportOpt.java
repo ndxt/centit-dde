@@ -54,9 +54,12 @@ public class ImportOpt implements java.io.Serializable {
     @Column(name="RECORDOPERATE")
     private String recordOperate;
 
-
+    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
+    @JoinColumn(name="importId") //这里表示数据库的外键 在t_street里面创建
     private List<ImportTrigger> importTriggers = null;
-
+    
+    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
+    @JoinColumn(name="importId") //这里表示数据库的外键 在t_street里面创建
     private List<ImportField> importFields = null;// new
     // ArrayList<ImportField>();
 

@@ -63,7 +63,12 @@ public class ExportSql implements java.io.Serializable {
     @Column(name="TABLESTORETYPE")
     private String tableStoreType;
     
+    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
+    @JoinColumn(name="exportId")
     private List<ExportTrigger> exportTriggers = null;
+    
+    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
+    @JoinColumn(name="exportId")
     private List<ExportField> exportFields = null;// new
     // ArrayList<ExportField>();
 

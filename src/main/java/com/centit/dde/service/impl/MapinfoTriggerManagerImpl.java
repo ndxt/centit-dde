@@ -21,10 +21,11 @@ public class MapinfoTriggerManagerImpl extends BaseEntityManagerImpl<MapinfoTrig
     public static final Log log = LogFactory.getLog(MapinfoTriggerManager.class);
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
-    @Resource(name="mapinfoTriggerDao")
-    @NotNull
+    
     private MapinfoTriggerDao mapinfoTriggerDao;
 
+    @Resource(name="mapinfoTriggerDao")
+    @NotNull
     public void setMapinfoTriggerDao(MapinfoTriggerDao baseDao) {
         this.mapinfoTriggerDao = baseDao;
         setBaseDao(this.mapinfoTriggerDao);

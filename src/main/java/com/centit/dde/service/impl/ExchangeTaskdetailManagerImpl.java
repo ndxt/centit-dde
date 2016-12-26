@@ -23,10 +23,11 @@ public class ExchangeTaskdetailManagerImpl
 
     // private static final SysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog();
-    @Resource(name = "exchangeTaskdetailDao")
-    @NotNull
+   
     private ExchangeTaskdetailDao exchangeTaskdetailDao;
 
+    @Resource(name = "exchangeTaskdetailDao")
+    @NotNull
     public void setExchangeTaskdetailDao(ExchangeTaskdetailDao baseDao) {
         this.exchangeTaskdetailDao = baseDao;
         setBaseDao(this.exchangeTaskdetailDao);

@@ -13,6 +13,7 @@ import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
 
+import com.centit.dde.dao.DataOptInfoDao;
 import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.dataio.ExportData;
 import com.centit.dde.dataio.ImportData;
@@ -35,8 +36,6 @@ public class ExchangeTaskManagerImpl
 
     private static final String JOB_GROUP_EXCHANGETASK = "JOB_GROUP_EXCHANGETASK";
     
-    @Resource(name = "exchangeTaskDao")
-    @NotNull
     private ExchangeTaskDao exchangeTaskDao;
 
     private TransferManager transferManager;
@@ -45,10 +44,11 @@ public class ExchangeTaskManagerImpl
 
     private ImportData importData;
 
+    
     public void setImportData(ImportData importData) {
         this.importData = importData;
     }
-
+    
     public void setExportData(ExportData exportData) {
         this.exportData = exportData;
     }
@@ -59,6 +59,8 @@ public class ExchangeTaskManagerImpl
 
     protected StaticEnvironmentManager platformEnvironment;
 
+    @Resource(name = "exchangeTaskDao")
+    @NotNull
     public void setExchangeTaskDao(ExchangeTaskDao baseDao) {
         this.exchangeTaskDao = baseDao;
         setBaseDao(this.exchangeTaskDao);

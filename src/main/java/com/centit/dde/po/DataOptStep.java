@@ -35,7 +35,7 @@ public class DataOptStep implements java.io.Serializable {
     @Column(name = "MAPINFOORDER")
     private Long mapinfoOrder;
 
-    @Column(name = "IMPORTNAME")
+    @Transient
     private String importName;
 
     // Constructors

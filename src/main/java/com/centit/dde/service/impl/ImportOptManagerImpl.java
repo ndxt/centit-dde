@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.centit.dde.dao.ExportSqlDao;
 import com.centit.dde.dao.ImportOptDao;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ImportField;
@@ -38,10 +39,15 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
     // private static final SysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog();
 
-    @Resource(name="importOptDao")
-    @NotNull
+   
     private ImportOptDao importOptDao;
 
+    @Resource(name="importOptDao")
+    @NotNull
+    public void setImportOptDao(ImportOptDao baseDao) {
+        this.importOptDao = baseDao;
+        setBaseDao(this.importOptDao);
+    }
     @Resource
     protected StaticEnvironmentManager platformEnvironment;
 

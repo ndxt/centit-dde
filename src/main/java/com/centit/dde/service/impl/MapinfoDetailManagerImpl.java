@@ -23,10 +23,11 @@ public class MapinfoDetailManagerImpl extends BaseEntityManagerImpl<MapinfoDetai
     public static final Log log = LogFactory.getLog(MapinfoDetailManager.class);
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
-    @Resource(name="mapinfoDetailDao")
-    @NotNull
+    
     private MapinfoDetailDao mapinfoDetailDao;
 
+    @Resource(name="mapinfoDetailDao")
+    @NotNull
     public void setMapinfoDetailDao(MapinfoDetailDao baseDao) {
         this.mapinfoDetailDao = baseDao;
         setBaseDao(this.mapinfoDetailDao);

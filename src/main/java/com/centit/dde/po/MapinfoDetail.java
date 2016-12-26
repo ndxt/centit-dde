@@ -40,16 +40,16 @@ public class MapinfoDetail implements java.io.Serializable {
     @Column(name="ISNULL")
     private String isNull;
 
-    @Column(name="SOUECETABLENAME")
+    @Transient
     private String soueceTableName;
     
-    @Column(name="GOALTABLENAME")
+    @Transient
     private String goalTableName;
     
-    @Column(name="SOURCEURL")
+    @Transient
     private String sourceUrl;
     
-    @Column(name="GOALURL")
+    @Transient
     private String goalUrl;
 
     public String getSourceUrl() {

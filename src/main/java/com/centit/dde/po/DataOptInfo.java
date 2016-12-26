@@ -27,7 +27,7 @@ public class DataOptInfo implements java.io.Serializable {
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String dataOptId;// mapinfoID
     
-    @Column(name = "optName")
+    @Transient
     private String optName;
     
     @Column(name = "OPTDESC")
@@ -42,6 +42,7 @@ public class DataOptInfo implements java.io.Serializable {
     @Column(name = "CREATETIME")
     private Date createTime;
     
+    @OneToMany(mappedBy="dataOptId",orphanRemoval=true,fetch=FetchType.LAZY)
     private List<DataOptStep> dataOptSteps = null;// new
     // ArrayList<DataOptStep>();
 

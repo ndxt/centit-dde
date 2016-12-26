@@ -41,11 +41,10 @@ public class ExchangeMapinfoManagerImpl
 
     // private static final SysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog();
-    @Resource(name = "exchangeMapinfoDao")
-    @NotNull
     private ExchangeMapinfoDao exchangeMapinfoDao;
 
-
+    @Resource(name = "exchangeMapinfoDao")
+    @NotNull
     public void setExchangeMapinfoDao(ExchangeMapinfoDao baseDao) {
         this.exchangeMapinfoDao = baseDao;
         setBaseDao(this.exchangeMapinfoDao);

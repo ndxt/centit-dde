@@ -3,6 +3,7 @@ package com.centit.dde.po;
 import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.ldap.odm.annotations.Id;
 
 
 /**
