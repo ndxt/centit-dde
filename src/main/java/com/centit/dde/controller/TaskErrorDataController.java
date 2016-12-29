@@ -14,7 +14,7 @@ import com.centit.dde.po.TaskErrorData;
 import com.centit.dde.service.TaskErrorDataManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
-import com.sun.istack.Nullable;
+
 
 @Controller
 @RequestMapping("/taskerrordata")
@@ -25,7 +25,7 @@ public class TaskErrorDataController extends BaseController {
 
     private static final long serialVersionUID = 1L;
     @Resource
-    @Nullable
+
     private TaskErrorDataManager taskErrorDataMag;
 
     @RequestMapping(value="/delete",method = {RequestMethod.PUT})

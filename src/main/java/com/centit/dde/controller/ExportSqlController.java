@@ -39,7 +39,7 @@ import com.centit.framework.staticsystem.po.DataDictionary;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.po.OsInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
-import com.sun.istack.Nullable;
+
 
 @Controller
 @RequestMapping("/exportsql")
@@ -52,7 +52,7 @@ public class ExportSqlController extends BaseController {
     private static final long serialVersionUID = 1L;
 
     @Resource
-    @Nullable
+
     private ExportSqlManager exportSqlMag;
 
     @Resource

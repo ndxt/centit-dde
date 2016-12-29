@@ -1,134 +1,157 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-		   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		   xmlns:tx="http://www.springframework.org/schema/tx"
-		   xmlns:context="http://www.springframework.org/schema/context"
-		   xmlns:aop="http://www.springframework.org/schema/aop"
-		   xsi:schemaLocation="http://www.springframework.org/schema/aop
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop 
 		http://www.springframework.org/schema/aop/spring-aop.xsd
-		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans 
 		http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx 
 		http://www.springframework.org/schema/tx/spring-tx.xsd
-		http://www.springframework.org/schema/context
-		http://www.springframework.org/schema/context/spring-context.xsd"
-		   default-lazy-init="true">
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/cache 
+        http://www.springframework.org/schema/cache/spring-cache.xsd"
+    default-lazy-init="true">
 
-		<bean id="initialEnvironment" init-method="initialEnvironment"
-			  class="com.centit.framework.listener.InitialWebRuntimeEnvironment"
-			  lazy-init="false">
-		</bean>
+	<!-- Hibernate4 -->
+	<!-- 加载资源文件  其中包含变量信息，必须在Spring配置文件的最前面加载，即第一个加载-->
+	<context:property-placeholder location="classpath:system.properties" />
 
-		<bean id="operationLogWriter" init-method="init"
-			  class="com.centit.framework.staticsystem.service.impl.TextOperationLogWriterImpl"
-			  lazy-init="false">
-		</bean>
-		<bean id="notificationCenter" init-method="initMsgSenders"
-			  class="com.centit.framework.components.impl.NotificationCenterImpl"
-			  lazy-init="false">
-		</bean>
-		<!-- Hibernate4 -->
-		<!-- 加载资源文件  其中包含变量信息，必须在Spring配置文件的最前面加载，即第一个加载-->
-		<context:property-placeholder location="classpath:system.properties" />
+	<bean id="initialEnvironment" init-method="initialEnvironment"
+		 class="com.centit.framework.listener.InitialWebRuntimeEnvironment" 
+		 lazy-init="false" 
+		 scope="singleton">
+	</bean>
+	
+	<bean id="notificationCenter" 
+		 class="com.centit.framework.components.impl.NotificationCenterImpl" 
+		 init-method="initMsgSenders"  
+		 scope="singleton">
+	</bean>	
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
+		destroy-method="close">      
+	    <property name="driverClassName" value="${jdbc.driver}" />      
+	    <property name="url" value="${jdbc.url}" />      
+	    <property name="username" value="${jdbc.user}" />      
+	    <property name="password" value="${jdbc.password}" />  
+	    <property name="maxTotal" value="${jdbc.maxActive}" />
+		<property name="maxIdle" value="${jdbc.maxIdle}" />
+		<property name="maxWaitMillis" value="${jdbc.maxWait}" />
+		<property name="defaultAutoCommit" value="${jdbc.defaultAutoCommit}" />
+		<property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}" />
+		<property name="validationQuery" value="${jdbc.validationQuery}" />    
+	</bean> 
+	<!-- 使用c3p0连接池 需要在 pom.xml中添加
+		<dependency>
+		  <groupId>c3p0</groupId>
+		  <artifactId>c3p0</artifactId>
+		  <version>0.9.1.2</version>
+		</dependency>
+	-->
+	<!-- <bean id="dataSource"
+		  class="com.mchange.v2.c3p0.ComboPooledDataSource" 
+		  p:driverClass="${jdbc.driver}"
+		  p:jdbcUrl="${jdbc.url}"
+		  p:user="${jdbc.user}"
+		  p:password="${jdbc.password}"
+		  p:initialPoolSize="${jdbc.minSize}"
+		  p:minPoolSize="${jdbc.minSize}"
+		  p:maxPoolSize="${jdbc.maxActive}"
+		  p:maxIdleTimeExcessConnections="${jdbc.maxIdle}"
+		  p:checkoutTimeout="${jdbc.maxWait}"
+		  p:acquireIncrement="${jdbc.cquireIncrement}"
+		  p:acquireRetryAttempts="${jdbc.acquireRetryAttempts}"
+		  p:acquireRetryDelay="${jdbc.acquireRetryDelay}"
+		  p:idleConnectionTestPeriod="${jdbc.idleConnectionTestPeriod}"
+		  p:preferredTestQuery="${jdbc.validationQuery}" />
+	-->
+	  
+	<!--定义了Hibernate的SessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${jdbc.dialect}</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<!--	
+  	 			<prop key="hibernate.current_session_context_class">jta</prop>	    
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.use_sql_comments">true</prop>				
+				<prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>
+				<prop key="hibernate.cache.provider_class">net.sf.ehcache.hibernate.EhCacheProvider</prop>
+				<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop> 
+				-->
+			</props>
+		</property>
+		
+		<property name="packagesToScan">
+			<list>
+				<value>com.centit</value>
+			</list>
+		</property>
+	</bean>
 
-		<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-			<property name="driverClassName" value="${jdbc.driver}" />
-			<property name="url" value="${jdbc.url}" />
-			<property name="username" value="${jdbc.user}" />
-			<property name="password" value="${jdbc.password}" />
-			<!-- 		<property name="maxActive" value="${jdbc.maxActive}" />
-                    <property name="maxIdle" value="${jdbc.maxIdle}" />
-                    <property name="maxWait" value="${jdbc.maxWait}" />
-                    <property name="defaultAutoCommit" value="${jdbc.defaultAutoCommit}" />
-                    <property name="removeAbandoned" value="${jdbc.removeAbandoned}" />
-                    <property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}" />
-                    <property name="validationQuery" value="${jdbc.validationQuery}" /> -->
-		</bean>
+	<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />        
+	</bean> 
+    <!-- 配置事务异常封装 -->
+    <bean id="persistenceExceptionTranslationPostProcessor" 
+   		class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
 
-		<!--定义了Hibernate的SessionFactory -->
-		<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-			<property name="dataSource" ref="dataSource" />
-			<property name="hibernateProperties">
-				<props>
-					<prop key="hibernate.dialect">${jdbc.dialect}</prop>
-					<prop key="hibernate.show_sql">false</prop>
-					<!--
-                       <prop key="hibernate.current_session_context_class">jta</prop>
-                    <prop key="hibernate.format_sql">true</prop>
-                    <prop key="hibernate.use_sql_comments">true</prop>
-                    <prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>
-                    <prop key="hibernate.cache.provider_class">net.sf.ehcache.hibernate.EhCacheProvider</prop>
-                    <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
-                    -->
-				</props>
-			</property>
+	<bean  class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+	
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+ 	<!-- proxy-target-class="true" -->
+	<context:component-scan base-package="com.centit">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+	
+	<context:annotation-config />
 
-			<property name="packagesToScan">
-				<list>
-					<value>com.centit</value>
-				</list>
-			</property>
-		</bean>
-		<!--<bean id="flywayMigration" class="org.flywaydb.core.Flyway"
-              init-method="migrate">
-            <property name="dataSource" ref="dataSource" />
-            <property name="baselineOnMigrate" value="true" />
-            <property name="locations">
-                <array value-type="java.lang.String">
-                    <value>${flyway.sql.dir}</value>
-                    <value>com.centit.framework.system.update</value>
-                </array>
-            </property>
-        </bean>-->
-		<!--为避免flyway没有完成更新操作之前，应用程序的其他逻辑已经开始使用数据库进行其他操作了，会导致应用程序产生很多bug ，甚至根本运行不起来。
-            要解决这个问题，我们可以利用Spring 的bean 依赖原理，让关键的数据库操作bean 依赖于flywayMigration 这个bean ，
-            达到在flywayMigration 没有实例化完成（数据库更新操作完成）之前，不能进行任何其他数据库相关操作。  -->
-		<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA)
-        depends-on="flywayMigration"-->
-		<bean id="transactionManager"
-			  class="org.springframework.orm.hibernate4.HibernateTransactionManager">
-			<property name="sessionFactory" ref="sessionFactory" />
-		</bean>
-		<!-- 配置事务异常封装 -->
-		<bean id="persistenceExceptionTranslationPostProcessor"
-			  class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
-		<bean  class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+	<!--
+	<bean id="nativeJdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.C3P0NativeJdbcExtractor" lazy-init="true" />
+ 	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler" lazy-init="true">
+		<property name="nativeJdbcExtractor">
+			<ref bean="nativeJdbcExtractor" />
+		</property>
+	</bean> -->
 
-		<tx:annotation-driven transaction-manager="transactionManager"/>
+    <bean name="openSessionInViewInterceptor" class="org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
 
-		<!-- proxy-target-class="true" -->
-		<context:component-scan base-package="com.centit">
-			<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
-		</context:component-scan>
+    <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" />
 
-		<context:annotation-config />
+	<cache:annotation-driven cache-manager="cacheManager" />
 
-		<bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" />
-		<bean id="platformEnvironment" init-method="init"
-			  class="com.centit.framework.staticsystem.service.impl.StaticSystemConfigImpl"
-			  lazy-init="false">
-			<property name="passwordEncoder" ref="passwordEncoder" />
-		</bean>
+	<!-- cacheManager工厂类，指定ehcache.xml的位置 -->
+	<bean id="cacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" p:configLocation="classpath:ehcache.xml" />
 
-		<bean id="csrfTokenRepository" class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository" />
+	<!-- 声明cacheManager -->
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager" p:cacheManager-ref="cacheManagerFactory" />
 
-		<!--
-        <bean id="nativeJdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.C3P0NativeJdbcExtractor" lazy-init="true" />
-         <bean id="lobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler" lazy-init="true">
-            <property name="nativeJdbcExtractor">
-                <ref bean="nativeJdbcExtractor" />
-            </property>
-        </bean> -->
-		<bean name="openSessionInViewInterceptor" class="org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor">
-			<property name="sessionFactory" ref="sessionFactory" />
-		</bean>
+	<!-- 声明csrf -->
+	<bean id="csrfTokenRepository" class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository" />
 
-		<!-- <cache:annotation-driven cache-manager="cacheManager" />
-        cacheManager工厂类，指定ehcache.xml的位置
-        <bean id="cacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" p:configLocation="classpath:ehcache.xml" />
-        声明cacheManager
-        <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager" p:cacheManager-ref="cacheManagerFactory" />
-         -->
+	<aop:aspectj-autoproxy />
 
-		<aop:aspectj-autoproxy />
-	</beans>
+ 	<!-- 资源文件绑定器 -->
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="fallbackToSystemLocale" value="false" />  
+        <property name="useCodeAsDefaultMessage" value="false" />  
+        <property name="basename">
+            <value>classpath:messagesource/base/messages</value>
+        </property>
+        <property name="defaultEncoding" value="UTF-8" />  
+        <!-- <property name="fileEncodings" value="UTF-8" /> -->
+        <property name="cacheSeconds" value="120" />
+    </bean>
+</beans>

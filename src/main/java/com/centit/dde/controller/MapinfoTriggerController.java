@@ -18,7 +18,7 @@ import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
-import com.sun.istack.Nullable;
+
 
 
 @Controller
@@ -30,7 +30,7 @@ public class MapinfoTriggerController extends BaseController {
 
     private static final long serialVersionUID = 1L;
     @Resource
-    @Nullable
+
     private MapinfoTriggerManager mapinfoTriggerMag;
 
 

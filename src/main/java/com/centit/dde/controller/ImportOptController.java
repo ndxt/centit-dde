@@ -9,7 +9,7 @@ import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.po.OsInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
-import com.sun.istack.Nullable;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,7 +43,7 @@ public class ImportOptController extends BaseController {
     private static final long serialVersionUID = 1L;
 
     @Resource
-    @Nullable
+
     private ImportOptManager importOptMag;
 
 

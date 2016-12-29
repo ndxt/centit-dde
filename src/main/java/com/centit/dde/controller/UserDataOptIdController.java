@@ -16,7 +16,7 @@ import com.centit.dde.po.UserDataOptId;
 import com.centit.dde.service.UserDataOptIdManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
-import com.sun.istack.Nullable;
+
 @Controller
 @RequestMapping("/userdataoptid")
 public class UserDataOptIdController extends BaseController {
@@ -25,7 +25,7 @@ public class UserDataOptIdController extends BaseController {
     private static final long serialVersionUID = 1L;
 
     @Resource
-    @Nullable
+
     private UserDataOptIdManager userDataOptIdManager;
 
     @RequestMapping(value="/save",method = {RequestMethod.PUT})

@@ -34,7 +34,7 @@
 	<bean id="ajaxSuccessHandler" class="com.centit.framework.security.AjaxAuthenticationSuccessHandler">
 		<property name="writeLog" value="true" />
 	</bean>
-
+    
 	<bean id="casFilter" class="org.springframework.security.cas.web.CasAuthenticationFilter">
 	    <property name="authenticationManager" ref="authenticationManager"/>
 	    <property name="authenticationFailureHandler" ref="ajaxFailureHandler" />    
@@ -48,7 +48,7 @@
 	     	这个机器名或者域名也是你生产证书的用户名 -->
 	    <property name="serviceProperties" ref="casServiceProperties" />
 	</bean>
-	
+	<!-- service 必须是login/cas -->
 	<bean id="casServiceProperties" class="org.springframework.security.cas.ServiceProperties">
 	    <property name="service" value="${local.home}/login/cas" />
 	    <!-- j_spring_cas_security_check -->
@@ -85,6 +85,9 @@
 		  class="com.centit.framework.security.DaoInvocationSecurityMetadataSource">
 	</bean>
 
+	<bean id="centitSessionRegistry"
+		  class="com.centit.framework.security.model.MemorySessionRegistryImpl"/>
+
 	<bean id="centitPowerFilter"
 		  class="com.centit.framework.security.DaoFilterSecurityInterceptor">
 		<property name="authenticationManager" ref="authenticationManager" />
@@ -92,6 +95,7 @@
 		<property name="accessDecisionManager" ref="centitAccessDecisionManagerBean" />
 		<!-- centitSecurityMetadataSource hostIpSecurityMetadataSource -->
 		<property name="securityMetadataSource" ref="centitSecurityMetadataSource" />
+		<property name="sessionRegistry" ref="centitSessionRegistry" />
 	</bean>
     
      <!-- 注销客户端 --> 

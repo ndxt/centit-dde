@@ -14,7 +14,7 @@ import com.centit.framework.staticsystem.po.UserInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.network.HtmlFormUtils;
-import com.sun.istack.Nullable;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,35 +41,35 @@ public class ExchangeTaskController extends BaseController {
     private static final long serialVersionUID = 1L;
 
     @Resource
-    @Nullable
+
     private ExchangeTaskManager exchangeTaskMag;
 
     @Resource
-    @Nullable
+
     private ExchangeMapinfoManager exchangeMapinfoManager;
 
     @Resource
-    @Nullable
+
     private ExchangeTaskdetailManager exchangeTaskdetailManager;
 
     @Resource
-    @Nullable
+
     private MapinfoDetailManager mapinfoDetailManager;
 
     @Resource
-    @Nullable
+
     private StaticEnvironmentManager platformEnvironment;
 
     @Resource
-    @Nullable
+
     private TaskErrorDataManager taskErrorDataManager;
 
     @Resource
-    @Nullable
+
     private TaskLogManager taskLogManager;
 
     @Resource
-    @Nullable
+
     private ExportSqlManager exportSqlManager;
 
 

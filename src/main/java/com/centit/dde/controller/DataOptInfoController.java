@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.sun.istack.internal.Nullable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
@@ -25,7 +26,6 @@ import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.staticsystem.po.OsInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
-import com.sun.istack.Nullable;
 
 @Controller
 @RequestMapping("/dataoptinfo")
@@ -43,7 +43,7 @@ public class DataOptInfoController extends BaseController {
     protected StaticEnvironmentManager platformEnvironment;
 
     @Resource
-    @Nullable
+
     private ImportOptManager importOptManager;
 
     @RequestMapping(value="/save/{{tabid}}",method = {RequestMethod.PUT})

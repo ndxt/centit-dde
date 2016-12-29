@@ -37,7 +37,7 @@ import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.core.dao.PageDesc;
-import com.sun.istack.Nullable;
+
 
 @Controller
 @RequestMapping("/tasklog")
@@ -49,16 +49,16 @@ public class TaskLogController extends BaseController {
 
     private static final long serialVersionUID = 1L;
     @Resource
-    @Nullable
+
     private TaskLogManager taskLogMag;
     @Resource
-    @Nullable
+
     private ExchangeTaskManager exchangeTaskManager;
     @Resource
-    @Nullable
+
     private ExportSqlManager exportSqlManager;
     @Resource
-    @Nullable
+
     private ImportOptManager importOptManager;
 
     private String fileName;

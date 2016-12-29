@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.centit.dde.service.ExchangeTaskdetailManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
-import com.sun.istack.Nullable;
+
 
 @Controller
 @RequestMapping("/exchangetaskdetail")
@@ -24,7 +24,7 @@ public class ExchangeTaskdetailController extends BaseController {
     //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");
     private static final long serialVersionUID = 1L;
     @Resource
-    @Nullable
+
     private ExchangeTaskdetailManager exchangeTaskdetailMag;
 
     @RequestMapping(value="/delete/{{mapinfoId}}",method = {RequestMethod.DELETE})

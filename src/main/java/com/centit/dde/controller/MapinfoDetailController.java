@@ -31,7 +31,7 @@ import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.centit.support.compiler.Lexer;
-import com.sun.istack.Nullable;
+
 
 @Controller
 @RequestMapping("/mapinfodetail")
@@ -42,10 +42,10 @@ public class MapinfoDetailController extends BaseController {
 
     private static final long serialVersionUID = 1L;
     @Resource
-    @Nullable
+
     private MapinfoDetailManager mapinfoDetailMag;
     @Resource
-    @Nullable
+
     private ExchangeMapinfoManager exchangeMapinfoManager;
     @Resource
     private StaticEnvironmentManager platformEnvironment;

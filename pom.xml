@@ -11,16 +11,55 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>4.2.7.RELEASE</spring.version>
+		<hibernate.version>4.3.11.Final</hibernate.version>
 		<!-- 3.2.7.RELEASE 4.0.1.RELEASE-->
 		<spring.security.version>4.1.3.RELEASE</spring.security.version>
-		<cas.client.version>3.4.1</cas.client.version>
 		<ehcache.version>2.8.3</ehcache.version>
-		<hibernate.version>4.3.11.Final</hibernate.version>
-		<log4j.version>1.2.17</log4j.version>
-		<commons-fileupload.version>1.3.1</commons-fileupload.version>
+		<commons-fileupload.version>1.3.1</commons-fileupload.version>		
 	</properties>
-
+  
 	<dependencies>
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+		<!-- cxf -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxws</artifactId>
+			<version>2.7.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+			<version>2.7.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.centit.framework</groupId>
+			<artifactId>framework-system</artifactId>
+			<version>3.1.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.centit.framework</groupId>
+			<artifactId>framework-sys-view-easyui</artifactId>
+			<version>3.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+		  <groupId>com.oracle</groupId>
+		  <artifactId>ojdbc6</artifactId>
+		  <version>11.2.0.4</version>
+		  <scope>runtime</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.centit.framework</groupId>
+			<artifactId>framework-hibernate</artifactId>
+			<version>3.1.1-SNAPSHOT</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.centit.framework</groupId>
 			<artifactId>framework-staticsystem</artifactId>
@@ -28,17 +67,12 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>com.centit.framework</groupId>
-			<artifactId>framework-hibernate</artifactId>
-			<version>3.0.1-SNAPSHOT</version>
+			<groupId>com.centit.support</groupId>
+			<artifactId>centit-office</artifactId>
+			<version>2.1.1-SNAPSHOT</version>
 		</dependency>
-		
-	 	<dependency>
-			<groupId>com.centit.framework</groupId>
-			<artifactId>framework-base-view-easyui</artifactId>
-			<version>3.0.1-SNAPSHOT</version>
-		</dependency>
-	     <dependency>
+
+		<dependency>
 		  <groupId>org.springframework</groupId>
 		  <artifactId>spring-orm</artifactId>
 		  <version>${spring.version}</version>
@@ -47,12 +81,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context-support</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
 		
@@ -66,51 +94,22 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>5.2.4.Final</version>
-		</dependency>	
-		<!-- cxf -->
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-frontend-jaxws</artifactId>
-			<version>2.7.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-transports-http</artifactId>
-			<version>2.7.3</version>
-		</dependency>
-		<!-- database -->
-		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>ojdbc6</artifactId>
-			<version>11.2.0.3</version>
-		</dependency>
-		<dependency>
-			<groupId>com.microsoft.sqlserver</groupId>
-			<artifactId>sqljdbc4</artifactId>
-			<scope>runtime</scope>
-			<version>1.0</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.38</version>
-		</dependency>
-	
-		<dependency>
-		  <groupId>org.quartz-scheduler</groupId>
-		  <artifactId>quartz</artifactId>
-		  <version>2.2.2</version>
 		</dependency>
 
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+			<version>${ehcache.version}</version>
+		</dependency>	
+	
 		<!-- server runtime library -->
 		<dependency>
-			<groupId>servletapi</groupId>
-			<artifactId>servlet-api</artifactId>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.0.1</version>
 			<scope>provided</scope>
-			<version>2.4</version>
 		</dependency>
-		
+
 		<!-- test library -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -124,26 +123,112 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 			<version>4.9</version>
-		</dependency>		
-		
-	</dependencies>
+		</dependency>
 	
+		<dependency>
+			<groupId>com.sun</groupId>
+			<artifactId>tools</artifactId>
+			<version>1.7.0</version>
+			<systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
+			<scope>system</scope>
+		</dependency>
+
+		<!-- <systemPath>${java.home}/../lib/tools.jar</systemPath> C:/develop/jvm/jdk1_7_0_60/lib/tools.jar 
+			${JAVA_HOME} /lib/tools.jar ${java.home}/lib/tools.jar ${env.JAVA_HOME}/lib/tools.jar -->
+	</dependencies>
+
+    <distributionManagement>
+		<repository>
+			<id>centit-releases</id>
+			<name>centit-release</name>
+			<url>http://develop.centit.com:8080/nexus/content/repositories/centit-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>centit-snapshots</id>
+			<name>centit-snapshots</name>
+			<url>http://develop.centit.com:8080/nexus/content/repositories/centit-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement> 
+
+
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/webapp</directory>
+				<excludes>
+					<exclude>WEB-INF/*</exclude>
+					<exclude>spring-plugins/*.xml</exclude>
+				</excludes>
+				<targetPath>META-INF/resources/</targetPath>
+			</resource>
+		</resources>
 		<plugins>
+			<!-- 打包时添加源码 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.4</version>  
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
 					<encoding>UTF-8</encoding>
-					<compilerArguments>
-						<verbose />
-						<bootclasspath>${java.home}/lib/rt.jar</bootclasspath>
-					</compilerArguments>
 				</configuration>
 			</plugin>
-		</plugins>
-	</build>
+
+      </plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-resources-plugin
+										</artifactId>
+										<versionRange>
+											[2.6,)
+										</versionRange>
+										<goals>
+											<goal>testResources</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+    </build>
 </project>

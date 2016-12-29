@@ -8,55 +8,40 @@
 					http://www.springframework.org/schema/security/spring-security.xsd">
 
     <security:http use-expressions="false" auto-config="false" entry-point-ref="authenticationEntryPoint">
- 		<security:port-mappings>  
-            <security:port-mapping http="8180" https="8543"/>  
-        </security:port-mappings>  
 
-        <!-- <security:intercept-url pattern="/system/mainframe/index" requires-channel="http"/>   -->
- 		<security:intercept-url pattern="/system/mainframe/login"  requires-channel="https" access="IS_AUTHENTICATED_ANONYMOUSLY" /> 
-		<security:intercept-url pattern="/login"  requires-channel="https"/>
-		<security:intercept-url pattern="/**"  requires-channel="http"/>
-		<security:intercept-url pattern="/system/mainframe/csrf"  access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:intercept-url pattern="/system/mainframe/login"  access="IS_AUTHENTICATED_ANONYMOUSLY" /> 
+		<security:intercept-url pattern="/system/mainframe/login/csrf"  access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		
 		<security:access-denied-handler error-page="/system/exception/accessDenied"/>
-
+		
+		<!-- <security:session-management session-fixation-protection="newSession">
+			<security:concurrency-control max-sessions="1" expired-url="/system/mainframe/expired" />
+		</security:session-management> -->
 		
 		<security:custom-filter ref="pretreatmentAuthenticationProcessingFilter" position="FORM_LOGIN_FILTER" />
 		<security:custom-filter ref="centitPowerFilter" before="FILTER_SECURITY_INTERCEPTOR" />
 		<security:custom-filter ref="logoutFilter" position="LOGOUT_FILTER" />
-		
 		<!-- token-repository-ref="csrfTokenRepository" -->
 		<security:csrf disabled="true" />
     </security:http>
 
-   <!--   filters="concurrentSessionFilter,securityContextPersistenceFilter,
-     logoutFilter,usernamePasswordAuthenticationFilter,rememberMeAuthenticationFilter,
-     sessionManagementFilter,anonymousAuthFilter,exceptionTranslationFilter,
-     filterSecurityInterceptor" 生成HttpSessionSecurityContextRepository  
-       -->
-	<!-- <bean id="securityContextFilter"  
-        class="org.springframework.security.web.context.SecurityContextPersistenceFilter">  
-        <property name="securityContextRepository"  
-            ref="securityContextRepository" />  
-    </bean>    
-    <bean id="securityContextRepository"  
-        class="org.springframework.security.web.context.HttpSessionSecurityContextRepository">  
-        <property name="allowSessionCreation" value="true" />  
-        <property name="disableUrlRewriting" value="false" />  
-    </bean>   -->   
-    
 	<bean id="authenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">  
     	<constructor-arg index="0" value="/system/mainframe/login" />
 	</bean>
-
+	
 	<bean id="centitAccessDecisionManagerBean"
 		 class="com.centit.framework.security.DaoAccessDecisionManager">
+		 <property name="allResourceMustBeAudited" value="false" />		 
 	</bean>
 	
 	<bean id="centitSecurityMetadataSource"
 		 class="com.centit.framework.security.DaoInvocationSecurityMetadataSource">
 	</bean>
-	
-    <!-- 一个自定义的filter，必须包含authenticationManager,accessDecisionManager,securityMetadataSource三个属性， 我们的所有控制将在这三个类中实现，解释详见具体配置 -->
+
+	<bean id="centitSessionRegistry"
+		  class="com.centit.framework.security.model.MemorySessionRegistryImpl"/>
+
+	<!-- 一个自定义的filter，必须包含authenticationManager,accessDecisionManager,securityMetadataSource三个属性， 我们的所有控制将在这三个类中实现，解释详见具体配置 -->
     <bean id="centitPowerFilter"
     	 class="com.centit.framework.security.DaoFilterSecurityInterceptor">
         <property name="authenticationManager" ref="authenticationManager" />
@@ -66,10 +51,18 @@
         <property name="securityMetadataSource" ref="centitSecurityMetadataSource" />
     </bean>
 
- 	<security:authentication-manager alias="authenticationManager" erase-credentials="false" >        
+ 	 <security:authentication-manager alias="authenticationManager" erase-credentials="false" >        
 		<security:authentication-provider ref="authenticationProvider"/>
 	</security:authentication-manager>
-	
+
+	<bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" />
+
+	<bean id="platformEnvironment" init-method="init"
+		  class="com.centit.framework.staticsystem.service.impl.StaticSystemConfigImpl"
+		  lazy-init="false">
+		<property name="passwordEncoder" ref="passwordEncoder" />
+	</bean>
+
 	<bean id="userDetailsService"
 		 class="com.centit.framework.staticsystem.service.impl.UserDetailsServiceImpl">
 		 <property name="platformEnvironment" ref="platformEnvironment" />
@@ -81,7 +74,6 @@
 		<property name="passwordEncoder" ref="passwordEncoder" />  
 		<property name="saltSource" ref="saltSource" />  
 	</bean>
-	
  	<bean id="saltSource" class="org.springframework.security.authentication.dao.ReflectionSaltSource">  
 	    <property name="userPropertyToUse" value="userCode"/>  
 	</bean>  
@@ -91,25 +83,28 @@
 		class="com.centit.framework.security.PretreatmentAuthenticationProcessingFilter">
 		<property name="authenticationManager" ref="authenticationManager" />		
 		<property name="checkCaptcha" value="false" /><!-- 是否校验验证码  -->
-		<property name="maxTryTimes" value="0" /><!-- 允许最大尝试次数，0 表示没有限制  -->
+		<property name="maxTryTimes" value="-1" /><!-- 允许最大尝试次数，-1 表示没有限制  -->
 		<property name="checkTimeTnterval" value="3" /><!-- 校验时间间隔单位为分钟，超过这个时间前面的尝试清零  -->
 		<property name="checkType" value="loginName" /><!-- 建议依据登录名或者ip地址loginName hostIp-->
 		<property name="lockMinites" value="3" /><!-- 锁定时间 单位分钟-->
 		<property name="continueChainBeforeSuccessfulAuthentication" value="false" /> <!-- 验证成功后继续做系统的验证-->
-		<property name="authenticationFailureHandler"
+		<property name="authenticationFailureHandler" 
 			ref="ajaxFailureHandler"/>
 		<property name="authenticationSuccessHandler" ref="ajaxSuccessHandler"/>
 	</bean>	
 	
 	<bean id="ajaxFailureHandler" class="com.centit.framework.security.AjaxAuthenticationFailureHandler">
-		<property name="defaultFailureUrl" value="/system/mainframe/login/error"/>
+		<property name="defaultFailureUrl" value="/system/mainframe/login/error" />
 		<property name="writeLog" value="false" />
     </bean>
      
     <bean id="ajaxSuccessHandler" class="com.centit.framework.security.AjaxAuthenticationSuccessHandler">
     	<property name="writeLog" value="true" />
     </bean>
- 
+
+	<!-- 声明csrf -->
+	<bean id="csrfTokenRepository" class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository" />
+
 	<!--登出拦截器-->
 	<bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
 		<constructor-arg index="0" value="/system/mainframe/login" />
