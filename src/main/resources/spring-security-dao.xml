@@ -49,6 +49,7 @@
         <property name="accessDecisionManager" ref="centitAccessDecisionManagerBean" />
         <!-- centitSecurityMetadataSource hostIpSecurityMetadataSource -->
         <property name="securityMetadataSource" ref="centitSecurityMetadataSource" />
+        <property name="sessionRegistry" ref="centitSessionRegistry" />
     </bean>
 
  	 <security:authentication-manager alias="authenticationManager" erase-credentials="false" >        

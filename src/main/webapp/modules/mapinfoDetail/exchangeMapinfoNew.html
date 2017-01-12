@@ -1,0 +1,66 @@
+<div class="easyui-layout" id="databaseInfo_panel" fit="ture">
+	<div class="easyui-panel search-body" cls="search">
+	    <form>
+	        <div class="search-item">
+	            <label>浜ゆ崲鍚嶇О:</label> 
+	            <input type="text" class="easyui-textbox" name="s_s_mapinfoName" id="s_nameCommon" prompt="浜ゆ崲鍚嶇О" />
+	        </div>
+	        <a class="easyui-linkbutton btn-search" iconCls="icon-search">妫�绱�</a>
+	    </form>
+	</div>
+	
+	<div class="temp-toolbar">
+		<a iconCls="icon-add" href="modules/exchangeMapinfoNew/ctrl/exchangeMapinfoNew-info.html" trigger="none"
+			target="dialog" rel="exchangeMapinfoNew_add" title="娣诲姞鏁版嵁搴撹〃" width="640" height="480" btnValue="娣诲姞鏁版嵁搴�">娣诲姞鏁版嵁搴�</a>
+		<hr>
+		<a iconCls="icon-edit" href="modules/exchangeMapinfoNew/ctrl/exchangeMapinfoNew-info.html" trigger="single"
+			target="dialog" rel="exchangeMapinfoNew_edit" title="缂栬緫 {{text}}" width="640" height="480" btnValue="鏇存柊">缂栬緫</a>
+		<hr>
+		<a iconCls="icon-base icon-base-ban" trigger="single"
+			target="confirm" rel="exchangeMapinfoNew_remove" title="鏄惁纭畾鍒犻櫎 {{text}}锛�">鍒犻櫎</a>
+	</div>
+	
+	<form class="form centit">
+		<table  id="table_userCodes"
+			idField="id"
+			checkbox="true" 
+			search=".search"
+			sortName="nameCommon" sortOrder="desc"
+			url="service/exchangemapinfonew/list"
+			toolbar=".temp-toolbar" 
+			layoutH=".search" 
+			treeField="text"
+			singleSelect="true"
+			checkOnSelect="true"
+			selectOnCheck="true"
+			>
+			<thead>
+				<tr>
+					<th data-options="field:'' " checkbox="true" ></th> 
+					<th data-options="field:'databaseName'" style="width: 10%">鏁版嵁搴撴爣璇�</th>
+					<th data-options="field:'dataDesc'" style="width: 10%">鏁版嵁搴撳悕</th>
+					<th data-options="field:'databaseType'" style="width: 10%">鏁版嵁搴撶被鍨�</th>
+					<th data-options="field:'databaseUrl'" style="width: 15%">鏁版嵁搴撹繛鎺rl</th>
+					<th data-options="field:'databaseName'" style="width: 10%">涓氬姟绯荤粺鍚嶇О</th>
+					<th data-options="field:'username'" style="width: 10%">鐢ㄦ埛鍚�</th>
+					<th data-options="field:'createTime'" style="width: 10%">鍒涘缓鏃堕棿</th>
+					<th data-options="field:'databaseInfo.created'" style="width: 15%">鍒涘缓浜哄憳</th>
+				</tr>
+			</thead>
+		</table>
+		<div class="temp-toolbar"></div>
+	</form>
+</div>
+
+<script>
+	$.parser.onComplete = function(panel) {
+		$.parser.onComplete = $.noop;
+		requirejs([
+		           'modules/exchangeMapinfoNew/ctrl/exchangeMapinfoNew'
+		          ], function(ExchangeMapinfoNew) {
+			window.ExchangeMapinfoNew = new ExchangeMapinfoNew('exchangeMapinfoNew', panel);
+			window.ExchangeMapinfoNew.load(panel);
+		});
+	};
+
+</script>

@@ -102,11 +102,11 @@ public class ExchangeTaskController extends BaseController {
             s_isvalid =(String)searchColumn.get("isvalid");
             if (null==s_isvalid)
                 s_isvalid="0";
-            if (!orderField.equals(null) && !orderDirection.equals(null)) {
+            if (!(orderField == null) && !(orderDirection == null)) {
 
                 searchColumn.put(CodeBook.SELF_ORDER_BY, orderField + " " + orderDirection);
 
-                // request.setAttribute("orderDirection", orderDirection);
+                // request.setAttribute("orderDirection ", orderDirection);
                 // request.setAttribute("orderField", orderField);
             }
 //            pageDesc = DwzTableUtils.makePageDesc(request);
