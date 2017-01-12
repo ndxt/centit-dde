@@ -16,28 +16,28 @@ public class MapinfoDetail implements java.io.Serializable {
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private MapinfoDetailId cid;
 
-    @Column(name="SOURCEFIELDNAME")
+    @Column(name="SOURCE_FIELD_NAME")
     private String sourceFieldName;
     
-    @Column(name="DESTFIELDNAME")
+    @Column(name="SOURCE_FIELD_SENTENCE")
     private String destFieldName;
     
-    @Column(name="SOURCEFIELDSENTENCE")
+    @Column(name="SOURCE_FIELD_TYPE")
     private String sourceFieldSentence;
     
-    @Column(name="SOURCEFIELDTYPE")
+    @Column(name="DEST_FIELD_NAME")
     private String sourceFieldType;
     
-    @Column(name="DESTFIELDTYPE")
+    @Column(name="DEST_FIELD_TYPE")
     private String destFieldType;
     
-    @Column(name="ISPK")
+    @Column(name="IS_PK")
     private String isPk;
     
-    @Column(name="DESTFIELDDEFAULT")
+    @Column(name="DEST_FIELD_DEFAULT")
     private String destFieldDefault;
     
-    @Column(name="ISNULL")
+    @Column(name="IS_NULL")
     private String isNull;
 
     @Transient

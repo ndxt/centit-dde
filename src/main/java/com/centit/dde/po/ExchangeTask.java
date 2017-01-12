@@ -22,57 +22,58 @@ public class ExchangeTask implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="TASKID")
+    @Column(name="TASK_ID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long taskId;
 
-    @Column(name="TASKNAME")
+    @Column(name="TASK_NAME")
     private String taskName;
     
-    @Column(name="TASKCRON")
+    @Column(name="TASK_CRON")
     private String taskCron;
 
-    @Column(name="TASKDESC")
+    @Column(name="TASK_DESC")
     private String taskDesc;
 
-    @Column(name="LASTRUNTIME")
+    @Column(name="LAST_RUN_TIME")
     private Date lastRunTime;
     
-    @Column(name="NEXTRUNTIME")
+    @Column(name="NEXT_RUN_TIME")
     private Date nextRunTime;
     
-    @Column(name="ISVALID")
+    @Column(name="IS_VALID")
     private String isvalid;
     
-    @Column(name="CREATETIME")
+    @Column(name="CREATE_TIME")
     private Date createTime;
     
     @Column(name="CREATED")
     private String created;
     
-    @Column(name="CREATEDNAME")
+    @Transient
     private String createdName;
     /**
      * '1: 直接交换 2 :导出离线文件 3：监控文件夹导入文件 4：调用接口 5:接口事件';
      */
-    @Column(name="TASKTYPE")
+    @Column(name="TASK_TYPE")
     private String taskType;// char(1) default '1'  not null
 
-    @Column(name="LASTUPDATETIME")
+    @Column(name="LAST_UPDATE_TIME")
     private Date lastUpdateTime;//     date
 
-    @Column(name="STOREISOLATION")
+    @Column(name="STORE_ISOLATION")
     private String storeIsolation;//      char(1)
 
-    @Column(name="MONITORFOLDER")
+    @Column(name="MONITOR_FOLDER")
     private String monitorFolder;//       varchar2(200);
 
     @Transient
     private Set<ExchangeTaskdetail> exchangeTaskdetails = null;// new
     // ArrayList<ExchangeTaskdetail>();
 
-    @OneToMany(mappedBy="taskId",orphanRemoval=true,fetch = FetchType.LAZY)
+    @OneToMany(orphanRemoval=true,fetch = FetchType.LAZY)
+    @JoinColumn(name="TASK_ID") //这里表示数据库的外键 在t_street里面创建
     private Set<TaskLog> taskLogs = null;// new ArrayList<TaskLog>();
 
     // Constructors

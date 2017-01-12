@@ -20,22 +20,22 @@ public class ExportField implements java.io.Serializable {
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private ExportFieldId cid;
 
-    @Column(name="fieldName")
+    @Column(name="FIELD_NAME")
     private String fieldName;
 
-    @Column(name="FIELDSENTENCE")
+    @Column(name="FIELD_SENTENCE")
     private String fieldSentence;
 
-    @Column(name="FIELDTYPE")
+    @Column(name="FIELD_TYPE")
     private String fieldType;
 
-    @Column(name="FIELDFORMAT")
+    @Column(name="FIELD_FORMAT")
     private String fieldFormat;
 
-    @Column(name="FIELDSTORETYPE")
+    @Column(name="FIELD_STORE_TYPE")
     private String fieldStoreType;
 
-    @Column(name="ISPK")
+    @Column(name="IS_PK")
     private String isPk;
 
     @Transient

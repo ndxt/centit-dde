@@ -18,51 +18,51 @@ public class ExchangeMapinfo implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="MAPINFOID")
+    @Column(name="MAPINFO_ID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long mapinfoId;
     
-    @Column(name="DESTDATABASENAME")
+    @Column(name="DEST_DATABASE_NAME")
     private String destDatabaseName;
     
-    @Column(name="MAPINFONAME")
+    @Column(name="MAPINFO_NAME")
     private String mapinfoName;
     
-    @Column(name="QUERYSQL")
+    @Column(name="QUERY_SQL")
     private String querySql;
     
-    @Column(name="SOURCEDATABASENAME")
+    @Column(name="SOURCE_DATABASE_NAME")
     private String sourceDatabaseName;
 
-    @Column(name="SOURCETABLENAME")
+    @Column(name="SOURCE_TABLENAME")
     private String sourceTablename;
 
-    @Column(name="DESTTABLENAME")
+    @Column(name="DEST_TABLENAME")
     private String destTablename;
 
-    @Column(name="ISREPEAT")
+    @Column(name="IS_REPEAT")
     private String isRepeat;
 
-    @Column(name="MAPINFODESC")
+    @Column(name="MAPINFO_DESC")
     private String mapinfoDesc;
 
-    @Column(name="RECORDOPERATE")
+    @Column(name="RECORD_OPERATE")
     private String recordOperate;
 
-    @Column(name="MAPINFOORDER")
+    @Transient
     private Long mapinfoOrder;
 
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="mapinfoId") //这里表示数据库的外键 在t_street里面创建
+    @JoinColumn(name="MAPINFO_ID") //这里表示数据库的外键 在t_street里面创建
     private List<MapinfoDetail> mapinfoDetails = null;
 
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="mapinfoId") //这里表示数据库的外键 在t_street里面创建
+    @JoinColumn(name="MAPINFO_ID") //这里表示数据库的外键 在t_street里面创建
     private List<MapinfoTrigger> mapinfoTriggers = null;
 
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="mapinfoId") //这里表示数据库的外键 在t_street里面创建
+    @JoinColumn(name="MAPINFO_ID") //这里表示数据库的外键 在t_street里面创建
     private List<ExchangeTaskdetail> exchangeTaskdetails = null;
 
     public List<ExchangeTaskdetail> getExchangeTaskdetails() {

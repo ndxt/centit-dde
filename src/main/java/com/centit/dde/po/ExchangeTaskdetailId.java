@@ -20,11 +20,11 @@ public class ExchangeTaskdetailId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     
-    @Column(name="MAPINFOID")
+    @Column(name="MAPINFO_ID")
     @NotBlank(message = "字段不能为空")
     private Long mapinfoId;
 
-    @Column(name="TASKID")
+    @Column(name="TASK_ID")
     @NotBlank(message = "字段不能为空")
     private Long taskId;
 

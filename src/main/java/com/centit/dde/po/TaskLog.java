@@ -38,33 +38,34 @@ public class TaskLog implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="LOGID")
+    @Column(name="LOG_ID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long logId;
 
-    @Column(name="TASKID")
+    @Column(name="TASK_ID")
     private Long taskId;
     
-    @Column(name="RUNBEGINTIME")
+    @Column(name="RUN_BEGIN_TIME")
     private Date runBeginTime;
     
-    @Column(name="runEndTime")
+    @Column(name="RUN_END_TIME")
     private Date runEndTime;
     
-    @Column(name="RUNTYPE")
+    @Column(name="RUN_TYPE")
     private String runType;
     
     @Column(name="RUNNER")
     private String runner;
     
-    @Column(name="OTHERMESSAGE")
+    @Column(name="OTHER_MESSAGE")
     private String otherMessage;
     
-    @Column(name="TASKTYPE")
+    @Column(name="TASK_TYPE")
     private String taskType;
     
-    @OneToMany(mappedBy="logDetailId",orphanRemoval=true,fetch=FetchType.LAZY)
+    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
+    @JoinColumn(name="LOG_ID") //这里表示数据库的外键 在t_street里面创建
     private Set<TaskDetailLog> taskDetailLogs = null;// new ArrayList<TaskDetailLog>();
 
     // Constructors

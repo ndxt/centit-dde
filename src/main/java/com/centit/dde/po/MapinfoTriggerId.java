@@ -22,12 +22,12 @@ public class MapinfoTriggerId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     
     @Id
-    @Column(name="TRIGGERID")
+    @Column(name="TRIGGER_ID")
     @NotBlank(message = "字段不能为空")
     private Long triggerId;
 
     @Id
-    @Column(name="MAPINFOID")
+    @Column(name="MAPINFO_ID")
     @NotBlank(message = "字段不能为空")
     private Long mapinfoId;
 

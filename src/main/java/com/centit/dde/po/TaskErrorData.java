@@ -16,12 +16,12 @@ public class TaskErrorData implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="DATAID")
+    @Column(name="DATA_ID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long dataId;
 
-    @Column(name="LOGDETAILID")
+    @Column(name="LOG_DETAIL_ID")
     private Long logDetailId;
 
     
@@ -33,10 +33,10 @@ public class TaskErrorData implements java.io.Serializable {
         this.logDetailId = logDetailId;
     }
 
-    @Column(name="DATACONTENT")
+    @Column(name="DATA_CONTENT")
     private String dataContent;
     
-    @Column(name="ERRORMESSAGE")
+    @Column(name="ERROR_MESSAGE")
     private String errorMessage;
 
     // Constructors

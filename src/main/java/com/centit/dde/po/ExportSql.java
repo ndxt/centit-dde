@@ -22,57 +22,57 @@ public class ExportSql implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="EXPORTID")
+    @Column(name="EXPORT_ID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long exportId;
 
-    @Column(name="SOURCEDATABASENAME")
+    @Column(name="SOURCE_DATABASE_NAME")
     private String sourceDatabaseName;
 
-    @Column(name="SOURCEOSID")
+    @Column(name="SOURCE_OS_ID")
     private String sourceOsId;
 
-    @Column(name="EXPORTNAME")
+    @Column(name="EXPORT_NAME")
     private String exportName;
 
-    @Column(name="QUERYSQL")
+    @Column(name="QUERY_SQL")
     private String querySql;
 
     @Column(name="CREATED")
     private String created;
 
-    @Column(name="AFTERSQLBLOCK")
+    @Column(name="AFTER_SQL_BLOCK")
     private String afterSqlBlock;
 
-    @Column(name="EXPORTDESC")
+    @Column(name="EXPORT_DESC")
     private String exportDesc;
 
-    @Column(name="LASTUPDATETIME")
+    @Column(name="LAST_UPDATE_TIME")
     private Date lastUpdateTime;
 
-    @Column(name="CREATETIME")
+    @Column(name="CREATE_TIME")
     private Date createTime;
 
-    @Column(name="BEFORESQLBLOCK")
+    @Column(name="BEFORE_SQL_BLOCK")
     private String beforeSqlBlock;
 
-    @Column(name="DATAOPTID")
+    @Column(name="Data_Opt_ID")
     private String dataOptId;
 
-    @Column(name="TABLESTORETYPE")
+    @Column(name="TABLE_STORE_TYPE")
     private String tableStoreType;
     
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="exportId")
+    @JoinColumn(name="EXPORT_ID")
     private List<ExportTrigger> exportTriggers = null;
     
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="exportId")
+    @JoinColumn(name="EXPORT_ID")
     private List<ExportField> exportFields = null;// new
     // ArrayList<ExportField>();
 
-
+    @Transient
     private Long exportsqlOrder;
 
     // Constructors

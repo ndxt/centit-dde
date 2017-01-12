@@ -22,27 +22,28 @@ public class DataOptInfo implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "DATAOPTID")
+    @Column(name = "DATA_OPT_ID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String dataOptId;// mapinfoID
     
-    @Transient
+    @Column(name="OPT_NAME")
     private String optName;
     
-    @Column(name = "OPTDESC")
+    @Column(name = "OPT_DESC")
     private String optDesc;
     
     @Column(name = "CREATED")
     private String created;
     
-    @Column(name = "LASTUPDATETIME")
+    @Column(name = "LAST_UPDATE_TIME")
     private Date lastUpdateTime;
     
-    @Column(name = "CREATETIME")
+    @Column(name = "CREATE_TIME")
     private Date createTime;
     
-    @OneToMany(mappedBy="dataOptId",orphanRemoval=true,fetch=FetchType.LAZY)
+    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
+    @JoinColumn(name="DATA_OPT_ID") //这里表示数据库的外键 在t_street里面创建
     private List<DataOptStep> dataOptSteps = null;// new
     // ArrayList<DataOptStep>();
 
