@@ -1,0 +1,69 @@
+<div class="easyui-layout" id="databaseInfo_panel" fit="ture">
+	<div class="easyui-panel search-body" cls="search">
+	    <form>
+	        <div class="search-item">
+	            <label>交换名称:</label> 
+	            <input type="text" class="easyui-textbox" name="s_s_mapinfoName" id="s_nameCommon" prompt="交换名称" />
+	        </div>
+	        <a class="easyui-linkbutton btn-search" iconCls="icon-search">检索</a>
+	    </form>
+	</div>
+	
+	<div class="temp-toolbar">
+		<a iconCls="icon-add" href="page/dde/datebaseInfo/ctrl/exchangeMapinfoNew-info.html" trigger="none"
+			target="dialog" rel="exchangeMapinfoNew_add" title="添加数据库表" width="640" height="480" btnValue="添加数据库">添加数据库</a>
+		<hr>
+		<a iconCls="icon-edit" href="page/dde/datebaseInfo/ctrl/exchangeMapinfoNew-info.html" trigger="single"
+			target="dialog" rel="exchangeMapinfoNew_edit" title="编辑 {{text}}" width="640" height="480" btnValue="更新">编辑</a>
+		<hr>
+		<a iconCls="icon-base icon-base-ban" trigger="single"
+			target="confirm" rel="exchangeMapinfoNew_remove" title="是否确定删除 {{text}}？">删除</a>
+	</div>
+	
+	<form class="form centit">
+		<table  id="table_userCodes"
+			idField="id"
+			checkbox="true" 
+			search=".search"
+			sortName="nameCommon" sortOrder="desc"
+			url="${ctx}/service/zygl/tbdept"
+			toolbar=".temp-toolbar" 
+			layoutH=".search" 
+			treeField="text"
+			singleSelect="true"
+			checkOnSelect="true"
+			selectOnCheck="true"
+			>
+			<thead>
+				<tr>
+					<th data-options="field:'' " checkbox="true" ></th> 
+					<th data-options="field:'databaseName'" style="width: 35%">数据库标识</th>
+					<th data-options="field:'dataDesc'" style="width: 10%">数据库名</th>
+					<th data-options="field:'databaseType'" style="width: 25%">数据库类型</th>
+					<th data-options="field:'databaseUrl'" style="width: 15%">数据库连接url</th>
+					<th data-options="field:'databaseName'" style="width: 35%">业务系统名称</th>
+					<th data-options="field:'username'" style="width: 10%">用户名</th>
+					<th data-options="field:'createTime'" style="width: 25%">创建时间</th>
+					<th data-options="field:'databaseInfo.created'" style="width: 15%">创建人员</th>
+				</tr>
+			</thead>
+		</table>
+		<div class="temp-toolbar"></div>
+	</form>
+</div>
+
+<script>
+	$.parser.onComplete = function(panel) {
+		$.parser.onComplete = $.noop;
+		/*$.parser.onComplete 是EasyUI提供的回调函数，在页面加载完并渲染完后自动调用，传入参数就是我们的列表页面  */
+		/*使用requirejs的好处是它会自动帮我们加载脚本所依赖的其他所有脚本，否则我们将会在页面上看到一长串的脚本引用  */
+		/*引入的RoleInfo对象我们称之为控制器，需要先传入id 和页面对象 实例化，之后就可以调用控制器自带的load 方法开始加载数据了 */
+		requirejs([
+		           'page/dde/datebaseInfo/ctrl/datebaseInfolist'
+		          ], function(DatebaseInfo) {
+			window.DatebaseInfo = new DatebaseInfo('databaseInfoList', panel);
+			window.DatebaseInfo.load(panel);
+		});
+	};
+
+</script>

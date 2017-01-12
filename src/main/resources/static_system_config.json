@@ -39,7 +39,7 @@
 				{"optId":"QueryModel",
 				"optName":"统计模块定义",
 				"preOptId":"STATCONF",
-				"optRoute":"modules/stat/querymodel/querymodel.html",
+				"optRoute":"modules/stat/querymodel/querymodel1.html",
 				"optUrl":"service/stat/querymodel",
 				"optType":"O",
 				"isInToolbar":"Y",

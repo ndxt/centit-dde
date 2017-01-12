@@ -1,0 +1,71 @@
+<div class="easyui-layout" id="exchangeMapinfo_panel" fit="ture">
+	<div class="easyui-panel search-body" cls="search">
+	    <form>
+	        <div class="search-item">
+	            <label>交换名称</label> 
+	            <input type="text" class="easyui-textbox" name="s_mapinfoName" id="s_nameCommon" prompt="数据库名称" />
+	        </div>
+	        <a class="easyui-linkbutton btn-search" iconCls="icon-search">检索</a>
+	    </form>
+	</div>
+	
+	<div class="temp-toolbar">
+		<a iconCls="icon-add" href="page/dde/exchangeMapinfo/ctrl/exchangeMapinfo-info.html" trigger="none"
+			target="dialog" rel="exchangeMapinfo_add" title="请选择一条记录" width="640" height="480" btnValue="请选择一条记录">添加</a>
+		<hr>
+		<a iconCls="icon-edit" href="page/dde/exchangeMapinfo/ctrl/exchangeMapinfo-info.html" trigger="single"
+			target="dialog" rel="exchangeMapinfo_edit" title="编辑交换 {{text}}对应关系" width="640" height="480" btnValue="更新">编辑</a>
+		<hr>
+		<a iconCls="icon-base icon-base-ban" trigger="single"
+			target="confirm" rel="databaseInfoList_remove" title="是否确定删除交换对应关系？">删除</a>
+		<a iconCls="icon-base icon-base-ban" trigger="single"
+		target="confirm" rel="databaseInfoList_copy" title="是否确定copy？">复制</a>
+	</div>
+	
+	<form class="form centit">
+		<table  id="table_exchangemapInfo"
+			idField="id"
+			checkbox="true" 
+			search=".search"
+			sortName="nameCommon" sortOrder="desc"
+			url="${ctx}/service/exchangemapinfo/list"
+			toolbar=".temp-toolbar" 
+			layoutH=".search" 
+			treeField="text"
+			singleSelect="true"
+			checkOnSelect="true"
+			selectOnCheck="true"
+			>
+			<thead>
+				<tr>
+					<th data-options="field:'' " checkbox="true" ></th> 
+					<th data-options="field:'mapinfoId'" style="width: 10%">序号</th>
+					<th data-options="field:'mapinfoName'" style="width: 10%">交换名称</th>
+					<th data-options="field:'sourceDatabaseName'" style="width: 10%">源数据库名</th>
+					<th data-options="field:'sourceTablename'" style="width: 15%">源表名</th>
+					<th data-options="field:'destDatabaseName'" style="width: 20%">目标数据库名</th>
+					<th data-options="field:'destTablename'" style="width: 15%">目标表名</th>
+					<th data-options="field:'isRepeat'" style="width: 15%">是否为重复执行</th>
+					<th data-options="field:'mapinfoDesc'" style="width: 15%">交换说明</th>
+				</tr>
+			</thead>
+		</table>
+		<div class="temp-toolbar"></div>
+	</form>
+</div>
+
+<script>
+	$.parser.onComplete = function(panel) {
+		$.parser.onComplete = $.noop;
+		/*$.parser.onComplete 是EasyUI提供的回调函数，在页面加载完并渲染完后自动调用，传入参数就是我们的列表页面  */
+		/*使用requirejs的好处是它会自动帮我们加载脚本所依赖的其他所有脚本，否则我们将会在页面上看到一长串的脚本引用  */
+		/*引入的RoleInfo对象我们称之为控制器，需要先传入id 和页面对象 实例化，之后就可以调用控制器自带的load 方法开始加载数据了 */
+		requirejs([
+		           'page/dde/exchangeMapinfo/ctrl/exchangeMapinfo'
+		          ], function(ExchangeMapinfo) {
+			window.ExchangeMapinfo = new ExchangeMapinfo('exchangeMapinfo', panel);
+			window.ExchangeMapinfo.load(panel);
+		});
+		};
+</script>
+

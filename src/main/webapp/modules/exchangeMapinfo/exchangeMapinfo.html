@@ -1,0 +1,71 @@
+<div class="easyui-layout" id="exchangeMapinfo_panel" fit="ture">
+	<div class="easyui-panel search-body" cls="search">
+	    <form>
+	        <div class="search-item">
+	            <label>交换名称</label> 
+	            <input type="text" class="easyui-textbox" name="s_mapinfoName" id="s_nameCommon" prompt="数据库名称" />
+	        </div>
+	        <a class="easyui-linkbutton btn-search" iconCls="icon-search">检索</a>
+	    </form>
+	</div>
+	
+	<div class="temp-toolbar">
+		<a iconCls="icon-add" href="modules/exchangeMapinfo/ctrl/exchangeMapinfo-info.html" trigger="none"
+			target="dialog" rel="exchangeMapinfo_add" title="请选择一条记录" width="640" height="480" btnValue="请选择一条记录">添加</a>
+		<hr>
+		<a iconCls="icon-edit" href="modules/exchangeMapinfo/ctrl/exchangeMapinfo-info.html" trigger="single"
+			target="dialog" rel="exchangeMapinfo_edit" title="编辑交换 {{text}}对应关系" width="640" height="480" btnValue="更新">编辑</a>
+		<hr>
+		<a iconCls="icon-base icon-base-ban" trigger="single"
+			target="confirm" rel="databaseInfoList_remove" title="是否确定删除交换对应关系？">删除</a>
+		<a iconCls="icon-base icon-base-ban" trigger="single"
+		target="confirm" rel="databaseInfoList_copy" title="是否确定copy">复制</a>
+	</div>
+	
+	<form class="form centit">
+		<table  id="table_exchangemapInfo"
+			idField="id"
+			checkbox="true" 
+			search=".search"
+			sortName="nameCommon" sortOrder="desc"
+			url="service/exchangemapinfo/list"
+			toolbar=".temp-toolbar" 
+			layoutH=".search" 
+			treeField="text"
+			singleSelect="true"
+			checkOnSelect="true"
+			selectOnCheck="true"
+			>
+			<thead>
+				<tr>
+					<th data-options="field:'' " checkbox="true" ></th> 
+					<th data-options="field:'mapinfoId'" style="width: 10%">序号</th>
+					<th data-options="field:'mapinfoName'" style="width: 10%">交换名称</th>
+					<th data-options="field:'sourceDatabaseName'" style="width: 10%">源数据库名</th>
+					<th data-options="field:'sourceTablename'" style="width: 15%">源表名</th>
+					<th data-options="field:'destDatabaseName'" style="width: 20%">目标数据库名</th>
+					<th data-options="field:'destTablename'" style="width: 15%">目标表名</th>
+					<th data-options="field:'isRepeat'" style="width: 15%">是否为重复执行</th>
+					<th data-options="field:'mapinfoDesc'" style="width: 15%">交换说明</th>
+				</tr>
+			</thead>
+		</table>
+		<div class="temp-toolbar"></div>
+	</form>
+</div>
+
+<script>
+	$.parser.onComplete = function(panel) {
+		$.parser.onComplete = $.noop;
+		/*$.parser.onComplete 鏄疎asyUI鎻愪緵鐨勫洖璋冨嚱鏁帮紝鍦ㄩ〉闈㈠姞杞藉畬骞舵覆鏌撳畬鍚庤嚜鍔ㄨ皟鐢紝浼犲叆鍙傛暟灏辨槸鎴戜滑鐨勫垪琛ㄩ〉闈�  */
+		/*浣跨敤requirejs鐨勫ソ澶勬槸瀹冧細鑷姩甯垜浠姞杞借剼鏈墍渚濊禆鐨勫叾浠栨墍鏈夎剼鏈紝鍚﹀垯鎴戜滑灏嗕細鍦ㄩ〉闈笂鐪嬪埌涓�闀夸覆鐨勮剼鏈紩鐢�  */
+		/*寮曞叆鐨凴oleInfo瀵硅薄鎴戜滑绉颁箣涓烘帶鍒跺櫒锛岄渶瑕佸厛浼犲叆id 鍜岄〉闈㈠璞� 瀹炰緥鍖栵紝涔嬪悗灏卞彲浠ヨ皟鐢ㄦ帶鍒跺櫒鑷甫鐨刲oad 鏂规硶寮�濮嬪姞杞芥暟鎹簡 */
+		requirejs([
+		           'modules/exchangeMapinfo/ctrl/exchangeMapinfo'
+		          ], function(ExchangeMapinfo) {
+			window.ExchangeMapinfo = new ExchangeMapinfo('exchangeMapinfo', panel);
+			window.ExchangeMapinfo.load(panel);
+		});
+		};
+</script>
+
