@@ -22,22 +22,22 @@ public class MapinfoTrigger implements java.io.Serializable {
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private MapinfoTriggerId cid;
 
-    @Column(name="TRIGGERSQL")
+    @Column(name="TRIGGER_SQL")
     private String triggerSql;
     
-    @Column(name="TRIGGERDESC")
+    @Column(name="TRIGGER_DESC")
     private String triggerDesc;
     
-    @Column(name="TRIGGERTYPE")
+    @Column(name="TRIGGER_TYPE")
     private String triggerType;
     
-    @Column(name="TRIGGERTIME")
+    @Column(name="TRIGGER_TIME")
     private String triggerTime;
     
-    @Column(name="TRIGGERDATABASE")
+    @Column(name="TRIGGER_DATABASE")
     private String triggerDatabase;
     
-    @Column(name="TIGGERORDER")
+    @Column(name="TIGGER_ORDER")
     private Long tiggerOrder;
     
     @Column(name="ISPROCEDURE")

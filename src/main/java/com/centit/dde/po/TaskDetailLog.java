@@ -22,39 +22,40 @@ public class TaskDetailLog implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="LOGDETAILID")
+    @Column(name="LOG_DETAIL_ID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long logDetailId;
 
-    @Column(name="LOGID")
+    @Column(name="LOG_ID")
     private Long logId;
     
-    @Column(name="RUNBEGINTIME")
+    @Column(name="RUN_BEGIN_TIME")
     private Date runBeginTime;
     
-    @Column(name="RUNENDTIME")
+    @Column(name="RUN_END_TIME")
     private Date runEndTime;
     
-    @Column(name="MAPINFOID")
+    @Column(name="MAPINFO_ID")
     private Long mapinfoId;
     
-    @Column(name="OPTTYPE")
+    @Column(name="OPT_TYPE")
     private String optType;
     
-    @Column(name="OSID")
+    @Column(name="OS_ID")
     private String osId;
     
-    @Column(name="SUCCESSPIECES")
+    @Column(name="SUCCESS_PIECES")
     private Long successPieces;
     
-    @Column(name="ERRORPIECES")
+    @Column(name="ERROR_PIECES")
     private Long errorPieces;
     
-    @Column(name="OTHERMESSAGE")
+    @Column(name="OTHER_MESSAGE")
     private String otherMessage;
     
-    @OneToMany(mappedBy="logDetailId",orphanRemoval=true,fetch=FetchType.LAZY)
+    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
+    @JoinColumn(name="LOG_DETAIL_ID") //这里表示数据库的外键 在t_street里面创建
     private Set<TaskErrorData> taskErrorDatas = null;// new ArrayList<TaskErrorData>();
     
     @Transient

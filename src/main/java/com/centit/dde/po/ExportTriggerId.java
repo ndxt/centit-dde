@@ -20,11 +20,11 @@ public class ExportTriggerId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     
     
-    @Column(name="TRIGGERID")
+    @Column(name="TRIGGER_ID")
     @NotBlank(message = "字段不能为空")
     private Long triggerId;
 
-    @Column(name="EXPORTID")
+    @Column(name="EXPORT_ID")
     @NotBlank(message = "字段不能为空")
     private Long exportId;
 

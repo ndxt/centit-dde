@@ -15,24 +15,24 @@ import org.hibernate.annotations.GenericGenerator;
 public class DataOptStep implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "OPTSTEPID")
+    @Column(name = "OPT_STEP_ID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long optStepId;
     
-    @Column(name = "IMPORTID")
+    @Column(name = "IMPORT_ID")
     private Long importId;
 
-    @Column(name = "OPTTYPE")
+    @Column(name = "OPT_TYPE")
     private String optType;
 
-    @Column(name = "DATAOPTID")
+    @Column(name = "DATA_OPT_ID")
     private String dataOptId;
 
-    @Column(name = "OSID")
+    @Column(name = "OS_ID")
     private String osId;
 
-    @Column(name = "MAPINFOORDER")
+    @Column(name = "MAPINFO_ORDER")
     private Long mapinfoOrder;
 
     @Transient

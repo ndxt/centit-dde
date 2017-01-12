@@ -20,7 +20,7 @@ public class ExchangeTaskdetail implements java.io.Serializable {
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private ExchangeTaskdetailId cid;
 
-    @Column(name="MAPINFOORDER")
+    @Column(name="MAPINFO_ORDER")
     private Long mapinfoOrder;
 
     // Constructors

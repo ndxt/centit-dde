@@ -17,7 +17,7 @@ public class UserDataOptId implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="UDID")
+    @Column(name="UD_ID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long udId;
@@ -28,16 +28,16 @@ public class UserDataOptId implements Serializable {
     @Column(name="DATAOPTID")
     private String dataOptId;
 
-    @Column(name="CREATEDATE")
+    @Column(name="CREATE_DATE")
     private Date createDate;
 
-    @Column(name="LASTMODIFYDATE")
+    @Column(name="LAST_MODIFY_DATE")
     private Date lastModifyDate;
 
     @Column(name="DESCRIBE")
     private String describe;
     
-    @Column(name="DATAOPTTYPE")
+    @Column(name="DATAOPT_TYPE")
     private String dataoptType;
 
     public String getDataoptType() {
