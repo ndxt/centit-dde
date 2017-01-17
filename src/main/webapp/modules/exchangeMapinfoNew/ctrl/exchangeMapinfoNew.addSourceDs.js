@@ -3,14 +3,7 @@ define(function(require) {
 	var Config = require('config');
 	var Page = require('core/page');
 	
-	
-	var ExchangeMapinfoNewAddSourceDs = require('./exchangeMapinfoNew.addSourceDs');
-	
-	var ExchangeMapinfoNewAdd = Page.extend(function() {
-		
-		this.injecte([
-          new ExchangeMapinfoNewAddSourceDs('exchangeMapinfoNew_addSourceDs'),
-    	]);
+	var ExchangeMapinfoNewAddSourceDs = Page.extend(function() {
 		
 		// @override
 		// 加载页面时调用
@@ -49,8 +42,5 @@ define(function(require) {
 	});
 	
 	
-	
-	
-	
-	return ExchangeMapinfoNewAdd;
+	return ExchangeMapinfoNewAddSourceDs;
 });
