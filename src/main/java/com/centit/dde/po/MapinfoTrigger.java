@@ -12,7 +12,7 @@ import org.springframework.ldap.odm.annotations.Id;
  * @author codefan@hotmail.com
  */
 @Entity
-@Table(name="D_IMPORT_TRIGGER")
+@Table(name="D_MAPINFO_TRIGGER")
 public class MapinfoTrigger implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     
