@@ -1,31 +1,30 @@
-<div class="easyui-layout" id="databaseInfo_panel" fit="ture">
+<div class="easyui-layout" id="exchangeMapinfoNew_panel" fit="ture">
 	<div class="easyui-panel search-body" cls="search">
 	    <form>
 	        <div class="search-item">
-	            <label>交换名称:</label> 
-	            <input type="text" class="easyui-textbox" name="s_s_mapinfoName" id="s_nameCommon" prompt="交换名称" />
+	            <label>交换名称</label> 
+	            <input type="text" class="easyui-textbox" name="s_s_mapinfoName" id="s_s_mapinfoName" prompt="交换名称" />
 	        </div>
 	        <a class="easyui-linkbutton btn-search" iconCls="icon-search">检索</a>
 	    </form>
 	</div>
 	
 	<div class="temp-toolbar">
-		<a iconCls="icon-add" href="modules/exchangeMapinfoNew/ctrl/exchangeMapinfoNew-info.html" trigger="none"
-			target="dialog" rel="exchangeMapinfoNew_add" title="添加数据库表" width="640" height="480" btnValue="添加数据库">添加数据库</a>
+		<a iconCls="icon-add" href="modules/exchangeMapinfoNew/exchangeMapinfoNew-info.html" trigger="none"
+			target="dialog" rel="exchangeMapinfoNew_add" title="添加数据库表" width="900" height="600" btnValue="添加数据库">添加数据库</a>
 		<hr>
-		<a iconCls="icon-edit" href="modules/exchangeMapinfoNew/ctrl/exchangeMapinfoNew-info.html" trigger="single"
-			target="dialog" rel="exchangeMapinfoNew_edit" title="编辑 {{text}}" width="640" height="480" btnValue="更新">编辑</a>
+		<a iconCls="icon-edit" href="modules/exchangeMapinfoNew/exchangeMapinfoNew-info.html" trigger="single"
+			target="dialog" rel="exchangeMapinfoNew_edit" title="编辑 {{text}}" width="900" height="600" btnValue="更新">编辑</a>
 		<hr>
 		<a iconCls="icon-base icon-base-ban" trigger="single"
 			target="confirm" rel="exchangeMapinfoNew_remove" title="是否确定删除 {{text}}？">删除</a>
 	</div>
 	
 	<form class="form centit">
-		<table  id="table_userCodes"
-			idField="id"
+		<table idField="id"
 			checkbox="true" 
 			search=".search"
-			sortName="nameCommon" sortOrder="desc"
+			sortName="mapinfoName" sortOrder="desc"
 			url="service/exchangemapinfonew/list"
 			toolbar=".temp-toolbar" 
 			layoutH=".search" 
@@ -37,14 +36,13 @@
 			<thead>
 				<tr>
 					<th data-options="field:'' " checkbox="true" ></th> 
-					<th data-options="field:'databaseName'" style="width: 10%">数据库标识</th>
-					<th data-options="field:'dataDesc'" style="width: 10%">数据库名</th>
-					<th data-options="field:'databaseType'" style="width: 10%">数据库类型</th>
-					<th data-options="field:'databaseUrl'" style="width: 15%">数据库连接url</th>
-					<th data-options="field:'databaseName'" style="width: 10%">业务系统名称</th>
-					<th data-options="field:'username'" style="width: 10%">用户名</th>
-					<th data-options="field:'createTime'" style="width: 10%">创建时间</th>
-					<th data-options="field:'databaseInfo.created'" style="width: 15%">创建人员</th>
+					<th data-options="field:'mapinfoName'" style="width: 10%">交换名称</th>
+					<th data-options="field:'sourceDatabaseName'" style="width: 10%">源数据库名</th>
+					<th data-options="field:'sourceTablename'" style="width: 10%">源表名</th>
+					<th data-options="field:'destDatabaseName'" style="width: 15%">目标数据库名</th>
+					<th data-options="field:'destTablename'" style="width: 10%">目标表名</th>
+					<th data-options="field:'isRepeat'" style="width: 10%">是否为重复执行</th>
+					<th data-options="field:'mapinfoDesc'" style="width: 10%">交换说明</th>
 				</tr>
 			</thead>
 		</table>

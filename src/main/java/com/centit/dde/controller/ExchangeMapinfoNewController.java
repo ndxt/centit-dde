@@ -68,8 +68,8 @@ public class ExchangeMapinfoNewController extends BaseController {
             Map<String, Object> searchColumn = convertSearchColumn(request);
             List<ExchangeMapinfo> objList = exchangeMapinfoMag.listObjects(searchColumn, pageDesc);
             ResponseData resData = new ResponseData();
-            resData.addResponseData("OBJLIST", objList);
-            resData.addResponseData("PAGE_DESC", pageDesc);
+            resData.addResponseData(OBJLIST, objList);
+            resData.addResponseData(PAGE_DESC, pageDesc);
             JsonResultUtils.writeResponseDataAsJson(resData, response);
 //            /page/dde/exchangeMapinfoNewList.jsp
         } catch (Exception e) {
