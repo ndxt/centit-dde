@@ -22,44 +22,44 @@ public class ImportOpt implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="IMPORTID")
+    @Column(name="IMPORT_ID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long importId;
 
-    @Column(name="DESTDATABASENAME")
+    @Column(name="DEST_DATABASE_NAME")
     private String destDatabaseName;
 
-    @Column(name="SOURCEOSID")
+    @Column(name="SOURCE_OS_ID")
     private String sourceOsId;
 
-    @Column(name="IMPORTNAME")
+    @Column(name="IMPORT_NAME")
     private String importName;
 
-    @Column(name="TABLENAME")
+    @Column(name="TABLE_NAME")
     private String tableName;
 
     @Column(name="CREATED")
     private String created;
 
-    @Column(name="IMPORTDESC")
+    @Column(name="IMPORT_DESC")
     private String importDesc;
 
-    @Column(name="LASTUPDATETIME")
+    @Column(name="LAST_UPDATE_TIME")
     private Date lastUpdateTime;
 
-    @Column(name="CREATETIME")
+    @Column(name="CREATE_TIME")
     private Date createTime;
 
-    @Column(name="RECORDOPERATE")
+    @Column(name="RECORD_OPERATE")
     private String recordOperate;
 
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="importId") //这里表示数据库的外键 在t_street里面创建
+    @JoinColumn(name="import_Id") //这里表示数据库的外键 在t_street里面创建
     private List<ImportTrigger> importTriggers = null;
     
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="importId") //这里表示数据库的外键 在t_street里面创建
+    @JoinColumn(name="import_Id") //这里表示数据库的外键 在t_street里面创建
     private List<ImportField> importFields = null;// new
     // ArrayList<ImportField>();
 
@@ -84,7 +84,7 @@ public class ImportOpt implements java.io.Serializable {
      * full constructor
      */
     public ImportOpt(Long importId, String destDatabaseName, String sourceOsId, String importName, String tableName,
-                     String created, String afterImportBlock, String beforeImportBlock, String importDesc, Date lastUpdateTime,
+                     String created, String importDesc, Date lastUpdateTime,
                      String recordOperate, Date createTime) {
 
         this.importId = importId;

@@ -20,22 +20,22 @@ public class ImportField implements java.io.Serializable {
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private ImportFieldId cid;
 
-    @Column(name="SOURCEFIELDNAME")
+    @Column(name="SOURCE_FIELD_NAME")
     private String sourceFieldName;
 
-    @Column(name="DESTFIELDNAME")
+    @Column(name="DEST_FIELD_NAME")
     private String destFieldName;
 
-    @Column(name="DESTFIELDTYPE")
+    @Column(name="DEST_FIELD_TYPE")
     private String destFieldType;
 
-    @Column(name="ISPK")
+    @Column(name="IS_PK")
     private String isPk;
 
-    @Column(name="DESTFIELDDEFAULT")
+    @Column(name="DEST_FIELD_DEFAULT")
     private String destFieldDefault;
 
-    @Column(name="ISNULL")
+    @Column(name="IS_NULL")
     private String isNull;
 
     // Constructors

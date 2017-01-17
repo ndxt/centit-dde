@@ -1,0 +1,64 @@
+        <div class="easyui-panel search-body" cls="search">
+            <form class="clearFromValue">
+                <div class="search-item">
+                    <label id="e@name">用户名</label>
+                    <input type="text" class="easyui-textbox" name="s_userName" />
+                </div>
+                <div class="search-item">
+                    <label id="d@organizationName">机构名称</label>
+                    <input class="easyui-combotree" name="s_byUnderUnit" editable="false" target="unit"/>
+                </div>
+                <a class="easyui-linkbutton btn-search" iconCls="icon-search"><p  id="e@btn.search">搜索</p></a>
+                <a class="easyui-linkbutton" style="margin-top:8px;" iconcls="icon-reload" onclick="javascript:$('.clearFromValue').form('clear');$('.defaultChecked').prop('checked','true');" group="" id="">
+                    <p>重置</p>
+                </a>
+            </form>
+        </div>
+
+        <table url="service/importopt/list"
+               idField="importId"
+               id="importOptTable"
+               search=".search"
+               toolbar=".temp-toolbar1"
+               layoutH=".search">
+            <thead>
+            <tr>
+                <th  data-options="field:'importId'" hidden="true">序号</th>
+                <th  data-options="field:'destDatabaseName'" width="15%">源数据库名</th>
+                <th  data-options="field:'sourceOsId'" width="15%">业务系统ID</th>
+                <th  data-options="field:'importName'" width="15%">导入名称</th>
+                <th  data-options="field:'tableName'" width="15%">导入表</th>
+                <th  data-options="field:'createTime'"  width="10%">创建时间</th>
+                <th  data-options="field:'created'" format="User" width="10%">创建人员</th>
+                <th  data-options="field:'importDesc'" width="19%">导入说明</th>
+
+            </tr>
+            </thead>
+        </table>
+        <div class="temp-toolbar1">
+            <!--<a iconCls="icon-add" href="modules/importOpt/importOpt-info.html" trigger="none"-->
+               <!--target="dialog" rel="importOpt_add" title="新增用户"  width="640" height="470" ><p>新增</p></a>-->
+            <!--<hr>-->
+            <a  iconCls="icon-edit" href="modules/importOpt/importOpt-edit.html" trigger="single"
+                target="dialog" rel="importOpt_edit" title="编辑 {{userName}} 用户" width="800" height="800" btnValue="更新"><p>编辑</p></a>
+
+            <hr>
+            <a  iconCls="icon-base icon-base-ban"  trigger="single"
+                target="confirm" rel="importOpt_remove" title="确定删除这条记录吗？" ><p>删除</p></a>
+        </div>
+
+<script>
+
+    $.parser.onComplete = function(panel) {
+        $.parser.onComplete = $.noop;
+        requirejs([
+            'core/filter/filter.dictionary',
+            'modules/importOpt/ctrl/importOpt'
+        ], function(FilterDictionary, ImportOpt) {
+            FilterDictionary.add(['YesOrNo']).then(function() {
+                new ImportOpt('importOpt', panel).load(panel);
+            });
+        });
+    };
+    setI18NText("");
+</script>

@@ -19,11 +19,11 @@ public class ImportFieldId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     
-    @Column(name="COLUMNNO")
+    @Column(name="COLUMN_NO")
     @NotBlank(message = "字段不能为空")
     private Long columnNo;
 
-    @Column(name="IMPORTID")
+    @Column(name="IMPORT_ID")
     @NotBlank(message = "字段不能为空")
     private Long importId;
 

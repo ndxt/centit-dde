@@ -21,19 +21,19 @@ public class ImportTrigger implements java.io.Serializable {
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private ImportTriggerId cid;
 
-    @Column(name="TRIGGERSQL")
+    @Column(name="TRIGGER_SQL")
     private String triggerSql;
     
-    @Column(name="TRIGGERDESC")
+    @Column(name="TRIGGER_DESC")
     private String triggerDesc;
     
-    @Column(name="TRIGGERTYPE")
+    @Column(name="TRIGGER_TYPE")
     private String triggerType;
     
-    @Column(name="TRIGGERTIME")
+    @Column(name="TRIGGER_TIME")
     private String triggerTime;
 
-    @Column(name="TIGGERORDER")
+    @Column(name="TIGGER_ORDER")
     private Long tiggerOrder;
     
     @Column(name="ISPROCEDURE")

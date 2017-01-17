@@ -6,10 +6,10 @@ import com.centit.dde.service.ImportOptManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.po.OsInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @Controller
 @RequestMapping("/importopt")
 public class ImportOptController extends BaseController {
@@ -50,6 +51,17 @@ public class ImportOptController extends BaseController {
     @Resource
     protected StaticEnvironmentManager platformEnvironment;
 
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> filterMap = convertSearchColumn(request);
+        List<ImportOpt> listObjects = importOptMag.listObjects(filterMap, pageDesc);
+        ResponseData resData = new ResponseData();
+        resData.addResponseData(OBJLIST, listObjects);
+        resData.addResponseData(PAGE_DESC, pageDesc);
+
+        JsonResultUtils.writeResponseDataAsJson(resData, response);
+
+    }
 
     @RequestMapping(value="/defDataSource",method = {RequestMethod.GET})
     public void defDataSource(HttpServletResponse response) {
@@ -94,8 +106,8 @@ public class ImportOptController extends BaseController {
 //        return "formTrigger";
 //    }
     
-    @RequestMapping(value="/save/{{tabid}}",method = {RequestMethod.PUT})
-    public void save(ImportOpt object,HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/save/{importId}",method = {RequestMethod.PUT})
+    public void save(@PathVariable Long importId ,ImportOpt object,HttpServletRequest request,HttpServletResponse response) {
 //        dwzResultParam = new DwzResultParam();
 //        dwzResultParam.setNavTabId(tabid);
 
@@ -149,29 +161,30 @@ public class ImportOptController extends BaseController {
         JsonResultUtils.writeSuccessJson(response);
     }
 
-    @RequestMapping(value="/edit/{{importid}}",method = {RequestMethod.PUT})
-    public void edit(@PathVariable Long importid ,ImportOpt object,HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/edit/{importid}",method = {RequestMethod.GET})
+    public void edit(@PathVariable Long importid ,HttpServletResponse response) {
         ImportOpt importOpt = importOptMag.getObjectById(importid);
-        if (null != importOpt) {
+        /*if (null != importOpt) {
             importOptMag.copyObject(object, importOpt);
-        }
+        }*/
 
         // copy
-        if (StringUtils.hasText(WebUtils.findParameterValue(request, "type"))) {
+        /*if (StringUtils.hasText(WebUtils.findParameterValue(request, "type"))) {
             object.setImportId(null);
             object.setImportName(null);
             object.setSourceOsId(null);
-        }
+        }*/
 
 
-        List<DatabaseInfo> dbList = platformEnvironment.listDatabaseInfo();
+        /*List<DatabaseInfo> dbList = platformEnvironment.listDatabaseInfo();
 
         // 业务系统
-        List<OsInfo> osinfoList = platformEnvironment.listOsInfos();
+        List<OsInfo> osinfoList = platformEnvironment.listOsInfos();*/
 
         ResponseData resData = new ResponseData();
-        resData.addResponseData("dbList", dbList);
-        resData.addResponseData("osinfoList",osinfoList);
+        resData.addResponseData("importOpt", importOpt);
+/*        resData.addResponseData("dbList", dbList);
+        resData.addResponseData("osinfoList",osinfoList);*/
 
         JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
@@ -196,7 +209,7 @@ public class ImportOptController extends BaseController {
     }
 
 
-    @RequestMapping(value="/delete/{{importid}}",method = {RequestMethod.DELETE})
+    @RequestMapping(value="/delete/{importid}",method = {RequestMethod.DELETE})
     public void delete(@PathVariable Long importid,HttpServletResponse response) {
         importOptMag.deleteObjectById(importid);
         JsonResultUtils.writeSuccessJson(response);

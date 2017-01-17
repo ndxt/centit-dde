@@ -1,21 +1,19 @@
 package com.centit.dde.controller;
 
-import java.util.Date;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.centit.dde.po.UserDataOptId;
+import com.centit.dde.service.UserDataOptIdManager;
+import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.core.controller.BaseController;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.centit.dde.po.UserDataOptId;
-import com.centit.dde.service.UserDataOptIdManager;
-import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.controller.BaseController;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 
 @Controller
 @RequestMapping("/userdataoptid")
@@ -28,8 +26,22 @@ public class UserDataOptIdController extends BaseController {
 
     private UserDataOptIdManager userDataOptIdManager;
 
+/*    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> filterMap = convertSearchColumn(request);
+        filterMap.put("roleCode", roleCode);
+        List<UserDataOptId> listObjects = userDataOptIdManager.listObjectBysql(filterMap, pageDesc);
+
+        ResponseData resData = new ResponseData();
+        resData.addResponseData(OBJLIST, listObjects);
+        resData.addResponseData(PAGE_DESC, pageDesc);
+
+        JsonResultUtils.writeResponseDataAsJson(resData, response);
+
+    }*/
+
     @RequestMapping(value="/save",method = {RequestMethod.PUT})
-    public void save(UserDataOptId object,HttpServletRequest request,HttpServletResponse response) {
+    public void save(UserDataOptId object,HttpServletResponse response) {
         if (null == object.getUdId()) {
             object.setCreateDate(new Date());
         } else {
@@ -37,12 +49,11 @@ public class UserDataOptIdController extends BaseController {
         }
 
         userDataOptIdManager.saveObject(object);
-//        return super.save();
         JsonResultUtils.writeSuccessJson(response);
     }
 
     @RequestMapping(value="/edit",method = {RequestMethod.PUT})
-    public void edit(UserDataOptId object,HttpServletRequest request,HttpServletResponse response) {
+    public void edit(UserDataOptId object,HttpServletResponse response) {
 //        super.edit();
         if (object == null) {
 //          object = getEntityClass().newInstance();
@@ -56,14 +67,11 @@ public class UserDataOptIdController extends BaseController {
           else
               userDataOptIdManager.clearObjectProperties(object);
       }
-//        return super.edit();
-
         JsonResultUtils.writeSuccessJson(response);
     }
 
     @RequestMapping(value="/delete",method = {RequestMethod.PUT})
-    public void delete(UserDataOptId object,HttpServletRequest request,HttpServletResponse response) {
-//        return "delete";
+    public void delete(UserDataOptId object,HttpServletResponse response) {
         userDataOptIdManager.deleteObjectById(object.getUdId());
         JsonResultUtils.writeSuccessJson(response);
     }

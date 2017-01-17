@@ -65,31 +65,18 @@
 				<c:forEach items="${objList }" var="obj" varStatus="s">
 						<tr>
 							    <td>${s.index+1}<input type="hidden" name="importId" id="importId" value="${obj.importId}"/></td>
-							    
-								<%-- <td>${obj.importId}</td> --%>
-								
 								<td title="${obj.destDatabaseName}">${obj.destDatabaseName}</td>
-								
 								<td title="${obj.sourceOsId}">${obj.sourceOsId}</td>
 								<td title="${obj.importName}">${obj.importName}</td>
 								<td title="${obj.tableName}">${obj.tableName}</td>
-							
-							
-								<%-- <td>${obj.querySql}</td> --%>
-							
 								<td> <fmt:formatDate pattern="yyyy-MM-dd HH:mm:ss" value="${obj.createTime}" /> </td>
-							
-							
 								<td>${cp:MAPVALUE('usercode', obj.created) }</td>
-								
 								<td title="${obj.importDesc}">${obj.importDesc}</td>
-								
 								<td>
 								    <a href="${contextPath }/dde/importOpt!edit.do?importId=${obj.importId}&tabid=external_IMPORTOPT" ${dialog_height } target='navTab' rel="dygxmx"  title="编辑数据导入内容"><span class="icon icon-edit"></span></a>
 								    <a href="${contextPath }/dde/importOpt!delete.do?importId=${obj.importId}" target="ajaxTodo" title="删除数据导入内容"><span class="icon icon-trash"></span></a>
 								    <a href="${contextPath }/dde/importOpt!edit.do?importId=${obj.importId}&type=copy&tabid=external_IMPORTOPT" rel="list_field" target="navTab" title="复制导入文件配置"><span class="icon icon-copy"></span></a>
 								</td>
-							
 						</tr>
 				</c:forEach>
 			</tbody>
