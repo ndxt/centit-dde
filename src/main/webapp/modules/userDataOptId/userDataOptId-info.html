@@ -1,0 +1,32 @@
+<div class="form centit">
+	<form class="centit form" novalidate="true">
+
+		<input name="udId" type="hidden" />
+
+		<div class="fields two">
+			<div class="field required">
+				<label>用户代码</label> <input type="text" class="easyui-textbox"
+					name="usercode" maxlength="4" required />
+			</div>
+		</div>
+
+		<div class ="fields two">
+			<div class="field ">
+				<label>业务操作ID</label> <input type="text" class="easyui-textbox"
+					name="dataOptId" />
+			</div>
+
+			<div class="field ">
+				<label>业务操作类型</label> <input type="radio" value="I"
+					name="dataoptType">导入</input> <input type="radio" value="E"
+					name="dataoptType">导出</input>
+			</div>
+		</div>
+
+		<div class="field ">
+			<label>描述</label> <input type="text" class="easyui-textbox"
+				name="describe" style="width: 100%; height: 100px;" />
+		</div>
+
+	</form>
+</div>

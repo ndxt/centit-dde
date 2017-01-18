@@ -1,0 +1,69 @@
+<div class="easyui-layout" id="userDataOptId_panel" fit="ture">
+	<div class="easyui-panel search-body" cls="search">
+	    <form>
+	        <div class="search-item">
+	            <label>用户代码</label> 
+	            <input type="text" class="easyui-textbox" name="s_usercode" id="s_usercode" prompt="用户代码" />
+	        </div>
+	        <div class="search-item">
+	            <label>业务操作ID</label> 
+	            <input type="text" class="easyui-textbox" name="s_dataOptId" id="s_dataOptId" prompt="业务操作ID" />
+	        </div>
+	        <a class="easyui-linkbutton btn-search" iconCls="icon-search">检索</a>
+	    </form>
+	</div>
+	
+	<div class="temp-toolbar">
+		<a iconCls="icon-add" href="modules/userDataOptId/userDataOptId-info.html" trigger="none"
+			target="dialog" rel="userDataOptId_add" title="添加" width="640" height="480" btnValue="添加">添加</a>
+		<hr>
+		<a iconCls="icon-edit" href="modules/userDataOptId/userDataOptId-info.html" trigger="single"
+			target="dialog" rel="userDataOptId_edit" title="编辑" width="640" height="480" btnValue="编辑">编辑</a>
+		<hr>
+		<a iconCls="icon-base icon-base-ban" trigger="single"
+			target="confirm" rel="userDataOptId_remove" title="删除">删除</a>
+	</div>
+	
+	<form class="form centit">
+		<table  id="table_userCodes"
+			idField="id"
+			checkbox="true" 
+			search=".search"
+			sortName="usercode" sortOrder="desc"
+			url="service/userdataoptid/list"
+			toolbar=".temp-toolbar" 
+			layoutH=".search" 
+			treeField="text"
+			singleSelect="true"
+			checkOnSelect="true"
+			selectOnCheck="true"
+			>
+			<thead>
+				<tr>
+					<th data-options="field:'udId'" hidden></th>
+					<th data-options="field:'usercode'" style="width: 15%">用户代码</th>
+					<th data-options="field:'dataDesc'" style="width: 15%">用户名</th>
+					<th data-options="field:'dataOptId'" style="width: 15%">业务操作ID</th>
+					<th data-options="field:'dataoptType'" style="width: 10%">业务操作类型</th>
+					<th data-options="field:'createDate'" style="width: 15%">创建时间</th>
+					<th data-options="field:'lastModifyDate'" style="width: 10%">最后更新时间</th>
+					<th data-options="field:'describe'" style="width: 23.5%">描述</th>
+				</tr>
+			</thead>
+		</table>
+		<div class="temp-toolbar"></div>
+	</form>
+</div>
+
+<script>
+	$.parser.onComplete = function(panel) {
+		$.parser.onComplete = $.noop;
+		requirejs([
+		           'modules/userDataOptId/ctrl/userDataOptId'
+		          ], function(UserDataOptId) {
+			window.UserDataOptId = new UserDataOptId('userDataOptId', panel);
+			window.UserDataOptId.load(panel);
+		});
+	};
+
+</script>

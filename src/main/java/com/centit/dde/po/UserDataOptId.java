@@ -10,7 +10,7 @@ import javax.persistence.*;
 /**
  * Created by sx on 2014/12/10.
  */
-@Embeddable
+@Entity
 @Table(name="D_USER_DATAOPTID")
 public class UserDataOptId implements Serializable {
 
@@ -18,8 +18,6 @@ public class UserDataOptId implements Serializable {
 
     @Id
     @Column(name="UD_ID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long udId;
 
     @Column(name="USERCODE")
