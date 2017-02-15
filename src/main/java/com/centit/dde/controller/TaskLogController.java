@@ -146,7 +146,7 @@ public class TaskLogController extends BaseController {
             ExchangeTask exchangeTask = null;
             if (object.getTaskId() != null) {
                 
-                exchangeTask = exchangeTaskManager.getObjectById(object.getTaskId());
+                exchangeTask = object.getTask();// exchangeTaskManager.getObjectById(object.getTaskId().getTaskId());
             }
             JsonResultUtils.writeSingleDataJson(exchangeTask, response);
             // return EDIT;

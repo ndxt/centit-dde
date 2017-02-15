@@ -7,9 +7,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
-import org.hibernate.annotations.GenericGenerator;
+import org.apache.cxf.common.util.CollectionUtils;
 
 /**
  * create by scaffold
@@ -23,8 +31,8 @@ public class ExchangeTask implements java.io.Serializable {
 
     @Id
     @Column(name="TASK_ID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
+   /* @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")*/
     private Long taskId;
 
     @Column(name="TASK_NAME")
@@ -71,11 +79,25 @@ public class ExchangeTask implements java.io.Serializable {
     @Transient
     private Set<ExchangeTaskdetail> exchangeTaskdetails = null;// new
     // ArrayList<ExchangeTaskdetail>();
+    
+    @Transient
+    private List<ExportSql> exportSqlList = null;
+    
+    public List<ExportSql> getExportSqlList() {
+        return exportSqlList;
+    }
 
-    @OneToMany(orphanRemoval=true,fetch = FetchType.LAZY)
+    public void setExportSqlList(List<ExportSql> exportSqlList) {
+        this.exportSqlList = exportSqlList;
+    }
+
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY )
     @JoinColumn(name="TASK_ID") //这里表示数据库的外键 在t_street里面创建
-    private Set<TaskLog> taskLogs = null;// new ArrayList<TaskLog>();
+    private List<TaskLog> taskLogs ;// new ArrayList<TaskLog>();
 
+//    fetch:表示抓取策略,默认为FetchType.LAZY,因为关联的多个对象通常不必从数据库预先读取到内存
+//    cascade:表示级联操作策略,对于OneToMany类型的关联非常重要,通常该实体更新或删除时,其关联的实体也应当被更新删除 
+    
     // Constructors
 
     /**
@@ -323,22 +345,22 @@ public class ExchangeTask implements java.io.Serializable {
         }
     }
 
-    public Set<TaskLog> getTaskLogs() {
-        if (this.taskLogs == null)
-            this.taskLogs = new HashSet<TaskLog>();
-        return this.taskLogs;
+    public List<TaskLog> getTaskLogs() {
+        if (taskLogs == null)
+            taskLogs = new ArrayList<TaskLog>();
+        return taskLogs;
     }
 
-    public void setTaskLogs(Set<TaskLog> taskLogs) {
+    public void setTaskLogs(List<TaskLog> taskLogs) {
         this.taskLogs = taskLogs;
     }
 
     public void addTaskLog(TaskLog taskLog) {
         if (this.taskLogs == null)
-            this.taskLogs = new HashSet<TaskLog>();
+            this.taskLogs = new ArrayList<TaskLog>();
         this.taskLogs.add(taskLog);
     }
-
+    
     public void removeTaskLog(TaskLog taskLog) {
         if (this.taskLogs == null)
             return;
@@ -347,9 +369,7 @@ public class ExchangeTask implements java.io.Serializable {
 
     public TaskLog newTaskLog() {
         TaskLog res = new TaskLog();
-
-        res.setTaskId(this.getTaskId());
-
+        res.setTaskId(taskId);
         return res;
     }
 
@@ -469,6 +489,21 @@ public class ExchangeTask implements java.io.Serializable {
         this.monitorFolder = null;
 
         this.exchangeTaskdetails = new HashSet<ExchangeTaskdetail>();
-        this.taskLogs = new HashSet<TaskLog>();
+        this.taskLogs = new ArrayList<TaskLog>();
+    }
+    public void addAll(){
+        
+    }
+    
+    public void addAll(List<TaskLog> taskLogs){
+        getTaskLogs().clear();
+        if(CollectionUtils.isEmpty(taskLogs)){
+            return;
+        }
+        for(TaskLog detail:taskLogs){
+            detail.setTask(this);
+        }
+        getTaskLogs().addAll(taskLogs);
+        
     }
 }

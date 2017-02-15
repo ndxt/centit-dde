@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.centit.dde.po.ExchangeTaskdetail;
+import com.centit.dde.po.ExchangeTaskdetailId;
 import com.centit.dde.service.ExchangeTaskdetailManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
@@ -27,11 +29,9 @@ public class ExchangeTaskdetailController extends BaseController {
 
     private ExchangeTaskdetailManager exchangeTaskdetailMag;
 
-    @RequestMapping(value="/delete/{{mapinfoId}}",method = {RequestMethod.DELETE})
-    public void delete(@PathVariable Long mapinfoId,HttpServletRequest request,HttpServletResponse response) {
-        exchangeTaskdetailMag.deleteDetailsByMapinfoId(mapinfoId);
-//        super.delete();
-//        return "delete";
+    @RequestMapping(value="/delete",method = {RequestMethod.DELETE})
+    public void delete(ExchangeTaskdetail exchangeTaskdetail,HttpServletRequest request,HttpServletResponse response) {
+        exchangeTaskdetailMag.deleteObject(exchangeTaskdetail);
         JsonResultUtils.writeSuccessJson(response);
     }
 }
