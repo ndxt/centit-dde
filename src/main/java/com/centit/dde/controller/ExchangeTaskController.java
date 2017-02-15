@@ -1,23 +1,21 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.po.*;
-import com.centit.dde.service.*;
-import com.centit.framework.components.CodeRepositoryUtil;
-import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.common.ResponseData;
-import com.centit.framework.core.controller.BaseController;
-import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.core.dao.PageDesc;
-import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.po.UserInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
-import com.centit.support.algorithm.StringRegularOpt;
-import com.centit.support.network.HtmlFormUtils;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,10 +23,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.WebUtils;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import com.centit.dde.po.ExchangeMapinfo;
+import com.centit.dde.po.ExchangeTask;
+import com.centit.dde.po.ExchangeTaskdetail;
+import com.centit.dde.po.ExportSql;
+import com.centit.dde.po.TaskErrorData;
+import com.centit.dde.po.TaskLog;
+import com.centit.dde.service.ExchangeMapinfoManager;
+import com.centit.dde.service.ExchangeTaskManager;
+import com.centit.dde.service.ExchangeTaskdetailManager;
+import com.centit.dde.service.ExportSqlManager;
+import com.centit.dde.service.MapinfoDetailManager;
+import com.centit.dde.service.TaskErrorDataManager;
+import com.centit.dde.service.TaskLogManager;
+import com.centit.framework.components.CodeRepositoryUtil;
+import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.dao.PageDesc;
+import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.staticsystem.po.UserInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.support.algorithm.StringRegularOpt;
 
 @Controller
 @RequestMapping("/exchangetask")
@@ -74,42 +91,17 @@ public class ExchangeTaskController extends BaseController {
 
 
 
-    @SuppressWarnings("unchecked")
-    @RequestMapping(value="/list" , method = {RequestMethod.GET})
-    public void list(PageDesc pageDesc, HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/list/{taskType}" , method = {RequestMethod.GET})
+    public void list(@PathVariable String taskType ,PageDesc pageDesc, HttpServletRequest request,HttpServletResponse response) {
         try {
-//            Map<Object, Object> paramMap = request.getParameterMap();
-//            resetPageParam(paramMap);
-
-            String orderField = request.getParameter("orderField");
-            String orderDirection = request.getParameter("orderDirection");
-            String s_isvalid = (String)request.getParameter("s_isvalid");
-
-//            Map<String, Object> filterMap = convertSearchColumn(paramMap);
-            Map<String, Object> searchColumn = convertSearchColumn(request); 
-
-            if (!searchColumn.containsKey("isvalid")) {
+            request.setCharacterEncoding("utf-8");
+            Map<String, Object> searchColumn = convertSearchColumn(request);
+            searchColumn.put("taskType", taskType);
+            if(searchColumn.get("isvalid")!=null){
+                searchColumn.remove("isvalid");
+            }else{
                 searchColumn.put("isvalid", "1");
             }
-            //包含禁用
-            if ("T".equals(searchColumn.get("isvalid"))) {
-                searchColumn.remove("isvalid");
-                searchColumn.put("isvalid","1");
-            }
-            if ("0".equals(searchColumn.get("isvalid"))) {
-                searchColumn.remove("isvalid");
-            }
-            s_isvalid =(String)searchColumn.get("isvalid");
-            if (null==s_isvalid)
-                s_isvalid="0";
-            if (!(orderField == null) && !(orderDirection == null)) {
-
-                searchColumn.put(CodeBook.SELF_ORDER_BY, orderField + " " + orderDirection);
-
-                // request.setAttribute("orderDirection ", orderDirection);
-                // request.setAttribute("orderField", orderField);
-            }
-//            pageDesc = DwzTableUtils.makePageDesc(request);
             List<ExchangeTask>  objList = exchangeTaskMag.listObjects(searchColumn, pageDesc);
 
             for (int i = 0; i < objList.size(); i++) {
@@ -120,23 +112,19 @@ public class ExchangeTaskController extends BaseController {
                     exchangeTask.setCreatedName(usesInfo.getUsername());
 
             }
-
-            setTaskTypeToPage(request);
-//            this.pageDesc = pageDesc;
             ResponseData resData = new ResponseData();
-            resData.addResponseData("OBJLIST", objList);
-            resData.addResponseData("PAGE_DESC", pageDesc);
+            resData.addResponseData(OBJLIST, objList);
+            resData.addResponseData(PAGE_DESC, pageDesc);
             JsonResultUtils.writeResponseDataAsJson(resData, response);
-//            return LIST;
         } catch (Exception e) {
             e.printStackTrace();
-//            return ERROR;
             JsonResultUtils.writeErrorMessageJson("error", response);
         }
     }
 
-    @RequestMapping(value="/save/{{taskId}}", method = {RequestMethod.PUT})
-    public void save(ExchangeTask object,@PathVariable Long taskId ,HttpServletRequest request ,HttpServletResponse response) {
+    @RequestMapping(value="/save", method = {RequestMethod.PUT})
+    public void save(ExchangeTask object ,HttpServletRequest request ,HttpServletResponse response) {
+        Long taskId = object.getTaskId();
         object.setTaskName(object.getTaskName().trim());
         try {
             ExchangeTask dbObject = exchangeTaskMag.getObjectById(taskId);
@@ -171,12 +159,12 @@ public class ExchangeTaskController extends BaseController {
             } else {
 //                saveMessage("编辑交换任务成功！");
             }
-            if (!object.getTaskCron().equals(null)) {
+            if (object.getTaskCron() != null) {
                 exchangeTaskMag.saveNewTimerTask(object);
             }
 
             //更新下次执行时间
-            if (object.getTaskCron().equals(null)) {
+            if (object.getTaskCron() != null) {
                 try {
                     CronSequenceGenerator generator = new CronSequenceGenerator(object.getTaskCron(), TimeZone.getDefault());
                     object.setNextRunTime(generator.next(new Date()));
@@ -205,8 +193,8 @@ public class ExchangeTaskController extends BaseController {
         }
     }
 
-    @RequestMapping(value="/editAndsave/{{taskId}}" , method = {RequestMethod.PUT})
-    public void editAndsave(ExchangeTask object,HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/editAndsave" , method = {RequestMethod.PUT})
+    public void editAndsave(@Valid  ExchangeTask object,HttpServletRequest request,HttpServletResponse response) {
         try {
             object.setTaskName(object.getTaskName().trim());
             Map<String, Object> filterMap = new HashMap<String, Object>();
@@ -233,14 +221,15 @@ public class ExchangeTaskController extends BaseController {
                 taskCron = true;
             }
             if (dbObject != null) {
-                exchangeTaskMag.copyObjectNotNullProperty(dbObject, object);
-                object = dbObject;
+               // exchangeTaskMag.copyObjectNotNullProperty(dbObject, object);
+                BeanUtils.copyProperties(object, dbObject, new String[] { "taskLogs" });
+                dbObject.addAll(object.getTaskLogs());
             }
             //更新下次执行时间
-            if (!object.getTaskCron().equals(null)) {
+            if (dbObject.getTaskCron() != null) {
                 try {
-                    CronSequenceGenerator generator = new CronSequenceGenerator(object.getTaskCron(), TimeZone.getDefault());
-                    object.setNextRunTime(generator.next(new Date()));
+                    CronSequenceGenerator generator = new CronSequenceGenerator(dbObject.getTaskCron(), TimeZone.getDefault());
+                    dbObject.setNextRunTime(generator.next(new Date()));
                 } catch (Exception e) {
 //                    saveError("定时任务表达式不正确");
 //                    return "editAndsave";
@@ -248,21 +237,21 @@ public class ExchangeTaskController extends BaseController {
                     return;
                 }
             } else {
-                object.setNextRunTime(null);
+                dbObject.setNextRunTime(null);
             }
 
 //            saveMessage("编辑交换任务成功！");
 
             if (taskCron) {
-                if (object.getTaskCron().equals("")) {
-                    exchangeTaskMag.delTimerTask(object);
+                if (dbObject.getTaskCron().equals("")) {
+                    exchangeTaskMag.delTimerTask(dbObject);
                 } else {
-                    exchangeTaskMag.updateTimerTask(object);
+                    exchangeTaskMag.updateTimerTask(dbObject);
                 }
             }
-
-
-            exchangeTaskMag.saveObject(object);
+//            object.getTaskLogs().clear();
+//            object.getTaskLogs().add(e);
+            exchangeTaskMag.mergeObject(dbObject);
 
             if ("3".equals(object.getTaskType())) {
 //                return "editAndsaveDialog";
@@ -280,54 +269,34 @@ public class ExchangeTaskController extends BaseController {
         }
     }
 
-    @RequestMapping(value="/edit/{{taskId}}" , method = {RequestMethod.PUT})
-    public  void edit(ExchangeTask object,@PathVariable Long taskId, HttpServletRequest request ,HttpServletResponse response) {
-        String view = "EDIT";
+    @RequestMapping(value="/edit/{taskId}" , method = {RequestMethod.GET})
+    public  void edit(@PathVariable Long taskId, ExchangeTask object,HttpServletRequest request ,HttpServletResponse response) {
 //        /page/dde/exchangeTaskForm.jsp
         try {
-            if (object == null) {
-//                object = getEntityClass().newInstance();
-            } else {
-                ExchangeTask o = exchangeTaskMag.getObjectById(taskId);
-                if (o != null)
-                    // 将对象o copy给object，object自己的属性会保留
-                    exchangeTaskMag.copyObject(object, o);
-                else
-                    exchangeTaskMag.clearObjectProperties(object);
+            ExchangeTask exchangeTask = exchangeTaskMag.getObjectById(taskId);
+            
+            Map<String, Object> filterMap = new HashMap<String, Object>();
+            filterMap.put("task_Id", taskId);
+            // filterMap.put("order by", "mapinfo_order");
+            List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
+            
+            List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
 
-                // 是否为任务编辑，如果为任务编辑则添加创建人姓名
-                if (null != object.getTaskId() && !"".equals(object.getTaskId())) {
-                    // 调用sysconfig下的manager 通过id查询创建人姓名
-                    UserInfo usesInfo = (UserInfo)CodeRepositoryUtil.getUserInfoByCode(o.getCreated());
-                    if (usesInfo != null) {
-                        object.setCreatedName(usesInfo.getUsername());
-                    }
-
-                    String taskType = WebUtils.findParameterValue(request, "s_taskType");
-
-                    Map<String, Object> filterMap = new HashMap<String, Object>();
-                    filterMap.put("task_Id", object.getTaskId());
-                    // filterMap.put("order by", "mapinfo_order");
-                    List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
-
-                    if ("1".equals(taskType)) {
-                        getExchangeMapinfo(exchangeTaskdetails, response);
-                    } else if ("2".equals(taskType) || "4".equals(taskType)) {
-                        getExportSql(exchangeTaskdetails, response);
-                    } else if ("3".equals(taskType)) {
-                        view = "editMonitor";
-//                        /page/dde/exchangeTaskMonitorForm.jsp
-                        
-                    }
-
+            for (ExchangeTaskdetail etd : exchangeTaskdetails) {
+                ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapinfoId());
+                if (null != exportSql) {
+                    exportSql.setExportsqlOrder(etd.getMapinfoOrder());
+                    exportSqlList.add(exportSql);
                 }
-
             }
-
-            setTaskTypeToPage(request);
-
-//            return view;
-            JsonResultUtils.writeBlankJson(response);
+            
+            exchangeTask.setExportSqlList(exportSqlList);
+            
+            UserInfo usesInfo = (UserInfo)CodeRepositoryUtil.getUserInfoByCode(exchangeTask.getCreated());
+            if (usesInfo != null){
+                exchangeTask.setCreatedName(usesInfo.getUsername());
+            }
+            JsonResultUtils.writeSingleDataJson(exchangeTask, response);
         } catch (Exception e) {
             e.printStackTrace();
 //            return ERROR;
@@ -447,7 +416,7 @@ public class ExchangeTaskController extends BaseController {
         }
     }
 
-    @RequestMapping(value="/delete/{{taskId}}", method = {RequestMethod.DELETE})
+    @RequestMapping(value="/delete/{taskId}", method = {RequestMethod.DELETE})
     public void delete(@PathVariable Long taskId,ExchangeTask object,HttpServletRequest request,HttpServletResponse response) {
         ExchangeTask exchangeTask = exchangeTaskMag.getObjectById(taskId);
         try {
@@ -493,46 +462,35 @@ public class ExchangeTaskController extends BaseController {
     }
 
     @SuppressWarnings("unchecked")
-    @RequestMapping(value="/listExchangeMapInfo", method = {RequestMethod.GET})
-    public void listExchangeMapInfo(PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
-        // List<String> mapinfoIds = new ArrayList<String>();
-//        Map<Object, Object> paramMap = request.getParameterMap();
-//        resetPageParam(paramMap);
-//
-//        Map<String, Object> filterMap = convertSearchColumn(paramMap);
-//        PageDesc pageDesc = DwzTableUtils.makePageDesc(request);
-        Map<String, Object> searchColumn = convertSearchColumn(request);
-        List<ExchangeMapinfo> objList = exchangeMapinfoManager.listObjects(searchColumn, pageDesc);
-
-        // filterMap.put("mapinfoIdNot", (String)filterMap.get("taskId"));
-        searchColumn.put("taskId", Long.valueOf(((String) searchColumn.get("taskId"))));
-        request.setAttribute("taskId", searchColumn.get("taskId"));
-
-        setTaskTypeToPage(request);
-
-        String taskType = (String) searchColumn.get("taskType");
-        request.setAttribute("taskType", taskType);
+    @RequestMapping(value="/listExchangeMapInfo/{taskType}/{taskId}", method = {RequestMethod.GET})
+    public void listExchangeMapInfo(@PathVariable String taskType,@PathVariable Long taskId,PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
         
+        //做一个判断为了 前面 有的list就不要了
+        Map<String, Object> filterMap = new HashMap<String, Object>();
+        filterMap.put("task_Id", taskId);
+        List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
+        List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
+        for (ExchangeTaskdetail etd : exchangeTaskdetails) {
+            ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapinfoId());
+            if (null != exportSql) {
+                exportSql.setExportsqlOrder(etd.getMapinfoOrder());
+                exportSqlList.add(exportSql);
+            }
+        }
+        //为了 去除重复项
+        Map<String, Object> searchColumn = convertSearchColumn(request);
+        List<ExportSql> objList = exportSqlManager.listObjects(searchColumn, pageDesc);
+        for(ExportSql sql : exportSqlList ){
+            for(int i=0;i< objList.size();i++ ){
+                if(sql.getExportId() == objList.get(i).getExportId()){
+                    objList.remove(i);
+                }
+            }
+        }
         ResponseData resData = new ResponseData();
         resData.addResponseData(OBJLIST, objList);
         resData.addResponseData(PAGE_DESC, pageDesc);
-        resData.addResponseData("searchColumn", searchColumn);
-        resData.addResponseData("taskType", taskType);
-
-        if ("1".equals(taskType)) {
-//            return listExchangeMapinfo(filterMap, pageDesc);
-            JsonResultUtils.writeResponseDataAsJson(resData, response);
-            return;
-        }
-
-        if ("2".equals(taskType) || "4".equals(taskType)) {
-//            return listExportSql(filterMap, pageDesc);
-            JsonResultUtils.writeResponseDataAsJson(resData, response);
-            return;
-        }
-
-//        return null;
-        JsonResultUtils.writeBlankJson(response);
+        JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
 
     @RequestMapping(value="/listExchangeMapinfo", method = {RequestMethod.GET})
@@ -581,24 +539,45 @@ public class ExchangeTaskController extends BaseController {
     }
 
     @SuppressWarnings("unchecked")
-    @RequestMapping(value="/importExchangeMapinfo", method = {RequestMethod.GET})
-    public void importExchangeMapinfo(HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/importExchangeMapinfo/{exportIds}/{taskId}", method = {RequestMethod.PUT})
+    public void importExchangeMapinfo(@PathVariable String exportIds,@PathVariable Long taskId,HttpServletRequest request,HttpServletResponse response) {
 //        Map<String, String[]> paramMap = request.getParameterMap();
-        Map<String, Object> paramMap = convertSearchColumn(request);
-
-        String taskParamId = HtmlFormUtils.getParameterString(paramMap.get("taskId"));
-        Long taskId = Long.valueOf(taskParamId);
-        String[] str = (String[]) paramMap.get("ids");
-        Set<Long> ids = new HashSet<Long>();
-        for (String s : str) {
-            if (NumberUtils.isNumber(s)) {
-                ids.add(Long.parseLong(s));
+        
+        //MapinfoOrder的判定
+        Map<String, Object> filterMap = new HashMap<String, Object>();
+        filterMap.put("task_Id", taskId);
+        Long mapinfoOrder = (long) 0;
+        List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
+        if(exchangeTaskdetails.size() == 0){
+            mapinfoOrder = (long) 1;
+        }else if(exchangeTaskdetails.size() == 1){
+            mapinfoOrder = exchangeTaskdetails.get(0).getMapinfoOrder();
+        }else{
+            for(int i = 1;i<exchangeTaskdetails.size();i++){
+                 if(exchangeTaskdetails.get(i-1).getMapinfoOrder() <= exchangeTaskdetails.get(i).getMapinfoOrder()){
+                     mapinfoOrder = exchangeTaskdetails.get(i).getMapinfoOrder() + 1;
+                 }else{
+                     mapinfoOrder = exchangeTaskdetails.get(i-1).getMapinfoOrder() + 1;
+                 }
             }
         }
+        
+        
+        String[] str = exportIds.split(",");
+        for (String s : str) {
+            if (NumberUtils.isNumber(s)) {
+                ExchangeTaskdetail excTD = new ExchangeTaskdetail();
+                excTD.setMapinfoId(Long.parseLong(s));
+                excTD.setTaskId(taskId);
+                excTD.setMapinfoOrder(mapinfoOrder);
+                exchangeTaskdetailManager.saveNewObject(excTD);
+                mapinfoOrder =mapinfoOrder + 1;//mapinfoOrder自增长
+            }
+        }
+        
+//        exchangeTaskdetailManager.saveObject(taskId, new ArrayList<Long>(ids));
 
-        exchangeTaskdetailManager.saveObject(taskId, new ArrayList<Long>(ids));
-
-//        return "ImportExchangeMapinfo";
+//        return "ImportExchangeMapinfo"; 
         JsonResultUtils.writeSuccessJson(response);
     }
 
@@ -674,9 +653,11 @@ public class ExchangeTaskController extends BaseController {
 
     /* 生成日志记录 */
     private TaskLog generateTaskLog(List<Object> logs, String usercode, Long taskId) {
+        ExchangeTask task = exchangeTaskMag.getObjectById(taskId);
         TaskLog taskLog = new TaskLog();
+        taskLog.setTask(task);
         taskLog.setLogId(taskLogManager.getTaskLogId());
-        taskLog.setTaskId(taskId);
+        //askLog.getTaskId().setTaskId(taskId);
         taskLog.setRunBeginTime((Date) logs.get(0));
         taskLog.setRunEndTime((Date) logs.get(1));
         taskLog.setRunType("1");

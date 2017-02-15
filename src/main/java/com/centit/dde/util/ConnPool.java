@@ -18,7 +18,7 @@ public class ConnPool {
         dbc.setConnUrl(dbInfo.getDatabaseUrl());
         dbc.setUsername(dbInfo.getUsername());
         dbc.setPassword(dbInfo.getClearPassword());
-        return DbcpConnectPools.getDataSource(dbc);
+        return null;//DbcpConnectPools.getDataSource(dbc);
     }
 
     public static DbcpConnect getConn(DatabaseInfo dbInfo) throws SQLException {

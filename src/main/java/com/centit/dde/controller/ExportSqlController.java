@@ -59,7 +59,7 @@ public class ExportSqlController extends BaseController {
     protected StaticEnvironmentManager platformEnvironment;
 
 
-    @RequestMapping(value="/save/{{tabid}}/{{exportId}}",method = {RequestMethod.PUT})
+    @RequestMapping(value="/save/{tabid}/{exportId}",method = {RequestMethod.PUT})
     public void save(@PathVariable Long exportId,ExportSql object, HttpServletRequest request,HttpServletResponse response) {
 //        dwzResultParam = new DwzResultParam();
 //        dwzResultParam.setNavTabId(tabid);
@@ -120,14 +120,14 @@ public class ExportSqlController extends BaseController {
         JsonResultUtils.writeSuccessJson(response);
     }
 
-    @RequestMapping(value="/delete/{{exportId}}" ,method = {RequestMethod.DELETE})
+    @RequestMapping(value="/delete/{exportId}" ,method = {RequestMethod.DELETE})
     public void delete(@PathVariable Long exportId,HttpServletRequest request,HttpServletResponse response) {
         exportSqlMag.deleteObjectById(exportId);
 //        return "delete";
         JsonResultUtils.writeSuccessJson(response);
     }
 
-    @RequestMapping(value="/edit/{{exportId}}" ,method = {RequestMethod.PUT})
+    @RequestMapping(value="/edit/{exportId}" ,method = {RequestMethod.PUT})
     public void edit(ExportSql object,@PathVariable Long exportId,HttpServletRequest request,HttpServletResponse response) {
 //        ExportSql exportSql = exportSqlMag.getObjectById(object.getExportId());
         ExportSql exportSql = exportSqlMag.getObjectById(object.getExportId());
