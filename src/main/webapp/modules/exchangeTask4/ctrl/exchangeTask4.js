@@ -10,6 +10,7 @@ define(function(require) {
     var ExchangeTask4Add = require('./exchangeTask4.add');
     var ExchangeTask4Edit = require('./exchangeTask4.edit');
     var ExchangeTask4Remove = require('./exchangeTask4.remove');
+    var ExchangeTask4Run = require('./exchangeTask4.run');
 
     // 业务信息
     var ExchangeTask4 = Page.extend(function() {
@@ -19,7 +20,8 @@ define(function(require) {
     	this.injecte([
           new ExchangeTask4Add('exchangeTask4_add'),
           new ExchangeTask4Edit('exchangeTask4_edit'),
-          new ExchangeTask4Remove('exchangeTask4_remove')
+          new ExchangeTask4Remove('exchangeTask4_remove'),
+          new ExchangeTask4Run('exchangeTask4_transfer_run')
     	]);
     	
     	// @override

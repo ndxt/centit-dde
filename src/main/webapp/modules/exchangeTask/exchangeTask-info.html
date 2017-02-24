@@ -1,87 +1,19 @@
-<div class="easyui-layout" id="databaseInfo_panel" fit="ture">
+<div class="form centit">
 	<form class="centit form" novalidate="true">
-	
-	
-	       	<div class="field required">
-	       		<label>任务名称</label>
-	       		<input type="text" class="easyui-textbox" name="taskName"
-					required
-				/>
-			</div>
-	       	
-	       	<div class="field required">
-	       		<label>任务执行定时器</label>
-	       		<input type="text" class="easyui-textbox" name="taskCron"
-					required 
-				/>
-			</div>
-	       	
-	   		<div class="field ">
-	       		<label>任务描述</label>
-	       		<input type="text" class="easyui-textbox" 
-	       		name="taskDesc" />
-			</div>
-	    	
-	   		<div class="field ">
-	       		<label>上次执行时间</label>
-	       		<input type="text" class="easyui-textbox" 
-	       		name="lastRunTime" />
-			</div>
-			
-			<div class="field ">
-	       		<label>下次执行时间</label>
-	       		<input type="text" class="easyui-textbox" 
-	       		name="lastRunTime" />
-			</div>
-			
-			<div class="field ">
-	       		<label>是否启用</label>
-	       		<input type="text" class="easyui-textbox" 
-	       		name=isvalid />
-	       		<!-- 单选 -->
-			</div>
 
-	   		<div class="field ">
-	       		<label>创建时间</label>
-	       		<input type="text" class="easyui-textbox" 
-	       		name="createTime" />
+		<input name="taskType" value="1	" type="hidden" />
+		<input name="isvalid"  value="1" type="hidden" />
+		<div class="fields two">
+			<div class="field required">
+				<label>任务名称</label> <input type="text" class="easyui-textbox"
+					name="taskName" maxlength="4" required />
 			</div>
-			
+		</div>
+		<div class="fields two">
 			<div class="field ">
-	       		<label>创建人员</label>
-	       		<input type="text" class="easyui-textbox" 
-	       		name="createdName" />
+				<label>描述</label> <input type="text" class="easyui-textbox"
+					name="taskDesc" />
 			</div>
-			
-			
-		<table  id="table_userCodes"
-			idField="id"
-			checkbox="true" 
-			search=".search"
-			sortName="nameCommon" sortOrder="desc"
-			url="service/exchangetask/list"
-			toolbar=".temp-toolbar" 
-			layoutH=".search" 
-			treeField="text"
-			singleSelect="true"
-			checkOnSelect="true"
-			selectOnCheck="true"
-			>
-			<thead>
-				<tr>
-					<th data-options="field:'' " checkbox="true" ></th> 
-					<th data-options="field:'taskName'" style="width: 10%">任务名称</th>
-					<th data-options="field:'taskDesc'" style="width: 10%">任务描述</th>
-					<th data-options="field:'taskCron'" style="width: 10%">任务执行定时器</th>
-					<th data-options="field:'lastRunTime'" style="width: 10%">上次执行时间</th>
-					<th data-options="field:'nextRunTime'" style="width: 15%">下次执行时间</th>
-					<th data-options="field:'createTime'" style="width: 10%">创建时间</th>
-					<th data-options="field:'createdName'" style="width: 10%">创建人员</th>
-					<th data-options="field:'isvalid'" style="width: 10%">是否停用</th>
-				</tr>
-			</thead>
-		</table>
-	    	
-	    	
+		</div>
 	</form>
 </div>
