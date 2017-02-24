@@ -4,12 +4,11 @@ define(function(require) {
 	var Page = require('core/page');
 	
 	// 删除数据字典
-	var exchangeTaskRemove = Page.extend(function() {
+	var ExchangeTaskRemove = Page.extend(function() {
 		
 		// @override
 		this.submit = function(table, data) {
-			Core.ajax(Config.ContextPath+'service/flow/optprocinfo/'+data.cid, {
-            	type: 'json',
+			Core.ajax(Config.ContextPath+'service/exchangetask/delete/'+data.taskId, {
                 method: 'post',
                 data: {
                     _method: 'delete'
@@ -20,5 +19,5 @@ define(function(require) {
 		}
 	});
 	
-	return exchangeTaskRemove;
+	return ExchangeTaskRemove;
 });

@@ -3,7 +3,7 @@ define(function(require) {
 	var Config = require('config');
 	var Page = require('core/page');
 	
-	var ExchangeTask = Page.extend(function() {
+	var ExchangeTaskAdd = Page.extend(function() {
 		
 		// @override
 		// 加载页面时调用
@@ -26,8 +26,8 @@ define(function(require) {
 			
 			if (isValid) {
 				form.form('ajax', {
-					url: Config.ContextPath + 'service/flow/optprocinfo',
-					method: 'post'
+					url: Config.ContextPath + 'service/exchangetask/save',
+					method: 'put'
 				}).then(closeCallback);
 			}
 			
@@ -41,5 +41,5 @@ define(function(require) {
 		};
 	});
 	
-	return ExchangeTask;
+	return ExchangeTaskAdd;
 });

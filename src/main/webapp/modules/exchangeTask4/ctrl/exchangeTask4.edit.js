@@ -6,6 +6,7 @@ define(function(require) {
 	var ExchangeTask4ExchangeMapinfoAdd = require('../ctrl/exchangeTask4.ExchangeMapinfo.add');
 	var ExchangeTask4exportSqlEdit = require('../ctrl/exchangeTask4.exportSql.edit');
 	var ExchangeTask4ExchangeTaskdetailIdRemove = require('../ctrl/exchangeTask4.ExchangeTaskdetailId.remove');
+	var ExchangeTask4Run = require('../ctrl/exchangeTask4.run');
 
 	var ExchangeTask4Edit = ExchangeTask4Add.extend(function() {
 		var _self = this;
@@ -14,6 +15,7 @@ define(function(require) {
 		  			new ExchangeTask4ExchangeMapinfoAdd('exchangeTask4_ExchangeMapinfo_add'),
 		  			new ExchangeTask4exportSqlEdit('exchangeTask4_exportSql_edit'),
 		  			new ExchangeTask4ExchangeTaskdetailIdRemove('exchangeTask4_ExchangeTaskdetailId_remove'),
+		  			new ExchangeTask4Run('exchangeTask4_transfer_run'),
 		  		]);
 		
 		
@@ -47,7 +49,6 @@ define(function(require) {
 					editable: true,
 					data:data.exportSqlList
 				});
-				table.datagrid('reload');
 			});
 		};
 		
@@ -74,9 +75,8 @@ define(function(require) {
 		};
 		
 		// @override
-		this.onClose = function(table) {
+		this.onClose = function(table,panel) {
 			table.datagrid('reload');
-			table.parent.datagrid('reload');
 		};
 	});
 

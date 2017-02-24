@@ -3,22 +3,19 @@ define(function(require) {
 	var Core = require('core/core');
 	var Page = require('core/page');
 	
-	// 删除数据字典
-	var exchangeTaskDo = Page.extend(function() {
+	var ExchangeTask4Run = Page.extend(function() {
+		
+		var _self = this;
 		
 		// @override
 		this.submit = function(table, data) {
-			Core.ajax(Config.ContextPath+'service/flow/optprocinfo/'+data.cid, {
-            	type: 'json',
+			Core.ajax(Config.ContextPath+'service/transfer/doTransfer/'+data.taskId, {
                 method: 'post',
-                data: {
-                    _method: 'delete'
-                }
 			}).then(function() {
 				table.datagrid('reload');
             });
-		}
+		};
 	});
 	
-	return exchangeTaskDo;
+	return ExchangeTask4Run;
 });

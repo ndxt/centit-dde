@@ -1,7 +1,6 @@
 package com.centit.dde.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.WebUtils;
 
-import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportSql;
@@ -52,7 +50,6 @@ public class ExportSqlController extends BaseController {
     private static final long serialVersionUID = 1L;
 
     @Resource
-
     private ExportSqlManager exportSqlMag;
 
     @Resource

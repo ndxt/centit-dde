@@ -275,22 +275,36 @@ public class ExchangeTaskController extends BaseController {
         try {
             ExchangeTask exchangeTask = exchangeTaskMag.getObjectById(taskId);
             
+            String taskType = exchangeTask.getTaskType();
+            
             Map<String, Object> filterMap = new HashMap<String, Object>();
             filterMap.put("task_Id", taskId);
             // filterMap.put("order by", "mapinfo_order");
             List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
             
             List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
-
-            for (ExchangeTaskdetail etd : exchangeTaskdetails) {
-                ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapinfoId());
-                if (null != exportSql) {
-                    exportSql.setExportsqlOrder(etd.getMapinfoOrder());
-                    exportSqlList.add(exportSql);
-                }
-            }
             
-            exchangeTask.setExportSqlList(exportSqlList);
+            List<ExchangeMapinfo> exchangeMapinfoList = new ArrayList<ExchangeMapinfo>();
+            
+            if(taskType.equals("1")){
+                for (ExchangeTaskdetail etd : exchangeTaskdetails) {
+                    ExchangeMapinfo exchangeMapinfo = exchangeMapinfoManager.getObjectById(etd.getMapinfoId());
+                    if (null != exchangeMapinfo) {
+                        exchangeMapinfo.setMapinfoOrder(etd.getMapinfoOrder());
+                        exchangeMapinfoList.add(exchangeMapinfo);
+                    }
+                }
+                exchangeTask.setExchangeMapinfoList(exchangeMapinfoList);
+            }else{
+                for (ExchangeTaskdetail etd : exchangeTaskdetails) {
+                    ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapinfoId());
+                    if (null != exportSql) {
+                        exportSql.setExportsqlOrder(etd.getMapinfoOrder());
+                        exportSqlList.add(exportSql);
+                    }
+                }
+                exchangeTask.setExportSqlList(exportSqlList);
+            }
             
             UserInfo usesInfo = (UserInfo)CodeRepositoryUtil.getUserInfoByCode(exchangeTask.getCreated());
             if (usesInfo != null){
@@ -492,6 +506,38 @@ public class ExchangeTaskController extends BaseController {
         resData.addResponseData(PAGE_DESC, pageDesc);
         JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
+    
+    @RequestMapping(value="/ExchangeMapInfolist/{taskType}/{taskId}", method = {RequestMethod.GET})
+    public void ExchangeMapInfolist(@PathVariable String taskType,@PathVariable Long taskId,PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
+        
+        //做一个判断为了 前面 有的list就不要了
+        Map<String, Object> filterMap = new HashMap<String, Object>();
+        filterMap.put("task_Id", taskId);
+        List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
+        List<ExchangeMapinfo> exchangeMapinfoList = new ArrayList<ExchangeMapinfo>();
+        List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
+        for (ExchangeTaskdetail etd : exchangeTaskdetails) {
+            ExchangeMapinfo exchangeMapinfo = exchangeMapinfoManager.getObjectById(etd.getMapinfoId());
+            if (null != exchangeMapinfo) {
+                exchangeMapinfo.setMapinfoOrder(etd.getMapinfoOrder());
+                exchangeMapinfoList.add(exchangeMapinfo);
+            }
+        }
+        //为了 去除重复项
+        Map<String, Object> searchColumn = convertSearchColumn(request);
+        List<ExchangeMapinfo> objList = exchangeMapinfoManager.listObjects(searchColumn, pageDesc);
+        for(ExchangeMapinfo map : exchangeMapinfoList ){
+            for(int i=0;i< objList.size();i++ ){
+                if(map.getMapinfoId() == objList.get(i).getMapinfoId()){
+                    objList.remove(i);
+                }
+            }
+        }
+        ResponseData resData = new ResponseData();
+        resData.addResponseData(OBJLIST, objList);
+        resData.addResponseData(PAGE_DESC, pageDesc);
+        JsonResultUtils.writeResponseDataAsJson(resData, response);
+    }
 
     @RequestMapping(value="/listExchangeMapinfo", method = {RequestMethod.GET})
     private void listExchangeMapinfo(Map<String, Object> filterMap, PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
@@ -539,8 +585,8 @@ public class ExchangeTaskController extends BaseController {
     }
 
     @SuppressWarnings("unchecked")
-    @RequestMapping(value="/importExchangeMapinfo/{exportIds}/{taskId}", method = {RequestMethod.PUT})
-    public void importExchangeMapinfo(@PathVariable String exportIds,@PathVariable Long taskId,HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/importExchangeMapinfo/{ExchangeIds}/{taskId}", method = {RequestMethod.PUT})
+    public void importExchangeMapinfo(@PathVariable String ExchangeIds,@PathVariable Long taskId,HttpServletRequest request,HttpServletResponse response) {
 //        Map<String, String[]> paramMap = request.getParameterMap();
         
         //MapinfoOrder的判定
@@ -563,7 +609,7 @@ public class ExchangeTaskController extends BaseController {
         }
         
         
-        String[] str = exportIds.split(",");
+        String[] str = ExchangeIds.split(",");
         for (String s : str) {
             if (NumberUtils.isNumber(s)) {
                 ExchangeTaskdetail excTD = new ExchangeTaskdetail();

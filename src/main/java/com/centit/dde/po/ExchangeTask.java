@@ -83,6 +83,17 @@ public class ExchangeTask implements java.io.Serializable {
     @Transient
     private List<ExportSql> exportSqlList = null;
     
+    @Transient
+    private List<ExchangeMapinfo> exchangeMapinfoList = null;
+    
+    public List<ExchangeMapinfo> getExchangeMapinfoList() {
+        return exchangeMapinfoList;
+    }
+
+    public void setExchangeMapinfoList(List<ExchangeMapinfo> exchangeMapinfoList) {
+        this.exchangeMapinfoList = exchangeMapinfoList;
+    }
+
     public List<ExportSql> getExportSqlList() {
         return exportSqlList;
     }

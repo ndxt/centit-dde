@@ -1,38 +1,34 @@
-<div class="easyui-layout" id="databaseInfo_panel" fit="ture">
+<div class="easyui-layout" id="ExchangeTask_panel" fit="ture">
 	<div class="easyui-panel search-body" cls="search">
-	    <form>
+	    <form method ="post">
 	        <div class="search-item">
 	            <label>任务名称</label> 
-	            <input type="text" class="easyui-textbox" name="s_taskName" id="s_nameCommon" prompt="任务名称" />
+	            <input type="text" class="easyui-textbox" name="s_taskName" id="s_taskName" prompt="任务名称" />
 	        </div>
-	        <a class="easyui-linkbutton btn-search" iconCls="icon-search">查询</a>
+	        <div class="search-item">
+	            <label>包含禁用</label> 
+	            <input type="checkbox" name="s_isvalid" id="s_isvalid" value="0"/>
+	        </div>
+	        <a class="easyui-linkbutton btn-search" iconCls="icon-search">检索</a>
 	    </form>
 	</div>
 	
 	<div class="temp-toolbar">
-		<a iconCls="icon-add" href="modules/exchangeTask/ctrl/exchangeTask-info.html" trigger="none"
-			target="dialog" rel="exchangeTask_add" title="添加直接交换任务" width="640" height="480" btnValue="添加直接交换任务">添加直接交换任务</a>
+		<a iconCls="icon-add" href="modules/exchangeTask/exchangeTask-info.html" trigger="none"
+			target="dialog" rel="exchangeTask_add" title="添加" width="340" height="280" btnValue="添加">添加</a>
 		<hr>
-		<a iconCls="icon-edit" href="modules/exchangeTask/ctrl/exchangeTask-info.html" trigger="single"
-			target="dialog" rel="exchangeTask_edit" title="编辑交换任务" width="640" height="480" btnValue="编辑交换任务">编辑</a>
-		<hr>
-		<a iconCls="icon-edit" trigger="single"
-			target="confirm" rel="exchangeTask_view" title="查看交换任务">查看</a>
-		<hr>
-		<a iconCls="icon-edit" trigger="single"
-			target="confirm" rel="exchangeTask_do" title="查看交换任务">执行</a>
+		<a iconCls="icon-edit" href="modules/exchangeTask/exchangeTask-edit.html" trigger="single"
+			target="dialog" rel="exchangeTask_edit" title="编辑" width="640" height="480" btnValue="编辑">编辑</a>
 		<hr>
 		<a iconCls="icon-base icon-base-ban" trigger="single"
-		target="confirm" rel="exchangeTask_remove" title="是否确定删除 ？">删除</a>
+			target="confirm" rel="exchangeTask_remove" title="删除">删除</a>
 	</div>
-	
-	<form class="form centit">
-		<table  id="table_userCodes"
-			idField="id"
+		<table  id="table_taskId"
+			idField="taskId"
 			checkbox="true" 
 			search=".search"
-			sortName="nameCommon" sortOrder="desc"
-			url="service/exchangetask/list"
+			sortName="taskId" sortOrder="desc"
+			url="service/exchangetask/list/1"
 			toolbar=".temp-toolbar" 
 			layoutH=".search" 
 			treeField="text"
@@ -42,20 +38,16 @@
 			>
 			<thead>
 				<tr>
-					<th data-options="field:'' " checkbox="true" ></th> 
-					<th data-options="field:'taskName'" style="width: 10%">任务名称</th>
-					<th data-options="field:'taskDesc'" style="width: 10%">任务描述</th>
-					<th data-options="field:'taskCron'" style="width: 10%">任务执行定时器</th>
+					<th data-options="field:'taskId'" hidden></th>
+					<th data-options="field:'taskName'" style="width: 15%">任务名称</th>
+					<th data-options="field:'taskCron'" style="width: 15%">任务定时器</th>
+					<th data-options="field:'taskDesc'" style="width: 15%">任务描述</th>
 					<th data-options="field:'lastRunTime'" style="width: 10%">上次执行时间</th>
-					<th data-options="field:'nextRunTime'" style="width: 15%">下次执行时间</th>
-					<th data-options="field:'createTime'" style="width: 10%">创建时间</th>
+					<th data-options="field:'createTime'" style="width: 15%">创建时间</th>
 					<th data-options="field:'createdName'" style="width: 10%">创建人员</th>
-					<th data-options="field:'isvalid'" style="width: 10%">是否停用</th>
 				</tr>
 			</thead>
 		</table>
-		<div class="temp-toolbar"></div>
-	</form>
 </div>
 
 <script>

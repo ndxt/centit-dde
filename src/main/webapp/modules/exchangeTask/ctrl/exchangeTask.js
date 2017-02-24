@@ -10,9 +10,6 @@ define(function(require) {
     var ExchangeTaskAdd = require('./exchangeTask.add');
     var ExchangeTaskEdit = require('./exchangeTask.edit');
     var ExchangeTaskRemove = require('./exchangeTask.remove');
-    var ExchangeTaskView = require('./exchangeTask.view');
-    var ExchangeTaskDo = require('./exchangeTask.do');
-    
 
     // 业务信息
     var ExchangeTask = Page.extend(function() {
@@ -22,9 +19,7 @@ define(function(require) {
     	this.injecte([
           new ExchangeTaskAdd('exchangeTask_add'),
           new ExchangeTaskEdit('exchangeTask_edit'),
-          new ExchangeTaskRemove('exchangeTask_remove'),
-          new ExchangeTaskView('exchangeTask_view'),
-          new ExchangeTaskDo('exchangeTask_do')
+          new ExchangeTaskRemove('exchangeTask_remove')
     	]);
     	
     	// @override

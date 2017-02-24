@@ -8,7 +8,7 @@ define(function(require) {
 	var ExchangeTask4ExchangeTaskdetailIdRemove = Page.extend(function() {
 		var _self = this;
 		// @override
-		this.submit = function(table, data,panel) {
+		this.submit = function(panel, data) {
 			var exportId = data.exportId;
 			data = _self.parent.data;
 			var taskId = data.taskId;
@@ -19,7 +19,20 @@ define(function(require) {
                     _method: 'delete'
                 }
 			}).then(function() {
-				table.datagrid('reload');
+				Core.ajax(Config.ContextPath+'service/exchangetask/edit/'+taskId, {
+					method: 'get',
+					data: {
+	                    _method: 'get'
+	                }
+				}).then(function(data2) {
+					$("#dg4 tbody").html("");
+					var tab1table = panel.find('table.tab1');
+					tab1table.cdatagrid({
+						controller:_self,
+						editable: true,
+						data:data2.exportSqlList
+					});
+				});
             });
 		}
 	});

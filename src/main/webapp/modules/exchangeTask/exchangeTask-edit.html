@@ -8,8 +8,8 @@
 		<div class="field">
 			<div class="field">
 				<label>任务执行定时器：</label>
-				<input type="text" class="easyui-textbox" id="taskCron2" name="taskCron"/>
-				<a rel="exchangeTask2_ExchangeMapinfo_edit_conAdd" class="easyui-linkbutton" data-options="iconCls:'icon-add'" 
+				<input type="text" class="easyui-textbox" id="taskCron" name="taskCron"/>
+				<a rel="exchangeTask_ExchangeMapinfo_edit_conAdd" class="easyui-linkbutton" data-options="iconCls:'icon-add'" 
 				 width="440" height="580" onclick="addCon()">Add</a>
 			</div>
 		</div>
@@ -44,22 +44,25 @@
 					>
 					<thead>
 						<tr>
-							<th data-options="field:'exportId'" hidden></th>
-							<th data-options="field:'exportName'" style="width: 25%">调用接口名称</th>
-							<th data-options="field:'sourceDatabaseName'" style="width: 25%">源数据库名</th>
-							<th data-options="field:'exportDesc'" style="width: 35%">调用接口说明</th>
+							<th data-options="field:'mapinfoId'" hidden></th>
+							<th data-options="field:'mapinfoName'" style="width: 15%">直接交换名称</th>
+							<th data-options="field:'sourceDatabaseName'" style="width: 15%">源数据库名</th>
+							<th data-options="field:'destDatabaseName'" style="width: 15%">目标数据库名</th>
+							<th data-options="field:'destTablename'" style="width: 15%">目标表名</th>
+							<th data-options="field:'isRepeat'" style="width: 10%">是否重复执行</th>
+							<th data-options="field:'mapinfoDesc'" style="width: 15%">直接交换说明</th>
 						</tr>
 					</thead>
 			</table>
 	</div>
 		<div class="tab1-toolbar">
-				<a rel="exchangeTask2_ExchangeMapinfo_add" href="modules/exchangeTask2/exchangeTask2-exchangeMapinfo-add.html" iconCls="icon-add"
+				<a rel="exchangeTask_ExchangeMapinfo_add" href="modules/exchangeTask/exchangeTask-exchangeMapinfo-add.html" iconCls="icon-add"
 				   target="dialog" trigger="none" width="740" height="380" title="添加调用接口对应关系" ><p>添加调用接口对应关系</p></a>
 				<hr>
-				<a rel="exchangeTask2_exportSql_edit" iconCls="icon-edit"
+				<a rel="exchangeTask_exportSql_edit" iconCls="icon-edit"
 				   target="custom" trigger="none" title="编辑"  ><p>编辑</p></a>
 				<hr>
-				<a rel="exchangeTask2_ExchangeTaskdetailId_remove" iconCls="icon-base icon-base-rubbish "
+				<a rel="exchangeTask_ExchangeTaskdetailId_remove" iconCls="icon-base icon-base-rubbish "
 				   target="custom" trigger="single" ><p>删除</p></a>
 		</div>
 </div>
@@ -67,7 +70,7 @@
 <!-- addCon dailog -->
 
 <div style="display: none;">
-	<div id="dlgaddCon2" class="easyui-dialog"  style="width: 560px; height: 360px;" closed="true" buttons="#dlgaddCon2-buttons">
+	<div id="dlgaddCon" class="easyui-dialog"  style="width: 560px; height: 360px;" closed="true" buttons="#dlgaddCon-buttons">
        	<div class="easyui-tabs" style="width:98%;height:200px;padding-left:6px;" >
 			<div title="按分钟" style="padding:5px;background-color:#E0ECFF">
 				 <div>
@@ -214,13 +217,13 @@
 	                <input id="chk_first_run_minute" type="checkbox"/><select class="easyui-combobox" name="state" style="width:40px;"></select>分
                 </span>
                 <!-- <c:set var="defaultCron" value="0 0 0 ? * ?"/> -->
-                <div style="padding:5px;">CRON表达式： <input class="easyui-textbox" value="0 0 0 ? * ?" style="width: 200px" id="txt_cron2"/></div>
+                <div style="padding:5px;">CRON表达式： <input class="easyui-textbox" value="0 0 0 ? * ?" style="width: 200px" id="txt_cron"/></div>
             </div>
         </div>
 		</div>
 	</div>
        	
-<div id="dlgaddCon2-buttons">
+<div id="dlgaddCon-buttons">
 	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="getCron();" iconcls="icon-edit" >生成表达式</a>
    	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="saveCron();" iconcls="icon-save" >保存</a>
 </div> 
