@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.po.MapinfoDetail;
 import com.centit.dde.po.MapinfoDetailId;
+import com.centit.dde.po.MapinfoTrigger;
 import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
@@ -45,9 +46,9 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId>
         if (filterField == null) {
             filterField = new HashMap<String, String>();
 
-            filterField.put("mapinfoId", CodeBook.EQUAL_HQL_ID);
+            filterField.put("cid.mapinfoId", CodeBook.EQUAL_HQL_ID);
 
-            filterField.put("columnNo", CodeBook.EQUAL_HQL_ID);
+            filterField.put("cid.columnNo", CodeBook.EQUAL_HQL_ID);
 
             filterField.put("orderNo", CodeBook.LIKE_HQL_ID);
 
@@ -71,6 +72,14 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId>
         return filterField;
     }
 
+    public List<MapinfoDetail> listByMapinfoId(Long mapinfoId) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("from MapinfoDetail t where  t.cid.mapinfoId=");
+        sql.append(mapinfoId);
+        sql.append(" order by t.cid.columnNo ");
+        return listObjects(sql.toString());
+    }
+    
     /**
      * @param
      * @return 查询数据库中的所有表

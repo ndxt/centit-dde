@@ -32,6 +32,7 @@ define(function(require) {
 		// @override
 		this.submit = function(panel, data,closeCallback) {
 			data = _self.parent.data;
+			var panelParent = _self.parent.panel;
 			var taskId = data.taskId;
 			var table = panel.find('#dg2');
 			var row = table.datagrid('getSelections');
@@ -48,6 +49,15 @@ define(function(require) {
 			Core.ajax(Config.ContextPath + 'service/exchangetask/importExchangeMapinfo/' + exportIds+'/'+taskId, {
 				method: 'put'
 			}).then(function() {
+				Core.ajax(Config.ContextPath+'service/exchangetask/edit/'+taskId, {
+					method: 'get',
+					data: {
+	                    _method: 'get'
+	                }
+				}).then(function(data2) {
+					var tableparent = panelParent.find('#dlgList2');
+					tableparent.datagrid('loadData',data2.exportSqlList);
+				});
 				closeCallback();
 			});
 			return false;

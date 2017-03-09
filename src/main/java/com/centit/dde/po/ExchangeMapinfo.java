@@ -53,12 +53,10 @@ public class ExchangeMapinfo implements java.io.Serializable {
     @Transient
     private Long mapinfoOrder;
 
-    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="MAPINFO_ID") //这里表示数据库的外键 在t_street里面创建
+    @Transient
     private List<MapinfoDetail> mapinfoDetails = null;
 
-    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="MAPINFO_ID") //这里表示数据库的外键 在t_street里面创建
+    @Transient
     private List<MapinfoTrigger> mapinfoTriggers = null;
 
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)

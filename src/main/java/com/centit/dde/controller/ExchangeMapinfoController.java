@@ -16,8 +16,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.centit.dde.po.ExchangeMapinfo;
+import com.centit.dde.po.ExchangeTask;
+import com.centit.dde.po.ExchangeTaskdetail;
+import com.centit.dde.po.MapinfoDetail;
+import com.centit.dde.po.MapinfoDetailId;
+import com.centit.dde.po.MapinfoTrigger;
 import com.centit.dde.service.ExchangeMapinfoManager;
 import com.centit.dde.service.ExchangeTaskdetailManager;
+import com.centit.dde.service.MapinfoDetailManager;
+import com.centit.dde.service.MapinfoTriggerManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
@@ -36,12 +43,16 @@ public class ExchangeMapinfoController extends BaseController {
     private static final long serialVersionUID = 1L;
     
     @Resource
-
     private ExchangeMapinfoManager exchangeMapinfoMag;
+    
     @Resource
-
     private ExchangeTaskdetailManager exchangeTaskdetailManager;
-
+    
+    @Resource
+    private MapinfoTriggerManager mapinfoTriggerManager;
+    
+    @Resource
+    private MapinfoDetailManager mapinfoDetailManager;
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value="/list" ,method = {RequestMethod.GET})
@@ -86,8 +97,6 @@ public class ExchangeMapinfoController extends BaseController {
                     exchangeMapinfoMag.clearObjectProperties(object);
             }
             List<String> DatabaseNames = exchangeMapinfoMag.listDatabaseName();
-            /*ServletActionContext.getContext().put("DatabaseNames", DatabaseNames);
-            return "add";*/
             JsonResultUtils.writeSingleDataJson(DatabaseNames, response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,25 +104,20 @@ public class ExchangeMapinfoController extends BaseController {
         }
     }
 
-    @RequestMapping(value="/edit/{{mapinfoId}}",method = {RequestMethod.PUT})
-    public void edit(@PathVariable Long mapinfoId,ExchangeMapinfo object, HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/edit/{mapinfoId}",method = {RequestMethod.GET})
+    public void edit(@PathVariable Long mapinfoId, HttpServletRequest request,HttpServletResponse response) {
         try {
-            if (object == null) {
-//                object = getEntityClass().newInstance();
-                JsonResultUtils.writeBlankJson(response);
-                return;
-            } else {
-                ExchangeMapinfo o = exchangeMapinfoMag.getObjectById(mapinfoId);
-                if (o != null)
-                    // 将对象o copy给object，object自己的属性会保留
-                    exchangeMapinfoMag.copyObject(object, o);
-                else
-                    exchangeMapinfoMag.clearObjectProperties(object);
-            }
-            List<String> DatabaseNames = exchangeMapinfoMag.listDatabaseName();
-            /*ServletActionContext.getContext().put("DatabaseNames", DatabaseNames);
-            return EDIT;*/
-            JsonResultUtils.writeSingleDataJson(DatabaseNames, response);
+            ExchangeMapinfo object = exchangeMapinfoMag.getObjectById(mapinfoId);
+//             Map<String, Object> filterMap = convertSearchColumn(request);
+//            filterMap.put("mapinfoId", mapinfoId);
+            List<MapinfoDetail> mapinfoDetails = mapinfoDetailManager.listByMapinfoId(mapinfoId);
+            
+            List<MapinfoTrigger> mapinfoTriggers = mapinfoTriggerManager.listTrigger(mapinfoId);
+            
+            object.setMapinfoDetails(mapinfoDetails);
+            object.setMapinfoTriggers(mapinfoTriggers);
+            
+            JsonResultUtils.writeSingleDataJson(object, response);
         } catch (Exception e) {
             e.printStackTrace();
 //            return ERROR;
@@ -121,22 +125,31 @@ public class ExchangeMapinfoController extends BaseController {
         }
     }
 
-    @RequestMapping(value="/save/{{mapinfoId}}" ,method = {RequestMethod.PUT})
+    @SuppressWarnings("null")
+    @RequestMapping(value="/save/{mapinfoId}" ,method = {RequestMethod.PUT})
     public void save(@PathVariable Long mapinfoId,ExchangeMapinfo object, HttpServletRequest request,HttpServletResponse response) {
         try {
+            
+            //先删除 再一个个的塞值list
+            mapinfoDetailManager.deleteMapinfoDetails(mapinfoId);
+            MapinfoDetailId cid  = new MapinfoDetailId();
+            cid.setMapinfoId(mapinfoId);
+            List<MapinfoDetail> mapinfoDetails = object.getMapinfoDetails();
+            for(int i=0;i<mapinfoDetails.size();i++){
+                MapinfoDetail mp = mapinfoDetails.get(i);
+                    cid.setColumnNo(Long.valueOf(i));
+                    mp.setCid(cid);
+                    mapinfoDetailManager.saveNewObject(mp);
+            }
             ExchangeMapinfo dbObject = exchangeMapinfoMag.getObjectById(mapinfoId);
             if (dbObject != null) {
                 exchangeMapinfoMag.copyObjectNotNullProperty(dbObject, object);
                 object = dbObject;
             }
             exchangeMapinfoMag.saveObject(object);
-//            savedMessage();
-//            return SUCCESS;
             JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-//            saveError(e.getMessage());
-//            return ERROR;
             JsonResultUtils.writeErrorMessageJson("error", response);
         }
     }

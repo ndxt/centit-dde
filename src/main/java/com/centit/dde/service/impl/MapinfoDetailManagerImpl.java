@@ -33,6 +33,11 @@ public class MapinfoDetailManagerImpl extends BaseEntityManagerImpl<MapinfoDetai
         setBaseDao(this.mapinfoDetailDao);
     }
 
+    
+    public List<MapinfoDetail> listByMapinfoId(Long mapinfoId) {
+        return mapinfoDetailDao.listByMapinfoId(mapinfoId);
+    }
+    
     public List<Map<String, String>> getGoalTableStruct(DatabaseInfo DatabaseInfo, String tableName) {
         return mapinfoDetailDao.getGoalTableStruct(DatabaseInfo, tableName);
     }

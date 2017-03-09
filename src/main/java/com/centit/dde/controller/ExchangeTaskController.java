@@ -221,9 +221,9 @@ public class ExchangeTaskController extends BaseController {
                 taskCron = true;
             }
             if (dbObject != null) {
-               // exchangeTaskMag.copyObjectNotNullProperty(dbObject, object);
-                BeanUtils.copyProperties(object, dbObject, new String[] { "taskLogs" });
-                dbObject.addAll(object.getTaskLogs());
+               exchangeTaskMag.copyObjectNotNullProperty(dbObject, object);
+//                BeanUtils.copyProperties(object, dbObject, new String[] { "taskLogs" });
+//                dbObject.addAll(object.getTaskLogs());
             }
             //更新下次执行时间
             if (dbObject.getTaskCron() != null) {
@@ -434,6 +434,21 @@ public class ExchangeTaskController extends BaseController {
     public void delete(@PathVariable Long taskId,ExchangeTask object,HttpServletRequest request,HttpServletResponse response) {
         ExchangeTask exchangeTask = exchangeTaskMag.getObjectById(taskId);
         try {
+            Map<String, Object> filterMap = new HashMap<String, Object>();
+            filterMap.put("task_Id", taskId);
+            List<TaskLog> TaskLogList = taskLogManager.listObjects(filterMap);
+            taskLogManager.deleteObjectById(taskId);
+            if(TaskLogList!=null){
+                for(TaskLog o : TaskLogList){
+                    taskLogManager.deleteObject(o);
+                }
+            }
+            List<ExchangeTaskdetail> exchangeTaskdetailList =exchangeTaskdetailManager.listObjects(filterMap);
+            if(exchangeTaskdetailList !=null){
+                for(ExchangeTaskdetail o : exchangeTaskdetailList){
+                    exchangeTaskdetailManager.deleteObject(o);
+                }
+            }
             exchangeTaskMag.delTimerTask(exchangeTask);
             exchangeTaskMag.deleteObjectById(taskId);
 //            deletedMessage();
@@ -701,7 +716,8 @@ public class ExchangeTaskController extends BaseController {
     private TaskLog generateTaskLog(List<Object> logs, String usercode, Long taskId) {
         ExchangeTask task = exchangeTaskMag.getObjectById(taskId);
         TaskLog taskLog = new TaskLog();
-        taskLog.setTask(task);
+//        taskLog.setTask(task);
+        taskLog.setTaskId(taskId);
         taskLog.setLogId(taskLogManager.getTaskLogId());
         //askLog.getTaskId().setTaskId(taskId);
         taskLog.setRunBeginTime((Date) logs.get(0));

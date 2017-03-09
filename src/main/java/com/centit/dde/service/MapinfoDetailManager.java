@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 
+
 import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.po.MapinfoDetail;
 import com.centit.dde.po.MapinfoDetailId;
@@ -34,4 +35,7 @@ public interface MapinfoDetailManager extends BaseEntityManager<MapinfoDetail,Ma
     public List<String> getGoalColumnStrut(Long mapinfoId);
 
     public void saveMapinfoDetails(MapinfoDetail mapinfoDetail);
+    
+    public List<MapinfoDetail> listByMapinfoId(Long mapinfoId);
+    
 }

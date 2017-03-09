@@ -11,10 +11,10 @@
 	
 	<div class="temp-toolbar">
 		<a iconCls="icon-add" href="modules/exchangeMapinfoNew/exchangeMapinfoNew-info.html" trigger="none"
-			target="dialog" rel="exchangeMapinfoNew_add" title="添加数据库表" width="900" height="600" btnValue="添加数据库">添加数据库</a>
+			target="dialog" rel="exchangeMapinfoNew_add" title="添加数据库表" width="750" height="600" btnValue="添加数据库">添加数据库</a>
 		<hr>
-		<a iconCls="icon-edit" href="modules/exchangeMapinfoNew/exchangeMapinfoNew-info.html" trigger="single"
-			target="dialog" rel="exchangeMapinfoNew_edit" title="编辑 {{text}}" width="900" height="600" btnValue="更新">编辑</a>
+		<a iconCls="icon-edit" href="modules/exchangeMapinfoNew/exchangeMapinfoNew-edit.html" trigger="single"
+			target="dialog" rel="exchangeMapinfoNew_edit" title="编辑 {{text}}" width="750" height="600" btnValue="更新">编辑</a>
 		<hr>
 		<a iconCls="icon-base icon-base-ban" trigger="single"
 			target="confirm" rel="exchangeMapinfoNew_remove" title="是否确定删除 {{text}}？">删除</a>
@@ -60,7 +60,7 @@
 		          ], function(ExchangeMapinfoNew) {
 			window.ExchangeMapinfoNew = new ExchangeMapinfoNew('exchangeMapinfoNew', panel);
 			window.ExchangeMapinfoNew.load(panel);
-		});
+		});  
 	};
 
 </script>
