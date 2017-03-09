@@ -8,7 +8,7 @@ define(function(require) {
 	var ExchangeTask4ExchangeTaskdetailIdRemove = Page.extend(function() {
 		var _self = this;
 		// @override
-		this.submit = function(panel, data) {
+		this.submit = function(table, data) {
 			var exportId = data.exportId;
 			data = _self.parent.data;
 			var taskId = data.taskId;
@@ -25,13 +25,14 @@ define(function(require) {
 	                    _method: 'get'
 	                }
 				}).then(function(data2) {
-					$("#dg4 tbody").html("");
+					/*$("#dg4 tbody").html("");
 					var tab1table = panel.find('table.tab1');
 					tab1table.cdatagrid({
 						controller:_self,
 						editable: true,
 						data:data2.exportSqlList
-					});
+					});*/
+					table.datagrid('loadData',data2.exportSqlList);
 				});
             });
 		}

@@ -7,6 +7,7 @@ define(function(require) {
 	var ExchangeTaskExchangeMapinfoAdd = require('../ctrl/exchangeTask.ExchangeMapinfo.add');
 	var ExchangeTaskexportSqlEdit = require('../ctrl/exchangeTask.exportSql.edit');
 	var ExchangeTaskExchangeTaskdetailIdRemove = require('../ctrl/exchangeTask.ExchangeTaskdetailId.remove');
+	var ExchangeTaskRun = require('../ctrl/exchangeTask.run');
 
 	var ExchangeTaskEdit = ExchangeTaskAdd.extend(function() {
 		var _self = this;
@@ -16,6 +17,7 @@ define(function(require) {
 		  			new ExchangeTaskExchangeMapinfoAdd('exchangeTask_ExchangeMapinfo_add'),
 		  			new ExchangeTaskexportSqlEdit('exchangeTask_exportSql_edit'),
 		  			new ExchangeTaskExchangeTaskdetailIdRemove('exchangeTask_ExchangeTaskdetailId_remove'),
+		  			new ExchangeTaskRun('exchangeTask_transfer_run'),
 		  		]);
 		
 		

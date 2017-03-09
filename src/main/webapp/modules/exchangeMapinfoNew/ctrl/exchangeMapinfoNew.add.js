@@ -1,7 +1,8 @@
 define(function(require) {
 
-	var Config = require('config');
 	var Page = require('core/page');
+	var Config = require('config');
+	var Core = require('core/core');
 	
 	
 	var ExchangeMapinfoNewAddSourceDs = require('./exchangeMapinfoNew.addSourceDs');
@@ -20,6 +21,7 @@ define(function(require) {
 			// 
 			form.form('disableValidation')
 			.form('focus');
+			onchange();
 		};
 		
 		// @override
@@ -47,6 +49,7 @@ define(function(require) {
 			table.datagrid('reload');
 		};
 	});
+	
 	
 	
 	

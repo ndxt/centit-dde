@@ -102,8 +102,9 @@ public class ExchangeTask implements java.io.Serializable {
         this.exportSqlList = exportSqlList;
     }
 
-    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY )
-    @JoinColumn(name="TASK_ID") //这里表示数据库的外键 在t_street里面创建
+//    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY )
+//    @JoinColumn(name="TASK_ID") //这里表示数据库的外键 在t_street里面创建
+    @Transient
     private List<TaskLog> taskLogs ;// new ArrayList<TaskLog>();
 
 //    fetch:表示抓取策略,默认为FetchType.LAZY,因为关联的多个对象通常不必从数据库预先读取到内存
@@ -506,15 +507,15 @@ public class ExchangeTask implements java.io.Serializable {
         
     }
     
-    public void addAll(List<TaskLog> taskLogs){
-        getTaskLogs().clear();
-        if(CollectionUtils.isEmpty(taskLogs)){
-            return;
-        }
-        for(TaskLog detail:taskLogs){
-            detail.setTask(this);
-        }
-        getTaskLogs().addAll(taskLogs);
-        
-    }
+//    public void addAll(List<TaskLog> taskLogs){
+//        getTaskLogs().clear();
+//        if(CollectionUtils.isEmpty(taskLogs)){
+//            return;
+//        }
+//        for(TaskLog detail:taskLogs){
+//            detail.setTask(this);
+//        }
+//        getTaskLogs().addAll(taskLogs);
+//        
+//    }
 }

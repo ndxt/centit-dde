@@ -19,7 +19,21 @@ define(function(require) {
                     _method: 'delete'
                 }
 			}).then(function() {
-				table.datagrid('reload');
+				Core.ajax(Config.ContextPath+'service/exchangetask/edit/'+taskId, {
+					method: 'get',
+					data: {
+	                    _method: 'get'
+	                }
+				}).then(function(data2) {
+					/*$("#dg4 tbody").html("");
+					var tab1table = panel.find('table.tab1');
+					tab1table.cdatagrid({
+						controller:_self,
+						editable: true,
+						data:data2.exportSqlList
+					});*/
+					table.datagrid('loadData',data2.exchangeMapinfoList);
+				});
             });
 		}
 	});

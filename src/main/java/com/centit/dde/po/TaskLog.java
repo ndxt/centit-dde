@@ -8,9 +8,8 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  * create by scaffold
@@ -44,31 +43,20 @@ public class TaskLog implements java.io.Serializable {
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long logId;
 
-    @ManyToOne
-    @JoinColumn(name="TASK_ID")
-    @JSONField(serialize=false)
-    private ExchangeTask task;
-    
+    @Column(name="TASK_ID")
+    private Long taskId;
     @Column(name="RUN_BEGIN_TIME")
     private Date runBeginTime;
-    
     @Column(name="RUN_END_TIME")
     private Date runEndTime;
-    
     @Column(name="RUN_TYPE")
     private String runType;
-    
     @Column(name="RUNNER")
     private String runner;
-    
     @Column(name="OTHER_MESSAGE")
     private String otherMessage;
-    
     @Column(name="TASK_TYPE")
     private String taskType;
-    
-//    @OneToMany(orphanRemoval=true,fetch = FetchType.LAZY,cascade=(CascadeType.ALL))
-//    @JoinColumn(name="LOG_ID") //这里表示数据库的外键 在t_street里面创建
     @Transient
     private Set<TaskDetailLog> taskDetailLogs = null;// new ArrayList<TaskDetailLog>();
 
@@ -103,7 +91,8 @@ public class TaskLog implements java.io.Serializable {
 
 
         this.logId = logId;
-        this.task.setTaskId(taskId);
+
+        this.taskId = taskId;
         this.runBeginTime = runBeginTime;
         this.runEndTime = runEndTime;
         this.runType = runType;
@@ -122,24 +111,12 @@ public class TaskLog implements java.io.Serializable {
     }
     // Property accessors
 
+    public Long getTaskId() {
+        return this.taskId;
+    }
 
     public void setTaskId(Long taskId) {
-       this.task.setTaskId(taskId);
-    }
-    
-    
-    public Long  getTaskId() {
-        return this.task.getTaskId();
-    }
-    
-    
-
-    public ExchangeTask getTask() {
-        return task;
-    }
-
-    public void setTask(ExchangeTask task) {
-        this.task = task;
+        this.taskId = taskId;
     }
 
     public Date getRunBeginTime() {
@@ -273,6 +250,7 @@ public class TaskLog implements java.io.Serializable {
 
         this.setLogId(other.getLogId());
 
+        this.taskId = other.getTaskId();
         this.runBeginTime = other.getRunBeginTime();
         this.runEndTime = other.getRunEndTime();
         this.runType = other.getRunType();
@@ -287,6 +265,8 @@ public class TaskLog implements java.io.Serializable {
         if (other.getLogId() != null)
             this.setLogId(other.getLogId());
 
+        if (other.getTaskId() != null)
+            this.taskId = other.getTaskId();
         if (other.getRunBeginTime() != null)
             this.runBeginTime = other.getRunBeginTime();
         if (other.getRunEndTime() != null)
@@ -304,7 +284,7 @@ public class TaskLog implements java.io.Serializable {
 
     public void clearProperties() {
 
-        this.task.setTaskId(null);
+        this.taskId = null;
         this.runBeginTime = null;
         this.runEndTime = null;
         this.runType = null;

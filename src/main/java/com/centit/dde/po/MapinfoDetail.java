@@ -12,20 +12,18 @@ public class MapinfoDetail implements java.io.Serializable {
     
     @EmbeddedId
     @Column(name="CID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private MapinfoDetailId cid;
 
     @Column(name="SOURCE_FIELD_NAME")
     private String sourceFieldName;
     
-    @Column(name="SOURCE_FIELD_SENTENCE")
+    @Column(name="DEST_FIELD_NAME")
     private String destFieldName;
     
-    @Column(name="SOURCE_FIELD_TYPE")
+    @Column(name="SOURCE_FIELD_SENTENCE")
     private String sourceFieldSentence;
     
-    @Column(name="DEST_FIELD_NAME")
+    @Column(name="SOURCE_FIELD_TYPE")
     private String sourceFieldType;
     
     @Column(name="DEST_FIELD_TYPE")

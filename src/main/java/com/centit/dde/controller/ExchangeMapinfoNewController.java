@@ -2,6 +2,10 @@ package com.centit.dde.controller;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +37,8 @@ import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.support.database.DataSourceDescription;
+import com.centit.support.database.DbcpConnectPools;
 
 
 @Controller
@@ -79,11 +85,43 @@ public class ExchangeMapinfoNewController extends BaseController {
         }
     }
 
-    @RequestMapping(value="/showMapinfoDetail/{{mapinfoId}}" ,method = {RequestMethod.GET})
+    @RequestMapping(value="/showMapinfoDetail/{mapinfoId}" ,method = {RequestMethod.GET})
     public void showMapinfoDetail(@PathVariable Long mapinfoId ,ExchangeMapinfo object, HttpServletRequest request,HttpServletResponse response) {
         object = exchangeMapinfoMag.getObjectById(mapinfoId);
         JsonResultUtils.writeSingleDataJson(object, response);
         /*return "showMapinfoDetail";*/
+    }
+    @RequestMapping(value="/getListDatebaseInfo" ,method = {RequestMethod.GET})
+    public void getListDatebaseInfo(HttpServletRequest request,HttpServletResponse response) {
+        List<DatabaseInfo> databaseInfoList = platformEnvironment.listDatabaseInfo();
+        JsonResultUtils.writeSingleDataJson(databaseInfoList, response);
+    }
+//    jdbc:sqlserver://192.168.132.76:1433;databaseName=BSDFW2
+//    jdbc:oracle:thin:@192.168.131.81:1521:ORCL
+    static Connection getConnection(DatabaseInfo databaseInfo ) throws Exception {
+        String connectURI = databaseInfo.getDatabaseUrl();
+//        connectURI = connectURI + ";databaseName="+databaseInfo.getDatabaseCode();
+        String username =  databaseInfo.getUsername();
+        String pswd =  databaseInfo.getPassword();
+        DataSourceDescription dataSource = new DataSourceDescription(connectURI, username, pswd);
+        dataSource.setDatabaseCode(databaseInfo.getDatabaseCode());
+        return DbcpConnectPools.getDbcpConnect(dataSource);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @RequestMapping(value="/getTables/{databaseCode}" ,method = {RequestMethod.GET})
+    public void getTables(@PathVariable String databaseCode ,HttpServletRequest request,HttpServletResponse response) throws Exception {
+        DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(databaseCode);
+        Connection connection = getConnection(databaseInfo);
+        DatabaseMetaData metaData = connection.getMetaData();
+        ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
+//        metaData.getColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern);
+        @SuppressWarnings("rawtypes")
+        List Tablelist = new ArrayList();
+        while (tables.next()) {
+            Tablelist.add(tables.getString("TABLE_NAME"));
+        }
+        JsonResultUtils.writeSingleDataJson(Tablelist, response);
     }
     
     @RequestMapping(value="/add" ,method = {RequestMethod.GET})
@@ -127,7 +165,7 @@ public class ExchangeMapinfoNewController extends BaseController {
         /*return "showMapinfoDetail";*/
     }
 
-    @RequestMapping(value="/edit/{{mapinfoId}}",method = {RequestMethod.GET})
+    @RequestMapping(value="/edit/{mapinfoId}",method = {RequestMethod.GET})
     public void edit(@PathVariable Long mapinfoId,ExchangeMapinfo object,HttpServletRequest request,HttpServletResponse response) {
         try {
             if (object == null) {
