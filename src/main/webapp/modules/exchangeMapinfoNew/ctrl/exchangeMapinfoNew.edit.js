@@ -36,7 +36,11 @@ define(function(require) {
 				tab1table.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.mapinfoDetails
+					data:data.mapinfoDetails,
+					dragSelection: true,
+					onLoadSuccess:function(){
+						$(this).datagrid('enableDnd');
+					}
 				});
 				
 				var tab1table1 = panel.find('table.tab2');

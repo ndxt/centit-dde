@@ -3,6 +3,7 @@ define(function(require) {
     var Config = require('config');
     var Core = require('core/core');
     var Page = require('core/page');
+    require(datagrid-dnd);
 
 /*  加载角色编辑控制器 require('./roleinfo.edit')   调用injecte方法注入该控制器的实例  */
     
@@ -30,13 +31,7 @@ define(function(require) {
 //			cdatagrid方法是继承自EasyUI的datagrid，只需要多传入一个参数：this即控制器本身示例对象，就可以自动关联搜索栏 工具栏
 //			就是这样，一个可以查询 分页具有工具栏的表格就完成了！
     		table.cdatagrid({
-    			controller: this,
-                dragSelection: true,
-                rowStyler: function(index) {
-                    if (index == 0) {
-                        $(this).datagrid('enableDnd');
-                    }
-                }
+    			controller: this
     		});
     	};
     	
