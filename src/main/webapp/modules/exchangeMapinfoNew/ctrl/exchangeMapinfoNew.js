@@ -3,6 +3,7 @@ define(function(require) {
     var Config = require('config');
     var Core = require('core/core');
     var Page = require('core/page');
+    require('datagrid-dnd');
 
 /*  加载角色编辑控制器 require('./roleinfo.edit')   调用injecte方法注入该控制器的实例  */
     
