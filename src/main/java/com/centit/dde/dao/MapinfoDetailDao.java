@@ -1,24 +1,7 @@
 package com.centit.dde.dao;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Repository;
-
-import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.po.MapinfoDetail;
 import com.centit.dde.po.MapinfoDetailId;
-import com.centit.dde.po.MapinfoTrigger;
 import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
@@ -27,6 +10,15 @@ import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.support.database.DbcpConnect;
 import com.centit.support.database.QueryUtils;
 import com.centit.support.database.transaction.Transactional;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Repository;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId> {

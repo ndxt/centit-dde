@@ -1,31 +1,11 @@
 package com.centit.dde.dataio;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.List;
-
-import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.dao.ExchangeTaskdetailDao;
 import com.centit.dde.dao.ExportSqlDao;
 import com.centit.dde.datafile.ExchangeFileWriter;
 import com.centit.dde.datafile.TableFileWriter;
-import com.centit.dde.po.ExchangeTask;
-import com.centit.dde.po.ExchangeTaskdetail;
-import com.centit.dde.po.ExportField;
-import com.centit.dde.po.ExportSql;
-import com.centit.dde.po.ExportTrigger;
-import com.centit.dde.po.TaskDetailLog;
-import com.centit.dde.po.TaskErrorData;
-import com.centit.dde.po.TaskLog;
+import com.centit.dde.po.*;
 import com.centit.dde.service.TaskDetailLogManager;
 import com.centit.dde.service.TaskErrorDataManager;
 import com.centit.dde.service.TaskLogManager;
@@ -34,9 +14,15 @@ import com.centit.dde.util.ConnPool;
 import com.centit.dde.util.ItemValue;
 import com.centit.dde.util.TaskConsoleWriteUtils;
 import com.centit.framework.common.SysParametersUtils;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.centit.support.algorithm.DatetimeOpt;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.annotation.Resource;
+import java.sql.*;
+import java.util.List;
 
 public class ExportDataImpl implements ExportData, CallWebService {
     private static final Log logger = LogFactory.getLog(ExportDataImpl.class);

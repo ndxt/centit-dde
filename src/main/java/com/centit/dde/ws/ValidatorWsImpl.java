@@ -1,21 +1,20 @@
 package com.centit.dde.ws;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.centit.framework.staticsystem.po.DatabaseInfo;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.cxf.common.util.CollectionUtils;
-import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
-
 import com.centit.dde.po.UserDataOptId;
 import com.centit.dde.service.UserDataOptIdManager;
 import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.model.basedata.IUserUnit;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.support.security.DESSecurityUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.cxf.common.util.CollectionUtils;
+import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by sx on 2014/12/10.

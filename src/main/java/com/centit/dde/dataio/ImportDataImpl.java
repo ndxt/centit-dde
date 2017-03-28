@@ -1,12 +1,5 @@
 package com.centit.dde.dataio;
 
-import java.io.File;
-import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.util.CollectionUtils;
-
 import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.datafile.ExchangeFileReader;
 import com.centit.dde.datafile.TableFileReader;
@@ -19,6 +12,12 @@ import com.centit.framework.common.SysParametersUtils;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.ZipCompressor;
 import com.centit.support.file.FileSystemOpt;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.util.CollectionUtils;
+
+import java.io.File;
+import java.util.List;
 
 public class ImportDataImpl implements ImportData {
     public static final Log logger = LogFactory.getLog(ImportDataImpl.class);

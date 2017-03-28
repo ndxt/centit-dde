@@ -1,18 +1,14 @@
 package com.centit.dde.po;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.Transient;
-
+import com.centit.dde.exception.SqlResolveException;
+import com.centit.dde.util.ItemValue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 
-import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.ExchangeMapinfo;
-import com.centit.dde.po.MapinfoDetail;
-import com.centit.dde.util.ItemValue;
+import javax.persistence.Transient;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TableMapInfo {
 

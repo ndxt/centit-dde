@@ -1,12 +1,11 @@
 package com.centit.dde.dataio;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.util.StringUtils;
-
 import com.centit.dde.po.ImportField;
 import com.centit.dde.po.ImportOpt;
+import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ImportSqlOpt {
     private String insertSql;

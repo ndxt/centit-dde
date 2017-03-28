@@ -1,16 +1,5 @@
 package com.centit.dde.ws;
 
-import java.io.ByteArrayInputStream;
-
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebService;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.centit.dde.datafile.TableFileReader;
 import com.centit.dde.dataio.ExecuteDataMap;
 import com.centit.dde.dataio.ImportDataImpl;
@@ -21,6 +10,15 @@ import com.centit.framework.common.SysParametersUtils;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.file.TxtLogFile;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+import javax.jws.WebService;
+import java.io.ByteArrayInputStream;
 
 @WebService(endpointInterface = "com.centit.dde.ws.UploadData")
 public class UploadDataImpl implements UploadData {

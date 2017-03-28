@@ -1,11 +1,10 @@
 package com.centit.dde.po;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-
-import org.hibernate.annotations.GenericGenerator;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * create by scaffold

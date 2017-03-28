@@ -1,22 +1,14 @@
 package com.centit.dde.datafile;
 
-import java.io.BufferedWriter;
-import java.io.CharArrayWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.Date;
-
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.file.FileSystemOpt;
+import com.centit.support.xml.XmlUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.file.FileSystemOpt;
-import com.centit.support.xml.XmlUtils;
+import java.io.*;
+import java.util.Date;
 
 public class TableFileWriter {
     public static final Log loger = LogFactory.getLog(TableFileWriter.class);

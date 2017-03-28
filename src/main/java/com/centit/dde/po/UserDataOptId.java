@@ -1,11 +1,11 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
-
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
-
-import javax.persistence.*;
 
 /**
  * Created by sx on 2014/12/10.

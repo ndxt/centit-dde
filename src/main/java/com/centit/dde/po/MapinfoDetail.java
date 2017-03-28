@@ -2,9 +2,6 @@ package com.centit.dde.po;
 
 import javax.persistence.*;
 
-import org.hibernate.annotations.GenericGenerator;
-
-
 @Entity
 @Table(name="D_MAPINFO_DETAIL")
 public class MapinfoDetail implements java.io.Serializable {

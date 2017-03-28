@@ -1,15 +1,11 @@
 package com.centit.dde.po;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.ldap.odm.annotations.Id;
-
 
 /**
  * FAddressBook entity.

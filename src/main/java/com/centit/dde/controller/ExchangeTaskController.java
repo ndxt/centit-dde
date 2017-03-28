@@ -1,41 +1,7 @@
 package com.centit.dde.controller;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.scheduling.support.CronSequenceGenerator;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.util.WebUtils;
-
-import com.centit.dde.po.ExchangeMapinfo;
-import com.centit.dde.po.ExchangeTask;
-import com.centit.dde.po.ExchangeTaskdetail;
-import com.centit.dde.po.ExportSql;
-import com.centit.dde.po.TaskErrorData;
-import com.centit.dde.po.TaskLog;
-import com.centit.dde.service.ExchangeMapinfoManager;
-import com.centit.dde.service.ExchangeTaskManager;
-import com.centit.dde.service.ExchangeTaskdetailManager;
-import com.centit.dde.service.ExportSqlManager;
-import com.centit.dde.service.MapinfoDetailManager;
-import com.centit.dde.service.TaskErrorDataManager;
-import com.centit.dde.service.TaskLogManager;
+import com.centit.dde.po.*;
+import com.centit.dde.service.*;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
@@ -46,6 +12,21 @@ import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.po.UserInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.centit.support.algorithm.StringRegularOpt;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.scheduling.support.CronSequenceGenerator;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.util.WebUtils;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.*;
 
 @Controller
 @RequestMapping("/exchangetask")

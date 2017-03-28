@@ -1,13 +1,13 @@
 package com.centit.dde.ws;
 
-import javax.jws.WebService;
-
 import com.centit.dde.dao.ExportSqlDao;
 import com.centit.dde.datafile.TableFileWriter;
 import com.centit.dde.dataio.ExportData;
 import com.centit.dde.po.ExportSql;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.model.basedata.IUserInfo;
+
+import javax.jws.WebService;
 
 @WebService(endpointInterface = "com.centit.dde.ws.DownloadData")
 public class DownloadDataImpl implements DownloadData {

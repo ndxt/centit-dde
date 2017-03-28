@@ -1,8 +1,8 @@
 package com.centit.dde.ws;
 
-import javax.jws.WebService;
-
 import com.centit.dde.service.ExchangeTaskManager;
+
+import javax.jws.WebService;
 
 @WebService(targetNamespace = "http://dde.centit.com/ws/")
 public class TaskCallerImpl implements  TaskCaller{

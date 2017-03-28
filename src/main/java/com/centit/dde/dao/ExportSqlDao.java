@@ -1,21 +1,5 @@
 package com.centit.dde.dao;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Repository;
-import org.springframework.util.CollectionUtils;
-
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportFieldId;
@@ -27,6 +11,16 @@ import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.support.database.DataSourceDescription;
 import com.centit.support.database.DbcpConnectPools;
 import com.centit.support.database.QueryUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {

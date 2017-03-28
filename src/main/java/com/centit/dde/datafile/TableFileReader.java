@@ -1,10 +1,10 @@
 package com.centit.dde.datafile;
 
-import org.apache.commons.codec.binary.Base64;
 import com.centit.dde.util.ItemValue;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.file.FileIOOpt;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

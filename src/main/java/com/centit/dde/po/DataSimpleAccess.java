@@ -1,10 +1,9 @@
 package com.centit.dde.po;
 
-import java.io.Serializable;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-
-import org.hibernate.annotations.GenericGenerator;
+import java.io.Serializable;
 
 /**
  * Created with IntelliJ IDEA.
