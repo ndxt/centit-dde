@@ -3,9 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:context="http://www.springframework.org/schema/context" 
-	xmlns:aop="http://www.springframework.org/schema/aop" 
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/aop 
 		http://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/beans 
@@ -13,27 +11,19 @@
 		http://www.springframework.org/schema/tx 
 		http://www.springframework.org/schema/tx/spring-tx.xsd
 		http://www.springframework.org/schema/context 
-		http://www.springframework.org/schema/context/spring-context.xsd
-        http://www.springframework.org/schema/cache 
-        http://www.springframework.org/schema/cache/spring-cache.xsd"
+		http://www.springframework.org/schema/context/spring-context.xsd"
     default-lazy-init="true">
-
 	<!-- Hibernate4 -->
 	<!-- 加载资源文件  其中包含变量信息，必须在Spring配置文件的最前面加载，即第一个加载-->
 	<context:property-placeholder location="classpath:system.properties" />
-
-	<bean id="initialEnvironment" init-method="initialEnvironment"
-		 class="com.centit.framework.listener.InitialWebRuntimeEnvironment" 
-		 lazy-init="false" 
-		 scope="singleton">
-	</bean>
-	
-	<bean id="notificationCenter" 
-		 class="com.centit.framework.components.impl.NotificationCenterImpl" 
-		 init-method="initMsgSenders"  
-		 scope="singleton">
-	</bean>	
-	
+	<!-- 
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.user}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>	 
+	-->
 	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
 		destroy-method="close">      
 	    <property name="driverClassName" value="${jdbc.driver}" />      
@@ -45,7 +35,7 @@
 		<property name="maxWaitMillis" value="${jdbc.maxWait}" />
 		<property name="defaultAutoCommit" value="${jdbc.defaultAutoCommit}" />
 		<property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}" />
-		<property name="validationQuery" value="${jdbc.validationQuery}" />    
+		<!--<property name="validationQuery" value="${jdbc.validationQuery}" />-->
 	</bean> 
 	<!-- 使用c3p0连接池 需要在 pom.xml中添加
 		<dependency>
@@ -71,7 +61,7 @@
 		  p:idleConnectionTestPeriod="${jdbc.idleConnectionTestPeriod}"
 		  p:preferredTestQuery="${jdbc.validationQuery}" />
 	-->
-	  
+	
 	<!--定义了Hibernate的SessionFactory -->
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
@@ -79,6 +69,7 @@
 			<props>
 				<prop key="hibernate.dialect">${jdbc.dialect}</prop>
 				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.id.new_generator_mappings">true</prop>
 				<!--	
   	 			<prop key="hibernate.current_session_context_class">jta</prop>	    
 				<prop key="hibernate.format_sql">true</prop>
@@ -92,15 +83,34 @@
 		
 		<property name="packagesToScan">
 			<list>
-				<value>com.centit</value>
+				<value>com.centit.*</value>
 			</list>
 		</property>
 	</bean>
 
+	<bean id="flywayMigration" class="org.flywaydb.core.Flyway"
+		  init-method="migrate">
+		<property name="dataSource" ref="dataSource" />
+		<property name="baselineOnMigrate" value="true" />
+		<property name="locations">
+			<array value-type="java.lang.String">
+				<value>${flyway.sql.dir}</value>
+				<value>com.centit.framework.system.update</value>
+			</array>
+		</property>
+	</bean>
+
+	<!--为避免flyway没有完成更新操作之前，应用程序的其他逻辑已经开始使用数据库进行其他操作了，会导致应用程序产生很多bug ，甚至根本运行不起来。
+        要解决这个问题，我们可以利用Spring 的bean 依赖原理，让关键的数据库操作bean 依赖于flywayMigration 这个bean ，
+        达到在flywayMigration 没有实例化完成（数据库更新操作完成）之前，不能进行任何其他数据库相关操作。
+          depends-on="flywayMigration" -->
+
 	<!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
-	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+	<bean id="transactionManager"
+		  class="org.springframework.orm.hibernate4.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />        
-	</bean> 
+	</bean>
+
     <!-- 配置事务异常封装 -->
     <bean id="persistenceExceptionTranslationPostProcessor" 
    		class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
@@ -110,48 +120,71 @@
 	<tx:annotation-driven transaction-manager="transactionManager"/>
 	
  	<!-- proxy-target-class="true" -->
-	<context:component-scan base-package="com.centit">
+	<context:component-scan base-package="com.centit.*">
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
 	
 	<context:annotation-config />
+	
 
-	<!--
-	<bean id="nativeJdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.C3P0NativeJdbcExtractor" lazy-init="true" />
- 	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler" lazy-init="true">
-		<property name="nativeJdbcExtractor">
-			<ref bean="nativeJdbcExtractor" />
+	<bean id="initialEnvironment" init-method="initialEnvironment"
+		 class="com.centit.framework.listener.InitialWebRuntimeEnvironment" 
+		 lazy-init="false">
+	</bean>
+	
+	<bean id="operationLogWriter" init-method="init"
+		 class="com.centit.framework.staticsystem.service.impl.TextOperationLogWriterImpl" 
+		 lazy-init="false">
+	</bean>
+	
+	<bean id="notificationCenter" 
+		 class="com.centit.framework.components.impl.NotificationCenterImpl" 
+		 init-method="initMsgSenders">
+	</bean>
+
+	<bean id="passwordEncoder" class="com.centit.framework.security.model.CentitMd5PasswordEncoder" />
+	
+	<!--<bean id="platformEnvironment" init-method="init"
+		 class="com.centit.framework.staticsystem.service.impl.StaticSystemConfigImpl" 
+		 lazy-init="false">
+		 <property name="passwordEncoder" ref="passwordEncoder" />
+	</bean>-->
+	
+
+	 <bean id="jsonPlatformEnvironment" init-method="init"
+		 class="com.centit.framework.staticsystem.service.impl.StaticSystemConfigImpl"
+		 lazy-init="false" >
+		 <property name="passwordEncoder" ref="passwordEncoder" />
+	</bean>
+
+	<bean id="ipPlatformEnvironment" init-method="init"
+		  class="com.centit.framework.staticsystem.service.impl.IPClientSystemConfigImpl"
+		  lazy-init="false">
+		<property name="platServerUrl" value="${centit.ip.home}" />
+		<property name="topOptId" value="${centit.ip.topoptid}" />
+	</bean>
+
+	<bean id="platformEnvironment"
+		  class="com.centit.framework.staticsystem.service.impl.EnvironmentManagerProxy"
+		  lazy-init="false">
+		<property name="evrnMangers">
+			<list value-type="com.centit.framework.staticsystem.service.StaticEnvironmentManager">
+				<ref bean="ipPlatformEnvironment" />
+				<ref bean="jsonPlatformEnvironment" />
+			</list>
 		</property>
+	</bean>
+
+	
+	<bean  class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+	
+	<!-- 文件上传，需要添加依赖 -->
+    <!--  
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+	    <property name="maxUploadSize" value="10485760" />  
 	</bean> -->
-
-    <bean name="openSessionInViewInterceptor" class="org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor">
-        <property name="sessionFactory" ref="sessionFactory" />
-    </bean>
-
-    <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" />
-
-	<cache:annotation-driven cache-manager="cacheManager" />
-
-	<!-- cacheManager工厂类，指定ehcache.xml的位置 -->
-	<bean id="cacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" p:configLocation="classpath:ehcache.xml" />
-
-	<!-- 声明cacheManager -->
-	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager" p:cacheManager-ref="cacheManagerFactory" />
-
 	<!-- 声明csrf -->
 	<bean id="csrfTokenRepository" class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository" />
 
 	<aop:aspectj-autoproxy />
-
- 	<!-- 资源文件绑定器 -->
-    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
-        <property name="fallbackToSystemLocale" value="false" />  
-        <property name="useCodeAsDefaultMessage" value="false" />  
-        <property name="basename">
-            <value>classpath:messagesource/base/messages</value>
-        </property>
-        <property name="defaultEncoding" value="UTF-8" />  
-        <!-- <property name="fileEncodings" value="UTF-8" /> -->
-        <property name="cacheSeconds" value="120" />
-    </bean>
 </beans>
