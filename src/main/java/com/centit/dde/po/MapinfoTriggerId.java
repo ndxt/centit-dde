@@ -4,7 +4,6 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Id;
 import javax.persistence.IdClass;
 
 /**
@@ -17,12 +16,10 @@ import javax.persistence.IdClass;
 public class MapinfoTriggerId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     
-    @Id
     @Column(name="TRIGGER_ID")
     @NotBlank(message = "字段不能为空")
     private Long triggerId;
 
-    @Id
     @Column(name="MAPINFO_ID")
     @NotBlank(message = "字段不能为空")
     private Long mapinfoId;
