@@ -144,12 +144,13 @@
 
 	<bean id="passwordEncoder" class="com.centit.framework.security.model.CentitMd5PasswordEncoder" />
 	
-	<!--<bean id="platformEnvironment" init-method="init"
+	<bean id="platformEnvironment" init-method="init"
 		 class="com.centit.framework.staticsystem.service.impl.StaticSystemConfigImpl" 
 		 lazy-init="false">
 		 <property name="passwordEncoder" ref="passwordEncoder" />
-	</bean>-->
+	</bean>
 	
+<!--
 
 	 <bean id="jsonPlatformEnvironment" init-method="init"
 		 class="com.centit.framework.staticsystem.service.impl.StaticSystemConfigImpl"
@@ -174,8 +175,7 @@
 			</list>
 		</property>
 	</bean>
-
-	
+-->
 	<bean  class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
 	
 	<!-- 文件上传，需要添加依赖 -->

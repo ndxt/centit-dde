@@ -73,7 +73,7 @@
     <orderEntry type="library" name="Maven: org.apache.cxf:cxf-rt-ws-policy:2.7.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.neethi:neethi:3.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.cxf:cxf-rt-transports-http:2.7.3" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.oracle:ojdbc6:11.2.0.4" level="project" />
+    <orderEntry type="library" name="Maven: com.oracle:ojdbc6:11.2.0.4" level="project" />
     <orderEntry type="library" name="Maven: com.centit.framework:framework-hibernate:3.1.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.flywaydb:flyway-core:4.0.3" level="project" />
     <orderEntry type="library" name="Maven: com.centit.framework:framework-core:3.1.1-SNAPSHOT" level="project" />
