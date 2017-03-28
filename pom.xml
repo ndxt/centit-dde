@@ -40,6 +40,12 @@
 		  <artifactId>ojdbc6</artifactId>
 		  <version>11.2.0.4</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.centit.framework</groupId>
+			<artifactId>framework-base-view-easyui</artifactId>
+			<version>3.0.1-SNAPSHOT</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>com.centit.framework</groupId>
