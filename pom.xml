@@ -34,7 +34,6 @@
 			<artifactId>cxf-rt-transports-http</artifactId>
 			<version>2.7.3</version>
 		</dependency>
-
 		<dependency>
 		  <groupId>com.oracle</groupId>
 		  <artifactId>ojdbc6</artifactId>
@@ -52,7 +51,6 @@
 			<artifactId>framework-hibernate</artifactId>
 			<version>3.1.1-SNAPSHOT</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.centit.framework</groupId>
 			<artifactId>framework-staticsystem</artifactId>
@@ -64,13 +62,11 @@
 			<artifactId>centit-office</artifactId>
 			<version>2.1.1-SNAPSHOT</version>
 		</dependency>
-
 		<dependency>
 		  <groupId>org.springframework</groupId>
 		  <artifactId>spring-orm</artifactId>
 		  <version>${spring.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
@@ -82,13 +78,11 @@
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>${hibernate.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>5.2.4.Final</version>
 		</dependency>
-
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
@@ -102,7 +96,6 @@
 			<version>3.0.1</version>
 			<scope>provided</scope>
 		</dependency>
-
 		<!-- test library -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -110,7 +103,6 @@
 			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -125,11 +117,9 @@
 			<systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
 			<scope>system</scope>
 		</dependency>
-
 		<!-- <systemPath>${java.home}/../lib/tools.jar</systemPath> C:/develop/jvm/jdk1_7_0_60/lib/tools.jar 
 			${JAVA_HOME} /lib/tools.jar ${java.home}/lib/tools.jar ${env.JAVA_HOME}/lib/tools.jar -->
 	</dependencies>
-
     <distributionManagement>
 		<repository>
 			<id>centit-releases</id>
@@ -142,8 +132,6 @@
 			<url>http://develop.centit.com:8080/nexus/content/repositories/centit-snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement> 
-
-
 	<build>
 		<resources>
 			<resource>
@@ -186,7 +174,6 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-
       </plugins>
 		<pluginManagement>
 			<plugins>

@@ -1,14 +1,11 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.DataOptInfo;
-import com.centit.dde.po.ImportOpt;
-import com.centit.dde.service.DataOptInfoManager;
-import com.centit.dde.service.ImportOptManager;
-import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.controller.BaseController;
-import com.centit.framework.staticsystem.po.OsInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
@@ -18,10 +15,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.WebUtils;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import com.centit.dde.exception.SqlResolveException;
+import com.centit.dde.po.DataOptInfo;
+import com.centit.dde.po.ImportOpt;
+import com.centit.dde.service.DataOptInfoManager;
+import com.centit.dde.service.ImportOptManager;
+import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.staticsystem.po.OsInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 
 @Controller
 @RequestMapping("/dataoptinfo")
