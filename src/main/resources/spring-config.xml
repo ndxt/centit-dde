@@ -88,7 +88,7 @@
 		</property>
 	</bean>
 
-	<bean id="flywayMigration" class="org.flywaydb.core.Flyway"
+	<!--<bean id="flywayMigration" class="org.flywaydb.core.Flyway"
 		  init-method="migrate">
 		<property name="dataSource" ref="dataSource" />
 		<property name="baselineOnMigrate" value="true" />
@@ -98,7 +98,7 @@
 				<value>com.centit.framework.system.update</value>
 			</array>
 		</property>
-	</bean>
+	</bean>-->
 
 	<!--为避免flyway没有完成更新操作之前，应用程序的其他逻辑已经开始使用数据库进行其他操作了，会导致应用程序产生很多bug ，甚至根本运行不起来。
         要解决这个问题，我们可以利用Spring 的bean 依赖原理，让关键的数据库操作bean 依赖于flywayMigration 这个bean ，
