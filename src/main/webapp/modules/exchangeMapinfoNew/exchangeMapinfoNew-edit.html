@@ -122,15 +122,18 @@
 
 
 <div style="display: none;">
-	<div id="dlgAddDbLeft" class="easyui-dialog"  style="width: 560px; height: 360px;" closed="true" buttons="#dlgaddCon-buttons">
+	<div id="dlgAddDbLeft" class="easyui-dialog"  style="width: 560px; height: 400px;" closed="true" buttons="#dlgaddCon-buttons">
 			<div style="padding:10px;">
 	                <span>数据库:
 		                <select class="easyui-combobox" id="txt_sourceDatabaseName" name="sourceDatabaseName" style="width:200px;" onchange="onchange()" ></select>
 	                </span>
+	                <span>表&nbsp;名:
+	        			<select class="easyui-combobox" id="txt_sourceTablename" name="txt_sourceTablename" style="width:200px;" ></select>
+	        		</span>
 	        </div>
 	        <div style="padding:10px;">
-	        	<span>表名:
-	        		<select class="easyui-combobox" id="txt_sourceTablename" name="txt_sourceTablename" style="width:200px;" ></select>
+	        	<span>字段名:
+	        		<input class="easyui-combobox" id="txt_sourceCodename" name="txt_sourceCodename" data-options="multiple:true,panelHeight:'auto'" style="width:455px;height:30px" ></input>
 	        	</span>
 	        </div>
 			<div style="padding:10px;">

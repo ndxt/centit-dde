@@ -125,6 +125,7 @@ define(function(require) {
 		if(document.getElementById('txt_sourceDatabaseName')){
 			$('#txt_sourceDatabaseName').combobox({
 				onChange: function (newValue, oldValue) {
+					$("#txt_sourceTablename").empty();
 					Core.ajax(Config.ContextPath+'service/exchangemapinfonew/getTables/'+newValue, {
 						method: 'get',
 						data: {
@@ -141,6 +142,32 @@ define(function(require) {
 						    TabledataList.push({"value": orgValue,"text":orgNameValue});
 						});
 						$("#txt_sourceTablename").combobox("loadData",TabledataList);
+					});
+				}
+			});
+		}
+		
+		if(document.getElementById('txt_sourceTablename')){
+			$('#txt_sourceTablename').combobox({
+				onChange: function (newValue, oldValue) {
+					$("#txt_sourceCodename").empty();
+					var databaseCode = $('#txt_sourceDatabaseName').combobox('getValue');
+					Core.ajax(Config.ContextPath+'service/exchangemapinfonew/getCodes/'+newValue+'/'+databaseCode, {
+						method: 'get',
+						data: {
+		                 _method: 'get'
+		             }
+					}).then(function(data) {
+						var orgValue;
+						var orgNameValue;
+						var codeDataList;
+						codeDataList = [];
+						$.each(data,function(index,item){
+						    orgValue = data[index];
+						    orgNameValue = data[index];
+						    codeDataList.push({"value": orgValue,"text":orgNameValue});
+						});
+						$("#txt_sourceCodename").combobox("loadData",codeDataList);
 					});
 				}
 			});

@@ -108,17 +108,40 @@ public class ExchangeMapinfoNewController extends BaseController {
     @SuppressWarnings("unchecked")
     @RequestMapping(value="/getTables/{databaseCode}" ,method = {RequestMethod.GET})
     public void getTables(@PathVariable String databaseCode ,HttpServletRequest request,HttpServletResponse response) throws Exception {
-        DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(databaseCode);
-        Connection connection = getConnection(databaseInfo);
-        DatabaseMetaData metaData = connection.getMetaData();
-        ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
-//        metaData.getColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern);
-        @SuppressWarnings("rawtypes")
-        List Tablelist = new ArrayList();
-        while (tables.next()) {
-            Tablelist.add(tables.getString("TABLE_NAME"));
+        if(databaseCode.equals("未选")){
+            List Tablelist = new ArrayList();
+            JsonResultUtils.writeSingleDataJson(Tablelist, response);
+        }else{
+            DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(databaseCode);
+            Connection connection = getConnection(databaseInfo);
+            DatabaseMetaData metaData = connection.getMetaData();
+            ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
+//            metaData.getColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern);
+            @SuppressWarnings("rawtypes")
+            List Tablelist = new ArrayList();
+            while (tables.next()) {
+                Tablelist.add(tables.getString("TABLE_NAME"));
+            }
+            connection.close();
+            JsonResultUtils.writeSingleDataJson(Tablelist, response);
         }
-        JsonResultUtils.writeSingleDataJson(Tablelist, response);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @RequestMapping(value="/getCodes/{tableCode}/{databaseCode}" ,method = {RequestMethod.GET})
+    public void getCodes(@PathVariable String tableCode ,@PathVariable String databaseCode ,HttpServletRequest request,HttpServletResponse response) throws Exception {
+            DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(databaseCode);
+            Connection connection = getConnection(databaseInfo);
+            DatabaseMetaData metaData = connection.getMetaData();
+            ResultSet resultSet  = metaData.getColumns(null, null,tableCode, null );
+//            metaData.getColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern);
+            @SuppressWarnings("rawtypes")
+            List codelist = new ArrayList();
+            while (resultSet .next()) {
+                codelist.add(resultSet .getString("COLUMN_NAME"));
+            }
+            connection.close();
+            JsonResultUtils.writeSingleDataJson(codelist, response);
     }
     
     @RequestMapping(value="/add" ,method = {RequestMethod.GET})
