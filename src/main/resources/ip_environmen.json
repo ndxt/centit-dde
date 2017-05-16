@@ -14,11 +14,21 @@
       "databaseCode": "0000000081",
       "osId": "CONTRACT",
       "databaseName": "公司经营数据管理数据库",
-      "databaseUrl": "jdbc:oracle:thin:@192.168.131.81:1521:ORCL",
-      "username": "fdemo2",
-      "password": "Q1etJ4PqbSg=",
+      "databaseUrl": "jdbc:oracle:thin:@192.168.128.13:1521:centora",
+      "username": "dde",
+      "password": "dde",
       "databaseDesc": "公司经营数据管理数据库",
       "created": "u0000000"
+    },
+    {
+      "databaseCode": "0000000082",
+      "osId": "CONTRACT",
+      "databaseName": "Test",
+      "databaseUrl": "jdbc:oracle:thin:@192.168.131.18:1521:orcl",
+      "username": "ndfi",
+      "password": "ndfi",
+      "databaseDesc": "Test",
+      "created": "admin"
     }
   ]
 }
