@@ -62,31 +62,52 @@
   	
   	
 <div class="easyui-tabs" style="width:97%;height:410px">
+
 	<div title="数据交换内容字段" style="padding:5px">
-			<table id="exchangeContent1" class="tab1"  style="width:96%;"
-				   pagination="false"
+			<div style="width:49%;float:left">
+				<table id="exchangeContent1" class="tab1"  style="width:100%;float:left"
+					   pagination="false"
+					   remoteSort="true"
+					   border="true" idField="cid"
+					   toolbar=".tab1-toolbar" >
+					<thead >
+						<th field="sourceFieldName" width="20%" data-options="editor: {type: 'text', options: {required: true}}">源字段名</th>
+						<th field="sourceFieldType" width="30%" data-options="editor: {type: 'text', options: {required: true}}">源字段类型</th>
+						<th field="sourceFieldSentence" width="30%" data-options="editor: {type: 'text', options: {required: true}}">源字段语句描述</th>
+						<!-- <th field="isPk" width="10%" data-options="editor: {type: 'text'}">是否为主键</th>
+						<th field="isNull" width="10%" data-options="editor: {type: 'text'}">目标是否可为空</th>
+						<th field="destFieldDefault" width="5%" data-options="editor: {type: 'text'}">常量</th> -->
+					</thead>
+				</table>
+				<div class="tab1-toolbar">
+					<a rel="exchangeMapinfoNew_Detail_add" iconCls="icon-add"
+					   target="custom" trigger="none" title="添加"  ><p>新增</p></a>
+					<hr>
+					<a rel="exchangeMapinfoNew_Detail_remove" iconCls="icon-base icon-base-rubbish"
+					   target="custom" trigger="single" ><p>删除</p></a>
+				</div>
+			</div>
+			
+			
+			
+			
+			<div style="width:50%;float:right" >
+				<table id="exchangeContent2"  style="width:100%;" toolbar=".temp-toolbar" pagination="false"
 				   remoteSort="true"
-				   border="true" idField="cid"
-				   toolbar=".tab1-toolbar" >
-				<thead >
-					<th field="sourceFieldName" width="14%" data-options="editor: {type: 'text', options: {required: true}}">源字段名</th>
-					<th field="sourceFieldType" width="15%" data-options="editor: {type: 'text', options: {required: true}}">源字段类型</th>
-					<th field="sourceFieldSentence" width="14%" data-options="editor: {type: 'text', options: {required: true}}">源字段语句描述</th>
-					<th field="destFieldName" width="14%" data-options="editor: {type: 'text', options: {required: true}}">目标字段名</th>
-					<th field="destFieldType" width="10%" data-options="editor: {type: 'text', options: {required: true}}">目标字段类型</th>
-					<th field="isPk" width="10%" data-options="editor: {type: 'text'}">是否为主键</th>
-					<th field="isNull" width="10%" data-options="editor: {type: 'text'}">目标是否可为空</th>
-					<th field="destFieldDefault" width="5%" data-options="editor: {type: 'text'}">常量</th>
-				</thead>
-			</table>
-		<div class="tab1-toolbar">
-			<a rel="exchangeMapinfoNew_Detail_add" iconCls="icon-add"
-			   target="custom" trigger="none" title="添加"  ><p>新增</p></a>
-			<hr>
-			<a rel="exchangeMapinfoNew_Detail_remove" iconCls="icon-base icon-base-rubbish "
-			   target="custom" trigger="single" ><p>删除</p></a>
-		</div>
-		
+				   border="true" idField="cid">
+			    </table> 
+				<div class="temp-toolbar">
+					<a rel="exchangeMapinfoNew_Detail_add" iconCls="icon-add"
+					   target="custom" trigger="none" title="添加"  ><p>新增</p></a>
+					<hr>
+					<a rel="exchangeMapinfoNew_Detail_remove" iconCls="icon-base icon-base-rubbish "
+					   target="custom" trigger="single" ><p>删除</p></a>
+				</div>
+			
+			</div>
+			
+			
+			
 	</div>
 	<div title="数据交换触发器" style="padding:5px">
 		<table id="exchangeContent" class="tab2"  style="width:96%;"
@@ -133,7 +154,7 @@
 	        </div>
 	        <div style="padding:10px;">
 	        	<span>字段名:
-	        		<input class="easyui-combobox" id="txt_sourceCodename" name="txt_sourceCodename" data-options="multiple:true,panelHeight:'auto'" style="width:455px;height:30px" ></input>
+	        		<select class="easyui-combobox" id="txt_sourceCodename" name="txt_sourceCodename" data-options="multiple:true,multiline:true" style="width:455px;height:30px" ></select>
 	        	</span>
 	        </div>
 			<div style="padding:10px;">

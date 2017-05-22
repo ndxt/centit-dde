@@ -137,11 +137,16 @@ public class ExchangeMapinfoNewController extends BaseController {
 //            metaData.getColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern);
             @SuppressWarnings("rawtypes")
             List codelist = new ArrayList();
+            List codeTypelist = new ArrayList();
             while (resultSet .next()) {
                 codelist.add(resultSet .getString("COLUMN_NAME"));
+                codeTypelist.add(resultSet .getString("TYPE_NAME"));
             }
             connection.close();
-            JsonResultUtils.writeSingleDataJson(codelist, response);
+            ResponseData resData = new ResponseData();
+            resData.addResponseData("codelist", codelist);
+            resData.addResponseData("codeTypelist", codeTypelist);
+            JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
     
     @RequestMapping(value="/add" ,method = {RequestMethod.GET})

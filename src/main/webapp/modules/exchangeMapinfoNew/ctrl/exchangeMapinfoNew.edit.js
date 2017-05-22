@@ -5,6 +5,8 @@ define(function(require) {
 	var ExchangeMapinfoNewAdd = require('./exchangeMapinfoNew.add');
 	var exchangeMapinfoNewDetailAdd = require('../ctrl/exchangeMapinfoNewDetail.add');
 	var ExchangeMapinfoNewDetailRemove = require('../ctrl/exchangeMapinfoNewDetail.remove');
+	var exchangeMapinfoNewDetailAdd2 = require('../ctrl/exchangeMapinfoNewDetail.add2');
+	var ExchangeMapinfoNewDetailRemove2 = require('../ctrl/exchangeMapinfoNewDetail.remove2');
 
 	var ExchangeMapinfoNewEdit = ExchangeMapinfoNewAdd.extend(function() {
 		var _self = this;
@@ -14,6 +16,8 @@ define(function(require) {
 		            new ExchangeMapinfoNewAdd('exchangeMapinfoNew_add'),
 		  			new exchangeMapinfoNewDetailAdd('exchangeMapinfoNew_Detail_add'),
 		  			new ExchangeMapinfoNewDetailRemove('exchangeMapinfoNew_Detail_remove'),
+		  			new exchangeMapinfoNewDetailAdd2('exchangeMapinfoNew_Detail_add2'),
+		  			new ExchangeMapinfoNewDetailRemove2('exchangeMapinfoNew_Detail_remove2'),
 		  		]);
 		
 		
@@ -32,6 +36,24 @@ define(function(require) {
 					.form('readonly', 'mapinfoId')
 					.form('focus');
 				
+				
+				var proArray = new Array(); 
+			    for(var i=0;i<data.mapinfoDetails.length;i++){ 
+			        var a = { 
+		        		destFieldName:data.mapinfoDetails[i].destFieldName, 
+		        		destFieldType:data.mapinfoDetails[i].destFieldType, 
+			        }; 
+			        proArray.push(a); 
+			    } 
+			     
+			    $("#exchangeContent2").datagrid({ 
+			        columns:[[ 
+			            {field:'destFieldName',title:'目标字段名',editor:'text',width:'30%'}, 
+			            {field:'destFieldType',title:'目标字段类型',editor:'text',width:'30%'}, 
+			        ]] 
+			    }).datagrid('loadData',proArray).datagrid('acceptChanges'); 
+				
+				
 				var tab1table = panel.find('table.tab1');
 				tab1table.cdatagrid({
 					controller:_self,
@@ -43,17 +65,15 @@ define(function(require) {
 					}
 				});
 				
-				var tab1table1 = panel.find('table.tab2');
-				tab1table1.cdatagrid({
+				
+				var tab2table = panel.find('table.tab2');
+				tab2table.cdatagrid({
 					controller:_self,
 					editable: true,
 					data:data.mapinfoTriggers
 				});
 			});
-			
 			onchange();
-			
-			
 		};
 		
 		
@@ -87,6 +107,7 @@ define(function(require) {
 	
 	
 	this.dlgAddDb = function(change){
+		var sourceDatabaseName = $('#sourceDatabaseName').val();
 		 $('#dlgAddDbLeft').dialog({
 	    	title:'数据库编辑',
 	    	resizable: true,
@@ -108,7 +129,7 @@ define(function(require) {
 				    orgNameValue = data[index].databaseName;
 				    dataList.push({"value": orgValue,"text":orgNameValue});
 				});
-				$('#txt_sourceDatabaseName').combobox('select','未选');
+				$('#txt_sourceDatabaseName').combobox('select',sourceDatabaseName);
 				$("#txt_sourceDatabaseName").combobox("loadData",dataList);
 			});
 //		 sql
@@ -125,7 +146,6 @@ define(function(require) {
 		if(document.getElementById('txt_sourceDatabaseName')){
 			$('#txt_sourceDatabaseName').combobox({
 				onChange: function (newValue, oldValue) {
-					$("#txt_sourceTablename").empty();
 					Core.ajax(Config.ContextPath+'service/exchangemapinfonew/getTables/'+newValue, {
 						method: 'get',
 						data: {
@@ -150,7 +170,7 @@ define(function(require) {
 		if(document.getElementById('txt_sourceTablename')){
 			$('#txt_sourceTablename').combobox({
 				onChange: function (newValue, oldValue) {
-					$("#txt_sourceCodename").empty();
+					$("#txt_sourceCodename").combobox('clear');
 					var databaseCode = $('#txt_sourceDatabaseName').combobox('getValue');
 					Core.ajax(Config.ContextPath+'service/exchangemapinfonew/getCodes/'+newValue+'/'+databaseCode, {
 						method: 'get',
@@ -162,10 +182,10 @@ define(function(require) {
 						var orgNameValue;
 						var codeDataList;
 						codeDataList = [];
-						$.each(data,function(index,item){
-						    orgValue = data[index];
-						    orgNameValue = data[index];
-						    codeDataList.push({"value": orgValue,"text":orgNameValue});
+						$.each(data.codeTypelist,function(index,item){
+						    orgValue = data.codeTypelist[index];
+						    orgNameValue = data.codelist[index];
+						    codeDataList.push({"id":index,"value": orgNameValue,"text":orgNameValue});
 						});
 						$("#txt_sourceCodename").combobox("loadData",codeDataList);
 					});
@@ -176,24 +196,37 @@ define(function(require) {
 	
 	
 	this.saveDbLeft = function(){
-		
-		 var text_Table = $("#txt_sourceTablename").val();
-		 var sql="select" ;
-		 var table = $("#exchangeContent").datagrid("getRows");
-		 for(var i=0;i<table.length;i++){
-			 if(i!=table.length-1){
-				 sql = sql +" "+ table[i].sourceFieldName+",";
-			 }else{
-				 sql = sql +" "+ table[i].sourceFieldName;
-			 }
-		 }
-//		 sql
-		 sql = sql + " FORM "+text_Table;
-		 $("#querySql").val(sql);
-//		 select 
-		 var txt_sourceDatabaseName =  $('#txt_sourceDatabaseName').combobox('getValue');
-		 $("#sourceDatabaseName").textbox("setValue", txt_sourceDatabaseName);
-		$('#dlgAddDbLeft').dialog("close");
+		 
+		 
+		 var txt_querySql = $('#txt_querySql').val();
+		 var text_Table = $("#txt_sourceTablename").combobox('getValue');
+		 var value_sourceCodename = $("#txt_sourceCodename").combobox('getValue');
+		 var txt_sourceCodename = $("#txt_sourceCodename").combobox('getText');
+		 var txt_sourceCodenames = txt_sourceCodename.split(",");
+	     for(var i=0;i<txt_sourceCodenames.length;i++){ 
+    		$('#exchangeContent1').datagrid('appendRow', {
+    			sourceFieldName : txt_sourceCodenames[i],
+    			sourceFieldType : 'VARCHAR2',
+    			sourceFieldSentence:'',
+    		});
+	     } 
+		 
+//		 var sql="select" ;
+//		 var table = $("#exchangeContent1").datagrid("getRows");
+//		 for(var i=0;i<table.length;i++){
+//			 if(i!=table.length-1){
+//				 sql = sql +" "+ table[i].sourceFieldName+",";
+//			 }else{
+//				 sql = sql +" "+ table[i].sourceFieldName;
+//			 }
+//		 }
+////		 sql
+//		 sql = sql + " FORM "+text_Table;
+//		 $("#querySql").val(sql);
+////		 select 
+//		 var txt_sourceDatabaseName =  $('#txt_sourceDatabaseName').combobox('getValue');
+//		 $("#sourceDatabaseName").textbox("setValue", txt_sourceDatabaseName);
+		 $('#dlgAddDbLeft').dialog("close");
 	};
 	this.closeDbLeft = function(){
 		$('#dlgAddDbLeft').dialog("close");

@@ -14,6 +14,7 @@ import com.centit.framework.staticsystem.po.DataDictionary;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.po.OsInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,7 +30,9 @@ import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -203,9 +206,9 @@ public class ExportSqlController extends BaseController {
      */
     @RequestMapping(value="/resolveQuerySql")
     public void resolveQuerySql(ExportSql object,HttpServletResponse response) throws IOException {
-//        PrintWriter writer = response.getWriter();
-//        String jsonResult = null;
-//        Map<String, Object> params = new HashMap<String, Object>();
+        PrintWriter writer = response.getWriter();
+        String jsonResult = null;
+        Map<String, Object> params = new HashMap<String, Object>();
         List<ExportField> efList = new ArrayList<ExportField>();
         ResponseData resData = new ResponseData();
         try {
