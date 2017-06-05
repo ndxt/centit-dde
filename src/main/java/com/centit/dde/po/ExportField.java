@@ -20,21 +20,39 @@ public class ExportField implements java.io.Serializable {
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private ExportFieldId cid;
 
+    /**
+     * 字段名称
+     */
     @Column(name="FIELD_NAME")
     private String fieldName;
 
+    /**
+     * 字段语句
+     */
     @Column(name="FIELD_SENTENCE")
     private String fieldSentence;
 
+    /**
+     * 字段类型
+     */
     @Column(name="FIELD_TYPE")
     private String fieldType;
 
+    /**
+     * 字段格式
+     */
     @Column(name="FIELD_FORMAT")
     private String fieldFormat;
 
+    /**
+     * 存储类型
+     */
     @Column(name="FIELD_STORE_TYPE")
     private String fieldStoreType;
 
+    /**
+     * 是否主键
+     */
     @Column(name="IS_PK")
     private String isPk;
 

@@ -13,7 +13,7 @@ define(function(require) {
 			
 			Core.ajax(Config.ContextPath+'service/userdataoptid/edit/'+data.udId, {
 				type: 'json',
-				method: 'post' 
+				method: 'get'
 //					.then()是Promise规范规定的异步调用方法    得到数据后，调用form的load方法将数据显示在表单中
 			}).then(function(data) {
 				_self.data = data;

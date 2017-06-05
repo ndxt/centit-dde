@@ -43,17 +43,17 @@ public class TaskLogController extends BaseController {
     // SysOptLogFactoryImpl.getSysOptLog("optid");
 
     private static final long serialVersionUID = 1L;
-    @Resource
 
+    @Resource
     private TaskLogManager taskLogMag;
-    @Resource
 
+    @Resource
     private ExchangeTaskManager exchangeTaskManager;
-    @Resource
 
+    @Resource
     private ExportSqlManager exportSqlManager;
-    @Resource
 
+    @Resource
     private ImportOptManager importOptManager;
 
     private String fileName;
@@ -162,28 +162,18 @@ public class TaskLogController extends BaseController {
 
 //        Map<String, Object> filterMap = convertSearchColumn(paramMap);
         Map<String, Object> searchColumn = convertSearchColumn(request);
-        if (!orderField.equals(null)
-                && !orderDirection.equals(null)) {
+        if (!orderField.equals(null) && !orderDirection.equals(null)) {
 
-            searchColumn.put(CodeBook.SELF_ORDER_BY, orderField + " "
-                    + orderDirection);
+            searchColumn.put(CodeBook.SELF_ORDER_BY, orderField + " " + orderDirection);
 
-            // request.setAttribute("orderDirection", orderDirection);
-            // request.setAttribute("orderField", orderField);
         }
 
-        searchColumn.put("taskId",
-                Long.parseLong(String.valueOf(searchColumn.get("taskId"))));
+        searchColumn.put("taskId",  Long.parseLong(String.valueOf(searchColumn.get("taskId"))));
 
         List<TaskLog> objList = taskLogMag.listObjects(searchColumn, pageDesc);
-//        totalRows = pageDesc.getTotalRows();
-//
-//        this.pageDesc = pageDesc;
 
         ExchangeTask exchangeTask = exchangeTaskManager
                 .getObjectById((Long) searchColumn.get("taskId"));
-        // request.setAttribute("exchangeTask", exchangeTask);
-        // return LIST;
         ResponseData resData = new ResponseData();
         resData.addResponseData("OBJLIST", objList);
         resData.addResponseData("PAGE_DESC", pageDesc);

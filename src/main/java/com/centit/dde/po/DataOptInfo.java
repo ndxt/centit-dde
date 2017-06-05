@@ -15,33 +15,48 @@ import java.util.*;
 public class DataOptInfo implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 数据处理ID
+     */
     @Id
     @Column(name = "DATA_OPT_ID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String dataOptId;// mapinfoID
-    
+
+    /**
+     * 处理名称
+     */
     @Column(name="OPT_NAME")
     private String optName;
-    
+
+    /**
+     * 处理说明
+     */
     @Column(name = "OPT_DESC")
     private String optDesc;
-    
+
+    /**
+     * 创建人员
+     */
     @Column(name = "CREATED")
     private String created;
-    
+
+    /**
+     * 最后更新时间
+     */
     @Column(name = "LAST_UPDATE_TIME")
     private Date lastUpdateTime;
-    
+
+    /**
+     * 创建时间
+     */
     @Column(name = "CREATE_TIME")
     private Date createTime;
     
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
     @JoinColumn(name="DATA_OPT_ID") //这里表示数据库的外键 在t_street里面创建
-    private List<DataOptStep> dataOptSteps = null;// new
-    // ArrayList<DataOptStep>();
-
-    // Constructors
+    private List<DataOptStep> dataOptSteps = null;
 
     /**
      * default constructor
@@ -55,16 +70,15 @@ public class DataOptInfo implements java.io.Serializable {
     public DataOptInfo(String dataOptId) {
 
         this.dataOptId = dataOptId;
-
     }
 
     /**
      * full constructor
      */
-    public DataOptInfo(String dataOptId, String optDesc, String created, Date lastUpdateTime, Date createTime) {
+    public DataOptInfo(String dataOptId, String optName, String optDesc, String created, Date lastUpdateTime, Date createTime) {
 
         this.dataOptId = dataOptId;
-
+        this.optName = optName;
         this.optDesc = optDesc;
         this.created = created;
         this.lastUpdateTime = lastUpdateTime;
@@ -80,6 +94,14 @@ public class DataOptInfo implements java.io.Serializable {
     }
 
     // Property accessors
+
+    public String getOptName() {
+        return this.optName;
+    }
+
+    public void setOptName(String optName) {
+        this.optName = optName;
+    }
 
     public String getOptDesc() {
         return this.optDesc;
@@ -115,7 +137,7 @@ public class DataOptInfo implements java.io.Serializable {
 
     public List<DataOptStep> getDataOptSteps() {
         if (this.dataOptSteps == null)
-            this.dataOptSteps = new ArrayList<DataOptStep>();
+            this.dataOptSteps = new ArrayList<>();
         return this.dataOptSteps;
     }
 
@@ -124,14 +146,16 @@ public class DataOptInfo implements java.io.Serializable {
     }
 
     public void addDataOptStep(DataOptStep dataOptStep) {
-        if (this.dataOptSteps == null)
-            this.dataOptSteps = new ArrayList<DataOptStep>();
+        if (this.dataOptSteps == null) {
+            this.dataOptSteps = new ArrayList<>();
+        }
         this.dataOptSteps.add(dataOptStep);
     }
 
     public void removeDataOptStep(DataOptStep dataOptStep) {
-        if (this.dataOptSteps == null)
+        if (this.dataOptSteps == null) {
             return;
+        }
         this.dataOptSteps.remove(dataOptStep);
     }
 
@@ -147,17 +171,18 @@ public class DataOptInfo implements java.io.Serializable {
      * 替换子类对象数组，这个函数主要是考虑hibernate中的对象的状态，以避免对象状态不一致的问题
      */
     public void replaceDataOptSteps(List<DataOptStep> dataOptSteps) {
-        List<DataOptStep> newObjs = new ArrayList<DataOptStep>();
+        List<DataOptStep> newObjs = new ArrayList<>();
         for (DataOptStep p : dataOptSteps) {
-            if (p == null)
+            if (p == null) {
                 continue;
+            }
             DataOptStep newdt = newDataOptStep();
             newdt.copyNotNullProperty(p);
             newObjs.add(newdt);
         }
         // delete
         boolean found = false;
-        Set<DataOptStep> oldObjs = new HashSet<DataOptStep>();
+        Set<DataOptStep> oldObjs = new HashSet<>();
         oldObjs.addAll(getDataOptSteps());
 
         for (Iterator<DataOptStep> it = oldObjs.iterator(); it.hasNext(); ) {
@@ -169,8 +194,9 @@ public class DataOptInfo implements java.io.Serializable {
                     break;
                 }
             }
-            if (!found)
+            if (!found) {
                 removeDataOptStep(odt);
+            }
         }
         oldObjs.clear();
         // insert or update
@@ -203,17 +229,21 @@ public class DataOptInfo implements java.io.Serializable {
 
     public void copyNotNullProperty(DataOptInfo other) {
 
-        if (other.getDataOptId() != null)
+        if (other.getDataOptId() != null) {
             this.setDataOptId(other.getDataOptId());
-
-        if (other.getOptDesc() != null)
+        }
+        if (other.getOptDesc() != null) {
             this.optDesc = other.getOptDesc();
-        if (other.getCreated() != null)
+        }
+        if (other.getCreated() != null) {
             this.created = other.getCreated();
-        if (other.getLastUpdateTime() != null)
+        }
+        if (other.getLastUpdateTime() != null) {
             this.lastUpdateTime = other.getLastUpdateTime();
-        if (other.getCreateTime() != null)
+        }
+        if (other.getCreateTime() != null) {
             this.createTime = other.getCreateTime();
+        }
         if (null != other.getOptName()) {
             this.optName = other.getOptName();
         }
@@ -230,12 +260,6 @@ public class DataOptInfo implements java.io.Serializable {
         // this.dataOptSteps = new HashSet<DataOptStep>();
     }
 
-    public String getOptName() {
-        return optName;
-    }
 
-    public void setOptName(String optName) {
-        this.optName = optName;
-    }
 
 }

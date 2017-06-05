@@ -1,33 +1,28 @@
 package com.centit.dde.service.impl;
 
+import com.centit.dde.dao.ExportSqlDao;
+import com.centit.dde.exception.SqlResolveException;
+import com.centit.dde.po.*;
+import com.centit.dde.service.ExportFieldManager;
+import com.centit.dde.service.ExportSqlManager;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.support.database.QueryUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.centit.framework.model.basedata.IUserInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
-import com.centit.support.database.QueryUtils;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import com.centit.dde.dao.ExportSqlDao;
-import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.ExportField;
-import com.centit.dde.po.ExportFieldId;
-import com.centit.dde.po.ExportSql;
-import com.centit.dde.po.ExportTrigger;
-import com.centit.dde.po.ExportTriggerId;
-import com.centit.dde.service.ExportFieldManager;
-import com.centit.dde.service.ExportSqlManager;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
-
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 @Service
 public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,ExportSqlDao>
         implements ExportSqlManager {
@@ -39,21 +34,16 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
     
     private ExportSqlDao exportSqlDao;
 
+    @Resource
     private ExportFieldManager exportFieldManager;
 
     @Resource
     protected StaticEnvironmentManager platformEnvironment;
-
-    public ExportFieldManager getExportFieldManager() {
-        return exportFieldManager;
-    }
     
     public String getMapinfoName(Long mapinfoId) {
         return this.exportSqlDao.getMapinfoName(mapinfoId);
     }
-    public void setExportFieldManager(ExportFieldManager exportFieldManager) {
-        this.exportFieldManager = exportFieldManager;
-    }
+
 
     @Resource(name="exportSqlDao")
     @NotNull
@@ -63,19 +53,20 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public void validator(ExportSql object) throws SqlResolveException {
         if (!StringUtils.hasText(object.getQuerySql())) {
             throw new SqlResolveException(10001);
         }
         object.setQuerySql(object.getQuerySql().toUpperCase());
 
-        DatabaseInfo dbinfo =  platformEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
-        if (null == dbinfo) {
+        DatabaseInfo dbInfo =  platformEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
+        if (null == dbInfo) {
             throw new SqlResolveException(10002);
         }
 
         // 验证sql有效性
-        exportSqlDao.validateSql(object.getQuerySql(), dbinfo);
+        exportSqlDao.validateSql(object.getQuerySql(), dbInfo);
 
         // 验证触发器的参数是否在字段中存在
         Set<String> params = new HashSet<String>();
@@ -92,11 +83,11 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
             et.setTriggerSql(triggerSql);
 
             List<String> names = QueryUtils.getSqlNamedParameters(triggerSql);
-            if (1 == names.size()) {
+            if (0 == names.size()) {
                 continue;
             }
 
-            names.remove(names.size() - 1);
+//            names.remove(names.size() - 1);
 
             params.addAll(names);
         }
@@ -130,48 +121,29 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public void saveObject(ExportSql object, IUserInfo userDetail) throws SqlResolveException {
         DatabaseInfo dbinfo =  platformEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
         object.setSourceOsId(dbinfo.getOsId());
 
         // save exportsql
-        ExportSql dbObject = exportSqlDao.getObjectById(object.getExportId());
+        ExportSql dbObject = exportSqlDao.loadObjectById(object.getExportId());
         if (null == dbObject) {
             object.setCreated(userDetail.getUserCode());
             object.setCreateTime(new Date());
-
             object.setExportId(exportSqlDao.getNextLongSequence());
-
             setExportFieldTriggerCid(object);
             saveObject(object);
         } else {
-            dbObject.getExportFields().clear();
-            dbObject.getExportTriggers().clear();
-
-            exportSqlDao.flush();
-            dbObject.setLastUpdateTime(new Date());
-
-            dbObject.copyNotNullProperty(object);
-            // copy database fields to convert fields
-
-            setExportFieldTriggerCid(object);
-
-            for (ExportField ef : object.getExportFields()) {
-                dbObject.addExportField(ef);
-            }
-
-            for (ExportTrigger et : object.getExportTriggers()) {
-                dbObject.addExportTrigger(et);
-            }
-
+            dbObject.replaceExportFields(object.getExportFields() );
+            dbObject.replaceExportTriggers(object.getExportTriggers());
             object = dbObject;
-
         }
 
-        saveObject(object);
-
+        mergeObject(object);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     private void setExportFieldTriggerCid(ExportSql object) {
         ExportField ef = null;
         ExportTrigger er = null;
@@ -187,6 +159,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public List<ExportField> listExportFieldsByQuerysql(ExportSql object) throws SqlResolveException {
         DatabaseInfo dbinfo =  platformEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
 

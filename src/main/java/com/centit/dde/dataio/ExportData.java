@@ -15,15 +15,15 @@ public interface ExportData {
      * @param usercode
      * @return >=0 为正常，<0 为错误编码
      */
-    public int doExport(Long exportID, String usercode);
+    int doExport(Long exportID, String usercode);
 
     /**
-     * 导出离线文件
+     * 执行导出任务
      *
      * @param taskID
-     * @param usercode
+     * @param userCode
      * @param runType  1:手动 0：系统自动 2:WebService接口
      * @return >=0 为正常，<0 为错误编码
      */
-    public String runExportTask(Long taskID, String usercode, String runType,String taskType);
+    String runExportTask(Long taskID, String userCode, String runType,String taskType);
 }

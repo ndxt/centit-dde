@@ -20,21 +20,39 @@ public class ImportField implements java.io.Serializable {
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private ImportFieldId cid;
 
+    /**
+     * 源字段
+     */
     @Column(name="SOURCE_FIELD_NAME")
     private String sourceFieldName;
 
+    /**
+     * 目标字段
+     */
     @Column(name="DEST_FIELD_NAME")
     private String destFieldName;
 
+    /**
+     * 目标字段类型
+     */
     @Column(name="DEST_FIELD_TYPE")
     private String destFieldType;
 
+    /**
+     * 是否主键
+     */
     @Column(name="IS_PK")
     private String isPk;
 
+    /**
+     * 默认值
+     */
     @Column(name="DEST_FIELD_DEFAULT")
     private String destFieldDefault;
 
+    /**
+     * 是否可为空
+     */
     @Column(name="IS_NULL")
     private String isNull;
 

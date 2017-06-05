@@ -1,31 +1,36 @@
 <form class="form centit">
 	<div class="fields two">
+		<!--<input hidden type="text" name="importId" />-->
 		<div class="field required">
 			<label>导入名称：</label>
 			<input type="text" class="easyui-textbox" name="importName" required />
 		</div>
 		<div class="field required">
-			<label>目标数据库名：</label>
-			<input type="text" class="easyui-textbox" name="destDatabaseName" required />
+			<label>目标数据库：</label>
+            <input id="db" name="destDatabaseName" class="easyui-combobox" required />
 		</div>
 	</div>
 	<div class="fields two">
 		<div class="field ">
-			<label>导入表：</label>
-			<input type="text" class="easyui-textbox" name="tableName" />
+			<label>目标表：</label>
+            <input id="table" name="tableName" class="easyui-combobox" />
 		</div>
 		<div class="field ">
-			<label>记录操作：</label>
-				<div class="centit radio">
-					<input type="radio" name="isValid" value="1" />
-					<label>插入</label>
+			<label>目标字段：</label>
+            <input id="field" class="easyui-combobox" />
+		</div>
+	</div>
+	<div class="field ">
+		<label>记录操作：</label>
+		<div class="centit radio">
+			<input type="radio" name="recordOperate" value="1" />
+			<label>插入</label>
 
-					<input type="radio" name="isValid" value="2" />
-					<label>更新</label>
+			<input type="radio" name="recordOperate" value="2" />
+			<label>更新</label>
 
-					<input type="radio" name="isValid" value="3" />
-					<label>合并</label>
-				</div>
+			<input type="radio" name="recordOperate" value="3" />
+			<label>合并</label>
 		</div>
 	</div>
 	<div class="field">
@@ -37,7 +42,8 @@
 	<div title="数据导入内容字段">
 		<table class="tab1"  style="width:96%;"
 			   pagination="false"
-			   border="true" idField="cid"
+			   border="true"
+			   idField="cid"
 			   toolbar=".tab1-toolbar" >
 			<thead >
 				<th field="sourceFieldName" width="24%" data-options="editor: {type: 'text', options: {required: true}}">源字段名</th>

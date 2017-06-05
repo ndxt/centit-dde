@@ -1,36 +1,32 @@
 package com.centit.dde.service.impl;
 
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.centit.dde.dao.ImportFieldDao;
+import com.centit.dde.dao.ImportOptDao;
+import com.centit.dde.exception.SqlResolveException;
+import com.centit.dde.po.*;
+import com.centit.dde.service.ImportOptManager;
+import com.centit.dde.util.ConnPool;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.centit.support.database.QueryUtils;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.centit.dde.dao.ExportSqlDao;
-import com.centit.dde.dao.ImportOptDao;
-import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.ImportField;
-import com.centit.dde.po.ImportFieldId;
-import com.centit.dde.po.ImportOpt;
-import com.centit.dde.po.ImportTrigger;
-import com.centit.dde.po.ImportTriggerId;
-import com.centit.dde.service.ImportOptManager;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
-
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+
 @Service
 public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,ImportOptDao> implements ImportOptManager {
 
@@ -39,6 +35,8 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
     // private static final SysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog();
 
+    @Resource
+    private ImportFieldDao importFieldDao;
    
     private ImportOptDao importOptDao;
 
@@ -136,6 +134,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public void saveObject(ImportOpt object, IUserInfo userDetail) throws SqlResolveException {
         // 判断导入的表是否存在
 
@@ -191,6 +190,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
 
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     private void setImportFieldTriggerCid(ImportOpt object) {
         ImportField ef = null;
         ImportTrigger et = null;
@@ -203,5 +203,46 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
             et = object.getImportTriggers().get(i);
             et.setCid(new ImportTriggerId((long) i, object.getImportId()));
         }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public List<ImportField> listFields(String databaseCode, String tableName) throws SqlResolveException {
+        List<ImportField> fields = new ArrayList<>();
+        Connection connection = null;
+        if (databaseCode != null && !"".equals(databaseCode)) {
+            DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(databaseCode);
+            if (databaseInfo != null) {
+                try {
+                    connection = ConnPool.getConn(databaseInfo);
+                    DatabaseMetaData metaData = connection.getMetaData();
+                    ResultSet resultSet = metaData.getColumns(null, null, tableName, null);
+                    while (resultSet.next()) {
+                        ImportField field = new ImportField();
+                        field.setDestFieldName(resultSet.getString("COLUMN_NAME"));
+                        field.setDestFieldType(resultSet.getString("TYPE_NAME"));
+                        field.setIsNull(resultSet.getString("NULLABLE"));
+//                        field.setDestFieldDefault(resultSet.getString(""));
+                        field.setIsPk("0");
+                        ResultSet pk = metaData.getPrimaryKeys(null, null, tableName);
+                        while (pk.next()) {
+                            if (pk.getString("COLUMN_NAME").equals(resultSet.getString("COLUMN_NAME"))) {
+                                field.setIsPk("1");
+                            }
+                        }
+                        fields.add(field);
+                    }
+                } catch (Exception e) {
+
+                } finally {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+
+                    }
+                }
+            }
+        }
+        return fields;
     }
 }

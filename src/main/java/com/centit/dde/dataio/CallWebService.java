@@ -8,7 +8,7 @@ public interface CallWebService {
      * @param usercode
      * @return >=0 为正常，<0 为错误编码
      */
-    public int doCallService(Long exportID, String usercode);
+    int doCallService(Long exportID, String usercode);
 
     /**
      * 导出离线文件
@@ -18,5 +18,5 @@ public interface CallWebService {
      * @param runType  1:手动 0：系统自动 2:WebService接口
      * @return >=0 为正常，<0 为错误编码
      */
-    public String runCallServiceTask(Long taskID, String usercode, String runType,String taskType);
+    String runCallServiceTask(Long taskID, String usercode, String runType,String taskType);
 }

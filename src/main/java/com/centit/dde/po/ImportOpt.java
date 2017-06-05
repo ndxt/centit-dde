@@ -21,21 +21,36 @@ public class ImportOpt implements java.io.Serializable {
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long importId;
 
+    /**
+     * 目标数据库
+     */
     @Column(name="DEST_DATABASE_NAME")
     private String destDatabaseName;
 
+    /**
+     * 业务系统ID
+     */
     @Column(name="SOURCE_OS_ID")
     private String sourceOsId;
 
+    /**
+     * 导入名称
+     */
     @Column(name="IMPORT_NAME")
     private String importName;
 
+    /**
+     * 表名
+     */
     @Column(name="TABLE_NAME")
     private String tableName;
 
     @Column(name="CREATED")
     private String created;
 
+    /**
+     * 导入说明
+     */
     @Column(name="IMPORT_DESC")
     private String importDesc;
 
@@ -45,6 +60,9 @@ public class ImportOpt implements java.io.Serializable {
     @Column(name="CREATE_TIME")
     private Date createTime;
 
+    /**
+     * 记录操作
+     */
     @Column(name="RECORD_OPERATE")
     private String recordOperate;
 
@@ -55,10 +73,8 @@ public class ImportOpt implements java.io.Serializable {
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
     @JoinColumn(name="import_Id") //这里表示数据库的外键 在t_street里面创建
     private List<ImportField> importFields = null;// new
-    // ArrayList<ImportField>();
 
     // Constructors
-
     /**
      * default constructor
      */

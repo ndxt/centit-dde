@@ -52,7 +52,6 @@ public class DataOptInfoDao extends BaseDaoImpl<DataOptInfo,String> {
                 + "where dos.importId = io.importId and dos.dataOptId = doi.dataOptId and doi.dataOptId = :dataOptId order by dos.mapinfoOrder";
 
         return (List<DataOptStep>) DatabaseOptUtils.findObjectsByHql(this,hql, 
-                QueryUtils.createSqlParamsMap(
-                        "dataOptId", object.getDataOptId()));
+                QueryUtils.createSqlParamsMap("dataOptId", object.getDataOptId()));
     }
 }

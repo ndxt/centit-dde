@@ -334,7 +334,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
         tableWriter.setExportName("exp" + exportSql.getExportId());
         tableWriter.setDataOptId(exportSql.getDataOptId());
-        tableWriter.setSorceOsId(exportSql.getSourceOsId());
+        tableWriter.setSourceOsId(exportSql.getSourceOsId());
         tableWriter.setSourceDBName(exportSql.getSourceDatabaseName());
 
         tableWriter.prepareWriter();
@@ -345,7 +345,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
     }
 
     @Override
-    public String runExportTask(Long taskID, String usercode, String runType,String taskType) {
+    public String runExportTask(Long taskID, String userCode, String runType,String taskType) {
         ExchangeTask exchangeTask = exchangeTaskDao.getObjectById(taskID);
         exchangeTask.setLastRunTime(DatetimeOpt.currentSqlDate());
         exchangeTaskDao.saveObject(exchangeTask);
@@ -362,7 +362,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
         taskLog.setTaskId(taskID);
         taskLog.setRunBeginTime(DatetimeOpt.currentSqlDate());
         taskLog.setRunType(runType);
-        taskLog.setRunner(usercode);
+        taskLog.setRunner(userCode);
         taskLog.setTaskType(taskType);
         taskLogManager.saveObject(taskLog);
 
@@ -379,7 +379,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
         ef.setDdeID(ddeId);
         ef.setExchangeName(exchangeTask.getTaskName());
         ef.setTaskID(String.valueOf(taskLogId));
-        ef.setOperator(usercode);
+        ef.setOperator(userCode);
         ef.setExportTime(DatetimeOpt.currentUtilDate());
 
         ef.prepareWriter();
@@ -412,7 +412,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
             tableWriter.setFilePath(filePath);
             tableWriter.setExportName("exp" + exportSql.getExportId());
             tableWriter.setDataOptId(exportSql.getDataOptId());
-            tableWriter.setSorceOsId(exportSql.getSourceOsId());
+            tableWriter.setSourceOsId(exportSql.getSourceOsId());
             tableWriter.setSourceDBName(exportSql.getSourceDatabaseName());
             tableWriter.setFilePath(ef.getExchangeFilePath());
             // 判断是否需要写入到单独的文件中
@@ -422,7 +422,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
                 tableWriter.setTableWriter(ef.getExchangeWriter());
             }
 
-            int nRes = doExportSql(exportSql, tableWriter, usercode, taskDetailLog);
+            int nRes = doExportSql(exportSql, tableWriter, userCode, taskDetailLog);
 
             Date endTime = DatetimeOpt.currentSqlDate();
             taskDetailLog.setRunEndTime(endTime);
@@ -475,7 +475,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
         tableWriter.setExportName("exp" + exportSql.getExportId());
         tableWriter.setDataOptId(exportSql.getDataOptId());
-        tableWriter.setSorceOsId(exportSql.getSourceOsId());
+        tableWriter.setSourceOsId(exportSql.getSourceOsId());
         tableWriter.setSourceDBName(exportSql.getSourceDatabaseName());
 
         tableWriter.prepareMemoryWriter();
@@ -532,7 +532,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
             tableWriter.setExportName("exp" + exportSql.getExportId());
             tableWriter.setDataOptId(exportSql.getDataOptId());
-            tableWriter.setSorceOsId(exportSql.getSourceOsId());
+            tableWriter.setSourceOsId(exportSql.getSourceOsId());
             tableWriter.setSourceDBName(exportSql.getSourceDatabaseName());
             tableWriter.prepareMemoryWriter();
 

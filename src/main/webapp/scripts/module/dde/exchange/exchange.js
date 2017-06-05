@@ -1437,7 +1437,7 @@ function ExportSql() {
 
             var columnNoVal = funs.get($object.parents('tr:eq(0)'), columnNo);
 
-            var href = DWZ.contextPath + '/dde/exchangeMapinfoNew!' + method + '.do?columnNo=' + columnNoVal;
+            var href = DWZ.contextPath + '/dde/exchangeMapInfo!' + method + '.do?columnNo=' + columnNoVal;
 
             funs.set($object, 'href', href);
         },

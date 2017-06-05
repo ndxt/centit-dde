@@ -1,9 +1,17 @@
 define(function(require) {
 
-	var Config = require('config');
 	var Page = require('core/page');
+	var Config = require('config');
+	var Core = require('core/core');
 	
-	var ExchangeMapinfoAdd = Page.extend(function() {
+	
+	var ExchangeMapInfoAddSourceDs = require('./exchangeMapInfo.addSourceDs');
+	
+	var ExchangeMapInfoAdd = Page.extend(function() {
+		
+		this.injecte([
+          new ExchangeMapInfoAddSourceDs('exchangeMapInfo_addSourceDs'),
+    	]);
 		
 		// @override
 		// 加载页面时调用
@@ -13,6 +21,7 @@ define(function(require) {
 			// 
 			form.form('disableValidation')
 			.form('focus');
+			onchange();
 		};
 		
 		// @override
@@ -26,8 +35,8 @@ define(function(require) {
 			
 			if (isValid) {
 				form.form('ajax', {
-					url: Config.ContextPath + 'service/flow/optprocinfo',
-					method: 'post'
+					url: Config.ContextPath + 'service/exchangemapinfo/save',
+					method: 'put'
 				}).then(closeCallback);
 			}
 			
@@ -40,6 +49,6 @@ define(function(require) {
 			table.datagrid('reload');
 		};
 	});
-	
-	return ExchangeMapinfoAdd;
+
+	return ExchangeMapInfoAdd;
 });

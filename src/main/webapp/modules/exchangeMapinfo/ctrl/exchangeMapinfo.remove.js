@@ -4,7 +4,7 @@ define(function(require) {
 	var Page = require('core/page');
 	
 	// 删除数据字典
-	var DatabaseInfoListRemove = Page.extend(function() {
+	var ExchangeMapInfoRemove = Page.extend(function() {
 		
 		// @override
 		this.submit = function(table, data) {
@@ -20,5 +20,5 @@ define(function(require) {
 		}
 	});
 	
-	return DatabaseInfoListRemove;
+	return ExchangeMapInfoRemove;
 });

@@ -32,21 +32,16 @@ import java.util.concurrent.Executors;
 @Controller
 @RequestMapping("/transfer")
 public class TransferController extends BaseController {
-    
-    @Resource
-    private ExchangeTaskManager exchangeTaskMag;
 
     private static Log logger = LogFactory.getLog(TransferController.class);
 
+    private static final long serialVersionUID = 1L;
+
+    @Resource
+    private ExchangeTaskManager exchangeTaskMag;
+
+    @Resource
     private TransferManager transferManager;
-
-    public TransferManager getTransferManager() {
-        return transferManager;
-    }
-
-    public void setTransferManager(TransferManager transferManager) {
-        this.transferManager = transferManager;
-    }
 
     private ExportData exportData;
 
@@ -66,16 +61,12 @@ public class TransferController extends BaseController {
         this.exportData = exportData;
     }
 
-    private static final long serialVersionUID = 1L;
-
     
     @RequestMapping(value="/doTransfer/{taskIds}", method = {RequestMethod.POST})
     public void doTransfer(@PathVariable Long taskIds,  HttpServletRequest request,HttpServletResponse response) {
         final long taskId = taskIds;
-//        final FUserinfo userDetails = (FUserinfo) this.getLoginUser();
         final CentitUserDetails userDetails = getLoginUser(request);
-//        final Long taskId = Long.valueOf(request.getParameter("id"));
-        
+
         ExchangeTask exchangeTask = exchangeTaskMag.getObjectById(taskId);
         
         String Type = exchangeTask.getTaskType();

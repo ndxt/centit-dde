@@ -1,29 +1,21 @@
 package com.centit.dde.service.impl;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.sql.Blob;
-import java.sql.CallableStatement;
-import java.sql.Clob;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import oracle.sql.BLOB;
-
+import com.centit.dde.dao.ExchangeMapinfoDao;
+import com.centit.dde.dao.ExchangeTaskDao;
+import com.centit.dde.dao.ExchangeTaskdetailDao;
+import com.centit.dde.dao.MapinfoTriggerDao;
+import com.centit.dde.exception.SqlResolveException;
+import com.centit.dde.po.*;
+import com.centit.dde.service.TaskDetailLogManager;
+import com.centit.dde.service.TaskErrorDataManager;
+import com.centit.dde.service.TaskLogManager;
+import com.centit.dde.service.TransferManager;
+import com.centit.dde.util.SQLUtils;
+import com.centit.dde.util.TaskConsoleWriteUtils;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.sun.istack.Nullable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
@@ -31,31 +23,15 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
-import com.centit.dde.dao.ExchangeMapinfoDao;
-import com.centit.dde.dao.ExchangeTaskDao;
-import com.centit.dde.dao.ExchangeTaskdetailDao;
-import com.centit.dde.dao.MapinfoTriggerDao;
-import com.centit.dde.exception.SqlResolveException;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.dde.po.ExchangeMapinfo;
-import com.centit.dde.po.ExchangeTask;
-import com.centit.dde.po.ExchangeTaskdetail;
-import com.centit.dde.po.MapInfoDBConn;
-import com.centit.dde.po.MapinfoTrigger;
-import com.centit.dde.po.TableMapInfo;
-import com.centit.dde.po.TaskDetailLog;
-import com.centit.dde.po.TaskErrorData;
-import com.centit.dde.po.TaskLog;
-import com.centit.dde.po.TransferResult;
-import com.centit.dde.service.TaskDetailLogManager;
-import com.centit.dde.service.TaskErrorDataManager;
-import com.centit.dde.service.TaskLogManager;
-import com.centit.dde.service.TransferManager;
-import com.centit.dde.util.SQLUtils;
-import com.centit.dde.util.TaskConsoleWriteUtils;
-import com.sun.istack.Nullable;
+import javax.annotation.Resource;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class TransferManagerImpl implements TransferManager {

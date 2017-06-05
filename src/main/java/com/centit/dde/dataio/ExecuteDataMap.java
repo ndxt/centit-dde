@@ -18,7 +18,7 @@ public interface ExecuteDataMap {
      * @return
      * @throws Exception
      */
-    public int doExecute(TableFileReader xmlData, String usercode, String runType, Long taskLogId)
+    int doExecute(TableFileReader xmlData, String usercode, String runType, Long taskLogId)
             throws SqlResolveException;
 
     /**
@@ -27,7 +27,7 @@ public interface ExecuteDataMap {
      * @param taskLogId
      * @return
      */
-    public int doCallWebService(TableFileReader xmlData, OsInfo osInfo, Long taskLogId);// throws
+    int doCallWebService(TableFileReader xmlData, OsInfo osInfo, Long taskLogId);// throws
     // Exception;
 
     /**
@@ -36,7 +36,7 @@ public interface ExecuteDataMap {
      * @param taskLogId
      * @return
      */
-    public int doMergeToDatabase(TableFileReader xmlData, ImportOpt importOpt, Long taskLogId)
+    int doMergeToDatabase(TableFileReader xmlData, ImportOpt importOpt, Long taskLogId)
             throws SqlResolveException;
 
     /**
@@ -46,7 +46,7 @@ public interface ExecuteDataMap {
      * @param taskLogId
      * @return
      */
-    public int doExecute(String xmlData, String usercode, String runType, Long taskLogId);// throws
+    int doExecute(String xmlData, String usercode, String runType, Long taskLogId);// throws
     // Exception;
 
     /**
@@ -59,7 +59,7 @@ public interface ExecuteDataMap {
      * @param lobData
      * @return
      */
-    public int updateLobField(String database, String tableName, String columnName, String keyDesc, byte[] lobData)
+    int updateLobField(String database, String tableName, String columnName, String keyDesc, byte[] lobData)
             throws WsDataException;
 
     /**
@@ -72,7 +72,7 @@ public interface ExecuteDataMap {
      * @param lobData
      * @return
      */
-    public int updateLobField(String database, String tableName, String columnName, String keyDesc, String lobData)
+    int updateLobField(String database, String tableName, String columnName, String keyDesc, String lobData)
             throws WsDataException;
 
 }

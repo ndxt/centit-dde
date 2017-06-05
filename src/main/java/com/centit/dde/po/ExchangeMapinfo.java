@@ -3,8 +3,7 @@ package com.centit.dde.po;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * create by scaffold
@@ -218,6 +217,17 @@ public class ExchangeMapinfo implements java.io.Serializable {
 
     public void setMapinfoDesc(String mapinfoDesc) {
         this.mapinfoDesc = mapinfoDesc;
+    }
+
+    /**
+     * 替换子类对象数组，这个函数主要是考虑hibernate中的对象的状态，以避免对象状态不一致的问题
+     */
+    public void replaceMapinfoDetails(List<MapinfoDetail> mapinfoDetails) {
+
+    }
+
+    public void replaceMapinfoTrrigers(List<MapinfoTrigger> mapinfoTriggers) {
+
     }
 
     public void copy(ExchangeMapinfo other) {

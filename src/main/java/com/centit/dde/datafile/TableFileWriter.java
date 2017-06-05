@@ -15,7 +15,7 @@ public class TableFileWriter {
     private static final int BUFSIZE = 64 * 1024;
     private CharArrayWriter memoryWriter = null;
 
-    private String sorceOsId;
+    private String sourceOsId;
     private String sourceDBName;
     private String exportName;//table name
     private String dataOptId;
@@ -28,12 +28,12 @@ public class TableFileWriter {
 /*    private String transaction;
     private String conflict;*/
 
-    public String getSorceOsId() {
-        return sorceOsId;
+    public String getSourceOsId() {
+        return sourceOsId;
     }
 
-    public void setSorceOsId(String sorceOsId) {
-        this.sorceOsId = sorceOsId;
+    public void setSourceOsId(String sourceOsId) {
+        this.sourceOsId = sourceOsId;
     }
 
     public String getSourceDBName() {
@@ -141,7 +141,7 @@ public class TableFileWriter {
     public void writeTableBegin() {
         try {
             tableWriter.write("<table name=\"" + exportName +
-                    "\" sorceosid=\"" + sorceOsId +
+                    "\" sorceosid=\"" + sourceOsId +
                     "\" sourcedatabase=\"" + sourceDBName +
                     "\" dataoptid=\"" + dataOptId +
                     "\" >\r\n");

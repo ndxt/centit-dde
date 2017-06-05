@@ -1,46 +1,36 @@
 package com.centit.dde.service.impl;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
-
-import com.centit.framework.model.basedata.IUserInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
-import com.centit.support.database.QueryUtils;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
 import com.centit.dde.dao.ExchangeMapinfoDao;
 import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.ExchangeMapinfo;
-import com.centit.dde.po.MapinfoDetail;
-import com.centit.dde.po.MapinfoDetailId;
-import com.centit.dde.po.MapinfoTrigger;
-import com.centit.dde.po.MapinfoTriggerId;
+import com.centit.dde.po.*;
 import com.centit.dde.service.ExchangeMapinfoManager;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.support.database.QueryUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
+import java.util.*;
 
 @Service
 public class ExchangeMapinfoManagerImpl
         extends BaseEntityManagerImpl<ExchangeMapinfo,Long,ExchangeMapinfoDao> implements
         ExchangeMapinfoManager {
 
+    public static final Log log = LogFactory.getLog(ExchangeMapinfoManager.class);
+
     @Resource
     protected StaticEnvironmentManager platformEnvironment;
 
-    public static final Log log = LogFactory.getLog(ExchangeMapinfoManager.class);
-
-    // private static final SysOptLog sysOptLog =
-    // SysOptLogFactoryImpl.getSysOptLog();
     private ExchangeMapinfoDao exchangeMapinfoDao;
 
     @Resource(name = "exchangeMapinfoDao")
@@ -50,16 +40,12 @@ public class ExchangeMapinfoManagerImpl
         setBaseDao(this.exchangeMapinfoDao);
     }
 
-    public List<String> listDatabaseName() {
-        return this.exchangeMapinfoDao.listDatabaseName();
-    }
-
+    @Transactional(propagation = Propagation.REQUIRED)
     public List<ExchangeMapinfo> listImportExchangeMapinfo(List<Long> mapinfoId) {
-        return this.exchangeMapinfoDao.listImportExchangeMapinfo(mapinfoId);
+        return exchangeMapinfoDao.listImportExchangeMapinfo(mapinfoId);
     }
 
-    @Override
-    public void validator(ExchangeMapinfo object) throws SqlResolveException {
+    private void validator(ExchangeMapinfo object) throws SqlResolveException {
         if (!StringUtils.hasText(object.getQuerySql())) {
             throw new SqlResolveException(10001);
         }
@@ -71,8 +57,8 @@ public class ExchangeMapinfoManagerImpl
         }
 
         // 验证触发器的参数是否在字段中存在
-        Set<String> params = new HashSet<String>();
-        Set<String> fields = new HashSet<String>();
+        Set<String> params = new HashSet<>();
+        Set<String> fields = new HashSet<>();
 
         String triggerSql = null;
 
@@ -134,34 +120,50 @@ public class ExchangeMapinfoManagerImpl
     }
 
     @Override
-    public void saveObject(ExchangeMapinfo object, IUserInfo userDetail) throws SqlResolveException {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void save(ExchangeMapinfo object) {
+        object.setMapinfoName(object.getMapinfoName().trim());
+
+        //判断交换名称的唯一性
+        Map<String, Object> filterMap = new HashMap<String, Object>();
+        filterMap.put("mapinfoNameEq", object.getMapinfoName());
+
+        List<ExchangeMapinfo> listObjects = listObjects(filterMap);
+
+        if (!CollectionUtils.isEmpty(listObjects)) {
+            ExchangeMapinfo exchangeMapinfoDb = getObjectById(object.getMapinfoId());
+            String message = "交换名称已存在";
+            if (null == exchangeMapinfoDb) {
+                log.error(message);
+            } else {
+                if (1 < listObjects.size() || !exchangeMapinfoDb.getMapinfoId().equals(listObjects.get(0).getMapinfoId())) {
+                    log.error(message);
+                }
+            }
+        }
+        try {
+            validator(object);
+        }catch (SqlResolveException e){
+            log.error("");
+        }
         ExchangeMapinfo dbObject = exchangeMapinfoDao.getObjectById(object.getMapinfoId());
         if (null == dbObject) {
             object.setMapinfoId(exchangeMapinfoDao.getNextLongSequence());
             setFieldTriggerCid(object);
-            saveObject(object);
         } else {
-            dbObject.getMapinfoDetails().clear();
-            dbObject.getMapinfoTriggers().clear();
-
-            exchangeMapinfoDao.flush();
-
             dbObject.copyNotNullProperty(object);
 
+            dbObject.replaceMapinfoDetails(object.getMapinfoDetails());
+            dbObject.replaceMapinfoTrrigers(object.getMapinfoTriggers());
+
             setFieldTriggerCid(dbObject);
-
-            for (MapinfoDetail md : object.getMapinfoDetails()) {
-                dbObject.addMapinfoDetail(md);
-            }
-
-            for (MapinfoTrigger mt : object.getMapinfoTriggers()) {
-                dbObject.addMapinfoTrigger(mt);
-            }
-            saveObject(dbObject);
+            object=dbObject;
         }
+        saveObject(object);
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public List<ExchangeMapinfo> listObjectExcludeUsed(Map<String, Object> filterMap, PageDesc pageDesc) {
         return exchangeMapinfoDao.listObjectExcludeUsed(filterMap, pageDesc);
     }

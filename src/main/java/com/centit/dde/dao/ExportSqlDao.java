@@ -4,16 +4,17 @@ import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportFieldId;
 import com.centit.dde.po.ExportSql;
+import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.support.database.DataSourceDescription;
-import com.centit.support.database.DbcpConnectPools;
 import com.centit.support.database.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.sql.*;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.centit.dde.util.ConnPool.getConn;
 
 @Repository
 public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
@@ -65,6 +68,7 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void saveObject(ExportSql o) {
         if (null == o.getExportId()) {
             o.setExportId(getNextLongSequence());
@@ -119,24 +123,21 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
 
     /**
      * 验证sql执行的正确性
-     *
-     * @param object
+     * @Param
+     * @Param object
      * @throws SqlResolveException
      */
     public void validateSql(String querysql, DatabaseInfo dbinfo) throws SqlResolveException {
-        if (!testConn(dbinfo)) {
+        if (!ConnPool.testConn(dbinfo)) {
             logger.error("连接数据库出错");
             throw new SqlResolveException(10002);
         }
-
         Connection conn = null;
         Statement statement = null;
         ResultSet rs = null;
         try {
             conn = getConn(dbinfo);
-
             statement = conn.createStatement();
-
             rs = statement.executeQuery(querysql);
 
             rs.next();
@@ -195,25 +196,6 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
     }
 
 
-    private static boolean testConn(DatabaseInfo dbinfo){
-        DataSourceDescription dbc = new DataSourceDescription();
-        dbc.setDatabaseCode(dbinfo.getDatabaseCode());
-        dbc.setConnUrl(dbinfo.getDatabaseUrl());
-        dbc.setUsername(dbinfo.getUsername());
-        dbc.setPassword(dbinfo.getClearPassword());        
-        return DbcpConnectPools.testDataSource(dbc);
-    }
-    
-    private static Connection getConn(DatabaseInfo dbinfo) throws SQLException {
-        DataSourceDescription dbc = new DataSourceDescription();
-        dbc.setDatabaseCode(dbinfo.getDatabaseCode());
-        dbc.setConnUrl(dbinfo.getDatabaseUrl());
-        dbc.setUsername(dbinfo.getUsername());
-        dbc.setPassword(dbinfo.getClearPassword());        
-        return DbcpConnectPools.getDbcpConnect(dbc);
-    }
-
-
     public ExportSql fetchObjectById(Long exportId) {
         String hql = "select distinct s from ExportSql s join fetch s.exportTriggers join fetch s.exportFields where s.exportId = ?";
 
@@ -238,5 +220,20 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
         ExportSql exportSql = listObjects.get(0);
         exportSql.setExportTriggers(null);
         return exportSql;
+    }
+
+    @Transactional
+    public ExportSql loadObjectById(Long id) {
+        if (id == null)
+            return null;
+        // Type[] params = getClass().getTypeParameters();
+        try {
+            return (ExportSql) getCurrentSession().load(ExportSql.class, id);
+            //return (T) getCurrentSession().get(getClassTName(), id);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return null;
+            //throw new ObjectException(ObjectException.DATABASE_OPERATE_EXCEPTION,e);
+        }
     }
 }

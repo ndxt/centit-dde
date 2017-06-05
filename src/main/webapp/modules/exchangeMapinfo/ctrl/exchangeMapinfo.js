@@ -3,23 +3,24 @@ define(function(require) {
     var Config = require('config');
     var Core = require('core/core');
     var Page = require('core/page');
+//    require(datagrid-dnd);
 
 /*  加载角色编辑控制器 require('./roleinfo.edit')   调用injecte方法注入该控制器的实例  */
     
 //   角色编辑控制器
-    var ExchangeMapinfoAdd = require('./exchangeMapinfo.add');
-    var ExchangeMapinfoEdit = require('./exchangeMapinfo.edit');
-    var ExchangeMapinfoRemove = require('./exchangeMapinfo.remove');
+    var ExchangeMapInfoAdd = require('./exchangeMapInfo.add');
+    var ExchangeMapInfoEdit = require('./exchangeMapInfo.edit');
+    var ExchangeMapInfoRemove = require('./exchangeMapInfo.remove');
 
     // 业务信息
-    var ExchangeMapinfo = Page.extend(function() {
+    var ExchangeMapInfo = Page.extend(function() {
     	
     	
 //    	调用injecte方法注入该控制器的实例(角色编辑控制器)
     	this.injecte([
-          new ExchangeMapinfoAdd('exchangeMapinfo_add'),
-          new ExchangeMapinfoEdit('exchangeMapinfo_edit'),
-          new ExchangeMapinfoRemove('exchangeMapinfo_remove')
+          new ExchangeMapInfoAdd('exchangeMapInfo_add'),
+          new ExchangeMapInfoEdit('exchangeMapInfo_edit'),
+          new ExchangeMapInfoRemove('exchangeMapInfo_remove')
     	]);
     	
     	// @override
@@ -36,5 +37,5 @@ define(function(require) {
     	
     });
 
-    return ExchangeMapinfo;
+    return ExchangeMapInfo;
 });

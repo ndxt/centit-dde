@@ -28,16 +28,12 @@ public class UserDataOptIdController extends BaseController {
     private static final long serialVersionUID = 1L;
 
     @Resource
-
     private UserDataOptIdManager userDataOptIdManager;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> searchColumn = convertSearchColumn(request);
         List<UserDataOptId> objList = userDataOptIdManager.listObjects(searchColumn, pageDesc);
-//        Map<String, Object> filterMap = convertSearchColumn(request);
-//        filterMap.put("roleCode", roleCode);
-//        List<UserDataOptId> listObjects = userDataOptIdManager.listObjectBysql(filterMap, pageDesc);
         ResponseData resData = new ResponseData();
         resData.addResponseData(OBJLIST, objList);
         resData.addResponseData(PAGE_DESC, pageDesc);
@@ -56,16 +52,14 @@ public class UserDataOptIdController extends BaseController {
         JsonResultUtils.writeSuccessJson(response);
     }
 
-    @RequestMapping(value="/edit/{udId}",method = {RequestMethod.POST})
-    public void edit(@PathVariable Long udId ,UserDataOptId object,HttpServletResponse response) {
+    @RequestMapping(value="/edit/{udId}",method = {RequestMethod.GET})
+    public void edit(@PathVariable Long udId,HttpServletResponse response) {
         UserDataOptId userDataOptId = userDataOptIdManager.getObjectById(udId);
-//        ResponseData resData = new ResponseData();
-//        resData.addResponseData("userDataOptId", userDataOptId);
         JsonResultUtils.writeSingleDataJson(userDataOptId, response);
     }
 
     @RequestMapping(value="/delete/{udId}",method = {RequestMethod.DELETE})
-    public void delete(@PathVariable Long udId,UserDataOptId object,HttpServletResponse response) {
+    public void delete(@PathVariable Long udId,HttpServletResponse response) {
         userDataOptIdManager.deleteObjectById(udId);
         JsonResultUtils.writeSuccessJson(response);
     }

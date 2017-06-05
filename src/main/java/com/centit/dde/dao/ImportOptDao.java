@@ -112,7 +112,8 @@ public class ImportOptDao extends BaseDaoImpl<ImportOpt,Long> {
         dbc.setDatabaseCode(dbinfo.getDatabaseCode());
         dbc.setConnUrl(dbinfo.getDatabaseUrl());
         dbc.setUsername(dbinfo.getUsername());
-        dbc.setPassword(dbinfo.getClearPassword());        
+//        dbc.setPassword(dbinfo.getClearPassword());
+        dbc.setPassword(dbinfo.getPassword());
         return DbcpConnectPools.getDbcpConnect(dbc);
     }
 }
