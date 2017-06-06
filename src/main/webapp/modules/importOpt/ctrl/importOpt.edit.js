@@ -47,10 +47,10 @@ define(function(require) {
 			$("#db").combobox({
 				valueField: 'databaseCode',
 				textField: 'databaseName',
-				url:'service/common/listDb',
+				url:'service/platform/listDb',
 				onSelect: function(rec) {
 				    databaseCode = rec.databaseCode;
-					var url = Config.ContextPath + 'service/common/listTable/' + databaseCode;
+					var url = Config.ContextPath + 'service/platform/listTable/' + databaseCode;
 					$('#table').combobox('reload', url);
 				}
 			});
@@ -58,7 +58,7 @@ define(function(require) {
 				valueField: 'tableName',
 				textField: 'tableName',
 				onSelect: function(rec) {
-                    // var url = Config.ContextPath + 'service/common/listField/' + databaseCode +"/" + rec.tableName;
+                    // var url = Config.ContextPath + 'service/platform/listField/' + databaseCode +"/" + rec.tableName;
                     // $('#field').combobox('reload', url);
 					Core.ajax(Config.ContextPath + 'service/importopt/getFields/'+ databaseCode +"/" + rec.tableName,{
 						method:'get',

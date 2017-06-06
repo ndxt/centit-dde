@@ -31,20 +31,15 @@ import java.util.*;
 public class MapinfoDetailController extends BaseController {
     private static final Log log = LogFactory.getLog(MapinfoDetailController.class);
 
-    //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");
-
     private static final long serialVersionUID = 1L;
     @Resource
-
     private MapinfoDetailManager mapinfoDetailMag;
-    @Resource
 
+    @Resource
     private ExchangeMapinfoManager exchangeMapinfoManager;
+
     @Resource
     private StaticEnvironmentManager platformEnvironment;
-
-
-
 
     @RequestMapping(value="/showMapinfoDetail",method = {RequestMethod.GET})
     public void showMapinfoDetail(String s_mapinfoId,PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
@@ -52,9 +47,9 @@ public class MapinfoDetailController extends BaseController {
         String goalTableName = null;
         Map<String, Object> searchColumn = convertSearchColumn(request);
 
-        List<Map<String, String>> sourceTableStruct = new ArrayList<Map<String, String>>();
-        List<Map<String, String>> goalTableStruct = new ArrayList<Map<String, String>>();
-        List<Map<String, String>> length = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> sourceTableStruct = new ArrayList<>();
+        List<Map<String, String>> goalTableStruct = new ArrayList<>();
+        List<Map<String, String>> length = new ArrayList<>();
 
         ExchangeMapinfo exchangeMapinfo = new ExchangeMapinfo();
         exchangeMapinfo.setMapinfoId(Long.parseLong(String.valueOf(searchColumn.get("mapinfoId"))));

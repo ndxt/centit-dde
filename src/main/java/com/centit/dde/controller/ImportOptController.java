@@ -8,14 +8,12 @@ import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.po.OsInfo;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,7 +25,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,12 +34,8 @@ import java.util.Map;
 public class ImportOptController extends BaseController {
     private static final Log log = LogFactory.getLog(ImportOptController.class);
 
-    // private static final ISysOptLog sysOptLog =
-    // SysOptLogFactoryImpl.getSysOptLog("optid");
-
-
     @Resource
-    private ImportOptManager importOptMag;
+    private ImportOptManager importOptManager;
 
     @Resource
     protected StaticEnvironmentManager platformEnvironment;
@@ -50,7 +43,7 @@ public class ImportOptController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> filterMap = convertSearchColumn(request);
-        List<ImportOpt> listObjects = importOptMag.listObjects(filterMap, pageDesc);
+        List<ImportOpt> listObjects = importOptManager.listObjects(filterMap, pageDesc);
         ResponseData resData = new ResponseData();
         resData.addResponseData(OBJLIST, listObjects);
         resData.addResponseData(PAGE_DESC, pageDesc);
@@ -58,82 +51,20 @@ public class ImportOptController extends BaseController {
         JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
 
-    @RequestMapping(value="/defDataSource",method = {RequestMethod.GET})
-    public void defDataSource(HttpServletResponse response) {
-        List<DatabaseInfo> dbList = platformEnvironment.listDatabaseInfo();
+    @RequestMapping(value="/save",method = {RequestMethod.PUT})
+    public void save(ImportOpt object,HttpServletRequest request,HttpServletResponse response) {
 
-        JsonResultUtils.writeSingleDataJson(dbList, response);
-    }
-
-    /**
-     * 数据导出内容字段
-     * @return
-     */
-    @RequestMapping(value="/listField",method = {RequestMethod.GET})
-    public void listField(ImportOpt object,HttpServletResponse response) {
-        object = importOptMag.getObjectById(object.getImportId());
-        if (null == object) {
-            //
-        }
-
-        List<DatabaseInfo> dbList = platformEnvironment.listDatabaseInfo();
-        // 业务系统
-        List<OsInfo> osinfoList = platformEnvironment.listOsInfos();
-        ResponseData resData = new ResponseData();
-        resData.addResponseData("dbList", dbList);
-        resData.addResponseData("osinfoList",osinfoList);
-
-        JsonResultUtils.writeResponseDataAsJson(resData, response);
-    }
-
-    @RequestMapping(value="/save/{importId}",method = {RequestMethod.PUT})
-    public void save(@PathVariable Long importId ,ImportOpt object,HttpServletRequest request,HttpServletResponse response) {
-
-        //判断名称的唯一性
-        object.setImportName(object.getImportName().trim());
-
-        Map<String, Object> filterMap = new HashMap<String, Object>();
-        filterMap.put("importNameEq", object.getImportName());
-
-        //获取同名的配置
-        List<ImportOpt> listObjects = importOptMag.listObjects(filterMap);
-
-        if (!CollectionUtils.isEmpty(listObjects)) {
-            ImportOpt importDB = importOptMag.getObjectById(object.getImportId());
-            String message = "导入名称已存在";
-            if (null == importDB) {//新增
-                JsonResultUtils.writeSingleDataJson(message, response);
-                return;
-            } else {//编辑
-                if (1 < listObjects.size() || !importDB.getImportId().equals(listObjects.get(0)
-                        .getImportId())) {
-
-                    JsonResultUtils.writeSingleDataJson(message, response);
-                return;
-                }
-            }
-        }
-
-        try {
-            importOptMag.validator(object);//校验目标数据库不为空、触发器参数存在于字段中
-
-            importOptMag.saveObject(object, getLoginUser(request));
-        } catch (SqlResolveException e) {
-            JsonResultUtils.writeSuccessJson(response);
-            return;
-        }
+        CentitUserDetails user = getLoginUser(request);
+        importOptManager.save(object, user);
 
         JsonResultUtils.writeSuccessJson(response);
     }
 
-    @RequestMapping(value="/edit/{importid}",method = {RequestMethod.GET})
-    public void edit(@PathVariable Long importid ,HttpServletResponse response) {
-        ImportOpt importOpt = importOptMag.getObjectById(importid);
+    @RequestMapping(value="/edit/{importId}",method = {RequestMethod.GET})
+    public void edit(@PathVariable Long importId ,HttpServletResponse response) {
+        ImportOpt importOpt = importOptManager.getObjectById(importId);
 
-        ResponseData resData = new ResponseData();
-        resData.addResponseData("importOpt", importOpt);
-
-        JsonResultUtils.writeResponseDataAsJson(resData, response);
+        JsonResultUtils.writeSingleDataJson(importOpt, response);
     }
 
     private File uploadify;
@@ -147,8 +78,7 @@ public class ImportOptController extends BaseController {
     public void uploadify(HttpServletResponse response) throws Exception {
 
         StringWriter sw = new StringWriter();
-        IOUtils.copy(new FileInputStream(uploadify), sw);
-
+        IOUtils.copy(new FileInputStream(uploadify), sw, "UTF-8");
 
         String text = sw.toString();
 
@@ -158,7 +88,7 @@ public class ImportOptController extends BaseController {
 
     @RequestMapping(value="/delete/{importId}",method = {RequestMethod.DELETE})
     public void delete(@PathVariable Long importId,HttpServletResponse response) {
-        importOptMag.deleteObjectById(importId);
+        importOptManager.deleteObjectById(importId);
         JsonResultUtils.writeSuccessJson(response);
     }
 
@@ -179,7 +109,7 @@ public class ImportOptController extends BaseController {
                                 @PathVariable String tableName,
                                 HttpServletResponse response) throws SqlResolveException, IOException {
 
-        List<ImportField> fields = importOptMag.listFields(databaseCode, tableName);
+        List<ImportField> fields = importOptManager.listFields(databaseCode, tableName);
 
         JsonResultUtils.writeSingleDataJson(fields, response);
     }

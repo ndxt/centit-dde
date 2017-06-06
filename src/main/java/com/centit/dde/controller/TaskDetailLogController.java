@@ -23,11 +23,10 @@ import java.util.List;
 public class TaskDetailLogController extends BaseController {
     private static final Log log = LogFactory.getLog(TaskDetailLogController.class);
 
-    //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");
-
     private static final long serialVersionUID = 1L;
     @Resource
     private TaskDetailLogManager taskDetailLogMag;
+
     @Resource
     private ExchangeMapinfoManager exchangeMapinfoManager;
 

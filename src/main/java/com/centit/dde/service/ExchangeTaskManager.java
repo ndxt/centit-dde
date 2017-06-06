@@ -1,26 +1,27 @@
 package com.centit.dde.service;
 
-import java.util.List;
-
 import com.centit.dde.po.ExchangeTask;
 import com.centit.framework.core.service.BaseEntityManager;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 
+import java.util.List;
+
 public interface ExchangeTaskManager extends BaseEntityManager<ExchangeTask,Long> {
-    public List<List<Object>> getSqlValues(DatabaseInfo DatabaseInfo, String sql);
+    List<List<Object>> getSqlValues(DatabaseInfo DatabaseInfo, String sql);
 
-    public List<Object> insertDatas(DatabaseInfo DatabaseInfo, String sql, List<List<Object>> datas);
+    List<Object> insertDatas(DatabaseInfo DatabaseInfo, String sql, List<List<Object>> datas);
 
-    public String getMapinfoName(Long mapinfoId);
+    String getMapinfoName(Long mapinfoId);
 
-    public Long getNewTaskId();
+    Long getNewTaskId();
 
     /**
      * 创建新的定时任务
      *
      * @param exchangeTask
      */
-    public void saveNewTimerTask(ExchangeTask exchangeTask);
+    void saveNewTimerTask(ExchangeTask exchangeTask);
 
     /**
      * 关闭原有定时任务
@@ -28,7 +29,7 @@ public interface ExchangeTaskManager extends BaseEntityManager<ExchangeTask,Long
      * @param exchangeTask
      * @return
      */
-    public boolean delTimerTask(ExchangeTask exchangeTask);
+    boolean delTimerTask(ExchangeTask exchangeTask);
 
     /**
      * 更新原有定时任务
@@ -36,10 +37,10 @@ public interface ExchangeTaskManager extends BaseEntityManager<ExchangeTask,Long
      * @param exchangeTask
      * @return
      */
-    public boolean updateTimerTask(ExchangeTask exchangeTask);
+    boolean updateTimerTask(ExchangeTask exchangeTask);
     
-    public boolean executeTask(Long taskID,String userCode,String runType);
+    boolean executeTask(Long taskID,String userCode,String runType);
 
-
+    void save(ExchangeTask exchangeTask, CentitUserDetails user);
 
 }

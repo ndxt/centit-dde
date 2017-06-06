@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
@@ -20,14 +19,13 @@ import javax.servlet.http.HttpServletResponse;
 public class ExchangeTaskdetailController extends BaseController {
     private static final Log log = LogFactory.getLog(ExchangeTaskdetailController.class);
 
-    //private static final ISysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog("optid");
     private static final long serialVersionUID = 1L;
-    @Resource
 
+    @Resource
     private ExchangeTaskdetailManager exchangeTaskdetailMag;
 
     @RequestMapping(value="/delete",method = {RequestMethod.DELETE})
-    public void delete(ExchangeTaskdetail exchangeTaskdetail,HttpServletRequest request,HttpServletResponse response) {
+    public void delete(ExchangeTaskdetail exchangeTaskdetail,HttpServletResponse response) {
         exchangeTaskdetailMag.deleteObject(exchangeTaskdetail);
         JsonResultUtils.writeSuccessJson(response);
     }

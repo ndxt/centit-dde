@@ -10,13 +10,13 @@ import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.staticsystem.po.DataDictionary;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +40,7 @@ public class ExportSqlController extends BaseController {
     private static final Log log = LogFactory.getLog(ExportSqlController.class);
 
     @Resource
-    private ExportSqlManager exportSqlMag;
+    private ExportSqlManager exportSqlManager;
 
     @Resource
     protected StaticEnvironmentManager platformEnvironment;
@@ -48,7 +48,7 @@ public class ExportSqlController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> filterMap = convertSearchColumn(request);
-        List<ExportSql> listObjects = exportSqlMag.listObjects(filterMap, pageDesc);
+        List<ExportSql> listObjects = exportSqlManager.listObjects(filterMap, pageDesc);
         ResponseData resData = new ResponseData();
         resData.addResponseData(OBJLIST, listObjects);
         resData.addResponseData(PAGE_DESC, pageDesc);
@@ -59,54 +59,21 @@ public class ExportSqlController extends BaseController {
     @RequestMapping(value="/save",method = {RequestMethod.PUT})
     public void save(ExportSql object, HttpServletRequest request,HttpServletResponse response) {
 
-        //判断名称的唯一性
-        object.setExportName(object.getExportName().trim());
+        CentitUserDetails user = getLoginUser(request);
+        exportSqlManager.save(object, user);
 
-        Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("eqExportName", object.getExportName());
-        List<ExportSql> listObjects = exportSqlMag.listObjects(filterMap);
-
-        if (!CollectionUtils.isEmpty(listObjects)) {
-            String message = "导出名称已存在";
-            ExportSql exportDB = exportSqlMag.getObjectById(object.getExportId());
-            if (null == exportDB) {
-                JsonResultUtils.writeSingleDataJson(message,response);
-                return;
-            } else {
-                if (1 < listObjects.size() || !exportDB.getExportId().equals(listObjects.get(0)
-                        .getExportId())) {
-                    JsonResultUtils.writeSingleDataJson(message,response);
-                  return;
-                }
-            }
-        }
-
-        try {
-            exportSqlMag.validator(object);
-
-            exportSqlMag.saveObject(object, getLoginUser(request));
-        } catch (SqlResolveException e) {
-            String message = null;
-            if (0 == e.getErrorcode()) {
-                message = e.getMessage();
-            } else {
-//                message = SysParametersUtils.getValue(String.valueOf(e.getErrorcode()));
-            }
-            JsonResultUtils.writeSuccessJson(response);
-            return;
-        }
         JsonResultUtils.writeSuccessJson(response);
     }
 
     @RequestMapping(value="/delete/{exportId}" ,method = {RequestMethod.DELETE})
-    public void delete(@PathVariable Long exportId,HttpServletRequest request,HttpServletResponse response) {
-        exportSqlMag.deleteObjectById(exportId);
+    public void delete(@PathVariable Long exportId, HttpServletResponse response) {
+        exportSqlManager.deleteObjectById(exportId);
         JsonResultUtils.writeSuccessJson(response);
     }
 
     @RequestMapping(value="/edit/{exportId}" ,method = {RequestMethod.GET})
-    public void edit(@PathVariable Long exportId,HttpServletRequest request,HttpServletResponse response) {
-        ExportSql exportSql = exportSqlMag.getObjectById(exportId);
+    public void edit(@PathVariable Long exportId, HttpServletResponse response) {
+        ExportSql exportSql = exportSqlManager.getObjectById(exportId);
         ResponseData resData = new ResponseData();
         resData.addResponseData("exportSql", exportSql);
 
@@ -122,7 +89,7 @@ public class ExportSqlController extends BaseController {
     public void resolveQuerySql(ExportSql object,HttpServletResponse response) throws IOException {
         List<ExportField> fields = new ArrayList();
         try {
-            fields = exportSqlMag.listExportFieldsByQuerysql(object);
+            fields = exportSqlManager.listExportFieldsByQuerysql(object);
         } catch (SqlResolveException e) {
         }
 
@@ -183,7 +150,7 @@ public class ExportSqlController extends BaseController {
     @RequestMapping(value="/exportSourceField")
     public void exportSourceField(ExportSql object,HttpServletResponse response) throws IOException {
         ServletOutputStream output = response.getOutputStream();
-        ExportSql exportSql = exportSqlMag.getObjectById(object.getExportId());
+        ExportSql exportSql = exportSqlManager.getObjectById(object.getExportId());
 
 
         List<ExportField> exportFields = exportSql.getExportFields();
@@ -198,6 +165,6 @@ public class ExportSqlController extends BaseController {
         response.setContentType("application/txt");
         response.setHeader("Content_Length", String.valueOf(text.length()));
 
-        IOUtils.copy(new StringReader(text), output);
+        IOUtils.copy(new StringReader(text), output, "UTF-8");
     }
 }

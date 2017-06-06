@@ -26,7 +26,7 @@ public class ConnPool {
         dbc.setDatabaseCode(dbInfo.getDatabaseCode());
         dbc.setConnUrl(dbInfo.getDatabaseUrl());
         dbc.setUsername(dbInfo.getUsername());
-        dbc.setPassword(dbInfo.getClearPassword());        
+        dbc.setPassword(dbInfo.getClearPassword());
         return DbcpConnectPools.getDbcpConnect(dbc);
     }
     
@@ -42,7 +42,7 @@ public class ConnPool {
         dbc.setDatabaseCode(dbinfo.getDatabaseCode());
         dbc.setConnUrl(dbinfo.getDatabaseUrl());
         dbc.setUsername(dbinfo.getUsername());
-        dbc.setPassword(dbinfo.getClearPassword());        
+        dbc.setPassword(dbinfo.getClearPassword());
         return DbcpConnectPools.testDataSource(dbc);
     }
     

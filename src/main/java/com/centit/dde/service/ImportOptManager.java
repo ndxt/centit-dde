@@ -6,6 +6,7 @@ import com.centit.dde.po.ImportField;
 import com.centit.dde.po.ImportOpt;
 import com.centit.framework.core.service.BaseEntityManager;
 import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.security.model.CentitUserDetails;
 
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface ImportOptManager extends BaseEntityManager<ImportOpt,Long> {
     String getMapinfoName(Long mapinfoId);
     void saveObject(ImportOpt object, IUserInfo loginUser) throws SqlResolveException;
     List<ImportField> listFields(String databaseCode, String tableName) throws SqlResolveException;
+
+    void save(ImportOpt object, CentitUserDetails user);
 }

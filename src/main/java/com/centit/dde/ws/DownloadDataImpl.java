@@ -47,7 +47,7 @@ public class DownloadDataImpl implements DownloadData {
 
         tableWriter.setExportName("exp" + exportSql.getExportId());
         tableWriter.setDataOptId(exportSql.getDataOptId());
-        tableWriter.setSorceOsId(exportSql.getSourceOsId());
+        tableWriter.setSourceOsId(exportSql.getSourceOsId());
         tableWriter.setSourceDBName(exportSql.getSourceDatabaseName());
 
 

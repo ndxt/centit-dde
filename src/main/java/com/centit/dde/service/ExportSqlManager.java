@@ -1,13 +1,13 @@
 package com.centit.dde.service;
 
-import java.util.List;
-
-
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportSql;
 import com.centit.framework.core.service.BaseEntityManager;
 import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.security.model.CentitUserDetails;
+
+import java.util.List;
 
 public interface ExportSqlManager extends BaseEntityManager<ExportSql,Long> {
 
@@ -36,4 +36,6 @@ public interface ExportSqlManager extends BaseEntityManager<ExportSql,Long> {
      * @throws SqlResolveException
      */
     List<ExportField> listExportFieldsByQuerysql(ExportSql object) throws SqlResolveException;
+
+    void save(ExportSql object, CentitUserDetails user);
 }

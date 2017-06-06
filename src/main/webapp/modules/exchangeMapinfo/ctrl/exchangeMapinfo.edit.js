@@ -172,22 +172,14 @@ define(function(require) {
 				onChange: function (newValue, oldValue) {
 					$("#txt_sourceCodename").combobox('clear');
 					var databaseCode = $('#txt_sourceDatabaseName').combobox('getValue');
-					Core.ajax(Config.ContextPath+'service/platform/listField/'+newValue+'/'+databaseCode, {
+					Core.ajax(Config.ContextPath+'service/platform/generateSQL/'+databaseCode+'/'+newValue, {
 						method: 'get',
 						data: {
 		                 _method: 'get'
 		             }
 					}).then(function(data) {
-						var orgValue;
-						var orgNameValue;
-						var codeDataList;
-						codeDataList = [];
-						$.each(data.codeTypelist,function(index,item){
-						    orgValue = data.codeTypelist[index];
-						    orgNameValue = data.codelist[index];
-						    codeDataList.push({"id":index,"value": orgNameValue,"text":orgNameValue});
-						});
-						$("#txt_sourceCodename").combobox("loadData",codeDataList);
+
+						$("#txt_querySql").textbox("setValue", data);
 					});
 				}
 			});
@@ -201,16 +193,7 @@ define(function(require) {
 		 var txt_querySql = $('#txt_querySql').val();
 		 var text_Table = $("#txt_sourceTablename").combobox('getValue');
 		 var value_sourceCodename = $("#txt_sourceCodename").combobox('getValue');
-		 var txt_sourceCodename = $("#txt_sourceCodename").combobox('getText');
-		 var txt_sourceCodenames = txt_sourceCodename.split(",");
-	     for(var i=0;i<txt_sourceCodenames.length;i++){ 
-    		$('#exchangeContent1').datagrid('appendRow', {
-    			sourceFieldName : txt_sourceCodenames[i],
-    			sourceFieldType : 'VARCHAR2',
-    			sourceFieldSentence:'',
-    		});
-	     } 
-		 
+
 //		 var sql="select" ;
 //		 var table = $("#exchangeContent1").datagrid("getRows");
 //		 for(var i=0;i<table.length;i++){

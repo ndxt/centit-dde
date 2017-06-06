@@ -8,6 +8,7 @@ import com.centit.dde.service.ImportOptManager;
 import com.centit.dde.util.ConnPool;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.centit.support.database.QueryUtils;
@@ -244,5 +245,38 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
             }
         }
         return fields;
+    }
+
+    public void save(ImportOpt object, CentitUserDetails user) {
+        //判断名称的唯一性
+        object.setImportName(object.getImportName().trim());
+
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("importNameEq", object.getImportName());
+
+        //获取同名的配置
+        List<ImportOpt> listObjects = listObjects(filterMap);
+
+        if (!CollectionUtils.isEmpty(listObjects)) {
+            ImportOpt importDB = getObjectById(object.getImportId());
+            String message = "导入名称已存在";
+            if (null == importDB) {//新增
+                return;
+            } else {//编辑
+                if (1 < listObjects.size() || !importDB.getImportId().equals(listObjects.get(0)
+                        .getImportId())) {
+
+                    return;
+                }
+            }
+        }
+
+        try {
+            validator(object);//校验目标数据库不为空、触发器参数存在于字段中
+
+            saveObject(object, user);
+        } catch (SqlResolveException e) {
+            return;
+        }
     }
 }

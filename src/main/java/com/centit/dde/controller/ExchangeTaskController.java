@@ -33,145 +33,55 @@ import java.util.*;
 public class ExchangeTaskController extends BaseController {
     private static final Log log = LogFactory.getLog(ExchangeTaskController.class);
 
-    // private static final ISysOptLog sysOptLog =
-    // SysOptLogFactoryImpl.getSysOptLog("optid");
-
     private static final long serialVersionUID = 1L;
 
     @Resource
-
     private ExchangeTaskManager exchangeTaskMag;
 
     @Resource
-
     private ExchangeMapinfoManager exchangeMapinfoManager;
 
     @Resource
-
     private ExchangeTaskdetailManager exchangeTaskdetailManager;
 
     @Resource
-
     private MapinfoDetailManager mapinfoDetailManager;
 
     @Resource
-
     private StaticEnvironmentManager platformEnvironment;
 
     @Resource
-
     private TaskErrorDataManager taskErrorDataManager;
 
     @Resource
-
     private TaskLogManager taskLogManager;
 
     @Resource
-
     private ExportSqlManager exportSqlManager;
-
-
 
     @RequestMapping(value="/list/{taskType}" , method = {RequestMethod.GET})
     public void list(@PathVariable String taskType ,PageDesc pageDesc, HttpServletRequest request,HttpServletResponse response) {
-        try {
-            request.setCharacterEncoding("utf-8");
-            Map<String, Object> searchColumn = convertSearchColumn(request);
-            searchColumn.put("taskType", taskType);
-            if(searchColumn.get("isvalid")!=null){
-                searchColumn.remove("isvalid");
-            }else{
-                searchColumn.put("isvalid", "1");
-            }
-            List<ExchangeTask>  objList = exchangeTaskMag.listObjects(searchColumn, pageDesc);
-
-            for (int i = 0; i < objList.size(); i++) {
-                ExchangeTask exchangeTask = objList.get(i);
-
-                UserInfo usesInfo = (UserInfo)CodeRepositoryUtil.getUserInfoByCode(exchangeTask.getCreated());
-                if (usesInfo != null)
-                    exchangeTask.setCreatedName(usesInfo.getUsername());
-
-            }
-            ResponseData resData = new ResponseData();
-            resData.addResponseData(OBJLIST, objList);
-            resData.addResponseData(PAGE_DESC, pageDesc);
-            JsonResultUtils.writeResponseDataAsJson(resData, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            JsonResultUtils.writeErrorMessageJson("error", response);
+        Map<String, Object> searchColumn = convertSearchColumn(request);
+        searchColumn.put("taskType", taskType);
+        if(searchColumn.get("isvalid")!=null){
+            searchColumn.remove("isvalid");
+        }else{
+            searchColumn.put("isvalid", "1");
         }
+        List<ExchangeTask>  objList = exchangeTaskMag.listObjects(searchColumn, pageDesc);
+
+        ResponseData resData = new ResponseData();
+        resData.addResponseData(OBJLIST, objList);
+        resData.addResponseData(PAGE_DESC, pageDesc);
+        JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
 
     @RequestMapping(value="/save", method = {RequestMethod.PUT})
     public void save(ExchangeTask object ,HttpServletRequest request ,HttpServletResponse response) {
-        Long taskId = object.getTaskId();
-        object.setTaskName(object.getTaskName().trim());
-        try {
-            ExchangeTask dbObject = exchangeTaskMag.getObjectById(taskId);
-            if (dbObject != null) {
-                dbObject.copyNotNullProperty(object);
-                // baseEntityManager.copyObjectNotNullProperty(dbObject,
-                // object);
-                object = dbObject;
-            }
+        CentitUserDetails user = getLoginUser(request);
+        exchangeTaskMag.save(object, user);
 
-            // 判断是否为新增
-            if (null == object.getTaskId() || 0 == object.getTaskId()) {
-                Map<String, Object> filterMap = new HashMap<String, Object>();
-                filterMap.put("taskNameEq", object.getTaskName());
-                List<ExchangeTask> listObjects = exchangeTaskMag.listObjects(filterMap);
-                if (!org.springframework.util.CollectionUtils.isEmpty(listObjects)) {
-//                    dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, "任务名称已存在");
-//                    return SUCCESS;
-                    JsonResultUtils.writeSuccessJson(response);
-                }
-
-
-                object.setTaskId(exchangeTaskMag.getNewTaskId()); // Long.toString(System.currentTimeMillis()));
-                object.setCreateTime(new Date());
-                object.setIsvalid("1");
-                // 获取登录用户
-                CentitUserDetails uinfo = getLoginUser(request);
-                if (uinfo != null) {
-                    object.setCreated(uinfo.getUserCode());
-                }
-//                saveMessage("添加交换任务成功！");
-            } else {
-//                saveMessage("编辑交换任务成功！");
-            }
-            if (object.getTaskCron() != null) {
-                exchangeTaskMag.saveNewTimerTask(object);
-            }
-
-            //更新下次执行时间
-            if (object.getTaskCron() != null) {
-                try {
-                    CronSequenceGenerator generator = new CronSequenceGenerator(object.getTaskCron(), TimeZone.getDefault());
-                    object.setNextRunTime(generator.next(new Date()));
-                } catch (Exception e) {
-//                    saveError("定时任务表达式不正确");
-
-//                    return ERROR;
-                    JsonResultUtils.writeErrorMessageJson("XXXXX", response);
-                    return;
-                }
-            }
-
-            exchangeTaskMag.saveObject(object);
-
-            // forward至列表页面
-//            dwzResultParam = new DwzResultParam("/dde/exchangeTask!list.do?s_taskType=" + object.getTaskType());
-
-//            return SUCCESS;
-            JsonResultUtils.writeSuccessJson(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("保存交换对应关系："+ e.getMessage(), e);
-//            saveError("保存交换对应关系："+ e.getMessage());
-//            return ERROR;
-            JsonResultUtils.writeErrorMessageJson("XXXXX", response);
-        }
+        JsonResultUtils.writeSuccessJson(response);
     }
 
     @RequestMapping(value="/editAndsave" , method = {RequestMethod.PUT})
@@ -183,13 +93,10 @@ public class ExchangeTaskController extends BaseController {
             List<ExchangeTask> listObjects = exchangeTaskMag.listObjects(filterMap);
             if (!org.springframework.util.CollectionUtils.isEmpty(listObjects)) {
                 if (1 < listObjects.size() || !listObjects.get(0).getTaskId().equals(object.getTaskId())) {
-//                    dwzResultParam = new DwzResultParam(DwzResultParam.STATUS_CODE_300, "任务名称已存在");
-//                    return SUCCESS;
                     JsonResultUtils.writeSuccessJson(response);
                     return;
                 }
             }
-
 
             // 判断taskCron字段是否修改，修改了为true
             boolean taskCron = false;
@@ -251,57 +158,49 @@ public class ExchangeTaskController extends BaseController {
     }
 
     @RequestMapping(value="/edit/{taskId}" , method = {RequestMethod.GET})
-    public  void edit(@PathVariable Long taskId, ExchangeTask object,HttpServletRequest request ,HttpServletResponse response) {
-//        /page/dde/exchangeTaskForm.jsp
-        try {
-            ExchangeTask exchangeTask = exchangeTaskMag.getObjectById(taskId);
-            
-            String taskType = exchangeTask.getTaskType();
-            
-            Map<String, Object> filterMap = new HashMap<String, Object>();
-            filterMap.put("task_Id", taskId);
-            // filterMap.put("order by", "mapinfo_order");
-            List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
-            
-            List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
-            
-            List<ExchangeMapinfo> exchangeMapinfoList = new ArrayList<ExchangeMapinfo>();
-            
-            if(taskType.equals("1")){
-                for (ExchangeTaskdetail etd : exchangeTaskdetails) {
-                    ExchangeMapinfo exchangeMapinfo = exchangeMapinfoManager.getObjectById(etd.getMapinfoId());
-                    if (null != exchangeMapinfo) {
-                        exchangeMapinfo.setMapinfoOrder(etd.getMapinfoOrder());
-                        exchangeMapinfoList.add(exchangeMapinfo);
-                    }
+    public  void edit(@PathVariable Long taskId, HttpServletResponse response) {
+        ExchangeTask exchangeTask = exchangeTaskMag.getObjectById(taskId);
+
+        String taskType = exchangeTask.getTaskType();
+
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("task_Id", taskId);
+        List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
+
+        List<ExportSql> exportSqlList = new ArrayList<>();
+
+        List<ExchangeMapinfo> exchangeMapinfoList = new ArrayList<>();
+
+        if(taskType.equals("1")){
+            for (ExchangeTaskdetail etd : exchangeTaskdetails) {
+                ExchangeMapinfo exchangeMapinfo = exchangeMapinfoManager.getObjectById(etd.getMapinfoId());
+                if (null != exchangeMapinfo) {
+                    exchangeMapinfo.setMapinfoOrder(etd.getMapinfoOrder());
+                    exchangeMapinfoList.add(exchangeMapinfo);
                 }
-                exchangeTask.setExchangeMapinfoList(exchangeMapinfoList);
-            }else{
-                for (ExchangeTaskdetail etd : exchangeTaskdetails) {
-                    ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapinfoId());
-                    if (null != exportSql) {
-                        exportSql.setExportsqlOrder(etd.getMapinfoOrder());
-                        exportSqlList.add(exportSql);
-                    }
+            }
+            exchangeTask.setExchangeMapinfoList(exchangeMapinfoList);
+        }else{
+            for (ExchangeTaskdetail etd : exchangeTaskdetails) {
+                ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapinfoId());
+                if (null != exportSql) {
+                    exportSql.setExportsqlOrder(etd.getMapinfoOrder());
+                    exportSqlList.add(exportSql);
                 }
-                exchangeTask.setExportSqlList(exportSqlList);
             }
-            
-            UserInfo usesInfo = (UserInfo)CodeRepositoryUtil.getUserInfoByCode(exchangeTask.getCreated());
-            if (usesInfo != null){
-                exchangeTask.setCreatedName(usesInfo.getUsername());
-            }
-            JsonResultUtils.writeSingleDataJson(exchangeTask, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-//            return ERROR;
-            JsonResultUtils.writeErrorMessageJson("error", response);
+            exchangeTask.setExportSqlList(exportSqlList);
         }
+
+        UserInfo usesInfo = (UserInfo)CodeRepositoryUtil.getUserInfoByCode(exchangeTask.getCreated());
+        if (usesInfo != null){
+            exchangeTask.setCreatedName(usesInfo.getUsername());
+        }
+        JsonResultUtils.writeSingleDataJson(exchangeTask, response);
     }
 
     @RequestMapping(value="/getExchangeMapinfo" , method = {RequestMethod.GET})
     private void getExchangeMapinfo(List<ExchangeTaskdetail> exchangeTaskdetails,HttpServletResponse response) {
-        List<ExchangeMapinfo> echangeMapInfoList = new ArrayList<ExchangeMapinfo>();
+        List<ExchangeMapinfo> echangeMapInfoList = new ArrayList<>();
 
         for (ExchangeTaskdetail etd : exchangeTaskdetails) {
             ExchangeMapinfo exchangeMapinfo = exchangeMapinfoManager.getObjectById(etd.getMapinfoId());
@@ -311,13 +210,12 @@ public class ExchangeTaskController extends BaseController {
             }
         }
 
-//        request.setAttribute("echangeMapInfoList", echangeMapInfoList);
         JsonResultUtils.writeSingleDataJson(echangeMapInfoList, response);
     }
 
     @RequestMapping(value="/getExportSql", method = {RequestMethod.GET})
     private void getExportSql(List<ExchangeTaskdetail> exchangeTaskdetails,HttpServletResponse response) {
-        List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
+        List<ExportSql> exportSqlList = new ArrayList<>();
 
         for (ExchangeTaskdetail etd : exchangeTaskdetails) {
             ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapinfoId());
@@ -327,11 +225,10 @@ public class ExchangeTaskController extends BaseController {
             }
         }
 
-//        request.setAttribute("exportSqlList", exportSqlList);
         JsonResultUtils.writeSingleDataJson(exportSqlList, response);
     }
 
-    @RequestMapping(value="/add/{{taskId}}", method = {RequestMethod.PUT})
+    @RequestMapping(value="/add/{taskId}", method = {RequestMethod.PUT})
     public void add(@PathVariable Long taskId,ExchangeTask object, HttpServletRequest request,HttpServletResponse response) {
         try {
             String s_taskType =request.getParameter("s_taskType");
@@ -359,7 +256,7 @@ public class ExchangeTaskController extends BaseController {
     /**
      * 查看明细
      */
-    @RequestMapping(value="/view/{{taskId}}" , method = {RequestMethod.GET})
+    @RequestMapping(value="/view/{taskId}" , method = {RequestMethod.GET})
     public void view(PageDesc pageDesc,ExchangeTask object,@PathVariable Long taskId,HttpServletRequest request,HttpServletResponse response) {
         try {
             ExchangeTask o = exchangeTaskMag.getObjectById(taskId);
@@ -444,7 +341,7 @@ public class ExchangeTaskController extends BaseController {
 
     }
 
-    @RequestMapping(value="/saveSequence/{{taskId}}" , method = {RequestMethod.PUT})
+    @RequestMapping(value="/saveSequence/{taskId}" , method = {RequestMethod.PUT})
     public void saveSequence(@PathVariable Long taskId, ExchangeTask object,HttpServletRequest request,HttpServletResponse response) {
         // 返回页面
         String returnPage = request.getParameter("inputPage");
@@ -784,7 +681,7 @@ public class ExchangeTaskController extends BaseController {
      */
     @RequestMapping(value="/setTaskTypeToPage")
     private void setTaskTypeToPage(HttpServletRequest request) {
-        Map<String, String> taskType = new HashMap<String, String>();
+        Map<String, String> taskType = new HashMap<>();
         taskType.put("1", "直接交换");
         taskType.put("2", "导出离线文件");
         taskType.put("3", "监控文件夹导入文件");

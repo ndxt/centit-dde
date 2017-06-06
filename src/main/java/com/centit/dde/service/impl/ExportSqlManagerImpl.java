@@ -7,6 +7,7 @@ import com.centit.dde.service.ExportFieldManager;
 import com.centit.dde.service.ExportSqlManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.centit.support.database.QueryUtils;
@@ -15,14 +16,13 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
 @Service
 public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,ExportSqlDao>
         implements ExportSqlManager {
@@ -166,6 +166,42 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
         exportSqlDao.validateSql(object.getQuerySql(), dbinfo);
 
         return exportSqlDao.getTableMetadata(object, dbinfo).getExportFields();
+    }
+
+    public void save(ExportSql object, CentitUserDetails user){
+        //判断名称的唯一性
+        object.setExportName(object.getExportName().trim());
+
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("eqExportName", object.getExportName());
+        List<ExportSql> listObjects = listObjects(filterMap);
+
+        if (!CollectionUtils.isEmpty(listObjects)) {
+            String message = "导出名称已存在";
+            ExportSql exportDB = getObjectById(object.getExportId());
+            if (null == exportDB) {
+                return;
+            } else {
+                if (1 < listObjects.size() || !exportDB.getExportId().equals(listObjects.get(0)
+                        .getExportId())) {
+                    return;
+                }
+            }
+        }
+
+        try {
+            validator(object);
+
+            saveObject(object, user);
+        } catch (SqlResolveException e) {
+            String message = null;
+            if (0 == e.getErrorcode()) {
+                message = e.getMessage();
+            } else {
+//                message = SysParametersUtils.getValue(String.valueOf(e.getErrorcode()));
+            }
+            return;
+        }
     }
 
 }

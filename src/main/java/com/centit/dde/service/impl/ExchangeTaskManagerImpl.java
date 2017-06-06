@@ -1,19 +1,5 @@
 package com.centit.dde.service.impl;
 
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.quartz.JobExecutionContext;
-import org.springframework.scheduling.support.CronSequenceGenerator;
-import org.springframework.stereotype.Service;
-
-import com.centit.dde.dao.DataOptInfoDao;
 import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.dataio.ExportData;
 import com.centit.dde.dataio.ImportData;
@@ -21,8 +7,21 @@ import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.service.ExchangeTaskManager;
 import com.centit.dde.transfer.TransferManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.quartz.JobExecutionContext;
+import org.springframework.scheduling.support.CronSequenceGenerator;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
+import java.util.*;
+
 @Service
 public class ExchangeTaskManagerImpl
         extends BaseEntityManagerImpl<ExchangeTask,Long,ExchangeTaskDao>
@@ -163,9 +162,61 @@ public class ExchangeTaskManagerImpl
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public boolean updateTimerTask(ExchangeTask exchangeTask) {
         delTimerTask(exchangeTask);
         saveNewTimerTask(exchangeTask);
         return true;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void save(ExchangeTask object, CentitUserDetails user) {
+        Long taskId = object.getTaskId();
+        object.setTaskName(object.getTaskName().trim());
+        ExchangeTask dbObject = getObjectById(taskId);
+        if (dbObject != null) {
+            dbObject.copyNotNullProperty(object);
+            object = dbObject;
+        }
+
+        // 判断是否为新增
+        if (null == object.getTaskId() || 0 == object.getTaskId()) {
+            Map<String, Object> filterMap = new HashMap<>();
+            filterMap.put("taskNameEq", object.getTaskName());
+            List<ExchangeTask> listObjects = listObjects(filterMap);
+            if (!org.springframework.util.CollectionUtils.isEmpty(listObjects)) {
+            }
+
+
+            object.setTaskId(getNewTaskId()); // Long.toString(System.currentTimeMillis()));
+            object.setCreateTime(new Date());
+            object.setIsvalid("1");
+            if (user != null) {
+                object.setCreated(user.getUserCode());
+                object.setCreatedName(user.getUserName());
+            }
+//                saveMessage("添加交换任务成功！");
+        } else {
+//                saveMessage("编辑交换任务成功！");
+        }
+        if (object.getTaskCron() != null) {
+            saveNewTimerTask(object);
+        }
+
+        //更新下次执行时间
+        if (object.getTaskCron() != null) {
+            try {
+                CronSequenceGenerator generator = new CronSequenceGenerator(object.getTaskCron(), TimeZone.getDefault());
+                object.setNextRunTime(generator.next(new Date()));
+            } catch (Exception e) {
+//                    saveError("定时任务表达式不正确");
+
+//                    return ERROR;
+                return;
+            }
+        }
+
+        saveObject(object);
     }
 }
