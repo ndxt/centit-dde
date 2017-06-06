@@ -1,0 +1,55 @@
+        <div class="easyui-panel search-body" cls="search">
+            <form class="clearFromValue">
+                <div class="search-item">
+                    <label >处理名称</label>
+                    <input type="text" class="easyui-textbox" name="s_exportName" />
+                </div>
+                <a class="easyui-linkbutton btn-search" iconCls="icon-search"><p  id="e@btn.search">搜索</p></a>
+                <a class="easyui-linkbutton" style="margin-top:8px;" iconcls="icon-reload" onclick="javascript:$('.clearFromValue').form('clear');$('.defaultChecked').prop('checked','true');" group="" id="">
+                    <p>重置</p>
+                </a>
+            </form>
+        </div>
+
+        <table url="service/dataoptinfo/list"
+               idField="dataOptId"
+               id="dataOptInfoTable"
+               search=".search"
+               toolbar=".temp-toolbar1"
+               layoutH=".search">
+            <thead>
+            <tr>
+                <th  data-options="field:'dataOptId'" hidden="true">数据处理操作ID</th>
+                <th  data-options="field:'optName'" width="15%">处理名称</th>
+                <th  data-options="field:'created'" format="User" width="10%">创建人员</th>
+                <th  data-options="field:'createTime'"  width="15%">创建时间</th>
+                <th  data-options="field:'lastUpdateTime'" width="15%">最后创建时间</th>
+            </tr>
+            </thead>
+        </table>
+        <div class="temp-toolbar1">
+            <a iconCls="icon-add" href="modules/dataOptInfo/dataOptInfo-edit.html" trigger="none"
+               target="dialog" rel="dataOptInfo_add" title="新增"  width="800" height="800" ><p>新增</p></a>
+            <hr>
+            <a  iconCls="icon-edit" href="modules/dataOptInfo/dataOptInfo-edit.html" trigger="single"
+                target="dialog" rel="dataOptInfo_edit" title="编辑" width="800" height="800" btnValue="更新"><p>编辑</p></a>
+            <hr>
+            <a  iconCls="icon-base icon-base-ban"  trigger="single"
+                target="confirm" rel="dataOptInfo_remove" title="确定删除这条记录吗？" ><p>删除</p></a>
+        </div>
+
+<script>
+
+    $.parser.onComplete = function(panel) {
+        $.parser.onComplete = $.noop;
+        requirejs([
+            'core/filter/filter.dictionary',
+            'modules/dataOptInfo/ctrl/dataOptInfo'
+        ], function(FilterDictionary, dataOptInfo) {
+            FilterDictionary.add(['YesOrNo']).then(function() {
+                new dataOptInfo('dataOptInfo', panel).load(panel);
+            });
+        });
+    };
+    setI18NText("");
+</script>

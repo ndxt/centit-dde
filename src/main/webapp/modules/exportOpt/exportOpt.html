@@ -1,0 +1,62 @@
+        <div class="easyui-panel search-body" cls="search">
+            <form class="clearFromValue">
+                <div class="search-item">
+                    <label >导出名称</label>
+                    <input type="text" class="easyui-textbox" name="s_exportName" />
+                </div>
+                <div class="search-item">
+                    <label >业务系统</label>
+                    <input class="easyui-combo" name="s_sourceOsId" editable="false"/>
+                </div>
+                <a class="easyui-linkbutton btn-search" iconCls="icon-search"><p  id="e@btn.search">搜索</p></a>
+                <a class="easyui-linkbutton" style="margin-top:8px;" iconcls="icon-reload" onclick="javascript:$('.clearFromValue').form('clear');$('.defaultChecked').prop('checked','true');" group="" id="">
+                    <p>重置</p>
+                </a>
+            </form>
+        </div>
+
+        <table url="service/exportsql/list"
+               idField="exportId"
+               id="exportOptTable"
+               search=".search"
+               toolbar=".temp-toolbar1"
+               layoutH=".search">
+            <thead>
+            <tr>
+                <th  data-options="field:'exportId'" hidden="true">序号</th>
+                <th  data-options="field:'dataOptId'" width="15%">数据处理操作ID</th>
+                <th  data-options="field:'exportName'" width="15%">导出名称</th>
+                <th  data-options="field:'sourceDatabaseName'" width="15%">源数据库名</th>
+                <th  data-options="field:'sourceOsId'" width="15%">业务系统ID</th>
+                <th  data-options="field:'createTime'"  width="10%">创建时间</th>
+                <th  data-options="field:'created'" format="User" width="10%">创建人员</th>
+                <th  data-options="field:'exportDesc'" width="19%">导出说明</th>
+            </tr>
+            </thead>
+        </table>
+        <div class="temp-toolbar1">
+            <a iconCls="icon-add" href="modules/exportOpt/exportOpt-edit.html" trigger="none"
+               target="dialog" rel="exportOpt_add" title="新增"  width="800" height="800" ><p>新增</p></a>
+            <hr>
+            <a  iconCls="icon-edit" href="modules/exportOpt/exportOpt-edit.html" trigger="single"
+                target="dialog" rel="exportOpt_edit" title="编辑" width="800" height="800" btnValue="更新"><p>编辑</p></a>
+            <hr>
+            <a  iconCls="icon-base icon-base-ban"  trigger="single"
+                target="confirm" rel="exportOpt_remove" title="确定删除这条记录吗？" ><p>删除</p></a>
+        </div>
+
+<script>
+
+    $.parser.onComplete = function(panel) {
+        $.parser.onComplete = $.noop;
+        requirejs([
+            'core/filter/filter.dictionary',
+            'modules/exportOpt/ctrl/exportOpt'
+        ], function(FilterDictionary, ExportOpt) {
+            FilterDictionary.add(['YesOrNo']).then(function() {
+                new ExportOpt('exportOpt', panel).load(panel);
+            });
+        });
+    };
+    setI18NText("");
+</script>

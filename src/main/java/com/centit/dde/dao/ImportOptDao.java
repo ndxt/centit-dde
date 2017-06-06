@@ -85,7 +85,7 @@ public class ImportOptDao extends BaseDaoImpl<ImportOpt,Long> {
      * @return
      * @throws SqlResolveException
      */
-    public boolean isExistsForTable(ImportOpt importOpt, DatabaseInfo dbinfo) throws SQLException {
+    public boolean isExistsForTable(ImportOpt importOpt, DatabaseInfo dbinfo){
         Connection conn = null;
         try {
             conn = getConn(dbinfo);
@@ -100,9 +100,13 @@ public class ImportOptDao extends BaseDaoImpl<ImportOpt,Long> {
                 return true;
             }
         } catch (SQLException e) {
-            throw e;
+            log.error("数据库连接出错");
         } finally {
-            conn.close();
+            try {
+                conn.close();
+            }catch (SQLException se){
+                log.error("关闭连接出错",se);
+            }
         }
         return false;
     }

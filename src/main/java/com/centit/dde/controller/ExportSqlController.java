@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 @Controller
 @RequestMapping("/exportsql")
 public class ExportSqlController extends BaseController {
@@ -60,7 +59,7 @@ public class ExportSqlController extends BaseController {
     public void save(ExportSql object, HttpServletRequest request,HttpServletResponse response) {
 
         CentitUserDetails user = getLoginUser(request);
-        exportSqlManager.save(object, user);
+        exportSqlManager.saveObject(object, user);
 
         JsonResultUtils.writeSuccessJson(response);
     }
@@ -74,10 +73,8 @@ public class ExportSqlController extends BaseController {
     @RequestMapping(value="/edit/{exportId}" ,method = {RequestMethod.GET})
     public void edit(@PathVariable Long exportId, HttpServletResponse response) {
         ExportSql exportSql = exportSqlManager.getObjectById(exportId);
-        ResponseData resData = new ResponseData();
-        resData.addResponseData("exportSql", exportSql);
 
-        JsonResultUtils.writeResponseDataAsJson(resData,response);
+        JsonResultUtils.writeSingleDataJson(exportSql,response);
     }
 
     /**
@@ -86,7 +83,7 @@ public class ExportSqlController extends BaseController {
      * @throws IOException
      */
     @RequestMapping(value="/resolveQuerySql" ,method = {RequestMethod.POST})
-    public void resolveQuerySql(ExportSql object,HttpServletResponse response) throws IOException {
+    public void resolveQuerySql(ExportSql object,HttpServletResponse response) {
         List<ExportField> fields = new ArrayList();
         try {
             fields = exportSqlManager.listExportFieldsByQuerysql(object);

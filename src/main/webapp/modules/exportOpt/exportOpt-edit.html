@@ -1,0 +1,80 @@
+<form class="form centit">
+	<input hidden type="text" name="exportId" />
+	<div class="fields two">
+		<div class="field required">
+			<label>导出名称：</label>
+			<input type="text" class="easyui-textbox" name="exportName" required />
+		</div>
+		<div class="field required">
+			<label>数据处理操作ID：</label>
+			<input type="text" class="easyui-textbox" name="dataOptId" required />
+		</div>
+	</div>
+	<div class="fields two">
+		<div class="field required">
+			<label>源数据库名：</label>
+			<input id="db" class="easyui-combobox" name="sourceDatabaseName" required />
+		</div>
+	</div>
+	<div class="field">
+		<label>查询语句sql：</label>
+		<input id="querySql" class="easyui-textbox" name="querySql"  multiline="true"
+			   style="width:100%; height: 100px;"/>
+	</div>
+	<div class="field">
+		<label>导出说明：</label>
+		<input type="text" class="easyui-textbox" name="exportDesc"  multiline="true" style="width:100%; height: 100px;"/>
+	</div>
+	<a iconCls="icon-add"  class="easyui-linkbutton"
+	   data-options="iconCls:'icon-add'" width="440" height="580" onclick="sync();">同步</a>
+</form>
+<div class="easyui-tabs" style="height: 400px;">
+	<div title="数据导出内容字段">
+		<table class="tab1"  style="width:96%;"
+			   pagination="false"
+			   border="true" idField="cid"
+			   toolbar=".tab1-toolbar" >
+			<thead >
+				<th field="fieldName" width="24%" data-options="editor: {type: 'text', options: {required: true}}">源字段名</th>
+				<th field="fieldSentence" width="24%" data-options="editor: {type: 'text', options: {required: true}}">源字段语句</th>
+				<th field="fieldType" width="15%" data-options="editor: {type: 'text', options: {required: true}}">源字段类型</th>
+				<th field="fieldFormat" width="15%" data-options="editor: {type: 'text', options: {required: true}}">字段格式</th>
+				<th field="fieldStoreType" width="15%" data-options="editor: {type: 'text', options: {required: true}}">存储类型</th>
+				<th field="isPk" width="10%" data-options="editor: {type: 'text'}">是否为主键</th>
+			</thead>
+		</table>
+		<div class="tab1-toolbar">
+			<a rel="exportOpt_exportField_add" iconCls="icon-add"
+			   target="custom" trigger="none" title="添加"  ><p>新增</p></a>
+			<hr>
+			<a rel="exportOpt_exportField_remove" iconCls="icon-base icon-base-rubbish "
+			   target="custom" trigger="single" ><p>删除</p></a>
+		</div>
+	</div>
+	<div title="数据导出触发器">
+		<table class="tab2"  style="width:96%;"
+			   pagination="false"
+			   border="true"
+			   toolbar=".tab2-toolbar">
+			<thead >
+			<th field="triggerSql" width="46%" data-options="editor: {type: 'text', options: {required: true}}">执行语句</th>
+			<th field="triggerType" width="10%" data-options="editor: {type: 'text', options: {required: true}}">触发类别</th>
+			<th field="triggerTime" width="10%" data-options="editor: {type: 'text', options: {required: true}}">触发时机</th>
+			<th field="tiggerOrder" width="10%">触发器顺序</th>
+			<th field="isprocedure" width="10%" data-options="editor: {type: 'text', options: {required: true}}">无参数存储过程</th>
+			</thead>
+		</table>
+		<div class="tab2-toolbar">
+			<a rel="exportOpt_exportTrigger_add" iconCls="icon-add"
+			   target="custom" trigger="none" title="添加"  ><p>新增</p></a>
+			<hr>
+			<a rel="exportOpt_exportTrigger_remove" iconCls="icon-base icon-base-rubbish "
+			   target="custom" trigger="single" ><p>删除</p></a>
+		</div>
+	</div>
+
+</div>
+
+<script>
+setI18NText();
+</script>

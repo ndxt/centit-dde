@@ -4,7 +4,6 @@ import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportFieldId;
 import com.centit.dde.po.ExportSql;
-import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
@@ -119,39 +118,6 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
         }
 
         return tableNames;
-    }
-
-    /**
-     * 验证sql执行的正确性
-     * @Param
-     * @Param object
-     * @throws SqlResolveException
-     */
-    public void validateSql(String querysql, DatabaseInfo dbinfo) throws SqlResolveException {
-        if (!ConnPool.testConn(dbinfo)) {
-            logger.error("连接数据库出错");
-            throw new SqlResolveException(10002);
-        }
-        Connection conn = null;
-        Statement statement = null;
-        ResultSet rs = null;
-        try {
-            conn = getConn(dbinfo);
-            statement = conn.createStatement();
-            rs = statement.executeQuery(querysql);
-
-            rs.next();
-        } catch (SQLException e) {
-            logger.error("验证数据库Sql执行语句报错", e);
-
-            throw new SqlResolveException(10001, e);
-        } finally {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public ExportSql getTableMetadata(ExportSql exportSql, DatabaseInfo dbinfo) throws SqlResolveException {

@@ -1,0 +1,68 @@
+<form class="form centit">
+	<input type="hidden" name="userCode"/>
+	<input type="hidden" name="isPrimary" value="T"/>
+	
+	<div class="fields two">
+		<div class="field required">
+			<label>用户名</label>
+			<input type="text" class="easyui-textbox" name="userName" style="width:100%;"
+				required />
+		</div>
+		<div class="field required">
+			<label>登录名</label>
+			<input type="text" class="easyui-textbox" name="loginName" style="width:100%;" 
+				required />
+		</div>
+	</div>
+	<div class="fields two">
+		<div class="field ">
+			<label>电话</label>
+			<input type="text" class="easyui-textbox" name="regCellPhone" style="width:100%;" 
+				 validType="phoneOrMobile" />
+		</div>
+		<div class="field ">
+			<label>邮箱</label>
+			<input type="text" class="easyui-textbox" name="regEmail" style="width:100%;" 
+				 validType="email" />
+		</div>
+	</div>
+	<div class="fields two">
+		<div class="field required">
+			<label>主机构</label>
+			<input type="text" class="easyui-combotree" name="primaryUnit" style="width:100%;" 
+				required target="unit"/>
+		</div>
+		<div class="field required">
+			<label>行政职务</label>
+			<input type="text" class="easyui-combobox" name="userRank" style="width:100%;" target="dictionary" key="RankType" required />
+		</div>
+	</div>
+	<div class="fields two">
+	<div class="field required">
+			<label id="d@post">岗位</label>
+			<input type="text" class="easyui-combobox" name="userStation" required target="dictionary" key="StationType" />
+		</div>
+		<div class="field required">
+			<label>排序</label>
+			<input type="text" class="easyui-textbox" name="userOrder" style="width:100%;" 
+				required />
+		</div>
+		
+	</div>
+		<div class="field">
+				<div class="centit radio">
+					<input type="radio" name="isValid" value="T" />
+					<label>在用</label>
+					
+					<input type="radio" name="isValid" value="F" />
+					<label>禁用</label>
+				</div>
+		</div>
+	<div class="field">
+		<label>描述</label>
+		<input type="text" class="easyui-textbox" name="userDesc"  multiline="true" style="width:100%; height: 100px;"/>
+	</div>
+</form>
+<script>
+setI18NText();
+</script>

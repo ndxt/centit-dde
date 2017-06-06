@@ -3,7 +3,6 @@ package com.centit.dde.controller;
 import com.centit.dde.po.ExchangeMapinfo;
 import com.centit.dde.po.MapinfoDetail;
 import com.centit.dde.service.ExchangeMapinfoManager;
-import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
@@ -24,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.StringReader;
-import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,37 +99,15 @@ public class ExchangeMapInfoController extends BaseController {
         response.setContentType("application/txt");
         response.setHeader("Content_Length", String.valueOf(text.length()));
 
-        IOUtils.copy(new StringReader(text), output);
+        IOUtils.copy(new StringReader(text), output, "UTF-8");
     }
 
     @RequestMapping(value="/resolveSQL", method = RequestMethod.GET)
     public void resolveSQL(ExchangeMapinfo mapinfo, HttpServletResponse response) {
         DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(mapinfo.getSourceDatabaseName());
-        List<MapinfoDetail> mapinfoDetails = null;
-        Connection connection = null;
-        Statement statement = null;
-        ResultSet rs = null;
 
-        if (databaseInfo != null) {
-            try {
-                connection = ConnPool.getConn(databaseInfo);
-                statement = connection.createStatement();
+        List<MapinfoDetail> mapinfoDetails = exchangeMapinfoManager.resolveSQL(databaseInfo, mapinfo.getQuerySql());
 
-                rs = statement.executeQuery(mapinfo.getQuerySql());
-                ResultSetMetaData rsmd = rs.getMetaData();
-                for(int i = 0; i < rsmd.getColumnCount(); i++){
-                    MapinfoDetail mapinfoDetail = new MapinfoDetail();
-                    mapinfoDetail.getCid().setColumnNo((long)(i-1));
-                    mapinfoDetail.setSoueceTableName(rsmd.getTableName(i));
-                    mapinfoDetail.setSourceFieldName(rsmd.getColumnName(i));
-                    mapinfoDetail.setSourceFieldSentence(rsmd.getColumnName(i));
-                    mapinfoDetail.setSourceFieldType(rsmd.getColumnTypeName(i));
-                    mapinfoDetails.add(mapinfoDetail);
-                }
-            }catch (SQLException e) {
-                log.error("数据库连接出错");
-            }
-        }
         JsonResultUtils.writeSingleDataJson(mapinfoDetails, response);
     }
 }

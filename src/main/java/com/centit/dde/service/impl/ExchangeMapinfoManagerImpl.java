@@ -4,6 +4,7 @@ import com.centit.dde.dao.ExchangeMapinfoDao;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.*;
 import com.centit.dde.service.ExchangeMapinfoManager;
+import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
@@ -19,6 +20,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
+import java.sql.*;
 import java.util.*;
 
 @Service
@@ -125,7 +127,7 @@ public class ExchangeMapinfoManagerImpl
         object.setMapinfoName(object.getMapinfoName().trim());
 
         //判断交换名称的唯一性
-        Map<String, Object> filterMap = new HashMap<String, Object>();
+        Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("mapinfoNameEq", object.getMapinfoName());
 
         List<ExchangeMapinfo> listObjects = listObjects(filterMap);
@@ -180,6 +182,37 @@ public class ExchangeMapinfoManagerImpl
             mt = object.getMapinfoTriggers().get(i);
             mt.setCid(new MapinfoTriggerId((long) i, object.getMapinfoId()));
         }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public List<MapinfoDetail> resolveSQL(DatabaseInfo databaseInfo, String sql) {
+        List<MapinfoDetail> mapinfoDetails = null;
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet rs = null;
+
+        if (databaseInfo != null) {
+            try {
+                connection = ConnPool.getConn(databaseInfo);
+                statement = connection.createStatement();
+
+                rs = statement.executeQuery(sql);
+                ResultSetMetaData rsmd = rs.getMetaData();
+                for(int i = 0; i < rsmd.getColumnCount(); i++){
+                    MapinfoDetail mapinfoDetail = new MapinfoDetail();
+                    mapinfoDetail.getCid().setColumnNo((long)(i-1));
+                    mapinfoDetail.setSoueceTableName(rsmd.getTableName(i));
+                    mapinfoDetail.setSourceFieldName(rsmd.getColumnName(i));
+                    mapinfoDetail.setSourceFieldSentence(rsmd.getColumnName(i));
+                    mapinfoDetail.setSourceFieldType(rsmd.getColumnTypeName(i));
+                    mapinfoDetails.add(mapinfoDetail);
+                }
+            }catch (SQLException e) {
+                log.error("数据库连接出错");
+            }
+        }
+        return mapinfoDetails;
     }
 
 }

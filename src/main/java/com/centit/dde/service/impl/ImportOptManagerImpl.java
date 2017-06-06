@@ -8,7 +8,6 @@ import com.centit.dde.service.ImportOptManager;
 import com.centit.dde.util.ConnPool;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.model.basedata.IUserInfo;
-import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import com.centit.support.database.QueryUtils;
@@ -38,25 +37,24 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
 
     @Resource
     private ImportFieldDao importFieldDao;
-   
-    private ImportOptDao importOptDao;
 
+    @Resource
+    protected StaticEnvironmentManager platformEnvironment;
+
+    private ImportOptDao importOptDao;
     @Resource(name="importOptDao")
     @NotNull
     public void setImportOptDao(ImportOptDao baseDao) {
         this.importOptDao = baseDao;
         setBaseDao(this.importOptDao);
     }
-    @Resource
-    protected StaticEnvironmentManager platformEnvironment;
 
     @Override
     public String getMapinfoName(Long mapinfoId) {
         return this.importOptDao.getMapinfoName(mapinfoId);
     }
 
-    @Override
-    public void validator(ImportOpt object) throws SqlResolveException {
+    private void validator(ImportOpt object) throws SqlResolveException {
         DatabaseInfo dbinfo = platformEnvironment.getDatabaseInfo(object.getDestDatabaseName());
         if (null == dbinfo) {
             throw new SqlResolveException(10002);
@@ -130,68 +128,63 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
                 throw new SqlResolveException("触发器中参数名[" + param + "]不存在于字段名称中");
             }
         }
-
-
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void saveObject(ImportOpt object, IUserInfo userDetail) throws SqlResolveException {
-        // 判断导入的表是否存在
-
-        DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(object.getDestDatabaseName());
-
-        object.setSourceOsId(databaseInfo.getOsId());
-        //将表名转换为大写
-        object.setTableName(object.getTableName().toUpperCase());
-
+    public void saveObject(ImportOpt object, IUserInfo userDetail) {
         try {
-            if (!importOptDao.isExistsForTable(object, databaseInfo)) {
-                throw new SqlResolveException(20001);
+            checkObject(object);
+            // 判断导入的表是否存在
+
+            DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(object.getDestDatabaseName());
+
+            object.setSourceOsId(databaseInfo.getOsId());
+            //将表名转换为大写
+            object.setTableName(object.getTableName().toUpperCase());
+
+            if (importOptDao.isExistsForTable(object, databaseInfo)) {
+
+                // save exportsql
+                ImportOpt dbObject = importOptDao.getObjectById(object.getImportId());
+                if (null == dbObject) {
+                    object.setCreated(userDetail.getUserCode());
+                    object.setCreateTime(new Date());
+
+                    object.setImportId(importOptDao.getNextLongSequence());
+
+                    setImportFieldTriggerCid(object);
+                    saveObject(object);
+
+                    // importOptDao.flush();
+                } else {
+                    dbObject.getImportFields().clear();
+                    dbObject.getImportTriggers().clear();
+                    importOptDao.flush();
+                    dbObject.setLastUpdateTime(new Date());
+
+                    dbObject.copyNotNullProperty(object);
+                    // copy database fields to convert fields
+
+                    setImportFieldTriggerCid(object);
+
+                    for (ImportField ef : object.getImportFields()) {
+                        dbObject.addImportField(ef);
+                    }
+                    for (ImportTrigger et : object.getImportTriggers()) {
+                        dbObject.addImportTrigger(et);
+                    }
+
+                    object = dbObject;
+
+                }
+                saveObject(object);
             }
-        } catch (SQLException e) {
-            throw new SqlResolveException(20001, e);
+        }catch(SqlResolveException e){
+            log.error("保存失败", e);
         }
-
-        // save exportsql
-        ImportOpt dbObject = importOptDao.getObjectById(object.getImportId());
-        if (null == dbObject) {
-            object.setCreated(userDetail.getUserCode());
-            object.setCreateTime(new Date());
-
-            object.setImportId(importOptDao.getNextLongSequence());
-
-            setImportFieldTriggerCid(object);
-            saveObject(object);
-
-            // importOptDao.flush();
-        } else {
-            dbObject.getImportFields().clear();
-            dbObject.getImportTriggers().clear();
-            importOptDao.flush();
-            dbObject.setLastUpdateTime(new Date());
-
-            dbObject.copyNotNullProperty(object);
-            // copy database fields to convert fields
-
-            setImportFieldTriggerCid(object);
-
-            for (ImportField ef : object.getImportFields()) {
-                dbObject.addImportField(ef);
-            }
-            for (ImportTrigger et : object.getImportTriggers()) {
-                dbObject.addImportTrigger(et);
-            }
-
-            object = dbObject;
-
-        }
-
-        saveObject(object);
-
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
     private void setImportFieldTriggerCid(ImportOpt object) {
         ImportField ef = null;
         ImportTrigger et = null;
@@ -247,13 +240,12 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
         return fields;
     }
 
-    public void save(ImportOpt object, CentitUserDetails user) {
+    private void checkObject(ImportOpt object) throws SqlResolveException {
         //判断名称的唯一性
         object.setImportName(object.getImportName().trim());
 
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("importNameEq", object.getImportName());
-
         //获取同名的配置
         List<ImportOpt> listObjects = listObjects(filterMap);
 
@@ -263,20 +255,12 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
             if (null == importDB) {//新增
                 return;
             } else {//编辑
-                if (1 < listObjects.size() || !importDB.getImportId().equals(listObjects.get(0)
-                        .getImportId())) {
+                if (1 < listObjects.size() || !importDB.getImportId().equals(listObjects.get(0).getImportId())) {
 
                     return;
                 }
             }
         }
-
-        try {
-            validator(object);//校验目标数据库不为空、触发器参数存在于字段中
-
-            saveObject(object, user);
-        } catch (SqlResolveException e) {
-            return;
-        }
+        validator(object);//校验目标数据库不为空、触发器参数存在于字段中
     }
 }

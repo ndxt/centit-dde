@@ -125,8 +125,7 @@ public class TaskLogController extends BaseController {
                             .getMapinfoName(taskDetailLog.getMapinfoId()));
                 }
                 if (object.getTaskType().equals("2")) {
-                    taskDetailLog.setMapinfoName(exportSqlManager
-                            .getMapinfoName(taskDetailLog.getMapinfoId()));
+                    taskDetailLog.setMapinfoName(exportSqlManager.getMapinfoName(taskDetailLog.getMapinfoId()));
                 }
                 if (object.getTaskType().equals("3")) {
                     taskDetailLog.setMapinfoName(importOptManager
