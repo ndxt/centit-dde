@@ -10,10 +10,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>4.3.5.RELEASE</spring.version>
-		<hibernate.version>4.3.11.Final</hibernate.version>
-		<!-- 3.2.7.RELEASE 4.0.1.RELEASE-->
-		<spring.security.version>4.1.3.RELEASE</spring.security.version>
 		<ehcache.version>2.8.3</ehcache.version>
 	</properties>
   
@@ -49,12 +45,12 @@
 		<dependency>
 			<groupId>com.centit.framework</groupId>
 			<artifactId>framework-hibernate</artifactId>
-			<version>3.1.1-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.centit.framework</groupId>
 			<artifactId>framework-staticsystem</artifactId>
-			<version>3.1.1-SNAPSHOT</version>
+			<version>4.0.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
@@ -62,27 +58,7 @@
 			<artifactId>centit-office</artifactId>
 			<version>2.1.1-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-		  <groupId>org.springframework</groupId>
-		  <artifactId>spring-orm</artifactId>
-		  <version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<version>${hibernate.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>5.2.4.Final</version>
-		</dependency>
+
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
@@ -96,20 +72,7 @@
 			<version>3.0.1</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- test library -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>${spring.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-			<version>4.9</version>
-		</dependency>
-	
+
 		<dependency>
 			<groupId>com.sun</groupId>
 			<artifactId>tools</artifactId>
@@ -169,8 +132,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 			    <artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>

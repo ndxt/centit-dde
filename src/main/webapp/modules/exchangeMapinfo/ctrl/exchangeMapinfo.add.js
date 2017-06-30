@@ -39,10 +39,9 @@ define(function(require) {
 					method: 'put'
 				}).then(closeCallback);
 			}
-			
 			return false;
 		};
-		
+
 		// @override 
 		// 窗口关闭时调用
 		this.onClose = function(table, data) {

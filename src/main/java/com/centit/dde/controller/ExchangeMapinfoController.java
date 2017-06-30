@@ -2,7 +2,10 @@ package com.centit.dde.controller;
 
 import com.centit.dde.po.ExchangeMapinfo;
 import com.centit.dde.po.MapinfoDetail;
+import com.centit.dde.po.MapinfoTrigger;
 import com.centit.dde.service.ExchangeMapinfoManager;
+import com.centit.dde.service.MapinfoDetailManager;
+import com.centit.dde.service.MapinfoTriggerManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
@@ -38,6 +41,12 @@ public class ExchangeMapInfoController extends BaseController {
     private ExchangeMapinfoManager exchangeMapinfoManager;
 
     @Resource
+    private MapinfoDetailManager mapinfoDetailManager;
+
+    @Resource
+    private MapinfoTriggerManager mapinfoTriggerManager;
+
+    @Resource
     protected StaticEnvironmentManager platformEnvironment;
     
     @RequestMapping(value="/list" ,method = {RequestMethod.GET})
@@ -53,6 +62,10 @@ public class ExchangeMapInfoController extends BaseController {
     @RequestMapping(value="/edit/{mapInfoId}" ,method = {RequestMethod.GET})
     public void edit(@PathVariable Long mapInfoId, HttpServletResponse response) {
         ExchangeMapinfo object = exchangeMapinfoManager.getObjectById(mapInfoId);
+        List<MapinfoDetail> mapinfoDetails = mapinfoDetailManager.listByMapinfoId(object.getMapinfoId());
+        List<MapinfoTrigger> mapinfoTriggers = mapinfoTriggerManager.listTrigger(object.getMapinfoId());
+        object.setMapinfoDetails(mapinfoDetails);
+        object.setMapinfoTriggers(mapinfoTriggers);
         JsonResultUtils.writeSingleDataJson(object, response);
     }
 

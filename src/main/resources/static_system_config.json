@@ -3,7 +3,7 @@
 				  "userName":"管理员",
 				  "isValid":"T",
 				  "loginName":"admin",
-				  "userPin":"d92ec26dec6234c5c79dfae76d375736"}],
+				  "userPin":"$2a$11$DbyFNhHeCES5CKoMuM5sXepY7GM35sZkUSqQbjYJnFTzJ2GDIYGLK"}],
 	"optInfos":[{"optId":"LOGINCAS",
 				"optName":"CAS登录入口",
 				"preOptId":"0",

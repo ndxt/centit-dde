@@ -1,14 +1,14 @@
 define(function(require) {
-//	var Page = require('core/page') Page是基础公共控制器，提供了一些公共方法，所有的子页面控制器都必须引用并继承它。
+	var Page = require('core/page') //Page是基础公共控制器，提供了一些公共方法，所有的子页面控制器都必须引用并继承它。
     var Config = require('config');
     var Core = require('core/core');
-    var Page = require('core/page');
 //    require(datagrid-dnd);
 
 /*  加载角色编辑控制器 require('./roleinfo.edit')   调用injecte方法注入该控制器的实例  */
     
 //   角色编辑控制器
     var ExchangeMapInfoAdd = require('./exchangeMapInfo.add');
+    var ExchangeMapInfoCopyAdd = require('./exchangeMapInfo.copyadd');
     var ExchangeMapInfoEdit = require('./exchangeMapInfo.edit');
     var ExchangeMapInfoRemove = require('./exchangeMapInfo.remove');
 
@@ -19,6 +19,7 @@ define(function(require) {
 //    	调用injecte方法注入该控制器的实例(角色编辑控制器)
     	this.injecte([
           new ExchangeMapInfoAdd('exchangeMapInfo_add'),
+          new ExchangeMapInfoCopyAdd('exchangeMapInfo_copyAdd'),
           new ExchangeMapInfoEdit('exchangeMapInfo_edit'),
           new ExchangeMapInfoRemove('exchangeMapInfo_remove')
     	]);
