@@ -61,21 +61,21 @@ public class ExchangeTask implements java.io.Serializable {
     private String monitorFolder;//       varchar2(200);
 
     @Transient
-    private Set<ExchangeTaskdetail> exchangeTaskdetails = null;// new
-    // ArrayList<ExchangeTaskdetail>();
+    private Set<ExchangeTaskDetail> exchangeTaskDetails = null;// new
+    // ArrayList<ExchangeTaskDetail>();
     
     @Transient
     private List<ExportSql> exportSqlList = null;
     
     @Transient
-    private List<ExchangeMapinfo> exchangeMapinfoList = null;
+    private List<ExchangeMapInfo> exchangeMapInfoList = null;
     
-    public List<ExchangeMapinfo> getExchangeMapinfoList() {
-        return exchangeMapinfoList;
+    public List<ExchangeMapInfo> getExchangeMapInfoList() {
+        return exchangeMapInfoList;
     }
 
-    public void setExchangeMapinfoList(List<ExchangeMapinfo> exchangeMapinfoList) {
-        this.exchangeMapinfoList = exchangeMapinfoList;
+    public void setExchangeMapInfoList(List<ExchangeMapInfo> exchangeMapInfoList) {
+        this.exchangeMapInfoList = exchangeMapInfoList;
     }
 
     public List<ExportSql> getExportSqlList() {
@@ -262,31 +262,31 @@ public class ExchangeTask implements java.io.Serializable {
         this.monitorFolder = monitorFolder;
     }
 
-    public Set<ExchangeTaskdetail> getExchangeTaskdetails() {
-        if (this.exchangeTaskdetails == null)
-            this.exchangeTaskdetails = new HashSet<ExchangeTaskdetail>();
-        return this.exchangeTaskdetails;
+    public Set<ExchangeTaskDetail> getExchangeTaskDetails() {
+        if (this.exchangeTaskDetails == null)
+            this.exchangeTaskDetails = new HashSet<ExchangeTaskDetail>();
+        return this.exchangeTaskDetails;
     }
 
-    public void setExchangeTaskdetails(
-            Set<ExchangeTaskdetail> exchangeTaskdetails) {
-        this.exchangeTaskdetails = exchangeTaskdetails;
+    public void setExchangeTaskDetails(
+            Set<ExchangeTaskDetail> exchangeTaskDetails) {
+        this.exchangeTaskDetails = exchangeTaskDetails;
     }
 
-    public void addExchangeTaskdetail(ExchangeTaskdetail exchangeTaskdetail) {
-        if (this.exchangeTaskdetails == null)
-            this.exchangeTaskdetails = new HashSet<ExchangeTaskdetail>();
-        this.exchangeTaskdetails.add(exchangeTaskdetail);
+    public void addExchangeTaskdetail(ExchangeTaskDetail exchangeTaskDetail) {
+        if (this.exchangeTaskDetails == null)
+            this.exchangeTaskDetails = new HashSet<ExchangeTaskDetail>();
+        this.exchangeTaskDetails.add(exchangeTaskDetail);
     }
 
-    public void removeExchangeTaskdetail(ExchangeTaskdetail exchangeTaskdetail) {
-        if (this.exchangeTaskdetails == null)
+    public void removeExchangeTaskdetail(ExchangeTaskDetail exchangeTaskDetail) {
+        if (this.exchangeTaskDetails == null)
             return;
-        this.exchangeTaskdetails.remove(exchangeTaskdetail);
+        this.exchangeTaskDetails.remove(exchangeTaskDetail);
     }
 
-    public ExchangeTaskdetail newExchangeTaskdetail() {
-        ExchangeTaskdetail res = new ExchangeTaskdetail();
+    public ExchangeTaskDetail newExchangeTaskdetail() {
+        ExchangeTaskDetail res = new ExchangeTaskDetail();
 
         res.setTaskId(this.getTaskId());
 
@@ -297,24 +297,24 @@ public class ExchangeTask implements java.io.Serializable {
      * 替换子类对象数组，这个函数主要是考虑hibernate中的对象的状态，以避免对象状态不�?��的问�?
      */
     public void replaceExchangeTaskdetails(
-            List<ExchangeTaskdetail> exchangeTaskdetails) {
-        List<ExchangeTaskdetail> newObjs = new ArrayList<ExchangeTaskdetail>();
-        for (ExchangeTaskdetail p : exchangeTaskdetails) {
+            List<ExchangeTaskDetail> exchangeTaskDetails) {
+        List<ExchangeTaskDetail> newObjs = new ArrayList<ExchangeTaskDetail>();
+        for (ExchangeTaskDetail p : exchangeTaskDetails) {
             if (p == null)
                 continue;
-            ExchangeTaskdetail newdt = newExchangeTaskdetail();
+            ExchangeTaskDetail newdt = newExchangeTaskdetail();
             newdt.copyNotNullProperty(p);
             newObjs.add(newdt);
         }
         // delete
         boolean found = false;
-        Set<ExchangeTaskdetail> oldObjs = new HashSet<ExchangeTaskdetail>();
-        oldObjs.addAll(getExchangeTaskdetails());
+        Set<ExchangeTaskDetail> oldObjs = new HashSet<ExchangeTaskDetail>();
+        oldObjs.addAll(getExchangeTaskDetails());
 
-        for (Iterator<ExchangeTaskdetail> it = oldObjs.iterator(); it.hasNext(); ) {
-            ExchangeTaskdetail odt = it.next();
+        for (Iterator<ExchangeTaskDetail> it = oldObjs.iterator(); it.hasNext(); ) {
+            ExchangeTaskDetail odt = it.next();
             found = false;
-            for (ExchangeTaskdetail newdt : newObjs) {
+            for (ExchangeTaskDetail newdt : newObjs) {
                 if (odt.getCid().equals(newdt.getCid())) {
                     found = true;
                     break;
@@ -325,11 +325,11 @@ public class ExchangeTask implements java.io.Serializable {
         }
         oldObjs.clear();
         // insert or update
-        for (ExchangeTaskdetail newdt : newObjs) {
+        for (ExchangeTaskDetail newdt : newObjs) {
             found = false;
-            for (Iterator<ExchangeTaskdetail> it = getExchangeTaskdetails()
+            for (Iterator<ExchangeTaskDetail> it = getExchangeTaskDetails()
                     .iterator(); it.hasNext(); ) {
-                ExchangeTaskdetail odt = it.next();
+                ExchangeTaskDetail odt = it.next();
                 if (odt.getCid().equals(newdt.getCid())) {
                     odt.copy(newdt);
                     found = true;
@@ -428,7 +428,7 @@ public class ExchangeTask implements java.io.Serializable {
         this.createTime = other.getCreateTime();
         this.created = other.getCreated();
 
-        this.exchangeTaskdetails = other.getExchangeTaskdetails();
+        this.exchangeTaskDetails = other.getExchangeTaskDetails();
         this.taskLogs = other.getTaskLogs();
 
         this.lastUpdateTime = other.getLastUpdateTime();
@@ -467,7 +467,7 @@ public class ExchangeTask implements java.io.Serializable {
             this.monitorFolder = other.getMonitorFolder();
 
         this.taskLogs = other.getTaskLogs();
-        this.exchangeTaskdetails = other.getExchangeTaskdetails();
+        this.exchangeTaskDetails = other.getExchangeTaskDetails();
     }
 
     public void clearProperties() {
@@ -484,7 +484,7 @@ public class ExchangeTask implements java.io.Serializable {
         this.storeIsolation = null;
         this.monitorFolder = null;
 
-        this.exchangeTaskdetails = new HashSet<ExchangeTaskdetail>();
+        this.exchangeTaskDetails = new HashSet<ExchangeTaskDetail>();
         this.taskLogs = new ArrayList<TaskLog>();
     }
     public void addAll(){

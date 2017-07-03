@@ -8,9 +8,9 @@
 <div class="pageContent">
 	<%-- <div class="panelBar">
 		<ul class="toolBar">
-			<li><a class="add" href="${contextPath }/dde/mapinfoDetail!add.do" rel="mapinfoDetailAdd" target='dialog' width="500" height="350"><span>新增</span></a></li>
+			<li><a class="add" href="${contextPath }/dde/mapInfoDetail!add.do" rel="mapinfoDetailAdd" target='dialog' width="500" height="350"><span>新增</span></a></li>
 			<li><a class="delete" onclick="deletetbale();"><span>删除</span></a></li>
-			<li><a class="edit" warn="请选择一个用户" href="${contextPath }/dde/mapinfoDetail!edit.do?s_columnNo={pkSource}&s_mapinfoId=${param['s_mapinfoId']}" rel="mapinfoDetailEdit" target='dialog' width="500" height="350"><span>编辑</span></a></li>
+			<li><a class="edit" warn="请选择一个用户" href="${contextPath }/dde/mapInfoDetail!edit.do?s_columnNo={pkSource}&s_mapinfoId=${param['s_mapinfoId']}" rel="mapinfoDetailEdit" target='dialog' width="500" height="350"><span>编辑</span></a></li>
 			<li><a class="icon" onclick="myFunction();"><span>保存</span></a></li>
 			<li class="line">line</li>
 		</ul>
@@ -20,7 +20,7 @@
         <div class="panelBar">
             <ul class="toolBar">
                 <li class="new"> 
-                  <a class="add" href="${contextPath }/dde/mapinfoDetail!add.do" rel="mapinfoDetailAdd" target='dialog' width="500" height="350"><span>新增</span></a>                   
+                  <a class="add" href="${contextPath }/dde/mapInfoDetail!add.do" rel="mapinfoDetailAdd" target='dialog' width="500" height="350"><span>新增</span></a>
                   <a class="edit" onclick="myFunction1();"><span>保存</span></a>
                   <a class="delete" onclick="deletetbale();"><span>删除整行</span></a>
                 </li>
@@ -31,7 +31,7 @@
      ${mapinfoDetailcaozuo}
 
 	<div layoutH="110" id="r_list_print">
-		<form id="mapinfoDetailForm" action="${pageContext.request.contextPath}/dde/mapinfoDetail!showMapinfoDetail.do"
+		<form id="mapinfoDetailForm" action="${pageContext.request.contextPath}/dde/mapInfoDetail!showMapinfoDetail.do"
 		    method="post" onsubmit="return navTabSearch(this)">
 	        <input type="hidden" name="s_goalTableName" value="${s_goalTableName}"/>
 	        <input type="hidden" name="s_mapinfoId" value="${param['s_mapinfoId']}"/>
@@ -118,7 +118,7 @@
 							
 							    <td>
 							       <a onclick="" class="delete"><span class="icon icon-trash"></span></a>
-							       <a href="${contextPath }/dde/mapinfoDetail!edit.do?s_columnNo=${s.index+1}&s_mapinfoId=${param['s_mapinfoId']}" 
+							       <a href="${contextPath }/dde/mapInfoDetail!edit.do?s_columnNo=${s.index+1}&s_mapinfoId=${param['s_mapinfoId']}"
 							          rel="mapinfoDetailEdit" target='dialog' width="500" height="350"><span class="icon icon-edit"></span></a>
 							    </td>
 						</tr>
@@ -133,21 +133,21 @@
 <script type="text/javascript">
 	function myFunction1(){
 		//debugger;
-		var mapinfoName = $("#mapinfoName_edit").val();
+		var mapInfoName = $("#mapinfoName_edit").val();
 		var isRepeat = $(".isRepeat_edit:checked").val();
-		var mapinfoDesc = $("#mapinfoDesc_edit").val();
+		var mapInfoDesc = $("#mapinfoDesc_edit").val();
 		/* var tableOperate = $("#tableOperate").val(); */
 		var recordOperate = $(".recordOperate_edit:checked").val();
 		
 		var mapinfoNameElement = DWZ.frag["INPUTHIDDEN"]
-		.replaceAll('{name}', 'mapinfoName')
-		.replaceAll('{value}', mapinfoName);
+		.replaceAll('{name}', 'mapInfoName')
+		.replaceAll('{value}', mapInfoName);
 		var isRepeatElement = DWZ.frag["INPUTHIDDEN"]
 		.replaceAll('{name}', 'isRepeat')
 		.replaceAll('{value}', isRepeat);
 		var mapinfoDescElement = DWZ.frag["INPUTHIDDEN"]
-		.replaceAll('{name}', 'mapinfoDesc')
-		.replaceAll('{value}', mapinfoDesc);
+		.replaceAll('{name}', 'mapInfoDesc')
+		.replaceAll('{value}', mapInfoDesc);
 		var recordOperateElement = DWZ.frag["INPUTHIDDEN"]
 		.replaceAll('{name}', 'recordOperate')
 		.replaceAll('{value}', recordOperate);
@@ -157,7 +157,7 @@
 		$("#mapinfoDetailForm").append(mapinfoDescElement);
 		$("#mapinfoDetailForm").append(recordOperateElement);
 		
-		$("#mapinfoDetailForm").attr("action","${pageContext.request.contextPath}/dde/mapinfoDetail!showMapinfoDetail.do?s_method=save&s_type=save").submit();
+		$("#mapinfoDetailForm").attr("action","${pageContext.request.contextPath}/dde/mapInfoDetail!showMapinfoDetail.do?s_method=save&s_type=save").submit();
 	}
 	
 	$("#mapinfoDetailForm a[class='delete']").click(function(event){
@@ -195,7 +195,7 @@
 	
 	function addMapinfoDetail(){
 		$("tr.selected").remove();
-		$("#mapinfoDetailForm").attr("action","${pageContext.request.contextPath}/dde/mapinfoDetail!showMapinfoDetail.do?s_method=save&s_type=save").submit();
+		$("#mapinfoDetailForm").attr("action","${pageContext.request.contextPath}/dde/mapInfoDetail!showMapinfoDetail.do?s_method=save&s_type=save").submit();
 	}
 	
 	$(function() {

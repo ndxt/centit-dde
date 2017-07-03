@@ -11,7 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="D_MAPINFO_TRIGGER")
-public class MapinfoTrigger implements java.io.Serializable {
+public class MapInfoTrigger implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     
     @EmbeddedId
@@ -143,13 +143,13 @@ public class MapinfoTrigger implements java.io.Serializable {
     /**
      * default constructor
      */
-    public MapinfoTrigger() {
+    public MapInfoTrigger() {
     }
 
     /**
      * minimal constructor
      */
-    public MapinfoTrigger(MapinfoTriggerId id
+    public MapInfoTrigger(MapinfoTriggerId id
 
     ) {
         this.cid = id;
@@ -160,7 +160,7 @@ public class MapinfoTrigger implements java.io.Serializable {
     /**
      * full constructor
      */
-    public MapinfoTrigger(MapinfoTriggerId id
+    public MapInfoTrigger(MapinfoTriggerId id
 
             , String triggerSql, String triggerDesc, String triggerType, String triggerTime, String triggerDatabase, Long tiggerOrder, String isprocedure) {
         this.cid = id;
@@ -259,7 +259,7 @@ public class MapinfoTrigger implements java.io.Serializable {
     }
 
 
-    public void copy(MapinfoTrigger other) {
+    public void copy(MapInfoTrigger other) {
 
         this.setTriggerId(other.getTriggerId());
         this.setMapinfoId(other.getMapinfoId());
@@ -274,7 +274,7 @@ public class MapinfoTrigger implements java.io.Serializable {
 
     }
 
-    public void copyNotNullProperty(MapinfoTrigger other) {
+    public void copyNotNullProperty(MapInfoTrigger other) {
 
         if (other.getTriggerId() != null)
             this.setTriggerId(other.getTriggerId());

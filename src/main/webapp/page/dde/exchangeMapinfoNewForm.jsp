@@ -4,14 +4,14 @@
 
 
 <div class="pageContent">
-	<s:form action="/dde/exchangeMapinfo!save.do"
+	<s:form action="/dde/exchangeMapInfo!save.do"
 		class="pageForm required-validate"
 		onsubmit="return validateCallback(this, dialogAjaxDone);">
 
 		<div class="pageFormContent" layoutH="58">
 			<div class="unit">
-				<label>交换编号：</label> <input name="mapinfoId" class="" type="text"
-					size="40" value="${object.mapinfoId }" readonly="readonly"/>
+				<label>交换编号：</label> <input name="mapInfoId" class="" type="text"
+					size="40" value="${object.mapInfoId }" readonly="readonly"/>
 			</div>
 			<div class="unit">
 				<label>源数据库名：</label> 
@@ -22,8 +22,8 @@
 				</select>
 			</div>
 			<div class="unit">
-				<label>交换名称：</label> <input name="mapinfoName" type="text"
-					size="40" value="${object.mapinfoName }" />
+				<label>交换名称：</label> <input name="mapInfoName" type="text"
+					size="40" value="${object.mapInfoName }" />
 			</div>
 			<div class="unit">
 				<label>数据源Sql语句：</label> <input name="querySql" type="text" size="40"
@@ -45,8 +45,8 @@
 				</select>
 			</div>
 			<div class="unit">
-				<label>交换说明：</label> <input name="mapinfoDesc" type="text" size="40"
-					value="${object.mapinfoDesc }" />
+				<label>交换说明：</label> <input name="mapInfoDesc" type="text" size="40"
+					value="${object.mapInfoDesc }" />
 			</div>
 		</div>
 

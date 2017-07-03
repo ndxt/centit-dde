@@ -4,7 +4,7 @@
 
 
 <div class="pageContent">
-	<form action="${pageContext.request.contextPath}/dde/mapinfoDetail!addAndsaveMapinfoDatails.do?s_method=save&s_type=save"
+	<form action="${pageContext.request.contextPath}/dde/mapInfoDetail!addAndsaveMapinfoDatails.do?s_method=save&s_type=save"
 		class="pageForm required-validate"
 		onsubmit="return validateCallback(this, dialogAjaxDone);">
 
@@ -88,10 +88,10 @@
 	   var isPk = $("select.isPk").val();
 	   var isNull = $("select.isNull").val();
 	   var destFieldDefault = $(".destFieldDefault").val();
-	   var mapinfoName = $("#mapinfoName").val();
-	   mapinfoName = newVal(mapinfoName, $mapinfoDetailFormAdd.find('#mapinfoName').val());
+	   var mapInfoName = $("#mapInfoName").val();
+	   mapInfoName = newVal(mapInfoName, $mapinfoDetailFormAdd.find('#mapInfoName').val());
 	   
-	   if('' == mapinfoName) {
+	   if('' == mapInfoName) {
 		   DWZ.ajaxDone({
 				statusCode : DWZ.statusCode.error,
 				message : '请填写交换名称'
@@ -105,8 +105,8 @@
 	   var isRepeat = $("#isRepeat").val();
 	   isRepeat = newVal(isRepeat, $mapinfoDetailFormAdd.find(':radio.isRepeat').val());
 	   
-	   var mapinfoDesc = $("#mapinfoDesc").val();
-	   mapinfoDesc = newVal(mapinfoDesc, $mapinfoDetailFormAdd.find('#mapinfoDesc').text());
+	   var mapInfoDesc = $("#mapInfoDesc").val();
+	   mapInfoDesc = newVal(mapInfoDesc, $mapinfoDetailFormAdd.find('#mapInfoDesc').text());
 	   
 	   var tableOperate = $("#tableOperate").val();
 	   //tableOperate = newVal(tableOperate, $mapinfoDetailFormAdd.find(':radio.isRepeat').val());
@@ -115,14 +115,14 @@
 	   recordOperate = newVal(recordOperate, $mapinfoDetailFormAdd.find(':radio.recordOperate').val());
 		
 	   var mapinfoNameElement = DWZ.frag["INPUTHIDDEN"]
-		.replaceAll('{name}', 'mapinfoName')
-		.replaceAll('{value}', mapinfoName);
+		.replaceAll('{name}', 'mapInfoName')
+		.replaceAll('{value}', mapInfoName);
 	   var isRepeatElement = DWZ.frag["INPUTHIDDEN"]
 		.replaceAll('{name}', 'isRepeat')
 		.replaceAll('{value}', isRepeat);
 	   var mapinfoDescElement = DWZ.frag["INPUTHIDDEN"]
-		.replaceAll('{name}', 'mapinfoDesc')
-		.replaceAll('{value}', mapinfoDesc);
+		.replaceAll('{name}', 'mapInfoDesc')
+		.replaceAll('{value}', mapInfoDesc);
 	   var tableOperateElement = DWZ.frag["INPUTHIDDEN"]
 		.replaceAll('{name}', 'tableOperate')
 		.replaceAll('{value}', tableOperate);
@@ -181,7 +181,7 @@
 	   }
 	   
 	   $.pdialog.close($.pdialog.getCurrent());
-	   $("#addmapinfoDetailForm").attr("action","${pageContext.request.contextPath}/dde/mapinfoDetail!addAndsaveMapinfoDatails.do?s_method=save&s_type=add").submit();
+	   $("#addmapinfoDetailForm").attr("action","${pageContext.request.contextPath}/dde/mapInfoDetail!addAndsaveMapinfoDatails.do?s_method=save&s_type=add").submit();
 }
    
    

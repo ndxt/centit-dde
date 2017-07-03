@@ -5,7 +5,7 @@
 
 	<form id="defSourceDataFrom" class="defSourceDataFrom"
 		onsubmit="return navTabSearch(this)"
-		action="${pageContext.request.contextPath}/dde/mapinfoDetail!addAndsaveMapinfoDatails.do?&s_type=init&s_method=updateSourceColumnSentence"
+		action="${pageContext.request.contextPath}/dde/mapInfoDetail!addAndsaveMapinfoDatails.do?&s_type=init&s_method=updateSourceColumnSentence"
 		method="post">
 		
 		<input type="hidden" name="s_goalTableName" value="${param['s_goalTableName']}"/>
@@ -16,7 +16,7 @@
 			<div class="unit">
 				<label>数据库连接：</label>
 				<select class="combox" name="s_sourcedatabaseName" ref="tableNames"
-						refUrl="${pageContext.request.contextPath }/dde/mapinfoDetail!database.do?databaseName={value}">
+						refUrl="${pageContext.request.contextPath }/dde/mapInfoDetail!database.do?databaseName={value}">
 						<option value="all">请选择数据库</option>
 				    <c:forEach var="database" items="${DATABASE}">
       				  <option value="${database}" <c:if test="${database eq param.s_sourcedatabaseName }">selected="selected"</c:if> >${database}</option>
@@ -70,21 +70,21 @@
 <script type="text/javascript">
 	  function submitMapInfo(){
 		  //debugger;
-		  var mapinfoName = $("#mapinfoName").val();
+		  var mapInfoName = $("#mapInfoName").val();
 		  var isRepeat = $(".isRepeat:checked").val();
-		  var mapinfoDesc = $("#mapinfoDesc").val();
+		  var mapInfoDesc = $("#mapInfoDesc").val();
 		  var tableOperate = $("#tableOperate").val();
 		  var recordOperate = $(".recordOperate:checked").val();
 			
 		  var mapinfoNameElement = DWZ.frag["INPUTHIDDEN"]
-			.replaceAll('{name}', 'mapinfoName')
-			.replaceAll('{value}', mapinfoName);
+			.replaceAll('{name}', 'mapInfoName')
+			.replaceAll('{value}', mapInfoName);
 		  var isRepeatElement = DWZ.frag["INPUTHIDDEN"]
 			.replaceAll('{name}', 'isRepeat')
 			.replaceAll('{value}', isRepeat);
 		  var mapinfoDescElement = DWZ.frag["INPUTHIDDEN"]
-			.replaceAll('{name}', 'mapinfoDesc')
-			.replaceAll('{value}', mapinfoDesc);
+			.replaceAll('{name}', 'mapInfoDesc')
+			.replaceAll('{value}', mapInfoDesc);
 		  var tableOperateElement = DWZ.frag["INPUTHIDDEN"]
 			.replaceAll('{name}', 'tableOperate')
 			.replaceAll('{value}', tableOperate);
@@ -103,7 +103,7 @@
 	  $('.table', $.pdialog.getCurrent()).change(function(event){
 		  $(".datasource").val($(this).val());
 		  $(".soueceTableName").val($(this).val());
-		  $("#defSourceDataFrom").attr("action","${pageContext.request.contextPath}/dde/mapinfoDetail!addAndsaveMapinfoDatails.do?s_type=reinitsource&s_method=updateSourceColumnSentence");
+		  $("#defSourceDataFrom").attr("action","${pageContext.request.contextPath}/dde/mapInfoDetail!addAndsaveMapinfoDatails.do?s_type=reinitsource&s_method=updateSourceColumnSentence");
 		  		  
 	  });
 	  

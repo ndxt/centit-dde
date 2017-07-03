@@ -12,7 +12,7 @@
 			<input name="s_soueceTableName" type="text" size="25"
 				class="datasource" value="${s_soueceTableName }" /> <a
 				class="btnLook"
-				href="${pageContext.request.contextPath }/dde/mapinfoDetail!defSourceData.do?s_soueceTableName=${s_soueceTableName }&s_goalTableName=${s_goalTableName}&s_mapinfoId=${param['s_mapinfoId'] }&s_sourceDatabaseName=${s_sourceDatabaseName }&s_goalDatabaseName=${s_goalDatabaseName }"
+				href="${pageContext.request.contextPath }/dde/mapInfoDetail!defSourceData.do?s_soueceTableName=${s_soueceTableName }&s_goalTableName=${s_goalTableName}&s_mapinfoId=${param['s_mapinfoId'] }&s_sourceDatabaseName=${s_sourceDatabaseName }&s_goalDatabaseName=${s_goalDatabaseName }"
 				target="dialog" rel="defSourceAndGoalData" mask="true" title="定义数据源"><span>定义数据源</span>
 			</a>
 		</dd>
@@ -25,7 +25,7 @@
 				   value="${s_goalDatabaseName }" readonly="readonly"/>
 			<input name="s_goalTableName" type="text" size="25" class="datadest"
 				value="${s_goalTableName}" /> <a class="btnLook"
-				href="${pageContext.request.contextPath }/dde/mapinfoDetail!defDestData.do?s_goalTableName=${s_goalTableName}&s_soueceTableName=${s_soueceTableName }&s_mapinfoId=${param['s_mapinfoId'] }&s_sourceDatabaseName=${s_sourceDatabaseName }&s_goalDatabaseName=${s_goalDatabaseName }"
+				href="${pageContext.request.contextPath }/dde/mapInfoDetail!defDestData.do?s_goalTableName=${s_goalTableName}&s_soueceTableName=${s_soueceTableName }&s_mapinfoId=${param['s_mapinfoId'] }&s_sourceDatabaseName=${s_sourceDatabaseName }&s_goalDatabaseName=${s_goalDatabaseName }"
 				target="dialog" rel="defSourceAndGoalData" mask="true"
 				title="定义数据目标"><span>定义数据目标</span> </a>
 		</dd>
@@ -34,14 +34,14 @@
 	<dl class="nowrap">
 				<dt>交换名称：</dt>
 				<dd>
-				<input type="text" name="mapinfoName" value="${mapinfoName}" size="40" id="mapinfoName_edit"/>
+				<input type="text" name="mapInfoName" value="${mapInfoName}" size="40" id="mapinfoName_edit"/>
 				</dd>
 	</dl>
 	
 	<dl class="nowrap">
 				<dt>交换说明：</dt>
 				<dd>
-				<textarea rows="3" cols="33" name="mapinfoDesc" id="mapinfoDesc_edit">${mapinfoDesc }</textarea>
+				<textarea rows="3" cols="33" name="mapInfoDesc" id="mapinfoDesc_edit">${mapInfoDesc }</textarea>
 				</dd>
 	</dl>
  </div>
@@ -73,8 +73,8 @@
 		<div class="tabsHeader">
 			<div class="tabsHeaderContent">
 				<ul>
-					<li><a id="mapInfo4Details_herf" href="${pageContext.request.contextPath}/dde/mapinfoDetail!showMapinfoDetail.do?s_soueceTableName=${s_soueceTableName }&s_goalTableName=${s_goalTableName}&s_mapinfoId=${param['s_mapinfoId'] }&s_type=initinner" target="ajax" rel="jbsxBox"><span>对应关系</span></a></li>
-					<li><a href="${pageContext.request.contextPath }/dde/mapinfoTrigger!list.do?s_mapinfoId=${param['s_mapinfoId'] }" target="ajax" rel="jbsxBox"><span>触发器</span></a></li>
+					<li><a id="mapInfo4Details_herf" href="${pageContext.request.contextPath}/dde/mapInfoDetail!showMapinfoDetail.do?s_soueceTableName=${s_soueceTableName }&s_goalTableName=${s_goalTableName}&s_mapinfoId=${param['s_mapinfoId'] }&s_type=initinner" target="ajax" rel="jbsxBox"><span>对应关系</span></a></li>
+					<li><a href="${pageContext.request.contextPath }/dde/mapInfoTrigger!list.do?s_mapinfoId=${param['s_mapinfoId'] }" target="ajax" rel="jbsxBox"><span>触发器</span></a></li>
 				</ul>
 			</div>
 		</div>

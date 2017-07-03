@@ -1,6 +1,6 @@
 package com.centit.dde.dao;
 
-import com.centit.dde.po.MapinfoTrigger;
+import com.centit.dde.po.MapInfoTrigger;
 import com.centit.dde.po.MapinfoTriggerId;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class MapinfoTriggerDao extends BaseDaoImpl<MapinfoTrigger,MapinfoTriggerId> {
+public class MapinfoTriggerDao extends BaseDaoImpl<MapInfoTrigger,MapinfoTriggerId> {
 
     public static final Log log = LogFactory.getLog(MapinfoTriggerDao.class);
     @Override
@@ -45,9 +45,9 @@ public class MapinfoTriggerDao extends BaseDaoImpl<MapinfoTrigger,MapinfoTrigger
         return filterField;
     }
 
-    public List<MapinfoTrigger> listTriggerByMapinfoId(Long mapinfoId) {
+    public List<MapInfoTrigger> listTriggerByMapinfoId(Long mapinfoId) {
         StringBuffer sql = new StringBuffer();
-        sql.append("from MapinfoTrigger t where  t.cid.mapinfoId=");
+        sql.append("from MapInfoTrigger t where  t.cid.mapinfoId=");
         sql.append(mapinfoId);
         sql.append(" order by t.triggerTime, t.tiggerOrder");
         return listObjects(sql.toString());

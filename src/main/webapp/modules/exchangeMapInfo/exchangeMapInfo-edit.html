@@ -1,34 +1,36 @@
 <form class="form centit">
-    <input hidden type="text" name="mapinfoId" />
+    <input hidden type="text" name="mapInfoId" />
 	<div class="fields two">
 		<div class="field" >
 			<label>交换名称：</label>
-			<input  class="easyui-textbox" name="mapinfoName" type="text"/>
+			<input  class="easyui-textbox" name="mapInfoName" type="text"/>
 		</div>
 	</div>
 	<div class="fields two">
 		<div class="field required">
 			<label>左（数据源）定义</label>
-			<div class="field required">
-				<input  class="easyui-textbox" id="sourceDatabaseName" name="sourceDatabaseName" type="text"/>
-				<input hidden id="querySql"  name="querySql" type="text"/>
-			</div>
-			<div class="field required">
-				<input  class="easyui-textbox" id="sourceTablename" name="sourceTablename" type="text"/>
-			</div>
-			<div class="field required">
-				<a iconCls="icon-add"  class="easyui-linkbutton"
-				data-options="iconCls:'icon-add'" width="440" height="580" onclick="dlgAddDb('left')"></a>
+			<div class="fields three">
+				<div class="field required">
+					<input  class="easyui-textbox" id="sourceDatabaseName" name="sourceDatabaseName" type="text"/>
+					<input hidden id="querySql"  name="querySql" type="text"/>
+				</div>
+				<div class="field required">
+					<input  class="easyui-textbox" id="sourceTableName" name="sourceTableName" type="text"/>
+				</div>
+				<div class="field required">
+					<a iconCls="icon-add"  class="easyui-linkbutton"
+					data-options="iconCls:'icon-add'" width="440" height="580" onclick="dlgAddDb('left')"></a>
+				</div>
 			</div>
 		</div>
 		<div class="field">
-			<div class="field required">
-				<label>右（数据目标）定义：</label>
+			<label>右（数据目标）定义：</label>
+			<div class="fields three">
 				<div class="field required">
 					<input id="txt_exchangemapinfo_dds" class="easyui-textbox"   name="destDatabaseName" type="text" size="10"/>
 				</div>
 				<div class="field required">
-					<input id="txt_exchangemapinfo_dt" class="easyui-textbox"  name="destTablename" type="text" size="25"/>
+					<input id="txt_exchangemapinfo_dt" class="easyui-textbox"  name="destTableName" type="text" size="25"/>
 				</div>
 				<div class="field required">
 					<a iconCls="icon-add" class="easyui-linkbutton"
@@ -53,12 +55,11 @@
 	<div class="field">
 		<div class="field ">
 			<label>交换说明：</label>
-			<input type="text" class="easyui-textbox" name="mapinfoDesc"  multiline="true" style="width:100%; height: 100px;"/>
+			<input type="text" class="easyui-textbox" name="mapInfoDesc"  multiline="true" style="width:100%; height: 100px;"/>
 		</div>
 	</div>
 </form>
 
-  	
 <div class="easyui-tabs" style="width:97%;height:410px">
 	<div title="数据交换内容字段" class="tab1" style="padding:5px">
 		<div style="width:37.5%;float:left">
@@ -126,7 +127,7 @@
 			<a iconCls="icon-add" href="modules/exchangeMapInfo/exchangeMapInfo-info.html" trigger="none"
 				target="dialog" rel="exchangeMapInfo_add" title="添加数据库表" width="750" height="600" btnValue="添加">添加</a>
 			<hr>
-			<a iconCls="icon-edit" href="modules/exchangeMapInfo/exchangeMapInfo-edit.html" trigger="single"
+			<a iconCls="icon-edit" href="modules/exchangeMapInfo/exchangeMapInfoTrigger-edit.html" trigger="single"
 				target="dialog" rel="exchangeMapInfo_edit" title="编辑 {{text}}" width="750" height="600" btnValue="更新">编辑</a>
 			<hr>
 			<a iconCls="icon-base icon-base-ban" trigger="single"

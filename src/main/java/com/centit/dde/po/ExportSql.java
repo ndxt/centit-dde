@@ -433,8 +433,8 @@ public class ExportSql implements java.io.Serializable {
         }
     }
 
-    public ExchangeTaskdetail newExchangeTaskdetail() {
-        ExchangeTaskdetail res = new ExchangeTaskdetail();
+    public ExchangeTaskDetail newExchangeTaskdetail() {
+        ExchangeTaskDetail res = new ExchangeTaskDetail();
 
         res.setMapinfoId(this.getExportId());
 

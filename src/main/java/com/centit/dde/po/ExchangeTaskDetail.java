@@ -12,7 +12,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="D_EXCHANGE_TASKDETAIL")
-public class ExchangeTaskdetail implements java.io.Serializable {
+public class ExchangeTaskDetail implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     @Column(name="CID")
@@ -28,13 +28,13 @@ public class ExchangeTaskdetail implements java.io.Serializable {
     /**
      * default constructor
      */
-    public ExchangeTaskdetail() {
+    public ExchangeTaskDetail() {
     }
 
     /**
      * minimal constructor
      */
-    public ExchangeTaskdetail(ExchangeTaskdetailId id
+    public ExchangeTaskDetail(ExchangeTaskdetailId id
 
     ) {
         this.cid = id;
@@ -45,7 +45,7 @@ public class ExchangeTaskdetail implements java.io.Serializable {
     /**
      * full constructor
      */
-    public ExchangeTaskdetail(ExchangeTaskdetailId id
+    public ExchangeTaskDetail(ExchangeTaskdetailId id
 
             , Long mapinfoOrder) {
         this.cid = id;
@@ -98,7 +98,7 @@ public class ExchangeTaskdetail implements java.io.Serializable {
     }
 
 
-    public void copy(ExchangeTaskdetail other) {
+    public void copy(ExchangeTaskDetail other) {
 
         this.setMapinfoId(other.getMapinfoId());
         this.setTaskId(other.getTaskId());
@@ -107,7 +107,7 @@ public class ExchangeTaskdetail implements java.io.Serializable {
 
     }
 
-    public void copyNotNullProperty(ExchangeTaskdetail other) {
+    public void copyNotNullProperty(ExchangeTaskDetail other) {
 
         if (other.getMapinfoId() != null)
             this.setMapinfoId(other.getMapinfoId());

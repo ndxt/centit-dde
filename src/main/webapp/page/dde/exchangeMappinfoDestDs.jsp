@@ -17,7 +17,7 @@
 			</div>
 
 			<div class="unit">
-				<label>表名：</label> <input id="txt_destTablename" name="destTablename" type="text" size="40" />
+				<label>表名：</label> <input id="txt_destTablename" name="destTableName" type="text" size="40" />
 
 			</div>
 

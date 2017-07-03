@@ -40,7 +40,7 @@ values ((select max(t.optcode) from f_optdef t)  + 1 , 'WSJHRW', 'WSJHRW', 'WSJH
 commit;
 
 update f_optinfo t set t.opturl = '/dde/exchangeMapinfoNew!list.do' where t.opturl = 
-'/dde/exchangeMapinfo!list.do';
+'/dde/exchangeMapInfo!list.do';
 
 update f_optinfo t set t.opturl = '/dde/exchangeTask!list.do?s_taskType=1' where t.opturl = 
 '/dde/exchangeTask!list.do';

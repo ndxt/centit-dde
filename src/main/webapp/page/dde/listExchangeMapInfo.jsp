@@ -41,26 +41,26 @@
             </thead>
             <tbody>
 
-            <c:forEach items="${exchangeMapinfos}" var="obj" varStatus="s">
+            <c:forEach items="${exchangeMapInfos}" var="obj" varStatus="s">
 
-                <tr target="mapinfoId" rel="${obj.mapinfoId}">
-                    <td><input name="ids" value="${obj.mapinfoId}" type="checkbox"
+                <tr target="mapInfoId" rel="${obj.mapInfoId}">
+                    <td><input name="ids" value="${obj.mapInfoId}" type="checkbox"
                     <c:forEach var="u" items="${used }">
-                               <c:if test="${u eq obj.mapinfoId }">checked="checked"</c:if>
+                               <c:if test="${u eq obj.mapInfoId }">checked="checked"</c:if>
                     </c:forEach>
                             ></td>
                     <td align="center"><c:out value="${s.index+1 }"></c:out></td>
-                    <%--<td align="center">${obj.mapinfoId }</td>--%>
+                    <%--<td align="center">${obj.mapInfoId }</td>--%>
                     <td align="center">${obj.sourceDatabaseName }</td>
-                    <td align="center">${obj.sourceTablename }</td>
-                    <td align="center">${obj.mapinfoName }</td>
+                    <td align="center">${obj.sourceTableName }</td>
+                    <td align="center">${obj.mapInfoName }</td>
                     <td align="center">${obj.destDatabaseName }</td>
-                    <td align="center">${obj.destTablename }</td>
+                    <td align="center">${obj.destTableName }</td>
                     <td align="center"><c:if
                             test="${!empty obj.isRepeat && 1== obj.isRepeat }">是</c:if>
                         <c:if
                                 test="${!empty obj.isRepeat && 0== obj.isRepeat }">否</c:if></td>
-                    <td align="center">${obj.mapinfoDesc }</td>
+                    <td align="center">${obj.mapInfoDesc }</td>
                 </tr>
             </c:forEach>
             </tbody>

@@ -2,7 +2,7 @@ package com.centit.dde.controller;
 
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskErrorData;
-import com.centit.dde.service.ExchangeMapinfoManager;
+import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.service.TaskDetailLogManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
@@ -28,7 +28,7 @@ public class TaskDetailLogController extends BaseController {
     private TaskDetailLogManager taskDetailLogMag;
 
     @Resource
-    private ExchangeMapinfoManager exchangeMapinfoManager;
+    private ExchangeMapInfoManager exchangeMapInfoManager;
 
 
     @RequestMapping(value="edit",method = {RequestMethod.PUT})
@@ -45,7 +45,7 @@ public class TaskDetailLogController extends BaseController {
                     taskDetailLogMag.clearObjectProperties(object);
             }
             if (null != object.getMapinfoId()) {
-//                ServletActionContext.getContext().put("exchangeMapinfo", exchangeMapinfoManager.getObjectById(object.getMapinfoId()));
+//                ServletActionContext.getContext().put("exchangeMapinfo", exchangeMapInfoManager.getObjectById(object.getMapInfoId()));
             }
 //            return EDIT;
             JsonResultUtils.writeSingleDataJson(object, response);

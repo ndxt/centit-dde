@@ -13,7 +13,7 @@ import javax.persistence.IdClass;
  * @author codefan@hotmail.com
  */
 @Embeddable
-@IdClass(MapinfoDetail.class)
+@IdClass(MapInfoDetail.class)
 public class MapinfoDetailId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 

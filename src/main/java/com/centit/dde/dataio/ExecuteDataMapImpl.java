@@ -426,7 +426,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
 
     public int doMergeToDatabase(TableFileReader xmlData, ImportOpt importOpt, Long taskLogId)
             throws SqlResolveException {
-        // String mapinfoId= xmlData.getMapinfoId();
+        // String mapinfoId= xmlData.getMapInfoId();
         // importOpt.
         TaskDetailLog taskDetailLog = new TaskDetailLog();
         Long taskDetailLogId = taskDetailLogManager.getTaskDetailLogId();

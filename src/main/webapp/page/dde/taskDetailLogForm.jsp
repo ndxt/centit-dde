@@ -7,7 +7,7 @@
     <div class="pageFormContent" style="height: 135px;">
         <div class="unit">
             <label>交换名称：</label>
-            <input name="mapinfoName" type="text" value="${exchangeMapinfo.mapinfoName }" readonly="readonly"/>
+            <input name="mapInfoName" type="text" value="${exchangeMapInfo.mapInfoName }" readonly="readonly"/>
             <label>执行开始时间：</label>
             <input name="runBeginTime" type="text"
                    <c:if test="${!empty object.runBeginTime }">readonly="readonly"</c:if>
@@ -36,7 +36,7 @@
 
         <div class="unit">
             <label>任务描述：</label>
-            <textarea rows="3" cols="69" name="mapinfoDesc">${exchangeMapinfo.mapinfoDesc }</textarea>
+            <textarea rows="3" cols="69" name="mapInfoDesc">${exchangeMapInfo.mapInfoDesc }</textarea>
 
         </div>
         <div class="buttonActive">

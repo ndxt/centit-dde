@@ -5,7 +5,7 @@
 
 	<form id="defGoalDataFrom" class="defGoalDataFrom"
 		onsubmit="return navTabSearch(this)"
-		action="${pageContext.request.contextPath}/dde/mapinfoDetail!addAndsaveMapinfoDatails.do?&s_type=init&s_method=updateSourceColumnSentence"
+		action="${pageContext.request.contextPath}/dde/mapInfoDetail!addAndsaveMapinfoDatails.do?&s_type=init&s_method=updateSourceColumnSentence"
 		method="post">
 		
 		<input type="hidden" name="s_soueceTableName" value="${param['s_soueceTableName']}"/>
@@ -16,7 +16,7 @@
 			<div class="unit">
 				<label>数据库连接：</label>
 				<select class="combox" name="s_goaldatabaseName" ref="tableNames"
-						refUrl="${pageContext.request.contextPath }/dde/mapinfoDetail!database.do?databaseName={value}">
+						refUrl="${pageContext.request.contextPath }/dde/mapInfoDetail!database.do?databaseName={value}">
 					<option value="all">请选择数据库</option>
 				    <c:forEach var="database" items="${DATABASE}">
       				  <option value="${database}" <c:if test="${database eq param.s_goaldatabaseName }">selected="selected"</c:if> >${database}</option>
@@ -74,7 +74,7 @@
 	  $('.table', $.pdialog.getCurrent()).change(function(event){
 		  $(".datadest").val($(this).val());
 		  $(".s_goalTableName").val($(this).val());
-		  $("#defGoalDataFrom").attr("action","${pageContext.request.contextPath}/dde/mapinfoDetail!addAndsaveMapinfoDatails.do?s_type=reinitsource&s_method=updateSourceColumnSentence")
+		  $("#defGoalDataFrom").attr("action","${pageContext.request.contextPath}/dde/mapInfoDetail!addAndsaveMapinfoDatails.do?s_type=reinitsource&s_method=updateSourceColumnSentence")
 		  		  
 	  });
 </script>

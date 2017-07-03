@@ -21,10 +21,10 @@ define(function(require) {
 		  		]);
 		
 		
-		// @override
+		//@override
 		this.load = function(panel, data) {
 			var form = panel.find('form');
-			Core.ajax(Config.ContextPath+'service/exchangemapinfo/edit/'+data.mapinfoId, {
+			Core.ajax(Config.ContextPath+'service/exchangemapinfo/edit/'+data.mapInfoId, {
 				type: 'json',
 				method: 'get' 
 //					.then()是Promise规范规定的异步调用方法    得到数据后，调用form的load方法将数据显示在表单中
@@ -33,14 +33,14 @@ define(function(require) {
 				
 				form.form('load', data)
 					.form('disableValidation')
-					.form('readonly', 'mapinfoId')
+					.form('readonly', 'mapInfoId')
 					.form('focus');
 
 			/*	var proArray = new Array();
-			    for(var i=0;i<data.mapinfoDetails.length;i++){ 
+			    for(var i=0;i<data.mapInfoDetails.length;i++){
 			        var a = { 
-		        		destFieldName:data.mapinfoDetails[i].destFieldName, 
-		        		destFieldType:data.mapinfoDetails[i].destFieldType, 
+		        		destFieldName:data.mapInfoDetails[i].destFieldName,
+		        		destFieldType:data.mapInfoDetails[i].destFieldType,
 			        }; 
 			        proArray.push(a); 
 			    } */
@@ -57,7 +57,7 @@ define(function(require) {
 				sourceTable.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.mapinfoDetails,
+					data:data.mapInfoDetails,
 					dragSelection: true,
 					onLoadSuccess:function(){
 						// $(this).datagrid('enableDnd');
@@ -67,18 +67,17 @@ define(function(require) {
 				destTable.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.mapinfoDetails,
+					data:data.mapInfoDetails,
 					dragSelection: true,
 					onLoadSuccess:function(){
 						// destTable.datagrid('enableDnd');
 					}
 				});
-
 				var tab2table = panel.find('table.trigger');
 				tab2table.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.mapinfoTriggers
+					data:data.mapInfoTriggers
 				});
 			});
 			onchange();
@@ -91,9 +90,9 @@ define(function(require) {
 			$.extend(data,formData);
 			var isValid = form.form('validate');
 			if (isValid) {
-				var mapinfoDetails = panel.find('table.tab1').datagrid("getData").rows;
-				data.mapinfoDetails = mapinfoDetails;
-				Core.ajax(Config.ContextPath + 'service/exchangemapinfo/save/' + data.mapinfoId, {
+				var mapInfoDetails = panel.find('table.tab1').datagrid("getData").rows;
+				data.mapInfoDetails = mapInfoDetails;
+				Core.ajax(Config.ContextPath + 'service/exchangemapinfo/save/' + data.mapInfoId, {
 					data: data,
 					method: 'put'
 				}).then(function() {

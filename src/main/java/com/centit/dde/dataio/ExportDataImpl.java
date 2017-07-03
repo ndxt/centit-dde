@@ -354,7 +354,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
         TaskConsoleWriteUtils.writeInfo(taskID, msg);
 
-        List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailDao.getTaskDetails(taskID);
+        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailDao.getTaskDetails(taskID);
 
         Long taskLogId = taskLogManager.getTaskLogId();
         TaskLog taskLog = new TaskLog();
@@ -388,7 +388,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
         int nError = 0;
         int nSucceed = 0;
-        for (ExchangeTaskdetail taskDetail : exchangeTaskdetails) {
+        for (ExchangeTaskDetail taskDetail : exchangeTaskDetails) {
             ExportSql exportSql = exportSqlDao.getObjectById(taskDetail.getMapinfoId());
             if (exportSql == null) {
                 msg = "主键 = " + taskDetail.getMapinfoId() + " 的导出数据不存在";
@@ -499,7 +499,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
         exchangeTask.setLastRunTime(DatetimeOpt.currentSqlDate());
         exchangeTaskDao.saveObject(exchangeTask);
         logger.info("开始执行导出：" + exchangeTask.getTaskName() + "........");
-        List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailDao.getTaskDetails(taskID);
+        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailDao.getTaskDetails(taskID);
 
         Long taskLogId = taskLogManager.getTaskLogId();
         TaskLog taskLog = new TaskLog();
@@ -513,7 +513,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
         int nError = 0;
         int nSucceed = 0;
-        for (ExchangeTaskdetail taskDetail : exchangeTaskdetails) {
+        for (ExchangeTaskDetail taskDetail : exchangeTaskDetails) {
             ExportSql exportSql = exportSqlDao.getObjectById(taskDetail.getMapinfoId());
             if (exportSql == null) {
                 continue;

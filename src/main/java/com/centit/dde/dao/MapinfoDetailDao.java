@@ -1,6 +1,6 @@
 package com.centit.dde.dao;
 
-import com.centit.dde.po.MapinfoDetail;
+import com.centit.dde.po.MapInfoDetail;
 import com.centit.dde.po.MapinfoDetailId;
 import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.dao.CodeBook;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId> {
+public class MapinfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapinfoDetailId> {
     
     public static final Log log = LogFactory.getLog(MapinfoDetailDao.class);
 
@@ -64,9 +64,9 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId>
         return filterField;
     }
 
-    public List<MapinfoDetail> listByMapinfoId(Long mapinfoId) {
+    public List<MapInfoDetail> listByMapinfoId(Long mapinfoId) {
         StringBuffer sql = new StringBuffer();
-        sql.append("from MapinfoDetail t where  t.cid.mapinfoId=");
+        sql.append("from MapInfoDetail t where  t.cid.mapinfoId=");
         sql.append(mapinfoId);
         sql.append(" order by t.cid.columnNo ");
         return listObjects(sql.toString());
@@ -345,7 +345,7 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId>
     public void deleteMapinfoDetails(Long mapinfoId) {
         // this.deleteObjectById(mapinfoId);
 
-        String hql = "delete from MapinfoDetail d where d.cid.mapinfoId = ?";
+        String hql = "delete from MapInfoDetail d where d.cid.mapinfoId = ?";
 
         DatabaseOptUtils.doExecuteHql(this,hql, mapinfoId);
     }
@@ -406,7 +406,7 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId>
     }
 
     private long countSourceField() {
-        String hql = "select count(t.sourceFieldName) as length from MapinfoDetail t";
+        String hql = "select count(t.sourceFieldName) as length from MapInfoDetail t";
 
         return DatabaseOptUtils.getSingleIntByHql(this,hql);
     }
@@ -423,9 +423,9 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapinfoDetail,MapinfoDetailId>
 
     }
 
-    public void saveMapinfoDetails(MapinfoDetail mapinfoDetail) {
+    public void saveMapinfoDetails(MapInfoDetail mapInfoDetail) {
         DatabaseOptUtils.flush(this.getCurrentSession());
-        this.saveObject(mapinfoDetail);
+        this.saveObject(mapInfoDetail);
     }
 
 }

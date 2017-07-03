@@ -6,21 +6,20 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 
+import com.centit.dde.po.MapInfoDetail;
+import com.centit.dde.service.MapInfoDetailManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.dao.MapinfoDetailDao;
-import com.centit.dde.po.MapinfoDetail;
 import com.centit.dde.po.MapinfoDetailId;
-import com.centit.dde.service.MapinfoDetailManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 @Service
-public class MapinfoDetailManagerImpl extends BaseEntityManagerImpl<MapinfoDetail,MapinfoDetailId,MapinfoDetailDao>
-        implements MapinfoDetailManager {
-    public static final Log log = LogFactory.getLog(MapinfoDetailManager.class);
+public class MapInfoDetailManagerImpl extends BaseEntityManagerImpl<MapInfoDetail,MapinfoDetailId,MapinfoDetailDao>
+        implements MapInfoDetailManager {
+    public static final Log log = LogFactory.getLog(MapInfoDetailManager.class);
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
     
@@ -34,7 +33,7 @@ public class MapinfoDetailManagerImpl extends BaseEntityManagerImpl<MapinfoDetai
     }
 
     
-    public List<MapinfoDetail> listByMapinfoId(Long mapinfoId) {
+    public List<MapInfoDetail> listByMapinfoId(Long mapinfoId) {
         return mapinfoDetailDao.listByMapinfoId(mapinfoId);
     }
     
@@ -82,8 +81,8 @@ public class MapinfoDetailManagerImpl extends BaseEntityManagerImpl<MapinfoDetai
         return this.mapinfoDetailDao.getGoalColumnStrut(mapinfoId);
     }
 
-    public void saveMapinfoDetails(MapinfoDetail mapinfoDetail) {
-        this.mapinfoDetailDao.saveMapinfoDetails(mapinfoDetail);
+    public void saveMapinfoDetails(MapInfoDetail mapInfoDetail) {
+        this.mapinfoDetailDao.saveMapinfoDetails(mapInfoDetail);
     }
 
 }

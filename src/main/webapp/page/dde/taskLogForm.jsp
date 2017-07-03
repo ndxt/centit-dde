@@ -76,7 +76,7 @@
                         <td align="center">
                                 ${s.index+1 }
                         </td>
-                        <td align="center">${taskDetailLogs.mapinfoName}</td>
+                        <td align="center">${taskDetailLogs.mapInfoName}</td>
                         <td align="center"><fmt:formatDate value="${taskDetailLogs.runBeginTime}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
                         <td align="center"><fmt:formatDate value="${taskDetailLogs.runEndTime}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
                         <td align="center">${taskDetailLogs.successPieces}</td>

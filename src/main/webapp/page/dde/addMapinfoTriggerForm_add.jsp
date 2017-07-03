@@ -4,14 +4,14 @@
 
 
 <div class="pageContent">
-	<form action="${pageContext.request.contextPath}/dde/mapinfoTrigger!addAndsaveTrigger.do?noInitfirst=true" id="addMapinfoTriggerForm_add" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone);">
+	<form action="${pageContext.request.contextPath}/dde/mapInfoTrigger!addAndsaveTrigger.do?noInitfirst=true" id="addMapinfoTriggerForm_add" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone);">
 		<div class="pageFormContent" layoutH="56">	
-		    <input type="hidden" name="mapinfoId" value="${param.mapinfoId }"/>
+		    <input type="hidden" name="mapInfoId" value="${param.mapInfoId }"/>
 		    <input type="hidden" name="triggerId" value="${object.triggerId }"/>	
 			<%-- <p>
 				<label>交换编号：</label>	 
-				<input name="mapinfoId" readonly="readonly" type="text" size="40" value="${param.mapinfoId }" />
-				<input name="s_mapinfoId" type="hidden" size="40" value="${param.mapinfoId }" />			
+				<input name="mapInfoId" readonly="readonly" type="text" size="40" value="${param.mapInfoId }" />
+				<input name="s_mapinfoId" type="hidden" size="40" value="${param.mapInfoId }" />
 			</p>
 			
 			<p>
@@ -91,21 +91,21 @@
 <script type="text/javascript">
   function saveTrigger(){
 	 //debugger;
-     var mapinfoName = $("#mapinfoName").val();
+     var mapInfoName = $("#mapInfoName").val();
      var isRepeat = $("#isRepeat").val();
-     var mapinfoDesc = $("#mapinfoDesc").val();
+     var mapInfoDesc = $("#mapInfoDesc").val();
      var tableOperate = $("#tableOperate").val();
      var recordOperate = $("#recordOperate").val();
 	
      var mapinfoNameElement = DWZ.frag["INPUTHIDDEN"]
-	     .replaceAll('{name}', 'mapinfoName')
-	     .replaceAll('{value}', mapinfoName);
+	     .replaceAll('{name}', 'mapInfoName')
+	     .replaceAll('{value}', mapInfoName);
      var isRepeatElement = DWZ.frag["INPUTHIDDEN"]
 	     .replaceAll('{name}', 'isRepeat')
 	     .replaceAll('{value}', isRepeat);
      var mapinfoDescElement = DWZ.frag["INPUTHIDDEN"]
-	     .replaceAll('{name}', 'mapinfoDesc')
-	     .replaceAll('{value}', mapinfoDesc);
+	     .replaceAll('{name}', 'mapInfoDesc')
+	     .replaceAll('{value}', mapInfoDesc);
      var tableOperateElement = DWZ.frag["INPUTHIDDEN"]
 	     .replaceAll('{name}', 'tableOperate')
 	     .replaceAll('{value}', tableOperate);

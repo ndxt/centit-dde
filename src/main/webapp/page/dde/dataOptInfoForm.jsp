@@ -71,7 +71,7 @@
 
 
 
-							<th type="text" name="dataOptStep.mapinfoOrder" fieldClass="required"><c:out value="dataOptStep.mapinfoOrder" /></th>
+							<th type="text" name="dataOptStep.mapInfoOrder" fieldClass="required"><c:out value="dataOptStep.mapInfoOrder" /></th>
 
 
 

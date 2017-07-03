@@ -5,7 +5,7 @@
 
 	<form id="defSourceDataFrom" class="defSourceDataFrom"
 		onsubmit="return navTabSearch(this)"
-		action="${pageContext.request.contextPath}/dde/mapinfoDetail!showMapinfoDetail.do?&s_type=reinitsource&s_method=updateSourceColumnSentence"
+		action="${pageContext.request.contextPath}/dde/mapInfoDetail!showMapinfoDetail.do?&s_type=reinitsource&s_method=updateSourceColumnSentence"
 		method="post">
 	<input type="hidden" name="s_goalUrl" value="${GOALURL}"/>
 	<input type="hidden" name="s_goalTableName" value="${param['s_goalTableName']}"/>
@@ -15,7 +15,7 @@
 			<div class="unit">
 				<label>数据库连接：</label>
 				<select  name="s_sourcedatabaseName" ref="tableNames"
-						refUrl="${pageContext.request.contextPath }/dde/mapinfoDetail!database.do?databaseName={value}">
+						refUrl="${pageContext.request.contextPath }/dde/mapInfoDetail!database.do?databaseName={value}">
 						<option value="all">请选择数据库</option>
 				    <c:forEach var="database" items="${DATABASE}">
       				  <option value="${database}" <c:if test="${sourceDatabaseName eq database }">selected=selected</c:if> >${database}</option>
@@ -71,7 +71,7 @@
 	  $('.table', $.pdialog.getCurrent()).change(function(event){
 		  $(".datasource").val($(this).val());
 		  $(".soueceTableName").val($(this).val());
-		  $("#defSourceDataFrom").attr("action","${pageContext.request.contextPath}/dde/mapinfoDetail!showMapinfoDetail.do?s_type=reinitsource&s_method=updateSourceColumnSentence");
+		  $("#defSourceDataFrom").attr("action","${pageContext.request.contextPath}/dde/mapInfoDetail!showMapinfoDetail.do?s_type=reinitsource&s_method=updateSourceColumnSentence");
 		  		  
 	  });
 	  

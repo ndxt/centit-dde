@@ -3,7 +3,7 @@ package com.centit.dde.service.impl;
 import com.centit.dde.dao.ExchangeMapinfoDao;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.*;
-import com.centit.dde.service.ExchangeMapinfoManager;
+import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
@@ -24,11 +24,11 @@ import java.sql.*;
 import java.util.*;
 
 @Service
-public class ExchangeMapinfoManagerImpl
-        extends BaseEntityManagerImpl<ExchangeMapinfo,Long,ExchangeMapinfoDao> implements
-        ExchangeMapinfoManager {
+public class ExchangeMapInfoManagerImpl
+        extends BaseEntityManagerImpl<ExchangeMapInfo,Long,ExchangeMapinfoDao> implements
+        ExchangeMapInfoManager {
 
-    public static final Log log = LogFactory.getLog(ExchangeMapinfoManager.class);
+    public static final Log log = LogFactory.getLog(ExchangeMapInfoManager.class);
 
     @Resource
     protected StaticEnvironmentManager platformEnvironment;
@@ -43,11 +43,11 @@ public class ExchangeMapinfoManagerImpl
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<ExchangeMapinfo> listImportExchangeMapinfo(List<Long> mapinfoId) {
+    public List<ExchangeMapInfo> listImportExchangeMapinfo(List<Long> mapinfoId) {
         return exchangeMapinfoDao.listImportExchangeMapinfo(mapinfoId);
     }
 
-    private void validator(ExchangeMapinfo object) throws SqlResolveException {
+    private void validator(ExchangeMapInfo object) throws SqlResolveException {
         if (!StringUtils.hasText(object.getQuerySql())) {
             throw new SqlResolveException(10001);
         }
@@ -64,7 +64,7 @@ public class ExchangeMapinfoManagerImpl
 
         String triggerSql = null;
 
-        for (MapinfoTrigger et : object.getMapinfoTriggers()) {
+        for (MapInfoTrigger et : object.getMapInfoTriggers()) {
             triggerSql = et.getTriggerSql();
             if (!StringUtils.hasText(triggerSql)) {
                 throw new SqlResolveException(10003);
@@ -84,7 +84,7 @@ public class ExchangeMapinfoManagerImpl
 
         int pkNum = 0;
         String sourceFieldName = null;
-        for (MapinfoDetail ef : object.getMapinfoDetails()) {
+        for (MapInfoDetail ef : object.getMapInfoDetails()) {
             sourceFieldName = ef.getSourceFieldName();
             if (!StringUtils.hasText(sourceFieldName)) {
                 continue;
@@ -123,22 +123,22 @@ public class ExchangeMapinfoManagerImpl
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void save(ExchangeMapinfo object) {
-        object.setMapinfoName(object.getMapinfoName().trim());
+    public void save(ExchangeMapInfo object) {
+        object.setMapInfoName(object.getMapInfoName().trim());
 
         //判断交换名称的唯一性
         Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("mapinfoNameEq", object.getMapinfoName());
+        filterMap.put("mapinfoNameEq", object.getMapInfoName());
 
-        List<ExchangeMapinfo> listObjects = listObjects(filterMap);
+        List<ExchangeMapInfo> listObjects = listObjects(filterMap);
 
         if (!CollectionUtils.isEmpty(listObjects)) {
-            ExchangeMapinfo exchangeMapinfoDb = getObjectById(object.getMapinfoId());
+            ExchangeMapInfo exchangeMapInfoDb = getObjectById(object.getMapInfoId());
             String message = "交换名称已存在";
-            if (null == exchangeMapinfoDb) {
+            if (null == exchangeMapInfoDb) {
                 log.error(message);
             } else {
-                if (1 < listObjects.size() || !exchangeMapinfoDb.getMapinfoId().equals(listObjects.get(0).getMapinfoId())) {
+                if (1 < listObjects.size() || !exchangeMapInfoDb.getMapInfoId().equals(listObjects.get(0).getMapInfoId())) {
                     log.error(message);
                 }
             }
@@ -148,15 +148,15 @@ public class ExchangeMapinfoManagerImpl
         }catch (SqlResolveException e){
             log.error("");
         }
-        ExchangeMapinfo dbObject = exchangeMapinfoDao.getObjectById(object.getMapinfoId());
+        ExchangeMapInfo dbObject = exchangeMapinfoDao.getObjectById(object.getMapInfoId());
         if (null == dbObject) {
-            object.setMapinfoId(exchangeMapinfoDao.getNextLongSequence());
+            object.setMapInfoId(exchangeMapinfoDao.getNextLongSequence());
             setFieldTriggerCid(object);
         } else {
             dbObject.copyNotNullProperty(object);
 
-            dbObject.replaceMapinfoDetails(object.getMapinfoDetails());
-            dbObject.replaceMapinfoTrrigers(object.getMapinfoTriggers());
+            dbObject.replaceMapinfoDetails(object.getMapInfoDetails());
+            dbObject.replaceMapinfoTrrigers(object.getMapInfoTriggers());
 
             setFieldTriggerCid(dbObject);
             object=dbObject;
@@ -166,28 +166,28 @@ public class ExchangeMapinfoManagerImpl
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<ExchangeMapinfo> listObjectExcludeUsed(Map<String, Object> filterMap, PageDesc pageDesc) {
+    public List<ExchangeMapInfo> listObjectExcludeUsed(Map<String, Object> filterMap, PageDesc pageDesc) {
         return exchangeMapinfoDao.listObjectExcludeUsed(filterMap, pageDesc);
     }
 
-    private static void setFieldTriggerCid(ExchangeMapinfo object) {
-        MapinfoDetail md = null;
-        MapinfoTrigger mt = null;
-        for (int i = 0; i < object.getMapinfoDetails().size(); i++) {
-            md = object.getMapinfoDetails().get(i);
+    private static void setFieldTriggerCid(ExchangeMapInfo object) {
+        MapInfoDetail md = null;
+        MapInfoTrigger mt = null;
+        for (int i = 0; i < object.getMapInfoDetails().size(); i++) {
+            md = object.getMapInfoDetails().get(i);
 
-            md.setCid(new MapinfoDetailId(object.getMapinfoId(), (long) i));
+            md.setCid(new MapinfoDetailId(object.getMapInfoId(), (long) i));
         }
-        for (int i = 0; i < object.getMapinfoTriggers().size(); i++) {
-            mt = object.getMapinfoTriggers().get(i);
-            mt.setCid(new MapinfoTriggerId((long) i, object.getMapinfoId()));
+        for (int i = 0; i < object.getMapInfoTriggers().size(); i++) {
+            mt = object.getMapInfoTriggers().get(i);
+            mt.setCid(new MapinfoTriggerId((long) i, object.getMapInfoId()));
         }
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<MapinfoDetail> resolveSQL(DatabaseInfo databaseInfo, String sql) {
-        List<MapinfoDetail> mapinfoDetails = null;
+    public List<MapInfoDetail> resolveSQL(DatabaseInfo databaseInfo, String sql) {
+        List<MapInfoDetail> mapInfoDetails = null;
         Connection connection = null;
         Statement statement = null;
         ResultSet rs = null;
@@ -200,19 +200,19 @@ public class ExchangeMapinfoManagerImpl
                 rs = statement.executeQuery(sql);
                 ResultSetMetaData rsmd = rs.getMetaData();
                 for(int i = 0; i < rsmd.getColumnCount(); i++){
-                    MapinfoDetail mapinfoDetail = new MapinfoDetail();
-                    mapinfoDetail.getCid().setColumnNo((long)(i-1));
-                    mapinfoDetail.setSoueceTableName(rsmd.getTableName(i));
-                    mapinfoDetail.setSourceFieldName(rsmd.getColumnName(i));
-                    mapinfoDetail.setSourceFieldSentence(rsmd.getColumnName(i));
-                    mapinfoDetail.setSourceFieldType(rsmd.getColumnTypeName(i));
-                    mapinfoDetails.add(mapinfoDetail);
+                    MapInfoDetail mapInfoDetail = new MapInfoDetail();
+                    mapInfoDetail.getCid().setColumnNo((long)(i-1));
+                    mapInfoDetail.setSoueceTableName(rsmd.getTableName(i));
+                    mapInfoDetail.setSourceFieldName(rsmd.getColumnName(i));
+                    mapInfoDetail.setSourceFieldSentence(rsmd.getColumnName(i));
+                    mapInfoDetail.setSourceFieldType(rsmd.getColumnTypeName(i));
+                    mapInfoDetails.add(mapInfoDetail);
                 }
             }catch (SQLException e) {
                 log.error("数据库连接出错");
             }
         }
-        return mapinfoDetails;
+        return mapInfoDetails;
     }
 
 }

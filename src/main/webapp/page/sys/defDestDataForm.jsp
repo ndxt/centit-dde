@@ -5,7 +5,7 @@
 
 	<form id="form2" class="defGoalDataFrom"
 		onsubmit="return navTabSearch(this)"
-		action="${pageContext.request.contextPath}/sys/mapinfoDetail!showMapinfoDetail.do"
+		action="${pageContext.request.contextPath}/sys/mapInfoDetail!showMapinfoDetail.do"
 		method="post">
 		<input type="hidden" name="s_sourceUrl" value="${SOURCEURL}"/>
 		<input type="hidden" name="s_soueceTableName" value="${param['s_soueceTableName']}"/>

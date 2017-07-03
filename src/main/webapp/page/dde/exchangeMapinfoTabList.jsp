@@ -10,37 +10,37 @@
 	<form id="frm_main_exchange_mapinfo" action="${pageContext.request.contextPath }/dde/exchangeMapinfoNew!save.do" method="post" class="pageForm required-validate" onsubmit="return validateCallback(this, navTabAjaxDone);">
 		<%-- 隐藏Field表单 --%>
 		<ul id="hid_field_form_list">
-			<c:forEach items="${object.mapinfoDetails }" var="field">
+			<c:forEach items="${object.mapInfoDetails }" var="field">
 				<li columnNo="${field.cid.columnNo }" type="source">
-					<input type="hidden" name="mapinfoDetails[${field.cid.columnNo }].soueceTableName" value="${field.soueceTableName }"/>
-					<input type="hidden" name="mapinfoDetails[${field.cid.columnNo }].sourceUrl" value="${field.sourceUrl }"/>
-					<input type="hidden" name="mapinfoDetails[${field.cid.columnNo }].sourceFieldName" value="${field.sourceFieldName }"/>
-					<input type="hidden" name="mapinfoDetails[${field.cid.columnNo }].sourceFieldSentence" value="${field.sourceFieldSentence }"/>
-					<input type="hidden" name="mapinfoDetails[${field.cid.columnNo }].sourceFieldType" value="${field.sourceFieldType }"/>
+					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].soueceTableName" value="${field.soueceTableName }"/>
+					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].sourceUrl" value="${field.sourceUrl }"/>
+					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].sourceFieldName" value="${field.sourceFieldName }"/>
+					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].sourceFieldSentence" value="${field.sourceFieldSentence }"/>
+					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].sourceFieldType" value="${field.sourceFieldType }"/>
 				</li>
 				<li columnNo="${field.cid.columnNo }" type="dest">
-					<input type="hidden" name="mapinfoDetails[${field.cid.columnNo }].goalTableName" value="${field.goalTableName }"/>
-					<input type="hidden" name="mapinfoDetails[${field.cid.columnNo }].goalUrl" value="${field.goalUrl }"/>
-					<input type="hidden" name="mapinfoDetails[${field.cid.columnNo }].destFieldName" value="${field.destFieldName }"/>
-					<input type="hidden" name="mapinfoDetails[${field.cid.columnNo }].destFieldType" value="${field.destFieldType }"/>
-					<input type="hidden" name="mapinfoDetails[${field.cid.columnNo }].isPk" value="${field.isPk }"/>
-					<input type="hidden" name="mapinfoDetails[${field.cid.columnNo }].isNull" value="${field.isNull }"/>
-					<input type="hidden" name="mapinfoDetails[${field.cid.columnNo }].destFieldDefault" value="${field.destFieldDefault }"/>
+					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].goalTableName" value="${field.goalTableName }"/>
+					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].goalUrl" value="${field.goalUrl }"/>
+					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].destFieldName" value="${field.destFieldName }"/>
+					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].destFieldType" value="${field.destFieldType }"/>
+					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].isPk" value="${field.isPk }"/>
+					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].isNull" value="${field.isNull }"/>
+					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].destFieldDefault" value="${field.destFieldDefault }"/>
 				</li>
 			</c:forEach>
 			
 		</ul>
 	
 		<ul id="hid_trigger_form_list">
-			<c:forEach items="${object.mapinfoTriggers }" var="trigger">
+			<c:forEach items="${object.mapInfoTriggers }" var="trigger">
 				<li columnNo="${trigger.cid.triggerId }">
-					<input type="hidden" name="mapinfoTriggers[${trigger.cid.triggerId}].triggerSql" value="${trigger.triggerSql }"/>
-					<input type="hidden" name="mapinfoTriggers[${trigger.cid.triggerId}].triggerDesc" value="${trigger.triggerDesc }"/>
-					<input type="hidden" name="mapinfoTriggers[${trigger.cid.triggerId}].triggerDatabase" value="${trigger.triggerDatabase }"/>
-					<input type="hidden" name="mapinfoTriggers[${trigger.cid.triggerId}].triggerType" value="${trigger.triggerType }"/>
-					<input type="hidden" name="mapinfoTriggers[${trigger.cid.triggerId}].triggerTime" value="${trigger.triggerTime }"/>
-					<input type="hidden" name="mapinfoTriggers[${trigger.cid.triggerId}].tiggerOrder" value="${trigger.tiggerOrder }"/>
-					<input type="hidden" name="mapinfoTriggers[${trigger.cid.triggerId}].isprocedure" value="${trigger.isprocedure }"/>
+					<input type="hidden" name="mapInfoTriggers[${trigger.cid.triggerId}].triggerSql" value="${trigger.triggerSql }"/>
+					<input type="hidden" name="mapInfoTriggers[${trigger.cid.triggerId}].triggerDesc" value="${trigger.triggerDesc }"/>
+					<input type="hidden" name="mapInfoTriggers[${trigger.cid.triggerId}].triggerDatabase" value="${trigger.triggerDatabase }"/>
+					<input type="hidden" name="mapInfoTriggers[${trigger.cid.triggerId}].triggerType" value="${trigger.triggerType }"/>
+					<input type="hidden" name="mapInfoTriggers[${trigger.cid.triggerId}].triggerTime" value="${trigger.triggerTime }"/>
+					<input type="hidden" name="mapInfoTriggers[${trigger.cid.triggerId}].tiggerOrder" value="${trigger.tiggerOrder }"/>
+					<input type="hidden" name="mapInfoTriggers[${trigger.cid.triggerId}].isprocedure" value="${trigger.isprocedure }"/>
 				</li>
 			</c:forEach>
 			
@@ -49,13 +49,13 @@
 		  
 		  
 		<div id="div_export_field" class="pageFormContent" style="height: 135px;">
-			<%-- ExchangeMapinfo 字段隐藏域  start --%>
-			<input type="hidden"  name="mapinfoId" value="${object.mapinfoId }" />
+			<%-- ExchangeMapInfo 字段隐藏域  start --%>
+			<input type="hidden"  name="mapInfoId" value="${object.mapInfoId }" />
 			<input id="hid_querysql" type="hidden" name="querySql" beforeval="" value="${object.querySql }"/>
 			<input id="hid_dest_querysql" type="hidden" />
 
       		
-      		<%-- ExchangeMapinfo 字段隐藏域  end --%>
+      		<%-- ExchangeMapInfo 字段隐藏域  end --%>
       		
       		
       		
@@ -64,20 +64,20 @@
 				<label>左（数据源）定义：</label> 
 				
 					<input id="txt_exchangemapinfo_sds" name="sourceDatabaseName" type="text" size="10" value="${object.sourceDatabaseName }" readonly="readonly"/>
-					<input id="txt_exchangemapinfo_st" name="sourceTablename" type="text" size="25" class="datasource" value="${object.sourceTablename }" readonly="readonly"/> 
+					<input id="txt_exchangemapinfo_st" name="sourceTableName" type="text" size="25" class="datasource" value="${object.sourceTableName }" readonly="readonly"/>
 					<a class="btnLook" href="${ctx }/dde/exchangeMapinfoNew!sourceDs.do" height="350" width="600" callback="new ExportSql().pubfuns.defSourceDsInit" target="dialog"
-					   rel="defSourceAndGoalData<c:if test="${not empty object.mapinfoId}">_edit</c:if>" mask="true" title="定义数据源"><span>定义数据源</span></a>
+					   rel="defSourceAndGoalData<c:if test="${not empty object.mapInfoId}">_edit</c:if>" mask="true" title="定义数据源"><span>定义数据源</span></a>
 				
 				<label>右（数据目标）定义：</label> 
 				
 					<input id="txt_exchangemapinfo_dds" name="destDatabaseName" type="text" size="10" value="${object.destDatabaseName }" readonly="readonly"/>
-					<input id="txt_exchangemapinfo_dt" name="destTablename" type="text" size="25" class="datadest" value="${object.destTablename}" readonly="readonly"/> 
+					<input id="txt_exchangemapinfo_dt" name="destTableName" type="text" size="25" class="datadest" value="${object.destTableName}" readonly="readonly"/>
 					<a class="btnLook" href="${ctx }/dde/exchangeMapinfoNew!destDs.do" target="dialog" height="350" width="600" callback="new ExportSql().pubfuns.defDestDsInit"
-					   rel="defDestAndGoalData<c:if test="${not empty object.mapinfoId}">_edit</c:if>" mask="true" title="定义数据目标"><span>定义数据目标</span> </a>
+					   rel="defDestAndGoalData<c:if test="${not empty object.mapInfoId}">_edit</c:if>" mask="true" title="定义数据目标"><span>定义数据目标</span> </a>
 			</div>
 			<div class="unit">
 				<label>交换名称：</label> 
-				<input type="text"  name="mapinfoName" value="${object.mapinfoName}" size="42" />
+				<input type="text"  name="mapInfoName" value="${object.mapInfoName}" size="42" />
 				
 				<label style="margin-left: 22px;">是否重复执行：</label>
 				<div style="float:left; ">
@@ -99,7 +99,7 @@
 			</div>
 			
 			<div class="unit">
-				<label>交换说明：</label> <textarea rows="3" cols="33" name="mapinfoDesc" id="mapinfoDesc_edit">${object.mapinfoDesc }</textarea>
+				<label>交换说明：</label> <textarea rows="3" cols="33" name="mapInfoDesc" id="mapinfoDesc_edit">${object.mapInfoDesc }</textarea>
 			
 			</div>
 		</div>
@@ -111,16 +111,16 @@
 	            <li style="float:right; width: 400px;">
 	            	    <div class="">
 	                        <div class="" style="">
-	                        <c:if test="${empty object.mapinfoName }">
+	                        <c:if test="${empty object.mapInfoName }">
 	                      
 	                            <button id="exchange_file_upload" ></button>
 	                        </c:if>
 	                        </div>
 	                    </div>
 	                    <div class="buttonActive">
-	                    <c:if test="${not empty object.mapinfoName }">
+	                    <c:if test="${not empty object.mapInfoName }">
 	                        <div class="buttonContent">
-	                            <a class="" href="${pageContext.request.contextPath }/dde/exchangeMapinfoNew!exportMapinfoDetail.do?mapinfoId=${object.mapinfoId }">导出字段配置</a>
+	                            <a class="" href="${pageContext.request.contextPath }/dde/exchangeMapinfoNew!exportMapinfoDetail.do?mapInfoId=${object.mapInfoId }">导出字段配置</a>
 	                        </div>
 	                    </c:if>
 	                    </div>
@@ -159,7 +159,7 @@
 
 
         <c:set var="hasData">
-            <c:if test="${20 > fn:length(object.mapinfoDetails)}">layoutH=".pageHeader ${pageHeaderHeight }"</c:if>
+            <c:if test="${20 > fn:length(object.mapInfoDetails)}">layoutH=".pageHeader ${pageHeaderHeight }"</c:if>
         </c:set>
 		
 		<div class="tabsContent">
@@ -205,7 +205,7 @@
 			            </tr>
 			            </thead>
 			            <tbody id="tbody_source_field" align="center" class="sortDrag sourcetable">
-				            <c:forEach items="${object.mapinfoDetails }" var="field">
+				            <c:forEach items="${object.mapInfoDetails }" var="field">
 			                    <%-- <c:if test="${not empty field.sourceFieldName }"> --%>
 					                <tr columnNo="${field.cid.columnNo }" type='fieldSource'>
 					                    <td nowrap width="13%" title="${field.sourceFieldName }">${field.sourceFieldName }</td>
@@ -236,7 +236,7 @@
 			            </tr>
 			            </thead>
 			            <tbody id="tbody_dest_field" align="center" class="sortDrag sourcetable">
-				            <c:forEach items="${object.mapinfoDetails }" var="field">
+				            <c:forEach items="${object.mapInfoDetails }" var="field">
 			                    <%-- <c:if test="${not empty field.destFieldName }"> --%>
 					                <tr columnNo="${field.cid.columnNo }" type='fieldDest'>
 					                    <td nowrap width="13%" title="${field.destFieldName }">${field.destFieldName }</td>
@@ -309,7 +309,7 @@
 				            </tr>
 				            </thead>
 				            <tbody id="tbody_export_trigger" align="center" class="sortDrag sourcetable">
-				            	<c:forEach items="${object.mapinfoTriggers }" var="trigger">
+				            	<c:forEach items="${object.mapInfoTriggers }" var="trigger">
 									<tr columnNo="${trigger.cid.triggerId }" type='trigger'>
 										<td nowrap width="50%" title="${trigger.triggerSql }">
 											<c:choose>

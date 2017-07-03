@@ -361,23 +361,23 @@
 
 <_PAGE_ id="ExchangeSourceField"><![CDATA[
 <li columnNo="{columnNo}" type="source">
-	<input type="hidden" name="mapinfoDetails[{columnNo}].soueceTableName" />
-	<input type="hidden" name="mapinfoDetails[{columnNo}].sourceUrl" />
-	<input type="hidden" name="mapinfoDetails[{columnNo}].sourceFieldName" />
-	<input type="hidden" name="mapinfoDetails[{columnNo}].sourceFieldSentence" />
-	<input type="hidden" name="mapinfoDetails[{columnNo}].sourceFieldType" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].soueceTableName" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].sourceUrl" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].sourceFieldName" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].sourceFieldSentence" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].sourceFieldType" />
 </li>
 ]]></_PAGE_>
 
 <_PAGE_ id="ExchangeDestField"><![CDATA[
 <li columnNo="{columnNo}" type="dest">
-	<input type="hidden" name="mapinfoDetails[{columnNo}].goalTableName" />
-	<input type="hidden" name="mapinfoDetails[{columnNo}].goalUrl" />
-	<input type="hidden" name="mapinfoDetails[{columnNo}].destFieldName" />
-	<input type="hidden" name="mapinfoDetails[{columnNo}].destFieldType" />
-	<input type="hidden" name="mapinfoDetails[{columnNo}].isPk" />
-	<input type="hidden" name="mapinfoDetails[{columnNo}].isNull" />
-	<input type="hidden" name="mapinfoDetails[{columnNo}].destFieldDefault" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].goalTableName" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].goalUrl" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].destFieldName" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].destFieldType" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].isPk" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].isNull" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].destFieldDefault" />
 </li>
 ]]></_PAGE_>
 
@@ -400,13 +400,13 @@
 
 <_PAGE_ id="ExchangeTrigger"><![CDATA[
 <li columnNo="{columnNo}">
-	<input type="hidden" name="mapinfoTriggers[{columnNo}].triggerSql" />
-	<input type="hidden" name="mapinfoTriggers[{columnNo}].triggerDesc" />
-	<input type="hidden" name="mapinfoTriggers[{columnNo}].triggerDatabase" />
-	<input type="hidden" name="mapinfoTriggers[{columnNo}].triggerType" />
-	<input type="hidden" name="mapinfoTriggers[{columnNo}].triggerTime" />
-	<input type="hidden" name="mapinfoTriggers[{columnNo}].tiggerOrder" />
-	<input type="hidden" name="mapinfoTriggers[{columnNo}].isprocedure" />
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].triggerSql" />
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].triggerDesc" />
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].triggerDatabase" />
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].triggerType" />
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].triggerTime" />
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].tiggerOrder" />
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].isprocedure" />
 </li>
 ]]></_PAGE_>
 
@@ -548,7 +548,7 @@
 	<input type="hidden" name="dataOptSteps[{columnNo}].optType" />
 	<input type="hidden" name="dataOptSteps[{columnNo}].dataOptId" />
 	<input type="hidden" name="dataOptSteps[{columnNo}].osId" />
-	<input type="hidden" name="dataOptSteps[{columnNo}].mapinfoOrder" />
+	<input type="hidden" name="dataOptSteps[{columnNo}].mapInfoOrder" />
 </field>
 ]]></_PAGE_>
 

@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="D_MAPINFO_DETAIL")
-public class MapinfoDetail implements java.io.Serializable {
+public class MapInfoDetail implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     
     @EmbeddedId
@@ -85,13 +85,13 @@ public class MapinfoDetail implements java.io.Serializable {
     /**
      * default constructor
      */
-    public MapinfoDetail() {
+    public MapInfoDetail() {
     }
 
     /**
      * minimal constructor
      */
-    public MapinfoDetail(MapinfoDetailId id
+    public MapInfoDetail(MapinfoDetailId id
 
             , String sourceFieldName, String sourceFieldSentence, String destFieldName) {
         this.cid = id;
@@ -105,9 +105,9 @@ public class MapinfoDetail implements java.io.Serializable {
     /**
      * full constructor
      */
-    public MapinfoDetail(MapinfoDetailId id, Long orderNo, String sourceFieldName, 
-            String sourceFieldSentence, String sourceFieldType, String destFieldName, 
-            String destFieldType, String isPk, String destFieldDefault, String isNull, String querySql) {
+    public MapInfoDetail(MapinfoDetailId id, Long orderNo, String sourceFieldName,
+                         String sourceFieldSentence, String sourceFieldType, String destFieldName,
+                         String destFieldType, String isPk, String destFieldDefault, String isNull, String querySql) {
         this.cid = id;
 
         this.sourceFieldName = sourceFieldName;
@@ -209,7 +209,7 @@ public class MapinfoDetail implements java.io.Serializable {
     }
 
 
-    public void copy(MapinfoDetail other) {
+    public void copy(MapInfoDetail other) {
 
         this.setMapinfoId(other.getMapinfoId());
 
@@ -224,7 +224,7 @@ public class MapinfoDetail implements java.io.Serializable {
 
     }
 
-    public void copyNotNullProperty(MapinfoDetail other) {
+    public void copyNotNullProperty(MapInfoDetail other) {
 
         if (other.getMapinfoId() != null)
             this.setMapinfoId(other.getMapinfoId());

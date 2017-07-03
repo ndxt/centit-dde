@@ -157,22 +157,22 @@
 						<c:choose>
 							<c:when test="${'1' eq s_taskType }">
 								<c:forEach items="${echangeMapInfoList}" var="echangeMapInfo" varStatus="s">
-									<tr target="pk" rel="${echangeMapInfo.mapinfoId}">
-										<input name="mapinfoId" type="hidden" value="${echangeMapInfo.mapinfoId}" />
-										<td align="center" class="dataClass">${echangeMapInfo.mapinfoName}</td>
+									<tr target="pk" rel="${echangeMapInfo.mapInfoId}">
+										<input name="mapInfoId" type="hidden" value="${echangeMapInfo.mapInfoId}" />
+										<td align="center" class="dataClass">${echangeMapInfo.mapInfoName}</td>
 										<td align="center">${echangeMapInfo.sourceDatabaseName}</td>
 										<%-- <td align="center">${echangeMapInfo.querySql}</td> --%>
 										<c:if test="${s_taskType=='1' }">
 											<td align="center">${echangeMapInfo.destDatabaseName}</td>
-											<td align="center">${echangeMapInfo.destTablename}</td>
+											<td align="center">${echangeMapInfo.destTableName}</td>
 											<td align="center"><c:if test="${!empty echangeMapInfo.isRepeat  && 1== echangeMapInfo.isRepeat }">是</c:if> <c:if
 													test="${!empty echangeMapInfo.isRepeat  && 0== echangeMapInfo.isRepeat }">否</c:if></td>
 										</c:if>
-										<td align="center">${echangeMapInfo.mapinfoDesc}</td>
+										<td align="center">${echangeMapInfo.mapInfoDesc}</td>
 										<td align="center">
-												<a href="${contextPath }/dde/exchangeMapinfoNew!showMapinfoDetail.do?mapinfoId=${echangeMapInfo.mapinfoId}&s_type=initfirst" target='navTab' rel="dygxmx" title="编辑${taskTypeList['4' eq s_taskType ? '' : s_taskType] }对应关系"><span
+												<a href="${contextPath }/dde/exchangeMapinfoNew!showMapinfoDetail.do?mapInfoId=${echangeMapInfo.mapInfoId}&s_type=initfirst" target='navTab' rel="dygxmx" title="编辑${taskTypeList['4' eq s_taskType ? '' : s_taskType] }对应关系"><span
 													class="icon icon-edit"></span></a>
-												<a href="${contextPath }/dde/exchangeTaskdetail!delete.do?taskId=${object.taskId }&mapinfoId=${echangeMapInfo.mapinfoId}" target="ajaxTodo" title="删除${taskTypeList['4' eq s_taskType ? '' : s_taskType] }对应关系"><span
+												<a href="${contextPath }/dde/exchangeTaskDetail!delete.do?taskId=${object.taskId }&mapInfoId=${echangeMapInfo.mapInfoId}" target="ajaxTodo" title="删除${taskTypeList['4' eq s_taskType ? '' : s_taskType] }对应关系"><span
 													class="icon icon-trash"></span></a>
 											
 										</td>
@@ -182,14 +182,14 @@
 							<c:when test="${'2' eq s_taskType or '4' eq s_taskType }">
 								<c:forEach items="${exportSqlList}" var="obj" varStatus="s">
 									<tr target="pk" rel="${obj.exportId}">
-										<input name="mapinfoId" type="hidden" value="${obj.exportId}" id="exportId" />										
+										<input name="mapInfoId" type="hidden" value="${obj.exportId}" id="exportId" />
 										<td align="center" class="dataClass">${obj.exportName}</td>
 										<td align="center">${obj.sourceDatabaseName}</td>
 										<td align="center">${obj.exportDesc}</td>
 										<td align="center"> 
 											<a href="${contextPath }/dde/exportSql!edit.do?exportId=${obj.exportId}&tabid=external_EXPORTSQL" target='navTab' rel="dygxmx" title="编辑${taskTypeList['2'] }对应关系"><span
 												class="icon icon-edit"></span></a>
-											<a href="${contextPath }/dde/exchangeTaskdetail!delete.do?cid.taskId=${object.taskId }&cid.mapinfoId=${obj.exportId}" target="ajaxTodo" title="删除${taskTypeList['2'] }对应关系"><span
+											<a href="${contextPath }/dde/exchangeTaskDetail!delete.do?cid.taskId=${object.taskId }&cid.mapInfoId=${obj.exportId}" target="ajaxTodo" title="删除${taskTypeList['2'] }对应关系"><span
 												class="icon icon-trash"></span></a>
 										</td>
 									</tr>

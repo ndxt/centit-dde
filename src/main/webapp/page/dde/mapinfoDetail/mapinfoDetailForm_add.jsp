@@ -3,7 +3,7 @@
 
 
 <script>
-	var url = navTab._getTab('dygxmx_add').attr('url',"${contextPath }/dde/mapinfoDetail!addAndsaveMapinfoDatails.do?s_mapinfoId=${s_mapinfoId}&s_type=initfirst&noInitfirst=true");
+	var url = navTab._getTab('dygxmx_add').attr('url',"${contextPath }/dde/mapInfoDetail!addAndsaveMapinfoDatails.do?s_mapinfoId=${s_mapinfoId}&s_type=initfirst&noInitfirst=true");
 </script>
 
 <div id="div_mapinfo_detail_form_add" class="pageFormContent dde" style="min-width:928px; width:98%; height:171px; ">
@@ -16,7 +16,7 @@
 			<input name="s_soueceTableName" type="text" size="25"
 				class="datasource" value="${s_soueceTableName }" /> <a
 				class="btnLook"
-				href="${pageContext.request.contextPath }/dde/mapinfoDetail!defSourceData_add.do?s_soueceTableName=${s_soueceTableName }&s_goalTableName=${s_goalTableName}&s_sourcedatabaseName=${s_sourcedatabaseName}&s_goaldatabaseName=${s_goaldatabaseName}&s_mapinfoId=${s_mapinfoId}"
+				href="${pageContext.request.contextPath }/dde/mapInfoDetail!defSourceData_add.do?s_soueceTableName=${s_soueceTableName }&s_goalTableName=${s_goalTableName}&s_sourcedatabaseName=${s_sourcedatabaseName}&s_goaldatabaseName=${s_goaldatabaseName}&s_mapinfoId=${s_mapinfoId}"
 				target="dialog" rel="defSourceAndGoalData" mask="true" title="定义数据源"><span>定义数据源</span>
 			</a>
 		</dd>
@@ -29,7 +29,7 @@
 				   value="${s_goaldatabaseName }" readonly="readonly"/>
 			<input name="s_goalTableName" type="text" size="25" class="datadest"
 				value="${s_goalTableName}" /> <a class="btnLook"
-				href="${pageContext.request.contextPath }/dde/mapinfoDetail!defGoalData_add.do?s_goalTableName=${s_goalTableName}&s_soueceTableName=${s_soueceTableName }&s_sourcedatabaseName=${s_sourcedatabaseName}&s_goaldatabaseName=${s_goaldatabaseName}&s_mapinfoId=${s_mapinfoId}"
+				href="${pageContext.request.contextPath }/dde/mapInfoDetail!defGoalData_add.do?s_goalTableName=${s_goalTableName}&s_soueceTableName=${s_soueceTableName }&s_sourcedatabaseName=${s_sourcedatabaseName}&s_goaldatabaseName=${s_goaldatabaseName}&s_mapinfoId=${s_mapinfoId}"
 				target="dialog" rel="defSourceAndGoalData" mask="true"
 				title="定义数据目标"><span>定义数据目标</span> </a>
 		</dd>
@@ -38,14 +38,14 @@
 	<dl class="nowrap">
 				<dt>交换名称：</dt>
 				<dd>
-				<input type="text" name="mapinfoName" value="${mapinfoName}" size="40" id="mapinfoName"/>
+				<input type="text" name="mapInfoName" value="${mapInfoName}" size="40" id="mapInfoName"/>
 				</dd>
 	</dl>
 	
 	<dl class="nowrap">
 				<dt>交换说明：</dt>
 				<dd>
-				<textarea rows="3" cols="33" name="mapinfoDesc" id="mapinfoDesc">${mapinfoDesc }</textarea>
+				<textarea rows="3" cols="33" name="mapInfoDesc" id="mapInfoDesc">${mapInfoDesc }</textarea>
 				</dd>
 	</dl>
   </div>
@@ -81,10 +81,10 @@
 			<div class="tabsHeaderContent">
 				<ul>
 					<li><a
-						href="${pageContext.request.contextPath}/dde/mapinfoDetail!addAndsaveMapinfoDatails.do?s_soueceTableName=${s_soueceTableName}&s_goalTableName=${s_goalTableName}&s_mapinfoId=${s_mapinfoId}&s_type=initinner&s_sourcedatabaseName=${s_sourcedatabaseName}&s_goaldatabaseName=${s_goaldatabaseName}"
+						href="${pageContext.request.contextPath}/dde/mapInfoDetail!addAndsaveMapinfoDatails.do?s_soueceTableName=${s_soueceTableName}&s_goalTableName=${s_goalTableName}&s_mapinfoId=${s_mapinfoId}&s_type=initinner&s_sourcedatabaseName=${s_sourcedatabaseName}&s_goaldatabaseName=${s_goaldatabaseName}"
 						target="ajax" rel="jbsxBox_add"><span>对应关系</span></a></li>
 					<li><a
-						href="${pageContext.request.contextPath }/dde/mapinfoTrigger!list_add.do?s_mapinfoId=${s_mapinfoId}"
+						href="${pageContext.request.contextPath }/dde/mapInfoTrigger!list_add.do?s_mapinfoId=${s_mapinfoId}"
 						target="ajax" rel="jbsxBox_add"><span>触发器</span></a></li>
 				</ul>
 			</div>

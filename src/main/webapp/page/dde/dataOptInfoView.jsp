@@ -66,7 +66,7 @@
 						 
 					 
 						
-							<th><c:out value="dataOptStep.mapinfoOrder" /></th> 
+							<th><c:out value="dataOptStep.mapInfoOrder" /></th>
 						 
 					
 				</tr>
@@ -97,7 +97,7 @@
 							 
 						 
 							
-								<td><c:out value="${dataOptStep.mapinfoOrder}" /></td> 
+								<td><c:out value="${dataOptStep.mapInfoOrder}" /></td>
 							 
 						
 					</tr>
@@ -175,7 +175,7 @@
 					<td class="tableHeader"><c:out value="dataOptStep.optType" /></td> 
 					<td class="tableHeader"><c:out value="dataOptStep.dataOptId" /></td> 
 					<td class="tableHeader"><c:out value="dataOptStep.osId" /></td> 
-					<td class="tableHeader"><c:out value="dataOptStep.mapinfoOrder" /></td> 
+					<td class="tableHeader"><c:out value="dataOptStep.mapInfoOrder" /></td>
 					<td class="tableHeader"><bean:message key="opt.btn.collection" /></td>
 				</tr>
 			</thead>
@@ -191,7 +191,7 @@
 						<td><c:out value="${dataOptStep.optType}" /></td> 
 						<td><c:out value="${dataOptStep.dataOptId}" /></td> 
 						<td><c:out value="${dataOptStep.osId}" /></td> 
-						<td><c:out value="${dataOptStep.mapinfoOrder}" /></td> 
+						<td><c:out value="${dataOptStep.mapInfoOrder}" /></td>
 						<td><c:set var="deletecofirm">
 								<bean:message key="label.delete.confirm" />
 							</c:set> <a href='dataOptStep.do?dataOptId=${dataOptInfo.dataOptId}&optStepId=${dataOptStep.optStepId}&method=edit'><bean:message key="opt.btn.edit" /></a> <a href='dataOptStep.do?dataOptId=${dataOptInfo.dataOptId}&optStepId=${dataOptStep.optStepId}&method=delete'

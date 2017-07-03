@@ -4,7 +4,7 @@
 
 
 <div class="pageContent">
-	<form action="${pageContext.request.contextPath}/dde/mapinfoDetail!showMapinfoDetail.do?s_method=save&s_type=save"
+	<form action="${pageContext.request.contextPath}/dde/mapInfoDetail!showMapinfoDetail.do?s_method=save&s_type=save"
 		class="pageForm required-validate"
 		onsubmit="return validateCallback(this, dialogAjaxDone);">
         <input type="hidden" name="columnNo" class="columnNo" value="${object.cid.columnNo}"/>
@@ -92,21 +92,21 @@
 	   $(".goaltable>tr").eq(columnNo).find("input.editGoalisNullable").val(isNull);
 	   $(".goaltable>tr").eq(columnNo).find("input.editGoalFieldDefault").val(destFieldDefault);
 	   
-	   var mapinfoName = $("#mapinfoName").val();
+	   var mapInfoName = $("#mapInfoName").val();
 		var isRepeat = $("#isRepeat").val();
-		var mapinfoDesc = $("#mapinfoDesc").val();
+		var mapInfoDesc = $("#mapInfoDesc").val();
 		var tableOperate = $("#tableOperate").val();
 		var recordOperate = $("#recordOperate").val();
 		
 		var mapinfoNameElement = DWZ.frag["INPUTHIDDEN"]
-		.replaceAll('{name}', 'mapinfoName')
-		.replaceAll('{value}', mapinfoName);
+		.replaceAll('{name}', 'mapInfoName')
+		.replaceAll('{value}', mapInfoName);
 		var isRepeatElement = DWZ.frag["INPUTHIDDEN"]
 		.replaceAll('{name}', 'isRepeat')
 		.replaceAll('{value}', isRepeat);
 		var mapinfoDescElement = DWZ.frag["INPUTHIDDEN"]
-		.replaceAll('{name}', 'mapinfoDesc')
-		.replaceAll('{value}', mapinfoDesc);
+		.replaceAll('{name}', 'mapInfoDesc')
+		.replaceAll('{value}', mapInfoDesc);
 		var tableOperateElement = DWZ.frag["INPUTHIDDEN"]
 		.replaceAll('{name}', 'tableOperate')
 		.replaceAll('{value}', tableOperate);
@@ -121,7 +121,7 @@
 		$("#addmapinfoDetailForm").append(recordOperateElement);
 	   
 	   $.pdialog.close($.pdialog.getCurrent());
-	   $("#addmapinfoDetailForm").attr("action","${pageContext.request.contextPath}/dde/mapinfoDetail!addAndsaveMapinfoDatails.do?s_method=save&s_type=edit").submit();
+	   $("#addmapinfoDetailForm").attr("action","${pageContext.request.contextPath}/dde/mapInfoDetail!addAndsaveMapinfoDatails.do?s_method=save&s_type=edit").submit();
 }
 </script>
 

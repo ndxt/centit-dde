@@ -81,19 +81,19 @@
 							<c:forEach items="${echangeMapInfoList}" var="echangeMapInfo" varStatus="s">
 								<tr target="pk" rel="${exchangeTask.taskId}">
 		
-									<td align="center">${s.index+1 } <input name="mapinfoId" type="hidden" value="${echangeMapInfo.mapinfoId}" />
+									<td align="center">${s.index+1 } <input name="mapInfoId" type="hidden" value="${echangeMapInfo.mapInfoId}" />
 		
 									</td>
-									<td align="center">${echangeMapInfo.mapinfoName}</td>
+									<td align="center">${echangeMapInfo.mapInfoName}</td>
 									<td align="center">${echangeMapInfo.sourceDatabaseName}</td>
 									<%-- <td align="center">${echangeMapInfo.querySql}</td> --%>
 									<td align="center">${echangeMapInfo.destDatabaseName}</td>
-									<td align="center">${echangeMapInfo.destTablename}</td>
+									<td align="center">${echangeMapInfo.destTableName}</td>
 									<td align="center">
 										<c:if test="${1 eq echangeMapInfo.isRepeat }">是</c:if> 
 										<c:if test="${1 ne echangeMapInfo.isRepeat }">否</c:if>
 									</td>
-									<td align="center">${echangeMapInfo.mapinfoDesc}</td>
+									<td align="center">${echangeMapInfo.mapInfoDesc}</td>
 								</tr>
 							</c:forEach>
 						</c:when>

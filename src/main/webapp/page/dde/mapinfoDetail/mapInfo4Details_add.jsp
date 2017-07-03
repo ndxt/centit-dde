@@ -4,7 +4,7 @@
 <div class="pageContent">
 	<%-- <div class="panelBar">
 		<ul class="toolBar">
-			<li><a class="add" href="${contextPath }/dde/mapinfoDetail!add_add.do" rel="mapinfoDetailAdd" target='dialog' width="500" height="350"><span>新增</span></a></li>
+			<li><a class="add" href="${contextPath }/dde/mapInfoDetail!add_add.do" rel="mapinfoDetailAdd" target='dialog' width="500" height="350"><span>新增</span></a></li>
 			<li><a class="icon" onclick="myFunction();"><span>保存</span></a></li>
 		</ul>
 	</div> --%>
@@ -13,7 +13,7 @@
         <div class="panelBar">
             <ul class="toolBar">
                 <li class="new"> 
-                  <a class="add" href="${contextPath }/dde/mapinfoDetail!add_add.do" rel="mapinfoDetailAdd" target='dialog' width="500" height="350"><span>新增</span></a>                   
+                  <a class="add" href="${contextPath }/dde/mapInfoDetail!add_add.do" rel="mapinfoDetailAdd" target='dialog' width="500" height="350"><span>新增</span></a>
                   <a class="edit" onclick="myFunction();"><span>保存</span></a>
                   <a class="delete" onclick="deletetbale();"><span>删除整行</span></a>
                 </li>
@@ -24,7 +24,7 @@
    ${addandsavemapinfoDetail}
    
 	<div layoutH="110" id="r_list_print">
-		<form id="addmapinfoDetailForm" action="${pageContext.request.contextPath}/dde/mapinfoDetail!addAndsaveMapinfoDatails.do"
+		<form id="addmapinfoDetailForm" action="${pageContext.request.contextPath}/dde/mapInfoDetail!addAndsaveMapinfoDatails.do"
 		    method="post" onsubmit="return navTabSearch(this)">
 	        <input type="hidden" name="s_goalTableName" value="${s_goalTableName}"/>
 	        <input type="hidden" name="s_mapinfoId" value="${param['s_mapinfoId']}"/>
@@ -92,7 +92,7 @@
 							    
 							    <td nowrap>
 							       <a onclick="" class="delete"><span class="icon icon-trash"></span></a>
-							       <a href="${contextPath }/dde/mapinfoDetail!edit_add.do?s_columnNo=${s.index+1}&s_mapinfoId=${param['s_mapinfoId']}" 
+							       <a href="${contextPath }/dde/mapInfoDetail!edit_add.do?s_columnNo=${s.index+1}&s_mapinfoId=${param['s_mapinfoId']}"
 							          rel="mapinfoDetailEdit" target='dialog' width="500" height="350"><span class="icon icon-edit"></span></a>
 							    </td>
 						</tr>
@@ -111,9 +111,9 @@
 		//父页面中表单信息
 		var $mapinfoDetailForm = $('#mapinfoDetailForm');
 		
-		var mapinfoName = $("#mapinfoName").val();
+		var mapInfoName = $("#mapInfoName").val();
 		
-		if('' == $.trim(mapinfoName)) {
+		if('' == $.trim(mapInfoName)) {
 			DWZ.ajaxDone({
 				statusCode : DWZ.statusCode.error,
 				message : '请填写交换名称'
@@ -123,14 +123,14 @@
 		}
 		
 		var isRepeat = $(".isRepeat:checked").val();
-		var mapinfoDesc = $("#mapinfoDesc").val();
+		var mapInfoDesc = $("#mapInfoDesc").val();
 		/* var tableOperate = $("#tableOperate").val(); */
 		var recordOperate = $(".recordOperate:checked").val();
 		
 		
-		var mapinfoNameElement = DWZ.frag["INPUTHIDDEN"].replaceAll('{name}', 'mapinfoName').replaceAll('{value}', mapinfoName);
+		var mapinfoNameElement = DWZ.frag["INPUTHIDDEN"].replaceAll('{name}', 'mapInfoName').replaceAll('{value}', mapInfoName);
 		var isRepeatElement = DWZ.frag["INPUTHIDDEN"].replaceAll('{name}', 'isRepeat').replaceAll('{value}', isRepeat);
-		var mapinfoDescElement = DWZ.frag["INPUTHIDDEN"].replaceAll('{name}', 'mapinfoDesc').replaceAll('{value}', mapinfoDesc);
+		var mapinfoDescElement = DWZ.frag["INPUTHIDDEN"].replaceAll('{name}', 'mapInfoDesc').replaceAll('{value}', mapInfoDesc);
 		/* var tableOperateElement = DWZ.frag["INPUTHIDDEN"]
 		.replaceAll('{name}', 'tableOperate')
 		.replaceAll('{value}', tableOperate); */
@@ -144,7 +144,7 @@
 		$("#addmapinfoDetailForm").append(recordOperateElement);
 
 		$("#addmapinfoDetailForm").attr("action",
-						"${pageContext.request.contextPath}/dde/mapinfoDetail!addAndsaveMapinfoDatails.do?s_method=save&s_type=save").submit();
+						"${pageContext.request.contextPath}/dde/mapInfoDetail!addAndsaveMapinfoDatails.do?s_method=save&s_type=save").submit();
 	}
 
 	$("#addmapinfoDetailForm a[class='delete']").click(function(event) {

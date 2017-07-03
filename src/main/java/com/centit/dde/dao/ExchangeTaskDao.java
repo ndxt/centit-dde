@@ -156,7 +156,7 @@ public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask,Long> {
     }
 
     public String getMapinfoName(Long mapinfoId) {
-        String hql = "select t.mapinfoName from ExchangeMapinfo t where t.mapinfoId=" + mapinfoId;
+        String hql = "select t.mapinfoName from ExchangeMapInfo t where t.mapinfoId=" + mapinfoId;
         Object o = DatabaseOptUtils.getSingleObjectByHql(this,hql);
         if (o == null)
             return "";

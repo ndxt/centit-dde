@@ -357,7 +357,7 @@ public class TransferManagerImpl implements TransferManager {
         return pInfo;
     }
 
-    private TransferResult runDataMap(ExchangeMapinfo exchangMapinfo, Long taskLogId) {
+    private TransferResult runDataMap(ExchangeMapInfo exchangMapinfo, Long taskLogId) {
         String msg = null;
         TaskLog taskLog = taskLogManager.getObjectById(taskLogId);
         Long taskId = taskLog.getTaskId();
@@ -366,10 +366,10 @@ public class TransferManagerImpl implements TransferManager {
         transferResult.setRes(0);
 
         if (debugEnabled) {
-            msg = "数据交换对应关系 Name = " + exchangMapinfo.getMapinfoName() + " querysql = "
+            msg = "数据交换对应关系 Name = " + exchangMapinfo.getMapInfoName() + " querysql = "
                     + exchangMapinfo.getQuerySql() + " 源数据库 = " + exchangMapinfo.getSourceDatabaseName() + " 源表名 = "
-                    + exchangMapinfo.getSourceTablename() + " 目标数据库 = " + exchangMapinfo.getDestDatabaseName()
-                    + " 目标表名 = " + exchangMapinfo.getDestTablename() + " 记录操作[1、插入（insert）2、更新（update）3、合并（merge）] = "
+                    + exchangMapinfo.getSourceTableName() + " 目标数据库 = " + exchangMapinfo.getDestDatabaseName()
+                    + " 目标表名 = " + exchangMapinfo.getDestTableName() + " 记录操作[1、插入（insert）2、更新（update）3、合并（merge）] = "
                     + exchangMapinfo.getRecordOperate();
             logger.debug(msg);
 
@@ -400,7 +400,7 @@ public class TransferManagerImpl implements TransferManager {
             return transferResult;
         }
 
-        List<MapinfoTrigger> mapinfoTriggers = mapinfoTriggerDao.listTriggerByMapinfoId(exchangMapinfo.getMapinfoId());
+        List<MapInfoTrigger> mapInfoTriggers = mapinfoTriggerDao.listTriggerByMapinfoId(exchangMapinfo.getMapInfoId());
 
         TableMapInfo mapinfo = new TableMapInfo();
         try {
@@ -444,7 +444,7 @@ public class TransferManagerImpl implements TransferManager {
         Long taskDetailLogId = taskDetailLogManager.getTaskDetailLogId();
         taskDetailLog.setLogDetailId(taskDetailLogId);
         taskDetailLog.setLogId(taskLogId);
-        taskDetailLog.setMapinfoId(exchangMapinfo.getMapinfoId());
+        taskDetailLog.setMapinfoId(exchangMapinfo.getMapInfoId());
         taskDetailLog.setRunBeginTime(beginTime);
 
         // 开始运行
@@ -457,17 +457,17 @@ public class TransferManagerImpl implements TransferManager {
             Connection rConn = pInfo.getRightDBConn();
 
             // 交换前事件
-            if (mapinfoTriggers != null) {
-                for (MapinfoTrigger mapinfoTrigger : mapinfoTriggers) {
-                    if (!runBreak && mapinfoTrigger.isBeforeTransferAtSource()) {
+            if (mapInfoTriggers != null) {
+                for (MapInfoTrigger mapInfoTrigger : mapInfoTriggers) {
+                    if (!runBreak && mapInfoTrigger.isBeforeTransferAtSource()) {
                         if (debugEnabled) {
-                            msg = "执行交换前事件 触发器语句 = " + mapinfoTrigger.getTriggerSql() + " 触发器类型 = 源表级触发器";
+                            msg = "执行交换前事件 触发器语句 = " + mapInfoTrigger.getTriggerSql() + " 触发器类型 = 源表级触发器";
                             logger.debug(msg);
 
                             TaskConsoleWriteUtils.write(taskId, msg);
                         }
                         try {
-                            execTriggerSql(lConn, mapinfoTrigger.getTriggerSql(), 2, mapinfoTrigger.getIsprocedure(),
+                            execTriggerSql(lConn, mapInfoTrigger.getTriggerSql(), 2, mapInfoTrigger.getIsprocedure(),
                                     null, nSucceed, nError, sLastErrorMsg, beginTime, beginTime);
                         } catch (Exception e) {
                             runBreak = true;
@@ -478,14 +478,14 @@ public class TransferManagerImpl implements TransferManager {
                             TaskConsoleWriteUtils.writeError(taskId, msg);
                         }
                     }
-                    if (!runBreak && mapinfoTrigger.isBeforeTransferAtDest()) {
+                    if (!runBreak && mapInfoTrigger.isBeforeTransferAtDest()) {
                         if (debugEnabled) {
-                            msg = "执行交换前事件 触发器语句 = " + mapinfoTrigger.getTriggerSql() + " 触发器类型 = 目标表级触发器";
+                            msg = "执行交换前事件 触发器语句 = " + mapInfoTrigger.getTriggerSql() + " 触发器类型 = 目标表级触发器";
                             logger.debug(msg);
                             TaskConsoleWriteUtils.write(taskId, msg);
                         }
                         try {
-                            execTriggerSql(rConn, mapinfoTrigger.getTriggerSql(), 2, mapinfoTrigger.getIsprocedure(),
+                            execTriggerSql(rConn, mapInfoTrigger.getTriggerSql(), 2, mapInfoTrigger.getIsprocedure(),
                                     null, nSucceed, nError, sLastErrorMsg, beginTime, beginTime);
                         } catch (Exception e) {
                             runBreak = true;
@@ -556,30 +556,30 @@ public class TransferManagerImpl implements TransferManager {
 
 
                         try {
-                            if (mapinfoTriggers != null) {
-                                for (MapinfoTrigger mapinfoTrigger : mapinfoTriggers) {
-                                    if (mapinfoTrigger.isBeforeWriteferAtSource()) {
+                            if (mapInfoTriggers != null) {
+                                for (MapInfoTrigger mapInfoTrigger : mapInfoTriggers) {
+                                    if (mapInfoTrigger.isBeforeWriteferAtSource()) {
                                         if (debugEnabled) {
-                                            msg = "执行交换前事件 触发器语句 = " + mapinfoTrigger.getTriggerSql()
+                                            msg = "执行交换前事件 触发器语句 = " + mapInfoTrigger.getTriggerSql()
                                                     + " 触发器类型 = 源表行级触发器";
                                             logger.debug(msg);
                                             TaskConsoleWriteUtils.write(taskId, msg);
                                         }
 
-                                        execTriggerSql(lConn, mapinfoTrigger.getTriggerSql(), 1,
-                                                mapinfoTrigger.getIsprocedure(), rs, nSucceed, nError, sLastErrorMsg,
+                                        execTriggerSql(lConn, mapInfoTrigger.getTriggerSql(), 1,
+                                                mapInfoTrigger.getIsprocedure(), rs, nSucceed, nError, sLastErrorMsg,
                                                 beginTime, beginTime);
                                     }
-                                    if (mapinfoTrigger.isBeforeWriteferAtDest()) {
+                                    if (mapInfoTrigger.isBeforeWriteferAtDest()) {
                                         if (debugEnabled) {
-                                            msg = "执行交换前事件 触发器语句 = " + mapinfoTrigger.getTriggerSql()
+                                            msg = "执行交换前事件 触发器语句 = " + mapInfoTrigger.getTriggerSql()
                                                     + " 触发器类型 = 目标表行级触发器";
                                             logger.debug(msg);
                                             TaskConsoleWriteUtils.write(taskId, msg);
                                         }
 
-                                        execTriggerSql(rConn, mapinfoTrigger.getTriggerSql(), 1,
-                                                mapinfoTrigger.getIsprocedure(), rs, nSucceed, nError, sLastErrorMsg,
+                                        execTriggerSql(rConn, mapInfoTrigger.getTriggerSql(), 1,
+                                                mapInfoTrigger.getIsprocedure(), rs, nSucceed, nError, sLastErrorMsg,
                                                 beginTime, beginTime);
                                     }
                                 }
@@ -589,30 +589,30 @@ public class TransferManagerImpl implements TransferManager {
                             exeMoveData(isExistStmt, updateStmt, insertStmt, rs, mapinfo);
 
 
-                            if (mapinfoTriggers != null) {
-                                for (MapinfoTrigger mapinfoTrigger : mapinfoTriggers) {
-                                    if (mapinfoTrigger.isAfterWriteAtSource()) {
+                            if (mapInfoTriggers != null) {
+                                for (MapInfoTrigger mapInfoTrigger : mapInfoTriggers) {
+                                    if (mapInfoTrigger.isAfterWriteAtSource()) {
                                         if (debugEnabled) {
-                                            msg = "执行交换后事件 触发器语句 = " + mapinfoTrigger.getTriggerSql()
+                                            msg = "执行交换后事件 触发器语句 = " + mapInfoTrigger.getTriggerSql()
                                                     + " 触发器类型 = 源表行级触发器";
                                             logger.debug(msg);
                                             TaskConsoleWriteUtils.write(taskId, msg);
                                         }
 
-                                        execTriggerSql(lConn, mapinfoTrigger.getTriggerSql(), 1,
-                                                mapinfoTrigger.getIsprocedure(), rs, nSucceed, nError, sLastErrorMsg,
+                                        execTriggerSql(lConn, mapInfoTrigger.getTriggerSql(), 1,
+                                                mapInfoTrigger.getIsprocedure(), rs, nSucceed, nError, sLastErrorMsg,
                                                 beginTime, beginTime);
                                     }
-                                    if (mapinfoTrigger.isAfterWriteAtDest()) {
+                                    if (mapInfoTrigger.isAfterWriteAtDest()) {
                                         if (debugEnabled) {
-                                            msg = "执行交换后事件 触发器语句 = " + mapinfoTrigger.getTriggerSql()
+                                            msg = "执行交换后事件 触发器语句 = " + mapInfoTrigger.getTriggerSql()
                                                     + " 触发器类型 = 目标表表级触发器";
                                             logger.debug(msg);
                                             TaskConsoleWriteUtils.write(taskId, msg);
                                         }
 
-                                        execTriggerSql(rConn, mapinfoTrigger.getTriggerSql(), 1,
-                                                mapinfoTrigger.getIsprocedure(), rs, nSucceed, nError, sLastErrorMsg,
+                                        execTriggerSql(rConn, mapInfoTrigger.getTriggerSql(), 1,
+                                                mapInfoTrigger.getIsprocedure(), rs, nSucceed, nError, sLastErrorMsg,
                                                 beginTime, beginTime);
                                     }
                                 }
@@ -622,7 +622,7 @@ public class TransferManagerImpl implements TransferManager {
                             nSucceed++;
 
                             //输出交换成功失败数
-                            TaskConsoleWriteUtils.writeProcess(taskId, nSucceed, nError, exchangMapinfo.getMapinfoName());
+                            TaskConsoleWriteUtils.writeProcess(taskId, nSucceed, nError, exchangMapinfo.getMapInfoName());
 
 
                             taskDetailLog.setSuccessPieces(nSucceed);
@@ -645,29 +645,29 @@ public class TransferManagerImpl implements TransferManager {
                                 TaskConsoleWriteUtils.writeError(taskId, msg);
                             }
 
-                            if (mapinfoTriggers != null) {
+                            if (mapInfoTriggers != null) {
                                 try {
-                                    for (MapinfoTrigger mapinfoTrigger : mapinfoTriggers) {
-                                        if (mapinfoTrigger.isWriteErrorAtSource()) {
+                                    for (MapInfoTrigger mapInfoTrigger : mapInfoTriggers) {
+                                        if (mapInfoTrigger.isWriteErrorAtSource()) {
                                             if (debugEnabled) {
-                                                msg = "执行交换后错误事件 触发器语句 = " + mapinfoTrigger.getTriggerSql()
+                                                msg = "执行交换后错误事件 触发器语句 = " + mapInfoTrigger.getTriggerSql()
                                                         + " 触发器类型 = 源表行级触发器";
                                                 logger.debug(msg);
                                                 TaskConsoleWriteUtils.writeError(taskId, msg);
                                             }
-                                            execTriggerSql(lConn, mapinfoTrigger.getTriggerSql(), 1,
-                                                    mapinfoTrigger.getIsprocedure(), rs, nSucceed, nError,
+                                            execTriggerSql(lConn, mapInfoTrigger.getTriggerSql(), 1,
+                                                    mapInfoTrigger.getIsprocedure(), rs, nSucceed, nError,
                                                     sLastErrorMsg, beginTime, beginTime);
                                         }
-                                        if (mapinfoTrigger.isWriteErrorAtDest()) {
+                                        if (mapInfoTrigger.isWriteErrorAtDest()) {
                                             if (debugEnabled) {
-                                                msg = "执行交换后错误事件 触发器语句 = " + mapinfoTrigger.getTriggerSql()
+                                                msg = "执行交换后错误事件 触发器语句 = " + mapInfoTrigger.getTriggerSql()
                                                         + " 触发器类型 = 目标表行级触发器";
                                                 logger.debug(msg);
                                                 TaskConsoleWriteUtils.writeError(taskId, msg);
                                             }
-                                            execTriggerSql(rConn, mapinfoTrigger.getTriggerSql(), 1,
-                                                    mapinfoTrigger.getIsprocedure(), rs, nSucceed, nError,
+                                            execTriggerSql(rConn, mapInfoTrigger.getTriggerSql(), 1,
+                                                    mapInfoTrigger.getIsprocedure(), rs, nSucceed, nError,
                                                     sLastErrorMsg, beginTime, beginTime);
                                         }
                                     }
@@ -717,17 +717,17 @@ public class TransferManagerImpl implements TransferManager {
 
             }
             Date endTime = DatetimeOpt.currentSqlDate();
-            if (!runBreak && mapinfoTriggers != null) {
-                for (MapinfoTrigger mapinfoTrigger : mapinfoTriggers) {
-                    if (mapinfoTrigger.isAfterTransferAtSource()) {
+            if (!runBreak && mapInfoTriggers != null) {
+                for (MapInfoTrigger mapInfoTrigger : mapInfoTriggers) {
+                    if (mapInfoTrigger.isAfterTransferAtSource()) {
                         if (debugEnabled) {
-                            msg = "执行交换后事件 触发器语句 = " + mapinfoTrigger.getTriggerSql()
+                            msg = "执行交换后事件 触发器语句 = " + mapInfoTrigger.getTriggerSql()
                                     + " 触发器类型 = 数据源表级触发器";
                             logger.debug(msg);
                             TaskConsoleWriteUtils.write(taskId, msg);
                         }
                         try {
-                            execTriggerSql(lConn, mapinfoTrigger.getTriggerSql(), 2, mapinfoTrigger.getIsprocedure(),
+                            execTriggerSql(lConn, mapInfoTrigger.getTriggerSql(), 2, mapInfoTrigger.getIsprocedure(),
                                     null, nSucceed, nError, sLastErrorMsg, beginTime, endTime);
 
                         } catch (Exception e) {
@@ -739,15 +739,15 @@ public class TransferManagerImpl implements TransferManager {
                             TaskConsoleWriteUtils.writeError(taskId, msg);
                         }
                     }
-                    if (mapinfoTrigger.isAfterTransferAtDest()) {
+                    if (mapInfoTrigger.isAfterTransferAtDest()) {
                         if (debugEnabled) {
-                            msg = "执行交换后事件 触发器语句 = " + mapinfoTrigger.getTriggerSql()
+                            msg = "执行交换后事件 触发器语句 = " + mapInfoTrigger.getTriggerSql()
                                     + " 触发器类型 = 数据目标表级触发器";
                             logger.debug(msg);
                             TaskConsoleWriteUtils.write(taskId, msg);
                         }
                         try {
-                            execTriggerSql(rConn, mapinfoTrigger.getTriggerSql(), 2, mapinfoTrigger.getIsprocedure(),
+                            execTriggerSql(rConn, mapInfoTrigger.getTriggerSql(), 2, mapInfoTrigger.getIsprocedure(),
                                     null, nSucceed, nError, sLastErrorMsg, beginTime, endTime);
                         } catch (Exception e) {
                             runBreak = true;
@@ -772,7 +772,7 @@ public class TransferManagerImpl implements TransferManager {
 
             TaskConsoleWriteUtils.writeError(taskId, msg);
         }
-        msg = "执行交换" + exchangMapinfo.getMapinfoName() + "完成；共交换" + String.valueOf(nSucceed + nError) + "条,其中成功"
+        msg = "执行交换" + exchangMapinfo.getMapInfoName() + "完成；共交换" + String.valueOf(nSucceed + nError) + "条,其中成功"
                 + String.valueOf(nSucceed) + "条,失败" + String.valueOf(nError) + "条。";
         logger.info(msg);
 
@@ -794,7 +794,7 @@ public class TransferManagerImpl implements TransferManager {
     }
 
     public int doTransfer(Long mapinfoID, String usercode) {
-        ExchangeMapinfo exchangMapinfo = exchangeMapinfoDao.getObjectById(mapinfoID);
+        ExchangeMapInfo exchangMapinfo = exchangeMapinfoDao.getObjectById(mapinfoID);
         if (exchangMapinfo == null)
             return -1;
         Long taskLogId = taskLogManager.getTaskLogId();
@@ -832,7 +832,7 @@ public class TransferManagerImpl implements TransferManager {
 
         TaskConsoleWriteUtils.writeInfo(taskID, msg);
 
-        List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailDao.getTaskDetails(taskID);
+        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailDao.getTaskDetails(taskID);
 
         Long taskLogId = taskLogManager.getTaskLogId();
         TaskLog taskLog = new TaskLog();
@@ -858,8 +858,8 @@ public class TransferManagerImpl implements TransferManager {
         List<String> exchangeMapinfoName = new ArrayList<String>();
 
 
-        for (ExchangeTaskdetail taskDetail : exchangeTaskdetails) {
-            ExchangeMapinfo exchangMapinfo = exchangeMapinfoDao.getObjectById(taskDetail.getMapinfoId());
+        for (ExchangeTaskDetail taskDetail : exchangeTaskDetails) {
+            ExchangeMapInfo exchangMapinfo = exchangeMapinfoDao.getObjectById(taskDetail.getMapinfoId());
 
             if (exchangMapinfo == null) {
                 if (debugEnabled) {
@@ -874,7 +874,7 @@ public class TransferManagerImpl implements TransferManager {
             int nRes = transferResult.getRes();
 
             //向页面推送本次交换中已执行的数据交换对应关系以及交换成功条数和失败条数
-            exchangeMapinfoName.add("数据交换对应关系名称 " + exchangMapinfo.getMapinfoName() + " 交换成功 " + transferResult.getSucc() + "条数，交换失败 " + transferResult.getError() + " 条数");
+            exchangeMapinfoName.add("数据交换对应关系名称 " + exchangMapinfo.getMapInfoName() + " 交换成功 " + transferResult.getSucc() + "条数，交换失败 " + transferResult.getError() + " 条数");
             TaskConsoleWriteUtils.writeAlreadyProcess(taskID, StringUtils.collectionToDelimitedString
                     (exchangeMapinfoName, "_split_"));
             logger.info(exchangeMapinfoName);
@@ -890,7 +890,7 @@ public class TransferManagerImpl implements TransferManager {
             if (nRes < 0) {
                 nError++;
 
-                errorMapinfoNameList.add(exchangMapinfo.getMapinfoName());
+                errorMapinfoNameList.add(exchangMapinfo.getMapInfoName());
             } else {
                 nSucceed++;
             }

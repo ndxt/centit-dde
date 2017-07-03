@@ -62,37 +62,37 @@
 				</tr>
 			</thead>
 			<tbody align="center">
-				<c:forEach items="${objList}" var="exchangeMapinfo" varStatus="s">
+				<c:forEach items="${objList}" var="exchangeMapInfo" varStatus="s">
 						<tr>
-							    <td>${s.index+1}<input type="hidden" name="mapinfoId" id="mapinfoId" value="${exchangeMapinfo.mapinfoId}"/></td>
+							    <td>${s.index+1}<input type="hidden" name="mapInfoId" id="mapInfoId" value="${exchangeMapInfo.mapInfoId}"/></td>
 							    
-								<%-- <td>${exchangeMapinfo.mapinfoId}</td> --%>
+								<%-- <td>${exchangeMapInfo.mapInfoId}</td> --%>
 								
-								<td title="${exchangeMapinfo.mapinfoName}">${exchangeMapinfo.mapinfoName}</td>
+								<td title="${exchangeMapInfo.mapInfoName}">${exchangeMapInfo.mapInfoName}</td>
 							
-								<td title="${exchangeMapinfo.sourceDatabaseName}">${exchangeMapinfo.sourceDatabaseName}</td>
+								<td title="${exchangeMapInfo.sourceDatabaseName}">${exchangeMapInfo.sourceDatabaseName}</td>
 								
-								<td title="${exchangeMapinfo.sourceTablename}">${exchangeMapinfo.sourceTablename}</td>
+								<td title="${exchangeMapInfo.sourceTableName}">${exchangeMapInfo.sourceTableName}</td>
 							
 							
-								<%-- <td>${exchangeMapinfo.querySql}</td> --%>
+								<%-- <td>${exchangeMapInfo.querySql}</td> --%>
 							
-								<td title="${exchangeMapinfo.destDatabaseName}">${exchangeMapinfo.destDatabaseName}</td>
+								<td title="${exchangeMapInfo.destDatabaseName}">${exchangeMapInfo.destDatabaseName}</td>
 							
-								<td title="${exchangeMapinfo.destTablename}">${exchangeMapinfo.destTablename}</td>
+								<td title="${exchangeMapInfo.destTableName}">${exchangeMapInfo.destTableName}</td>
 							
-								<td><c:if test="${exchangeMapinfo.isRepeat eq '1'}">是</c:if>
-									<c:if test="${exchangeMapinfo.isRepeat eq '0'}">否</c:if>
+								<td><c:if test="${exchangeMapInfo.isRepeat eq '1'}">是</c:if>
+									<c:if test="${exchangeMapInfo.isRepeat eq '0'}">否</c:if>
 								</td>
 							
-								<td title="${exchangeMapinfo.mapinfoDesc}">${exchangeMapinfo.mapinfoDesc}</td>
+								<td title="${exchangeMapInfo.mapInfoDesc}">${exchangeMapInfo.mapInfoDesc}</td>
 								
 								<td>
-								    <a href="${contextPath }/dde/exchangeMapinfoNew!showMapinfoDetail.do?mapinfoId=${exchangeMapinfo.mapinfoId}&s_type=initfirst" 
+								    <a href="${contextPath }/dde/exchangeMapinfoNew!showMapinfoDetail.do?mapInfoId=${exchangeMapInfo.mapInfoId}&s_type=initfirst"
 								       target='navTab' rel="dygxmx"  title="编辑交换对应关系"><span class="icon icon-edit"></span></a>
-								    <a href="${contextPath }/dde/exchangeMapinfo!delete.do?mapinfoId=${exchangeMapinfo.mapinfoId}" 
+								    <a href="${contextPath }/dde/exchangeMapInfo!delete.do?mapInfoId=${exchangeMapInfo.mapInfoId}"
 								       target="ajaxTodo" title="删除交换对应关系"><span class="icon icon-trash"></span></a>
-								    <a href="${contextPath }/dde/exchangeMapinfoNew!copy.do?mapinfoId=${exchangeMapinfo.mapinfoId}&s_type=initcopy"
+								    <a href="${contextPath }/dde/exchangeMapinfoNew!copy.do?mapInfoId=${exchangeMapInfo.mapInfoId}&s_type=initcopy"
 								       target="navTab" title="复制交换对应关系"><span class="icon icon-copy"></span></a>
 								</td>
 							

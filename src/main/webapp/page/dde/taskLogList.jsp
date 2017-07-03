@@ -32,7 +32,7 @@
             </c:if>
 
             <div class="unit">
-                <label>任务描述：</label> <textarea rows="3" cols="69" name="mapinfoDesc" id="mapinfoDesc_edit">${exchangeTask.taskDesc }</textarea>
+                <label>任务描述：</label> <textarea rows="3" cols="69" name="mapInfoDesc" id="mapinfoDesc_edit">${exchangeTask.taskDesc }</textarea>
 
             </div>
         </div>

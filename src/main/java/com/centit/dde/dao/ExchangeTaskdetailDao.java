@@ -1,6 +1,6 @@
 package com.centit.dde.dao;
 
-import com.centit.dde.po.ExchangeTaskdetail;
+import com.centit.dde.po.ExchangeTaskDetail;
 import com.centit.dde.po.ExchangeTaskdetailId;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @Repository
-public class ExchangeTaskdetailDao extends BaseDaoImpl<ExchangeTaskdetail,ExchangeTaskdetailId> {
+public class ExchangeTaskdetailDao extends BaseDaoImpl<ExchangeTaskDetail,ExchangeTaskdetailId> {
 
     public static final Log log = LogFactory.getLog(ExchangeTaskdetailDao.class);
     @Override
@@ -39,39 +39,39 @@ public class ExchangeTaskdetailDao extends BaseDaoImpl<ExchangeTaskdetail,Exchan
 
     @SuppressWarnings("unchecked")
     public List<Long> getMapinfoIdUsed(Long taskId) {
-        String hql = "select e.cid.mapinfoId from ExchangeTaskdetail e where e.cid.taskId=" + taskId + " order by e.mapinfoOrder";
+        String hql = "select e.cid.mapinfoId from ExchangeTaskDetail e where e.cid.taskId=" + taskId + " order by e.mapinfoOrder";
         return (List<Long>) DatabaseOptUtils.findObjectsByHql(this,hql);
     }
 
-    public List<ExchangeTaskdetail> getTaskDetails(Long taskId) {
+    public List<ExchangeTaskDetail> getTaskDetails(Long taskId) {
         return listObjects(
-                "from ExchangeTaskdetail where task_id=? order by mapinfoOrder",
+                "from ExchangeTaskDetail where task_id=? order by mapinfoOrder",
                 taskId);
     }
 
     public Long getMapinfoOrder(Long taskId) {
 
-        String hql = "select nvl(max(e.mapinfoOrder),0) from ExchangeTaskdetail e where e.cid.taskId=" + taskId;
+        String hql = "select nvl(max(e.mapinfoOrder),0) from ExchangeTaskDetail e where e.cid.taskId=" + taskId;
         return DatabaseOptUtils.getSingleIntByHql(this,hql);
     }
 
     public void deleteDetails(Long taskId, Long mapinfoId) {
-        //String hql = "delete ExchangeTaskdetail e where e.cid.taskId="+taskId+" and e.cid.mapinfoId="+mapinfoId;
+        //String hql = "delete ExchangeTaskDetail e where e.cid.taskId="+taskId+" and e.cid.mapinfoId="+mapinfoId;
         this.deleteObjectById(new ExchangeTaskdetailId(mapinfoId, taskId));
     }
 
     public void deleteDetailsByMapinfoId(Long mapinfoId) {
-        String hql = "delete ExchangeTaskdetail e where e.cid.mapinfoId=" + mapinfoId;
+        String hql = "delete ExchangeTaskDetail e where e.cid.mapinfoId=" + mapinfoId;
         DatabaseOptUtils.doExecuteHql(this,hql);
     }
 
     public void deleteDetailsByTaskId(Long taskId) {
-        String hql = "delete ExchangeTaskdetail e where e.cid.taskId = ?";
+        String hql = "delete ExchangeTaskDetail e where e.cid.taskId = ?";
         DatabaseOptUtils.doExecuteHql(this,hql, taskId);
     }
 
     public void updateDetailOrder(Long taskId, Long mapOrder) {
-        String hql = "update ExchangeTaskdetail d set d.mapinfoOrder = d.mapinfoOrder - 1 where d.cid.taskId = ? and d.mapinfoOrder > ?";
+        String hql = "update ExchangeTaskDetail d set d.mapinfoOrder = d.mapinfoOrder - 1 where d.cid.taskId = ? and d.mapinfoOrder > ?";
 
         DatabaseOptUtils.doExecuteHql(this,hql, new Object[]{taskId, mapOrder});
     }

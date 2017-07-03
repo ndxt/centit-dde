@@ -12,7 +12,7 @@ import javax.persistence.IdClass;
  * @author codefan@hotmail.com
  */
 @Embeddable
-@IdClass(MapinfoTrigger.class)
+@IdClass(MapInfoTrigger.class)
 public class MapinfoTriggerId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     

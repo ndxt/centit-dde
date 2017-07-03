@@ -5,18 +5,18 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 
+import com.centit.dde.po.ExchangeTaskDetail;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
 import com.centit.dde.dao.ExchangeTaskdetailDao;
-import com.centit.dde.po.ExchangeTaskdetail;
 import com.centit.dde.po.ExchangeTaskdetailId;
 import com.centit.dde.service.ExchangeTaskdetailManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 @Service
 public class ExchangeTaskdetailManagerImpl
-        extends BaseEntityManagerImpl<ExchangeTaskdetail,ExchangeTaskdetailId,ExchangeTaskdetailDao>
+        extends BaseEntityManagerImpl<ExchangeTaskDetail,ExchangeTaskdetailId,ExchangeTaskdetailDao>
         implements ExchangeTaskdetailManager {
 
     public static final Log log = LogFactory.getLog(ExchangeTaskdetailManager.class);
@@ -46,7 +46,7 @@ public class ExchangeTaskdetailManagerImpl
     }
 
     public String getMapinfoName(Long mapinfoId) {
-        // return this.getMapinfoName(mapinfoId);
+        // return this.getMapInfoName(mapinfoId);
         return String.valueOf(mapinfoId);
     }
 
@@ -56,7 +56,7 @@ public class ExchangeTaskdetailManagerImpl
 
     @Override
     public void deleteObjectById(ExchangeTaskdetailId id) {
-        ExchangeTaskdetail dbObject = getObjectById(id);
+        ExchangeTaskDetail dbObject = getObjectById(id);
         Long mapinfoOrder = dbObject.getMapinfoOrder();
         exchangeTaskdetailDao.updateDetailOrder(dbObject.getTaskId(), mapinfoOrder);
         super.deleteObjectById(id);
@@ -71,13 +71,13 @@ public class ExchangeTaskdetailManagerImpl
         for (int i = 0; i < mapinfoId.size(); i++) {
             Long id = mapinfoId.get(i);
 
-            ExchangeTaskdetail exchangeTaskdetail = new ExchangeTaskdetail();
+            ExchangeTaskDetail exchangeTaskDetail = new ExchangeTaskDetail();
             ExchangeTaskdetailId exchangeTaskdetailId = new ExchangeTaskdetailId();
             exchangeTaskdetailId.setMapinfoId(id);
             exchangeTaskdetailId.setTaskId(taskId);
-            exchangeTaskdetail.setCid(exchangeTaskdetailId);
-            exchangeTaskdetail.setMapinfoOrder(used.size() + i + 1L);
-            saveObject(exchangeTaskdetail);
+            exchangeTaskDetail.setCid(exchangeTaskdetailId);
+            exchangeTaskDetail.setMapinfoOrder(used.size() + i + 1L);
+            saveObject(exchangeTaskDetail);
         }
 
     }

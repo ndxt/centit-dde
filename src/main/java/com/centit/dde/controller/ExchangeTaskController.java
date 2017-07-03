@@ -39,13 +39,13 @@ public class ExchangeTaskController extends BaseController {
     private ExchangeTaskManager exchangeTaskMag;
 
     @Resource
-    private ExchangeMapinfoManager exchangeMapinfoManager;
+    private ExchangeMapInfoManager exchangeMapInfoManager;
 
     @Resource
     private ExchangeTaskdetailManager exchangeTaskdetailManager;
 
     @Resource
-    private MapinfoDetailManager mapinfoDetailManager;
+    private MapInfoDetailManager mapInfoDetailManager;
 
     @Resource
     private StaticEnvironmentManager platformEnvironment;
@@ -165,23 +165,23 @@ public class ExchangeTaskController extends BaseController {
 
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("task_Id", taskId);
-        List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
+        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailManager.listObjects(filterMap);
 
         List<ExportSql> exportSqlList = new ArrayList<>();
 
-        List<ExchangeMapinfo> exchangeMapinfoList = new ArrayList<>();
+        List<ExchangeMapInfo> exchangeMapInfoList = new ArrayList<>();
 
         if(taskType.equals("1")){
-            for (ExchangeTaskdetail etd : exchangeTaskdetails) {
-                ExchangeMapinfo exchangeMapinfo = exchangeMapinfoManager.getObjectById(etd.getMapinfoId());
-                if (null != exchangeMapinfo) {
-                    exchangeMapinfo.setMapinfoOrder(etd.getMapinfoOrder());
-                    exchangeMapinfoList.add(exchangeMapinfo);
+            for (ExchangeTaskDetail etd : exchangeTaskDetails) {
+                ExchangeMapInfo exchangeMapInfo = exchangeMapInfoManager.getObjectById(etd.getMapinfoId());
+                if (null != exchangeMapInfo) {
+                    exchangeMapInfo.setMapInfoOrder(etd.getMapinfoOrder());
+                    exchangeMapInfoList.add(exchangeMapInfo);
                 }
             }
-            exchangeTask.setExchangeMapinfoList(exchangeMapinfoList);
+            exchangeTask.setExchangeMapInfoList(exchangeMapInfoList);
         }else{
-            for (ExchangeTaskdetail etd : exchangeTaskdetails) {
+            for (ExchangeTaskDetail etd : exchangeTaskDetails) {
                 ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapinfoId());
                 if (null != exportSql) {
                     exportSql.setExportsqlOrder(etd.getMapinfoOrder());
@@ -199,14 +199,14 @@ public class ExchangeTaskController extends BaseController {
     }
 
     @RequestMapping(value="/getExchangeMapinfo" , method = {RequestMethod.GET})
-    private void getExchangeMapinfo(List<ExchangeTaskdetail> exchangeTaskdetails,HttpServletResponse response) {
-        List<ExchangeMapinfo> echangeMapInfoList = new ArrayList<>();
+    private void getExchangeMapinfo(List<ExchangeTaskDetail> exchangeTaskDetails, HttpServletResponse response) {
+        List<ExchangeMapInfo> echangeMapInfoList = new ArrayList<>();
 
-        for (ExchangeTaskdetail etd : exchangeTaskdetails) {
-            ExchangeMapinfo exchangeMapinfo = exchangeMapinfoManager.getObjectById(etd.getMapinfoId());
-            if (null != exchangeMapinfo) {
-                exchangeMapinfo.setMapinfoOrder(etd.getMapinfoOrder());
-                echangeMapInfoList.add(exchangeMapinfo);
+        for (ExchangeTaskDetail etd : exchangeTaskDetails) {
+            ExchangeMapInfo exchangeMapInfo = exchangeMapInfoManager.getObjectById(etd.getMapinfoId());
+            if (null != exchangeMapInfo) {
+                exchangeMapInfo.setMapInfoOrder(etd.getMapinfoOrder());
+                echangeMapInfoList.add(exchangeMapInfo);
             }
         }
 
@@ -214,10 +214,10 @@ public class ExchangeTaskController extends BaseController {
     }
 
     @RequestMapping(value="/getExportSql", method = {RequestMethod.GET})
-    private void getExportSql(List<ExchangeTaskdetail> exchangeTaskdetails,HttpServletResponse response) {
+    private void getExportSql(List<ExchangeTaskDetail> exchangeTaskDetails, HttpServletResponse response) {
         List<ExportSql> exportSqlList = new ArrayList<>();
 
-        for (ExchangeTaskdetail etd : exchangeTaskdetails) {
+        for (ExchangeTaskDetail etd : exchangeTaskDetails) {
             ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapinfoId());
             if (null != exportSql) {
                 exportSql.setExportsqlOrder(etd.getMapinfoOrder());
@@ -287,13 +287,13 @@ public class ExchangeTaskController extends BaseController {
                 Map<String, Object> filterMap = new HashMap<String, Object>();
                 filterMap.put("task_Id", object.getTaskId());
                 // filterMap.put("order by", "mapinfo_order");
-                List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
-                JsonResultUtils.writeSingleDataJson(exchangeTaskdetails, response);
+                List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailManager.listObjects(filterMap);
+                JsonResultUtils.writeSingleDataJson(exchangeTaskDetails, response);
                 
                 if ("1".equals(taskType)) {
-                    getExchangeMapinfo(exchangeTaskdetails, response);
+                    getExchangeMapinfo(exchangeTaskDetails, response);
                 } else if ("2".equals(taskType)) {
-                    getExportSql(exchangeTaskdetails, response);
+                    getExportSql(exchangeTaskDetails, response);
                 }
             }
 
@@ -321,9 +321,9 @@ public class ExchangeTaskController extends BaseController {
                     taskLogManager.deleteObject(o);
                 }
             }
-            List<ExchangeTaskdetail> exchangeTaskdetailList =exchangeTaskdetailManager.listObjects(filterMap);
-            if(exchangeTaskdetailList !=null){
-                for(ExchangeTaskdetail o : exchangeTaskdetailList){
+            List<ExchangeTaskDetail> exchangeTaskDetailList =exchangeTaskdetailManager.listObjects(filterMap);
+            if(exchangeTaskDetailList !=null){
+                for(ExchangeTaskDetail o : exchangeTaskDetailList){
                     exchangeTaskdetailManager.deleteObject(o);
                 }
             }
@@ -350,17 +350,17 @@ public class ExchangeTaskController extends BaseController {
         // String[] mapinfoOrderAry =
         // request.getParameterValues("mapinfoOrder");
 
-        ExchangeTaskdetail exchangeTaskdetail;
+        ExchangeTaskDetail exchangeTaskDetail;
 
         for (int i = 0; i < mapinfoIdAry.length; i++) {
             if (StringRegularOpt.isNumber(mapinfoIdAry[i])) {
                 Long mapInfoId = Long.valueOf(mapinfoIdAry[i]);
-                exchangeTaskdetail = new ExchangeTaskdetail();
-                exchangeTaskdetail.setTaskId(object.getTaskId());
-                exchangeTaskdetail.setMapinfoId(mapInfoId);
-                exchangeTaskdetail.setMapinfoOrder(Long.valueOf(i + 1));
+                exchangeTaskDetail = new ExchangeTaskDetail();
+                exchangeTaskDetail.setTaskId(object.getTaskId());
+                exchangeTaskDetail.setMapinfoId(mapInfoId);
+                exchangeTaskDetail.setMapinfoOrder(Long.valueOf(i + 1));
 
-                exchangeTaskdetailManager.saveObject(exchangeTaskdetail);
+                exchangeTaskdetailManager.saveObject(exchangeTaskDetail);
             }
 
         }
@@ -375,9 +375,9 @@ public class ExchangeTaskController extends BaseController {
         //做一个判断为了 前面 有的list就不要了
         Map<String, Object> filterMap = new HashMap<String, Object>();
         filterMap.put("task_Id", taskId);
-        List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
+        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailManager.listObjects(filterMap);
         List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
-        for (ExchangeTaskdetail etd : exchangeTaskdetails) {
+        for (ExchangeTaskDetail etd : exchangeTaskDetails) {
             ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapinfoId());
             if (null != exportSql) {
                 exportSql.setExportsqlOrder(etd.getMapinfoOrder());
@@ -406,22 +406,22 @@ public class ExchangeTaskController extends BaseController {
         //做一个判断为了 前面 有的list就不要了
         Map<String, Object> filterMap = new HashMap<String, Object>();
         filterMap.put("task_Id", taskId);
-        List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
-        List<ExchangeMapinfo> exchangeMapinfoList = new ArrayList<ExchangeMapinfo>();
+        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailManager.listObjects(filterMap);
+        List<ExchangeMapInfo> exchangeMapInfoList = new ArrayList<ExchangeMapInfo>();
         List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
-        for (ExchangeTaskdetail etd : exchangeTaskdetails) {
-            ExchangeMapinfo exchangeMapinfo = exchangeMapinfoManager.getObjectById(etd.getMapinfoId());
-            if (null != exchangeMapinfo) {
-                exchangeMapinfo.setMapinfoOrder(etd.getMapinfoOrder());
-                exchangeMapinfoList.add(exchangeMapinfo);
+        for (ExchangeTaskDetail etd : exchangeTaskDetails) {
+            ExchangeMapInfo exchangeMapInfo = exchangeMapInfoManager.getObjectById(etd.getMapinfoId());
+            if (null != exchangeMapInfo) {
+                exchangeMapInfo.setMapInfoOrder(etd.getMapinfoOrder());
+                exchangeMapInfoList.add(exchangeMapInfo);
             }
         }
         //为了 去除重复项
         Map<String, Object> searchColumn = convertSearchColumn(request);
-        List<ExchangeMapinfo> objList = exchangeMapinfoManager.listObjects(searchColumn, pageDesc);
-        for(ExchangeMapinfo map : exchangeMapinfoList ){
+        List<ExchangeMapInfo> objList = exchangeMapInfoManager.listObjects(searchColumn, pageDesc);
+        for(ExchangeMapInfo map : exchangeMapInfoList){
             for(int i=0;i< objList.size();i++ ){
-                if(map.getMapinfoId() == objList.get(i).getMapinfoId()){
+                if(map.getMapInfoId() == objList.get(i).getMapInfoId()){
                     objList.remove(i);
                 }
             }
@@ -435,10 +435,10 @@ public class ExchangeTaskController extends BaseController {
     @RequestMapping(value="/listExchangeMapinfo", method = {RequestMethod.GET})
     private void listExchangeMapinfo(Map<String, Object> filterMap, PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
 
-        List<ExchangeMapinfo> exchangeMapinfos = exchangeMapinfoManager.listObjectExcludeUsed(filterMap, pageDesc);
+        List<ExchangeMapInfo> exchangeMapInfos = exchangeMapInfoManager.listObjectExcludeUsed(filterMap, pageDesc);
 
 
-//        request.setAttribute("exchangeMapinfos", exchangeMapinfos);
+//        request.setAttribute("exchangeMapInfos", exchangeMapInfos);
         // ServletActionContext.getContext().put("taskId",
         // filterMap.get("taskId"));
 
@@ -451,7 +451,7 @@ public class ExchangeTaskController extends BaseController {
 //        this.pageDesc = pageDesc;
 
 //        return "listExchangeMapInfo";
-        JsonResultUtils.writeSingleDataJson(exchangeMapinfos, response);
+        JsonResultUtils.writeSingleDataJson(exchangeMapInfos, response);
     }
 
     /**
@@ -486,17 +486,17 @@ public class ExchangeTaskController extends BaseController {
         Map<String, Object> filterMap = new HashMap<String, Object>();
         filterMap.put("task_Id", taskId);
         Long mapinfoOrder = (long) 0;
-        List<ExchangeTaskdetail> exchangeTaskdetails = exchangeTaskdetailManager.listObjects(filterMap);
-        if(exchangeTaskdetails.size() == 0){
+        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailManager.listObjects(filterMap);
+        if(exchangeTaskDetails.size() == 0){
             mapinfoOrder = (long) 1;
-        }else if(exchangeTaskdetails.size() == 1){
-            mapinfoOrder = exchangeTaskdetails.get(0).getMapinfoOrder();
+        }else if(exchangeTaskDetails.size() == 1){
+            mapinfoOrder = exchangeTaskDetails.get(0).getMapinfoOrder();
         }else{
-            for(int i = 1;i<exchangeTaskdetails.size();i++){
-                 if(exchangeTaskdetails.get(i-1).getMapinfoOrder() <= exchangeTaskdetails.get(i).getMapinfoOrder()){
-                     mapinfoOrder = exchangeTaskdetails.get(i).getMapinfoOrder() + 1;
+            for(int i = 1; i< exchangeTaskDetails.size(); i++){
+                 if(exchangeTaskDetails.get(i-1).getMapinfoOrder() <= exchangeTaskDetails.get(i).getMapinfoOrder()){
+                     mapinfoOrder = exchangeTaskDetails.get(i).getMapinfoOrder() + 1;
                  }else{
-                     mapinfoOrder = exchangeTaskdetails.get(i-1).getMapinfoOrder() + 1;
+                     mapinfoOrder = exchangeTaskDetails.get(i-1).getMapinfoOrder() + 1;
                  }
             }
         }
@@ -505,7 +505,7 @@ public class ExchangeTaskController extends BaseController {
         String[] str = ExchangeIds.split(",");
         for (String s : str) {
             if (NumberUtils.isNumber(s)) {
-                ExchangeTaskdetail excTD = new ExchangeTaskdetail();
+                ExchangeTaskDetail excTD = new ExchangeTaskDetail();
                 excTD.setMapinfoId(Long.parseLong(s));
                 excTD.setTaskId(taskId);
                 excTD.setMapinfoOrder(mapinfoOrder);
@@ -534,14 +534,14 @@ public class ExchangeTaskController extends BaseController {
 
     @RequestMapping(value="/executeMapinfo", method = {RequestMethod.GET})
     private void executeMapinfo(Long mapinfoId, Long taskId,HttpServletRequest request,HttpServletResponse response) {
-        ExchangeMapinfo exchangeMapinfo = this.exchangeMapinfoManager.getObjectById(Long.valueOf(mapinfoId));
-        String sql = exchangeMapinfo.getQuerySql();
-        DatabaseInfo databaseInfoSource = platformEnvironment.getDatabaseInfo(exchangeMapinfo.getSourceDatabaseName());
-        DatabaseInfo databaseInfoGoal = platformEnvironment.getDatabaseInfo(exchangeMapinfo.getDestDatabaseName());
+        ExchangeMapInfo exchangeMapInfo = this.exchangeMapInfoManager.getObjectById(Long.valueOf(mapinfoId));
+        String sql = exchangeMapInfo.getQuerySql();
+        DatabaseInfo databaseInfoSource = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
+        DatabaseInfo databaseInfoGoal = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
 
 		/*
          * String tableOperateSql =
-		 * this.generateTableOperateSql(databaseInfoSource, exchangeMapinfo);
+		 * this.generateTableOperateSql(databaseInfoSource, exchangeMapInfo);
 		 */
 
         List<List<Object>> datas = this.exchangeTaskMag.getSqlValues(databaseInfoSource, sql);
@@ -565,12 +565,12 @@ public class ExchangeTaskController extends BaseController {
     /* 生成插入语句 */
     @RequestMapping(value="/generateInsertSql", method = {RequestMethod.GET})
     private String generateInsertSql(Long mapinfoId) {
-//        MapinfoDetail mapinfoDetail = mapinfoDetailManager.getObjectById(Long.valueOf(mapinfoId));方法需要重新写
-        ExchangeMapinfo exchangeMapinfo = exchangeMapinfoManager.getObjectById(Long.valueOf(mapinfoId));
-        List<String> GoalColumnStrut = mapinfoDetailManager.getGoalColumnStrut(mapinfoId);
+//        MapInfoDetail mapinfoDetail = mapInfoDetailManager.getObjectById(Long.valueOf(mapinfoId));方法需要重新写
+        ExchangeMapInfo exchangeMapInfo = exchangeMapInfoManager.getObjectById(Long.valueOf(mapinfoId));
+        List<String> GoalColumnStrut = mapInfoDetailManager.getGoalColumnStrut(mapinfoId);
         StringBuffer sql = new StringBuffer();
         sql.append("insert into ");
-        sql.append(exchangeMapinfo.getDestTablename());
+        sql.append(exchangeMapInfo.getDestTableName());
         sql.append(" (");
         String GoalColumnStrutSql = "";
         String values = "";
@@ -627,16 +627,16 @@ public class ExchangeTaskController extends BaseController {
 
 	/*
 	 * 生成表操作记录语句 private String generateTableOperateSql(DatabaseInfo
-	 * databaseInfoSource,ExchangeMapinfo exchangeMapinfo){
+	 * databaseInfoSource,ExchangeMapInfo exchangeMapinfo){
 	 * List<Map<String,String>> sourceTableStrutsDatas=
-	 * mapinfoDetailManager.getSourceTableStruct(databaseInfoSource,
-	 * exchangeMapinfo.getSourceTablename()); StringBuffer tableOperateSql = new
+	 * mapInfoDetailManager.getSourceTableStruct(databaseInfoSource,
+	 * exchangeMapinfo.getSourceTableName()); StringBuffer tableOperateSql = new
 	 * StringBuffer(); if(exchangeMapinfo.getTableOperate().equals("2")){
 	 * tableOperateSql
-	 * .append("create table "+exchangeMapinfo.getSourceTablename(
+	 * .append("create table "+exchangeMapinfo.getSourceTableName(
 	 * )+" if not exists;");
 	 * tableOperateSql.append("create table "+exchangeMapinfo
-	 * .getSourceTablename()+"("); }else{
+	 * .getSourceTableName()+"("); }else{
 	 * 
 	 * } return tableOperateSql.toString(); }
 	 */

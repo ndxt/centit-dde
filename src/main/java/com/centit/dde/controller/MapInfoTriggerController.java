@@ -1,7 +1,7 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.po.MapinfoTrigger;
-import com.centit.dde.service.MapinfoTriggerManager;
+import com.centit.dde.po.MapInfoTrigger;
+import com.centit.dde.service.MapInfoTriggerManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
@@ -20,20 +20,20 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/mapinfotrigger")
-public class MapinfoTriggerController extends BaseController {
-    private static final Log log = LogFactory.getLog(MapinfoTriggerController.class);
+public class MapInfoTriggerController extends BaseController {
+    private static final Log log = LogFactory.getLog(MapInfoTriggerController.class);
 
     private static final long serialVersionUID = 1L;
 
     @Resource
-    private MapinfoTriggerManager mapinfoTriggerMag;
+    private MapInfoTriggerManager mapinfoTriggerMag;
 
     @RequestMapping(value="/list",method = {RequestMethod.GET})
     public void list(PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
         Map<String, Object> searchColumn = convertSearchColumn(request);
 
         searchColumn.put("cid.mapinfoId", searchColumn.get("mapinfoId"));
-        List<MapinfoTrigger> objList = mapinfoTriggerMag.listTrigger(Long.valueOf((String) searchColumn.get("mapinfoId")));
+        List<MapInfoTrigger> objList = mapinfoTriggerMag.listTrigger(Long.valueOf((String) searchColumn.get("mapinfoId")));
 
         pageDesc.setTotalRows(objList.size());
         ResponseData resData = new ResponseData();
@@ -43,11 +43,11 @@ public class MapinfoTriggerController extends BaseController {
     }
 
     @RequestMapping(value="/edit",method = {RequestMethod.GET})
-    public void edit(MapinfoTrigger object ,HttpServletRequest request,HttpServletResponse response) {
+    public void edit(MapInfoTrigger object , HttpServletRequest request, HttpServletResponse response) {
         if (object == null) {
 //                object = getEntityClass().newInstance();
         } else {
-            MapinfoTrigger o = mapinfoTriggerMag.getObjectById(object.getCid());
+            MapInfoTrigger o = mapinfoTriggerMag.getObjectById(object.getCid());
             if (o != null)
                 mapinfoTriggerMag.copyObject(object, o);
             else
@@ -58,9 +58,9 @@ public class MapinfoTriggerController extends BaseController {
     }
 
     @RequestMapping(value="/saveTrigger",method = {RequestMethod.PUT})
-    public void saveTrigger(MapinfoTrigger object, HttpServletResponse response) {
+    public void saveTrigger(MapInfoTrigger object, HttpServletResponse response) {
         try {
-            MapinfoTrigger dbObject = mapinfoTriggerMag.getObjectById(object.getCid());
+            MapInfoTrigger dbObject = mapinfoTriggerMag.getObjectById(object.getCid());
             if (dbObject != null) {
                 mapinfoTriggerMag.copyObjectNotNullProperty(dbObject, object);
                 object = dbObject;
@@ -81,9 +81,9 @@ public class MapinfoTriggerController extends BaseController {
     }
 
     @RequestMapping(value="/addAndsaveTrigger",method = {RequestMethod.PUT})
-    public void addAndsaveTrigger(MapinfoTrigger object,HttpServletRequest request,HttpServletResponse response) {
+    public void addAndsaveTrigger(MapInfoTrigger object, HttpServletRequest request, HttpServletResponse response) {
         try {
-            MapinfoTrigger dbObject = mapinfoTriggerMag.getObjectById(object.getCid());
+            MapInfoTrigger dbObject = mapinfoTriggerMag.getObjectById(object.getCid());
             if (dbObject != null) {
                 mapinfoTriggerMag.copyObjectNotNullProperty(dbObject, object);
                 object = dbObject;
@@ -104,7 +104,7 @@ public class MapinfoTriggerController extends BaseController {
     }
 
     @RequestMapping(value="/delete",method = {RequestMethod.DELETE})
-    public void delete(MapinfoTrigger object,HttpServletRequest request,HttpServletResponse response) {
+    public void delete(MapInfoTrigger object, HttpServletRequest request, HttpServletResponse response) {
         mapinfoTriggerMag.deleteObjectById(object.getCid());
 
         JsonResultUtils.writeSuccessJson(response);

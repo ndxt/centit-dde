@@ -1,16 +1,15 @@
 package com.centit.dde.transfer;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.centit.dde.exception.SqlResolveException;
+import com.centit.dde.po.ExchangeMapInfo;
+import com.centit.dde.po.MapInfoDetail;
+import com.centit.dde.util.ItemValue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 
-import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.ExchangeMapinfo;
-import com.centit.dde.po.MapinfoDetail;
-import com.centit.dde.util.ItemValue;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TableMapInfo {
 
@@ -61,13 +60,13 @@ public class TableMapInfo {
         return outs;
     }
 
-    public void loadMapFromData(ExchangeMapinfo exchangMapinfo) throws SqlResolveException {
+    public void loadMapFromData(ExchangeMapInfo exchangMapinfo) throws SqlResolveException {
         if (logger.isDebugEnabled()) {
             logger.debug("解析数据交换对应关系属性值...");
         }
         try {
             sourceSql = exchangMapinfo.getQuerySql();
-            desTable = exchangMapinfo.getDestTablename();
+            desTable = exchangMapinfo.getDestTableName();
             
             if ("1".equals(exchangMapinfo.getRecordOperate())) {
                 rowOptType = "insert";
@@ -84,40 +83,40 @@ public class TableMapInfo {
             fieldsMap = new ArrayList<FieldMapInfo>();
             /*
 			 * 这一段应该是排序，这个其实是没有必要的在hbm.xml中应该可以指定顺序，添加order-by属性就可以
-			 * List<MapinfoDetail> mapinfoDetails = new
-			 * ArrayList<MapinfoDetail>(); int length =
-			 * exchangMapinfo.getMapinfoDetails().size(); for(int
-			 * i=1;i<=length;i++){ for (MapinfoDetail mapinfoDetailtemp :
-			 * exchangMapinfo .getMapinfoDetails()){
+			 * List<MapInfoDetail> mapinfoDetails = new
+			 * ArrayList<MapInfoDetail>(); int length =
+			 * exchangMapinfo.getMapInfoDetails().size(); for(int
+			 * i=1;i<=length;i++){ for (MapInfoDetail mapinfoDetailtemp :
+			 * exchangMapinfo .getMapInfoDetails()){
 			 * if(mapinfoDetailtemp.getCid(
 			 * ).getColumnNo().equals(Long.valueOf(i))){
 			 * mapinfoDetails.add(mapinfoDetailtemp); } } }
 			 */
-            for (MapinfoDetail mapinfoDetail : exchangMapinfo.getMapinfoDetails()) {
+            for (MapInfoDetail mapInfoDetail : exchangMapinfo.getMapInfoDetails()) {
                 //添加对目标内容的过滤条件，没有目标字段的对应关系可以忽略
-                if(!StringUtils.hasText( mapinfoDetail.getDestFieldName()))
+                if(!StringUtils.hasText( mapInfoDetail.getDestFieldName()))
                     continue;
                 FieldMapInfo map = new FieldMapInfo();
-                map.setRightColType(ItemValue.mapDbType(mapinfoDetail.getDestFieldType()));
-                map.setLeftColType(ItemValue.mapDbType(mapinfoDetail.getSourceFieldType()));
-                map.setDefaultValue(mapinfoDetail.getDestFieldDefault());
-                if ("1".equals(mapinfoDetail.getIsPk())) {
+                map.setRightColType(ItemValue.mapDbType(mapInfoDetail.getDestFieldType()));
+                map.setLeftColType(ItemValue.mapDbType(mapInfoDetail.getSourceFieldType()));
+                map.setDefaultValue(mapInfoDetail.getDestFieldDefault());
+                if ("1".equals(mapInfoDetail.getIsPk())) {
                     map.setKey(true);
                 } else {
                     map.setKey(false);
                 }
-                map.setLeftName(mapinfoDetail.getSourceFieldName());
-                if ("1".equals(mapinfoDetail.getIsNull())) {
+                map.setLeftName(mapInfoDetail.getSourceFieldName());
+                if ("1".equals(mapInfoDetail.getIsNull())) {
                     map.setNullable(true);
                 } else {
                     map.setNullable(false);
                 }
-                map.setOrder(mapinfoDetail.getCid().getColumnNo().intValue());
-                map.setRightName(mapinfoDetail.getDestFieldName());
+                map.setOrder(mapInfoDetail.getCid().getColumnNo().intValue());
+                map.setRightName(mapInfoDetail.getDestFieldName());
                 fieldsMap.add(map);
             }
             
-            fieldCount = fieldsMap.size();// exchangMapinfo.getMapinfoDetails().size();
+            fieldCount = fieldsMap.size();// exchangMapinfo.getMapInfoDetails().size();
             
             makeSqlNoNamedParams();
         } catch (Exception e) {

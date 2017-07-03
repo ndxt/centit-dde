@@ -4,14 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 
-
-import com.alibaba.fastjson.JSONArray;
-import com.centit.dde.po.MapinfoDetail;
+import com.centit.dde.po.MapInfoDetail;
 import com.centit.dde.po.MapinfoDetailId;
 import com.centit.framework.core.service.BaseEntityManager;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 
-public interface MapinfoDetailManager extends BaseEntityManager<MapinfoDetail,MapinfoDetailId> {
+public interface MapInfoDetailManager extends BaseEntityManager<MapInfoDetail,MapinfoDetailId> {
     public List<Map<String, String>> getGoalTableStruct(DatabaseInfo DatabaseInfo, String tableName);
 
     public List<Map<String, String>> getSourceTableStruct(DatabaseInfo DatabaseInfo, String tableName);
@@ -34,8 +32,8 @@ public interface MapinfoDetailManager extends BaseEntityManager<MapinfoDetail,Ma
 
     public List<String> getGoalColumnStrut(Long mapinfoId);
 
-    public void saveMapinfoDetails(MapinfoDetail mapinfoDetail);
+    public void saveMapinfoDetails(MapInfoDetail mapInfoDetail);
     
-    public List<MapinfoDetail> listByMapinfoId(Long mapinfoId);
+    public List<MapInfoDetail> listByMapinfoId(Long mapinfoId);
     
 }

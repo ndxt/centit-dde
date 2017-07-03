@@ -4,13 +4,13 @@
 
 
 <div class="pageContent">
-	<form action="${pageContext.request.contextPath}/dde/mapinfoTrigger!saveTrigger.do" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone);">
+	<form action="${pageContext.request.contextPath}/dde/mapInfoTrigger!saveTrigger.do" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone);">
 		<div class="pageFormContent" layoutH="56">
-		    <input type="hidden" name="mapinfoId" value="${param.mapinfoId }"/>
+		    <input type="hidden" name="mapInfoId" value="${param.mapInfoId }"/>
 		    <input type="hidden" name="triggerId" value="${object.triggerId }"/>		
 			<%-- <p>
 				<label>交换编号：</label>	 
-				<input name="mapinfoId" readonly="readonly" type="text" size="40" value="${param.mapinfoId }" />			
+				<input name="mapInfoId" readonly="readonly" type="text" size="40" value="${param.mapInfoId }" />
 			</p>
 			 --%>
 			<%-- <p>

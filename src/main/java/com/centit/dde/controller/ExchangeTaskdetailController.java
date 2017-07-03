@@ -1,6 +1,6 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.po.ExchangeTaskdetail;
+import com.centit.dde.po.ExchangeTaskDetail;
 import com.centit.dde.service.ExchangeTaskdetailManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
@@ -25,8 +25,8 @@ public class ExchangeTaskdetailController extends BaseController {
     private ExchangeTaskdetailManager exchangeTaskdetailMag;
 
     @RequestMapping(value="/delete",method = {RequestMethod.DELETE})
-    public void delete(ExchangeTaskdetail exchangeTaskdetail,HttpServletResponse response) {
-        exchangeTaskdetailMag.deleteObject(exchangeTaskdetail);
+    public void delete(ExchangeTaskDetail exchangeTaskDetail, HttpServletResponse response) {
+        exchangeTaskdetailMag.deleteObject(exchangeTaskDetail);
         JsonResultUtils.writeSuccessJson(response);
     }
 }

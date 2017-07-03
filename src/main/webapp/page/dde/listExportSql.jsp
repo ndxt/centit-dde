@@ -40,7 +40,7 @@
 		<tbody>
 		
 		    <c:forEach items="${exportSqls }" var="obj" varStatus="s">
-					<tr target="mapinfoId" rel="${obj.exportId}">
+					<tr target="mapInfoId" rel="${obj.exportId}">
 					    <td><input name="ids" value="${obj.exportId}" type="checkbox" 
 								<c:forEach var="u" items="${used }">
 									<c:if test="${u eq obj.exportId }">checked="checked"</c:if>

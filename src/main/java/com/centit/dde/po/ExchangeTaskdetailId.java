@@ -13,7 +13,7 @@ import javax.persistence.IdClass;
  * @author codefan@hotmail.com
  */
 @Embeddable
-@IdClass(ExchangeTaskdetail.class)
+@IdClass(ExchangeTaskDetail.class)
 public class ExchangeTaskdetailId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 

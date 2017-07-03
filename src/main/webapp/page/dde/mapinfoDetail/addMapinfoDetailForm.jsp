@@ -4,7 +4,7 @@
 
 
 <div class="pageContent">
-	<form action="${pageContext.request.contextPath}/dde/mapinfoDetail!showMapinfoDetail.do?s_method=save&s_type=save"
+	<form action="${pageContext.request.contextPath}/dde/mapInfoDetail!showMapinfoDetail.do?s_method=save&s_type=save"
 		class="pageForm required-validate"
 		onsubmit="return validateCallback(this, dialogAjaxDone);">
 
@@ -88,21 +88,21 @@
 	   var isNull = $("select.isNull").val();
 	   var destFieldDefault = $(".destFieldDefault").val();
 	   
-	   var mapinfoName = $("#mapinfoName_edit").val();
+	   var mapInfoName = $("#mapinfoName_edit").val();
 		var isRepeat = $(".isRepeat_edit:checked").val();
-		var mapinfoDesc = $("#mapinfoDesc_edit").val();
+		var mapInfoDesc = $("#mapinfoDesc_edit").val();
 		/* var tableOperate = $("#tableOperate").val(); */
 		var recordOperate = $(".recordOperate_edit:checked").val();
 		
 		var mapinfoNameElement = DWZ.frag["INPUTHIDDEN"]
-		.replaceAll('{name}', 'mapinfoName')
-		.replaceAll('{value}', mapinfoName);
+		.replaceAll('{name}', 'mapInfoName')
+		.replaceAll('{value}', mapInfoName);
 		var isRepeatElement = DWZ.frag["INPUTHIDDEN"]
 		.replaceAll('{name}', 'isRepeat')
 		.replaceAll('{value}', isRepeat);
 		var mapinfoDescElement = DWZ.frag["INPUTHIDDEN"]
-		.replaceAll('{name}', 'mapinfoDesc')
-		.replaceAll('{value}', mapinfoDesc);
+		.replaceAll('{name}', 'mapInfoDesc')
+		.replaceAll('{value}', mapInfoDesc);
 		var recordOperateElement = DWZ.frag["INPUTHIDDEN"]
 		.replaceAll('{name}', 'recordOperate')
 		.replaceAll('{value}', recordOperate);
@@ -159,7 +159,7 @@
 	   $.pdialog.close($.pdialog.getCurrent());
 	   
 	   //console.dir($mapinfoDetailForm.html());
-	   $mapinfoDetailForm.attr("action","${pageContext.request.contextPath}/dde/mapinfoDetail!showMapinfoDetail.do?s_method=save&s_type=save").submit();
+	   $mapinfoDetailForm.attr("action","${pageContext.request.contextPath}/dde/mapInfoDetail!showMapinfoDetail.do?s_method=save&s_type=save").submit();
 }
 </script>
 

@@ -22,7 +22,7 @@ define(function(require) {
 		// @override
 		this.load = function(panel, data) {
 			var form = panel.find('form');
-			Core.ajax(Config.ContextPath+'service/exchangemapinfo/copy/'+data.mapinfoId, {
+			Core.ajax(Config.ContextPath+'service/exchangemapinfo/copy/'+data.mapInfoId, {
 				type: 'json',
 				method: 'get'
 //					.then()是Promise规范规定的异步调用方法    得到数据后，调用form的load方法将数据显示在表单中
@@ -31,36 +31,34 @@ define(function(require) {
 
 				form.form('load', data)
 					.form('disableValidation')
-					.form('readonly', 'mapinfoId')
+					.form('readonly', 'mapInfoId')
 					.form('focus');
 
-				var sourceTable = panel.find('table.tab1');
+				var sourceTable = panel.find('table.source');
 				sourceTable.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.mapinfoDetails,
+					data:data.mapInfoDetails,
 					dragSelection: true,
 					onLoadSuccess:function(){
-						$(this).datagrid('enableDnd');
+						// $(this).datagrid('enableDnd');
 					}
 				});
 				var destTable = panel.find('table.dest');
 				destTable.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.mapinfoDetails,
+					data:data.mapInfoDetails,
 					dragSelection: true,
 					onLoadSuccess:function(){
-						$(this).datagrid('enableDnd');
+						// destTable.datagrid('enableDnd');
 					}
 				});
-
-
-				var tab2table = panel.find('table.tab2');
+				var tab2table = panel.find('table.trigger');
 				tab2table.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.mapinfoTriggers
+					data:data.mapInfoTriggers
 				});
 			});
 			onchange();
@@ -73,9 +71,9 @@ define(function(require) {
 			$.extend(data,formData);
 			var isValid = form.form('validate');
 			if (isValid) {
-				var mapinfoDetails = panel.find('table.tab1').datagrid("getData").rows;
-				data.mapinfoDetails = mapinfoDetails;
-				Core.ajax(Config.ContextPath + 'service/exchangemapinfo/save/' + data.mapinfoId, {
+				var mapInfoDetails = panel.find('table.tab1').datagrid("getData").rows;
+				data.mapInfoDetails = mapInfoDetails;
+				Core.ajax(Config.ContextPath + 'service/exchangemapinfo/save/' + data.mapInfoId, {
 					data: data,
 					method: 'put'
 				}).then(function() {
@@ -90,11 +88,6 @@ define(function(require) {
 			table.datagrid('reload');
 		};
 	});
-
-
-
-
-
 
 	this.dlgAddDb = function(change){
 		var sourceDatabaseName = $('#sourceDatabaseName').val();
