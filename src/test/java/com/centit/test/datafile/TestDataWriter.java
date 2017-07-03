@@ -1,9 +1,5 @@
 package com.centit.test.datafile;
 
-import java.io.File;
-import java.io.Writer;
-import java.util.Map;
-
 import com.centit.dde.datafile.ExchangeFileReader;
 import com.centit.dde.datafile.ExchangeFileWriter;
 import com.centit.dde.datafile.TableFileReader;
@@ -13,6 +9,10 @@ import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.ZipCompressor;
 import com.centit.support.file.FileSystemOpt;
 import com.centit.support.file.PropertiesReader;
+
+import java.io.File;
+import java.io.Writer;
+import java.util.Map;
 
 public class TestDataWriter {
 
@@ -40,7 +40,7 @@ public class TestDataWriter {
         tf.setFilePath(ef.getExchangeFilePath());
         tf.setExportName("table01");
         tf.setDataOptId("opt-01");
-        tf.setSorceOsId("epower");
+        tf.setSourceOsId("epower");
         tf.setSourceDBName("epowerdb");
         tf.setTableWriter(ef.getExchangeWriter());
         tf.writeTableBegin();
@@ -83,7 +83,7 @@ public class TestDataWriter {
         tf.setFilePath(ef.getExchangeFilePath());
         tf.setExportName("table01");
         tf.setDataOptId("opt-01");
-        tf.setSorceOsId("epower");
+        tf.setSourceOsId("epower");
         tf.setSourceDBName("epowerdb");
         
          tf.prepareWriter();
@@ -129,7 +129,7 @@ public class TestDataWriter {
         tf.setFilePath(ef.getExchangeFilePath());
         tf.setExportName("table01");
         tf.setDataOptId("opt-01");
-        tf.setSorceOsId("epower");
+        tf.setSourceOsId("epower");
         tf.setSourceDBName("epowerdb");
         
         tf.setTableWriter(ef.getExchangeWriter());
