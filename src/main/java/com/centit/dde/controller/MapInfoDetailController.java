@@ -11,7 +11,7 @@ import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.framework.staticsystem.service.IntegrationEnvironment;
 import com.centit.support.compiler.Lexer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,7 +39,7 @@ public class MapInfoDetailController extends BaseController {
     private ExchangeMapInfoManager exchangeMapInfoManager;
 
     @Resource
-    private StaticEnvironmentManager platformEnvironment;
+    private IntegrationEnvironment integrationEnvironment;
 
     @RequestMapping(value="/showMapinfoDetail",method = {RequestMethod.GET})
     public void showMapinfoDetail(String s_mapinfoId,PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
@@ -96,8 +96,8 @@ public class MapInfoDetailController extends BaseController {
             }
         }
 
-        DatabaseInfo sourceDatabaseInfo = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
-        DatabaseInfo goalDatabaseInfo = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
+        DatabaseInfo sourceDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
+        DatabaseInfo goalDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
         
        /* sourceTableStruct = */
         //从数据库表中读取表结构
@@ -227,16 +227,16 @@ public class MapInfoDetailController extends BaseController {
         DatabaseInfo goalDatabaseInfo = null;
 
         if (sourcedatabaseName != null) {
-            sourceDatabaseInfo = platformEnvironment.getDatabaseInfo(sourcedatabaseName);
+            sourceDatabaseInfo = integrationEnvironment.getDatabaseInfo(sourcedatabaseName);
         }
         if (goaldatabaseName != null) {
-            goalDatabaseInfo = platformEnvironment.getDatabaseInfo(goaldatabaseName);
+            goalDatabaseInfo = integrationEnvironment.getDatabaseInfo(goaldatabaseName);
         }
         if (exchangeMapInfo != null && exchangeMapInfo.getSourceDatabaseName() != null) {
-            sourceDatabaseInfo = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
+            sourceDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
         }
         if (exchangeMapInfo != null && exchangeMapInfo.getDestDatabaseName() != null) {
-            goalDatabaseInfo = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
+            goalDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
         }
 
         if (s_mapinfoId != null) {
@@ -343,16 +343,16 @@ public class MapInfoDetailController extends BaseController {
         DatabaseInfo goalDatabaseInfo = null;
 
         if (sourcedatabaseName != null) {
-            sourceDatabaseInfo = platformEnvironment.getDatabaseInfo(sourcedatabaseName);
+            sourceDatabaseInfo = integrationEnvironment.getDatabaseInfo(sourcedatabaseName);
         }
         if (goaldatabaseName != null) {
-            goalDatabaseInfo = platformEnvironment.getDatabaseInfo(goaldatabaseName);
+            goalDatabaseInfo = integrationEnvironment.getDatabaseInfo(goaldatabaseName);
         }
         if (exchangeMapInfo != null && exchangeMapInfo.getSourceDatabaseName() != null) {
-            sourceDatabaseInfo = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
+            sourceDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
         }
         if (exchangeMapInfo != null && exchangeMapInfo.getDestDatabaseName() != null) {
-            goalDatabaseInfo = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
+            goalDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
         }
 
         if (s_mapinfoId != null) {
@@ -419,15 +419,15 @@ public class MapInfoDetailController extends BaseController {
         exchangeMapInfo.setMapInfoId(Long.parseLong(String.valueOf(searchColumn.get("mapinfoId"))));
         exchangeMapInfo = exchangeMapInfoManager.getObjectById(exchangeMapInfo.getMapInfoId());
 
-        DatabaseInfo sourceDatabaseInfo = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
-        DatabaseInfo goalDatabaseInfo = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
+        DatabaseInfo sourceDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
+        DatabaseInfo goalDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
 
         ResponseData resData = new ResponseData();
         resData.addResponseData("OBJLIST", sourceDatabaseInfo.getDatabaseUrl());
         resData.addResponseData("GOALURL", goalDatabaseInfo.getDatabaseUrl());
         resData.addResponseData("SQL", exchangeMapInfo.getQuerySql());
         resData.addResponseData("sourceDatabaseName", (String) searchColumn.get("sourceDatabaseName"));
-        resData.addResponseData("DATABASE",platformEnvironment.listDatabaseInfo());
+        resData.addResponseData("DATABASE",integrationEnvironment.listDatabaseInfo());
         JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
 
@@ -442,11 +442,11 @@ public class MapInfoDetailController extends BaseController {
         if (exchangeMapInfo != null) {
             resData.addResponseData("SQL", exchangeMapInfo.getQuerySql());
         }
-        resData.addResponseData("DATABASE", platformEnvironment.listDatabaseInfo());
+        resData.addResponseData("DATABASE", integrationEnvironment.listDatabaseInfo());
 
         //database下面所有 的表
         if (searchColumn.containsKey("sourcedatabaseName") && StringUtils.hasText((String) searchColumn.get("sourcedatabaseName"))) {
-            DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo((String) searchColumn.get("sourcedatabaseName"));
+            DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo((String) searchColumn.get("sourcedatabaseName"));
             List<Object> tables = mapinfoDetailMag.getTable(databaseInfo);
             resData.addResponseData("tables", tables);
         }
@@ -456,10 +456,10 @@ public class MapInfoDetailController extends BaseController {
     @RequestMapping(value="/defGoalData_add",method = {RequestMethod.GET})
     public void defGoalData_add(HttpServletRequest request,HttpServletResponse response) {
         ResponseData resData = new ResponseData();
-        resData.addResponseData("DATABASE", platformEnvironment.listDatabaseInfo());
+        resData.addResponseData("DATABASE", integrationEnvironment.listDatabaseInfo());
         Map<String, Object> searchColumn = convertSearchColumn(request);
         if (searchColumn.containsKey("goaldatabaseName") && StringUtils.hasText((String) searchColumn.get("goaldatabaseName"))) {
-            DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo((String) searchColumn.get("goaldatabaseName"));
+            DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo((String) searchColumn.get("goaldatabaseName"));
             List<Object> tables = mapinfoDetailMag.getTable(databaseInfo);
             resData.addResponseData("tables", tables);
         }
@@ -469,7 +469,7 @@ public class MapInfoDetailController extends BaseController {
     @RequestMapping(value="/database",method = {RequestMethod.GET})
     public void database(String databaseName,HttpServletRequest request,HttpServletResponse response) {
         DatabaseInfo databaseInfo = new DatabaseInfo();
-        databaseInfo = platformEnvironment.getDatabaseInfo(databaseName);
+        databaseInfo = integrationEnvironment.getDatabaseInfo(databaseName);
         List<Object> tables = mapinfoDetailMag.getTable(databaseInfo);
         JsonResultUtils.writeSingleDataJson(tables, response);
     }
@@ -480,13 +480,13 @@ public class MapInfoDetailController extends BaseController {
         ExchangeMapInfo exchangeMapInfo = new ExchangeMapInfo();
         exchangeMapInfo.setMapInfoId(Long.parseLong(String.valueOf(searchColumn.get("mapinfoId"))));
         exchangeMapInfo = exchangeMapInfoManager.getObjectById(exchangeMapInfo.getMapInfoId());
-        DatabaseInfo sourceDatabaseInfo = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
-        DatabaseInfo goalDatabaseInfo = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
+        DatabaseInfo sourceDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
+        DatabaseInfo goalDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
         ResponseData resData = new ResponseData();
         resData.addResponseData("GOALURL", goalDatabaseInfo.getDatabaseUrl());
         resData.addResponseData("SOURCEURL", sourceDatabaseInfo.getDatabaseUrl());
         resData.addResponseData("goalDatabaseName", (String) searchColumn.get("goalDatabaseName"));
-        resData.addResponseData("DATABASE", platformEnvironment.listDatabaseInfo());
+        resData.addResponseData("DATABASE", integrationEnvironment.listDatabaseInfo());
         JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
     

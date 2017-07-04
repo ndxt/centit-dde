@@ -7,6 +7,9 @@ define(function(require) {
 	var ExchangeMapInfoDetailRemove = require('../ctrl/exchangeMapInfoDetail.remove');
 	var ExchangeMapInfoDetailAdd2 = require('../ctrl/exchangeMapInfoDetail.add2');
 	var ExchangeMapInfoDetailRemove2 = require('../ctrl/exchangeMapInfoDetail.remove2');
+	var ExchangeMapInfoTriggerAdd = require("../ctrl/exchangeMapInfoTrigger.add");
+	var ExchangeMapInfoTriggerEdit = require("../ctrl/exchangeMapInfoTrigger.edit");
+	var ExchangeMapInfoTriggerRemove = require("../ctrl/exchangeMapInfoTrigger.remove");
 
 	var ExchangeMapInfoEdit = Page.extend(function() {
 		var _self = this;
@@ -18,6 +21,9 @@ define(function(require) {
 		  			new ExchangeMapInfoDetailRemove('source_detail_remove'),
 		  			new ExchangeMapInfoDetailAdd2('dest_detail_add'),
 		  			new ExchangeMapInfoDetailRemove2('dest_detail_remove'),
+					new ExchangeMapInfoTriggerAdd('exchangeMapInfoTrigger_add'),
+					new ExchangeMapInfoTriggerEdit('exchangeMapInfoTrigger_edit'),
+					new ExchangeMapInfoTriggerRemove('exchangeMapInfoTrigger_remove')
 		  		]);
 		
 		
@@ -36,21 +42,21 @@ define(function(require) {
 					.form('readonly', 'mapInfoId')
 					.form('focus');
 
-			/*	var proArray = new Array();
+				/*var proArray = new Array();
 			    for(var i=0;i<data.mapInfoDetails.length;i++){
 			        var a = { 
 		        		destFieldName:data.mapInfoDetails[i].destFieldName,
 		        		destFieldType:data.mapInfoDetails[i].destFieldType,
 			        }; 
 			        proArray.push(a); 
-			    } */
+			    }
 			     
-			    /*$("#exchangeContent2").datagrid({
+			    $("#exchangeContent2").datagrid({
 			        columns:[[ 
 			            {field:'destFieldName',title:'目标字段名',editor:'text',width:'30%'}, 
 			            {field:'destFieldType',title:'目标字段类型',editor:'text',width:'30%'}, 
 			        ]] 
-			    }).datagrid('loadData',proArray).datagrid('acceptChanges'); */
+			    }).datagrid('loadData',proArray).datagrid('acceptChanges');*/
 				
 				
 				var sourceTable = panel.find('table.source');
@@ -60,7 +66,7 @@ define(function(require) {
 					data:data.mapInfoDetails,
 					dragSelection: true,
 					onLoadSuccess:function(){
-						// $(this).datagrid('enableDnd');
+						$(this).datagrid('enableDnd');
 					}
 				});
 				var destTable = panel.find('table.dest');
@@ -70,14 +76,18 @@ define(function(require) {
 					data:data.mapInfoDetails,
 					dragSelection: true,
 					onLoadSuccess:function(){
-						// destTable.datagrid('enableDnd');
+						$(this).datagrid('enableDnd');
 					}
 				});
 				var tab2table = panel.find('table.trigger');
 				tab2table.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.mapInfoTriggers
+					data:data.mapInfoTriggers,
+                    dragSelection: true,
+                    onLoadSuccess:function(){
+                        $(this).datagrid('enableDnd');
+                    }
 				});
 			});
 			onchange();
@@ -90,9 +100,10 @@ define(function(require) {
 			$.extend(data,formData);
 			var isValid = form.form('validate');
 			if (isValid) {
-				var mapInfoDetails = panel.find('table.tab1').datagrid("getData").rows;
-				data.mapInfoDetails = mapInfoDetails;
-				Core.ajax(Config.ContextPath + 'service/exchangemapinfo/save/' + data.mapInfoId, {
+				var source = panel.find('.source').datagrid("getData").rows;
+				var dest = panel.find('.dest').datagrid("getData").rows;
+				data.mapInfoDetails = source;
+				Core.ajax(Config.ContextPath + 'service/exchangemapinfo/save', {
 					data: data,
 					method: 'put'
 				}).then(function() {

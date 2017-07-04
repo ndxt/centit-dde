@@ -1,10 +1,8 @@
 <form class="form centit">
     <input hidden type="text" name="mapInfoId" />
-	<div class="fields two">
-		<div class="field" >
-			<label>交换名称：</label>
-			<input  class="easyui-textbox" name="mapInfoName" type="text"/>
-		</div>
+	<div class="field" >
+		<label>交换名称：</label>
+		<input  class="easyui-textbox" name="mapInfoName" type="text"/>
 	</div>
 	<div class="fields two">
 		<div class="field required">
@@ -62,7 +60,7 @@
 
 <div class="easyui-tabs" style="width:97%;height:410px">
 	<div title="数据交换内容字段" class="tab1" style="padding:5px">
-		<div style="width:37.5%;float:left">
+		<div style="width:45%;float:left">
 			<table id="exchangeContent1" class="source"  style="width:100%;float:left"
 				   pagination="false"
 				   remoteSort="true"
@@ -71,8 +69,8 @@
 				   toolbar=".tab1-toolbar" >
 				<thead >
 					<th field="sourceFieldName" width="30%" data-options="editor: {type: 'text', options: {required: true}}">源字段名</th>
-					<th field="sourceFieldType" width="30%" data-options="editor: {type: 'text', options: {required: true}}">源字段类型</th>
-					<th field="sourceFieldSentence" width="40%" data-options="editor: {type: 'text', options: {required: true}}">源字段语句描述</th>
+					<th field="sourceFieldType" width="31%" data-options="editor: {type: 'text', options: {required: true}}">源字段类型</th>
+					<th field="sourceFieldSentence" width="35%" data-options="editor: {type: 'text', options: {required: true}}">源字段语句描述</th>
 				</thead>
 			</table>
 			<div class="tab1-toolbar">
@@ -83,18 +81,19 @@
 				   target="custom" trigger="single" ><p>删除</p></a>
 			</div>
 		</div>
-		<div style="width:62.5%;float:right" >
+		<div style="width:55%;float:right" >
 			<table id="exchangeContent2" class="dest" style="width:100%;"
 				   toolbar=".temp-toolbar"
 				   pagination="false"
 				   remoteSort="true"
+				   rownumbers="false"
 				   border="true"
 				   idField="cid">
 				<thead >
-					<th field="destFieldName" width="20%" data-options="editor: {type: 'text', options: {required: true}}">目标字段名</th>
-					<th field="destFieldType" width="20%" data-options="editor: {type: 'text', options: {required: true}}">字段类型</th>
-					<th field="isPk" width="20%" data-options="editor: {type: 'text', options: {required: true}}">主键</th>
-					<th field="isNull" width="20%" data-options="editor: {type: 'text', options: {required: true}}">允许空</th>
+					<th field="destFieldName" width="30%" data-options="editor: {type: 'text', options: {required: true}}">目标字段名</th>
+					<th field="destFieldType" width="30%" data-options="editor: {type: 'text', options: {required: true}}">字段类型</th>
+					<th field="isPk" width="10%" data-options="editor: {type: 'text', options: {required: true}}">主键</th>
+					<th field="isNull" width="15%" data-options="editor: {type: 'text', options: {required: true}}">允许空</th>
 					<th field="destFieldDefault" width="20%" data-options="editor: {type: 'text', options: {required: true}}">默认值</th>
 				</thead>
 			</table>
@@ -108,30 +107,30 @@
 		</div>
 	</div>
 	<div title="数据交换触发器" class="tab2" style="padding:5px">
-		<table id="exchangeContent" class="trigger"  style="width:96%;"
+		<table id="exchangeContent" class="trigger"  style="width:100%;"
 			   pagination="false"
 			   remoteSort="true"
 			   border="true"
 			   idField="cid"
 			   toolbar=".tab2-toolbar" >
 			<thead >
-				<th field="triggerSql" width="14%" >执行sql语句</th>
-				<th field="triggerDesc" width="15%" >执行语句说明</th>
-				<th field="triggerDatabase" width="14%" >执行对象</th>
-				<th field="triggerType" width="14%" >触发类别</th>
+				<th field="triggerSql" width="36%" >执行sql语句</th>
+				<th field="triggerDesc" width="20%" >执行语句说明</th>
+				<th field="triggerDatabase" width="10%" >执行对象</th>
+				<th field="triggerType" width="10%" >触发类别</th>
 				<th field="triggerTime" width="10%">触发时机</th>
 				<th field="isprocedure" width="10%">无参存储过程</th>
 			</thead>
 		</table>
-		<div class=".tab2-toolbar">
-			<a iconCls="icon-add" href="modules/exchangeMapInfo/exchangeMapInfo-info.html" trigger="none"
-				target="dialog" rel="exchangeMapInfo_add" title="添加数据库表" width="750" height="600" btnValue="添加">添加</a>
+		<div class="tab2-toolbar">
+			<a iconCls="icon-add" href="modules/exchangeMapInfo/exchangeMapInfoTrigger-detail.html" trigger="none"
+				target="dialog" rel="exchangeMapInfoTrigger_add" title="新增" width="750" height="600" btnValue="新增">新增</a>
 			<hr>
-			<a iconCls="icon-edit" href="modules/exchangeMapInfo/exchangeMapInfoTrigger-edit.html" trigger="single"
-				target="dialog" rel="exchangeMapInfo_edit" title="编辑 {{text}}" width="750" height="600" btnValue="更新">编辑</a>
+			<a iconCls="icon-edit" href="modules/exchangeMapInfo/exchangeMapInfoTrigger-detail.html" trigger="single"
+				target="dialog" rel="exchangeMapInfoTrigger_edit" title="编辑 {{text}}" width="750" height="600" btnValue="编辑">编辑</a>
 			<hr>
 			<a iconCls="icon-base icon-base-ban" trigger="single"
-				target="confirm" rel="exchangeMapInfo_remove" title="是否确定删除 {{text}}？">删除</a>
+				target="confirm" rel="exchangeMapInfoTrigger_remove" title="是否确定删除 {{text}}？">删除</a>
 		</div>
 	</div>
 </div>

@@ -9,7 +9,6 @@ import com.centit.dde.transfer.TransferManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.JobExecutionContext;
@@ -55,8 +54,6 @@ public class ExchangeTaskManagerImpl
     public void setTransferManager(TransferManager transferManager) {
         this.transferManager = transferManager;
     }
-
-    protected StaticEnvironmentManager platformEnvironment;
 
     @Resource(name = "exchangeTaskDao")
     @NotNull

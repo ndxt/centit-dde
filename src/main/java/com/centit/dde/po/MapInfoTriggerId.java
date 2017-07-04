@@ -13,7 +13,7 @@ import javax.persistence.IdClass;
  */
 @Embeddable
 @IdClass(MapInfoTrigger.class)
-public class MapinfoTriggerId implements java.io.Serializable {
+public class MapInfoTriggerId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     
     @Column(name="TRIGGER_ID")
@@ -29,13 +29,13 @@ public class MapinfoTriggerId implements java.io.Serializable {
     /**
      * default constructor
      */
-    public MapinfoTriggerId() {
+    public MapInfoTriggerId() {
     }
 
     /**
      * full constructor
      */
-    public MapinfoTriggerId(Long triggerId, Long mapinfoId) {
+    public MapInfoTriggerId(Long triggerId, Long mapinfoId) {
 
         this.triggerId = triggerId;
         this.mapinfoId = mapinfoId;
@@ -64,10 +64,10 @@ public class MapinfoTriggerId implements java.io.Serializable {
             return true;
         if ((other == null))
             return false;
-        if (!(other instanceof MapinfoTriggerId))
+        if (!(other instanceof MapInfoTriggerId))
             return false;
 
-        MapinfoTriggerId castOther = (MapinfoTriggerId) other;
+        MapInfoTriggerId castOther = (MapInfoTriggerId) other;
         boolean ret = true;
 
         ret = ret && (this.getTriggerId() == castOther.getTriggerId() ||

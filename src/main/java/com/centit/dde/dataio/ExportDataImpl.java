@@ -15,7 +15,7 @@ import com.centit.dde.util.ItemValue;
 import com.centit.dde.util.TaskConsoleWriteUtils;
 import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.framework.staticsystem.service.IntegrationEnvironment;
 import com.centit.support.algorithm.DatetimeOpt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,7 +30,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
     private static boolean debugEnabled = logger.isDebugEnabled();
 
     @Resource
-    protected StaticEnvironmentManager platformEnvironment;
+    protected IntegrationEnvironment integrationEnvironment;
 
     private ExportSqlDao exportSqlDao;
 
@@ -96,7 +96,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
             List<ExportTrigger> exportTriggers = exportSql.getExportTriggers();
 
-            DatabaseInfo dbInfo = platformEnvironment.getDatabaseInfo(exportSql.getSourceDatabaseName());
+            DatabaseInfo dbInfo = integrationEnvironment.getDatabaseInfo(exportSql.getSourceDatabaseName());
             Connection conn = ConnPool.getConn(dbInfo);
 
             // 交换前事件

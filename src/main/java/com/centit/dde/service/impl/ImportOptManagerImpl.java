@@ -9,7 +9,7 @@ import com.centit.dde.util.ConnPool;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.framework.staticsystem.service.IntegrationEnvironment;
 import com.centit.support.database.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,7 +39,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
     private ImportFieldDao importFieldDao;
 
     @Resource
-    protected StaticEnvironmentManager platformEnvironment;
+    protected IntegrationEnvironment integrationEnvironment;
 
     private ImportOptDao importOptDao;
     @Resource(name="importOptDao")
@@ -55,7 +55,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
     }
 
     private void validator(ImportOpt object) throws SqlResolveException {
-        DatabaseInfo dbinfo = platformEnvironment.getDatabaseInfo(object.getDestDatabaseName());
+        DatabaseInfo dbinfo = integrationEnvironment.getDatabaseInfo(object.getDestDatabaseName());
         if (null == dbinfo) {
             throw new SqlResolveException(10002);
         }
@@ -137,7 +137,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
             checkObject(object);
             // 判断导入的表是否存在
 
-            DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(object.getDestDatabaseName());
+            DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(object.getDestDatabaseName());
 
             object.setSourceOsId(databaseInfo.getOsId());
             //将表名转换为大写
@@ -205,7 +205,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
         List<ImportField> fields = new ArrayList<>();
         Connection connection = null;
         if (databaseCode != null && !"".equals(databaseCode)) {
-            DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(databaseCode);
+            DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(databaseCode);
             if (databaseInfo != null) {
                 try {
                     connection = ConnPool.getConn(databaseInfo);

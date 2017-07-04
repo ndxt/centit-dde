@@ -57,5 +57,4 @@ public class DataOptInfoManagerImpl
     public List<DataOptStep> listDataOptStepByDataOptInfo(DataOptInfo object) {
         return dataOptInfoDao.listDataOptStepByDataOptInfo(object);
     }
-
 }

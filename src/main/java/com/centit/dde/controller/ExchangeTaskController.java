@@ -10,7 +10,7 @@ import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.po.UserInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.framework.staticsystem.service.IntegrationEnvironment;
 import com.centit.support.algorithm.StringRegularOpt;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.logging.Log;
@@ -48,7 +48,7 @@ public class ExchangeTaskController extends BaseController {
     private MapInfoDetailManager mapInfoDetailManager;
 
     @Resource
-    private StaticEnvironmentManager platformEnvironment;
+    private IntegrationEnvironment integrationEnvironment;
 
     @Resource
     private TaskErrorDataManager taskErrorDataManager;
@@ -536,8 +536,8 @@ public class ExchangeTaskController extends BaseController {
     private void executeMapinfo(Long mapinfoId, Long taskId,HttpServletRequest request,HttpServletResponse response) {
         ExchangeMapInfo exchangeMapInfo = this.exchangeMapInfoManager.getObjectById(Long.valueOf(mapinfoId));
         String sql = exchangeMapInfo.getQuerySql();
-        DatabaseInfo databaseInfoSource = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
-        DatabaseInfo databaseInfoGoal = platformEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
+        DatabaseInfo databaseInfoSource = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
+        DatabaseInfo databaseInfoGoal = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
 
 		/*
          * String tableOperateSql =

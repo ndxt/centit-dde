@@ -15,7 +15,7 @@ import com.centit.dde.transfer.TransferManager;
 import com.centit.dde.transfer.TransferResult;
 import com.centit.dde.util.TaskConsoleWriteUtils;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.framework.staticsystem.service.IntegrationEnvironment;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.QueryUtils;
 import org.apache.commons.logging.Log;
@@ -54,7 +54,7 @@ public class TransferManagerImpl implements TransferManager {
     private TaskDetailLogManager taskDetailLogManager;
 
     @Resource
-    protected StaticEnvironmentManager platformEnvironment;
+    protected IntegrationEnvironment integrationEnvironment;
 
     public void setTaskDetailLogManager(TaskDetailLogManager taskDetailLogManager) {
         this.taskDetailLogManager = taskDetailLogManager;
@@ -367,7 +367,7 @@ public class TransferManagerImpl implements TransferManager {
 
 
         // 准备环境
-        DatabaseInfo sourceDatabaseInfo = platformEnvironment.getDatabaseInfo(exchangMapinfo.getSourceDatabaseName());
+        DatabaseInfo sourceDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangMapinfo.getSourceDatabaseName());
         if (null == sourceDatabaseInfo) {
             msg = "源数据库 " + exchangMapinfo.getSourceDatabaseName() + " 不存在";
             logger.error(msg);
@@ -378,7 +378,7 @@ public class TransferManagerImpl implements TransferManager {
             return transferResult;
         }
 
-        DatabaseInfo desDatabaseInfo = platformEnvironment.getDatabaseInfo(exchangMapinfo.getDestDatabaseName());
+        DatabaseInfo desDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangMapinfo.getDestDatabaseName());
         if (null == desDatabaseInfo) {
             msg = "目标数据库 " + exchangMapinfo.getDestDatabaseName() + " 不存在";
 

@@ -1,11 +1,15 @@
 package com.centit.dde.config;
 
-import com.centit.framework.listener.InitialWebRuntimeEnvironment;
 import com.centit.framework.hibernate.config.DataSourceConfig;
+import com.centit.framework.listener.InitialWebRuntimeEnvironment;
 import com.centit.framework.staticsystem.config.SpringConfig;
 import org.springframework.context.annotation.*;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
+@EnableScheduling
+@EnableAsync
 @Import({SpringConfig.class, DataSourceConfig.class})
 @ComponentScan(basePackages={"com.centit.dde"},
         excludeFilters={@ComponentScan.Filter(type= FilterType.ANNOTATION,

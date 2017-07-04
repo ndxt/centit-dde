@@ -8,10 +8,10 @@ import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.framework.staticsystem.service.IntegrationEnvironment;
 import com.centit.support.database.QueryUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,10 +28,10 @@ public class ExchangeMapInfoManagerImpl
         extends BaseEntityManagerImpl<ExchangeMapInfo,Long,ExchangeMapinfoDao> implements
         ExchangeMapInfoManager {
 
-    public static final Log log = LogFactory.getLog(ExchangeMapInfoManager.class);
+    public static final Logger log = LoggerFactory.getLogger(ExchangeMapInfoManager.class);
 
     @Resource
-    protected StaticEnvironmentManager platformEnvironment;
+    protected IntegrationEnvironment integrationEnvironment;
 
     private ExchangeMapinfoDao exchangeMapinfoDao;
 
@@ -53,7 +53,7 @@ public class ExchangeMapInfoManagerImpl
         }
         object.setQuerySql(object.getQuerySql().toUpperCase());
 
-        DatabaseInfo dbinfo = platformEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
+        DatabaseInfo dbinfo = integrationEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
         if (null == dbinfo) {
             throw new SqlResolveException(10002);
         }
@@ -128,7 +128,7 @@ public class ExchangeMapInfoManagerImpl
 
         //判断交换名称的唯一性
         Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("mapinfoNameEq", object.getMapInfoName());
+        filterMap.put("mapInfoNameEq", object.getMapInfoName());
 
         List<ExchangeMapInfo> listObjects = listObjects(filterMap);
 
@@ -180,7 +180,7 @@ public class ExchangeMapInfoManagerImpl
         }
         for (int i = 0; i < object.getMapInfoTriggers().size(); i++) {
             mt = object.getMapInfoTriggers().get(i);
-            mt.setCid(new MapinfoTriggerId((long) i, object.getMapInfoId()));
+            mt.setCid(new MapInfoTriggerId((long) i, object.getMapInfoId()));
         }
     }
 
@@ -214,5 +214,4 @@ public class ExchangeMapInfoManagerImpl
         }
         return mapInfoDetails;
     }
-
 }

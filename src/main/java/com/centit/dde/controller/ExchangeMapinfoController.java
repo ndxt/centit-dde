@@ -11,7 +11,7 @@ import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.framework.staticsystem.service.IntegrationEnvironment;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public class ExchangeMapInfoController extends BaseController {
     private MapInfoTriggerManager mapInfoTriggerManager;
 
     @Resource
-    protected StaticEnvironmentManager platformEnvironment;
+    protected IntegrationEnvironment integrationEnvironment;
     
     @RequestMapping(value="/list" ,method = {RequestMethod.GET})
     public void list(PageDesc pageDesc,HttpServletRequest request, HttpServletResponse response) {
@@ -119,7 +119,7 @@ public class ExchangeMapInfoController extends BaseController {
 
     @RequestMapping(value="/resolveSQL", method = RequestMethod.GET)
     public void resolveSQL(ExchangeMapInfo mapinfo, HttpServletResponse response) {
-        DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(mapinfo.getSourceDatabaseName());
+        DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(mapinfo.getSourceDatabaseName());
 
         List<MapInfoDetail> mapInfoDetails = exchangeMapInfoManager.resolveSQL(databaseInfo, mapinfo.getQuerySql());
 

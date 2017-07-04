@@ -1,22 +1,19 @@
 package com.centit.dde.service.impl;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
-
+import com.centit.dde.dao.MapinfoTriggerDao;
 import com.centit.dde.po.MapInfoTrigger;
-import com.centit.dde.po.MapinfoTriggerId;
-
+import com.centit.dde.po.MapInfoTriggerId;
+import com.centit.dde.service.MapInfoTriggerManager;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
-import com.centit.dde.dao.MapinfoTriggerDao;
-import com.centit.dde.service.MapInfoTriggerManager;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 @Service
-public class MapInfoTriggerManagerImpl extends BaseEntityManagerImpl<MapInfoTrigger,MapinfoTriggerId,MapinfoTriggerDao>
+public class MapInfoTriggerManagerImpl extends BaseEntityManagerImpl<MapInfoTrigger,MapInfoTriggerId,MapinfoTriggerDao>
         implements MapInfoTriggerManager {
     public static final Log log = LogFactory.getLog(MapInfoTriggerManager.class);
 

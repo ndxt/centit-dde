@@ -5,7 +5,7 @@ import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.po.OsInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.framework.staticsystem.service.IntegrationEnvironment;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +31,7 @@ public class PlatformController extends BaseController {
     private static final Log log = LogFactory.getLog(ExchangeMapInfoController.class);
 
     @Resource
-    protected StaticEnvironmentManager platformEnvironment;
+    protected IntegrationEnvironment integrationEnvironment;
 
     /**
      * 获取业务系统列表
@@ -37,7 +40,7 @@ public class PlatformController extends BaseController {
      */
     @RequestMapping(value = "/listOs", method = RequestMethod.GET)
     public void listOs(HttpServletRequest request, HttpServletResponse response) {
-        List<OsInfo> dbList = platformEnvironment.listOsInfos();
+        List<OsInfo> dbList = integrationEnvironment.listOsInfos();
         JsonResultUtils.writeSingleDataJson(dbList, response);
     }
 
@@ -49,7 +52,7 @@ public class PlatformController extends BaseController {
     @RequestMapping(value="/listDb" ,method = {RequestMethod.GET})
     public void listDb(HttpServletRequest request,HttpServletResponse response) {
 
-        List<DatabaseInfo> dbList = platformEnvironment.listDatabaseInfo();
+        List<DatabaseInfo> dbList = integrationEnvironment.listDatabaseInfo();
         JsonResultUtils.writeSingleDataJson(dbList, response);
     }
 
@@ -65,7 +68,7 @@ public class PlatformController extends BaseController {
         Connection connection = null;
         if(databaseCode != null && !"".equals(databaseCode)){
             try {
-                DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(databaseCode);
+                DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(databaseCode);
                 if (databaseInfo != null) {
                     connection = ConnPool.getConn(databaseInfo);
                     DatabaseMetaData metaData = connection.getMetaData();
@@ -94,7 +97,7 @@ public class PlatformController extends BaseController {
         List<Map<String, String>> fieldList = new ArrayList<>();
         Connection connection = null;
         if(databaseCode != null && !"".equals(databaseCode)) {
-            DatabaseInfo databaseInfo = platformEnvironment.getDatabaseInfo(databaseCode);
+            DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(databaseCode);
             if (databaseInfo != null) {
                 try {
                     connection = ConnPool.getConn(databaseInfo);

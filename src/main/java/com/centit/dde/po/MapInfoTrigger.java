@@ -18,7 +18,7 @@ public class MapInfoTrigger implements java.io.Serializable {
     @Column(name="CID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
-    private MapinfoTriggerId cid;
+    private MapInfoTriggerId cid;
 
     @Column(name="TRIGGER_SQL")
     private String triggerSql;
@@ -149,7 +149,7 @@ public class MapInfoTrigger implements java.io.Serializable {
     /**
      * minimal constructor
      */
-    public MapInfoTrigger(MapinfoTriggerId id
+    public MapInfoTrigger(MapInfoTriggerId id
 
     ) {
         this.cid = id;
@@ -160,7 +160,7 @@ public class MapInfoTrigger implements java.io.Serializable {
     /**
      * full constructor
      */
-    public MapInfoTrigger(MapinfoTriggerId id
+    public MapInfoTrigger(MapInfoTriggerId id
 
             , String triggerSql, String triggerDesc, String triggerType, String triggerTime, String triggerDatabase, Long tiggerOrder, String isprocedure) {
         this.cid = id;
@@ -175,35 +175,35 @@ public class MapInfoTrigger implements java.io.Serializable {
         this.isprocedure = isprocedure;
     }
 
-    public MapinfoTriggerId getCid() {
+    public MapInfoTriggerId getCid() {
         return this.cid;
     }
 
-    public void setCid(MapinfoTriggerId id) {
+    public void setCid(MapInfoTriggerId id) {
         this.cid = id;
     }
 
     public Long getTriggerId() {
         if (this.cid == null)
-            this.cid = new MapinfoTriggerId();
+            this.cid = new MapInfoTriggerId();
         return this.cid.getTriggerId();
     }
 
     public void setTriggerId(Long triggerId) {
         if (this.cid == null)
-            this.cid = new MapinfoTriggerId();
+            this.cid = new MapInfoTriggerId();
         this.cid.setTriggerId(triggerId);
     }
 
     public Long getMapinfoId() {
         if (this.cid == null)
-            this.cid = new MapinfoTriggerId();
+            this.cid = new MapInfoTriggerId();
         return this.cid.getMapinfoId();
     }
 
     public void setMapinfoId(Long mapinfoId) {
         if (this.cid == null)
-            this.cid = new MapinfoTriggerId();
+            this.cid = new MapInfoTriggerId();
         this.cid.setMapinfoId(mapinfoId);
     }
 

@@ -223,7 +223,48 @@ public class ExchangeMapInfo implements java.io.Serializable {
      * 替换子类对象数组，这个函数主要是考虑hibernate中的对象的状态，以避免对象状态不一致的问题
      */
     public void replaceMapinfoDetails(List<MapInfoDetail> mapInfoDetails) {
-
+//        List<MapInfoDetail> newObjs = new ArrayList<>();
+//        for (MapInfoDetail p : mapInfoDetails) {
+//            if (p == null) {
+//                continue;
+//            }
+//            MapInfoDetail newdt = new MapInfoDetail();
+//            newdt.copyNotNullProperty(p);
+//            newObjs.add(newdt);
+//        }
+//        // delete
+//        boolean found = false;
+//        Set<DataOptStep> oldObjs = new HashSet<>();
+//        oldObjs.addAll(getDataOptSteps());
+//
+//        for (Iterator<DataOptStep> it = oldObjs.iterator(); it.hasNext(); ) {
+//            DataOptStep odt = it.next();
+//            found = false;
+//            for (DataOptStep newdt : newObjs) {
+//                if (odt.getOptStepId().equals(newdt.getOptStepId())) {
+//                    found = true;
+//                    break;
+//                }
+//            }
+//            if (!found) {
+//                removeDataOptStep(odt);
+//            }
+//        }
+//        oldObjs.clear();
+//        // insert or update
+//        for (DataOptStep newdt : newObjs) {
+//            found = false;
+//            for (Iterator<DataOptStep> it = getDataOptSteps().iterator(); it.hasNext(); ) {
+//                DataOptStep odt = it.next();
+//                if (odt.getOptStepId().equals(newdt.getOptStepId())) {
+//                    odt.copy(newdt);
+//                    found = true;
+//                    break;
+//                }
+//            }
+//            if (!found)
+//                addDataOptStep(newdt);
+//        }
     }
 
     public void replaceMapinfoTrrigers(List<MapInfoTrigger> mapInfoTriggers) {

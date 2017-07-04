@@ -9,7 +9,7 @@ import com.centit.dde.util.ConnPool;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.framework.staticsystem.service.IntegrationEnvironment;
 import com.centit.support.database.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,7 +44,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
     private ExportFieldManager exportFieldManager;
 
     @Resource
-    protected StaticEnvironmentManager platformEnvironment;
+    protected IntegrationEnvironment integrationEnvironment;
     
     @Resource(name="exportSqlDao")
     @NotNull
@@ -60,7 +60,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public void saveObject(ExportSql object, IUserInfo userDetail) {
-        DatabaseInfo dbinfo =  platformEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
+        DatabaseInfo dbinfo =  integrationEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
         try {
             checkObject(object);
             object.setSourceOsId(dbinfo.getOsId());
@@ -100,7 +100,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public List<ExportField> listExportFieldsByQuerysql(ExportSql object) throws SqlResolveException {
-        DatabaseInfo dbinfo =  platformEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
+        DatabaseInfo dbinfo =  integrationEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
 
         validateSql(object.getQuerySql(), dbinfo);
 
@@ -138,7 +138,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
         }
         object.setQuerySql(object.getQuerySql().toUpperCase());
 
-        DatabaseInfo dbInfo =  platformEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
+        DatabaseInfo dbInfo =  integrationEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
         if (null == dbInfo) {
             log.error("数据库信息错误");
             throw new SqlResolveException(10002);

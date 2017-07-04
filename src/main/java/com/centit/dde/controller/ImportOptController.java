@@ -9,7 +9,6 @@ import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,9 +35,6 @@ public class ImportOptController extends BaseController {
 
     @Resource
     private ImportOptManager importOptManager;
-
-    @Resource
-    protected StaticEnvironmentManager platformEnvironment;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {

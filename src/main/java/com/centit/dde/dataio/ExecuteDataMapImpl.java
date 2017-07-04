@@ -17,7 +17,7 @@ import com.centit.dde.ws.WsDataException;
 import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.po.OsInfo;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
+import com.centit.framework.staticsystem.service.IntegrationEnvironment;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.QueryUtils;
 import org.apache.commons.logging.Log;
@@ -40,7 +40,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
     private static final Log logger = LogFactory.getLog(ExecuteDataMapImpl.class);
 
     @Resource
-    protected StaticEnvironmentManager platformEnvironment;
+    protected IntegrationEnvironment integrationEnvironment;
     //private static boolean debugEnabled = logger.isDebugEnabled();
 
     private DataOptInfoDao dataOptInfoDao;
@@ -143,7 +143,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
                 msg = "执行WebService接口导入操作...";
                 logger.info(msg);
                 TaskConsoleWriteUtils.write(taskId, msg);
-                OsInfo osInfo = platformEnvironment.getOsInfo(optStep.getOsId());
+                OsInfo osInfo = integrationEnvironment.getOsInfo(optStep.getOsId());
                 if (osInfo != null) {
                     doCallWebService(xmlData, osInfo, taskLogId);
                 } else {
@@ -453,7 +453,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         String sLastErrorMsg = "";
         Date endTime = null;
 
-        DatabaseInfo dbInfo = platformEnvironment.getDatabaseInfo(importOpt.getDestDatabaseName());
+        DatabaseInfo dbInfo = integrationEnvironment.getDatabaseInfo(importOpt.getDestDatabaseName());
 
         SQLException se = null;
         try {
@@ -707,7 +707,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
                     + columnName + " keyDesc = " + keyDesc);
         }
 
-        DatabaseInfo dbInfo = platformEnvironment.getDatabaseInfo(database);
+        DatabaseInfo dbInfo = integrationEnvironment.getDatabaseInfo(database);
         if (null == dbInfo) {
             logger.error(SysParametersUtils.getStringValue("ERR-20002","ERR-20002"));
             throw new WsDataException(20002, null);
@@ -739,5 +739,4 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
             throw new WsDataException(-1, e.getMessage(), e);
         }
     }
-
 }

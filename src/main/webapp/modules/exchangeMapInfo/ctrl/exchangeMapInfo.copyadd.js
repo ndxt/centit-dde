@@ -7,6 +7,9 @@ define(function(require) {
 	var ExchangeMapInfoDetailRemove = require('../ctrl/exchangeMapInfoDetail.remove');
 	var ExchangeMapInfoDetailAdd2 = require('../ctrl/exchangeMapInfoDetail.add2');
 	var ExchangeMapInfoDetailRemove2 = require('../ctrl/exchangeMapInfoDetail.remove2');
+	var ExchangeMapInfoTriggerAdd = require("../ctrl/exchangeMapInfoTrigger.add");
+	var ExchangeMapInfoTriggerEdit = require("../ctrl/exchangeMapInfoTrigger.edit");
+	var ExchangeMapInfoTriggerRemove = require("../ctrl/exchangeMapInfoTrigger.remove");
 
 	var ExchangeMapInfoEdit = Page.extend(function() {
 		var _self = this;
@@ -17,6 +20,9 @@ define(function(require) {
 			new ExchangeMapInfoDetailRemove('source_detail_remove'),
 			new ExchangeMapInfoDetailAdd2('dest_detail_add'),
 			new ExchangeMapInfoDetailRemove2('dest_detail_remove'),
+			new ExchangeMapInfoTriggerAdd('exchangeMapInfoTrigger_add'),
+			new ExchangeMapInfoTriggerEdit('exchangeMapInfoTrigger_edit'),
+			new ExchangeMapInfoTriggerRemove('exchangeMapInfoTrigger_remove')
 		]);
 
 		// @override
@@ -41,7 +47,7 @@ define(function(require) {
 					data:data.mapInfoDetails,
 					dragSelection: true,
 					onLoadSuccess:function(){
-						// $(this).datagrid('enableDnd');
+						$(this).datagrid('enableDnd');
 					}
 				});
 				var destTable = panel.find('table.dest');
@@ -51,7 +57,7 @@ define(function(require) {
 					data:data.mapInfoDetails,
 					dragSelection: true,
 					onLoadSuccess:function(){
-						// destTable.datagrid('enableDnd');
+						$(this).datagrid('enableDnd');
 					}
 				});
 				var tab2table = panel.find('table.trigger');
@@ -71,7 +77,7 @@ define(function(require) {
 			$.extend(data,formData);
 			var isValid = form.form('validate');
 			if (isValid) {
-				var mapInfoDetails = panel.find('table.tab1').datagrid("getData").rows;
+				var mapInfoDetails = panel.find('.source').datagrid("getData").rows;
 				data.mapInfoDetails = mapInfoDetails;
 				Core.ajax(Config.ContextPath + 'service/exchangemapinfo/save/' + data.mapInfoId, {
 					data: data,

@@ -1,8 +1,8 @@
 define(function(require) {
-	var Page = require('core/page') //Page是基础公共控制器，提供了一些公共方法，所有的子页面控制器都必须引用并继承它。
+    require('datagrid-dnd');
+    var Page = require('core/page') //Page是基础公共控制器，提供了一些公共方法，所有的子页面控制器都必须引用并继承它。
     var Config = require('config');
     var Core = require('core/core');
-//    require(datagrid-dnd);
 
 /*  加载角色编辑控制器 require('./roleinfo.edit')   调用injecte方法注入该控制器的实例  */
     

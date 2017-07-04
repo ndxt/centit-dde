@@ -20,16 +20,16 @@ public class ExchangeMapinfoDao extends BaseDaoImpl<ExchangeMapInfo,Long> {
     @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {
-            filterField = new HashMap<String, String>();
+            filterField = new HashMap<>();
 
-            filterField.put("mapinfoId", CodeBook.EQUAL_HQL_ID);
+            filterField.put("mapInfoId", CodeBook.EQUAL_HQL_ID);
 
-            filterField.put("mapinfoIdNot", "mapinfoId not in (select e.cid.mapinfoId from ExchangeTaskDetail e where e.cid.taskId=? )");
+            filterField.put("mapInfoIdNot", "mapInfoId not in (select e.cid.mapInfoId from ExchangeTaskDetail e where e.cid.taskId=? )");
 
             filterField.put("destDatabaseName", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("mapinfoName", CodeBook.LIKE_HQL_ID);
-            filterField.put("mapinfoNameEq", "mapinfoName = ?");
+            filterField.put("mapInfoName", CodeBook.LIKE_HQL_ID);
+            filterField.put("mapInfoNameEq", "mapInfoName = ?");
 
             filterField.put("querySql", CodeBook.LIKE_HQL_ID);
 
@@ -39,9 +39,9 @@ public class ExchangeMapinfoDao extends BaseDaoImpl<ExchangeMapInfo,Long> {
 
             filterField.put("isRepeat", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("mapinfoDesc", CodeBook.LIKE_HQL_ID);
+            filterField.put("mapInfoDesc", CodeBook.LIKE_HQL_ID);
 
-            filterField.put(CodeBook.ORDER_BY_HQL_ID, "mapinfoId");
+            filterField.put(CodeBook.ORDER_BY_HQL_ID, "mapInfoId");
 
         }
         return filterField;
@@ -54,12 +54,12 @@ public class ExchangeMapinfoDao extends BaseDaoImpl<ExchangeMapInfo,Long> {
         //return this.getHibernateTemplate().getSessionFactory().openSession().createSQLQuery("select t.databaseName from DatabaseInfo t").list();
     }
 
-    public List<ExchangeMapInfo> listImportExchangeMapinfo(List<Long> mapinfoId) {
-        if (mapinfoId.size() == 0) {
-            mapinfoId.add(Long.valueOf(-1));
+    public List<ExchangeMapInfo> listImportExchangeMapinfo(List<Long> mapInfoId) {
+        if (mapInfoId.size() == 0) {
+            mapInfoId.add(Long.valueOf(-1));
         }
-        String hql = "from ExchangeMapInfo e where e.mapinfoId not in (?)";
-        return this.listObjects(hql, (Object) mapinfoId);
+        String hql = "from ExchangeMapInfo e where e.mapInfoId not in (?)";
+        return this.listObjects(hql, (Object) mapInfoId);
     }
 
     public Long getNextLongSequence() {
@@ -75,12 +75,12 @@ public class ExchangeMapinfoDao extends BaseDaoImpl<ExchangeMapInfo,Long> {
 
     @SuppressWarnings("unchecked")
     public List<ExchangeMapInfo> listObjectExcludeUsed(final Map<String, Object> filterMap, final PageDesc pageDesc) {
-        final String hql = "from ExchangeMapInfo ma where not exists (select m.mapinfoId from ExchangeMapInfo m, ExchangeTask t " +
+        final String hql = "from ExchangeMapInfo ma where not exists (select m.mapInfoId from ExchangeMapInfo m, ExchangeTask t " +
                 " join m.exchangeTaskdetails etd " +
-                " where ma.mapinfoId = m.mapinfoId and etd.cid.mapinfoId = m.mapinfoId and etd.cid.taskId = t.taskId" +
+                " where ma.mapInfoId = m.mapInfoId and etd.cid.mapInfoId = m.mapInfoId and etd.cid.taskId = t.taskId" +
                 " and etd.cid.taskId = :taskId )";
        /* pageDesc.setTotalRows( Long.valueOf( DatabaseOptUtils.getSingleIntByHql(this,
-                "select count(ma.mapinfoId) " + hql)).intValue()
+                "select count(ma.mapInfoId) " + hql)).intValue()
                 );*/
         return (List<ExchangeMapInfo>)DatabaseOptUtils.findObjectsByHql(this, "select ma " + hql,
                 QueryUtils.createSqlParamsMap(

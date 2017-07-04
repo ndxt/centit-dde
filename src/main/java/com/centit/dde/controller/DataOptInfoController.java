@@ -6,7 +6,6 @@ import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
-import com.centit.framework.staticsystem.service.StaticEnvironmentManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
@@ -27,9 +26,6 @@ public class DataOptInfoController extends BaseController {
 
     @Resource
     private DataOptInfoManager dataOptInfoManager;
-
-    @Resource
-    protected StaticEnvironmentManager platformEnvironment;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
@@ -61,5 +57,4 @@ public class DataOptInfoController extends BaseController {
 
         JsonResultUtils.writeSuccessJson(response);
     }
-
 }

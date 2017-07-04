@@ -1,7 +1,7 @@
 package com.centit.dde.dao;
 
 import com.centit.dde.po.MapInfoTrigger;
-import com.centit.dde.po.MapinfoTriggerId;
+import com.centit.dde.po.MapInfoTriggerId;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class MapinfoTriggerDao extends BaseDaoImpl<MapInfoTrigger,MapinfoTriggerId> {
+public class MapinfoTriggerDao extends BaseDaoImpl<MapInfoTrigger,MapInfoTriggerId> {
 
     public static final Log log = LogFactory.getLog(MapinfoTriggerDao.class);
     @Override

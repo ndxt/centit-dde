@@ -13,7 +13,6 @@ import javax.servlet.ServletRegistration;
  * Created by zou_wy on 2017/3/29.
  */
 
-
 public class WebInitializer implements WebApplicationInitializer {
 
 
@@ -27,7 +26,7 @@ public class WebInitializer implements WebApplicationInitializer {
 
     private void initializeSpringConfig(ServletContext servletContext){
         AnnotationConfigWebApplicationContext springContext = new AnnotationConfigWebApplicationContext();
-        springContext.scan("com.centit");
+        springContext.register(BeanConfig.class);
         servletContext.addListener(new ContextLoaderListener(springContext));
     }
 
