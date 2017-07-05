@@ -78,36 +78,18 @@
 		</dependency>	
 	
 		<!-- server runtime library -->
+
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
+			<version>3.1.0</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>com.sun</groupId>
-			<artifactId>tools</artifactId>
-			<version>1.7.0</version>
-			<systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
-			<scope>system</scope>
-		</dependency>
-		<!-- <systemPath>${java.home}/../lib/tools.jar</systemPath> C:/develop/jvm/jdk1_7_0_60/lib/tools.jar 
-			${JAVA_HOME} /lib/tools.jar ${java.home}/lib/tools.jar ${env.JAVA_HOME}/lib/tools.jar -->
 	</dependencies>
-    <distributionManagement>
-		<repository>
-			<id>centit-releases</id>
-			<name>centit-release</name>
-			<url>http://develop.centit.com:8080/nexus/content/repositories/centit-releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>centit-snapshots</id>
-			<name>centit-snapshots</name>
-			<url>http://develop.centit.com:8080/nexus/content/repositories/centit-snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement> 
+
+
 	<build>
+		<!-- maven 打包时包含Hibernate配置文件 -->
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -119,17 +101,31 @@
 				<directory>src/main/webapp</directory>
 				<excludes>
 					<exclude>WEB-INF/*</exclude>
-					<exclude>spring-plugins/*.xml</exclude>
 				</excludes>
 				<targetPath>META-INF/resources/</targetPath>
 			</resource>
 		</resources>
+
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>UTF-8</encoding>
+					<compilerArguments>
+						<verbose />
+						<bootclasspath>${java.home}/lib/rt.jar</bootclasspath>
+					</compilerArguments>
+					<debug>true</debug>
+					<!--  <debuglevel>lines,vars,source</debuglevel> none -->
+				</configuration>
+			</plugin>
 			<!-- 打包时添加源码 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.4</version>  
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -139,51 +135,15 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-compiler-plugin</artifactId>
+				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>UTF-8</encoding>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
 			</plugin>
-      </plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.maven.plugins
-										</groupId>
-										<artifactId>
-											maven-resources-plugin
-										</artifactId>
-										<versionRange>
-											[2.6,)
-										</versionRange>
-										<goals>
-											<goal>testResources</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-    </build>
+		</plugins>
+
+	</build>
 </project>
