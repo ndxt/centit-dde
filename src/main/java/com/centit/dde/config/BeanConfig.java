@@ -8,16 +8,17 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
-@EnableScheduling
 @EnableAsync
+@EnableScheduling
 @Import({SpringConfig.class, DataSourceConfig.class})
 @ComponentScan(basePackages={"com.centit.dde"},
-        excludeFilters={@ComponentScan.Filter(type= FilterType.ANNOTATION,
-                value=org.springframework.stereotype.Controller.class)})
-public class BeanConfig  {
+        excludeFilters=@ComponentScan.Filter(value=org.springframework.stereotype.Controller.class))
+public class BeanConfig {
     @Bean(initMethod = "initialEnvironment")
     @Lazy(value = false)
     public InitialWebRuntimeEnvironment initialEnvironment() {
         return new InitialWebRuntimeEnvironment();
     }
+
+
 }

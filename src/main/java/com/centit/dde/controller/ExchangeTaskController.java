@@ -173,18 +173,18 @@ public class ExchangeTaskController extends BaseController {
 
         if(taskType.equals("1")){
             for (ExchangeTaskDetail etd : exchangeTaskDetails) {
-                ExchangeMapInfo exchangeMapInfo = exchangeMapInfoManager.getObjectById(etd.getMapinfoId());
+                ExchangeMapInfo exchangeMapInfo = exchangeMapInfoManager.getObjectById(etd.getMapInfoId());
                 if (null != exchangeMapInfo) {
-                    exchangeMapInfo.setMapInfoOrder(etd.getMapinfoOrder());
+                    exchangeMapInfo.setMapInfoOrder(etd.getMapInfoOrder());
                     exchangeMapInfoList.add(exchangeMapInfo);
                 }
             }
             exchangeTask.setExchangeMapInfoList(exchangeMapInfoList);
         }else{
             for (ExchangeTaskDetail etd : exchangeTaskDetails) {
-                ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapinfoId());
+                ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapInfoId());
                 if (null != exportSql) {
-                    exportSql.setExportsqlOrder(etd.getMapinfoOrder());
+                    exportSql.setExportsqlOrder(etd.getMapInfoOrder());
                     exportSqlList.add(exportSql);
                 }
             }
@@ -203,9 +203,9 @@ public class ExchangeTaskController extends BaseController {
         List<ExchangeMapInfo> echangeMapInfoList = new ArrayList<>();
 
         for (ExchangeTaskDetail etd : exchangeTaskDetails) {
-            ExchangeMapInfo exchangeMapInfo = exchangeMapInfoManager.getObjectById(etd.getMapinfoId());
+            ExchangeMapInfo exchangeMapInfo = exchangeMapInfoManager.getObjectById(etd.getMapInfoId());
             if (null != exchangeMapInfo) {
-                exchangeMapInfo.setMapInfoOrder(etd.getMapinfoOrder());
+                exchangeMapInfo.setMapInfoOrder(etd.getMapInfoOrder());
                 echangeMapInfoList.add(exchangeMapInfo);
             }
         }
@@ -218,9 +218,9 @@ public class ExchangeTaskController extends BaseController {
         List<ExportSql> exportSqlList = new ArrayList<>();
 
         for (ExchangeTaskDetail etd : exchangeTaskDetails) {
-            ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapinfoId());
+            ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapInfoId());
             if (null != exportSql) {
-                exportSql.setExportsqlOrder(etd.getMapinfoOrder());
+                exportSql.setExportsqlOrder(etd.getMapInfoOrder());
                 exportSqlList.add(exportSql);
             }
         }
@@ -357,8 +357,8 @@ public class ExchangeTaskController extends BaseController {
                 Long mapInfoId = Long.valueOf(mapinfoIdAry[i]);
                 exchangeTaskDetail = new ExchangeTaskDetail();
                 exchangeTaskDetail.setTaskId(object.getTaskId());
-                exchangeTaskDetail.setMapinfoId(mapInfoId);
-                exchangeTaskDetail.setMapinfoOrder(Long.valueOf(i + 1));
+                exchangeTaskDetail.setMapInfoId(mapInfoId);
+                exchangeTaskDetail.setMapInfoOrder(Long.valueOf(i + 1));
 
                 exchangeTaskdetailManager.saveObject(exchangeTaskDetail);
             }
@@ -378,9 +378,9 @@ public class ExchangeTaskController extends BaseController {
         List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailManager.listObjects(filterMap);
         List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
         for (ExchangeTaskDetail etd : exchangeTaskDetails) {
-            ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapinfoId());
+            ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapInfoId());
             if (null != exportSql) {
-                exportSql.setExportsqlOrder(etd.getMapinfoOrder());
+                exportSql.setExportsqlOrder(etd.getMapInfoOrder());
                 exportSqlList.add(exportSql);
             }
         }
@@ -410,9 +410,9 @@ public class ExchangeTaskController extends BaseController {
         List<ExchangeMapInfo> exchangeMapInfoList = new ArrayList<ExchangeMapInfo>();
         List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
         for (ExchangeTaskDetail etd : exchangeTaskDetails) {
-            ExchangeMapInfo exchangeMapInfo = exchangeMapInfoManager.getObjectById(etd.getMapinfoId());
+            ExchangeMapInfo exchangeMapInfo = exchangeMapInfoManager.getObjectById(etd.getMapInfoId());
             if (null != exchangeMapInfo) {
-                exchangeMapInfo.setMapInfoOrder(etd.getMapinfoOrder());
+                exchangeMapInfo.setMapInfoOrder(etd.getMapInfoOrder());
                 exchangeMapInfoList.add(exchangeMapInfo);
             }
         }
@@ -490,13 +490,13 @@ public class ExchangeTaskController extends BaseController {
         if(exchangeTaskDetails.size() == 0){
             mapinfoOrder = (long) 1;
         }else if(exchangeTaskDetails.size() == 1){
-            mapinfoOrder = exchangeTaskDetails.get(0).getMapinfoOrder();
+            mapinfoOrder = exchangeTaskDetails.get(0).getMapInfoOrder();
         }else{
             for(int i = 1; i< exchangeTaskDetails.size(); i++){
-                 if(exchangeTaskDetails.get(i-1).getMapinfoOrder() <= exchangeTaskDetails.get(i).getMapinfoOrder()){
-                     mapinfoOrder = exchangeTaskDetails.get(i).getMapinfoOrder() + 1;
+                 if(exchangeTaskDetails.get(i-1).getMapInfoOrder() <= exchangeTaskDetails.get(i).getMapInfoOrder()){
+                     mapinfoOrder = exchangeTaskDetails.get(i).getMapInfoOrder() + 1;
                  }else{
-                     mapinfoOrder = exchangeTaskDetails.get(i-1).getMapinfoOrder() + 1;
+                     mapinfoOrder = exchangeTaskDetails.get(i-1).getMapInfoOrder() + 1;
                  }
             }
         }
@@ -506,9 +506,9 @@ public class ExchangeTaskController extends BaseController {
         for (String s : str) {
             if (NumberUtils.isNumber(s)) {
                 ExchangeTaskDetail excTD = new ExchangeTaskDetail();
-                excTD.setMapinfoId(Long.parseLong(s));
+                excTD.setMapInfoId(Long.parseLong(s));
                 excTD.setTaskId(taskId);
-                excTD.setMapinfoOrder(mapinfoOrder);
+                excTD.setMapInfoOrder(mapinfoOrder);
                 exchangeTaskdetailManager.saveNewObject(excTD);
                 mapinfoOrder =mapinfoOrder + 1;//mapinfoOrder自增长
             }

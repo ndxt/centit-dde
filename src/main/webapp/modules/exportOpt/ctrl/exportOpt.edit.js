@@ -28,19 +28,19 @@ define(function(require) {
 			}).then(function(data) {
 				_self.data = data;
 				form.form('disableValidation')
-					.form('load', data.exportSql)
+					.form('load', data)
 					.form('focus');
 				var tab1table = panel.find('table.tab1');
 				tab1table.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.exportSql.exportFields
+					data:data.exportFields
 				});
 				var tab2table = panel.find('table.tab2');
 				tab2table.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.exportSql.exportTriggers
+					data:data.exportTriggers
 				});
 			});
 			var databaseCode = "";

@@ -22,7 +22,7 @@ public class MapInfoTriggerId implements java.io.Serializable {
 
     @Column(name="MAPINFO_ID")
     @NotBlank(message = "字段不能为空")
-    private Long mapinfoId;
+    private Long mapInfoId;
 
     // Constructors
 
@@ -35,10 +35,10 @@ public class MapInfoTriggerId implements java.io.Serializable {
     /**
      * full constructor
      */
-    public MapInfoTriggerId(Long triggerId, Long mapinfoId) {
+    public MapInfoTriggerId(Long triggerId, Long mapInfoId) {
 
         this.triggerId = triggerId;
-        this.mapinfoId = mapinfoId;
+        this.mapInfoId = mapInfoId;
     }
 
 
@@ -50,12 +50,12 @@ public class MapInfoTriggerId implements java.io.Serializable {
         this.triggerId = triggerId;
     }
 
-    public Long getMapinfoId() {
-        return this.mapinfoId;
+    public Long getMapInfoId() {
+        return this.mapInfoId;
     }
 
-    public void setMapinfoId(Long mapinfoId) {
-        this.mapinfoId = mapinfoId;
+    public void setMapInfoId(Long mapInfoId) {
+        this.mapInfoId = mapInfoId;
     }
 
 
@@ -74,9 +74,9 @@ public class MapInfoTriggerId implements java.io.Serializable {
                 (this.getTriggerId() != null && castOther.getTriggerId() != null
                         && this.getTriggerId().equals(castOther.getTriggerId())));
 
-        ret = ret && (this.getMapinfoId() == castOther.getMapinfoId() ||
-                (this.getMapinfoId() != null && castOther.getMapinfoId() != null
-                        && this.getMapinfoId().equals(castOther.getMapinfoId())));
+        ret = ret && (this.getMapInfoId() == castOther.getMapInfoId() ||
+                (this.getMapInfoId() != null && castOther.getMapInfoId() != null
+                        && this.getMapInfoId().equals(castOther.getMapInfoId())));
 
         return ret;
     }
@@ -88,7 +88,7 @@ public class MapInfoTriggerId implements java.io.Serializable {
                 (this.getTriggerId() == null ? 0 : this.getTriggerId().hashCode());
 
         result = 37 * result +
-                (this.getMapinfoId() == null ? 0 : this.getMapinfoId().hashCode());
+                (this.getMapInfoId() == null ? 0 : this.getMapInfoId().hashCode());
 
         return result;
     }

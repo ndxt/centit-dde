@@ -302,7 +302,7 @@ public class ExportSql implements java.io.Serializable {
      */
 
     public void replaceExportTriggers(List<ExportTrigger> exportTriggers) {
-        List<ExportTrigger> newObjs = new ArrayList<ExportTrigger>();
+        List<ExportTrigger> newObjs = new ArrayList<>();
         for (ExportTrigger p : exportTriggers) {
             if (p == null)
                 continue;
@@ -312,7 +312,7 @@ public class ExportSql implements java.io.Serializable {
         }
         // delete
         boolean found = false;
-        Set<ExportTrigger> oldObjs = new HashSet<ExportTrigger>();
+        Set<ExportTrigger> oldObjs = new HashSet<>();
         oldObjs.addAll(getExportTriggers());
 
         for (Iterator<ExportTrigger> it = oldObjs.iterator(); it.hasNext(); ) {
@@ -436,7 +436,7 @@ public class ExportSql implements java.io.Serializable {
     public ExchangeTaskDetail newExchangeTaskdetail() {
         ExchangeTaskDetail res = new ExchangeTaskDetail();
 
-        res.setMapinfoId(this.getExportId());
+        res.setMapInfoId(this.getExportId());
 
         return res;
     }

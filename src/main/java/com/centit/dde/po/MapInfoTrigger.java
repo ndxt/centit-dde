@@ -198,13 +198,13 @@ public class MapInfoTrigger implements java.io.Serializable {
     public Long getMapinfoId() {
         if (this.cid == null)
             this.cid = new MapInfoTriggerId();
-        return this.cid.getMapinfoId();
+        return this.cid.getMapInfoId();
     }
 
     public void setMapinfoId(Long mapinfoId) {
         if (this.cid == null)
             this.cid = new MapInfoTriggerId();
-        this.cid.setMapinfoId(mapinfoId);
+        this.cid.setMapInfoId(mapinfoId);
     }
 
 

@@ -25,7 +25,7 @@
 			</div>
 			<div class="unit">
 				<label>表名：</label>
-				<input name="s_soueceTableName" size="20"  value="${param['s_soueceTableName']}" type="text" Class="required  soueceTableName" />
+				<input name="s_soueceTableName" size="20"  value="${param['s_soueceTableName']}" type="text" Class="required  sourceTableName" />
 				
 				
 				<label style="width:60px">请选择:</label>
@@ -102,7 +102,7 @@
 	  }
 	  $('.table', $.pdialog.getCurrent()).change(function(event){
 		  $(".datasource").val($(this).val());
-		  $(".soueceTableName").val($(this).val());
+		  $(".sourceTableName").val($(this).val());
 		  $("#defSourceDataFrom").attr("action","${pageContext.request.contextPath}/dde/mapInfoDetail!addAndsaveMapinfoDatails.do?s_type=reinitsource&s_method=updateSourceColumnSentence");
 		  		  
 	  });

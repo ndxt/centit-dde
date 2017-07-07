@@ -15,13 +15,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 import java.sql.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class ExchangeMapInfoManagerImpl
@@ -124,44 +126,45 @@ public class ExchangeMapInfoManagerImpl
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public void save(ExchangeMapInfo object) {
-        object.setMapInfoName(object.getMapInfoName().trim());
 
         //判断交换名称的唯一性
-        Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("mapInfoNameEq", object.getMapInfoName());
-
-        List<ExchangeMapInfo> listObjects = listObjects(filterMap);
-
-        if (!CollectionUtils.isEmpty(listObjects)) {
-            ExchangeMapInfo exchangeMapInfoDb = getObjectById(object.getMapInfoId());
-            String message = "交换名称已存在";
-            if (null == exchangeMapInfoDb) {
-                log.error(message);
-            } else {
-                if (1 < listObjects.size() || !exchangeMapInfoDb.getMapInfoId().equals(listObjects.get(0).getMapInfoId())) {
-                    log.error(message);
-                }
-            }
-        }
-        try {
-            validator(object);
-        }catch (SqlResolveException e){
-            log.error("");
-        }
+//        Map<String, Object> filterMap = new HashMap<>();
+//        filterMap.put("mapInfoNameEq", object.getMapInfoName());
+//
+//        List<ExchangeMapInfo> exchangeMapInfos = listObjects(filterMap);
+//
+//        if (!CollectionUtils.isEmpty(exchangeMapInfos)) {
+//            ExchangeMapInfo exchangeMapInfoDb = getObjectById(object.getMapInfoId());
+//            String message = "交换名称已存在";
+//            if (null == exchangeMapInfoDb) {
+//                log.error(message);
+//            } else {
+//                if (1 < exchangeMapInfos.size() || !exchangeMapInfoDb.getMapInfoId().equals(exchangeMapInfos.get(0).getMapInfoId())) {
+//                    log.error(message);
+//                }
+//            }
+//        }
+//        try {
+//            validator(object);
+//        }catch (SqlResolveException e){
+//            log.error("");
+//        }
         ExchangeMapInfo dbObject = exchangeMapinfoDao.getObjectById(object.getMapInfoId());
         if (null == dbObject) {
             object.setMapInfoId(exchangeMapinfoDao.getNextLongSequence());
-            setFieldTriggerCid(object);
+//            setFieldTriggerCid(object);
+            saveNewObject(object);
         } else {
-            dbObject.copyNotNullProperty(object);
+//            dbObject.copyNotNullProperty(object);
+//
+//            dbObject.replaceMapInfoDetails(object.getMapInfoDetails());
+//            dbObject.replaceMapInfoTriggers(object.getMapInfoTriggers());
 
-            dbObject.replaceMapinfoDetails(object.getMapInfoDetails());
-            dbObject.replaceMapinfoTrrigers(object.getMapInfoTriggers());
-
-            setFieldTriggerCid(dbObject);
-            object=dbObject;
+            setFieldTriggerCid(object);
+//            object=dbObject;
+            updateObject(dbObject);
         }
-        saveObject(object);
+
     }
 
     @Override
@@ -176,7 +179,7 @@ public class ExchangeMapInfoManagerImpl
         for (int i = 0; i < object.getMapInfoDetails().size(); i++) {
             md = object.getMapInfoDetails().get(i);
 
-            md.setCid(new MapinfoDetailId(object.getMapInfoId(), (long) i));
+            md.setCid(new MapInfoDetailId(object.getMapInfoId(), (long) i));
         }
         for (int i = 0; i < object.getMapInfoTriggers().size(); i++) {
             mt = object.getMapInfoTriggers().get(i);
@@ -202,7 +205,7 @@ public class ExchangeMapInfoManagerImpl
                 for(int i = 0; i < rsmd.getColumnCount(); i++){
                     MapInfoDetail mapInfoDetail = new MapInfoDetail();
                     mapInfoDetail.getCid().setColumnNo((long)(i-1));
-                    mapInfoDetail.setSoueceTableName(rsmd.getTableName(i));
+                    mapInfoDetail.setSourceTableName(rsmd.getTableName(i));
                     mapInfoDetail.setSourceFieldName(rsmd.getColumnName(i));
                     mapInfoDetail.setSourceFieldSentence(rsmd.getColumnName(i));
                     mapInfoDetail.setSourceFieldType(rsmd.getColumnTypeName(i));

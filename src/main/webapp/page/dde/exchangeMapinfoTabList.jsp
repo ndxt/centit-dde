@@ -12,7 +12,7 @@
 		<ul id="hid_field_form_list">
 			<c:forEach items="${object.mapInfoDetails }" var="field">
 				<li columnNo="${field.cid.columnNo }" type="source">
-					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].soueceTableName" value="${field.soueceTableName }"/>
+					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].sourceTableName" value="${field.sourceTableName }"/>
 					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].sourceUrl" value="${field.sourceUrl }"/>
 					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].sourceFieldName" value="${field.sourceFieldName }"/>
 					<input type="hidden" name="mapInfoDetails[${field.cid.columnNo }].sourceFieldSentence" value="${field.sourceFieldSentence }"/>

@@ -3,7 +3,7 @@ package com.centit.dde.service.impl;
 import com.centit.dde.dao.ExchangeMapinfoDao;
 import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.dao.ExchangeTaskdetailDao;
-import com.centit.dde.dao.MapinfoTriggerDao;
+import com.centit.dde.dao.MapInfoTriggerDao;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.*;
 import com.centit.dde.service.TaskDetailLogManager;
@@ -48,7 +48,7 @@ public class TransferManagerImpl implements TransferManager {
 
     private ExchangeTaskdetailDao exchangeTaskdetailDao;
 
-    private MapinfoTriggerDao mapinfoTriggerDao;
+    private MapInfoTriggerDao mapInfoTriggerDao;
 
     @Resource
     private TaskLogManager taskLogManager;
@@ -71,10 +71,10 @@ public class TransferManagerImpl implements TransferManager {
         this.taskErrorDataManager = taskErrorDataManager;
     }
 
-    @Resource(name="mapinfoTriggerDao")
+    @Resource
     @Nullable
-    public void setMapinfoTriggerDao(MapinfoTriggerDao mapinfoTriggerDao) {
-        this.mapinfoTriggerDao = mapinfoTriggerDao;
+    public void setMapInfoTriggerDao(MapInfoTriggerDao mapInfoTriggerDao) {
+        this.mapInfoTriggerDao = mapInfoTriggerDao;
     }
 
     @Resource(name="exchangeTaskDao")
@@ -400,7 +400,7 @@ public class TransferManagerImpl implements TransferManager {
             return transferResult;
         }
 
-        List<MapInfoTrigger> mapInfoTriggers = mapinfoTriggerDao.listTriggerByMapinfoId(exchangMapinfo.getMapInfoId());
+        List<MapInfoTrigger> mapInfoTriggers = mapInfoTriggerDao.listTriggerByMapinfoId(exchangMapinfo.getMapInfoId());
 
         TableMapInfo mapinfo = new TableMapInfo();
         try {
@@ -859,11 +859,11 @@ public class TransferManagerImpl implements TransferManager {
 
 
         for (ExchangeTaskDetail taskDetail : exchangeTaskDetails) {
-            ExchangeMapInfo exchangMapinfo = exchangeMapinfoDao.getObjectById(taskDetail.getMapinfoId());
+            ExchangeMapInfo exchangMapinfo = exchangeMapinfoDao.getObjectById(taskDetail.getMapInfoId());
 
             if (exchangMapinfo == null) {
                 if (debugEnabled) {
-                    msg = "交换任务中交换编号 = " + taskDetail.getMapinfoId() + " 不存在";
+                    msg = "交换任务中交换编号 = " + taskDetail.getMapInfoId() + " 不存在";
                     logger.debug(msg);
 
                     TaskConsoleWriteUtils.writeError(taskID, msg);

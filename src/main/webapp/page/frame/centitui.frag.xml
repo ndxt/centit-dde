@@ -361,7 +361,7 @@
 
 <_PAGE_ id="ExchangeSourceField"><![CDATA[
 <li columnNo="{columnNo}" type="source">
-	<input type="hidden" name="mapInfoDetails[{columnNo}].soueceTableName" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].sourceTableName" />
 	<input type="hidden" name="mapInfoDetails[{columnNo}].sourceUrl" />
 	<input type="hidden" name="mapInfoDetails[{columnNo}].sourceFieldName" />
 	<input type="hidden" name="mapInfoDetails[{columnNo}].sourceFieldSentence" />

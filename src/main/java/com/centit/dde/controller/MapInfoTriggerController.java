@@ -32,7 +32,7 @@ public class MapInfoTriggerController extends BaseController {
     public void list(PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
         Map<String, Object> searchColumn = convertSearchColumn(request);
 
-        searchColumn.put("cid.mapinfoId", searchColumn.get("mapinfoId"));
+        searchColumn.put("cid.mapInfoId", searchColumn.get("mapInfoId"));
         List<MapInfoTrigger> objList = mapinfoTriggerMag.listTrigger(Long.valueOf((String) searchColumn.get("mapinfoId")));
 
         pageDesc.setTotalRows(objList.size());

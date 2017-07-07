@@ -18,10 +18,10 @@ public class ExchangeTaskDetail implements java.io.Serializable {
     @Column(name="CID")
     @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
-    private ExchangeTaskdetailId cid;
+    private ExchangeTaskDetailId cid;
 
     @Column(name="MAPINFO_ORDER")
-    private Long mapinfoOrder;
+    private Long mapInfoOrder;
 
     // Constructors
 
@@ -34,94 +34,87 @@ public class ExchangeTaskDetail implements java.io.Serializable {
     /**
      * minimal constructor
      */
-    public ExchangeTaskDetail(ExchangeTaskdetailId id
-
-    ) {
+    public ExchangeTaskDetail(ExchangeTaskDetailId id) {
         this.cid = id;
-
-
     }
 
     /**
      * full constructor
      */
-    public ExchangeTaskDetail(ExchangeTaskdetailId id
-
-            , Long mapinfoOrder) {
+    public ExchangeTaskDetail(ExchangeTaskDetailId id, Long mapInfoOrder) {
         this.cid = id;
 
-
-        this.mapinfoOrder = mapinfoOrder;
+        this.mapInfoOrder = mapInfoOrder;
     }
 
-    public ExchangeTaskdetailId getCid() {
+    public ExchangeTaskDetailId getCid() {
         return this.cid;
     }
 
-    public void setCid(ExchangeTaskdetailId id) {
+    public void setCid(ExchangeTaskDetailId id) {
         this.cid = id;
     }
 
-    public Long getMapinfoId() {
+    public Long getMapInfoId() {
         if (this.cid == null)
-            this.cid = new ExchangeTaskdetailId();
-        return this.cid.getMapinfoId();
+            this.cid = new ExchangeTaskDetailId();
+        return this.cid.getMapInfoId();
     }
 
-    public void setMapinfoId(Long mapinfoId) {
+    public void setMapInfoId(Long mapInfoId) {
         if (this.cid == null)
-            this.cid = new ExchangeTaskdetailId();
-        this.cid.setMapinfoId(mapinfoId);
+            this.cid = new ExchangeTaskDetailId();
+        this.cid.setMapInfoId(mapInfoId);
     }
 
     public Long getTaskId() {
         if (this.cid == null)
-            this.cid = new ExchangeTaskdetailId();
+            this.cid = new ExchangeTaskDetailId();
         return this.cid.getTaskId();
     }
 
     public void setTaskId(Long taskId) {
         if (this.cid == null)
-            this.cid = new ExchangeTaskdetailId();
+            this.cid = new ExchangeTaskDetailId();
         this.cid.setTaskId(taskId);
     }
 
 
     // Property accessors
 
-    public Long getMapinfoOrder() {
-        return this.mapinfoOrder;
+    public Long getMapInfoOrder() {
+        return this.mapInfoOrder;
     }
 
-    public void setMapinfoOrder(Long mapinfoOrder) {
-        this.mapinfoOrder = mapinfoOrder;
+    public void setMapInfoOrder(Long mapInfoOrder) {
+        this.mapInfoOrder = mapInfoOrder;
     }
 
 
     public void copy(ExchangeTaskDetail other) {
 
-        this.setMapinfoId(other.getMapinfoId());
+        this.setMapInfoId(other.getMapInfoId());
         this.setTaskId(other.getTaskId());
 
-        this.mapinfoOrder = other.getMapinfoOrder();
+        this.mapInfoOrder = other.getMapInfoOrder();
 
     }
 
     public void copyNotNullProperty(ExchangeTaskDetail other) {
 
-        if (other.getMapinfoId() != null)
-            this.setMapinfoId(other.getMapinfoId());
+        if (other.getMapInfoId() != null)
+            this.setMapInfoId(other.getMapInfoId());
         if (other.getTaskId() != null)
             this.setTaskId(other.getTaskId());
 
-        if (other.getMapinfoOrder() != null)
-            this.mapinfoOrder = other.getMapinfoOrder();
+        if (other.getMapInfoOrder() != null)
+            this.mapInfoOrder = other.getMapInfoOrder();
 
     }
 
     public void clearProperties() {
 
-        this.mapinfoOrder = null;
+        this.mapInfoOrder = null;
 
     }
 }

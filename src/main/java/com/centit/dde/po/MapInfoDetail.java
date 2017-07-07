@@ -9,7 +9,7 @@ public class MapInfoDetail implements java.io.Serializable {
     
     @EmbeddedId
     @Column(name="CID")
-    private MapinfoDetailId cid;
+    private MapInfoDetailId cid;
 
     @Column(name="SOURCE_FIELD_NAME")
     private String sourceFieldName;
@@ -36,7 +36,7 @@ public class MapInfoDetail implements java.io.Serializable {
     private String isNull;
 
     @Transient
-    private String soueceTableName;
+    private String sourceTableName;
     
     @Transient
     private String goalTableName;
@@ -63,12 +63,12 @@ public class MapInfoDetail implements java.io.Serializable {
         this.goalUrl = goalUrl;
     }
 
-    public String getSoueceTableName() {
-        return soueceTableName;
+    public String getSourceTableName() {
+        return sourceTableName;
     }
 
-    public void setSoueceTableName(String soueceTableName) {
-        this.soueceTableName = soueceTableName;
+    public void setSourceTableName(String sourceTableName) {
+        this.sourceTableName = sourceTableName;
     }
 
     public String getGoalTableName() {
@@ -91,7 +91,7 @@ public class MapInfoDetail implements java.io.Serializable {
     /**
      * minimal constructor
      */
-    public MapInfoDetail(MapinfoDetailId id
+    public MapInfoDetail(MapInfoDetailId id
 
             , String sourceFieldName, String sourceFieldSentence, String destFieldName) {
         this.cid = id;
@@ -105,7 +105,7 @@ public class MapInfoDetail implements java.io.Serializable {
     /**
      * full constructor
      */
-    public MapInfoDetail(MapinfoDetailId id, Long orderNo, String sourceFieldName,
+    public MapInfoDetail(MapInfoDetailId id, Long orderNo, String sourceFieldName,
                          String sourceFieldSentence, String sourceFieldType, String destFieldName,
                          String destFieldType, String isPk, String destFieldDefault, String isNull, String querySql) {
         this.cid = id;
@@ -120,24 +120,24 @@ public class MapInfoDetail implements java.io.Serializable {
         this.isNull = isNull;
     }
 
-    public MapinfoDetailId getCid() {
+    public MapInfoDetailId getCid() {
         return this.cid;
     }
 
-    public void setCid(MapinfoDetailId id) {
+    public void setCid(MapInfoDetailId id) {
         this.cid = id;
     }
 
-    public Long getMapinfoId() {
+    public Long getMapInfoId() {
         if (this.cid == null)
-            this.cid = new MapinfoDetailId();
-        return this.cid.getMapinfoId();
+            this.cid = new MapInfoDetailId();
+        return this.cid.getMapInfoId();
     }
 
     public void setMapinfoId(Long mapinfoId) {
         if (this.cid == null)
-            this.cid = new MapinfoDetailId();
-        this.cid.setMapinfoId(mapinfoId);
+            this.cid = new MapInfoDetailId();
+        this.cid.setMapInfoId(mapinfoId);
     }
 
 
@@ -211,7 +211,7 @@ public class MapInfoDetail implements java.io.Serializable {
 
     public void copy(MapInfoDetail other) {
 
-        this.setMapinfoId(other.getMapinfoId());
+        this.setMapinfoId(other.getMapInfoId());
 
         this.sourceFieldName = other.getSourceFieldName();
         this.sourceFieldSentence = other.getSourceFieldSentence();
@@ -226,8 +226,8 @@ public class MapInfoDetail implements java.io.Serializable {
 
     public void copyNotNullProperty(MapInfoDetail other) {
 
-        if (other.getMapinfoId() != null)
-            this.setMapinfoId(other.getMapinfoId());
+        if (other.getMapInfoId() != null)
+            this.setMapinfoId(other.getMapInfoId());
 
         if (other.getSourceFieldName() != null)
             this.sourceFieldName = other.getSourceFieldName();

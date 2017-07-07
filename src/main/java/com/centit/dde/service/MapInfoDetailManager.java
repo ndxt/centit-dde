@@ -5,11 +5,11 @@ import java.util.Map;
 
 
 import com.centit.dde.po.MapInfoDetail;
-import com.centit.dde.po.MapinfoDetailId;
+import com.centit.dde.po.MapInfoDetailId;
 import com.centit.framework.core.service.BaseEntityManager;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 
-public interface MapInfoDetailManager extends BaseEntityManager<MapInfoDetail,MapinfoDetailId> {
+public interface MapInfoDetailManager extends BaseEntityManager<MapInfoDetail,MapInfoDetailId> {
     public List<Map<String, String>> getGoalTableStruct(DatabaseInfo DatabaseInfo, String tableName);
 
     public List<Map<String, String>> getSourceTableStruct(DatabaseInfo DatabaseInfo, String tableName);

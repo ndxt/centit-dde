@@ -1,6 +1,6 @@
 package com.centit.dde.service.impl;
 
-import com.centit.dde.dao.MapinfoTriggerDao;
+import com.centit.dde.dao.MapInfoTriggerDao;
 import com.centit.dde.po.MapInfoTrigger;
 import com.centit.dde.po.MapInfoTriggerId;
 import com.centit.dde.service.MapInfoTriggerManager;
@@ -13,27 +13,27 @@ import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 @Service
-public class MapInfoTriggerManagerImpl extends BaseEntityManagerImpl<MapInfoTrigger,MapInfoTriggerId,MapinfoTriggerDao>
+public class MapInfoTriggerManagerImpl extends BaseEntityManagerImpl<MapInfoTrigger,MapInfoTriggerId, MapInfoTriggerDao>
         implements MapInfoTriggerManager {
     public static final Log log = LogFactory.getLog(MapInfoTriggerManager.class);
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
     
-    private MapinfoTriggerDao mapinfoTriggerDao;
+    private MapInfoTriggerDao mapInfoTriggerDao;
 
-    @Resource(name="mapinfoTriggerDao")
+    @Resource
     @NotNull
-    public void setMapinfoTriggerDao(MapinfoTriggerDao baseDao) {
-        this.mapinfoTriggerDao = baseDao;
-        setBaseDao(this.mapinfoTriggerDao);
+    public void setMapInfoTriggerDao(MapInfoTriggerDao baseDao) {
+        this.mapInfoTriggerDao = baseDao;
+        setBaseDao(this.mapInfoTriggerDao);
     }
 
     public List<MapInfoTrigger> listTrigger(Long mapinfoId) {
-        return this.mapinfoTriggerDao.listTriggerByMapinfoId(mapinfoId);
+        return this.mapInfoTriggerDao.listTriggerByMapinfoId(mapinfoId);
     }
 
     public Long getTriggerId() {
-        return this.mapinfoTriggerDao.getTriggerId();
+        return this.mapInfoTriggerDao.getTriggerId();
     }
 
 }

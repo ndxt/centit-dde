@@ -389,9 +389,9 @@ public class ExportDataImpl implements ExportData, CallWebService {
         int nError = 0;
         int nSucceed = 0;
         for (ExchangeTaskDetail taskDetail : exchangeTaskDetails) {
-            ExportSql exportSql = exportSqlDao.getObjectById(taskDetail.getMapinfoId());
+            ExportSql exportSql = exportSqlDao.getObjectById(taskDetail.getMapInfoId());
             if (exportSql == null) {
-                msg = "主键 = " + taskDetail.getMapinfoId() + " 的导出数据不存在";
+                msg = "主键 = " + taskDetail.getMapInfoId() + " 的导出数据不存在";
                 logger.error(msg);
 
                 TaskConsoleWriteUtils.writeError(taskID, msg);
@@ -514,7 +514,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
         int nError = 0;
         int nSucceed = 0;
         for (ExchangeTaskDetail taskDetail : exchangeTaskDetails) {
-            ExportSql exportSql = exportSqlDao.getObjectById(taskDetail.getMapinfoId());
+            ExportSql exportSql = exportSqlDao.getObjectById(taskDetail.getMapInfoId());
             if (exportSql == null) {
                 continue;
             }

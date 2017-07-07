@@ -14,13 +14,13 @@ import javax.persistence.IdClass;
  */
 @Embeddable
 @IdClass(MapInfoDetail.class)
-public class MapinfoDetailId implements java.io.Serializable {
+public class MapInfoDetailId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     
     @Column(name="MAPINFO_ID")
     @NotBlank(message = "字段不能为空")
-    private Long mapinfoId;
+    private Long mapInfoId;
 
     @Column(name="COLUMN_NO")
     @NotBlank(message = "字段不能为空")
@@ -31,25 +31,25 @@ public class MapinfoDetailId implements java.io.Serializable {
     /**
      * default constructor
      */
-    public MapinfoDetailId() {
+    public MapInfoDetailId() {
     }
 
     /**
      * full constructor
      */
-    public MapinfoDetailId(Long mapinfoId, Long columnNo) {
+    public MapInfoDetailId(Long mapInfoId, Long columnNo) {
 
-        this.mapinfoId = mapinfoId;
+        this.mapInfoId = mapInfoId;
         this.columnNo = columnNo;
     }
 
 
-    public Long getMapinfoId() {
-        return this.mapinfoId;
+    public Long getMapInfoId() {
+        return this.mapInfoId;
     }
 
-    public void setMapinfoId(Long mapinfoId) {
-        this.mapinfoId = mapinfoId;
+    public void setMapInfoId(Long mapInfoId) {
+        this.mapInfoId = mapInfoId;
     }
 
     public Long getColumnNo() {
@@ -66,15 +66,15 @@ public class MapinfoDetailId implements java.io.Serializable {
             return true;
         if ((other == null))
             return false;
-        if (!(other instanceof MapinfoDetailId))
+        if (!(other instanceof MapInfoDetailId))
             return false;
 
-        MapinfoDetailId castOther = (MapinfoDetailId) other;
+        MapInfoDetailId castOther = (MapInfoDetailId) other;
         boolean ret = true;
 
-        ret = ret && (this.getMapinfoId() == castOther.getMapinfoId() ||
-                (this.getMapinfoId() != null && castOther.getMapinfoId() != null
-                        && this.getMapinfoId().equals(castOther.getMapinfoId())));
+        ret = ret && (this.getMapInfoId() == castOther.getMapInfoId() ||
+                (this.getMapInfoId() != null && castOther.getMapInfoId() != null
+                        && this.getMapInfoId().equals(castOther.getMapInfoId())));
 
         ret = ret && (this.getColumnNo() == castOther.getColumnNo() ||
                 (this.getColumnNo() != null && castOther.getColumnNo() != null
@@ -87,7 +87,7 @@ public class MapinfoDetailId implements java.io.Serializable {
         int result = 17;
 
         result = 37 * result +
-                (this.getMapinfoId() == null ? 0 : this.getMapinfoId().hashCode());
+                (this.getMapInfoId() == null ? 0 : this.getMapInfoId().hashCode());
 
         result = 37 * result +
                 (this.getColumnNo() == null ? 0 : this.getColumnNo().hashCode());

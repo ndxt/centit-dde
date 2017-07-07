@@ -1,88 +1,86 @@
 package com.centit.dde.service.impl;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
-
+import com.centit.dde.dao.MapInfoDetailDao;
 import com.centit.dde.po.MapInfoDetail;
+import com.centit.dde.po.MapInfoDetailId;
 import com.centit.dde.service.MapInfoDetailManager;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import com.centit.framework.staticsystem.po.DatabaseInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
-import com.centit.dde.dao.MapinfoDetailDao;
-import com.centit.dde.po.MapinfoDetailId;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Map;
 @Service
-public class MapInfoDetailManagerImpl extends BaseEntityManagerImpl<MapInfoDetail,MapinfoDetailId,MapinfoDetailDao>
+public class MapInfoDetailManagerImpl extends BaseEntityManagerImpl<MapInfoDetail,MapInfoDetailId, MapInfoDetailDao>
         implements MapInfoDetailManager {
     public static final Log log = LogFactory.getLog(MapInfoDetailManager.class);
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
     
-    private MapinfoDetailDao mapinfoDetailDao;
+    private MapInfoDetailDao mapInfoDetailDao;
 
-    @Resource(name="mapinfoDetailDao")
+    @Resource
     @NotNull
-    public void setMapinfoDetailDao(MapinfoDetailDao baseDao) {
-        this.mapinfoDetailDao = baseDao;
-        setBaseDao(this.mapinfoDetailDao);
+    public void setMapInfoDetailDao(MapInfoDetailDao baseDao) {
+        this.mapInfoDetailDao = baseDao;
+        setBaseDao(this.mapInfoDetailDao);
     }
 
     
     public List<MapInfoDetail> listByMapinfoId(Long mapinfoId) {
-        return mapinfoDetailDao.listByMapinfoId(mapinfoId);
+        return mapInfoDetailDao.listByMapinfoId(mapinfoId);
     }
     
     public List<Map<String, String>> getGoalTableStruct(DatabaseInfo DatabaseInfo, String tableName) {
-        return mapinfoDetailDao.getGoalTableStruct(DatabaseInfo, tableName);
+        return mapInfoDetailDao.getGoalTableStruct(DatabaseInfo, tableName);
     }
 
     public List<Map<String, String>> getSourceTableStruct(DatabaseInfo DatabaseInfo, String tableName) {
-        return mapinfoDetailDao.getSourceTableStruct(DatabaseInfo, tableName);
+        return mapInfoDetailDao.getSourceTableStruct(DatabaseInfo, tableName);
     }
 
     public List<String> getTables(DatabaseInfo databaseInfo) {
-        return mapinfoDetailDao.getTables(databaseInfo);
+        return mapInfoDetailDao.getTables(databaseInfo);
     }
 
     public List<Object> getTable(DatabaseInfo databaseInfo) {
-        return mapinfoDetailDao.getTable(databaseInfo);
+        return mapInfoDetailDao.getTable(databaseInfo);
     }
 
     public void deleteMapinfoDetails(Long mapinfoId) {
-        mapinfoDetailDao.deleteMapinfoDetails(mapinfoId);
+        mapInfoDetailDao.deleteMapinfoDetails(mapinfoId);
     }
 
     public void updateExchangeMapinfo(Long mapinfoId, String soueceTableName, String goalTableName, String createSql) {
-        mapinfoDetailDao.updateExchangeMapinfo(mapinfoId, soueceTableName, goalTableName, createSql);
+        mapInfoDetailDao.updateExchangeMapinfo(mapinfoId, soueceTableName, goalTableName, createSql);
     }
 
     public List<Map<String, String>> getSourceTableStructFromDatabase(Long mapinfoId) {
-        return mapinfoDetailDao.getSourceTableStructFromDatabase(mapinfoId);
+        return mapInfoDetailDao.getSourceTableStructFromDatabase(mapinfoId);
     }
 
     public List<Map<String, String>> getGoalTableStructFromDatabase(Long mapinfoId) {
-        return mapinfoDetailDao.getGoalTableStructFromDatabase(mapinfoId);
+        return mapInfoDetailDao.getGoalTableStructFromDatabase(mapinfoId);
     }
 
     public void updateSourceColumnSentence(Map<String, Object> structs, String mapinfoId) {
-        mapinfoDetailDao.updateSourceColumnSentence(structs, mapinfoId);
+        mapInfoDetailDao.updateSourceColumnSentence(structs, mapinfoId);
     }
 
     public Long getMapinfoId() {
-        return mapinfoDetailDao.getMapinfoId();
+        return mapInfoDetailDao.getMapinfoId();
     }
 
     public List<String> getGoalColumnStrut(Long mapinfoId) {
-        return this.mapinfoDetailDao.getGoalColumnStrut(mapinfoId);
+        return this.mapInfoDetailDao.getGoalColumnStrut(mapinfoId);
     }
 
     public void saveMapinfoDetails(MapInfoDetail mapInfoDetail) {
-        this.mapinfoDetailDao.saveMapinfoDetails(mapInfoDetail);
+        this.mapInfoDetailDao.saveMapinfoDetails(mapInfoDetail);
     }
 
 }

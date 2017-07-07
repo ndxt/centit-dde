@@ -1,7 +1,7 @@
 package com.centit.dde.dao;
 
 import com.centit.dde.po.ExchangeTaskDetail;
-import com.centit.dde.po.ExchangeTaskdetailId;
+import com.centit.dde.po.ExchangeTaskDetailId;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @Repository
-public class ExchangeTaskdetailDao extends BaseDaoImpl<ExchangeTaskDetail,ExchangeTaskdetailId> {
+public class ExchangeTaskdetailDao extends BaseDaoImpl<ExchangeTaskDetail,ExchangeTaskDetailId> {
 
     public static final Log log = LogFactory.getLog(ExchangeTaskdetailDao.class);
     @Override
@@ -39,7 +39,7 @@ public class ExchangeTaskdetailDao extends BaseDaoImpl<ExchangeTaskDetail,Exchan
 
     @SuppressWarnings("unchecked")
     public List<Long> getMapinfoIdUsed(Long taskId) {
-        String hql = "select e.cid.mapinfoId from ExchangeTaskDetail e where e.cid.taskId=" + taskId + " order by e.mapinfoOrder";
+        String hql = "select e.cid.mapInfoId from ExchangeTaskDetail e where e.cid.taskId=" + taskId + " order by e.mapinfoOrder";
         return (List<Long>) DatabaseOptUtils.findObjectsByHql(this,hql);
     }
 
@@ -57,7 +57,7 @@ public class ExchangeTaskdetailDao extends BaseDaoImpl<ExchangeTaskDetail,Exchan
 
     public void deleteDetails(Long taskId, Long mapinfoId) {
         //String hql = "delete ExchangeTaskDetail e where e.cid.taskId="+taskId+" and e.cid.mapinfoId="+mapinfoId;
-        this.deleteObjectById(new ExchangeTaskdetailId(mapinfoId, taskId));
+        this.deleteObjectById(new ExchangeTaskDetailId(mapinfoId, taskId));
     }
 
     public void deleteDetailsByMapinfoId(Long mapinfoId) {

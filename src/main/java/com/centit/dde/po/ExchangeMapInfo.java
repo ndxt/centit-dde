@@ -51,10 +51,12 @@ public class ExchangeMapInfo implements java.io.Serializable {
     @Transient
     private Long mapInfoOrder;
 
-    @Transient
+    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
+    @JoinColumn(name="MAPINFO_ID")
     private List<MapInfoDetail> mapInfoDetails = null;
 
-    @Transient
+    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
+    @JoinColumn(name="MAPINFO_ID")
     private List<MapInfoTrigger> mapInfoTriggers = null;
 
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
@@ -98,7 +100,7 @@ public class ExchangeMapInfo implements java.io.Serializable {
 
     public List<MapInfoDetail> getMapInfoDetails() {
         if (null == mapInfoDetails) {
-            mapInfoDetails = new ArrayList<MapInfoDetail>();
+            mapInfoDetails = new ArrayList<>();
         }
         return mapInfoDetails;
     }
@@ -219,56 +221,139 @@ public class ExchangeMapInfo implements java.io.Serializable {
         this.mapInfoDesc = mapInfoDesc;
     }
 
+    public void addMapInfoDetail(MapInfoDetail mapInfoDetail) {
+        if (this.mapInfoDetails == null)
+            this.mapInfoDetails = new ArrayList<MapInfoDetail>();
+        this.mapInfoDetails.add(mapInfoDetail);
+    }
+
+    public void removeMapInfoDetail(MapInfoDetail mapInfoDetail) {
+        if (this.mapInfoDetails == null)
+            return;
+        this.mapInfoDetails.remove(mapInfoDetail);
+    }
+
+    public MapInfoDetail newMapInfoDetail() {
+        MapInfoDetail res = new MapInfoDetail();
+
+        res.setMapinfoId(this.getMapInfoId());
+
+        return res;
+    }
+
     /**
      * 替换子类对象数组，这个函数主要是考虑hibernate中的对象的状态，以避免对象状态不一致的问题
      */
-    public void replaceMapinfoDetails(List<MapInfoDetail> mapInfoDetails) {
-//        List<MapInfoDetail> newObjs = new ArrayList<>();
-//        for (MapInfoDetail p : mapInfoDetails) {
-//            if (p == null) {
-//                continue;
-//            }
-//            MapInfoDetail newdt = new MapInfoDetail();
-//            newdt.copyNotNullProperty(p);
-//            newObjs.add(newdt);
-//        }
-//        // delete
-//        boolean found = false;
-//        Set<DataOptStep> oldObjs = new HashSet<>();
-//        oldObjs.addAll(getDataOptSteps());
-//
-//        for (Iterator<DataOptStep> it = oldObjs.iterator(); it.hasNext(); ) {
-//            DataOptStep odt = it.next();
-//            found = false;
-//            for (DataOptStep newdt : newObjs) {
-//                if (odt.getOptStepId().equals(newdt.getOptStepId())) {
-//                    found = true;
-//                    break;
-//                }
-//            }
-//            if (!found) {
-//                removeDataOptStep(odt);
-//            }
-//        }
-//        oldObjs.clear();
-//        // insert or update
-//        for (DataOptStep newdt : newObjs) {
-//            found = false;
-//            for (Iterator<DataOptStep> it = getDataOptSteps().iterator(); it.hasNext(); ) {
-//                DataOptStep odt = it.next();
-//                if (odt.getOptStepId().equals(newdt.getOptStepId())) {
-//                    odt.copy(newdt);
-//                    found = true;
-//                    break;
-//                }
-//            }
-//            if (!found)
-//                addDataOptStep(newdt);
-//        }
+    public void replaceMapInfoDetails(List<MapInfoDetail> mapInfoDetails) {
+        List<MapInfoDetail> newObjs = new ArrayList<>();
+        for (MapInfoDetail p : mapInfoDetails) {
+            if (p == null) {
+                continue;
+            }
+            MapInfoDetail newdt = newMapInfoDetail();
+            newdt.copyNotNullProperty(p);
+            newObjs.add(newdt);
+        }
+        // delete
+        boolean found = false;
+        Set<MapInfoDetail> oldObjs = new HashSet<>();
+        oldObjs.addAll(getMapInfoDetails());
+
+        for (Iterator<MapInfoDetail> it = oldObjs.iterator(); it.hasNext(); ) {
+            MapInfoDetail odt = it.next();
+            found = false;
+            for (MapInfoDetail newdt : newObjs) {
+                if (odt.getMapInfoId().equals(newdt.getMapInfoId())) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                removeMapInfoDetail(odt);
+            }
+        }
+        oldObjs.clear();
+        // insert or update
+        for (MapInfoDetail newdt : newObjs) {
+            found = false;
+            for (Iterator<MapInfoDetail> it = getMapInfoDetails().iterator(); it.hasNext(); ) {
+                MapInfoDetail odt = it.next();
+                if (odt.getMapInfoId().equals(newdt.getMapInfoId())) {
+                    odt.copy(newdt);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                addMapInfoDetail(newdt);
+        }
     }
 
-    public void replaceMapinfoTrrigers(List<MapInfoTrigger> mapInfoTriggers) {
+    public void addMapInfoTrigger(MapInfoTrigger mapInfoTrigger) {
+        if (this.mapInfoTriggers == null)
+            this.mapInfoTriggers = new ArrayList<>();
+        this.mapInfoTriggers.add(mapInfoTrigger);
+    }
 
+    public void removeMapInfoTrigger(MapInfoTrigger mapInfoTrigger) {
+        if (this.mapInfoTriggers == null)
+            return;
+        this.mapInfoTriggers.remove(mapInfoTrigger);
+    }
+
+    public MapInfoTrigger newMapInfoTrigger() {
+        MapInfoTrigger res = new MapInfoTrigger();
+
+        res.setMapinfoId(this.getMapInfoId());
+
+        return res;
+    }
+
+    /**
+     * 替换子类对象数组，这个函数主要是考虑hibernate中的对象的状态，以避免对象状态不一致的问题
+     */
+    public void replaceMapInfoTriggers(List<MapInfoTrigger> mapInfoTriggers) {
+
+        List<MapInfoTrigger> newObjs = new ArrayList<>();
+        for (MapInfoTrigger p : mapInfoTriggers) {
+            if (p == null)
+                continue;
+            MapInfoTrigger newdt = newMapInfoTrigger();
+            newdt.copyNotNullProperty(p);
+            newObjs.add(newdt);
+        }
+        // delete
+        boolean found = false;
+        Set<MapInfoTrigger> oldObjs = new HashSet<>();
+        oldObjs.addAll(getMapInfoTriggers());
+
+        for (Iterator<MapInfoTrigger> it = oldObjs.iterator(); it.hasNext(); ) {
+            MapInfoTrigger odt = it.next();
+            found = false;
+            for (MapInfoTrigger newdt : newObjs) {
+                if (odt.getCid().equals(newdt.getCid())) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                removeMapInfoTrigger(odt);
+        }
+        oldObjs.clear();
+        // insert or update
+        for (MapInfoTrigger newdt : newObjs) {
+            found = false;
+            for (Iterator<MapInfoTrigger> it = getMapInfoTriggers().iterator(); it.hasNext(); ) {
+                MapInfoTrigger odt = it.next();
+                if (odt.getCid().equals(newdt.getCid())) {
+                    odt.copy(newdt);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                addMapInfoTrigger(newdt);
+        }
     }
 
     public void copy(ExchangeMapInfo other) {

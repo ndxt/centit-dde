@@ -1,7 +1,7 @@
 package com.centit.dde.dao;
 
 import com.centit.dde.po.MapInfoDetail;
-import com.centit.dde.po.MapinfoDetailId;
+import com.centit.dde.po.MapInfoDetailId;
 import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class MapinfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapinfoDetailId> {
+public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId> {
     
-    public static final Log log = LogFactory.getLog(MapinfoDetailDao.class);
+    public static final Log log = LogFactory.getLog(MapInfoDetailDao.class);
 
 	/*
      * private Connection connSource = null ; private Connection connGoal = null
@@ -38,7 +38,7 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapinfoDetailId>
         if (filterField == null) {
             filterField = new HashMap<String, String>();
 
-            filterField.put("cid.mapinfoId", CodeBook.EQUAL_HQL_ID);
+            filterField.put("cid.mapInfoId", CodeBook.EQUAL_HQL_ID);
 
             filterField.put("cid.columnNo", CodeBook.EQUAL_HQL_ID);
 
@@ -66,7 +66,7 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapinfoDetailId>
 
     public List<MapInfoDetail> listByMapinfoId(Long mapinfoId) {
         StringBuffer sql = new StringBuffer();
-        sql.append("from MapInfoDetail t where  t.cid.mapinfoId=");
+        sql.append("from MapInfoDetail t where  t.cid.mapInfoId=");
         sql.append(mapinfoId);
         sql.append(" order by t.cid.columnNo ");
         return listObjects(sql.toString());
@@ -345,7 +345,7 @@ public class MapinfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapinfoDetailId>
     public void deleteMapinfoDetails(Long mapinfoId) {
         // this.deleteObjectById(mapinfoId);
 
-        String hql = "delete from MapInfoDetail d where d.cid.mapinfoId = ?";
+        String hql = "delete from MapInfoDetail d where d.cid.mapInfoId = ?";
 
         DatabaseOptUtils.doExecuteHql(this,hql, mapinfoId);
     }

@@ -8,13 +8,13 @@
 
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
 
-    <jaxws:endpoint id="uploadData" serviceName="uploadData" implementor="#uploadDataBean" address="/uploadData" >
-    </jaxws:endpoint>
-    
-    <jaxws:endpoint id="downloadData" serviceName="downloadData" implementor="#downloadDataBean" address="/downloadData" >
-    </jaxws:endpoint>
-    
-    <jaxws:endpoint id="taskCaller" serviceName="taskCaller" implementor="#taskCallerBean" address="/taskCaller" >
-    </jaxws:endpoint>
+    <!--<jaxws:endpoint id="uploadData" serviceName="uploadData" implementor="#uploadDataBean" address="/uploadData" >-->
+    <!--</jaxws:endpoint>-->
+    <!---->
+    <!--<jaxws:endpoint id="downloadData" serviceName="downloadData" implementor="#downloadDataBean" address="/downloadData" >-->
+    <!--</jaxws:endpoint>-->
+    <!---->
+    <!--<jaxws:endpoint id="taskCaller" serviceName="taskCaller" implementor="#taskCallerBean" address="/taskCaller" >-->
+    <!--</jaxws:endpoint>-->
 
 </beans>

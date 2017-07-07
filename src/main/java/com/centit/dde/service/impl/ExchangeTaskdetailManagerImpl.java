@@ -11,12 +11,12 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
 import com.centit.dde.dao.ExchangeTaskdetailDao;
-import com.centit.dde.po.ExchangeTaskdetailId;
+import com.centit.dde.po.ExchangeTaskDetailId;
 import com.centit.dde.service.ExchangeTaskdetailManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 @Service
 public class ExchangeTaskdetailManagerImpl
-        extends BaseEntityManagerImpl<ExchangeTaskDetail,ExchangeTaskdetailId,ExchangeTaskdetailDao>
+        extends BaseEntityManagerImpl<ExchangeTaskDetail,ExchangeTaskDetailId,ExchangeTaskdetailDao>
         implements ExchangeTaskdetailManager {
 
     public static final Log log = LogFactory.getLog(ExchangeTaskdetailManager.class);
@@ -55,9 +55,9 @@ public class ExchangeTaskdetailManagerImpl
     }
 
     @Override
-    public void deleteObjectById(ExchangeTaskdetailId id) {
+    public void deleteObjectById(ExchangeTaskDetailId id) {
         ExchangeTaskDetail dbObject = getObjectById(id);
-        Long mapinfoOrder = dbObject.getMapinfoOrder();
+        Long mapinfoOrder = dbObject.getMapInfoOrder();
         exchangeTaskdetailDao.updateDetailOrder(dbObject.getTaskId(), mapinfoOrder);
         super.deleteObjectById(id);
     }
@@ -72,11 +72,11 @@ public class ExchangeTaskdetailManagerImpl
             Long id = mapinfoId.get(i);
 
             ExchangeTaskDetail exchangeTaskDetail = new ExchangeTaskDetail();
-            ExchangeTaskdetailId exchangeTaskdetailId = new ExchangeTaskdetailId();
-            exchangeTaskdetailId.setMapinfoId(id);
-            exchangeTaskdetailId.setTaskId(taskId);
-            exchangeTaskDetail.setCid(exchangeTaskdetailId);
-            exchangeTaskDetail.setMapinfoOrder(used.size() + i + 1L);
+            ExchangeTaskDetailId exchangeTaskDetailId = new ExchangeTaskDetailId();
+            exchangeTaskDetailId.setMapInfoId(id);
+            exchangeTaskDetailId.setTaskId(taskId);
+            exchangeTaskDetail.setCid(exchangeTaskDetailId);
+            exchangeTaskDetail.setMapInfoOrder(used.size() + i + 1L);
             saveObject(exchangeTaskDetail);
         }
 

@@ -13,8 +13,7 @@ define(function(require) {
 
 	var ExchangeMapInfoEdit = Page.extend(function() {
 		var _self = this;
-		
-		
+
 		this.injecte([
 		            new ExchangeMapInfoAdd('exchangeMapInfo_add'),
 		  			new ExchangeMapInfoDetailAdd('source_detail_add'),
@@ -25,8 +24,7 @@ define(function(require) {
 					new ExchangeMapInfoTriggerEdit('exchangeMapInfoTrigger_edit'),
 					new ExchangeMapInfoTriggerRemove('exchangeMapInfoTrigger_remove')
 		  		]);
-		
-		
+
 		//@override
 		this.load = function(panel, data) {
 			var form = panel.find('form');
@@ -42,23 +40,6 @@ define(function(require) {
 					.form('readonly', 'mapInfoId')
 					.form('focus');
 
-				/*var proArray = new Array();
-			    for(var i=0;i<data.mapInfoDetails.length;i++){
-			        var a = { 
-		        		destFieldName:data.mapInfoDetails[i].destFieldName,
-		        		destFieldType:data.mapInfoDetails[i].destFieldType,
-			        }; 
-			        proArray.push(a); 
-			    }
-			     
-			    $("#exchangeContent2").datagrid({
-			        columns:[[ 
-			            {field:'destFieldName',title:'目标字段名',editor:'text',width:'30%'}, 
-			            {field:'destFieldType',title:'目标字段类型',editor:'text',width:'30%'}, 
-			        ]] 
-			    }).datagrid('loadData',proArray).datagrid('acceptChanges');*/
-				
-				
 				var sourceTable = panel.find('table.source');
 				sourceTable.cdatagrid({
 					controller:_self,
@@ -100,9 +81,11 @@ define(function(require) {
 			$.extend(data,formData);
 			var isValid = form.form('validate');
 			if (isValid) {
-				var source = panel.find('.source').datagrid("getData").rows;
-				var dest = panel.find('.dest').datagrid("getData").rows;
-				data.mapInfoDetails = source;
+				// var source = panel.find('.source').datagrid("getData").rows;
+				// var dest = panel.find('.dest').datagrid("getData").rows;
+				// var triggers = panel.find('.trigger').datagrid("getData").rows;
+				// data.mapInfoDetails = source;
+				// data.mapInfoTriggers = triggers;
 				Core.ajax(Config.ContextPath + 'service/exchangemapinfo/save', {
 					data: data,
 					method: 'put'
@@ -118,12 +101,7 @@ define(function(require) {
 			table.datagrid('reload');
 		};
 	});
-	
-	
-	
-	
-	
-	
+
 	this.dlgAddDb = function(change){
 		var sourceDatabaseName = $('#sourceDatabaseName').val();
 		 $('#dlgAddDbLeft').dialog({

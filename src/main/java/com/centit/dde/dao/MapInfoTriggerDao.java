@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class MapinfoTriggerDao extends BaseDaoImpl<MapInfoTrigger,MapInfoTriggerId> {
+public class MapInfoTriggerDao extends BaseDaoImpl<MapInfoTrigger,MapInfoTriggerId> {
 
-    public static final Log log = LogFactory.getLog(MapinfoTriggerDao.class);
+    public static final Log log = LogFactory.getLog(MapInfoTriggerDao.class);
     @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {
@@ -24,7 +24,7 @@ public class MapinfoTriggerDao extends BaseDaoImpl<MapInfoTrigger,MapInfoTrigger
 
             filterField.put("cid.triggerId", CodeBook.EQUAL_HQL_ID);
 
-            filterField.put("cid.mapinfoId", CodeBook.EQUAL_HQL_ID);
+            filterField.put("cid.mapInfoId", CodeBook.EQUAL_HQL_ID);
 
 
             filterField.put("triggerSql", CodeBook.LIKE_HQL_ID);
@@ -47,7 +47,7 @@ public class MapinfoTriggerDao extends BaseDaoImpl<MapInfoTrigger,MapInfoTrigger
 
     public List<MapInfoTrigger> listTriggerByMapinfoId(Long mapinfoId) {
         StringBuffer sql = new StringBuffer();
-        sql.append("from MapInfoTrigger t where  t.cid.mapinfoId=");
+        sql.append("from MapInfoTrigger t where  t.cid.mapInfoId=");
         sql.append(mapinfoId);
         sql.append(" order by t.triggerTime, t.tiggerOrder");
         return listObjects(sql.toString());
