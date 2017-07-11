@@ -2,7 +2,7 @@
     <input hidden type="text" name="mapInfoId" />
 	<div class="field" >
 		<label>交换名称：</label>
-		<input  class="easyui-textbox" name="mapInfoName" type="text"/>
+		<input class="easyui-textbox" name="mapInfoName" type="text"/>
 	</div>
 	<div class="fields two">
 		<div class="field required">
@@ -140,15 +140,15 @@
 		<form>
 			<div style="padding:10px;">
 	                <span>数据库:
-		                <select class="easyui-combobox" id="txt_sourceDatabaseName" name="sourceDatabaseName" style="width:200px;" onchange="onchange()" ></select>
+		                <input class="easyui-combobox" id="txt_sourceDatabaseName" name="sourceDatabaseName" style="width:200px;" />
 	                </span>
-	                <span>表&nbsp;名:
-	        			<select class="easyui-combobox" id="txt_sourceTablename" name="txt_sourceTablename" style="width:200px;" ></select>
+	                <span>表名:
+	        			<input class="easyui-combobox" id="txt_sourceTableName" name="txt_sourceTableName" style="width:200px;" />
 	        		</span>
 	        </div>
 			<div style="padding:10px;">
 				<div class="field ">
-					<label>SQL：</label> 
+					<label>SQL：</label>
 					<input type="text" class="easyui-textbox" id="txt_querySql" name="txt_querySql"  multiline="true" style="width:100%; height: 200px;"/>
 				</div>
 			</div>

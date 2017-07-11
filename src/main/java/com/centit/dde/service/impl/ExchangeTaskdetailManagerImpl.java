@@ -1,22 +1,20 @@
 package com.centit.dde.service.impl;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
-
+import com.centit.dde.dao.ExchangeTaskDetailDao;
 import com.centit.dde.po.ExchangeTaskDetail;
+import com.centit.dde.po.ExchangeTaskDetailId;
+import com.centit.dde.service.ExchangeTaskdetailManager;
+import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
-import com.centit.dde.dao.ExchangeTaskdetailDao;
-import com.centit.dde.po.ExchangeTaskDetailId;
-import com.centit.dde.service.ExchangeTaskdetailManager;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 @Service
 public class ExchangeTaskdetailManagerImpl
-        extends BaseEntityManagerImpl<ExchangeTaskDetail,ExchangeTaskDetailId,ExchangeTaskdetailDao>
+        extends BaseEntityManagerImpl<ExchangeTaskDetail,ExchangeTaskDetailId, ExchangeTaskDetailDao>
         implements ExchangeTaskdetailManager {
 
     public static final Log log = LogFactory.getLog(ExchangeTaskdetailManager.class);
@@ -24,25 +22,25 @@ public class ExchangeTaskdetailManagerImpl
     // private static final SysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog();
    
-    private ExchangeTaskdetailDao exchangeTaskdetailDao;
+    private ExchangeTaskDetailDao exchangeTaskDetailDao;
 
-    @Resource(name = "exchangeTaskdetailDao")
+    @Resource
     @NotNull
-    public void setExchangeTaskdetailDao(ExchangeTaskdetailDao baseDao) {
-        this.exchangeTaskdetailDao = baseDao;
-        setBaseDao(this.exchangeTaskdetailDao);
+    public void setExchangeTaskDetailDao(ExchangeTaskDetailDao baseDao) {
+        this.exchangeTaskDetailDao = baseDao;
+        setBaseDao(this.exchangeTaskDetailDao);
     }
 
     public List<Long> getMapinfoIdUsed(Long taskId) {
-        return this.exchangeTaskdetailDao.getMapinfoIdUsed(taskId);
+        return this.exchangeTaskDetailDao.getMapinfoIdUsed(taskId);
     }
 
     public Long getMapinfoOrder(Long taskId) {
-        return this.exchangeTaskdetailDao.getMapinfoOrder(taskId);
+        return this.exchangeTaskDetailDao.getMapinfoOrder(taskId);
     }
 
     public void deleteDetails(Long taskId, Long mapinfoId) {
-        this.exchangeTaskdetailDao.deleteDetails(taskId, mapinfoId);
+        this.exchangeTaskDetailDao.deleteDetails(taskId, mapinfoId);
     }
 
     public String getMapinfoName(Long mapinfoId) {
@@ -51,14 +49,14 @@ public class ExchangeTaskdetailManagerImpl
     }
 
     public void deleteDetailsByMapinfoId(Long mapinfoId) {
-        this.exchangeTaskdetailDao.deleteDetailsByMapinfoId(mapinfoId);
+        this.exchangeTaskDetailDao.deleteDetailsByMapinfoId(mapinfoId);
     }
 
     @Override
     public void deleteObjectById(ExchangeTaskDetailId id) {
         ExchangeTaskDetail dbObject = getObjectById(id);
         Long mapinfoOrder = dbObject.getMapInfoOrder();
-        exchangeTaskdetailDao.updateDetailOrder(dbObject.getTaskId(), mapinfoOrder);
+        exchangeTaskDetailDao.updateDetailOrder(dbObject.getTaskId(), mapinfoOrder);
         super.deleteObjectById(id);
     }
 

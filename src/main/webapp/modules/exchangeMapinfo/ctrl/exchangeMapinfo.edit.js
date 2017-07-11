@@ -11,11 +11,11 @@ define(function(require) {
 	var ExchangeMapInfoTriggerEdit = require("../ctrl/exchangeMapInfoTrigger.edit");
 	var ExchangeMapInfoTriggerRemove = require("../ctrl/exchangeMapInfoTrigger.remove");
 
-	var ExchangeMapInfoEdit = Page.extend(function() {
+	var ExchangeMapInfoEdit = ExchangeMapInfoAdd.extend(function() {
 		var _self = this;
 
 		this.injecte([
-		            new ExchangeMapInfoAdd('exchangeMapInfo_add'),
+		            // new ExchangeMapInfoAdd('exchangeMapInfo_add'),
 		  			new ExchangeMapInfoDetailAdd('source_detail_add'),
 		  			new ExchangeMapInfoDetailRemove('source_detail_remove'),
 		  			new ExchangeMapInfoDetailAdd2('dest_detail_add'),
@@ -28,13 +28,13 @@ define(function(require) {
 		//@override
 		this.load = function(panel, data) {
 			var form = panel.find('form');
-			Core.ajax(Config.ContextPath+'service/exchangemapinfo/edit/'+data.mapInfoId, {
-				type: 'json',
-				method: 'get' 
-//					.then()是Promise规范规定的异步调用方法    得到数据后，调用form的load方法将数据显示在表单中
-			}).then(function(data) {
+// 			Core.ajax(Config.ContextPath+'service/exchangemapinfo/edit/'+data.mapInfoId, {
+// 				type: 'json',
+// 				method: 'get'
+// //					.then()是Promise规范规定的异步调用方法    得到数据后，调用form的load方法将数据显示在表单中
+// 			}).then(function(data) {
 				_self.data = data;
-				
+
 				form.form('load', data)
 					.form('disableValidation')
 					.form('readonly', 'mapInfoId')
@@ -70,64 +70,57 @@ define(function(require) {
                         $(this).datagrid('enableDnd');
                     }
 				});
-			});
+			// });
 			onchange();
-		};
-		
-		
-		this.submit = function(panel, data,closeCallback) {
-			var form = panel.find('form');
-			var formData = form.form('value');
-			$.extend(data,formData);
-			var isValid = form.form('validate');
-			if (isValid) {
-				// var source = panel.find('.source').datagrid("getData").rows;
-				// var dest = panel.find('.dest').datagrid("getData").rows;
-				// var triggers = panel.find('.trigger').datagrid("getData").rows;
-				// data.mapInfoDetails = source;
-				// data.mapInfoTriggers = triggers;
-				Core.ajax(Config.ContextPath + 'service/exchangemapinfo/save', {
-					data: data,
-					method: 'put'
-				}).then(function() {
-					closeCallback();
-				});
-			}
-			return false;
-		};
-		
-		// @override
-		this.onClose = function(table) {
-			table.datagrid('reload');
 		};
 	});
 
 	this.dlgAddDb = function(change){
-		var sourceDatabaseName = $('#sourceDatabaseName').val();
-		 $('#dlgAddDbLeft').dialog({
-	    	title:'数据库编辑',
-	    	resizable: true,
-	        modal: true,
-		 });
-		 $('#dlgAddDbLeft').dialog("open");
-		 Core.ajax(Config.ContextPath+'service/platform/listDb', {
-				method: 'get',
-				data: {
-                _method: 'get'
-            }
-			}).then(function(data) {
-				var orgValue;
-				var orgNameValue;
-				var dataList;
-				dataList = [];
-				$.each(data,function(index,item){
-				    orgValue = data[index].databaseCode;
-				    orgNameValue = data[index].databaseName;
-				    dataList.push({"value": orgValue,"text":orgNameValue});
-				});
-				$('#txt_sourceDatabaseName').combobox('select',sourceDatabaseName);
-				$("#txt_sourceDatabaseName").combobox("loadData",dataList);
-			});
+		// var sourceDatabaseName = $('#sourceDatabaseName').val();
+		$('#dlgAddDbLeft').dialog({
+			title:'数据库编辑',
+			resizable: true,
+			modal: true,
+		}).dialog("open");
+
+		$("#txt_sourceDatabaseName").combobox({
+			valueField: 'databaseCode',
+			textField: 'databaseName',
+			url:'service/platform/listDb',
+			onSelect: function(rec) {
+				var url = Config.ContextPath + 'service/platform/listTable/' + rec.databaseCode;
+				$('#txt_sourceTableName').combobox('reload', url);
+			}
+		});
+
+		$("#txt_sourceTableName").combobox({
+			valueField: 'tableName',
+			textField: 'tableName',
+			// url:'service/platform/listTable',
+			onSelect: function(rec) {
+				var url = Config.ContextPath + 'service/platform/listFields/' + rec.tableName;
+				// $('#txt_querySql');
+			}
+		});
+
+		//  Core.ajax(Config.ContextPath+'service/platform/listDb', {
+		// 		method: 'get',
+		// 		data: {
+         //        _method: 'get'
+         //    }
+		// 	}).then(function(data) {
+		// 		var orgValue;
+		// 		var orgNameValue;
+		// 		var dataList;
+		// 		dataList = [];
+		// 		$.each(data,function(index,item){
+		// 		    orgValue = data[index].databaseCode;
+		// 		    orgNameValue = data[index].databaseName;
+		// 		    dataList.push({"value": orgValue,"text":orgNameValue});
+		// 		});
+		// 		$('#txt_sourceDatabaseName').combobox('select',sourceDatabaseName);
+		// 		$("#txt_sourceDatabaseName").combobox("loadData",dataList);
+		// 	});
 //		 sql
 		 var querySql=$('#querySql').val();
 		 $("#txt_querySql").textbox("setValue", querySql);
@@ -136,8 +129,7 @@ define(function(require) {
 		 $("#txt_sourceTablename").textbox("setValue", table);
 //		 select
 	};
-	
-	
+
 	this.onchange = function (){
 		if(document.getElementById('txt_sourceDatabaseName')){
 			$('#txt_sourceDatabaseName').combobox({
@@ -162,7 +154,7 @@ define(function(require) {
 				}
 			});
 		}
-		
+
 		if(document.getElementById('txt_sourceTablename')){
 			$('#txt_sourceTablename').combobox({
 				onChange: function (newValue, oldValue) {
@@ -181,10 +173,10 @@ define(function(require) {
 			});
 		}
 	}
-	
-	
+
+
 	this.saveDbLeft = function(){
-		 
+
 
 		 var txt_querySql = $('#txt_querySql').val();
 		 var text_Table = $("#txt_sourceTablename").combobox('getValue');

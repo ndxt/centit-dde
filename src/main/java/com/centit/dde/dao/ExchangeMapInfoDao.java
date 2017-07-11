@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class ExchangeMapinfoDao extends BaseDaoImpl<ExchangeMapInfo,Long> {
-    public static final Log log = LogFactory.getLog(ExchangeMapinfoDao.class);
+public class ExchangeMapInfoDao extends BaseDaoImpl<ExchangeMapInfo,Long> {
+    public static final Log log = LogFactory.getLog(ExchangeMapInfoDao.class);
     @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {

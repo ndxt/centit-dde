@@ -1,5 +1,6 @@
 package com.centit.dde.controller;
 
+import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExchangeMapInfo;
 import com.centit.dde.po.MapInfoDetail;
 import com.centit.dde.po.MapInfoTrigger;
@@ -83,8 +84,12 @@ public class ExchangeMapInfoController extends BaseController {
 
     @RequestMapping(value="/save",method = {RequestMethod.PUT})
     public void save(ExchangeMapInfo object, HttpServletResponse response) {
-
-        exchangeMapInfoManager.save(object);
+        try {
+            exchangeMapInfoManager.save(object);
+        }catch (SqlResolveException e){
+            JsonResultUtils.writeErrorMessageJson(e.getMessage(), response);
+            return;
+        }
 
         JsonResultUtils.writeSuccessJson(response);
     }

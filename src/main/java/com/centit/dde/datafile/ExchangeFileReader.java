@@ -3,19 +3,19 @@ package com.centit.dde.datafile;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.ZipCompressor;
 import com.centit.support.file.FileSystemOpt;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Date;
 import java.util.List;
 
 public class ExchangeFileReader {
-    public static final Log loger = LogFactory.getLog(ExchangeFileReader.class);
+    public static final Logger logger = LoggerFactory.getLogger(ExchangeFileReader.class);
 
     private String dataDirPath;
 
@@ -140,7 +140,7 @@ public class ExchangeFileReader {
             readOK = true;
 //            xmlDoc = DocumentHelper.parseText(xmlStr);
         } catch (DocumentException e) {
-            loger.error("读取导入文件" + dataDirPath + "/exchange.xml 错误:" + e.getMessage(), e.getCause());
+            logger.error("读取导入文件" + dataDirPath + "/exchange.xml 错误:" + e.getMessage(), e.getCause());
         }
 
         return readOK;
@@ -186,7 +186,7 @@ public class ExchangeFileReader {
         String sStore = tableElement.attributeValue("store");
         if ("infile".equals(sStore)) {
             String tableFilePath = dataDirPath + "/" + tableElement.getTextTrim();
-            loger.info(tableFilePath);
+            logger.info(tableFilePath);
 
             tableReader.readTableInfo(tableFilePath);
         } else {

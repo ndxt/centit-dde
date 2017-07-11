@@ -1,8 +1,8 @@
 package com.centit.dde.transfer.Impl;
 
-import com.centit.dde.dao.ExchangeMapinfoDao;
+import com.centit.dde.dao.ExchangeMapInfoDao;
 import com.centit.dde.dao.ExchangeTaskDao;
-import com.centit.dde.dao.ExchangeTaskdetailDao;
+import com.centit.dde.dao.ExchangeTaskDetailDao;
 import com.centit.dde.dao.MapInfoTriggerDao;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.*;
@@ -39,11 +39,11 @@ public class TransferManagerImpl implements TransferManager {
 
     private static boolean debugEnabled = logger.isDebugEnabled();
 
-    private ExchangeMapinfoDao exchangeMapinfoDao;
+    private ExchangeMapInfoDao exchangeMapInfoDao;
 
      private ExchangeTaskDao exchangeTaskDao;
 
-    private ExchangeTaskdetailDao exchangeTaskdetailDao;
+    private ExchangeTaskDetailDao exchangeTaskDetailDao;
 
     private MapInfoTriggerDao mapInfoTriggerDao;
 
@@ -76,12 +76,12 @@ public class TransferManagerImpl implements TransferManager {
         this.exchangeTaskDao = exchangeTaskDao;
     }
 
-    public void setExchangeTaskdetailDao(ExchangeTaskdetailDao exchangeTaskdetailDao) {
-        this.exchangeTaskdetailDao = exchangeTaskdetailDao;
+    public void setExchangeTaskDetailDao(ExchangeTaskDetailDao exchangeTaskDetailDao) {
+        this.exchangeTaskDetailDao = exchangeTaskDetailDao;
     }
 
-    public void setExchangeMapinfoDao(ExchangeMapinfoDao exchangeMapinfoDao) {
-        this.exchangeMapinfoDao = exchangeMapinfoDao;
+    public void setExchangeMapInfoDao(ExchangeMapInfoDao exchangeMapInfoDao) {
+        this.exchangeMapInfoDao = exchangeMapInfoDao;
     }
 
     private static void setAdoParameter(PreparedStatement souce, int pn, int sn, ResultSet rs) throws SQLException {
@@ -185,10 +185,6 @@ public class TransferManagerImpl implements TransferManager {
 
     }
 
-    public static Timestamp currentSqlTimestamp() {
-        return new java.sql.Timestamp(System.currentTimeMillis());
-    }
-
     /**
      * @param souce
      * @param pn
@@ -206,7 +202,7 @@ public class TransferManagerImpl implements TransferManager {
                                          long nMoved, long nError, String sLastErrorMsg, Date dtBeginMove, Date dtEndMove) throws SQLException {
         String sPrmName = sPN.toUpperCase();
         if (sPrmName.equals("TODAY")) {
-            souce.setTimestamp(pn, currentSqlTimestamp());
+            souce.setTimestamp(pn, DatetimeOpt.currentSqlTimeStamp());
         } else if (nSqlType != 2) {
             if ((nSqlType == 1) && sPrmName.equals("SQL_ERROR_MSG")) {
                 souce.setString(pn, sLastErrorMsg);
@@ -785,8 +781,8 @@ public class TransferManagerImpl implements TransferManager {
 
     }
 
-    public int doTransfer(Long mapinfoID, String usercode) {
-        ExchangeMapInfo exchangMapinfo = exchangeMapinfoDao.getObjectById(mapinfoID);
+    public int doTransfer(Long mapInfoID, String userCode) {
+        ExchangeMapInfo exchangMapinfo = exchangeMapInfoDao.getObjectById(mapInfoID);
         if (exchangMapinfo == null)
             return -1;
         Long taskLogId = taskLogManager.getTaskLogId();
@@ -795,7 +791,7 @@ public class TransferManagerImpl implements TransferManager {
         taskLog.setTaskId(0l);
         taskLog.setRunBeginTime(DatetimeOpt.currentSqlDate());
         taskLog.setRunType("1");
-        taskLog.setRunner(usercode);
+        taskLog.setRunner(userCode);
         taskLogManager.saveObject(taskLog);
         TransferResult transferResult = runDataMap(exchangMapinfo, taskLogId);
         int nRes = transferResult.getRes();
@@ -804,7 +800,7 @@ public class TransferManagerImpl implements TransferManager {
         return nRes;
     }
 
-    public String runTransferTask(Long taskID, String usercode, String runType,String taskType) {
+    public String runTransferTask(Long taskID, String userCode, String runType, String taskType) {
 
         String msg = null;
 
@@ -824,7 +820,7 @@ public class TransferManagerImpl implements TransferManager {
 
         TaskConsoleWriteUtils.writeInfo(taskID, msg);
 
-        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailDao.getTaskDetails(taskID);
+        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskDetailDao.getTaskDetails(taskID);
 
         Long taskLogId = taskLogManager.getTaskLogId();
         TaskLog taskLog = new TaskLog();
@@ -832,7 +828,7 @@ public class TransferManagerImpl implements TransferManager {
         taskLog.setTaskId(taskID);
         taskLog.setRunBeginTime(DatetimeOpt.currentSqlDate());
         taskLog.setRunType(runType);
-        taskLog.setRunner(usercode);
+        taskLog.setRunner(userCode);
         taskLog.setTaskType(taskType);
         taskLogManager.saveObject(taskLog);
         //taskLogManager.flush();
@@ -851,7 +847,7 @@ public class TransferManagerImpl implements TransferManager {
 
 
         for (ExchangeTaskDetail taskDetail : exchangeTaskDetails) {
-            ExchangeMapInfo exchangMapinfo = exchangeMapinfoDao.getObjectById(taskDetail.getMapInfoId());
+            ExchangeMapInfo exchangMapinfo = exchangeMapInfoDao.getObjectById(taskDetail.getMapInfoId());
 
             if (exchangMapinfo == null) {
                 if (debugEnabled) {

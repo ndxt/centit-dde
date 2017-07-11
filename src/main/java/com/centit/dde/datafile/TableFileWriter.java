@@ -4,14 +4,14 @@ import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.file.FileSystemOpt;
 import com.centit.support.xml.XmlUtils;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Date;
 
 public class TableFileWriter {
-    public static final Log loger = LogFactory.getLog(TableFileWriter.class);
+    public static final Logger logger = LoggerFactory.getLogger(TableFileWriter.class);
     private static final int BUFSIZE = 64 * 1024;
     private CharArrayWriter memoryWriter = null;
 
@@ -93,7 +93,7 @@ public class TableFileWriter {
 
             fw.write("<?xml version=\"1.0\" encoding=\"GBK\"?>\r\n");
         } catch (IOException e) {
-            loger.error("创建并打开输出文件:" + filePath + "/" + exportName + ".xml  错误：" + e.getMessage());
+            logger.error("创建并打开输出文件:" + filePath + "/" + exportName + ".xml  错误：" + e.getMessage());
             //e.printStackTrace();
         }
         closeWriter();
@@ -107,7 +107,7 @@ public class TableFileWriter {
         try {
             fw.write("<?xml version=\"1.0\" encoding=\"GBK\"?>\r\n");
         } catch (IOException e) {
-            loger.error("创建CharArrayWriter:" + String.valueOf(BUFSIZE) + " 错误：" + e.getMessage());
+            logger.error("创建CharArrayWriter:" + String.valueOf(BUFSIZE) + " 错误：" + e.getMessage());
             //e.printStackTrace();
         }
         closeWriter();
@@ -124,7 +124,7 @@ public class TableFileWriter {
             if (tableWriter != null)
                 tableWriter.close();
         } catch (IOException e) {
-            loger.error("关闭文件:" + filePath + "/" + exportName + ".xml 错误：" + e.getMessage());
+            logger.error("关闭文件:" + filePath + "/" + exportName + ".xml 错误：" + e.getMessage());
             //e.printStackTrace();
         }
     }
@@ -163,7 +163,7 @@ public class TableFileWriter {
         try {
             tableWriter.write("<item name=\"" + name + "\"/>\r\n");
         } catch (IOException e) {
-            loger.error("写入item:" + name + " value:null 错误：" + e.getMessage());
+            logger.error("写入item:" + name + " value:null 错误：" + e.getMessage());
             //e.printStackTrace();
         }
     }
@@ -173,7 +173,7 @@ public class TableFileWriter {
             tableWriter.write("<item name=\"" + name + "\">" +
                     XmlUtils.encodeString(value) + "</item>\r\n");
         } catch (IOException e) {
-            loger.error("写入item:" + name + " value:" + value + " 错误：" + e.getMessage());
+            logger.error("写入item:" + name + " value:" + value + " 错误：" + e.getMessage());
             //e.printStackTrace();
         }
     }
@@ -183,7 +183,7 @@ public class TableFileWriter {
             tableWriter.write("<item name=\"" + name + "\"><![CDATA[" +
                     value + "]]></item>\r\n");
         } catch (IOException e) {
-            loger.error("写入item:" + name + " value:" + value + " 错误：" + e.getMessage());
+            logger.error("写入item:" + name + " value:" + value + " 错误：" + e.getMessage());
             //e.printStackTrace();
         }
     }
@@ -193,7 +193,7 @@ public class TableFileWriter {
             tableWriter.write("<item name=\"" + name + "\" type=\"number\">" +
                     String.valueOf(iValue) + "</item>\r\n");
         } catch (IOException e) {
-            loger.error("写入item:" + name + " value:" + String.valueOf(iValue) + " 错误：" + e.getMessage());
+            logger.error("写入item:" + name + " value:" + String.valueOf(iValue) + " 错误：" + e.getMessage());
             //e.printStackTrace();
         }
     }
@@ -203,7 +203,7 @@ public class TableFileWriter {
             tableWriter.write("<item name=\"" + name + "\" type=\"number\">" +
                     String.valueOf(lValue) + "</item>\r\n");
         } catch (IOException e) {
-            loger.error("写入item:" + name + " value:" + String.valueOf(lValue) + " 错误：" + e.getMessage());
+            logger.error("写入item:" + name + " value:" + String.valueOf(lValue) + " 错误：" + e.getMessage());
             //e.printStackTrace();
         }
     }
@@ -213,7 +213,7 @@ public class TableFileWriter {
             tableWriter.write("<item name=\"" + name + "\" type=\"number\">" +
                     String.valueOf(dbValue) + "</item>\r\n");
         } catch (IOException e) {
-            loger.error("写入item:" + name + " value:" + String.valueOf(dbValue) + " 错误：" + e.getMessage());
+            logger.error("写入item:" + name + " value:" + String.valueOf(dbValue) + " 错误：" + e.getMessage());
             //e.printStackTrace();
         }
     }
@@ -223,7 +223,7 @@ public class TableFileWriter {
             tableWriter.write("<item name=\"" + name + "\" type=\"date\" >" +
                     DatetimeOpt.convertDateToString(dateValue) + "</item>\r\n");
         } catch (IOException e) {
-            loger.error("写入item:" + name + " value:" + dateValue.toString() + " 错误：" + e.getMessage());
+            logger.error("写入item:" + name + " value:" + dateValue.toString() + " 错误：" + e.getMessage());
             //e.printStackTrace();
         }
     }
@@ -234,7 +234,7 @@ public class TableFileWriter {
             tableWriter.write("<item name=\"" + name + "\" type=\"date\" format=\"" + format + "\">" +
                     DatetimeOpt.convertDateToString(dateValue, format) + "</item>\r\n");
         } catch (IOException e) {
-            loger.error("写入item:" + name + " value:" + dateValue.toString() + " 错误：" + e.getMessage());
+            logger.error("写入item:" + name + " value:" + dateValue.toString() + " 错误：" + e.getMessage());
             //e.printStackTrace();
         }
     }
@@ -245,7 +245,7 @@ public class TableFileWriter {
             tableWriter.write("<item name=\"" + name + "\" type=\"datetime\" >" +
                     DatetimeOpt.convertDatetimeToString(dateValue) + "</item>\r\n");
         } catch (IOException e) {
-            loger.error("写入item:" + name + " value:" + dateValue.toString() + " 错误：" + e.getMessage());
+            logger.error("写入item:" + name + " value:" + dateValue.toString() + " 错误：" + e.getMessage());
             //e.printStackTrace();
         }
     }
@@ -265,7 +265,7 @@ public class TableFileWriter {
                     lobw.write(clobValue);
                     lobw.close();
                 } catch (IOException e) {
-                    loger.error("写入clob文件:" + filePath + "/" + exportName + "/" + name + "/" + sKey + ".dat 错误：" + e.getMessage());
+                    logger.error("写入clob文件:" + filePath + "/" + exportName + "/" + name + "/" + sKey + ".dat 错误：" + e.getMessage());
                     //e.printStackTrace();
                 }
 
@@ -274,7 +274,7 @@ public class TableFileWriter {
                         clobValue + "]]></item>\r\n");
 
         } catch (IOException e) {
-            loger.error("写入clobitem:" + name + " length:" + clobValue.length() + " 错误：" + e.getMessage());
+            logger.error("写入clobitem:" + name + " length:" + clobValue.length() + " 错误：" + e.getMessage());
             //e.printStackTrace();
         }
     }
@@ -292,14 +292,14 @@ public class TableFileWriter {
                     dos.close();
 
                 } catch (IOException e) {
-                    loger.error("写入blob文件:" + filePath + "/" + exportName + "/" + name + "/" + sKey + ".dat 错误：" + e.getMessage());
+                    logger.error("写入blob文件:" + filePath + "/" + exportName + "/" + name + "/" + sKey + ".dat 错误：" + e.getMessage());
                     //e.printStackTrace();
                 }
             } else
                 tableWriter.write("<item name=\"" + name + "\" type=\"blob\" format=\"base64\"><![CDATA[ " +
                         new String(Base64.encodeBase64(blobValue)) + "]]></item>\r\n");
         } catch (IOException e) {
-            loger.error("写入blobitem:" + name + " length:" + blobValue.length + " 错误：" + e.getMessage());
+            logger.error("写入blobitem:" + name + " length:" + blobValue.length + " 错误：" + e.getMessage());
             //e.printStackTrace();
         }
 

@@ -3,14 +3,14 @@ package com.centit.dde.datafile;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.ZipCompressor;
 import com.centit.support.file.FileSystemOpt;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Date;
 
 public class ExchangeFileWriter {
-    public static final Log loger = LogFactory.getLog(ExchangeFileWriter.class);
+    public static final Logger logger = LoggerFactory.getLogger(ExchangeFileWriter.class);
     private static final int BUFSIZE = 64 * 1024;
 
     private CharArrayWriter memoryWriter = null;
@@ -129,7 +129,7 @@ public class ExchangeFileWriter {
                     filePath + "/" + exchangeName + "/" + exchangeName + taskID + "/exchange.xml", false));
             fw.write("<?xml version=\"1.0\" encoding=\"GBK\"?>\r\n");
         } catch (IOException e) {
-            loger.error("创建并打开输出文件:" + filePath + "/" + exchangeName + "/" + exchangeName + taskID
+            logger.error("创建并打开输出文件:" + filePath + "/" + exchangeName + "/" + exchangeName + taskID
                     + "/" + exchangeName + ".xml  错误：" + e.getMessage());
             //e.printStackTrace();
         }
@@ -144,7 +144,7 @@ public class ExchangeFileWriter {
         try {
             fw.write("<?xml version=\"1.0\" encoding=\"GBK\"?>\r\n");
         } catch (IOException e) {
-            loger.error("创建CharArrayWriter:" + String.valueOf(BUFSIZE) + " 错误：" + e.getMessage());
+            logger.error("创建CharArrayWriter:" + String.valueOf(BUFSIZE) + " 错误：" + e.getMessage());
             //e.printStackTrace();
         }
         closeWriter();
@@ -162,7 +162,7 @@ public class ExchangeFileWriter {
             if (exchangeWriter != null)
                 exchangeWriter.close();
         } catch (IOException e) {
-            loger.error("关闭文件:" + filePath + "/" + exchangeName + "/" + exchangeName + taskID
+            logger.error("关闭文件:" + filePath + "/" + exchangeName + "/" + exchangeName + taskID
                     + "/" + exchangeName + ".xml  错误：" + e.getMessage());
             //e.printStackTrace();
         }
@@ -185,7 +185,7 @@ public class ExchangeFileWriter {
                     + "\" operator=\"" + operator
                     + "\" exporttime=\"" + DatetimeOpt.convertDatetimeToString(exportTime) + "\">\r\n");
         } catch (IOException e) {
-            loger.error("写入exchange信息:" + exchangeName + "-" + taskID
+            logger.error("写入exchange信息:" + exchangeName + "-" + taskID
                     + " 错误：" + e.getMessage());
             //e.printStackTrace();
         }
@@ -206,7 +206,7 @@ public class ExchangeFileWriter {
                     "\" store=\"infile\" >" +
                     tableName + ".xml</table>\r\n");
         } catch (IOException e) {
-            loger.error("写入数据文件信息:" + tableName + "  错误：" + e.getMessage());
+            logger.error("写入数据文件信息:" + tableName + "  错误：" + e.getMessage());
             //e.printStackTrace();
         }
     }

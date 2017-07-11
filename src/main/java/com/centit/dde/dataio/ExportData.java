@@ -5,17 +5,17 @@ import com.centit.dde.po.ExportSql;
 import com.centit.dde.po.TaskDetailLog;
 
 public interface ExportData {
-    int doExportSql(ExportSql exportSql, TableFileWriter tableWriter, String usercode,
+    int doExportSql(ExportSql exportSql, TableFileWriter tableWriter, String userCode,
                     TaskDetailLog taskDetailLog);
 
     /**
      * 导出离线文件
      *
      * @param exportID
-     * @param usercode
+     * @param userCode
      * @return >=0 为正常，<0 为错误编码
      */
-    int doExport(Long exportID, String usercode);
+    int doExport(Long exportID, String userCode);
 
     /**
      * 执行导出任务

@@ -12,13 +12,13 @@ public interface ExecuteDataMap {
      * 执行数据导入操作，可能是调用其他业务WebService 也可能是直接写入数据库
      *
      * @param xmlData
-     * @param usercode
+     * @param userCode
      * @param runType   1:手动 0：系统自动 2:WebService接口
      * @param taskLogId
      * @return
      * @throws Exception
      */
-    int doExecute(TableFileReader xmlData, String usercode, String runType, Long taskLogId)
+    int doExecute(TableFileReader xmlData, String userCode, String runType, Long taskLogId)
             throws SqlResolveException;
 
     /**

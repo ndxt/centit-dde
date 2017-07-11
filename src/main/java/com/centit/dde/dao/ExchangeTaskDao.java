@@ -21,7 +21,7 @@ public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask,Long> {
     @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {
-            filterField = new HashMap<String, String>();
+            filterField = new HashMap<>();
 
             filterField.put("taskId", CodeBook.EQUAL_HQL_ID);
 

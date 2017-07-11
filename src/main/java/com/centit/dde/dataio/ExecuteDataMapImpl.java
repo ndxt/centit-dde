@@ -20,8 +20,8 @@ import com.centit.framework.staticsystem.po.OsInfo;
 import com.centit.framework.staticsystem.service.IntegrationEnvironment;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.QueryUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.support.AbstractLobCreatingPreparedStatementCallback;
@@ -37,7 +37,7 @@ import java.util.Map;
 
 public class ExecuteDataMapImpl implements ExecuteDataMap {
 
-    private static final Log logger = LogFactory.getLog(ExecuteDataMapImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExecuteDataMapImpl.class);
 
     @Resource
     protected IntegrationEnvironment integrationEnvironment;
@@ -75,12 +75,12 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
 
      /**
      * @param xmlData
-     * @param usercode
+     * @param userCode
      * @param runType  1:手动 0：系统自动 2:WebService接口
      * @return
      * @throws SqlResolveException
      */
-    public int doExecute(TableFileReader xmlData, String usercode, String runType, Long taskLogId)
+    public int doExecute(TableFileReader xmlData, String userCode, String runType, Long taskLogId)
             throws SqlResolveException {
         String msg = null;
 
@@ -89,7 +89,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
 
         if (logger.isDebugEnabled()) {
             logger.debug("xmlData = " + xmlData);
-            logger.debug("用户代码 = " + usercode + " 运行类型 = " + runType + " 任务日志id = " + taskLogId);
+            logger.debug("用户代码 = " + userCode + " 运行类型 = " + runType + " 任务日志id = " + taskLogId);
         }
 
         String mapinfoId = xmlData.getDataOptId();
@@ -252,7 +252,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
             logger.debug("执行Insert操作开始");
         }
 
-        int nC = mapinfo.getPrameterSum();
+        int nC = mapinfo.getParameterSum();
         for (int i = 0; i < nC; i++) {
             ImportField field = mapinfo.getImportField(mapinfo.getInsertFieldMap().get(i));
 
@@ -277,7 +277,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
             throws SQLException {
         // int nC = pStmtSql.getParameterMetaData().getParameterCount();
 
-        int nC = mapinfo.getPrameterSum();
+        int nC = mapinfo.getParameterSum();
 
         if (logger.isDebugEnabled()) {
             logger.debug("执行Update操作开始，参数prameterSum值 = " + nC);

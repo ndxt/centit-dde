@@ -6,10 +6,10 @@ import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.file.FileIOOpt;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,14 +20,14 @@ import java.util.Map;
 
 public class TableFileReader {
 
-    public static final Log LOGGER = LogFactory.getLog(TableFileReader.class);
+    public static final Logger logger = LoggerFactory.getLogger(TableFileReader.class);
 
     /**
      * 临时文件夹路径
      */
     private String filePath;
 
-    private String sorceOsId;
+    private String sourceOsId;
 
     private String sourceDBName;
 
@@ -37,8 +37,8 @@ public class TableFileReader {
 
     private String exportDesc;
 
-    public String getSorceOsId() {
-        return sorceOsId;
+    public String getSourceOsId() {
+        return sourceOsId;
     }
 
     public String getSourceDBName() {
@@ -75,7 +75,7 @@ public class TableFileReader {
 
             // xmlDoc = DocumentHelper.parseText(xmlStr);
         } catch (DocumentException e) {
-            LOGGER.error("读取导入文件" + filePath + " 错误:" + e.getMessage(), e.getCause());
+            logger.error("读取导入文件" + filePath + " 错误:" + e.getMessage(), e.getCause());
         }
 
         return tempElement;
@@ -87,7 +87,7 @@ public class TableFileReader {
             Document tableDom = DocumentHelper.parseText(xmlData);
             tempElement = tableDom.getRootElement();
 
-            if (LOGGER.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("XML 根目录中参数为 ");
 
@@ -97,14 +97,14 @@ public class TableFileReader {
                     sb.append("name = " + attribute.getName() + " value = " + attribute.getValue());
                 }
 
-                LOGGER.debug(sb);
+                logger.debug(sb.toString());
             }
 
             if (!"table".equals(tempElement.getName())) {
                 tempElement = null;
             }
         } catch (DocumentException e) {
-            LOGGER.error("解析XML字符串 错误:" + e.getMessage(), e.getCause());
+            logger.error("解析XML字符串 错误:" + e.getMessage(), e.getCause());
         }
         if (tempElement == null) {
             return false;
@@ -123,7 +123,7 @@ public class TableFileReader {
             if (!"table".equals(tempElement.getName()))
                 tempElement = null;
         } catch (DocumentException e) {
-            LOGGER.error("解析XML字符串 错误:" + e.getMessage(), e.getCause());
+            logger.error("解析XML字符串 错误:" + e.getMessage(), e.getCause());
         }
         if (tempElement == null)
             return false;
@@ -148,7 +148,7 @@ public class TableFileReader {
          * <table mapinfoId="opt-01" sourcedatabase="epowerdb" * *
          * sorceosid="epower" name="table01">
          */
-        sorceOsId = tableElement.attributeValue("sorceosid");
+        sourceOsId = tableElement.attributeValue("sorceosid");
         sourceDBName = tableElement.attributeValue("sourcedatabase");
         exportName = tableElement.attributeValue("name");
         dataOptId = tableElement.attributeValue("dataoptid");
@@ -217,7 +217,7 @@ public class TableFileReader {
                         item.setStrValue(FileIOOpt.readStringFromFile(filePath + "/" + sValue));
 
                     } catch (IOException err) {
-                        LOGGER.error("读取clob文件:" + filePath + "/" + sValue + " 错误：" + err.getMessage());
+                        logger.error("读取clob文件:" + filePath + "/" + sValue + " 错误：" + err.getMessage());
                         // e.printStackTrace();
                     }
                 } else {
@@ -246,7 +246,7 @@ public class TableFileReader {
                         item.setBlobValue(FileUtils.readFileToByteArray(new File(filePath + "/" + sValue)));
 
                     } catch (IOException err) {
-                        LOGGER.error("读取clob文件:" + filePath + "/" + sValue + " 错误：" + err.getMessage());
+                        logger.error("读取clob文件:" + filePath + "/" + sValue + " 错误：" + err.getMessage());
                         // e.printStackTrace();
                     }
                 } else {
@@ -272,7 +272,7 @@ public class TableFileReader {
 
     @Override
     public String toString() {
-        return "TableFileReader [filePath=" + filePath + ", sorceOsId=" + sorceOsId + ", sourceDBName=" + sourceDBName
+        return "TableFileReader [filePath=" + filePath + ", sourceOsId=" + sourceOsId + ", sourceDBName=" + sourceDBName
                 + ", exportName=" + exportName + ", dataOptId=" + dataOptId + ", exportDesc=" + exportDesc
                 + ", tableElement=" + tableElement + "]";
     }

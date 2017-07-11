@@ -52,7 +52,7 @@ public class ImportDataImpl implements ImportData {
     }
 
     @Override
-    public int doImport(String filePath, String usercode, String runType, Long taskId) {
+    public int doImport(String filePath, String userCode, String runType, Long taskId) {
         String msg = null;
         if (!FileSystemOpt.existFile(filePath + "/exchange.xml")) {
             msg = "未找到解压后指定目录" + filePath + "/exchange.xml" + " 中的文件";
@@ -70,7 +70,7 @@ public class ImportDataImpl implements ImportData {
         taskLog.setTaskId(taskId);
         taskLog.setRunBeginTime(DatetimeOpt.currentSqlDate());
         taskLog.setRunType(runType);
-        taskLog.setRunner(usercode);
+        taskLog.setRunner(userCode);
         taskLog.setTaskType("3");
         taskLogManager.saveObject(taskLog);
         int nError = 0;
@@ -97,7 +97,7 @@ public class ImportDataImpl implements ImportData {
 
             int nRes = -1;
             try {
-                nRes = executeDataMap.doExecute(tr, usercode, runType, taskLogId);
+                nRes = executeDataMap.doExecute(tr, userCode, runType, taskLogId);
             } catch (SqlResolveException e) {
                 logger.error(e.getMessage(), e);
             }
@@ -109,7 +109,7 @@ public class ImportDataImpl implements ImportData {
             if (nRes < 0) {
                 nError++;
                 logger.error("执行导入 " + tr.getFilePath() + " 目录文件错误, dataOptId = " + tr.getDataOptId()
-                        + " sourceOsId = " + tr.getSorceOsId() + " tableName = " + tr.getExportName());
+                        + " sourceOsId = " + tr.getSourceOsId() + " tableName = " + tr.getExportName());
 
             } else {
                 nSucceed++;
@@ -129,12 +129,12 @@ public class ImportDataImpl implements ImportData {
         return 0;
     }
 
-    public int doImport(String filePath, String usercode, String runType) {
-        return doImport(filePath, usercode, runType, 0l);
+    public int doImport(String filePath, String userCode, String runType) {
+        return doImport(filePath, userCode, runType, 0l);
     }
 
     @Override
-    public int doImportZipFile(String zipFilePath, String usercode, String runType, Long taskId) {
+    public int doImportZipFile(String zipFilePath, String userCode, String runType, Long taskId) {
         String dataPath = calcZipFolderPath(zipFilePath);
 
         if (debugEnabled) {
@@ -150,18 +150,18 @@ public class ImportDataImpl implements ImportData {
         if (debugEnabled) {
             logger.debug("解压.zip文件结束");
         }
-        int n = doImport(dataPath, usercode, runType, taskId);
+        int n = doImport(dataPath, userCode, runType, taskId);
         
         FileSystemOpt.deleteDirect(new File(dataPath));
         return n;
     }
 
-    public int doImportZipFile(String zipFilePath, String usercode, String runType) {
-        return doImportZipFile(zipFilePath, usercode, runType, 0l);
+    public int doImportZipFile(String zipFilePath, String userCode, String runType) {
+        return doImportZipFile(zipFilePath, userCode, runType, 0l);
     }
 
     @Override
-    public String runImportTask(Long taskID, String usercode, String runType) {
+    public String runImportTask(Long taskID, String userCode, String runType) {
         String msg = null;
 
         ExchangeTask exchangeTask = exchangeTaskDao.getObjectById(taskID);
@@ -190,7 +190,7 @@ public class ImportDataImpl implements ImportData {
             msg = "导入文件全路径 = " + fileName;
             logger.info(msg);
 
-            int resultCode = doImportZipFile(fileName, usercode, runType, taskID);
+            int resultCode = doImportZipFile(fileName, userCode, runType, taskID);
 
             if (0 == resultCode) {
                 msg = "成功完成导入操作";

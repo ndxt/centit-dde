@@ -15,7 +15,7 @@ public class ImportSqlOpt {
     private String desTable;
     private String rowOptType;
     private int fieldCount; // 配对的fieldCount
-    private int prameterSum; // insert语句和Update语句的参数个数
+    private int parameterSum; // insert语句和Update语句的参数个数
     private int keyCount;
     private List<Integer> insertFieldMap;// 记录字段在 insert语句中的顺序号
     private List<Integer> updateFieldMap;// 记录字段在 update语句中的顺序号
@@ -23,7 +23,7 @@ public class ImportSqlOpt {
     private ImportOpt importOpt;
 
     public ImportSqlOpt() {
-        fieldCount = prameterSum = keyCount = 0;
+        fieldCount = parameterSum = keyCount = 0;
         insertFieldMap = null;
         updateFieldMap = null;
         keyFieldMap = null;
@@ -60,7 +60,7 @@ public class ImportSqlOpt {
     }
 
     public void makeSqlNoNamedParams() {
-        prameterSum = 0;
+        parameterSum = 0;
         String sInsertSql = "insert into " + desTable + " (";
         String sValues = "values(";
         String sIsExistSql = "select count(1) as isthere from " + desTable;
@@ -86,7 +86,7 @@ public class ImportSqlOpt {
             sInsertSql = sInsertSql + field.getDestFieldName();
             if (!StringUtils.hasText(field.getDestFieldDefault())) {
                 insertFieldMap.add(i);
-                prameterSum++;
+                parameterSum++;
                 sValues = sValues + " ?";// ":prm" + i;
             } else {
                 sValues = sValues
@@ -136,7 +136,7 @@ public class ImportSqlOpt {
         updateSql = sUpdateSql + " where " + sWhere;
         isExistSql = sIsExistSql + " where " + sWhere;
 
-        if (prameterSum < fieldCount) {
+        if (parameterSum < fieldCount) {
             for (i = 0; i < nKey; i++) {
                 updateFieldMap.set(nCol + i,
                         updateFieldMap.get(fieldCount - nKey + i));
@@ -150,7 +150,7 @@ public class ImportSqlOpt {
     }
 
     public void makeSqlWithNamedParams() {
-        prameterSum = 0;
+        parameterSum = 0;
         String sInsertSql = "insert into " + desTable + " (";
         String sValues = "values(";
         String sIsExistSql = "select count(1) as isthere from " + desTable;
@@ -175,7 +175,7 @@ public class ImportSqlOpt {
             sInsertSql = sInsertSql + field.getDestFieldName();
             if (!StringUtils.hasText(field.getDestFieldDefault())) {
                 insertFieldMap.add(i);
-                prameterSum++;
+                parameterSum++;
                 sValues = sValues + ":prm" + i;
             } else {
                 sValues = sValues
@@ -221,7 +221,7 @@ public class ImportSqlOpt {
         updateSql = sUpdateSql + " where " + sWhere;
         isExistSql = sIsExistSql + " where " + sWhere;
 
-        if (prameterSum < fieldCount) {
+        if (parameterSum < fieldCount) {
             for (i = 0; i < nKey; i++) {
                 updateFieldMap.set(nCol + i,
                         updateFieldMap.get(fieldCount - nKey + i));
@@ -283,12 +283,12 @@ public class ImportSqlOpt {
         this.fieldCount = fieldCount;
     }
 
-    public int getPrameterSum() {
-        return prameterSum;
+    public int getParameterSum() {
+        return parameterSum;
     }
 
-    public void setPrameterSum(int prameterSum) {
-        this.prameterSum = prameterSum;
+    public void setParameterSum(int parameterSum) {
+        this.parameterSum = parameterSum;
     }
 
 

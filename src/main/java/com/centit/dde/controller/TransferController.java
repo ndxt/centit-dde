@@ -9,8 +9,8 @@ import com.centit.dde.service.TransferManager;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.security.model.CentitUserDetails;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,16 +24,11 @@ import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
-
-
-
-
 @Controller
 @RequestMapping("/transfer")
 public class TransferController extends BaseController {
 
-    private static Log logger = LogFactory.getLog(TransferController.class);
+    private static Logger logger = LoggerFactory.getLogger(TransferController.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -90,7 +85,7 @@ public class TransferController extends BaseController {
                         callWebService.runCallServiceTask(taskId, userDetails.getUserCode(), "1",taskType);
                     }
                 } catch (RuntimeException e) {
-                    logger.error(e);
+                    logger.error(e.getMessage());
                 }
 
             }

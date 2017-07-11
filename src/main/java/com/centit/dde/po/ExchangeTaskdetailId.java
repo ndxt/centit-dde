@@ -14,13 +14,13 @@ import javax.persistence.IdClass;
  */
 @Embeddable
 @IdClass(ExchangeTaskDetail.class)
-public class ExchangeTaskdetailId implements java.io.Serializable {
+public class ExchangeTaskDetailId implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     
     @Column(name="MAPINFO_ID")
     @NotBlank(message = "字段不能为空")
-    private Long mapinfoId;
+    private Long mapInfoId;
 
     @Column(name="TASK_ID")
     @NotBlank(message = "字段不能为空")
@@ -31,25 +31,25 @@ public class ExchangeTaskdetailId implements java.io.Serializable {
     /**
      * default constructor
      */
-    public ExchangeTaskdetailId() {
+    public ExchangeTaskDetailId() {
     }
 
     /**
      * full constructor
      */
-    public ExchangeTaskdetailId(Long mapinfoId, Long taskId) {
+    public ExchangeTaskDetailId(Long mapInfoId, Long taskId) {
 
-        this.mapinfoId = mapinfoId;
+        this.mapInfoId = mapInfoId;
         this.taskId = taskId;
     }
 
 
-    public Long getMapinfoId() {
-        return this.mapinfoId;
+    public Long getMapInfoId() {
+        return this.mapInfoId;
     }
 
-    public void setMapinfoId(Long mapinfoId) {
-        this.mapinfoId = mapinfoId;
+    public void setMapInfoId(Long mapInfoId) {
+        this.mapInfoId = mapInfoId;
     }
 
     public Long getTaskId() {
@@ -66,15 +66,15 @@ public class ExchangeTaskdetailId implements java.io.Serializable {
             return true;
         if ((other == null))
             return false;
-        if (!(other instanceof ExchangeTaskdetailId))
+        if (!(other instanceof ExchangeTaskDetailId))
             return false;
 
-        ExchangeTaskdetailId castOther = (ExchangeTaskdetailId) other;
+        ExchangeTaskDetailId castOther = (ExchangeTaskDetailId) other;
         boolean ret = true;
 
-        ret = ret && (this.getMapinfoId() == castOther.getMapinfoId() ||
-                (this.getMapinfoId() != null && castOther.getMapinfoId() != null
-                        && this.getMapinfoId().equals(castOther.getMapinfoId())));
+        ret = ret && (this.getMapInfoId() == castOther.getMapInfoId() ||
+                (this.getMapInfoId() != null && castOther.getMapInfoId() != null
+                        && this.getMapInfoId().equals(castOther.getMapInfoId())));
 
         ret = ret && (this.getTaskId() == castOther.getTaskId() ||
                 (this.getTaskId() != null && castOther.getTaskId() != null
@@ -87,7 +87,7 @@ public class ExchangeTaskdetailId implements java.io.Serializable {
         int result = 17;
 
         result = 37 * result +
-                (this.getMapinfoId() == null ? 0 : this.getMapinfoId().hashCode());
+                (this.getMapInfoId() == null ? 0 : this.getMapInfoId().hashCode());
 
         result = 37 * result +
                 (this.getTaskId() == null ? 0 : this.getTaskId().hashCode());

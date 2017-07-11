@@ -263,7 +263,7 @@ public class ExchangeMapInfo implements java.io.Serializable {
             MapInfoDetail odt = it.next();
             found = false;
             for (MapInfoDetail newdt : newObjs) {
-                if (odt.getMapInfoId().equals(newdt.getMapInfoId())) {
+                if (odt.getCid().equals(newdt.getCid())) {
                     found = true;
                     break;
                 }
@@ -278,7 +278,7 @@ public class ExchangeMapInfo implements java.io.Serializable {
             found = false;
             for (Iterator<MapInfoDetail> it = getMapInfoDetails().iterator(); it.hasNext(); ) {
                 MapInfoDetail odt = it.next();
-                if (odt.getMapInfoId().equals(newdt.getMapInfoId())) {
+                if (odt.getCid().equals(newdt.getCid())) {
                     odt.copy(newdt);
                     found = true;
                     break;

@@ -1,8 +1,8 @@
 package com.centit.dde.service.impl;
 
-import com.centit.dde.dao.ExchangeMapinfoDao;
+import com.centit.dde.dao.ExchangeMapInfoDao;
 import com.centit.dde.dao.ExchangeTaskDao;
-import com.centit.dde.dao.ExchangeTaskdetailDao;
+import com.centit.dde.dao.ExchangeTaskDetailDao;
 import com.centit.dde.dao.MapInfoTriggerDao;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.*;
@@ -15,9 +15,8 @@ import com.centit.dde.util.TaskConsoleWriteUtils;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.service.IntegrationEnvironment;
 import com.centit.support.algorithm.DatetimeOpt;
-import com.sun.istack.Nullable;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -35,19 +34,23 @@ import java.util.List;
 
 @Service
 public class TransferManagerImpl implements TransferManager {
-    private static final Log logger = LogFactory.getLog(TransferManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(TransferManager.class);
 
     private static boolean debugEnabled = logger.isDebugEnabled();
 
-    private ExchangeMapinfoDao exchangeMapinfoDao;
+    @Resource
+    private ExchangeMapInfoDao exchangeMapInfoDao;
 
     @Resource
     protected IntegrationEnvironment integrationEnvironment;
 
+    @Resource
     private ExchangeTaskDao exchangeTaskDao;
 
-    private ExchangeTaskdetailDao exchangeTaskdetailDao;
+    @Resource
+    private ExchangeTaskDetailDao exchangeTaskDetailDao;
 
+    @Resource
     private MapInfoTriggerDao mapInfoTriggerDao;
 
     @Resource
@@ -58,42 +61,6 @@ public class TransferManagerImpl implements TransferManager {
 
     @Resource
     private TaskDetailLogManager taskDetailLogManager;
-
-    public void setTaskDetailLogManager(TaskDetailLogManager taskDetailLogManager) {
-        this.taskDetailLogManager = taskDetailLogManager;
-    }
-
-    public void setTaskLogManager(TaskLogManager taskLogManager) {
-        this.taskLogManager = taskLogManager;
-    }
-
-    public void setTaskErrorDataManager(TaskErrorDataManager taskErrorDataManager) {
-        this.taskErrorDataManager = taskErrorDataManager;
-    }
-
-    @Resource
-    @Nullable
-    public void setMapInfoTriggerDao(MapInfoTriggerDao mapInfoTriggerDao) {
-        this.mapInfoTriggerDao = mapInfoTriggerDao;
-    }
-
-    @Resource(name="exchangeTaskDao")
-    @Nullable
-    public void setExchangeTaskDao(ExchangeTaskDao exchangeTaskDao) {
-        this.exchangeTaskDao = exchangeTaskDao;
-    }
-
-    @Resource(name="exchangeTaskdetailDao")
-    @Nullable
-    public void setExchangeTaskdetailDao(ExchangeTaskdetailDao exchangeTaskdetailDao) {
-        this.exchangeTaskdetailDao = exchangeTaskdetailDao;
-    }
-
-    @Resource(name="exchangeMapinfoDao")
-    @Nullable
-    public void setExchangeMapinfoDao(ExchangeMapinfoDao exchangeMapinfoDao) {
-        this.exchangeMapinfoDao = exchangeMapinfoDao;
-    }
 
     private static void setAdoParameter(PreparedStatement souce, int pn, int sn, ResultSet rs) throws SQLException {
         int rsc = rs.getMetaData().getColumnCount();// rs.getMetaData().getColumnType(sn);
@@ -196,10 +163,6 @@ public class TransferManagerImpl implements TransferManager {
 
     }
 
-    public static Timestamp currentSqlTimestamp() {
-        return new java.sql.Timestamp(System.currentTimeMillis());
-    }
-
     /**
      * @param souce
      * @param pn
@@ -217,7 +180,7 @@ public class TransferManagerImpl implements TransferManager {
                                          long nMoved, long nError, String sLastErrorMsg, Date dtBeginMove, Date dtEndMove) throws SQLException {
         String sPrmName = sPN.toUpperCase();
         if (sPrmName.equals("TODAY")) {
-            souce.setTimestamp(pn, currentSqlTimestamp());
+            souce.setTimestamp(pn, DatetimeOpt.currentSqlTimeStamp());
         } else if (nSqlType != 2) {
             if ((nSqlType == 1) && sPrmName.equals("SQL_ERROR_MSG")) {
                 souce.setString(pn, sLastErrorMsg);
@@ -297,7 +260,7 @@ public class TransferManagerImpl implements TransferManager {
     private static void exeInsert(PreparedStatement pStmtSql, ResultSet rs, TableMapInfo mapinfo) throws SQLException {
         // int nC = pStmtSql.getParameterMetaData().getParameterCount();
 
-        int nC = mapinfo.getPrameterSum();
+        int nC = mapinfo.getParameterSum();
         for (int i = 0; i < nC; i++)
             setAdoParameter(pStmtSql, i + 1, mapinfo.getInsertFieldMap().get(i) + 1, rs, mapinfo);
         pStmtSql.execute();
@@ -310,7 +273,7 @@ public class TransferManagerImpl implements TransferManager {
     private static void exeUpdate(PreparedStatement pStmtSql, ResultSet rs, TableMapInfo mapinfo) throws SQLException {
         // int nC = pStmtSql.getParameterMetaData().getParameterCount();
 
-        int nC = mapinfo.getPrameterSum();
+        int nC = mapinfo.getParameterSum();
 
         for (int i = 0; i < nC; i++) {
             setAdoParameter(pStmtSql, i + 1, mapinfo.getUpdateFieldMap().get(i) + 1, rs, mapinfo);
@@ -357,7 +320,7 @@ public class TransferManagerImpl implements TransferManager {
         return pInfo;
     }
 
-    private TransferResult runDataMap(ExchangeMapInfo exchangMapinfo, Long taskLogId) {
+    private TransferResult runDataMap(ExchangeMapInfo exchangeMapInfo, Long taskLogId) {
         String msg = null;
         TaskLog taskLog = taskLogManager.getObjectById(taskLogId);
         Long taskId = taskLog.getTaskId();
@@ -366,11 +329,11 @@ public class TransferManagerImpl implements TransferManager {
         transferResult.setRes(0);
 
         if (debugEnabled) {
-            msg = "数据交换对应关系 Name = " + exchangMapinfo.getMapInfoName() + " querysql = "
-                    + exchangMapinfo.getQuerySql() + " 源数据库 = " + exchangMapinfo.getSourceDatabaseName() + " 源表名 = "
-                    + exchangMapinfo.getSourceTableName() + " 目标数据库 = " + exchangMapinfo.getDestDatabaseName()
-                    + " 目标表名 = " + exchangMapinfo.getDestTableName() + " 记录操作[1、插入（insert）2、更新（update）3、合并（merge）] = "
-                    + exchangMapinfo.getRecordOperate();
+            msg = "数据交换对应关系 Name = " + exchangeMapInfo.getMapInfoName() + " querysql = "
+                    + exchangeMapInfo.getQuerySql() + " 源数据库 = " + exchangeMapInfo.getSourceDatabaseName() + " 源表名 = "
+                    + exchangeMapInfo.getSourceTableName() + " 目标数据库 = " + exchangeMapInfo.getDestDatabaseName()
+                    + " 目标表名 = " + exchangeMapInfo.getDestTableName() + " 记录操作[1、插入（insert）2、更新（update）3、合并（merge）] = "
+                    + exchangeMapInfo.getRecordOperate();
             logger.debug(msg);
 
             TaskConsoleWriteUtils.write(taskId, msg);
@@ -378,9 +341,9 @@ public class TransferManagerImpl implements TransferManager {
 
 
         // 准备环境
-        DatabaseInfo sourceDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangMapinfo.getSourceDatabaseName());
+        DatabaseInfo sourceDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
         if (null == sourceDatabaseInfo) {
-            msg = "源数据库 " + exchangMapinfo.getSourceDatabaseName() + " 不存在";
+            msg = "源数据库 " + exchangeMapInfo.getSourceDatabaseName() + " 不存在";
             logger.error(msg);
 
             TaskConsoleWriteUtils.writeError(taskId, msg);
@@ -389,9 +352,9 @@ public class TransferManagerImpl implements TransferManager {
             return transferResult;
         }
 
-        DatabaseInfo desDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangMapinfo.getDestDatabaseName());
+        DatabaseInfo desDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
         if (null == desDatabaseInfo) {
-            msg = "目标数据库 " + exchangMapinfo.getDestDatabaseName() + " 不存在";
+            msg = "目标数据库 " + exchangeMapInfo.getDestDatabaseName() + " 不存在";
 
             TaskConsoleWriteUtils.writeError(taskId, msg);
 
@@ -400,14 +363,14 @@ public class TransferManagerImpl implements TransferManager {
             return transferResult;
         }
 
-        List<MapInfoTrigger> mapInfoTriggers = mapInfoTriggerDao.listTriggerByMapinfoId(exchangMapinfo.getMapInfoId());
+        List<MapInfoTrigger> mapInfoTriggers = mapInfoTriggerDao.listTriggerByMapinfoId(exchangeMapInfo.getMapInfoId());
 
-        TableMapInfo mapinfo = new TableMapInfo();
+        TableMapInfo mapInfo = new TableMapInfo();
         try {
-            mapinfo.loadMapFromData(exchangMapinfo);
+            mapInfo.loadMapFromData(exchangeMapInfo);
         } catch (SqlResolveException e) {
-            logger.error(e.getMessage(), e);
             msg = e.getMessage();
+            logger.error(msg, e);
 
             TaskConsoleWriteUtils.writeError(taskId, msg);
 
@@ -416,18 +379,18 @@ public class TransferManagerImpl implements TransferManager {
         }
         MapInfoDBConn pInfo = loadMapInfoDBConfig(sourceDatabaseInfo, desDatabaseInfo);
 
-        msg = "InsertSql = " + mapinfo.getInsertSql();
+        msg = "InsertSql = " + mapInfo.getInsertSql();
         logger.info(msg);
 
         TaskConsoleWriteUtils.write(taskId, msg);
 
 
-        msg = "UpdateSql = " + mapinfo.getUpdateSql();
+        msg = "UpdateSql = " + mapInfo.getUpdateSql();
         logger.info(msg);
 
         TaskConsoleWriteUtils.write(taskId, msg);
 
-        msg = "IsExistSql = " + mapinfo.getIsExistSql();
+        msg = "IsExistSql = " + mapInfo.getIsExistSql();
         logger.info(msg);
 
         TaskConsoleWriteUtils.write(taskId, msg);
@@ -444,7 +407,7 @@ public class TransferManagerImpl implements TransferManager {
         Long taskDetailLogId = taskDetailLogManager.getTaskDetailLogId();
         taskDetailLog.setLogDetailId(taskDetailLogId);
         taskDetailLog.setLogId(taskLogId);
-        taskDetailLog.setMapinfoId(exchangMapinfo.getMapInfoId());
+        taskDetailLog.setMapinfoId(exchangeMapInfo.getMapInfoId());
         taskDetailLog.setRunBeginTime(beginTime);
 
         // 开始运行
@@ -507,14 +470,14 @@ public class TransferManagerImpl implements TransferManager {
                 PreparedStatement insertStmt = null;
                 PreparedStatement updateStmt = null;
                 PreparedStatement isExistStmt = null;
-                if (!mapinfo.getRowOptType().equals("update")) {
-                    insertStmt = rConn.prepareStatement(mapinfo.getInsertSql());
+                if (!mapInfo.getRowOptType().equals("update")) {
+                    insertStmt = rConn.prepareStatement(mapInfo.getInsertSql());
                 }
-                if (!mapinfo.getRowOptType().equals("insert")) {
-                    updateStmt = rConn.prepareStatement(mapinfo.getUpdateSql());
+                if (!mapInfo.getRowOptType().equals("insert")) {
+                    updateStmt = rConn.prepareStatement(mapInfo.getUpdateSql());
                 }
-                if (mapinfo.getRowOptType().equals("merge")) {
-                    isExistStmt = rConn.prepareStatement(mapinfo.getIsExistSql());
+                if (mapInfo.getRowOptType().equals("merge")) {
+                    isExistStmt = rConn.prepareStatement(mapInfo.getIsExistSql());
                 }
 
                 // 内循环
@@ -526,7 +489,7 @@ public class TransferManagerImpl implements TransferManager {
                     curMoved = 0;
                     preSucceed = nSucceed;// 记录上次成功的条数，如果一个循环没有一条成功的则终止循环
 
-                    String sourceSql = mapinfo.getSourceSql();
+                    String sourceSql = mapInfo.getSourceSql();
                     // sql 中含有< > 等时会转码，此处需要再转换回来
                     sourceSql = HtmlUtils.htmlUnescape(sourceSql);
 
@@ -535,7 +498,7 @@ public class TransferManagerImpl implements TransferManager {
                     logger.info(msg);
 
                     TaskConsoleWriteUtils.write(taskId, msg);
-                    TaskConsoleWriteUtils.write(taskId, "当前交换任务" + (mapinfo.isRepeatRun() ? "" : "没有") + "开启重复执行");
+                    TaskConsoleWriteUtils.write(taskId, "当前交换任务" + (mapInfo.isRepeatRun() ? "" : "没有") + "开启重复执行");
 
                     PreparedStatement pStmt = lConn.prepareStatement(sourceSql);
                     ResultSet rs = pStmt.executeQuery();
@@ -586,7 +549,7 @@ public class TransferManagerImpl implements TransferManager {
                             }
 
                             //执行交换
-                            exeMoveData(isExistStmt, updateStmt, insertStmt, rs, mapinfo);
+                            exeMoveData(isExistStmt, updateStmt, insertStmt, rs, mapInfo);
 
 
                             if (mapInfoTriggers != null) {
@@ -622,7 +585,7 @@ public class TransferManagerImpl implements TransferManager {
                             nSucceed++;
 
                             //输出交换成功失败数
-                            TaskConsoleWriteUtils.writeProcess(taskId, nSucceed, nError, exchangMapinfo.getMapInfoName());
+                            TaskConsoleWriteUtils.writeProcess(taskId, nSucceed, nError, exchangeMapInfo.getMapInfoName());
 
 
                             taskDetailLog.setSuccessPieces(nSucceed);
@@ -674,7 +637,7 @@ public class TransferManagerImpl implements TransferManager {
                                     lConn.commit();
                                     rConn.commit();
                                 } catch (Exception e2) {
-                                    logger.error(e2);
+                                    logger.error(e2.getLocalizedMessage());
                                     sLastErrorMsg = sLastErrorMsg + " || " + e.getMessage();
                                 }
                             }
@@ -685,7 +648,7 @@ public class TransferManagerImpl implements TransferManager {
                             taskErrorData.setErrorMessage(sLastErrorMsg);
                             StringBuilder sb = new StringBuilder();
                             for (int i = 0; i < columnCount; i++) {
-                                int feildType = mapinfo.getFieldsMap().get(i).getRightColType();
+                                int feildType = mapInfo.getFieldsMap().get(i).getRightColType();
                                 if (feildType == 4 || feildType == 5) {
                                     sb.append("LOB,");
                                 } else {
@@ -713,7 +676,7 @@ public class TransferManagerImpl implements TransferManager {
                     logger.info(message);
                     TaskConsoleWriteUtils.write(taskId, message);
 
-                } while (mapinfo.isRepeatRun() && (curMoved >= preMoved) && (preSucceed < nSucceed));
+                } while (mapInfo.isRepeatRun() && (curMoved >= preMoved) && (preSucceed < nSucceed));
 
             }
             Date endTime = DatetimeOpt.currentSqlDate();
@@ -772,7 +735,7 @@ public class TransferManagerImpl implements TransferManager {
 
             TaskConsoleWriteUtils.writeError(taskId, msg);
         }
-        msg = "执行交换" + exchangMapinfo.getMapInfoName() + "完成；共交换" + String.valueOf(nSucceed + nError) + "条,其中成功"
+        msg = "执行交换" + exchangeMapInfo.getMapInfoName() + "完成；共交换" + String.valueOf(nSucceed + nError) + "条,其中成功"
                 + String.valueOf(nSucceed) + "条,失败" + String.valueOf(nError) + "条。";
         logger.info(msg);
 
@@ -793,9 +756,9 @@ public class TransferManagerImpl implements TransferManager {
 
     }
 
-    public int doTransfer(Long mapinfoID, String usercode) {
-        ExchangeMapInfo exchangMapinfo = exchangeMapinfoDao.getObjectById(mapinfoID);
-        if (exchangMapinfo == null)
+    public int doTransfer(Long mapInfoID, String userCode) {
+        ExchangeMapInfo exchangeMapInfo = exchangeMapInfoDao.getObjectById(mapInfoID);
+        if (exchangeMapInfo == null)
             return -1;
         Long taskLogId = taskLogManager.getTaskLogId();
         TaskLog taskLog = new TaskLog();
@@ -803,16 +766,16 @@ public class TransferManagerImpl implements TransferManager {
         taskLog.setTaskId(0l);
         taskLog.setRunBeginTime(DatetimeOpt.currentSqlDate());
         taskLog.setRunType("1");
-        taskLog.setRunner(usercode);
+        taskLog.setRunner(userCode);
         taskLogManager.saveObject(taskLog);
-        TransferResult transferResult = runDataMap(exchangMapinfo, taskLogId);
+        TransferResult transferResult = runDataMap(exchangeMapInfo, taskLogId);
         int nRes = transferResult.getRes();
         taskLog.setRunEndTime(DatetimeOpt.currentSqlDate());
-        taskLogManager.saveObject(taskLog);
+        taskLogManager.updateObject(taskLog);
         return nRes;
     }
 
-    public String runTransferTask(Long taskID, String usercode, String runType,String taskType) {
+    public String runTransferTask(Long taskID, String userCode, String runType, String taskType) {
 
         String msg = null;
 
@@ -832,7 +795,7 @@ public class TransferManagerImpl implements TransferManager {
 
         TaskConsoleWriteUtils.writeInfo(taskID, msg);
 
-        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailDao.getTaskDetails(taskID);
+        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskDetailDao.getTaskDetails(taskID);
 
         Long taskLogId = taskLogManager.getTaskLogId();
         TaskLog taskLog = new TaskLog();
@@ -840,7 +803,7 @@ public class TransferManagerImpl implements TransferManager {
         taskLog.setTaskId(taskID);
         taskLog.setRunBeginTime(DatetimeOpt.currentSqlDate());
         taskLog.setRunType(runType);
-        taskLog.setRunner(usercode);
+        taskLog.setRunner(userCode);
         taskLog.setTaskType(taskType);
         taskLogManager.saveObject(taskLog);
         //taskLogManager.flush();
@@ -849,17 +812,17 @@ public class TransferManagerImpl implements TransferManager {
         int nError = 0;
         int nSucceed = 0;
 
-        List<String> errorMapinfoNameList = new ArrayList<String>();
+        List<String> errorMapinfoNameList = new ArrayList<>();
         int succ = 0, error = 0;
         boolean sourceHasData = false;
         /**
          * 已执行完交换对应关系名称集合
          */
-        List<String> exchangeMapinfoName = new ArrayList<String>();
+        List<String> exchangeMapinfoName = new ArrayList<>();
 
 
         for (ExchangeTaskDetail taskDetail : exchangeTaskDetails) {
-            ExchangeMapInfo exchangMapinfo = exchangeMapinfoDao.getObjectById(taskDetail.getMapInfoId());
+            ExchangeMapInfo exchangMapinfo = exchangeMapInfoDao.getObjectById(taskDetail.getMapInfoId());
 
             if (exchangMapinfo == null) {
                 if (debugEnabled) {
@@ -877,7 +840,7 @@ public class TransferManagerImpl implements TransferManager {
             exchangeMapinfoName.add("数据交换对应关系名称 " + exchangMapinfo.getMapInfoName() + " 交换成功 " + transferResult.getSucc() + "条数，交换失败 " + transferResult.getError() + " 条数");
             TaskConsoleWriteUtils.writeAlreadyProcess(taskID, StringUtils.collectionToDelimitedString
                     (exchangeMapinfoName, "_split_"));
-            logger.info(exchangeMapinfoName);
+            logger.info(exchangeMapinfoName.toString());
 
 
             //整个交换任务中总的成功条数，失败条数

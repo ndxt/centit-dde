@@ -1,7 +1,7 @@
 package com.centit.dde.dataio;
 
 import com.centit.dde.dao.ExchangeTaskDao;
-import com.centit.dde.dao.ExchangeTaskdetailDao;
+import com.centit.dde.dao.ExchangeTaskDetailDao;
 import com.centit.dde.dao.ExportSqlDao;
 import com.centit.dde.datafile.ExchangeFileWriter;
 import com.centit.dde.datafile.TableFileWriter;
@@ -17,15 +17,15 @@ import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.service.IntegrationEnvironment;
 import com.centit.support.algorithm.DatetimeOpt;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.sql.*;
 import java.util.List;
 
 public class ExportDataImpl implements ExportData, CallWebService {
-    private static final Log logger = LogFactory.getLog(ExportDataImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExportDataImpl.class);
 
     private static boolean debugEnabled = logger.isDebugEnabled();
 
@@ -36,7 +36,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
     private ExchangeTaskDao exchangeTaskDao;
 
-    private ExchangeTaskdetailDao exchangeTaskdetailDao;
+    private ExchangeTaskDetailDao exchangeTaskDetailDao;
 
     private TaskLogManager taskLogManager;
 
@@ -54,8 +54,8 @@ public class ExportDataImpl implements ExportData, CallWebService {
         this.exchangeTaskDao = exchangeTaskDao;
     }
 
-    public void setExchangeTaskdetailDao(ExchangeTaskdetailDao exchangeTaskdetailDao) {
-        this.exchangeTaskdetailDao = exchangeTaskdetailDao;
+    public void setExchangeTaskDetailDao(ExchangeTaskDetailDao exchangeTaskDetailDao) {
+        this.exchangeTaskDetailDao = exchangeTaskDetailDao;
     }
 
     public void setTaskErrorDataManager(TaskErrorDataManager taskErrorDataManager) {
@@ -75,7 +75,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
     }
 
     @Override
-    public int doExportSql(ExportSql exportSql, TableFileWriter tableWriter, String usercode,
+    public int doExportSql(ExportSql exportSql, TableFileWriter tableWriter, String userCode,
                            TaskDetailLog taskDetailLog) {
         String msg = null;
 
@@ -326,7 +326,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
     }
 
     @Override
-    public int doExport(Long exportID, String usercode) {
+    public int doExport(Long exportID, String userCode) {
         ExportSql exportSql = exportSqlDao.getObjectById(exportID);
         TableFileWriter tableWriter = new TableFileWriter();
 
@@ -339,7 +339,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
         tableWriter.prepareWriter();
         // exportSql.getExportField()
-        int nRes = doExportSql(exportSql, tableWriter, usercode, null);
+        int nRes = doExportSql(exportSql, tableWriter, userCode, null);
         tableWriter.closeWriter();
         return nRes;
     }
@@ -354,7 +354,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
         TaskConsoleWriteUtils.writeInfo(taskID, msg);
 
-        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailDao.getTaskDetails(taskID);
+        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskDetailDao.getTaskDetails(taskID);
 
         Long taskLogId = taskLogManager.getTaskLogId();
         TaskLog taskLog = new TaskLog();
@@ -469,7 +469,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
     }
 
     @Override
-    public int doCallService(Long exportID, String usercode) {
+    public int doCallService(Long exportID, String userCode) {
         ExportSql exportSql = exportSqlDao.getObjectById(exportID);
         TableFileWriter tableWriter = new TableFileWriter();
 
@@ -480,26 +480,26 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
         tableWriter.prepareMemoryWriter();
         // exportSql.getExportField()
-        int nRes = doExportSql(exportSql, tableWriter, usercode, null);
+        int nRes = doExportSql(exportSql, tableWriter, userCode, null);
 
         String xmlData = tableWriter.getMemoryDataXML();//.toString();
 
         tableWriter.closeWriter();
 
         if (nRes > 0) {
-            executeDataMap.doExecute(xmlData, usercode, "1", 0l);
+            executeDataMap.doExecute(xmlData, userCode, "1", 0l);
         }
 
         return nRes;
     }
 
     @Override
-    public String runCallServiceTask(Long taskID, String usercode, String runType,String taskType) {
+    public String runCallServiceTask(Long taskID, String userCode, String runType, String taskType) {
         ExchangeTask exchangeTask = exchangeTaskDao.getObjectById(taskID);
         exchangeTask.setLastRunTime(DatetimeOpt.currentSqlDate());
         exchangeTaskDao.saveObject(exchangeTask);
         logger.info("开始执行导出：" + exchangeTask.getTaskName() + "........");
-        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailDao.getTaskDetails(taskID);
+        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskDetailDao.getTaskDetails(taskID);
 
         Long taskLogId = taskLogManager.getTaskLogId();
         TaskLog taskLog = new TaskLog();
@@ -507,7 +507,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
         taskLog.setTaskId(taskID);
         taskLog.setRunBeginTime(DatetimeOpt.currentSqlDate());
         taskLog.setRunType(runType);
-        taskLog.setRunner(usercode);
+        taskLog.setRunner(userCode);
         taskLog.setTaskType(taskType);
         taskLogManager.saveObject(taskLog);
 
@@ -536,13 +536,13 @@ public class ExportDataImpl implements ExportData, CallWebService {
             tableWriter.setSourceDBName(exportSql.getSourceDatabaseName());
             tableWriter.prepareMemoryWriter();
 
-            int nRes = doExportSql(exportSql, tableWriter, usercode, taskDetailLog);
+            int nRes = doExportSql(exportSql, tableWriter, userCode, taskDetailLog);
 
             tableWriter.closeWriter();
             String xmlData = tableWriter.getMemoryDataXML();
 
             if (nRes > 0)
-                nRes = executeDataMap.doExecute(xmlData, usercode, "0", taskLogId);
+                nRes = executeDataMap.doExecute(xmlData, userCode, "0", taskLogId);
 
             Date endTime = DatetimeOpt.currentSqlDate();
             taskDetailLog.setRunEndTime(endTime);

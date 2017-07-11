@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @Repository
-public class ExchangeTaskdetailDao extends BaseDaoImpl<ExchangeTaskDetail,ExchangeTaskDetailId> {
+public class ExchangeTaskDetailDao extends BaseDaoImpl<ExchangeTaskDetail,ExchangeTaskDetailId> {
 
-    public static final Log log = LogFactory.getLog(ExchangeTaskdetailDao.class);
+    public static final Log log = LogFactory.getLog(ExchangeTaskDetailDao.class);
     @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {

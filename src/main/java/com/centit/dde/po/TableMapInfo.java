@@ -36,7 +36,7 @@ public class TableMapInfo {
     private int fieldCount; // 配对的fieldCount
 
     @Transient
-    private int prameterSum; // insert语句和Update语句的参数个数
+    private int parameterSum; // insert语句和Update语句的参数个数
 
     @Transient
     private int destFieldCount;
@@ -63,7 +63,7 @@ public class TableMapInfo {
     private boolean repeatRun;
 
     public TableMapInfo() {
-        fieldCount = prameterSum = destFieldCount = souFieldCount = keyCount = 0;
+        fieldCount = parameterSum = destFieldCount = souFieldCount = keyCount = 0;
         fieldsMap = null;
         insertFieldMap = null;
         updateFieldMap = null;
@@ -75,39 +75,39 @@ public class TableMapInfo {
         return outs;
     }
 
-    public void loadMapFromData(ExchangeMapInfo exchangMapinfo) throws SqlResolveException {
+    public void loadMapFromData(ExchangeMapInfo exchangeMapInfo) throws SqlResolveException {
         if (logger.isDebugEnabled()) {
             logger.debug("解析数据交换对应关系属性值...");
         }
         try {
-            sourceSql = exchangMapinfo.getQuerySql();
-            desTable = exchangMapinfo.getDestTableName();
+            sourceSql = exchangeMapInfo.getQuerySql();
+            desTable = exchangeMapInfo.getDestTableName();
             
-            if ("1".equals(exchangMapinfo.getRecordOperate())) {
+            if ("1".equals(exchangeMapInfo.getRecordOperate())) {
                 rowOptType = "insert";
-            } else if ("2".equals(exchangMapinfo.getRecordOperate())) {
+            } else if ("2".equals(exchangeMapInfo.getRecordOperate())) {
                 rowOptType = "update";
             } else {
                 rowOptType = "merge";
             }
-            if ("1".equals(exchangMapinfo.getIsRepeat())) {
+            if ("1".equals(exchangeMapInfo.getIsRepeat())) {
                 repeatRun = true;
             } else {
                 repeatRun = false;
             }
-            fieldsMap = new ArrayList<FieldMapInfo>();
+            fieldsMap = new ArrayList<>();
             /*
 			 * 这一段应该是排序，这个其实是没有必要的在hbm.xml中应该可以指定顺序，添加order-by属性就可以
 			 * List<MapInfoDetail> mapinfoDetails = new
 			 * ArrayList<MapInfoDetail>(); int length =
-			 * exchangMapinfo.getMapInfoDetails().size(); for(int
+			 * exchangeMapInfo.getMapInfoDetails().size(); for(int
 			 * i=1;i<=length;i++){ for (MapInfoDetail mapinfoDetailtemp :
-			 * exchangMapinfo .getMapInfoDetails()){
+			 * exchangeMapInfo .getMapInfoDetails()){
 			 * if(mapinfoDetailtemp.getCid(
 			 * ).getColumnNo().equals(Long.valueOf(i))){
 			 * mapinfoDetails.add(mapinfoDetailtemp); } } }
 			 */
-            for (MapInfoDetail mapInfoDetail : exchangMapinfo.getMapInfoDetails()) {
+            for (MapInfoDetail mapInfoDetail : exchangeMapInfo.getMapInfoDetails()) {
                 //添加对目标内容的过滤条件，没有目标字段的对应关系可以忽略
                 if(!StringUtils.hasText( mapInfoDetail.getDestFieldName()))
                     continue;
@@ -131,7 +131,7 @@ public class TableMapInfo {
                 fieldsMap.add(map);
             }
             
-            fieldCount = fieldsMap.size();// exchangMapinfo.getMapInfoDetails().size();
+            fieldCount = fieldsMap.size();// exchangeMapInfo.getMapInfoDetails().size();
             
             makeSqlNoNamedParams();
         } catch (Exception e) {
@@ -141,10 +141,10 @@ public class TableMapInfo {
 
     public void makeSqlNoNamedParams() {
         if (logger.isDebugEnabled()) {
-            logger.debug("解析数据交换对应关系中字段值，生成 insert, update margen 执行的sql语句...");
+            logger.debug("解析数据交换对应关系中字段值，生成 insert, update merge 执行的sql语句...");
         }
 
-        prameterSum = 0;
+        parameterSum = 0;
         String sInsertSql = "insert into " + desTable + " (";
         String sValues = "values(";
         String sIsExistSql = "select count(1) as isthere from " + desTable;
@@ -166,7 +166,7 @@ public class TableMapInfo {
             sInsertSql = sInsertSql + fieldsMap.get(i).getRightName();
             if (!StringUtils.hasText(fieldsMap.get(i).getDefaultValue())) {
                 insertFieldMap.add(i);
-                prameterSum++;
+                parameterSum++;
                 sValues = sValues + " ?";// ":prm" + i;
             } else {
                 sValues = sValues + quotedstr(fieldsMap.get(i).getDefaultValue());
@@ -212,7 +212,7 @@ public class TableMapInfo {
         updateSql = sUpdateSql + " where " + sWhere;
         isExistSql = sIsExistSql + " where " + sWhere;
 
-        if (prameterSum < fieldCount) {
+        if (parameterSum < fieldCount) {
             for (int i = 0; i < nKey; i++) {
                 updateFieldMap.set(nCol + i, updateFieldMap.get(fieldCount - nKey + i));
             }
@@ -235,7 +235,7 @@ public class TableMapInfo {
             logger.debug("解析数据交换对应关系中字段值，生成 insert, update margen 执行的sql语句...");
         }
 
-        prameterSum = 0;
+        parameterSum = 0;
         String sInsertSql = "insert into " + desTable + " (";
         String sValues = "values(";
         String sIsExistSql = "select count(1) as isthere from " + desTable;
@@ -257,7 +257,7 @@ public class TableMapInfo {
             sInsertSql = sInsertSql + fieldsMap.get(i).getRightName();
             if (!StringUtils.hasText(fieldsMap.get(i).getDefaultValue())) {
                 insertFieldMap.add(i);
-                prameterSum++;
+                parameterSum++;
                 sValues = sValues + ":prm" + i;
             } else {
                 sValues = sValues + quotedstr(fieldsMap.get(i).getDefaultValue());
@@ -296,7 +296,7 @@ public class TableMapInfo {
         updateSql = sUpdateSql + " where " + sWhere;
         isExistSql = sIsExistSql + " where " + sWhere;
 
-        if (prameterSum < fieldCount) {
+        if (parameterSum < fieldCount) {
             for (int i = 0; i < nKey; i++) {
                 updateFieldMap.set(nCol + i, updateFieldMap.get(fieldCount - nKey + i));
             }
@@ -369,12 +369,12 @@ public class TableMapInfo {
         this.fieldCount = fieldCount;
     }
 
-    public int getPrameterSum() {
-        return prameterSum;
+    public int getParameterSum() {
+        return parameterSum;
     }
 
-    public void setPrameterSum(int prameterSum) {
-        this.prameterSum = prameterSum;
+    public void setParameterSum(int parameterSum) {
+        this.parameterSum = parameterSum;
     }
 
     public int getDestFieldCount() {
