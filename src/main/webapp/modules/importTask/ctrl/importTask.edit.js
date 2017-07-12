@@ -2,22 +2,18 @@ define(function(require) {
 	var Config = require('config');
 	var Core = require('core/core');
 	
-	var ExchangeTaskEditConAdd = require('./exchangeTask.edit.conAdd');
-	var ExchangeTaskAdd = require('./exchangeTask.add');
-	var ExchangeTaskExchangeMapinfoAdd = require('../ctrl/exchangeTask.ExchangeMapinfo.add');
-	var ExchangeTaskexportSqlEdit = require('../ctrl/exchangeTask.exportSql.edit');
-	var ExchangeTaskExchangeTaskdetailIdRemove = require('../ctrl/exchangeTask.ExchangeTaskdetailId.remove');
-	var ExchangeTaskRun = require('../ctrl/exchangeTask.run');
+	var importTaskAdd = require('./importTask.add');
+	var importTaskExchangeMapinfoAdd = require('../ctrl/importTask.ExchangeMapinfo.add');
+	var importTaskexportSqlEdit = require('../ctrl/importTask.exportSql.edit');
+	var importTaskExchangeTaskdetailIdRemove = require('../ctrl/importTask.ExchangeTaskdetailId.remove');
 
-	var ExchangeTaskEdit = ExchangeTaskAdd.extend(function() {
+	var importTaskEdit = importTaskAdd.extend(function() {
 		var _self = this;
 		
 		this.injecte([
-		            new ExchangeTaskEditConAdd('exchangeTask_ExchangeMapinfo_edit_conAdd'),
-		  			new ExchangeTaskExchangeMapinfoAdd('exchangeTask_ExchangeMapinfo_add'),
-		  			new ExchangeTaskexportSqlEdit('exchangeTask_exportSql_edit'),
-		  			new ExchangeTaskExchangeTaskdetailIdRemove('exchangeTask_ExchangeTaskdetailId_remove'),
-		  			new ExchangeTaskRun('exchangeTask_transfer_run'),
+		  			new importTaskExchangeMapinfoAdd('importTask_ExchangeMapinfo_add'),
+		  			new importTaskexportSqlEdit('importTask_exportSql_edit'),
+		  			new importTaskExchangeTaskdetailIdRemove('importTask_ExchangeTaskdetailId_remove'),
 		  		]);
 		
 		
@@ -38,11 +34,18 @@ define(function(require) {
 					.form('readonly', 'taskId')
 					.form('focus');
 				
+				var tab2table = panel.find('table.tab2');
+				tab2table.cdatagrid({
+					controller:_self,
+					editable: true,
+					data:data.taskLogs
+				});
+				
 				var tab1table = panel.find('table.tab1');
 				tab1table.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.exchangeMapinfoList
+					data:data.exportSqlList
 				});
 				table.datagrid('reload');
 			});
@@ -75,16 +78,19 @@ define(function(require) {
 			table.datagrid('reload');
 		};
 	});
-//	/centit-dde3/src/main/webapp/modules/exportTask/exportTask-edit-conAdd.html
+	
+	
+	
+	
 	this.addCon = function(){
-		 $('#dlgaddCon').dialog({
+		 $('#dlgaddCon3').dialog({
 	    	title:'定时器添加',
 	    	resizable: true,
 	        modal: true,
-        });
-        $('#dlgaddCon').dialog("open");
-        var change = $("#taskCron").textbox('getValue');
-        $("#txt_cron").textbox('setValue',change);
+       });
+       $('#dlgaddCon3').dialog("open");
+       var change = $("#taskCron3").textbox('getValue');
+       $("#txt_cron3").textbox('setValue',change);
 	};
 
 	
@@ -198,18 +204,15 @@ define(function(require) {
 		
 		var total = null;
 		total = MinTotal+" "+HourTotal+" "+dayTotal+" "+monthTotal+" "+weekTotal;
-		$("#txt_cron").textbox('setValue',total);
+		$("#txt_cron3").textbox('setValue',total);
 	};
 	
 	
 	this.saveCron = function(){
-		var cron = $("#txt_cron").textbox('getValue');
-		$("#taskCron").textbox('setValue',cron);
-        $('#dlgaddCon').dialog("close");
+		var cron = $("#txt_cron3").textbox('getValue');
+		$("#taskCron3").textbox('setValue',cron);
+		$('#dlgaddCon3').dialog("close");
 	};
-	
-	
-	
-	
-	return ExchangeTaskEdit;
+
+	return importTaskEdit;
 });

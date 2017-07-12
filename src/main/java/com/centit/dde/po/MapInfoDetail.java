@@ -226,9 +226,10 @@ public class MapInfoDetail implements java.io.Serializable {
 
     public void copyNotNullProperty(MapInfoDetail other) {
 
-        if (other.getMapInfoId() != null)
-            this.setMapinfoId(other.getMapInfoId());
-
+//        if (other.getMapInfoId() != null)
+//            this.setMapinfoId(other.getMapInfoId());
+        if(other.getCid() != null)
+            this.setCid(other.getCid());
         if (other.getSourceFieldName() != null)
             this.sourceFieldName = other.getSourceFieldName();
         if (other.getSourceFieldSentence() != null)

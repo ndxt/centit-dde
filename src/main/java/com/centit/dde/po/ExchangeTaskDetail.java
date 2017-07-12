@@ -6,6 +6,7 @@ import javax.persistence.*;
 
 
 /**
+ * 交换任务明细
  * create by scaffold
  *
  * @author codefan@hotmail.com

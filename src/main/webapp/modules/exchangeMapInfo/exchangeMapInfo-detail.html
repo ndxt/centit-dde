@@ -17,7 +17,7 @@
 				</div>
 				<div class="field required">
 					<a iconCls="icon-add"  class="easyui-linkbutton"
-					data-options="iconCls:'icon-add'" width="440" height="580" onclick="dlgAddDb('left')"></a>
+					data-options="iconCls:'icon-add'" width="440" height="580" onclick="sourceDb()"></a>
 				</div>
 			</div>
 		</div>
@@ -32,7 +32,7 @@
 				</div>
 				<div class="field required">
 					<a iconCls="icon-add" class="easyui-linkbutton"
-					data-options="iconCls:'icon-add'" width="440" height="580"  onclick="dlgAddDb('right')"></a>
+					data-options="iconCls:'icon-add'" width="440" height="580"  onclick="destDb()"></a>
 				</div>
 			</div>
 		</div>
@@ -136,15 +136,15 @@
 </div>
 
 <div style="display: none;">
-	<div id="dlgAddDbLeft" class="easyui-dialog"  style="width: 560px; height: 400px;" closed="true" buttons="#dlgaddCon-buttons">
+	<div id="sourceDb" class="easyui-dialog"  style="width: 560px; height: 400px;" closed="true" buttons="#sourceDb-buttons">
 		<form>
 			<div style="padding:10px;">
-	                <span>数据库:
-		                <input class="easyui-combobox" id="txt_sourceDatabaseName" name="sourceDatabaseName" style="width:200px;" />
-	                </span>
-	                <span>表名:
-	        			<input class="easyui-combobox" id="txt_sourceTableName" name="txt_sourceTableName" style="width:200px;" />
-	        		</span>
+				<span>数据库:
+					<input class="easyui-combobox" id="txt_sourceDatabaseName" name="sourceDatabaseName" style="width:200px;" />
+				</span>
+				<span>表名:
+					<input class="easyui-combobox" id="txt_sourceTableName" name="txt_sourceTableName" style="width:200px;" />
+				</span>
 	        </div>
 			<div style="padding:10px;">
 				<div class="field ">
@@ -152,12 +152,29 @@
 					<input type="text" class="easyui-textbox" id="txt_querySql" name="txt_querySql"  multiline="true" style="width:100%; height: 200px;"/>
 				</div>
 			</div>
-			<div id="dlgaddCon-buttons">
-				<a href="javascript:void(0)" class="easyui-linkbutton" onclick="closeDbLeft();" iconcls="icon-remove" >取消</a>
-				<a href="javascript:void(0)" class="easyui-linkbutton" onclick="saveDbLeft();" iconcls="icon-save" >保存</a>
-			</div>
 		</form>
 	</div>
-
+	<div id="sourceDb-buttons">
+		<a href="javascript:void(0)" class="easyui-linkbutton" onclick="closeSourceDb();" iconcls="icon-remove" >取消</a>
+		<a href="javascript:void(0)" class="easyui-linkbutton" onclick="saveSourceDb();" iconcls="icon-save" >保存</a>
+	</div>
 </div>
-       	
+<div style="display: none;">
+	<div id="destDb" class="easyui-dialog"  style="width: 560px; height: 200px;" closed="true" buttons="#destDb-buttons">
+		<form>
+			<div style="padding:10px;">
+				<span>数据库:
+					<input class="easyui-combobox" id="txt_destDatabaseName" name="sourceDatabaseName" style="width:200px;" />
+				</span>
+				<span>表名:
+					<input class="easyui-combobox" id="txt_destTableName" name="txt_sourceTableName" style="width:200px;" />
+				</span>
+	        </div>
+		</form>
+	</div>
+	<div id="destDb-buttons">
+		<a href="javascript:void(0)" class="easyui-linkbutton" onclick="closeDestDb();" iconcls="icon-remove" >取消</a>
+		<a href="javascript:void(0)" class="easyui-linkbutton" onclick="saveDestDb();" iconcls="icon-save" >保存</a>
+	</div>
+</div>
+

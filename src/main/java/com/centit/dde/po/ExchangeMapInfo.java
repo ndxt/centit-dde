@@ -53,19 +53,19 @@ public class ExchangeMapInfo implements java.io.Serializable {
 
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
     @JoinColumn(name="MAPINFO_ID")
-    private List<MapInfoDetail> mapInfoDetails = null;
+    private List<MapInfoDetail> mapInfoDetails;
 
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
     @JoinColumn(name="MAPINFO_ID")
-    private List<MapInfoTrigger> mapInfoTriggers = null;
+    private List<MapInfoTrigger> mapInfoTriggers;
 
     @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="MAPINFO_ID") //这里表示数据库的外键 在t_street里面创建
-    private List<ExchangeTaskDetail> exchangeTaskDetails = null;
+    @JoinColumn(name="MAPINFO_ID")
+    private List<ExchangeTaskDetail> exchangeTaskDetails;
 
     public List<ExchangeTaskDetail> getExchangeTaskDetails() {
         if (null == exchangeTaskDetails) {
-            exchangeTaskDetails = new ArrayList<ExchangeTaskDetail>();
+            exchangeTaskDetails = new ArrayList<>();
         }
         return exchangeTaskDetails;
     }
@@ -405,21 +405,5 @@ public class ExchangeMapInfo implements java.io.Serializable {
         this.isRepeat = null;
         this.mapInfoDesc = null;
 
-    }
-
-    public void addMapinfoDetail(MapInfoDetail mapInfoDetail) {
-        if (null == mapInfoDetails) {
-            mapInfoDetails = new ArrayList<MapInfoDetail>();
-        }
-
-        mapInfoDetails.add(mapInfoDetail);
-    }
-
-    public void addMapinfoTrigger(MapInfoTrigger mapInfoTrigger) {
-        if (null == mapInfoTriggers) {
-            mapInfoTriggers = new ArrayList<MapInfoTrigger>();
-        }
-
-        mapInfoTriggers.add(mapInfoTrigger);
     }
 }

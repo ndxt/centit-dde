@@ -1,0 +1,64 @@
+<form class="form centit">
+	<div class="fields two">
+		<div class="field required">
+			<label>任务名称：</label>
+			<input hidden name="taskId" />
+			<input type="text" class="easyui-textbox" name="taskName" required />
+		</div>
+		<div class="field">
+			<div class="field">
+				<label>任务执行定时器：</label>
+				<input type="text" class="easyui-textbox" name="taskCron" required />
+				<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-add'">Add</a>
+			</div>
+		</div>
+	</div>
+	<div class="fields two">
+		<div class="field required">
+				<label>任务描述：</label>
+				<input type="text" class="easyui-textbox" name="taskDesc" required />
+		</div>
+		<div class="field ">
+			<label>上次执行时间：</label>
+			<input type="text" class="easyui-datetimebox" name="lastRunTime" readonly="readonly" />
+		</div>
+	</div>
+	<div class="fields two">
+		<div class="field ">
+			<label>创建时间：</label>
+			<input type="text" class="easyui-datetimebox" name="createTime"  readonly="readonly"/>
+		</div>
+		<div class="field  required">
+			<label>创建人员：</label>
+			<input type="text" class="easyui-textbox" name="createdName"  readonly="readonly" />
+		</div>
+	</div>
+</form>
+<div class="fields two" style="height:400px;">
+	<div title="数据导入内容字段">
+			<table id="dg1" class="tab1" style="width:96%;"
+			   pagination="false"
+			   border="true" idField="table_exportId"
+			   toolbar=".tab1-toolbar"
+					>
+					<thead>
+						<tr>
+							<th data-options="field:'exportId'" hidden></th>
+							<th data-options="field:'exportName'" style="width: 25%">调用接口名称</th>
+							<th data-options="field:'sourceDatabaseName'" style="width: 25%">源数据库名</th>
+							<th data-options="field:'exportDesc'" style="width: 35%">调用接口说明</th>
+						</tr>
+					</thead>
+			</table>
+	</div>
+		<div class="tab1-toolbar">
+				<a rel="exportTask_ExchangeMapinfo_add" href="modules/exportTask/exportTask-exchangeMapInfo-add.html" iconCls="icon-add"
+				   target="dialog" trigger="none" width="740" height="380" title="添加调用接口对应关系" ><p>添加调用接口对应关系</p></a>
+				<hr>
+				<a rel="exportTask_exportSql_edit" iconCls="icon-edit"
+				   target="custom" trigger="none" title="编辑"  ><p>编辑</p></a>
+				<hr>
+				<a rel="exportTask_ExchangeTaskdetailId_remove" iconCls="icon-base icon-base-rubbish "
+				   target="custom" trigger="single" ><p>删除</p></a>
+		</div>
+</div>

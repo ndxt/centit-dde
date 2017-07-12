@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.util.*;
 
 /**
+ * 数据处理方式
  * create by scaffold
  *
  * @author codefan@hotmail.com

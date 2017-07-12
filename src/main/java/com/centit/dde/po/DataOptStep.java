@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 
 /**
+ * 数据处理步骤
  * create by scaffold
  *
  * @author codefan@hotmail.com

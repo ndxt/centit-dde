@@ -1,9 +1,12 @@
 package com.centit.dde.po;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.util.*;
 
 /**
+ * 交换任务
  * create by scaffold
  *
  * @author codefan@hotmail.com
@@ -15,8 +18,8 @@ public class ExchangeTask implements java.io.Serializable {
 
     @Id
     @Column(name="TASK_ID")
-   /* @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")*/
+    @GeneratedValue(generator = "assignedGenerator")
+    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long taskId;
 
     @Column(name="TASK_NAME")

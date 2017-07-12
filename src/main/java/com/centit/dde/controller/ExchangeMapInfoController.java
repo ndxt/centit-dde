@@ -61,10 +61,6 @@ public class ExchangeMapInfoController extends BaseController {
     @RequestMapping(value="/edit/{mapInfoId}" ,method = {RequestMethod.GET})
     public void edit(@PathVariable Long mapInfoId, HttpServletResponse response) {
         ExchangeMapInfo object = exchangeMapInfoManager.getObjectById(mapInfoId);
-        List<MapInfoDetail> mapInfoDetails = mapInfoDetailManager.listByMapinfoId(object.getMapInfoId());
-        List<MapInfoTrigger> mapInfoTriggers = mapInfoTriggerManager.listTrigger(object.getMapInfoId());
-        object.setMapInfoDetails(mapInfoDetails);
-        object.setMapInfoTriggers(mapInfoTriggers);
         JsonResultUtils.writeSingleDataJson(object, response);
     }
 

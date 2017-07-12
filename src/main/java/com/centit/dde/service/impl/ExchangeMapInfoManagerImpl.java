@@ -1,6 +1,7 @@
 package com.centit.dde.service.impl;
 
 import com.centit.dde.dao.ExchangeMapInfoDao;
+import com.centit.dde.dao.MapInfoTriggerDao;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.*;
 import com.centit.dde.service.ExchangeMapInfoManager;
@@ -32,6 +33,9 @@ public class ExchangeMapInfoManagerImpl
 
     @Resource
     protected IntegrationEnvironment integrationEnvironment;
+
+    @Resource
+    private MapInfoTriggerDao mapInfoTriggerDao;
 
     private ExchangeMapInfoDao exchangeMapInfoDao;
 
@@ -147,10 +151,16 @@ public class ExchangeMapInfoManagerImpl
         ExchangeMapInfo dbObject = exchangeMapInfoDao.getObjectById(object.getMapInfoId());
         if (null == dbObject) {
             object.setMapInfoId(exchangeMapInfoDao.getNextLongSequence());
+            if(object.getMapInfoTriggers() != null){
+                for(MapInfoTrigger trigger : object.getMapInfoTriggers()){
+                    trigger.setTriggerId(mapInfoTriggerDao.getTriggerId());
+                }
+            }
             setFieldTriggerCid(object);
             saveNewObject(object);
         } else {
             dbObject.copyNotNullProperty(object);
+
 
             setFieldTriggerCid(object);
             dbObject.replaceMapInfoDetails(object.getMapInfoDetails());
@@ -176,7 +186,7 @@ public class ExchangeMapInfoManagerImpl
         }
         for (int i = 0; i < object.getMapInfoTriggers().size(); i++) {
             mt = object.getMapInfoTriggers().get(i);
-            mt.setCid(new MapInfoTriggerId((long) i, object.getMapInfoId()));
+            mt.setTiggerOrder((long) i);
         }
     }
 

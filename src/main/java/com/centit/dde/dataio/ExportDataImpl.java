@@ -99,7 +99,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
             DatabaseInfo dbInfo = integrationEnvironment.getDatabaseInfo(exportSql.getSourceDatabaseName());
             Connection conn = ConnPool.getConn(dbInfo);
 
-            // 交换前事件
+            // 导出前事件
             if (exportTriggers != null) {
                 for (ExportTrigger exportTrigger : exportTriggers) {
                     if (!runBreak && exportTrigger.isBeforeTransferAtSource()) {

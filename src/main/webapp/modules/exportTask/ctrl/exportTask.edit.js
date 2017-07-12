@@ -2,22 +2,20 @@ define(function(require) {
 	var Config = require('config');
 	var Core = require('core/core');
 	
-	var ExchangeTaskEditConAdd = require('./exchangeTask.edit.conAdd');
-	var ExchangeTaskAdd = require('./exchangeTask.add');
-	var ExchangeTaskExchangeMapinfoAdd = require('../ctrl/exchangeTask.ExchangeMapinfo.add');
-	var ExchangeTaskexportSqlEdit = require('../ctrl/exchangeTask.exportSql.edit');
-	var ExchangeTaskExchangeTaskdetailIdRemove = require('../ctrl/exchangeTask.ExchangeTaskdetailId.remove');
-	var ExchangeTaskRun = require('../ctrl/exchangeTask.run');
+	var exportTaskEditConAdd = require('./exportTask.edit.conAdd');
+	var exportTaskAdd = require('./exportTask.add');
+	var exportTaskExchangeMapinfoAdd = require('../ctrl/exportTask.ExchangeMapinfo.add');
+	var exportTaskexportSqlEdit = require('../ctrl/exportTask.exportSql.edit');
+	var exportTaskExchangeTaskdetailIdRemove = require('../ctrl/exportTask.ExchangeTaskdetailId.remove');
 
-	var ExchangeTaskEdit = ExchangeTaskAdd.extend(function() {
+	var exportTaskEdit = exportTaskAdd.extend(function() {
 		var _self = this;
 		
 		this.injecte([
-		            new ExchangeTaskEditConAdd('exchangeTask_ExchangeMapinfo_edit_conAdd'),
-		  			new ExchangeTaskExchangeMapinfoAdd('exchangeTask_ExchangeMapinfo_add'),
-		  			new ExchangeTaskexportSqlEdit('exchangeTask_exportSql_edit'),
-		  			new ExchangeTaskExchangeTaskdetailIdRemove('exchangeTask_ExchangeTaskdetailId_remove'),
-		  			new ExchangeTaskRun('exchangeTask_transfer_run'),
+		            new exportTaskEditConAdd('exportTask_ExchangeMapinfo_edit_conAdd'),
+		  			new exportTaskExchangeMapinfoAdd('exportTask_ExchangeMapinfo_add'),
+		  			new exportTaskexportSqlEdit('exportTask_exportSql_edit'),
+		  			new exportTaskExchangeTaskdetailIdRemove('exportTask_ExchangeTaskdetailId_remove'),
 		  		]);
 		
 		
@@ -38,11 +36,18 @@ define(function(require) {
 					.form('readonly', 'taskId')
 					.form('focus');
 				
+				var tab2table = panel.find('table.tab2');
+				tab2table.cdatagrid({
+					controller:_self,
+					editable: true,
+					data:data.taskLogs
+				});
+				
 				var tab1table = panel.find('table.tab1');
 				tab1table.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.exchangeMapinfoList
+					data:data.exportSqlList
 				});
 				table.datagrid('reload');
 			});
@@ -82,9 +87,9 @@ define(function(require) {
 	    	resizable: true,
 	        modal: true,
         });
-        $('#dlgaddCon').dialog("open");
-        var change = $("#taskCron").textbox('getValue');
-        $("#txt_cron").textbox('setValue',change);
+        $('#dlgaddCon2').dialog("open");
+        var change = $("#taskCron2").textbox('getValue');
+        $("#txt_cron2").textbox('setValue',change);
 	};
 
 	
@@ -198,18 +203,18 @@ define(function(require) {
 		
 		var total = null;
 		total = MinTotal+" "+HourTotal+" "+dayTotal+" "+monthTotal+" "+weekTotal;
-		$("#txt_cron").textbox('setValue',total);
+		$("#txt_cron2").textbox('setValue',total);
 	};
 	
 	
 	this.saveCron = function(){
-		var cron = $("#txt_cron").textbox('getValue');
-		$("#taskCron").textbox('setValue',cron);
-        $('#dlgaddCon').dialog("close");
+		var cron = $("#txt_cron2").textbox('getValue');
+		$("#taskCron2").textbox('setValue',cron);
+        $('#dlgaddCon2').dialog("close");
 	};
 	
 	
 	
 	
-	return ExchangeTaskEdit;
+	return exportTaskEdit;
 });
