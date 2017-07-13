@@ -504,7 +504,7 @@ public class ExchangeTaskController extends BaseController {
         
         String[] str = ExchangeIds.split(",");
         for (String s : str) {
-            if (NumberUtils.isNumber(s)) {
+            if (NumberUtils.isCreatable(s)) {
                 ExchangeTaskDetail excTD = new ExchangeTaskDetail();
                 excTD.setMapInfoId(Long.parseLong(s));
                 excTD.setTaskId(taskId);

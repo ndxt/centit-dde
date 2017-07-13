@@ -20,7 +20,7 @@ public class MapInfoDetailId implements java.io.Serializable {
     
     @Column(name="MAPINFO_ID")
     @NotBlank(message = "字段不能为空")
-    private Long mapinfoId;
+    private Long mapInfoId;
 
     @Column(name="COLUMN_NO")
     @NotBlank(message = "字段不能为空")
@@ -37,19 +37,19 @@ public class MapInfoDetailId implements java.io.Serializable {
     /**
      * full constructor
      */
-    public MapInfoDetailId(Long mapinfoId, Long columnNo) {
+    public MapInfoDetailId(Long mapInfoId, Long columnNo) {
 
-        this.mapinfoId = mapinfoId;
+        this.mapInfoId = mapInfoId;
         this.columnNo = columnNo;
     }
 
 
-    public Long getMapinfoId() {
-        return this.mapinfoId;
+    public Long getMapInfoId() {
+        return this.mapInfoId;
     }
 
-    public void setMapinfoId(Long mapinfoId) {
-        this.mapinfoId = mapinfoId;
+    public void setMapInfoId(Long mapInfoId) {
+        this.mapInfoId = mapInfoId;
     }
 
     public Long getColumnNo() {
@@ -72,9 +72,9 @@ public class MapInfoDetailId implements java.io.Serializable {
         MapInfoDetailId castOther = (MapInfoDetailId) other;
         boolean ret = true;
 
-        ret = ret && (this.getMapinfoId() == castOther.getMapinfoId() ||
-                (this.getMapinfoId() != null && castOther.getMapinfoId() != null
-                        && this.getMapinfoId().equals(castOther.getMapinfoId())));
+        ret = ret && (this.getMapInfoId() == castOther.getMapInfoId() ||
+                (this.getMapInfoId() != null && castOther.getMapInfoId() != null
+                        && this.getMapInfoId().equals(castOther.getMapInfoId())));
 
         ret = ret && (this.getColumnNo() == castOther.getColumnNo() ||
                 (this.getColumnNo() != null && castOther.getColumnNo() != null
@@ -87,7 +87,7 @@ public class MapInfoDetailId implements java.io.Serializable {
         int result = 17;
 
         result = 37 * result +
-                (this.getMapinfoId() == null ? 0 : this.getMapinfoId().hashCode());
+                (this.getMapInfoId() == null ? 0 : this.getMapInfoId().hashCode());
 
         result = 37 * result +
                 (this.getColumnNo() == null ? 0 : this.getColumnNo().hashCode());
