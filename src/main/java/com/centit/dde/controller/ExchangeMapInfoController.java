@@ -119,10 +119,10 @@ public class ExchangeMapInfoController extends BaseController {
     }
 
     @RequestMapping(value="/resolveSQL", method = RequestMethod.GET)
-    public void resolveSQL(ExchangeMapInfo mapinfo, HttpServletResponse response) {
-        DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(mapinfo.getSourceDatabaseName());
+    public void resolveSQL(String databaseCode, String querySql, HttpServletResponse response) {
+        DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(databaseCode);
 
-        List<MapInfoDetail> mapInfoDetails = exchangeMapInfoManager.resolveSQL(databaseInfo, mapinfo.getQuerySql());
+        List<MapInfoDetail> mapInfoDetails = exchangeMapInfoManager.resolveSQL(databaseInfo, querySql);
 
         JsonResultUtils.writeSingleDataJson(mapInfoDetails, response);
     }

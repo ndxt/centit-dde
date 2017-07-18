@@ -9,11 +9,11 @@
 			<label>左（数据源）定义</label>
 			<div class="fields three">
 				<div class="field required">
-					<input  class="easyui-textbox" id="sourceDatabaseName" name="sourceDatabaseName" type="text"/>
-					<input hidden id="querySql"  name="querySql" type="text"/>
+					<input class="easyui-textbox" id="sourceDatabaseName" name="sourceDatabaseName" type="text"/>
+					<input hidden id="sourceDatabaseCode" type="text"/>
 				</div>
 				<div class="field required">
-					<input  class="easyui-textbox" id="sourceTableName" name="sourceTableName" type="text"/>
+					<input class="easyui-textbox" id="sourceTableName" name="sourceTableName" type="text"/>
 				</div>
 				<div class="field required">
 					<a iconCls="icon-add"  class="easyui-linkbutton"
@@ -25,10 +25,11 @@
 			<label>右（数据目标）定义：</label>
 			<div class="fields three">
 				<div class="field required">
-					<input id="txt_exchangemapinfo_dds" class="easyui-textbox"   name="destDatabaseName" type="text" size="10"/>
+					<input id="destDatabaseName" class="easyui-textbox" name="destDatabaseName" type="text" />
+					<input hidden id="destDatabaseCode" type="text" />
 				</div>
 				<div class="field required">
-					<input id="txt_exchangemapinfo_dt" class="easyui-textbox"  name="destTableName" type="text" size="25"/>
+					<input id="destTableName" class="easyui-textbox"  name="destTableName" type="text" />
 				</div>
 				<div class="field required">
 					<a iconCls="icon-add" class="easyui-linkbutton"
@@ -92,8 +93,8 @@
 				<thead >
 					<th field="destFieldName" width="30%" data-options="editor: {type: 'text', options: {required: true}}">目标字段名</th>
 					<th field="destFieldType" width="30%" data-options="editor: {type: 'text', options: {required: true}}">字段类型</th>
-					<th field="isPk" width="10%" data-options="editor: {type: 'text', options: {required: true}}">主键</th>
-					<th field="isNull" width="15%" data-options="editor: {type: 'text', options: {required: true}}">允许空</th>
+					<th field="isPk" width="10%" data-options="editor: {type: 'text', options: {required: true}}, formatter:isPK">主键</th>
+					<th field="isNull" width="15%" data-options="editor: {type: 'text', options: {required: true}}, formatter:isNULL">允许空</th>
 					<th field="destFieldDefault" width="20%" data-options="editor: {type: 'text', options: {required: true}}">默认值</th>
 				</thead>
 			</table>
@@ -143,13 +144,13 @@
 					<input class="easyui-combobox" id="txt_sourceDatabaseName" name="sourceDatabaseName" style="width:200px;" />
 				</span>
 				<span>表名:
-					<input class="easyui-combobox" id="txt_sourceTableName" name="txt_sourceTableName" style="width:200px;" />
+					<input class="easyui-combobox" id="txt_sourceTableName" name="sourceTableName" style="width:200px;" />
 				</span>
 	        </div>
 			<div style="padding:10px;">
 				<div class="field ">
 					<label>SQL：</label>
-					<input type="text" class="easyui-textbox" id="txt_querySql" name="txt_querySql"  multiline="true" style="width:100%; height: 200px;"/>
+					<input class="easyui-textbox" id="txt_querySql" name="querySql"  multiline="true" style="width:100%; height: 200px;"/>
 				</div>
 			</div>
 		</form>

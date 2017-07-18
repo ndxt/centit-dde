@@ -1,6 +1,7 @@
 package com.centit.dde.controller;
 
 import com.centit.dde.util.ConnPool;
+import com.centit.dde.util.SQLUtils;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
@@ -72,7 +73,7 @@ public class PlatformController extends BaseController {
                 if (databaseInfo != null) {
                     connection = ConnPool.getConn(databaseInfo);
                     DatabaseMetaData metaData = connection.getMetaData();
-                    ResultSet tables = metaData.getTables(null, null, null, new String[]{"TABLE"});
+                    ResultSet tables = metaData.getTables(null, databaseInfo.getUsername().toUpperCase(), null, new String[]{"TABLE"});
                     while (tables.next()) {
                         Map map = new HashMap();
                         map.put("tableName", tables.getString("Table_NAME"));
@@ -102,7 +103,7 @@ public class PlatformController extends BaseController {
                 try {
                     connection = ConnPool.getConn(databaseInfo);
                     DatabaseMetaData metaData = connection.getMetaData();
-                    ResultSet resultSet = metaData.getColumns(null, null, tableName, null);
+                    ResultSet resultSet = metaData.getColumns(null, databaseInfo.getUsername().toUpperCase(), tableName, null);
                     while (resultSet.next()) {
                         Map<String, String> map = new HashMap<>();
                         map.put("fieldName", resultSet.getString("COLUMN_NAME"));
@@ -144,6 +145,11 @@ public class PlatformController extends BaseController {
         sql.append(" FROM ");
         sql.append(tableName);
         JsonResultUtils.writeSingleDataJson(sql, response);
+    }
+
+    @RequestMapping(value="/listFields/{sql}", method = RequestMethod.GET)
+    public void list(@PathVariable String sql, HttpServletResponse response){
+        JsonResultUtils.writeSingleDataJson(SQLUtils.splitSqlByFields(sql),response);
     }
 
 }

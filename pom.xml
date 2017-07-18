@@ -43,6 +43,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.9</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.centit.framework</groupId>
 			<artifactId>framework-base-view-easyui</artifactId>
 			<version>3.0.1-SNAPSHOT</version>
@@ -55,7 +61,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.centit.framework</groupId>
-			<artifactId>framework-staticsystem</artifactId>
+			<artifactId>framework-system-static</artifactId>
 			<version>4.0.0-SNAPSHOT</version>
 		</dependency>
 		
@@ -86,7 +92,6 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
-
 
 	<build>
 		<!-- maven 打包时包含Hibernate配置文件 -->

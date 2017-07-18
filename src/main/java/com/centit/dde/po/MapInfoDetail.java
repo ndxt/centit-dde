@@ -1,5 +1,7 @@
 package com.centit.dde.po;
 
+import com.centit.framework.core.dao.DictionaryMap;
+
 import javax.persistence.*;
 
 @Entity
@@ -27,12 +29,14 @@ public class MapInfoDetail implements java.io.Serializable {
     private String destFieldType;
     
     @Column(name="IS_PK")
+    @DictionaryMap(value="YesOrNo",fieldName = "IS_PK")
     private String isPk;
     
     @Column(name="DEST_FIELD_DEFAULT")
     private String destFieldDefault;
     
     @Column(name="IS_NULL")
+    @DictionaryMap(value="YesOrNo", fieldName = "IS_NULL")
     private String isNull;
 
     @Transient
@@ -138,6 +142,19 @@ public class MapInfoDetail implements java.io.Serializable {
         if (this.cid == null)
             this.cid = new MapInfoDetailId();
         this.cid.setMapInfoId(mapinfoId);
+    }
+
+    public Long getColumnNo(){
+        if(this.cid == null)
+            this.cid = new MapInfoDetailId();
+        return this.cid.getColumnNo();
+    }
+
+    public void setColumnNo(Long columnNo) {
+        if(this.cid == null){
+            this.cid = new MapInfoDetailId();
+        }
+        this.cid.setColumnNo(columnNo);
     }
 
 

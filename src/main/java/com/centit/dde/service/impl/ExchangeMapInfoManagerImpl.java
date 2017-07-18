@@ -3,9 +3,13 @@ package com.centit.dde.service.impl;
 import com.centit.dde.dao.ExchangeMapInfoDao;
 import com.centit.dde.dao.MapInfoTriggerDao;
 import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.*;
+import com.centit.dde.po.ExchangeMapInfo;
+import com.centit.dde.po.MapInfoDetail;
+import com.centit.dde.po.MapInfoDetailId;
+import com.centit.dde.po.MapInfoTrigger;
 import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.util.ConnPool;
+import com.centit.dde.util.SQLUtils;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
@@ -193,29 +197,46 @@ public class ExchangeMapInfoManagerImpl
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public List<MapInfoDetail> resolveSQL(DatabaseInfo databaseInfo, String sql) {
-        List<MapInfoDetail> mapInfoDetails = null;
+        List<MapInfoDetail> mapInfoDetails = new ArrayList<>();
         Connection connection = null;
         Statement statement = null;
         ResultSet rs = null;
+
+        List<String> list = SQLUtils.splitSqlByFields(sql);
+
 
         if (databaseInfo != null) {
             try {
                 connection = ConnPool.getConn(databaseInfo);
                 statement = connection.createStatement();
 
+                DatabaseMetaData dbMeta = connection.getMetaData();
+                ResultSet pk = dbMeta.getPrimaryKeys(null, null, list.get(2).trim());
+                List<String> pks = new ArrayList<>();
+                while(pk.next()){
+                    pks.add(pk.getString("COLUMN_NAME"));
+                }
+                List<String> fields = SQLUtils.getSqlFileds(sql);
                 rs = statement.executeQuery(sql);
                 ResultSetMetaData rsmd = rs.getMetaData();
-                for(int i = 0; i < rsmd.getColumnCount(); i++){
+                for(int i = 1; i <= rsmd.getColumnCount(); i++){
+                    String columnName = rsmd.getColumnName(i);
                     MapInfoDetail mapInfoDetail = new MapInfoDetail();
-                    mapInfoDetail.getCid().setColumnNo((long)(i-1));
-                    mapInfoDetail.setSourceTableName(rsmd.getTableName(i));
-                    mapInfoDetail.setSourceFieldName(rsmd.getColumnName(i));
-                    mapInfoDetail.setSourceFieldSentence(rsmd.getColumnName(i));
+                    mapInfoDetail.setColumnNo((long)i);
+                    mapInfoDetail.setSourceFieldName(columnName);
+                    mapInfoDetail.setSourceFieldSentence(fields.size() != rsmd.getColumnCount() ?
+                                                                            columnName : fields.get(i - 1));
                     mapInfoDetail.setSourceFieldType(rsmd.getColumnTypeName(i));
+
+                    mapInfoDetail.setDestFieldName(columnName);
+                    mapInfoDetail.setDestFieldType(rsmd.getColumnTypeName(i));
+                    mapInfoDetail.setIsNull(ResultSetMetaData.columnNoNulls == rsmd.isNullable(i) ? "N" : "Y");
+                    mapInfoDetail.setIsPk(pks.contains(columnName) ? "Y" : "N");
+
                     mapInfoDetails.add(mapInfoDetail);
                 }
             }catch (SQLException e) {
-                log.error("数据库连接出错");
+                log.error(e.getMessage(),e);
             }
         }
         return mapInfoDetails;

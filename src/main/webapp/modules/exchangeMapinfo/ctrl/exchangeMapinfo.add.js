@@ -89,42 +89,86 @@ define(function(require) {
 		this.onClose = function(table, data) {
 			table.datagrid('reload');
 		};
-	});
 
-	this.dlgAddDb = function(change){
-		$('#dlgAddDbLeft').dialog({
+	});
+	this.isPK = function(value, row, index) {
+		if (row.isPk == 'Y') {
+			return "是";
+		} else {
+			return "否";
+		}
+	};
+	this.isNULL = function(value, row, index) {
+		if (row.isNull == 'Y') {
+			return "是";
+		} else {
+			return "否";
+		}
+	};
+
+	// this.sourceDb = function() {
+	// 	// var sourceDatabaseName = $('#sourceDatabaseName').val();
+	// 	$('#sourceDb').dialog({
+	// 		title: '数据库编辑',
+	// 		resizable: true,
+	// 		modal: true,
+	// 	}).dialog("open");
+    //
+	// 	$("#txt_sourceDatabaseName").combobox({
+	// 		valueField: 'databaseCode',
+	// 		textField: 'databaseName',
+	// 		url: 'service/platform/listDb',
+	// 		onSelect: function (rec) {
+	// 			var url = Config.ContextPath + 'service/platform/listTable/' + rec.databaseCode;
+	// 			$('#txt_sourceTableName').combobox('reload', url);
+	// 		}
+	// 	});
+    //
+	// 	$("#txt_sourceTableName").combobox({
+	// 		valueField: 'tableName',
+	// 		textField: 'tableName',
+	// 		// url:'service/platform/listTable',
+	// 		onSelect: function (rec) {
+	// 			var url = Config.ContextPath + 'service/platform/listFields/' + rec.tableName;
+	// 			// $('#txt_querySql');
+	// 			Core.ajax(url,{
+	// 				method:'get'
+	// 			}).then(function(data){
+	//
+	// 			});
+    //
+    //
+	// 		}
+	// 	});
+	// };
+
+	this.destDb = function(){
+		// var sourceDatabaseName = $('#sourceDatabaseName').val();
+		$('#destDb').dialog({
 			title:'数据库编辑',
 			resizable: true,
 			modal: true,
-		});
-		$('#dlgAddDbLeft').dialog("open");
+		}).dialog("open");
 
-		$("#txt_sourceDatabaseName").combobox({
+		$("#txt_destDatabaseName").combobox({
 			valueField: 'databaseCode',
 			textField: 'databaseName',
 			url:'service/platform/listDb',
 			onSelect: function(rec) {
 				var url = Config.ContextPath + 'service/platform/listTable/' + rec.databaseCode;
-				$('#txt_sourceTableName').combobox('reload', url);
+				$('#txt_destTableName').combobox('reload', url);
 			}
 		});
 
-		$("#txt_sourceTableName").combobox({
+		$("#txt_destTableName").combobox({
 			valueField: 'tableName',
 			textField: 'tableName',
 			// url:'service/platform/listTable',
 			onSelect: function(rec) {
-			    var databaseCode = $("#txt_sourceDatabaseName");
-				var url = Config.ContextPath + 'service/platform/generateSQL/' + databaseCode + '/ '+ rec.tableName;
-                Core.ajax(url,{
-                    method: 'get'
-                }).then(function(data) {
-                    var d = data;
-                })
+				var url = Config.ContextPath + 'service/platform/listFields/' + rec.tableName;
 				// $('#txt_querySql');
 			}
 		});
-
 	};
 
 	return ExchangeMapInfoAdd;

@@ -30,7 +30,7 @@ public class TestWebService {
      * @param pwd
      */
     static void encrypwd(String pwd) {
-        System.out.println(DESSecurityUtils.encryptAndBase64(pwd,"password"));
+        System.out.println(DESSecurityUtils.encryptAndBase64(pwd,"0123456789abcdefghijklmnopqrstuvwxyzABCDEF"));
 
         //System.out.println(Thread.currentThread().getStackTrace()[1].getMethodName());
 
@@ -46,7 +46,7 @@ public class TestWebService {
 //        testWS();
 //        testExportWs();
 
-//        encrypwd("000000");
+        encrypwd("dde2");
 
 
 
