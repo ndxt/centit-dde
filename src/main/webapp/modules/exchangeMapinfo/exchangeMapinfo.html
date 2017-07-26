@@ -11,7 +11,7 @@
 	
 	<div class="temp-toolbar">
 		<a iconCls="icon-add" href="modules/exchangeMapInfo/exchangeMapInfo-detail.html" trigger="none"
-			target="dialog" rel="exchangeMapInfo_add" title="添加" width="800" height="800" btnValue="添加">添加</a>
+			target="view_frame" rel="exchangeMapInfo_add" title="添加" width="800" height="800" btnValue="添加">添加</a>
 		<a iconCls="icon-add" href="modules/exchangeMapInfo/exchangeMapInfo-detail.html" trigger="single"
 			target="dialog" rel="exchangeMapInfo_copyAdd" title="添加" width="800" height="800" btnValue="复制添加">复制添加</a>
 		<a iconCls="icon-edit" href="modules/exchangeMapInfo/exchangeMapInfo-detail.html" trigger="single"
@@ -59,8 +59,7 @@
 		requirejs([
 		           'modules/exchangeMapInfo/ctrl/exchangeMapInfo'
 		          ], function(ExchangeMapInfo) {
-			window.ExchangeMapInfo = new ExchangeMapInfo('exchangeMapInfo', panel);
-			window.ExchangeMapInfo.load(panel);
+			new ExchangeMapInfo('exchangeMapInfo', panel).load(panel);
 		});  
 	};
 </script>

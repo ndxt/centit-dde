@@ -13,32 +13,6 @@ define(function(require) {
 			form.form('disableValidation')
 				.form('focus');
 
-			var sourceTable = panel.find('table.source');
-			sourceTable.cdatagrid({
-				controller:_self,
-				editable: true,
-				dragSelection: true,
-				onLoadSuccess:function(){
-					// $(this).datagrid('enableDnd');
-				}
-			});
-			var destTable = panel.find('table.dest');
-			destTable.cdatagrid({
-				controller:_self,
-				editable: true,
-				dragSelection: true,
-				onLoadSuccess:function(){
-					// destTable.datagrid('enableDnd');
-				}
-			});
-
-			var tab2table = panel.find('table.trigger');
-			tab2table.cdatagrid({
-				controller:_self,
-				editable: true,
-			});
-
-			onchange();
 		};
 
 		// @override

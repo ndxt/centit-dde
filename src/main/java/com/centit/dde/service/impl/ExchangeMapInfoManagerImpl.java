@@ -11,16 +11,17 @@ import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.util.ConnPool;
 import com.centit.dde.util.SQLUtils;
 import com.centit.framework.core.dao.PageDesc;
+import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.staticsystem.po.DatabaseInfo;
 import com.centit.framework.staticsystem.service.IntegrationEnvironment;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.database.QueryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -133,25 +134,13 @@ public class ExchangeMapInfoManagerImpl
     public void save(ExchangeMapInfo object) throws SqlResolveException {
 
         //判断交换名称的唯一性
-        Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("mapInfoNameEq", object.getMapInfoName());
-
-        List<ExchangeMapInfo> exchangeMapInfos = listObjects(filterMap);
-
-        if (!CollectionUtils.isEmpty(exchangeMapInfos)) {
-            ExchangeMapInfo exchangeMapInfoDb = getObjectById(object.getMapInfoId());
-            String message = "交换名称已存在";
-            if (null == exchangeMapInfoDb) {
-                log.error(message);
-                throw new SqlResolveException(message);
-            } else {
-                if (1 < exchangeMapInfos.size() || !exchangeMapInfoDb.getMapInfoId().equals(exchangeMapInfos.get(0).getMapInfoId())) {
-                    log.error(message);
-                    throw new SqlResolveException(message);
-                }
-            }
+        if(checkName(object.getMapInfoId(), object.getMapInfoName())){
+            log.error("交换名称已存在");
+            throw new SqlResolveException("交换名称"+object.getMapInfoName()+"已存在,请更换！");
         }
+
         validator(object);
+
         ExchangeMapInfo dbObject = exchangeMapInfoDao.getObjectById(object.getMapInfoId());
         if (null == dbObject) {
             object.setMapInfoId(exchangeMapInfoDao.getNextLongSequence());
@@ -173,6 +162,22 @@ public class ExchangeMapInfoManagerImpl
             updateObject(dbObject);
         }
 
+    }
+
+    private boolean checkName(Long id, String name) {
+        StringBuilder sql = new StringBuilder();
+        Object obj;
+        sql.append("select count(*) as mapCount from D_EXCHANGE_MAPINFO t where t.mapinfo_name = ? ");
+        if(id != null){
+            sql.append("and t.mapinfo_id <> ?");
+            obj  = DatabaseOptUtils.getSingleObjectBySql(baseDao, sql.toString(),
+                    new Object[]{name, id} );
+        }else{
+            obj  = DatabaseOptUtils.getSingleObjectBySql(baseDao, sql.toString(),
+                    new Object[]{name} );
+        }
+        Long uc = NumberBaseOpt.castObjectToLong(obj);
+        return (uc!=null && uc>0);
     }
 
     @Override

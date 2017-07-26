@@ -106,44 +106,62 @@ define(function(require) {
 		}
 	};
 
-	// this.sourceDb = function() {
-	// 	// var sourceDatabaseName = $('#sourceDatabaseName').val();
-	// 	$('#sourceDb').dialog({
-	// 		title: '数据库编辑',
-	// 		resizable: true,
-	// 		modal: true,
-	// 	}).dialog("open");
-    //
-	// 	$("#txt_sourceDatabaseName").combobox({
-	// 		valueField: 'databaseCode',
-	// 		textField: 'databaseName',
-	// 		url: 'service/platform/listDb',
-	// 		onSelect: function (rec) {
-	// 			var url = Config.ContextPath + 'service/platform/listTable/' + rec.databaseCode;
-	// 			$('#txt_sourceTableName').combobox('reload', url);
-	// 		}
-	// 	});
-    //
-	// 	$("#txt_sourceTableName").combobox({
-	// 		valueField: 'tableName',
-	// 		textField: 'tableName',
-	// 		// url:'service/platform/listTable',
-	// 		onSelect: function (rec) {
-	// 			var url = Config.ContextPath + 'service/platform/listFields/' + rec.tableName;
-	// 			// $('#txt_querySql');
-	// 			Core.ajax(url,{
-	// 				method:'get'
-	// 			}).then(function(data){
-	//
-	// 			});
-    //
-    //
-	// 		}
-	// 	});
-	// };
+	this.sourceDb = function() {
+
+		$('#sourceDb').dialog({
+			title: '数据库编辑',
+			resizable: true,
+			modal: true,
+		}).dialog("open");
+
+		$("#txt_sourceDatabaseName").combobox({
+			valueField: 'databaseCode',
+			textField: 'databaseName',
+			url: 'service/platform/listDb',
+			onSelect: function (rec) {
+				var url = Config.ContextPath + 'service/platform/listTable/' + rec.databaseCode;
+				$('#txt_sourceTableName').combobox('reload', url);
+			}
+		});
+
+		var url = Config.ContextPath + 'service/platform/listTable/0000000082';
+		$('#txt_sourceTableName').combobox('reload', url);
+		$("#txt_sourceTableName").combobox({
+			valueField: 'tableName',
+			textField: 'tableName',
+			onSelect: function (rec) {
+				if (rec.tableName != ($("#sourceTableName").textbox('getValue'))) {
+					// var databaseCode = $("#txt_sourceDatabaseName").combobox("getValue");
+					var url = Config.ContextPath + 'service/platform/generateSQL/0000000082/' + rec.tableName;
+					Core.ajax(url, {
+						method: 'get'
+					}).then(function (data) {
+						$('#txt_querySql').textbox("setValue", data);
+					});
+				}
+			}
+		});
+
+		$("#txt_sourceDatabaseName").combobox("setValue", $("#sourceDatabaseCode").val());
+		$("#txt_sourceTableName").combobox("setValue", $("#sourceTableName").textbox('getValue'));
+		var sourceTable = $("#exchangeContent1").datagrid("getRows");
+		if(sourceTable.length == 0){
+			return;
+		}
+		var sql = 'SELECT';
+		for(var i=0;i<sourceTable.length;i++){
+			if(i == 0){
+				sql = sql + " " + sourceTable[i].sourceFieldSentence;
+			}else{
+				sql = sql +", "+ sourceTable[i].sourceFieldSentence;
+			}
+		}
+		sql = sql + " FROM " + $("#sourceTableName").val();
+		$("#txt_querySql").textbox('setValue', sql);
+	};
 
 	this.destDb = function(){
-		// var sourceDatabaseName = $('#sourceDatabaseName').val();
+
 		$('#destDb').dialog({
 			title:'数据库编辑',
 			resizable: true,
@@ -163,12 +181,72 @@ define(function(require) {
 		$("#txt_destTableName").combobox({
 			valueField: 'tableName',
 			textField: 'tableName',
-			// url:'service/platform/listTable',
-			onSelect: function(rec) {
-				var url = Config.ContextPath + 'service/platform/listFields/' + rec.tableName;
-				// $('#txt_querySql');
-			}
 		});
+
+		$("#txt_destDatabaseName").combobox("setValue", $('#destDatabaseCode').val());
+		$("#txt_destTableName").combobox("setValue", $("#destTableName").textbox("getValue"));
+	};
+
+	this.saveSourceDb = function(){
+
+		var sourceQuerySql = $('#txt_querySql').textbox('getValue');
+		var sourceTableName = $("#txt_sourceTableName").combobox('getValue');
+		var sourceDatabaseCode = $("#txt_sourceDatabaseName").combobox('getValue');
+		var sourceDatabaseName = $("#txt_sourceDatabaseName").combobox('getText');
+
+		$("#sourceDatabaseName").textbox("setValue",sourceDatabaseName);
+		$("#sourceDatabaseCode").val(sourceDatabaseCode);
+		$("#sourceTableName").textbox("setValue",sourceTableName);
+
+		var url = Config.ContextPath + 'service/exchangemapinfo/resolveSQL/';
+		Core.ajax(url,{
+			method:'get',
+			data:{
+				databaseCode:sourceDatabaseCode,
+				querySql:sourceQuerySql
+			}
+		}).then(function(data){
+			$(".source").cdatagrid({
+				data:data
+			})
+		});
+
+		$('#sourceDb').dialog("close");
+	};
+
+	this.saveDestDb = function(){
+		var databaseCode = $("#txt_destDatabaseName").combobox('getValue');
+		var databaseName = $("#txt_destDatabaseName").combobox('getText');
+		var tableName = $("#txt_destTableName").combobox('getValue');
+
+		$("#destDatabaseName").textbox("setValue",databaseName);
+		$("#destDatabaseCode").val(databaseCode);
+		$("#destTableName").textbox("setValue",tableName);
+		Core.ajax(Config.ContextPath + 'service/platform/generateSQL/'+ databaseCode + '/' + tableName,{
+			method:'get'
+		}).then(function(sql){
+			Core.ajax(Config.ContextPath + 'service/exchangemapinfo/resolveSQL/',{
+				method:'get',
+				data:{
+					databaseCode:databaseCode,
+					querySql:sql
+				}
+			}).then(function(fields){
+				$(".dest").cdatagrid({
+					data:fields
+				})
+			});
+		});
+
+		$('#destDb').dialog("close");
+	};
+
+	this.closeSourceDb = function(){
+		$('#sourceDb').dialog("close");
+	};
+
+	this.closeDestDb = function(){
+		$('#destDb').dialog("close");
 	};
 
 	return ExchangeMapInfoAdd;

@@ -25,6 +25,7 @@ import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class ExchangeMapInfoController extends BaseController {
 
     @Resource
     protected IntegrationEnvironment integrationEnvironment;
-    
+
     @RequestMapping(value="/list" ,method = {RequestMethod.GET})
     public void list(PageDesc pageDesc,HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> searchColumn = convertSearchColumn(request);
@@ -79,7 +80,7 @@ public class ExchangeMapInfoController extends BaseController {
     }
 
     @RequestMapping(value="/save",method = {RequestMethod.PUT})
-    public void save(ExchangeMapInfo object, HttpServletResponse response) {
+    public void save(@Valid ExchangeMapInfo object, HttpServletResponse response) {
         try {
             exchangeMapInfoManager.save(object);
         }catch (SqlResolveException e){
