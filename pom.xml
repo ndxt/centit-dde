@@ -15,7 +15,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <centit.fileserver.version>2.0.1-SNAPSHOT</centit.fileserver.version>
+        <centit.dde.version>3.0.1-SNAPSHOT</centit.dde.version>
         <jdk.version>1.8</jdk.version>
 
         <centit.commons.version>2.2.1</centit.commons.version>
