@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib version="2.1" xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd">
+    <description>JSTL 1.1 core library</description>
+    <display-name>JSTL core</display-name>
+    <tlib-version>1.0</tlib-version>
+    <short-name>coderepo</short-name>
+    <uri>http://www.centit.com/el/coderepo</uri>
+    <function>
+        <description>get label beans</description>
+        <name>DATACATALOG</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>java.util.Map&lt;java.lang.String,java.lang.String&gt; getDataCatalogMap()</function-signature>
+    </function>
+    <function>
+        <description>get label beans</description>
+        <name>LVB</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>java.util.Map&lt;java.lang.String,java.lang.String&gt; getLabelValueMap(java.lang.String)
+        </function-signature>
+    </function>
+    <function>
+        <description>map the dictionary value by catalogcode and datacode</description>
+        <name>MAPVALUE</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>java.lang.String getValue(java.lang.String,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <description>map the dictionary code by catalogcode and datavalue</description>
+        <name>MAPCODE</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>java.lang.String getCode(java.lang.String,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <description>map the dictionary value by catalogcode and transExpression</description>
+        <name>MAPEXPRESSION</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>java.lang.String transExpression(java.lang.String,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <description>map the dictionary state by catalogcode and datacode</description>
+        <name>MAPSTATE</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>java.lang.String getItemState(java.lang.String,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <description>get all vaild unit under an unitcode with the same unittype or 'A'</description>
+        <name>SUBUNITS</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>List&lt;com.centit.framework.model.basedata.IUnitInfo&gt;
+            getSortedSubUnits(java.lang.String,java.lang.String)
+        </function-signature>
+    </function>
+    <function>
+        <description>get all vaild unit under an unitcode include unvalid</description>
+        <name>ALLUNITS</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>Map&lt;java.lang.String,com.centit.framework.model.basedata.IUnitInfo&gt; getAllUnits(java.lang.String)
+        </function-signature>
+    </function>
+    <function>
+        <description>get all vaild unit under an unitcode recurse</description>
+        <name>RECURSEUNITS</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>Map&lt;java.lang.String,com.centit.framework.model.basedata.IUnitInfo&gt;
+            getUnitMapBuyParaentRecurse(java.lang.String)
+        </function-signature>
+    </function>
+    <function>
+        <description>get one dictionary's item by catalogcode</description>
+        <name>DICTIONARY</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>List&lt;com.centit.framework.model.basedata.IDataDictionary&gt; getDictionary(java.lang.String)
+        </function-signature>
+    </function>
+    <function>
+        <description>get one dictionary and format as json by catalogcode</description>
+        <name>DICTIONARYJSON</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>java.lang.String getDictionaryAsJson(java.lang.String)</function-signature>
+    </function>
+    <function>
+        <description>get one dictionary's item by catalogcode ingore state eq 'D'</description>
+        <name>DICTIONARY_D</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>List&lt;com.centit.framework.model.basedata.IDataDictionary&gt; getDictionaryIgnoreD(java.lang.String)
+        </function-signature>
+    </function>
+    <function>
+        <description>get all user of one unit include not valid</description>
+        <name>UNITUSER</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>List&lt;com.centit.framework.model.basedata.IUserInfo&gt; getSortedUnitUsers(java.lang.String)
+        </function-signature>
+    </function>
+    <function>
+        <description>get all user of one unit include not valid</description>
+        <name>ALLUSER</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>List&lt;com.centit.framework.model.basedata.IUserInfo&gt; getAllUsers(java.lang.String)</function-signature>
+    </function>
+    <function>
+        <description>get all vaild unit list</description>
+        <name>UNITSLIST</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>List&lt;java.lang.String,com.centit.framework.model.basedata.IUnitInfo&gt; getUnitList(java.lang.String)
+        </function-signature>
+    </function>
+    <function>
+        <description>get all optinfo by opttype</description>
+        <name>OPTINFO</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>List&lt;com.centit.framework.model.basedata.IOptInfo&gt; getOptinfoList(java.lang.String)</function-signature>
+    </function>
+    <function>
+        <description>get all optdef by optid</description>
+        <name>OPTDEF</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>List&lt;com.centit.framework.model.basedata.IOptMethod&gt; getOptMethodByOptID(java.lang.String)
+        </function-signature>
+    </function>
+    <function>
+        <description>get roleinfo list by prefix</description>
+        <name>ROLEINFO</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>List&lt;com.centit.framework.model.basedata.IRoleInfo&gt; getRoleinfoList(java.lang.String)
+        </function-signature>
+    </function>
+
+    <function>
+        <description>check current user power by optId,optMethod</description>
+        <name>CHECKUSEROPTPOWER</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>java.lang.Boolean checkUserOptPower(java.lang.String, java.lang.String)</function-signature>
+    </function>
+
+	<function>
+        <description>获取用户设置的参数值 </description>
+        <name>USERSETTING</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>java.lang.String getUserSettingValue(java.lang.String)</function-signature>
+    </function>
+    
+    <function>
+        <description>获取System.properties文件属性值</description>
+        <name>SYS_VALUE</name>
+        <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
+        <function-signature>java.lang.String getSysConfigValue(java.lang.String)</function-signature>
+    </function>
+
+</taglib>

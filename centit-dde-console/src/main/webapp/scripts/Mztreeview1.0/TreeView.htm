@@ -1,0 +1,127 @@
+<html>
+<head>
+    <title>TreeView</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+
+    <script language="JavaScript" src="MzTreeView10.js"></script>
+
+    <style type="text/css">
+        BODY
+        {
+            background-image: url();
+            margin-left: 0px;
+            margin-top: 0px;
+            margin-right: 0px;
+            margin-bottom: 0px;
+            background-color: #f2f9ff;
+            scrollbar-face-color: #99D1F7;
+            scrollbar-highlight-color: #99D1F7;
+            scrollbar-shadow-color: #65A2EA;
+            scrollbar-3dlight-color: #65A2EA;
+            scrollbar-arrow-color: #E0F7FC;
+            scrollbar-track-color: #E0F7FC;
+            scrollbar-darkshadow-color: #FFFFFF;
+        }
+        .style6
+        {
+            font-weight: bold;
+            font-size: 16px;
+            color: #FFFFFF;
+        }
+    </style>
+    <style type="text/css">
+        body, td
+        {
+            font-family: 宋体;
+            font-size: 12px;
+        }
+        A:LINK, A:VISITED, A:ACTIVE, A:HOVER
+        {
+            color: #800080;
+            font-size: 13px;
+            padding-left: 3px;
+            text-decoration: NONE;
+        }
+        a:link
+        {
+            color: #000000;
+        }
+        a:visited
+        {
+            color: #000000;
+        }
+        a:hover
+        {
+            color: #000000;
+        }
+        a:active
+        {
+            color: #000000;
+        }
+    </style>
+</head>
+<body style="margin-left: 10px;">
+    <div id="treeviewarea">
+
+        <script language="JavaScript">
+        
+            var tree = new MzTreeView("tree");
+            tree.setIconPath("treeview/");
+            tree.nodes['0_1'] = "text:检验信息管理; ";
+            tree.nodes['1_2'] = "text:外购产品检验组; ";
+            tree.nodes['1_3'] = "text:最终产品检验;  ";
+            tree.nodes['1_4'] = "text:复检情况;  ";
+            tree.nodes['1_5'] = "text:办公辅助;  ";
+			tree.nodes['5_55'] = "text:办公辅助;  ";
+
+			tree.nodes['801_1001'] = "text:万年历和世界时钟的儿子;  url:OAHelper/WorldTime.htm; target:mainFrame";
+            tree.nodes['801_1002'] = "text:万年历和世界时钟的儿子;  url:OAHelper/WorldTime.htm; target:mainFrame";
+            tree.nodes['1_6'] = "text:基础信息管理;  ";
+
+            tree.nodes['1_7'] = "text:部门意见与建议;  ";
+            tree.nodes['1_8'] = "text:系统意见与建议;  ";
+
+
+            tree.nodes['2_200'] = "text:来料及待检情况;  url:job/cailiao.aspx; target:mainFrame";
+            tree.nodes['2_201'] = "text:检验情况;  url:job/CheckOver.aspx; target:mainFrame";
+
+
+            tree.nodes['3_300'] = "text:批次产品及厂检;  url:zuizhong/zuizhongMingpin.aspx; target:mainFrame";
+            tree.nodes['3_301'] = "text:合同产品及军检;  url:zuizhong2/zuizhongMingpin2.aspx; target:mainFrame";
+            tree.nodes['3_302'] = "text:新品试验汇总;  url: Newpin/Newpin.aspx; target:mainFrame";
+            tree.nodes['3_303'] = "text:服务部送检情况;  url:jishu/jishu.aspx; target:mainFrame";
+
+
+            tree.nodes['4_400'] = "text:复检情况;  url: outCheck/fujian.aspx; target:mainFrame";
+
+            tree.nodes['5_500'] = "text:新闻管理;  url:New/NewsList.aspx?type=1; target:mainFrame";
+            tree.nodes['5_501'] = "text:通告管理;  url:New/NewsList.aspx?type=2; target:mainFrame";
+            tree.nodes['5_502'] = "text:公共文件管理;  url:webFile/index.html; target:_blank";
+            tree.nodes['5_503'] = "text:个人文件管理;  url:webFile/UserFiles/index.html; target:_blank";
+
+            tree.nodes['5_504'] = "text:万年历和世界时钟;  url:OAHelper/WorldTime.htm; target:mainFrame";
+            
+
+            tree.nodes['6_601'] = "text:员工管理;  url:sysMgr/UserMgr.aspx; target:mainFrame";
+            tree.nodes['6_602'] = "text:部门管理;  url:sysMgr/dept.aspx; target:mainFrame";
+
+            tree.nodes['6_603'] = "text:角色管理;  url:sysMgr/RoleMgr.aspx; target:mainFrame";
+            tree.nodes['6_604'] = "text:角色权限管理;  url:sysMgr/WarrantMgr.aspx; target:mainFrame";
+
+            tree.nodes['6_605'] = "text:基础数据字典管理;  url:Job/Modify.aspx; target:mainFrame";
+            tree.nodes['6_606'] = "text:产品类型管理; url:Product/Product.aspx; target:mainFrame";
+            tree.nodes['6_607'] = "text:数据库备份和还原; url:DBBackUp/DBBackup.aspx; target:mainFrame";
+
+            tree.nodes['7_701'] = "text:意见建议反馈;  url:message.aspx; target:mainFrame";
+           
+            tree.nodes['8_801'] = "text:意见建议反馈;  url:zuizhong2/message2.aspx; target:mainFrame";
+            
+            tree.nodes['504_1000'] = "text:万年历和世界时钟的儿子;  url:OAHelper/WorldTime.htm; target:mainFrame";
+            
+            document.getElementById('treeviewarea').innerHTML = tree.toString();
+            tree.expandAll();
+        </script>
+
+    </div>
+</body>
+</html>

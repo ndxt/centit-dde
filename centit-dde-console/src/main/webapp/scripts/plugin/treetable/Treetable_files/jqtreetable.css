@@ -1,0 +1,32 @@
+/* 
+Copyright: Paul Hanlon
+
+Released under the MIT/BSD licence which means you can do anything you want 
+with it, as long as you keep this copyright notice on the page 
+*/
+.collapsed { display: none; }
+.tablemain {border-collapse: collapse; border: solid 1px #447; padding: 0px; text-align: left; }
+.tablemain td {margin-left:3px;}
+#treet1 {background-color:#ffc}
+#treet2 {background-color:#ffc}
+#treet1 td { font: normal 10pt Arial; padding: 0px 2px 0px 0px; cursor: pointer;}
+#treet2 td { font: normal 10pt Arial; padding: 0px 2px 0px 0px; cursor: pointer;}
+.adeimg, .ttimage, .parimg, .preimg { border: none; margin: 0px; padding: 0px; vertical-align: bottom; width: 16px; height: 16px; }
+.adeimg, .parimg {cursor: pointer; }
+
+table.tablemain {border-collapse:collapse; border:solid 1px #ededed;}
+table.tablemain thead tr {background:url("../default/images/tableth.png") repeat-x scroll 0 0 #F0EFF0;}
+table.tablemain th {padding:1px 2px; line-height:21px; border-right: solid 1px #D0D0D0; border-bottom:solid 1px #D0D0D0; font-weight:bolder; }
+table.tablemain td {padding:1px 2px; line-height:21px; border-right:solid 1px #ededed;}
+table.tablemain th.asc, .grid .gridHeader th.asc{background-position: 100% 0; background:url(../default/images/order_up.gif) no-repeat right; cursor:pointer;}
+table.tablemain th.desc, .grid .gridHeader th.desc{background-position: 100% 0; background:url(../default/images/order_down.gif) no-repeat right; cursor:pointer;}
+table.tablemain tbody {background-color:#fff;}
+table.tablemain .right {text-align:right;}
+table.tablemain .even {background-color:#F8F8F8;}
+table.tablemain .hot {background-color:#fff5c0;}
+table.tablemain .over {background-color:#e4f5ff;}
+table.tablemain .selected {background-color:#7cc5e5;border-color:#b8d0d6; }
+table.tablemain a {color:#3C7FB1; font-size:11px; line-height:20px;}
+table.tablemain a:hover {text-decoration:underline; line-height:20px;}
+table.tablemain td span.error {z-index:-1}
+table.nowrap tbody tr {border-bottom:solid 1px #ededed;}

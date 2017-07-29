@@ -1,0 +1,908 @@
+<?xml version="1.0" encoding="utf-8"?>
+<_AJAX_>
+
+<!-- dwz.dialog -->
+<_PAGE_ id="dialogFrag"><![CDATA[
+<div class="dialog" style="top:150px; left:300px;">
+	<div class="dialogHeader" onselectstart="return false;" oncopy="return false;" onpaste="return false;" oncut="return false;">
+		<div class="dialogHeader_r">
+			<div class="dialogHeader_c">
+				<a class="close" href="#close">close</a>
+				<a class="maximize" href="#maximize">maximize</a>
+				<a class="restore" href="#restore">restore</a>
+				<a class="minimize" href="#minimize">minimize</a>
+				<h1>弹出窗口</h1>
+			</div>
+		</div>
+	</div>
+	<div class="dialogContent layoutBox unitBox">
+	</div>
+	<div class="dialogFooter"><div class="dialogFooter_r"><div class="dialogFooter_c"></div></div></div>
+	<div class="resizable_h_l" tar="nw"></div>
+	<div class="resizable_h_r" tar="ne"></div>
+	<div class="resizable_h_c" tar="n"></div>
+	<div class="resizable_c_l" tar="w" style="height:300px;"></div>
+	<div class="resizable_c_r" tar="e" style="height:300px;"></div>
+	<div class="resizable_f_l" tar="sw"></div>
+	<div class="resizable_f_r" tar="se"></div>
+	<div class="resizable_f_c" tar="s"></div>
+</div>
+]]></_PAGE_>
+
+<_PAGE_ id="MyHome"><![CDATA[
+<div class="panel" id="${id}">
+	<div class="panelHeader">
+		<div class="panelHeaderContent"><h1>${title}</h1><a href="#" class="maximize"></a><a href="#" class="restore"></a></div>
+	</div>
+	<div class="panelContent"><iframe scrolling="auto" id="frame_${id}" resize="no" frameborder="0"></iframe></div>
+	<div class="panelFooter"><div class="panelFooterContent"></div></div>
+</div>
+]]></_PAGE_>
+
+<!-- 文件 -->
+<_PAGE_ id="PUBLIC_FILE_LINE"><![CDATA[
+<div class="line" _data_infocode="{infocode}">
+<div class="name info"">
+	<span class="check icon"></span>
+	<span class="icon {type} cst1">&nbsp;</span> 
+	<a href="{url}" type="{atype}" title="{fullFilename}">{filename}</a>
+</div>
+<div class="size info">{size}</div>
+<div class="owner info">{ownercode}</div>
+<div class="time info">{uploadtime}</div>
+</div>
+]]></_PAGE_>
+
+<!-- 新建文件夹 -->
+<_PAGE_ id="PUBLIC_NEW_FOLDER"><![CDATA[
+<div class="line new">
+	<div class="name info">
+		<span class="check icon"></span>
+		<span class="icon folder cst1">&nbsp;</span> 
+		<input type="text" name="filename" value="新建文件夹" class="newfolder" />
+		<a title="确定" class="btn sure bst4" href="javascript:;">确定</a>
+		<a title="取消" class="btn cancel bst4" href="javascript:;">取消</a>
+	</div>
+	<div class="size info">-</div>
+	<div class="owner info">{username}</div>
+	<div class="time info">-</div>
+</div>
+]]></_PAGE_>
+
+<!-- 上传文件容器 -->
+<_PAGE_ id="PUBLIC_UPLOAD_CONTAINER"><![CDATA[
+<div class="upload-dialog shadow" style="display:none;">
+	<div class="title">
+		<div class="inline-mask" style="width:0"></div>
+		<a href="javascript:;" title="关闭" class="btn close bst5">关闭 </a>
+		<a href="javascript:;" title="最小化" class="btn min bst5">最小化</a>
+		<h4 class="h4">
+			<strong class="info-num"></strong>
+			<strong class="info-speed"></strong>
+		</h4>
+	</div>
+	<div class="content">
+		<dl id="upload-content"></dl> 
+	</div>
+</div>
+]]></_PAGE_>
+
+
+<!-- 上传文件显示 -->
+<_PAGE_ id="PUBLIC_UPLOAD_FILE"><![CDATA[
+<dd class="line" id="${fileID}">
+	<div class="inline-mask" style="width:0"></div>
+	<div class="name cell">${fileName}</div>
+	<div class="size cell">${fileSize}</div>
+	<div class="path cell">
+		<a>我的文件夹</a>
+	</div>
+	<div class="status cell">
+	</div>
+	<div class="operation cell">
+		<a class="btn waiting bst6" href="javascript:;" title="取消上传"></a>\
+	</div>
+</dd>
+]]></_PAGE_>
+
+<!-- 幻灯片切换 -->
+<_PAGE_ id="Slideshow"><![CDATA[
+<div class="slideshowBtn side prev"></div>
+<div class="slideshowBtn side next"></div>
+<div class="slideshowBtn bottom"></div>
+]]></_PAGE_>
+
+<!-- dwz.dialog shadow -->
+<_PAGE_ id="dialogProxy"><![CDATA[
+<div id="dialogProxy" class="dialog dialogProxy">
+	<div class="dialogHeader">
+		<div class="dialogHeader_r">
+			<div class="dialogHeader_c">
+				<a class="close" href="#close">close</a>
+				<a class="maximize" href="#maximize">maximize</a>
+				<a class="minimize" href="#minimize">minimize</a>
+				<h1></h1>
+			</div>
+		</div>
+	</div>
+	<div class="dialogContent"></div>
+	<div class="dialogFooter">
+		<div class="dialogFooter_r">
+			<div class="dialogFooter_c">
+			</div>
+		</div>
+	</div>
+</div>
+]]></_PAGE_>
+<!-- dwz.dialog taskbar -->
+<_PAGE_ id="taskbar"><![CDATA[
+<div id="taskbar" style="left:0px; display:none;">
+	<div class="taskbarContent">
+		<ul></ul>
+	</div>
+	<div class="taskbarLeft taskbarLeftDisabled" style="display:none;">taskbarLeft</div>
+	<div class="taskbarRight" style="display:none;">taskbarRight</div>
+</div>
+]]></_PAGE_>
+
+<!-- other dwz fragment -->
+<_PAGE_ id="dwzFrag"><![CDATA[
+<div id="splitBar"></div>
+<div id="splitBarProxy"></div>
+
+<!--拖动效果-->
+<div class="resizable"></div>
+<!--阴影-->
+<div class="shadow" id="dwzShadow" style="width:508px; top:148px; left:296px;">
+	<div class="shadow_h">
+		<div class="shadow_h_l"></div>
+		<div class="shadow_h_r"></div>
+		<div class="shadow_h_c"></div>
+	</div>
+	<div class="shadow_c">
+		<div class="shadow_c_l" style="height:296px;"></div>
+		<div class="shadow_c_r" style="height:296px;"></div>
+		<div class="shadow_c_c" style="height:296px;"></div>
+	</div>
+	<div class="shadow_f">
+		<div class="shadow_f_l"></div>
+		<div class="shadow_f_r"></div>
+		<div class="shadow_f_c"></div>
+	</div>
+</div>
+<!--遮盖屏幕-->
+<div id="alertBackground" class="alertBackground"></div>
+<div id="dialogBackground" class="dialogBackground"></div>
+
+<div id='background' class='background'></div>
+<div id='progressBar' class='progressBar'>数据加载中，请稍等...</div>
+]]></_PAGE_>
+
+<!-- other dwz fragment -->
+<_PAGE_ id="CentitFrag"><![CDATA[
+<!--阴影-->
+<div class="shadow" style="width:508px; top:148px; left:296px;">
+	<div class="shadow_h">
+		<div class="shadow_h_l"></div>
+		<div class="shadow_h_r"></div>
+		<div class="shadow_h_c"></div>
+	</div>
+	<div class="shadow_c">
+		<div class="shadow_c_l" style="height:296px;"></div>
+		<div class="shadow_c_r" style="height:296px;"></div>
+		<div class="shadow_c_c" style="height:296px;"></div>
+	</div>
+	<div class="shadow_f">
+		<div class="shadow_f_l"></div>
+		<div class="shadow_f_r"></div>
+		<div class="shadow_f_c"></div>
+	</div>
+</div>
+]]></_PAGE_>
+
+<!-- dwz.pagination -->
+<_PAGE_ id="pagination"><![CDATA[
+<ul>
+	<li class="j-first">
+		<a class="first" href="javascript:;"><span>首页</span></a>
+		<span class="first"><span>首页</span></span>
+	</li>
+	<li class="j-prev">
+		<a class="previous" href="javascript:;"><span>上一页</span></a>
+		<span class="previous"><span>上一页</span></span>
+	</li>
+	#pageNumFrag#
+	<li class="j-next">
+		<a class="next" href="javascript:;"><span>下一页</span></a>
+		<span class="next"><span>下一页</span></span>
+	</li>
+	<li class="j-last">
+		<a class="last" href="javascript:;"><span>末页</span></a>
+		<span class="last"><span>末页</span></span>
+	</li>
+	<li class="jumpto"><input class="textInput" type="text" size="4" value="#currentPage#" /><input class="goto" type="button" value="确定" /></li>
+</ul>
+]]></_PAGE_>
+
+	
+<!-- dwz.alertMsg -->
+<_PAGE_ id="alertBoxFrag"><![CDATA[
+<div id="alertMsgBox" class="alert"><div class="alertContent"><div class="#type#"><div class="alertInner"><h1>#title#</h1><div class="msg">#message#</div></div><div class="toolBar"><ul>#butFragment#</ul></div></div></div><div class="alertFooter"><div class="alertFooter_r"><div class="alertFooter_c"></div></div></div></div>
+]]></_PAGE_>
+		
+<_PAGE_ id="alertButFrag"><![CDATA[
+<li><a class="button" rel="#callback#" onclick="alertMsg.close()" href="javascript:"><span>#butMsg#</span></a></li>
+]]></_PAGE_>
+
+<_PAGE_ id="calendarFrag"><![CDATA[
+<div id="calendar">
+	<div class="main">
+		<div class="head">
+			<table width="100%" border="0" cellpadding="0" cellspacing="2">
+			<tr>
+				<td><select name="year"></select></td>
+				<td><select name="month"></select></td>
+				<td width="20"><span class="close">×</span></td>
+			</tr>
+			</table>
+		</div>
+		<div class="body">
+			<dl class="dayNames"><dt>日</dt><dt>一</dt><dt>二</dt><dt>三</dt><dt>四</dt><dt>五</dt><dt>六</dt></dl>
+			<dl class="days">日期列表选项</dl>
+			<div style="clear:both;height:0;line-height:0"></div>
+			<div class="tm">
+				<ul class="hh">
+					<li>0</li>
+					<li>1</li>
+					<li>2</li>
+					<li>3</li>
+					<li>4</li>
+					<li>5</li>
+					<li>6</li>
+					<li>7</li>
+					<li>8</li>
+					<li>9</li>
+					<li>10</li>
+					<li>11</li>
+					<li>12</li>
+					<li>13</li>
+					<li>14</li>
+					<li>15</li>
+					<li>16</li>
+					<li>17</li>
+					<li>18</li>
+					<li>19</li>
+					<li>20</li>
+					<li>21</li>
+					<li>22</li>
+					<li>23</li>
+				</ul>
+				<ul class="mm">
+					<li>0</li>
+					<li>5</li>
+					<li>10</li>
+					<li>15</li>
+					<li>20</li>
+					<li>25</li>
+					<li>30</li>
+					<li>35</li>
+					<li>40</li>
+					<li>45</li>
+					<li>50</li>
+					<li>55</li>
+				</ul>
+				<ul class="ss">
+					<li>0</li>
+					<li>10</li>
+					<li>20</li>
+					<li>30</li>
+					<li>40</li>
+					<li>50</li>
+				</ul>
+			</div>
+		</div>
+		<div class="foot">
+			<table class="time">
+				<tr>
+					<td>
+						<input type="text" class="hh" maxlength="2" start="0" end="23"/>:
+						<input type="text" class="mm" maxlength="2" start="0" end="59"/>:
+						<input type="text" class="ss" maxlength="2" start="0" end="59"/>
+					</td>
+					<td><ul><li class="up">&and;</li><li class="down">&or;</li></ul></td>
+				</tr>
+			</table>
+			<button type="button" class="clearBut">清空</button>
+			<button type="button" class="okBut">确定</button>
+		<div>
+	</div>
+</div>
+]]></_PAGE_>
+
+<_PAGE_ id="navTabCM"><![CDATA[
+<ul id="navTabCM">
+	<li rel="reload">刷新标签页</li>
+	<li rel="closeCurrent">关闭标签页</li>
+	<li rel="closeOther">关闭其它标签页</li>
+	<li rel="closeAll">关闭全部标签页</li>
+</ul>
+]]></_PAGE_>
+
+<_PAGE_ id="TrExchangeFieldSourceTemplate"><![CDATA[
+<tr style="display: none;" columnNo type='fieldSource'>
+    <td nowrap width="13%"></td>
+    <td nowrap width="15%"></td>
+    <td nowrap width="10%"></td>
+    <td align="center">
+   		<a class="edit" href="" target="dialog" callback="javascript:new ExportSql().pubfuns.exportFieldCallback(this, 'formField');" rel="exchange_field_source" width="530" height="430" resizable="false" maxable="false" title="编辑数据交换字段"><span class="icon icon-compose"></span></a>
+        <a class="delete" href="javascript:;"><span class="icon icon-trash"></span></a>
+        
+    </td>
+</tr>
+]]></_PAGE_>
+
+
+<_PAGE_ id="TrExchangeFieldDestTemplate"><![CDATA[
+<tr style="display: none;" columnNo type='fieldDest'>
+    <td nowrap width="13%"></td>
+	<td nowrap width="15%"></td>
+	<td nowrap width="10%"></td>
+	<td nowrap width="10%"></td>
+	<td nowrap width="10%"></td>
+    <td align="center">
+            <a class="edit" href=""
+               target="dialog" callback="javascript:new ExportSql().pubfuns.exportFieldCallback(this, 'formField');" rel="exchange_field_dest" width="530" height="430" resizable="false" maxable="false" title="编辑数据交换字段"><span class="icon icon-compose"></span></a>
+
+            <a class="delete" href="javascript:;"><span class="icon icon-trash"></span></a>
+        
+    </td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ExchangeSourceField"><![CDATA[
+<li columnNo="{columnNo}" type="source">
+	<input type="hidden" name="mapInfoDetails[{columnNo}].sourceTableName" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].sourceUrl" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].sourceFieldName" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].sourceFieldSentence" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].sourceFieldType" />
+</li>
+]]></_PAGE_>
+
+<_PAGE_ id="ExchangeDestField"><![CDATA[
+<li columnNo="{columnNo}" type="dest">
+	<input type="hidden" name="mapInfoDetails[{columnNo}].goalTableName" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].goalUrl" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].destFieldName" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].destFieldType" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].isPk" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].isNull" />
+	<input type="hidden" name="mapInfoDetails[{columnNo}].destFieldDefault" />
+</li>
+]]></_PAGE_>
+
+<_PAGE_ id="TrExchangeTriggerTemplate"><![CDATA[
+<tr style="display: none;" columnNo type='trigger'>
+    <td nowrap width="50%" style="cursor: move;"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td align="center">
+	    <a class="edit" href=""
+	       target="dialog" callback="javascript:new ExportSql().pubfuns.exportFieldCallback(this, 'formTrigger');" rel="exchange_trigger" height="600" width="680" resizable="false" maxable="false" title="编辑交换对应关系触发器"><span class="icon icon-compose"></span></a>
+	    <a class="delete" href="javascript:;"><span class="icon icon-trash"></span></a>
+        
+    </td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ExchangeTrigger"><![CDATA[
+<li columnNo="{columnNo}">
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].triggerSql" />
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].triggerDesc" />
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].triggerDatabase" />
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].triggerType" />
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].triggerTime" />
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].tiggerOrder" />
+	<input type="hidden" name="mapInfoTriggers[{columnNo}].isprocedure" />
+</li>
+]]></_PAGE_>
+
+
+
+<_PAGE_ id="TrExportFieldTemplate"><![CDATA[
+<tr style="display: none;" columnNo>
+    <td nowrap width="13%"></td>
+    <td nowrap width="15%"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td align="center">
+            <a class="edit" href=""
+               target="dialog" callback="javascript:new ExportSql().pubfuns.exportFieldCallback(this, 'formField');" rel="export_field" width="530" height="430" resizable="false" maxable="false" title="编辑数据导出内容字段"><span class="icon icon-compose"></span></a>
+
+            <a class="delete" href="javascript:;"><span class="icon icon-trash"></span></a>
+        
+    </td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ExportField"><![CDATA[
+<li columnNo="{columnNo}">
+	<input type="hidden" name="exportFields[{columnNo}].fieldName" />
+	<input type="hidden" name="exportFields[{columnNo}].fieldSentence" />
+	<input type="hidden" name="exportFields[{columnNo}].fieldType" />
+	<input type="hidden" name="exportFields[{columnNo}].fieldFormat" />
+	<input type="hidden" name="exportFields[{columnNo}].fieldStoreType" />
+	<input type="hidden" name="exportFields[{columnNo}].isPk" />
+</li>
+]]></_PAGE_>
+
+
+<_PAGE_ id="TrExportTriggerTemplate"><![CDATA[
+<tr style="display: none;" columnNo type='trigger'>
+    <td nowrap width="50%" style="cursor: move;"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td align="center">
+	    <a class="edit" href=""
+	       target="dialog" callback="javascript:new ExportSql().pubfuns.exportFieldCallback(this, 'formTrigger');" rel="export_trigger" width="560" height="430" resizable="false" maxable="false" title="编辑数据导入触发器"><span class="icon icon-compose"></span></a>
+	    <a class="delete" href="javascript:;"><span class="icon icon-trash"></span></a>
+        
+    </td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ExportTrigger"><![CDATA[
+<li columnNo="{columnNo}">
+	<input type="hidden" name="exportTriggers[{columnNo}].triggerSql" />
+	<input type="hidden" name="exportTriggers[{columnNo}].triggerDesc" />
+	<input type="hidden" name="exportTriggers[{columnNo}].triggerType" />
+	<input type="hidden" name="exportTriggers[{columnNo}].triggerTime" />
+	<input type="hidden" name="exportTriggers[{columnNo}].tiggerOrder" />
+	<input type="hidden" name="exportTriggers[{columnNo}].isprocedure" />
+</li>
+]]></_PAGE_>
+
+
+<_PAGE_ id="TrImportFieldTemplate"><![CDATA[
+<tr style="display: none;" columnNo type='field'>
+    <td nowrap width="13%" style="cursor: move;"></td>
+    <td nowrap width="40%"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td align="center">
+            <a class="edit" href=""
+               target="dialog" callback="javascript:new ExportSql().pubfuns.exportFieldCallback(this, 'formField');" rel="import_field" width="530" height="430" resizable="false" maxable="false" title="编辑数据导入内容字段"><span class="icon icon-compose"></span></a>
+
+            <a class="delete" href="javascript:;"><span class="icon icon-trash"></span></a>
+        
+    </td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ImportField"><![CDATA[
+<field columnNo="{columnNo}">
+	<input type="hidden" name="importFields[{columnNo}].sourceFieldName" />
+	<input type="hidden" name="importFields[{columnNo}].destFieldName" />
+	<input type="hidden" name="importFields[{columnNo}].destFieldType" />
+	<input type="hidden" name="importFields[{columnNo}].isPk" />
+	<input type="hidden" name="importFields[{columnNo}].isNull" />
+	<input type="hidden" name="importFields[{columnNo}].destFieldDefault" />
+</field>
+]]></_PAGE_>
+
+<_PAGE_ id="TrImportTriggerTemplate"><![CDATA[
+<tr style="display: none;" columnNo type='trigger'>
+    <td nowrap width="50%" style="cursor: move;"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td align="center">
+	    <a class="edit" href=""
+	       target="dialog" callback="javascript:new ExportSql().pubfuns.exportFieldCallback(this, 'formTrigger');" rel="import_trigger" width="560" height="430" resizable="false" maxable="false" title="编辑数据导入触发器"><span class="icon icon-compose"></span></a>
+	    <a class="delete" href="javascript:;"><span class="icon icon-trash"></span></a>
+        
+    </td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ImportTrigger"><![CDATA[
+<trigger columnNo="{columnNo}">
+	<input type="hidden" name="importTriggers[{columnNo}].triggerSql" />
+	<input type="hidden" name="importTriggers[{columnNo}].triggerDesc" />
+	<input type="hidden" name="importTriggers[{columnNo}].triggerType" />
+	<input type="hidden" name="importTriggers[{columnNo}].triggerTime" />
+	<input type="hidden" name="importTriggers[{columnNo}].tiggerOrder" />
+	<input type="hidden" name="importTriggers[{columnNo}].isprocedure" />
+</trigger>
+]]></_PAGE_>
+
+<_PAGE_ id="TrDataOptInfoFieldTemplate"><![CDATA[
+<tr style="display: none;" columnNo>
+    <td nowrap width="30%"></td>
+    <td nowrap width="30%"></td>
+    <td nowrap width="10%"></td>
+    <td nowrap width="10%"></td>
+    <td align="center">
+            <a class="edit" href=""
+               target="dialog" callback="javascript:new ExportSql().pubfuns.exportFieldCallback(this);" rel="dataoptinfo_field" width="530" height="430" resizable="false" maxable="false" title="编辑数据处理步骤"><span class="icon icon-compose"></span></a>
+
+            <a class="delete" href="javascript:;"><span class="icon icon-trash"></span></a>
+        
+    </td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="DataOptInfoField"><![CDATA[
+<field columnNo="{columnNo}">
+	<input type="hidden" name="dataOptSteps[{columnNo}].optStepId" />
+	<input type="hidden" name="dataOptSteps[{columnNo}].importId" />
+	<input type="hidden" name="dataOptSteps[{columnNo}].optType" />
+	<input type="hidden" name="dataOptSteps[{columnNo}].dataOptId" />
+	<input type="hidden" name="dataOptSteps[{columnNo}].osId" />
+	<input type="hidden" name="dataOptSteps[{columnNo}].mapInfoOrder" />
+</field>
+]]></_PAGE_>
+
+<_PAGE_ id="ADDMAPINFODETAILSOURCE"><![CDATA[
+<tr> 
+
+	<td>{sourceFieldName}<input type="hidden" name="sourceColumnName" value="{sourceFieldName}"/></td>
+	<td>{sourceFieldSentence}<input type="hidden" name="SourceColumnSentence" value="{sourceFieldSentence}"/></td>
+	<td>{sourceFieldType}<input type="hidden" name="SourceColumnType" value="{sourceFieldType}"/></td>
+
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ADDMAPINFODETAILGOAL"><![CDATA[
+<tr>
+	<td>{destFieldName}<input type="hidden" name="GoalColumnName" value="{destFieldName}"/></td>						
+	<td>{destFieldType}<input type="hidden" name="GoalColumnType" value="{destFieldType}"/> </td>						
+	<td>{isPk}<input type="hidden" name="GoalisPk" value="{isPk}"/></td>						    
+    <td>{isNull}<input type="hidden" name="GoalisNullable" value="{isNull}"/></td>
+	<td>{destFieldDefault}<input type="hidden" name="GoalFieldDefault" value="{destFieldDefault}"/></td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="INPUTHIDDEN"><![CDATA[
+<input type="hidden" name="{name}" value="{value}"/>
+]]></_PAGE_>
+
+<!-- CT_NUM -->
+<_PAGE_ id="contentDealMethod_CTNUM"><![CDATA[
+<option value="none">无操作</option>
+<option value="+">+</option>
+<option value="-">-</option>
+<option value="*">*</option>
+<option value="/">/</option>
+<option value="abs">abs</option>
+<option value="sum">求和</option>
+<option value="ave">求平均</option>
+<option value="max">最大值</option>
+<option value="min">最小值</option>
+]]></_PAGE_>
+
+<!-- CT_NUM -->
+<_PAGE_ id="filterDealMethod_CTNUM"><![CDATA[
+<option value="none">无操作</option>
+<option value="+">+</option>
+<option value="-">-</option>
+<option value="*">*</option>
+<option value="/">/</option>
+<option value="abs">abs</option>
+]]></_PAGE_>
+
+<_PAGE_ id="filterDetailLogic_CTNUM"><![CDATA[
+<option value=">">大于(>)</option>
+<option value="<;">小于(<;)</option>
+<option value="=">等于(=)</option>
+<option value=">=">大于等于(>=)</option>
+<option value="<=">小于等于(<=)</option>
+<option value="<>">不等于(<>)</option>
+]]></_PAGE_>
+
+<!-- CT_CHAR -->
+<_PAGE_ id="contentDealMethod_CTCHAR"><![CDATA[
+<option value="none">无操作</option>
+<option value="max">最大值</option>
+<option value="min">最小值</option>
+<option value="upper">大写</option>
+<option value="lower">小写</option>
+]]></_PAGE_>
+
+<!-- CT_CHAR -->
+<_PAGE_ id="filterDealMethod_CTCHAR"><![CDATA[
+<option value="none">无操作</option>
+<option value="upper">大写</option>
+<option value="lower">小写</option>
+]]></_PAGE_>
+
+<_PAGE_ id="filterDetailLogic_CTCHAR"><![CDATA[
+<option value=">">大于(>)</option>
+<option value="<;">小于(<;)</option>
+<option value="=">等于(=)</option>
+<option value=">=">大于等于(>=)</option>
+<option value="<=">小于等于(<=)</option>
+<option value="<>">不等于(<>)</option>
+<option value="in">包含于(in)</option>
+]]></_PAGE_>
+
+
+<!-- CT_STRING -->
+<_PAGE_ id="contentDealMethod_CTSTRING"><![CDATA[
+<option value="none">无操作</option>
+<option value="max">最大值</option>
+<option value="min">最小值</option>
+<option value="upper">大写</option>
+<option value="lower">小写</option>
+<option value="ltrim">左整理</option>
+<option value="rtrim">右整理</option>
+<option value="trim">整理</option>
+<option value="length">求长度</option>
+<option value="substr">取子串</option>
+]]></_PAGE_>
+
+<!-- CT_STRING -->
+<_PAGE_ id="filterDealMethod_CTSTRING"><![CDATA[
+<option value="none">无操作</option>
+<option value="upper">大写</option>
+<option value="lower">小写</option>
+<option value="ltrim">左整理</option>
+<option value="rtrim">右整理</option>
+<option value="trim">整理</option>
+<option value="length">求长度</option>
+<option value="substr">取子串</option>
+]]></_PAGE_>
+
+<_PAGE_ id="filterDetailLogic_CTSTRING"><![CDATA[
+<option value=">">大于(>)</option>
+<option value="<;">小于(<;)</option>
+<option value="=">等于(=)</option>
+<option value=">=">大于等于(>=)</option>
+<option value="<=">小于等于(<=)</option>
+<option value="<>">不等于(<>)</option>
+<option value="<>">像(like)</option>
+<option value="in">包含于(in)</option>
+]]></_PAGE_>
+
+<!-- CT_DATE -->
+<_PAGE_ id="contentDealMethod_CTDATE"><![CDATA[
+<option value="none">无操作</option>
+<option value="year">年</option>
+<option value="month">月</option>
+<option value="day">日</option>
+<option value="trunc">取整</option>
+]]></_PAGE_>
+
+<!-- CT_DATE -->
+<_PAGE_ id="filterDealMethod_CTDATE"><![CDATA[
+<option value="none">无操作</option>
+<option value="year">年</option>
+<option value="month">月</option>
+<option value="day">日</option>
+<option value="trunc">取整</option>
+]]></_PAGE_>
+
+<_PAGE_ id="filterDetailLogic_CTDATE"><![CDATA[
+<option value="noop">无操作</option>
+<option value=">">大于(>)</option>
+<option value="<;">小于(<;)</option>
+<option value="=">等于(=)</option>
+<option value=">=">大于等于(>=)</option>
+<option value="<=">小于等于(<=)</option>
+<option value="<>">不等于(<>)</option>
+]]></_PAGE_>
+
+<!-- CT_NONE -->
+<_PAGE_ id="contentDealMethod_CTNONE"><![CDATA[
+<option value="count">计数</option>
+<option value="dcount">精确计数</option>
+]]></_PAGE_>
+
+<!-- CT_NONE -->
+<_PAGE_ id="filterDealMethod_CTNONE"><![CDATA[
+
+]]></_PAGE_>
+
+<_PAGE_ id="filterDetailLogic_CTNONE"><![CDATA[
+
+<option value="is null">是空值(is null)</option>
+<option value="is not null">非空值(is not null)</option>
+<option value="bjz">标记值</option>
+]]></_PAGE_>
+
+<!-- CT_NONE -->
+<_PAGE_ id="contentDealMethod_PARAMETER1"><![CDATA[
+<label><Strong>参数1：</Strong></label>
+<input type="text"  name="contentDealMethodPARAMETER1"  size="10" id="contentDealMethodPARAMETER1"/>
+]]></_PAGE_>
+
+<!-- CT_NONE -->
+<_PAGE_ id="contentDealMethod_PARAMETER2"><![CDATA[
+<label><Strong>参数1：</Strong></label>
+<input type="text"  name="contentDealMethodPARAMETER1"  size="10" id="contentDealMethodPARAMETER1"/>
+<label><Strong>参数2：</Strong></label>
+<input type="text"  name="contentDealMethodPARAMETER2"  size="10" id="contentDealMethodPARAMETER2"/>
+]]></_PAGE_>
+
+
+<_PAGE_ id="ADDSQLCONTENT"><![CDATA[
+<tr class="parent"> 
+	<td>{NO} <input type="hidden" name="NOTABLE" value="{NO}" id="NOTABLE" class="NOTABLE"/>
+	         <input type="hidden" name="parentTable_table" value="{parentTable_table}" id="parentTable_table" class="parentTable_table"/>
+	         <input type="hidden" name="CT_RESULT_TABLE" value="{CT_RESULT_TABLE}" id="CT_RESULT_TABLE" class="CT_RESULT_TABLE"/></td>
+	<td>{contentFieldExpressionCode}<input type="hidden" name="contentFieldExpressionCode" value="{contentFieldExpressionCode}"/>
+	     <input type="hidden" name="contentFieldExpressionCodeGobal" value="{contentFieldExpressionCodeGobal}"/>
+	     <input type="hidden" name="contentFieldExpressionDesGobal" value="{contentFieldExpressionDesGobal}"/>
+	     <input type="hidden" name="contentDealMethod" value="{contentDealMethod}"/></td>
+	<td>{contentFieldAlias}<input type="hidden" name="contentFieldAlias" value="{contentFieldAlias}"/></td>
+	<td>{contentFieldExpressionDes}<input type="hidden" name="contentFieldExpressionDes" value="{contentFieldExpressionDes}"/></td>
+	<td><a onclick="editContent(this);"><span class="icon icon-edit"></span></a><a onclick="deleteContent(this);"><span class="icon icon-trash"></span></a></td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ADDSQLFILTER"><![CDATA[
+<tr class="parent"> 
+	<td>{NO}</td>
+	<td>{filterDetailCode} <input type="hidden" name="noFilter" value="{NO}"/>
+						   <input type="hidden" name="filterDetailCode" value="{filterDetailCode}"/>
+	                       <input type="hidden" name="filterDetailCodeGobal" value="{filterDetailCodeGobal}"/>
+	     				   <input type="hidden" name="filterDetailDesGobal" value="{filterDetailDesGobal}"/>
+	     				   <input type="hidden" name="filterDealMethod" value="{filterDealMethod}"/>
+	     				   <input type="hidden" name="CT_RESULT_TABLE_FILTER" value="{CT_RESULT_TABLE_FILTER}" id="CT_RESULT_TABLE_FILTER" class="CT_RESULT_TABLE_FILTER"/>
+	     				   <input type="hidden" name="parentTable_table2" value="{parentTable_table}" id="parentTable_table2" class="parentTable_table"/></td>
+	<td>{filterDetailLogic} <input type="hidden" name="filterDetailLogic" value="{filterDetailLogic}"/></td>
+	<td>{filterDetailNumber} <input type="hidden" name="filterDetailNumber" value="{filterDetailNumber}"/></td>
+	<td align="left">{filterLogicExpression} <input type="hidden" name="filterLogicExpression" value="{filterLogicExpression}"/></td>
+	<td >{filterLogicExpressionDes} <input type="hidden" name="filterLogicExpressionDes" value="{filterLogicExpressionDes}"/></td>
+	<td><a onclick="editFilter(this);"><span class="icon icon-edit"></span></a><a onclick="deleteFilter(this);"><span class="icon icon-trash"></span></a></td>
+</tr>
+]]></_PAGE_>
+
+
+
+<_PAGE_ id="ADDSQLTABLE"><![CDATA[
+<tr name="addsqltable"> 
+	<td>{tableParentTable}<input type="hidden" name="tableParentTable" value="{tableParentTable}"/>
+	                      <input type="hidden" name="pColcode" value="{pColcode}"/></td>
+	<td>
+	    <select style="float:none" id="tableLinkType" name="tableLinkType" onclick="getSQL();">
+	       <option value="inner join">内连接</option>
+	       <option value="left join">左连接</option>
+	       <option value="right join">右连接</option>
+	       <option value="full join">完整连接</option>
+	    </select>
+	</td>
+	<td>{tableChildTable}<input type="hidden" name="tableChildTable" value="{tableChildTable}"/>
+	                     <input type="hidden" name="cColcode" value="{cColcode}"/></td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ADDSQLGROUP"><![CDATA[
+<tr name="addsqlgroup" > 
+	<td>{NO} <input type="hidden" name="noGroup" value="{NO}"/></td>
+	<td>{groupFieldExpressionDes}
+	    <input type="hidden" name="groupFieldExpressionDes" value="{groupFieldExpressionDes}"/>
+	</td>
+	    
+	<td>{groupFieldExpressionCode}
+	    <input type="hidden" name="groupFieldExpressionCode" value="{groupFieldExpressionCode}"/>
+	</td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ADDSQLGROUP1"><![CDATA[
+<tr name="addsqlgroup1"  onclick="sqlHavings(this);"> 
+	<td>{groupFieldExpressionDes1}
+	    <input type="hidden" name="groupFieldExpressionDes1" value="{groupFieldExpressionDes1}"/>
+	    <input type="hidden" name="parentTable_table1" value="{parentTable_table1}"/>
+	    <input type="hidden" name="CT_RESULT_HAVING_TABLE" value="{CT_RESULT_HAVING_TABLE}"/>
+	</td>
+	    
+	<td>{groupFieldExpressionCode1}
+	    <input type="hidden" name="groupFieldExpressionCode1" value="{groupFieldExpressionCode1}"/>
+	</td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ADDSQLHAVING"><![CDATA[
+<tr class="parent"> 
+	<td>{NO}</td>
+	<td>{havingDetailCode} <input type="hidden" name="havingDetailCode" value="{havingDetailCode}"/>
+	                       <input type="hidden" name="havingDetailCodeGobal" value="{havingDetailCodeGobal}"/>
+	     				   <input type="hidden" name="havingDetailDesGobal" value="{havingDetailDesGobal}"/>
+	     				   <input type="hidden" name="havingDealMethod" value="{havingDealMethod}"/>
+	     				   <input type="hidden" name="CT_RESULT_TABLE_HAVING" value="{CT_RESULT_TABLE_HAVING}" id="CT_RESULT_TABLE_HAVING" class="CT_RESULT_TABLE_HAVING"/>
+	     				   <input type="hidden" name="parentTable_table3" value="{parentTable_table}" id="parentTable_table3" class="parentTable_table"/></td>
+	<td>{havingDetailLogic} <input type="hidden" name="havingDetailLogic" value="{havingDetailLogic}"/></td>
+	<td>{havingDetailNumber} <input type="hidden" name="havingDetailNumber" value="{havingDetailNumber}"/></td>
+	<td align="left">{havingLogicExpression} <input type="hidden" name="havingLogicExpression" value="{havingLogicExpression}"/></td>
+	<td >{havingLogicExpressionDes} <input type="hidden" name="havingLogicExpressionDes" value="{havingLogicExpressionDes}"/></td>
+	<td><a onclick="editHaving(this);"><span class="icon icon-edit"></span></a><a onclick="deleteHaving(this);"><span class="icon icon-trash"></span></a></td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ADDSQLORDERLEFT"><![CDATA[
+<tr name="addsqlorderleft" onclick="sqlOrders(this);"> 
+	<td>{sortFieldExpressionDesLeft}
+	    <input type="hidden" name="sortFieldExpressionDesLeft" value="{sortFieldExpressionDesLeft}"/>
+	</td>   
+	<td>{sortFieldExpressionCodeLeft}
+	    <input type="hidden" name="sortFieldExpressionCodeLeft" value="{sortFieldExpressionCodeLeft}"/>
+	</td>
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ADDSQLORDERRIGTH"><![CDATA[
+<tr name="addsqlorderrigth"> 
+	<td>{sortFieldExpressionDesRight}
+		<input type="hidden" name="sortNo" value="{sortNo}"/>
+	    <input type="hidden" name="sortFieldExpressionDesRight" value="{sortFieldExpressionDesRight}"/>
+	</td>   
+	<td>{sortFieldExpressionCodeRight}
+	    <input type="hidden" name="sortFieldExpressionCodeRight" value="{sortFieldExpressionCodeRight}"/>
+	</td>
+	<td>{orderMethod}
+	    <input type="hidden" name="orderMethod" value="{orderMethod}"/>
+	</td>
+	<td><a onclick="editOrder(this);"><span class="icon icon-edit"></span></a>
+	    <a onclick="deleteOrder(this);"><span class="icon icon-trash"></span></a>
+	</td>
+	
+</tr>
+]]></_PAGE_>
+
+<_PAGE_ id="ADDSQLPARAMETER"><![CDATA[
+<tr name="addsqlparameter"> 
+	<td>{parameterDes}
+		<input type="hidden" name="parameterNo" value="{parameterNo}"/>
+	    <input type="hidden" name="parameterDes" value="{parameterDes}"/>
+	</td>   
+	<td>{parameterDefaultValue}
+	    <input type="hidden" name="parameterDefaultValue" value="{parameterDefaultValue}"/>
+	</td>
+	<td><a onclick="editParameter(this);"><span class="icon icon-edit"></span></a>
+	    <a onclick="deleteParameter(this);"><span class="icon icon-trash"></span></a>
+	</td>
+</tr>
+]]></_PAGE_>
+
+
+
+
+
+<_PAGE_ id="SORTFINISH"><![CDATA[
+<div class="buttonActive" id="sortFinish">
+	<div class="buttonContent">
+	  <button type="button" onclick="sortFinish();">排序完成</button>
+	</div>
+</div>
+]]></_PAGE_>
+
+
+<_PAGE_ id="dialogCM"><![CDATA[
+<ul id="dialogCM">
+	<li rel="closeCurrent">关闭弹出窗口</li>
+	<li rel="closeOther">关闭其它弹出窗口</li>
+	<li rel="closeAll">关闭全部弹出窗口</li>
+</ul>
+]]></_PAGE_>
+<_PAGE_ id="externalFrag"><![CDATA[
+<iframe src="{url}" style="width:100%;height:{height};" frameborder="no" border="0" marginwidth="0" marginheight="0"></iframe>
+]]></_PAGE_>
+<_MSG_ id="validateFormError"><![CDATA[提交数据不完整，{0}个字段有错误，请改正后再提交!]]></_MSG_>
+<_MSG_ id="sessionTimout"><![CDATA[会话超时，请重新登录!]]></_MSG_>
+<_MSG_ id="alertSelectMsg"><![CDATA[请选择信息!]]></_MSG_>
+<_MSG_ id="forwardConfirmMsg"><![CDATA[继续下一步!]]></_MSG_>
+
+<_MSG_ id="dwzTitle"><![CDATA[DWZ富客户端框架]]></_MSG_>
+<_MSG_ id="mainTabTitle"><![CDATA[我的主页]]></_MSG_>
+</_AJAX_>

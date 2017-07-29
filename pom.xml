@@ -5,150 +5,188 @@
 	<groupId>com.centit.product</groupId>
 	<artifactId>centit-dde3</artifactId>
 	<version>3.0.1-SNAPSHOT</version>
-	<name>centit-dde3</name>
-	<packaging>war</packaging>
+    <modules>
+        <module>centit-dde-console</module>
+        <module>centit-dde-datamoving</module>
+        <module>centit-dde-client</module>
+    </modules>
+    <name>com.centit.product:centit-dde</name>
+	<packaging>pom</packaging>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<ehcache.version>2.8.3</ehcache.version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <centit.fileserver.version>2.0.1-SNAPSHOT</centit.fileserver.version>
+        <jdk.version>1.8</jdk.version>
+
+        <centit.commons.version>2.2.1</centit.commons.version>
+        <centit.framework.version>4.0.0-SNAPSHOT</centit.framework.version>
+        <centit.ui.version>3.0.1-SNAPSHOT</centit.ui.version>
+        <centit.ip.version>0.0.2-SNAPSHOT</centit.ip.version>
+        <centit.search.version>0.1</centit.search.version>
+        <cxf.version>2.7.3</cxf.version>
+        <commons-fileupload.version>1.3.3</commons-fileupload.version>
+        <quartz.version>2.3.0</quartz.version>
+        <zip4j.version>1.3.2</zip4j.version>
+        <ojdbc6.version>11.2.0.4</ojdbc6.version>
+        <junit.version>4.12</junit.version>
+        <mysql.version>6.0.6</mysql.version>
+        <aliyun-sdk-oss.version>2.8.1</aliyun-sdk-oss.version>
+        <servlet-api.version>3.1.0</servlet-api.version>
+        <ehcache.version>2.10.4</ehcache.version>
 	</properties>
-  
-	<dependencies>
-		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>2.2.2</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<!-- cxf -->
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-frontend-jaxws</artifactId>
-			<version>2.7.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-transports-http</artifactId>
-			<version>2.7.3</version>
-		</dependency>
-		<dependency>
-		  <groupId>com.oracle</groupId>
-		  <artifactId>ojdbc6</artifactId>
-		  <version>11.2.0.4</version>
-		</dependency>
 
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.9</version>
-		</dependency>
+    <description> 数据交换工具，分三部分，一个控制台，一个数据交换程序 和 一个调用交换服务的客户端
+    </description>
+    <url>https://github.com/ndxt/centit-dde</url>
 
-		<dependency>
-			<groupId>com.centit.framework</groupId>
-			<artifactId>framework-base-view-easyui</artifactId>
-			<version>3.0.1-SNAPSHOT</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.centit.framework</groupId>
-			<artifactId>framework-hibernate</artifactId>
-			<version>4.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.centit.framework</groupId>
-			<artifactId>framework-system-static</artifactId>
-			<version>4.0.0-SNAPSHOT</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.centit.support</groupId>
-			<artifactId>centit-office</artifactId>
-			<version>2.2.0-SNAPSHOT</version>
-		</dependency>
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
-		<dependency>
-			<groupId>net.sf.ehcache</groupId>
-			<artifactId>ehcache</artifactId>
-			<version>${ehcache.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>	
-	
-		<!-- server runtime library -->
+    <developers>
+        <developer>
+            <name>杨淮生</name>
+            <email>codefan@sina.com</email>
+            <organization>centit.com</organization>
+            <organizationUrl>http://www.centit.com</organizationUrl>
+        </developer>
 
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
+        <developer>
+            <name>李苏红</name>
+            <email>lsh@centit.com</email>
+            <organization>centit.com</organization>
+            <organizationUrl>http://www.centit.com</organizationUrl>
+        </developer>
 
-	<build>
-		<!-- maven 打包时包含Hibernate配置文件 -->
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>**/*</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/webapp</directory>
-				<excludes>
-					<exclude>WEB-INF/*</exclude>
-				</excludes>
-				<targetPath>META-INF/resources/</targetPath>
-			</resource>
-		</resources>
+        <developer>
+            <name>邹午阳</name>
+            <email>zou_wy@centit.com</email>
+            <organization>centit.com</organization>
+            <organizationUrl>http://www.centit.com</organizationUrl>
+        </developer>
+    </developers>
 
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>UTF-8</encoding>
-					<compilerArguments>
-						<verbose />
-						<bootclasspath>${java.home}/lib/rt.jar</bootclasspath>
-					</compilerArguments>
-					<debug>true</debug>
-					<!--  <debuglevel>lines,vars,source</debuglevel> none -->
-				</configuration>
-			</plugin>
-			<!-- 打包时添加源码 -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+    <scm>
+        <connection>
+            scm:git:https://github.com/ndxt/centit-dde.git
+        </connection>
+        <developerConnection>
+            scm:git:https://github.com/ndxt/centit-dde.git
+        </developerConnection>
+        <url>https://github.com/ndxt/centit-dde</url>
+        <tag>v1.12</tag>
+    </scm>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-				</configuration>
-			</plugin>
-		</plugins>
+    <!-- mvn deploy -DpomFile=pom.xml -->
+    <!--
+            <distributionManagement>
+               <repository>
+                   <id>ossrh</id>
+                   <name>sonatype-releases</name>
+                   <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+               </repository>
+               <snapshotRepository>
+                   <id>ossrh</id>
+                   <name>sonatype-snapshots</name>
+                   <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+               </snapshotRepository>
+           </distributionManagement>
+    -->
 
-	</build>
+    <distributionManagement>
+        <repository>
+            <id>centit-releases</id>
+            <name>centit-release</name>
+            <url>http://develop.centit.com:8080/nexus/content/repositories/centit-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>centit-snapshots</id>
+            <name>centit-snapshots</name>
+            <url>http://develop.centit.com:8080/nexus/content/repositories/centit-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.1</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArguments>
+                        <verbose />
+                        <bootclasspath>${java.home}/lib/rt.jar;${java.home}/lib/jce.jar</bootclasspath>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+
+            <!-- 打包时添加源码 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- GPG自动签名的插件 -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- sonatype release :
+                mvn nexus-staging:release -->
+
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.8</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
 </project>

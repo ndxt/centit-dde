@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd">
+	
+	<diskStore path="${java.io.tmpdir}/${system.project_name}/cache" />
+	
+	<cache name="DataDictionary" maxElementsInMemory="100000" timeToLiveSeconds="3600" eternal="false" overflowToDisk="false" />
+	<cache name="UserInfo" maxElementsInMemory="100000" timeToLiveSeconds="3600" eternal="false" overflowToDisk="false"  />
+	<cache name="UnitInfo" maxElementsInMemory="100000" timeToLiveSeconds="3600" eternal="false" overflowToDisk="false" />
+	<cache name="RoleInfo" maxElementsInMemory="100000" timeToLiveSeconds="3600" eternal="false" overflowToDisk="false"  />
+	<cache name="UserUnits" maxElementsInMemory="100000" timeToLiveSeconds="3600" eternal="false" overflowToDisk="false" />
+	<cache name="UnitUsers" maxElementsInMemory="100000" timeToLiveSeconds="3600" eternal="false" overflowToDisk="false" />
+	<cache name="AllUserUnits" maxElementsInMemory="100000" timeToLiveSeconds="3600" eternal="false" overflowToDisk="false" />
+	<cache name="OptInfo" maxElementsInMemory="100000" timeToLiveSeconds="3600" eternal="false" overflowToDisk="false"  />
+	<cache name="DBInfo" maxElementsInMemory="100000" timeToLiveSeconds="3600" eternal="false" overflowToDisk="false"  />
+</ehcache>
