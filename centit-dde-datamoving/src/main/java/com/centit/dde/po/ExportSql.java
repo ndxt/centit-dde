@@ -1,7 +1,5 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import java.util.*;
 
 /**
@@ -9,99 +7,76 @@ import java.util.*;
  *
  * @author codefan@hotmail.com
  */
-@Entity
-@Table(name="D_EXPORT_SQL")
 public class ExportSql implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name="EXPORT_ID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long exportId;
 
     /**
      * 源数据库名称
      */
-    @Column(name="SOURCE_DATABASE_NAME")
     private String sourceDatabaseName;
 
     /**
      * 业务系统
      */
-    @Column(name="SOURCE_OS_ID")
     private String sourceOsId;
 
     /**
      * 导出名称
      */
-    @Column(name="EXPORT_NAME")
     private String exportName;
 
     /**
      * 查询语句
      */
-    @Column(name="QUERY_SQL")
     private String querySql;
 
     /**
      * 创建人员
      */
-    @Column(name="CREATED")
     private String created;
 
     /**
      * 导出后处理语句
      */
-    @Column(name="AFTER_SQL_BLOCK")
     private String afterSqlBlock;
 
     /**
      * 导出说明
      */
-    @Column(name="EXPORT_DESC")
     private String exportDesc;
 
     /**
      * 最后更新时间
      */
-    @Column(name="LAST_UPDATE_TIME")
     private Date lastUpdateTime;
 
     /**
      * 创建时间
      */
-    @Column(name="CREATE_TIME")
     private Date createTime;
 
     /**
      * 导出前处理语句
      */
-    @Column(name="BEFORE_SQL_BLOCK")
     private String beforeSqlBlock;
 
     /**
      * 数据处理操作ID
      */
-    @Column(name="Data_Opt_ID")
     private String dataOptId;
 
     /**
      * 存储类型
      */
-    @Column(name="TABLE_STORE_TYPE")
     private String tableStoreType;
     
-    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="EXPORT_ID")
     private List<ExportTrigger> exportTriggers = null;
     
-    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="EXPORT_ID")
     private List<ExportField> exportFields = null;// new
     // ArrayList<ExportField>();
 
-    @Transient
     private Long exportsqlOrder;
 
     // Constructors

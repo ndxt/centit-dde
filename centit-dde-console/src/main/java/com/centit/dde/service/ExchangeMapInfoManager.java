@@ -5,7 +5,7 @@ import com.centit.dde.po.ExchangeMapInfo;
 import com.centit.dde.po.MapInfoDetail;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.core.service.BaseEntityManager;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.ip.po.DatabaseInfo;
 
 import java.util.List;
 import java.util.Map;

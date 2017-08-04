@@ -1,7 +1,7 @@
 package com.centit.dde.po;
 
 import com.centit.dde.util.ConnPool;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.support.database.DataSourceDescription;
 import com.centit.support.database.DbcpConnect;
 

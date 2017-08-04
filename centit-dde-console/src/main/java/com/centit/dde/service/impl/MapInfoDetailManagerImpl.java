@@ -5,7 +5,7 @@ import com.centit.dde.po.MapInfoDetail;
 import com.centit.dde.po.MapInfoDetailId;
 import com.centit.dde.service.MapInfoDetailManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.ip.po.DatabaseInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;

@@ -1,48 +1,34 @@
 package com.centit.dde.po;
 
-@Entity
-@Table(name="D_MAPINFO_DETAIL")
+import java.beans.Transient;
+
 public class MapInfoDetail implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     
-    @EmbeddedId
-    @Column(name="CID")
     private MapInfoDetailId cid;
 
-    @Column(name="SOURCE_FIELD_NAME")
     private String sourceFieldName;
     
-    @Column(name="DEST_FIELD_NAME")
     private String destFieldName;
     
-    @Column(name="SOURCE_FIELD_SENTENCE")
     private String sourceFieldSentence;
     
-    @Column(name="SOURCE_FIELD_TYPE")
     private String sourceFieldType;
     
-    @Column(name="DEST_FIELD_TYPE")
     private String destFieldType;
     
-    @Column(name="IS_PK")
     private String isPk;
     
-    @Column(name="DEST_FIELD_DEFAULT")
     private String destFieldDefault;
     
-    @Column(name="IS_NULL")
     private String isNull;
 
-    @Transient
     private String sourceTableName;
     
-    @Transient
     private String goalTableName;
     
-    @Transient
     private String sourceUrl;
     
-    @Transient
     private String goalUrl;
 
     public String getSourceUrl() {

@@ -7,11 +7,11 @@ import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.service.MapInfoDetailManager;
 import com.centit.dde.util.SQLUtils;
 import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.service.IntegrationEnvironment;
+import com.centit.framework.ip.po.DatabaseInfo;
+import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.support.compiler.Lexer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -124,7 +124,7 @@ public class MapInfoDetailController extends BaseController {
             length.addAll(goalTableStruct);
         }
 
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         if (type.equals("initcopy4")) {
             resData.addResponseData("h_mapinfoId",mapinfoDetailMag.getMapinfoId());
         }
@@ -261,7 +261,7 @@ public class MapInfoDetailController extends BaseController {
         List<List<Map<String,String>>> TableStruct = new ArrayList();
         TableStruct.add(sourceTableStruct);
         TableStruct.add(goalTableStruct);
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         if (sourceTableStruct.size() >= goalTableStruct.size()) {
             length.addAll(sourceTableStruct);
         } else {
@@ -383,7 +383,7 @@ public class MapInfoDetailController extends BaseController {
         List TableStruct = new ArrayList<List<Object>>();
         TableStruct.add(sourceTableStruct);
         TableStruct.add(goalTableStruct);
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         if (sourceTableStruct.size() >= goalTableStruct.size()) {
             length.addAll(sourceTableStruct);
         } else {
@@ -422,7 +422,7 @@ public class MapInfoDetailController extends BaseController {
         DatabaseInfo sourceDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
         DatabaseInfo goalDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
 
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData("OBJLIST", sourceDatabaseInfo.getDatabaseUrl());
         resData.addResponseData("GOALURL", goalDatabaseInfo.getDatabaseUrl());
         resData.addResponseData("SQL", exchangeMapInfo.getQuerySql());
@@ -437,7 +437,7 @@ public class MapInfoDetailController extends BaseController {
         Map<String, Object> searchColumn = convertSearchColumn(request);
         ExchangeMapInfo exchangeMapInfo = new ExchangeMapInfo();
         exchangeMapInfo.setMapInfoId(Long.parseLong(s_mapinfoId));
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         exchangeMapInfo = exchangeMapInfoManager.getObjectById(exchangeMapInfo.getMapInfoId());
         if (exchangeMapInfo != null) {
             resData.addResponseData("SQL", exchangeMapInfo.getQuerySql());
@@ -455,7 +455,7 @@ public class MapInfoDetailController extends BaseController {
 
     @RequestMapping(value="/defGoalData_add",method = {RequestMethod.GET})
     public void defGoalData_add(HttpServletRequest request,HttpServletResponse response) {
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData("DATABASE", integrationEnvironment.listDatabaseInfo());
         Map<String, Object> searchColumn = convertSearchColumn(request);
         if (searchColumn.containsKey("goaldatabaseName") && StringUtils.hasText((String) searchColumn.get("goaldatabaseName"))) {
@@ -482,7 +482,7 @@ public class MapInfoDetailController extends BaseController {
         exchangeMapInfo = exchangeMapInfoManager.getObjectById(exchangeMapInfo.getMapInfoId());
         DatabaseInfo sourceDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getSourceDatabaseName());
         DatabaseInfo goalDatabaseInfo = integrationEnvironment.getDatabaseInfo(exchangeMapInfo.getDestDatabaseName());
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData("GOALURL", goalDatabaseInfo.getDatabaseUrl());
         resData.addResponseData("SOURCEURL", sourceDatabaseInfo.getDatabaseUrl());
         resData.addResponseData("goalDatabaseName", (String) searchColumn.get("goalDatabaseName"));

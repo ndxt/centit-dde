@@ -3,7 +3,7 @@ package com.centit.dde.controller;
 import com.centit.dde.po.UserDataOptId;
 import com.centit.dde.service.UserDataOptIdManager;
 import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
 import org.apache.commons.logging.Log;
@@ -34,7 +34,7 @@ public class UserDataOptIdController extends BaseController {
     public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> searchColumn = convertSearchColumn(request);
         List<UserDataOptId> objList = userDataOptIdManager.listObjects(searchColumn, pageDesc);
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, objList);
         resData.addResponseData(PAGE_DESC, pageDesc);
         JsonResultUtils.writeResponseDataAsJson(resData, response);

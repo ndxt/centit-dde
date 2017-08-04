@@ -9,7 +9,7 @@ import com.centit.dde.service.ImportOptManager;
 import com.centit.dde.service.TaskLogManager;
 import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.core.dao.PageDesc;
@@ -173,7 +173,7 @@ public class TaskLogController extends BaseController {
 
         ExchangeTask exchangeTask = exchangeTaskManager
                 .getObjectById((Long) searchColumn.get("taskId"));
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData("OBJLIST", objList);
         resData.addResponseData("PAGE_DESC", pageDesc);
         JsonResultUtils.writeResponseDataAsJson(resData, response);
@@ -231,7 +231,7 @@ public class TaskLogController extends BaseController {
 
 //        this.pageDesc = pageDesc;
         // return "listall";
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData("OBJLIST", objList);
         resData.addResponseData("PAGE_DESC", pageDesc);
         JsonResultUtils.writeResponseDataAsJson(resData, response);

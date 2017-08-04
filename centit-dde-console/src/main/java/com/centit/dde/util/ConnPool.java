@@ -1,14 +1,14 @@
 package com.centit.dde.util;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import javax.sql.DataSource;
-
+import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.support.database.DBType;
 import com.centit.support.database.DataSourceDescription;
 import com.centit.support.database.DbcpConnect;
 import com.centit.support.database.DbcpConnectPools;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class ConnPool {
 

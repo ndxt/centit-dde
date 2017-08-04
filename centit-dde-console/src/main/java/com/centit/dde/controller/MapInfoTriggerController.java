@@ -3,7 +3,7 @@ package com.centit.dde.controller;
 import com.centit.dde.po.MapInfoTrigger;
 import com.centit.dde.service.MapInfoTriggerManager;
 import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
 import org.apache.commons.logging.Log;
@@ -36,7 +36,7 @@ public class MapInfoTriggerController extends BaseController {
         List<MapInfoTrigger> objList = mapinfoTriggerMag.listTrigger(Long.valueOf((String) searchColumn.get("mapinfoId")));
 
         pageDesc.setTotalRows(objList.size());
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData("OBJLIST", objList);
         resData.addResponseData("PAGE_DESC", pageDesc);
         JsonResultUtils.writeResponseDataAsJson(resData, response);

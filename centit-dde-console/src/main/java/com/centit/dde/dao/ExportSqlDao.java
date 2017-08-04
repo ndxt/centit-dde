@@ -7,7 +7,7 @@ import com.centit.dde.po.ExportSql;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.support.database.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

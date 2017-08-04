@@ -1,5 +1,6 @@
 package com.centit.dde.po;
 
+import java.beans.Transient;
 import java.util.*;
 
 /**
@@ -7,66 +8,46 @@ import java.util.*;
  *
  * @author codefan@hotmail.com
  */
-@Entity
-@Table(name="D_EXCHANGE_TASK")
 public class ExchangeTask implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name="TASK_ID")
    /* @GeneratedValue(generator = "assignedGenerator")
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")*/
     private Long taskId;
 
-    @Column(name="TASK_NAME")
     private String taskName;
     
-    @Column(name="TASK_CRON")
     private String taskCron;
 
-    @Column(name="TASK_DESC")
     private String taskDesc;
 
-    @Column(name="LAST_RUN_TIME")
     private Date lastRunTime;
     
-    @Column(name="NEXT_RUN_TIME")
     private Date nextRunTime;
     
-    @Column(name="IS_VALID")
     private String isvalid;
     
-    @Column(name="CREATE_TIME")
     private Date createTime;
-    
-    @Column(name="CREATED")
+
     private String created;
     
-    @Transient
     private String createdName;
     /**
      * '1: 直接交换 2 :导出离线文件 3：监控文件夹导入文件 4：调用接口 5:接口事件';
      */
-    @Column(name="TASK_TYPE")
     private String taskType;// char(1) default '1'  not null
 
-    @Column(name="LAST_UPDATE_TIME")
     private Date lastUpdateTime;//     date
 
-    @Column(name="STORE_ISOLATION")
     private String storeIsolation;//      char(1)
 
-    @Column(name="MONITOR_FOLDER")
     private String monitorFolder;//       varchar2(200);
 
-    @Transient
     private Set<ExchangeTaskDetail> exchangeTaskDetails = null;// new
     // ArrayList<ExchangeTaskDetail>();
     
-    @Transient
     private List<ExportSql> exportSqlList = null;
     
-    @Transient
     private List<ExchangeMapInfo> exchangeMapInfoList = null;
     
     public List<ExchangeMapInfo> getExchangeMapInfoList() {
@@ -87,7 +68,6 @@ public class ExchangeTask implements java.io.Serializable {
 
 //    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY )
 //    @JoinColumn(name="TASK_ID") //这里表示数据库的外键 在t_street里面创建
-    @Transient
     private List<TaskLog> taskLogs ;// new ArrayList<TaskLog>();
 
 //    fetch:表示抓取策略,默认为FetchType.LAZY,因为关联的多个对象通常不必从数据库预先读取到内存

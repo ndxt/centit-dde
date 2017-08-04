@@ -8,9 +8,9 @@ import com.centit.framework.core.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.staticsystem.po.UserInfo;
-import com.centit.framework.staticsystem.service.IntegrationEnvironment;
+import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.support.algorithm.StringRegularOpt;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.logging.Log;
@@ -70,7 +70,7 @@ public class ExchangeTaskController extends BaseController {
         }
         List<ExchangeTask>  objList = exchangeTaskMag.listObjects(searchColumn, pageDesc);
 
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, objList);
         resData.addResponseData(PAGE_DESC, pageDesc);
         JsonResultUtils.writeResponseDataAsJson(resData, response);
@@ -266,7 +266,7 @@ public class ExchangeTaskController extends BaseController {
 //                /page/dde/mapinfoTriggerList.jsp
 //                return LIST;
                 
-                ResponseData resData = new ResponseData();
+                ResponseMapData resData = new ResponseMapData();
                 resData.addResponseData("OBJLIST", objList);
                 resData.addResponseData("PAGE_DESC", pageDesc);
                 JsonResultUtils.writeResponseDataAsJson(resData, response);
@@ -394,7 +394,7 @@ public class ExchangeTaskController extends BaseController {
                 }
             }
         }
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, objList);
         resData.addResponseData(PAGE_DESC, pageDesc);
         JsonResultUtils.writeResponseDataAsJson(resData, response);
@@ -426,7 +426,7 @@ public class ExchangeTaskController extends BaseController {
                 }
             }
         }
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, objList);
         resData.addResponseData(PAGE_DESC, pageDesc);
         JsonResultUtils.writeResponseDataAsJson(resData, response);
@@ -471,7 +471,7 @@ public class ExchangeTaskController extends BaseController {
 //        this.pageDesc = pageDesc;
 
 //        return "listExportSql";
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData("exportSqls", exportSqls);
         resData.addResponseData("used", used);
         JsonResultUtils.writeResponseDataAsJson(resData, response);

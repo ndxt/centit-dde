@@ -4,7 +4,7 @@ import com.centit.dde.datafile.TableFileReader;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ImportOpt;
 import com.centit.dde.ws.WsDataException;
-import com.centit.framework.staticsystem.po.OsInfo;
+import com.centit.framework.ip.po.OsInfo;
 
 public interface ExecuteDataMap {
 

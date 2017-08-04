@@ -7,7 +7,7 @@ import com.centit.dde.service.ExportSqlManager;
 import com.centit.dde.util.SQLUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.security.model.CentitUserDetails;
@@ -44,7 +44,7 @@ public class ExportSqlController extends BaseController {
     public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> filterMap = convertSearchColumn(request);
         List<ExportSql> listObjects = exportSqlManager.listObjects(filterMap, pageDesc);
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, listObjects);
         resData.addResponseData(PAGE_DESC, pageDesc);
 
@@ -96,7 +96,7 @@ public class ExportSqlController extends BaseController {
      */
     @RequestMapping(value="/splitQuerySql")
     public void splitQuerySql(ExportSql object,HttpServletResponse response) throws IOException {
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData("splitsql", SQLUtils.splitSqlByFields(object.getQuerySql()));
         resData.addResponseData("sqlfields", SQLUtils.getSqlFileds(object.getQuerySql()));
         JsonResultUtils.writeResponseDataAsJson(resData, response);
@@ -115,7 +115,7 @@ public class ExportSqlController extends BaseController {
         List<DataDictionary> dataTypes = (List<DataDictionary>) CodeRepositoryUtil.getDictionary("DATA_TYPE");
 //        Map<String, List<String>> dataTypeMap = new HashMap<String, List<String>>();
         
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
 
         for (DataDictionary dataType : dataTypes) {
             if (resData.getResponseData(dataType.getDataCode())==null) {

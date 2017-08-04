@@ -3,7 +3,7 @@ package com.centit.dde.controller;
 import com.centit.dde.po.DataOptInfo;
 import com.centit.dde.service.DataOptInfoManager;
 import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
 import org.apache.commons.logging.Log;
@@ -31,7 +31,7 @@ public class DataOptInfoController extends BaseController {
     public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> searchColumn = convertSearchColumn(request);
         List<DataOptInfo> objList = dataOptInfoManager.listObjects(searchColumn, pageDesc);
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, objList);
         resData.addResponseData(PAGE_DESC, pageDesc);
         JsonResultUtils.writeResponseDataAsJson(resData, response);

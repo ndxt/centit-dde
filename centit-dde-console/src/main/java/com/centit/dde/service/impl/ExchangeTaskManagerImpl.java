@@ -8,7 +8,7 @@ import com.centit.dde.service.ExchangeTaskManager;
 import com.centit.dde.transfer.TransferManager;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.ip.po.DatabaseInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.JobExecutionContext;

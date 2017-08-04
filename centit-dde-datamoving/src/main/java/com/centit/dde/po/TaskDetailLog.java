@@ -1,7 +1,5 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import java.util.*;
 
 /**
@@ -9,49 +7,31 @@ import java.util.*;
  *
  * @author codefan@hotmail.com
  */
-@Entity
-@Table(name="D_TASK_DETAIL_LOG")
 public class TaskDetailLog implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name="LOG_DETAIL_ID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long logDetailId;
 
-    @Column(name="LOG_ID")
     private Long logId;
     
-    @Column(name="RUN_BEGIN_TIME")
     private Date runBeginTime;
     
-    @Column(name="RUN_END_TIME")
     private Date runEndTime;
     
-    @Column(name="MAPINFO_ID")
     private Long mapinfoId;
     
-    @Column(name="OPT_TYPE")
     private String optType;
     
-    @Column(name="OS_ID")
     private String osId;
     
-    @Column(name="SUCCESS_PIECES")
     private Long successPieces;
     
-    @Column(name="ERROR_PIECES")
     private Long errorPieces;
     
-    @Column(name="OTHER_MESSAGE")
     private String otherMessage;
     
-    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="LOG_DETAIL_ID") //这里表示数据库的外键 在t_street里面创建
     private Set<TaskErrorData> taskErrorDatas = null;// new ArrayList<TaskErrorData>();
     
-    @Transient
     private String mapinfoName;
 
     public String getMapinfoName() {

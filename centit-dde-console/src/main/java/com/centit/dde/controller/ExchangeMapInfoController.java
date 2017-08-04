@@ -8,11 +8,11 @@ import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.service.MapInfoDetailManager;
 import com.centit.dde.service.MapInfoTriggerManager;
 import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
-import com.centit.framework.staticsystem.service.IntegrationEnvironment;
+import com.centit.framework.ip.po.DatabaseInfo;
+import com.centit.framework.ip.service.IntegrationEnvironment;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class ExchangeMapInfoController extends BaseController {
     public void list(PageDesc pageDesc,HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> searchColumn = convertSearchColumn(request);
         List<ExchangeMapInfo> objList = exchangeMapInfoManager.listObjects(searchColumn, pageDesc);
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, objList);
         resData.addResponseData(PAGE_DESC, pageDesc);
         JsonResultUtils.writeResponseDataAsJson(resData, response);

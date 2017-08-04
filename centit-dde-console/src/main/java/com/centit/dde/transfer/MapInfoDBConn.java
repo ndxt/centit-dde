@@ -5,7 +5,7 @@ import java.sql.Connection;
 import com.centit.dde.util.ConnPool;
 import com.centit.support.database.DataSourceDescription;
 import com.centit.support.database.DbcpConnect;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.ip.po.DatabaseInfo;
 
 public class MapInfoDBConn {
     private DataSourceDescription leftDBC;

@@ -1,25 +1,15 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
-
-
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-@Entity
-@Table(name="D_TASK_ERROR_DATA")
 public class TaskErrorData implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name="DATA_ID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long dataId;
 
-    @Column(name="LOG_DETAIL_ID")
     private Long logDetailId;
 
     
@@ -31,10 +21,8 @@ public class TaskErrorData implements java.io.Serializable {
         this.logDetailId = logDetailId;
     }
 
-    @Column(name="DATA_CONTENT")
     private String dataContent;
     
-    @Column(name="ERROR_MESSAGE")
     private String errorMessage;
 
     // Constructors

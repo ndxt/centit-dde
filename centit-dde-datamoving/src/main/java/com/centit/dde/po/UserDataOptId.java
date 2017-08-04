@@ -1,17 +1,11 @@
 package com.centit.dde.po;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by sx on 2014/12/10.
  */
-@Entity
-@Table(name="D_USER_DATAOPTID")
 public class UserDataOptId implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -19,44 +13,36 @@ public class UserDataOptId implements Serializable {
     /**
      * 任务ID
      */
-    @Id
-    @Column(name="UD_ID")
     private Long udId;
 
     /**
      * 用户代码
      */
-    @Column(name="USERCODE")
     private String usercode;
 
     /**
      * 业务操作ID
      */
-    @Column(name="DATAOPTID")
     private String dataOptId;
 
     /**
      * 创建时间
      */
-    @Column(name="CREATE_DATE")
     private Date createDate;
 
     /**
      * 最后更新时间
      */
-    @Column(name="LAST_MODIFY_DATE")
     private Date lastModifyDate;
 
     /**
      * 描述
      */
-    @Column(name="DESCRIBE")
     private String describe;
 
     /**
      * 业务操作类型
      */
-    @Column(name="DATAOPT_TYPE")
     private String dataoptType;
 
     public String getDataoptType() {

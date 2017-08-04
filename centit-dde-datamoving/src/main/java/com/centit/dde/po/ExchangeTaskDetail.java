@@ -1,24 +1,14 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
-
-
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-@Entity
-@Table(name="D_EXCHANGE_TASKDETAIL")
 public class ExchangeTaskDetail implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
-    @Column(name="CID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private ExchangeTaskDetailId cid;
 
-    @Column(name="MAPINFO_ORDER")
     private Long mapInfoOrder;
 
     // Constructors

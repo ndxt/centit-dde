@@ -3,7 +3,7 @@ package com.centit.dde.service;
 import com.centit.dde.po.ExchangeTask;
 import com.centit.framework.core.service.BaseEntityManager;
 import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.ip.po.DatabaseInfo;
 
 import java.util.List;
 

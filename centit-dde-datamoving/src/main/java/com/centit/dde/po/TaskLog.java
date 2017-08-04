@@ -1,7 +1,5 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import java.util.*;
 
 /**
@@ -25,32 +23,18 @@ import java.util.*;
  *
  * @author codefan@hotmail.com
  */
-@Entity
-@Table(name="D_TASK_LOG")
 public class TaskLog implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(name="LOG_ID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private Long logId;
 
-    @Column(name="TASK_ID")
     private Long taskId;
-    @Column(name="RUN_BEGIN_TIME")
     private Date runBeginTime;
-    @Column(name="RUN_END_TIME")
     private Date runEndTime;
-    @Column(name="RUN_TYPE")
     private String runType;
-    @Column(name="RUNNER")
     private String runner;
-    @Column(name="OTHER_MESSAGE")
     private String otherMessage;
-    @Column(name="TASK_TYPE")
     private String taskType;
-    @Transient
     private Set<TaskDetailLog> taskDetailLogs = null;// new ArrayList<TaskDetailLog>();
 
     // Constructors

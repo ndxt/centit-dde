@@ -5,7 +5,7 @@ import com.centit.dde.po.ImportField;
 import com.centit.dde.po.ImportOpt;
 import com.centit.dde.service.ImportOptManager;
 import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.security.model.CentitUserDetails;
@@ -40,7 +40,7 @@ public class ImportOptController extends BaseController {
     public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> filterMap = convertSearchColumn(request);
         List<ImportOpt> listObjects = importOptManager.listObjects(filterMap, pageDesc);
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, listObjects);
         resData.addResponseData(PAGE_DESC, pageDesc);
 

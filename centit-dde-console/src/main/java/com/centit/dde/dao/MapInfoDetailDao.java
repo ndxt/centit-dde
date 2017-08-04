@@ -6,7 +6,7 @@ import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.support.database.DbcpConnect;
 import com.centit.support.database.QueryUtils;
 import com.centit.support.database.transaction.Transactional;

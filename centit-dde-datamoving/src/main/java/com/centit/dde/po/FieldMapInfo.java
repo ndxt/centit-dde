@@ -1,24 +1,14 @@
 package com.centit.dde.po;
 
-import javax.persistence.Transient;
-
 public class FieldMapInfo {
 
-    @Transient
     private String leftName;
-    @Transient
     private String rightName;
-    @Transient
     private int rightColType;
-    @Transient
     private int leftColType;
-    @Transient
     private boolean isKey;
-    @Transient
     private boolean isNullable;
-    @Transient
     private String defaultValue;
-    @Transient
     private int order;
 
     public FieldMapInfo() {

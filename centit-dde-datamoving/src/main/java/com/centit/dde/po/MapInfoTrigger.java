@@ -1,42 +1,27 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
-
 /**
  * create by scaffold
  *
  * @author codefan@hotmail.com
  */
-@Entity
-@Table(name="D_MAPINFO_TRIGGER")
 public class MapInfoTrigger implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     
-    @EmbeddedId
-    @Column(name="CID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private MapInfoTriggerId cid;
 
-    @Column(name="TRIGGER_SQL")
     private String triggerSql;
     
-    @Column(name="TRIGGER_DESC")
     private String triggerDesc;
     
-    @Column(name="TRIGGER_TYPE")
     private String triggerType;
     
-    @Column(name="TRIGGER_TIME")
     private String triggerTime;
     
-    @Column(name="TRIGGER_DATABASE")
     private String triggerDatabase;
     
-    @Column(name="TIGGER_ORDER")
     private Long tiggerOrder;
     
-    @Column(name="ISPROCEDURE")
     private String isprocedure;
 
     /**

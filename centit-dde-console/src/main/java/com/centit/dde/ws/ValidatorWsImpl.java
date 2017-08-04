@@ -6,7 +6,7 @@ import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.model.basedata.IUserUnit;
-import com.centit.framework.staticsystem.po.DatabaseInfo;
+import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.support.security.DESSecurityUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.common.util.CollectionUtils;
