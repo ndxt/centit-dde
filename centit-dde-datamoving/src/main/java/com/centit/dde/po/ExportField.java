@@ -1,6 +1,7 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
 
 /**
  * create by scaffold
@@ -15,7 +16,6 @@ public class ExportField implements java.io.Serializable {
     @EmbeddedId
     @Column(name="CID")
     @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private ExportFieldId cid;
 
     /**

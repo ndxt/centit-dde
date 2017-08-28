@@ -2,7 +2,7 @@ package com.centit.dde.controller;
 
 import com.centit.dde.util.ConnPool;
 import com.centit.dde.util.SQLUtils;
-import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;

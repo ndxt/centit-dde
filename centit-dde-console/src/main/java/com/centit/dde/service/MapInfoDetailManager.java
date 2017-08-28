@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.centit.dde.po.MapInfoDetail;
 import com.centit.dde.po.MapInfoDetailId;
-import com.centit.framework.core.service.BaseEntityManager;
+import com.centit.framework.hibernate.service.BaseEntityManager;
 import com.centit.framework.ip.po.DatabaseInfo;
 
 public interface MapInfoDetailManager extends BaseEntityManager<MapInfoDetail,MapInfoDetailId> {

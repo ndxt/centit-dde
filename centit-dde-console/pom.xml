@@ -54,9 +54,10 @@
 
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>framework-hibernate</artifactId>
-            <version>${centit.framework.version}</version>
+            <artifactId>centit-persistence-hibernate</artifactId>
+            <version>${centit.persistence.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-ip-app</artifactId>

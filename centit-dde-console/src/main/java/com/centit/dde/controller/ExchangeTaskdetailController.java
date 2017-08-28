@@ -2,7 +2,7 @@ package com.centit.dde.controller;
 
 import com.centit.dde.po.ExchangeTaskDetail;
 import com.centit.dde.service.ExchangeTaskdetailManager;
-import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

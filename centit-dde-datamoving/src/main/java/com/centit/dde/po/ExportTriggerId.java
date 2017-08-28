@@ -1,7 +1,5 @@
 package com.centit.dde.po;
 
-import org.hibernate.validator.constraints.NotBlank;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.IdClass;
@@ -19,11 +17,11 @@ public class ExportTriggerId implements java.io.Serializable {
     
     
     @Column(name="TRIGGER_ID")
-    @NotBlank(message = "字段不能为空")
+    //@NotBlank(message = "字段不能为空")
     private Long triggerId;
 
     @Column(name="EXPORT_ID")
-    @NotBlank(message = "字段不能为空")
+    //@NotBlank(message = "字段不能为空")
     private Long exportId;
 
     // Constructors

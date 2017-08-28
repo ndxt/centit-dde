@@ -3,8 +3,7 @@ package com.centit.dde.transfer;
 import java.sql.Connection;
 
 import com.centit.dde.util.ConnPool;
-import com.centit.support.database.DataSourceDescription;
-import com.centit.support.database.DbcpConnect;
+import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.framework.ip.po.DatabaseInfo;
 
 public class MapInfoDBConn {
@@ -40,11 +39,11 @@ public class MapInfoDBConn {
         ConnPool.closeConn(conn);
     }
 
-    public DbcpConnect getLeftDBConn() throws Exception {
+    public Connection getLeftDBConn() throws Exception {
         return ConnPool.getConn(leftDBC);
     }
 
-    public DbcpConnect getRightDBConn() throws Exception {
+    public Connection getRightDBConn() throws Exception {
         return ConnPool.getConn(rightDBC);
     }
 

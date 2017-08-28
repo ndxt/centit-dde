@@ -7,9 +7,8 @@ import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.support.database.DbcpConnect;
-import com.centit.support.database.QueryUtils;
-import com.centit.support.database.transaction.Transactional;
+import com.centit.support.database.utils.DBType;
+import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
@@ -164,7 +163,7 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId>
      * @return 获取源表的字段，字段类型等信息
      */
     public List<Map<String, String>> getSourceTableStruct(DatabaseInfo sourceDatabaseInfo, String sourcetableName) {
-        DbcpConnect connSource = null;
+        Connection connSource = null;
         PreparedStatement pstmtSource = null;
         ResultSet rsSource = null;
         ResultSetMetaData rsmdSource = null;
@@ -179,7 +178,7 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId>
             while (rsKey.next()) {
                 keyList.add(rsKey.getString(4));
             }
-            switch(connSource.getDatabaseType()){
+            switch(DBType.mapDBType(sourceDatabaseInfo.getDatabaseUrl())){
             case SqlServer:
                 pstmtSource = connSource.prepareStatement( "select top 1 * from " + sourcetableName);
                 break;
@@ -236,14 +235,14 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId>
         return datas;
     }
 
-    @Transactional
+
     public List<Map<String, String>> getSourceTableStructFromDatabase(Long mapinfoId) {
         String sql = "select t.source_field_name as ColumnName,t.source_field_type as ColumnType,"
                 + "t.source_field_sentence as SOURCECOLUMNSENTENCE from D_MAPINFO_DETAIL t where t.mapinfo_id=?  order by t.column_no";
         return  (List<Map<String, String>>)DatabaseOptUtils.findObjectsBySql(this, sql,new Object[]{mapinfoId});
     }
 
-    @Transactional
+
     public List<Map<String, String>> getGoalTableStructFromDatabase(Long mapinfoId) {
         String sql = "select t.dest_field_name as ColumnName,t.dest_field_type as ColumnType,"
                 + "t.is_pk as isPk,t.is_null as isNullable,t.dest_field_default as destfielddefault from D_MAPINFO_DETAIL "

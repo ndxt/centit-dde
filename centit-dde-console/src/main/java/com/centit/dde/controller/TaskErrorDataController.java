@@ -2,7 +2,7 @@ package com.centit.dde.controller;
 
 import com.centit.dde.po.TaskErrorData;
 import com.centit.dde.service.TaskErrorDataManager;
-import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

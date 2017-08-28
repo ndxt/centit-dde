@@ -1,13 +1,13 @@
 <component name="libraryTable">
   <library name="Maven: com.centit.framework:framework-base-view-easyui:3.0.1-SNAPSHOT">
     <CLASSES>
-      <root url="jar:///D/MyAppData/maven3/repo/com/centit/framework/framework-base-view-easyui/3.0.1-SNAPSHOT/framework-base-view-easyui-3.0.1-20170424.052009-52.jar!/" />
+      <root url="jar:///D/MyAppData/maven3/repo/com/centit/framework/framework-base-view-easyui/3.0.1-SNAPSHOT/framework-base-view-easyui-3.0.1-20170821.090024-93.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar:///D/MyAppData/maven3/repo/com/centit/framework/framework-base-view-easyui/3.0.1-SNAPSHOT/framework-base-view-easyui-3.0.1-20170424.052009-52-javadoc.jar!/" />
+      <root url="jar:///D/MyAppData/maven3/repo/com/centit/framework/framework-base-view-easyui/3.0.1-SNAPSHOT/framework-base-view-easyui-3.0.1-20170821.090024-93-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
-      <root url="jar:///D/MyAppData/maven3/repo/com/centit/framework/framework-base-view-easyui/3.0.1-SNAPSHOT/framework-base-view-easyui-3.0.1-20170424.052009-52-sources.jar!/" />
+      <root url="jar:///D/MyAppData/maven3/repo/com/centit/framework/framework-base-view-easyui/3.0.1-SNAPSHOT/framework-base-view-easyui-3.0.1-20170821.090024-93-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

@@ -1,10 +1,9 @@
 package com.centit.dde.util;
 
 import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.support.database.DBType;
-import com.centit.support.database.DataSourceDescription;
-import com.centit.support.database.DbcpConnect;
-import com.centit.support.database.DbcpConnectPools;
+import com.centit.support.database.utils.DBType;
+import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.support.database.utils.DbcpConnectPools;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -21,7 +20,7 @@ public class ConnPool {
         return null;//DbcpConnectPools.getDataSource(dbc);
     }
 
-    public static DbcpConnect getConn(DatabaseInfo dbInfo) throws SQLException {
+    public static Connection getConn(DatabaseInfo dbInfo) throws SQLException {
         DataSourceDescription dbc = new DataSourceDescription();
         dbc.setDatabaseCode(dbInfo.getDatabaseCode());
         dbc.setConnUrl(dbInfo.getDatabaseUrl());
@@ -31,7 +30,7 @@ public class ConnPool {
     }
     
     
-    public static DbcpConnect getConn(DataSourceDescription dbInfo) throws SQLException {
+    public static Connection getConn(DataSourceDescription dbInfo) throws SQLException {
      
         return DbcpConnectPools.getDbcpConnect(dbInfo);
     }

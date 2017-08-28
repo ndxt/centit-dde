@@ -5,6 +5,7 @@ import com.centit.dde.datafile.ExchangeFileWriter;
 import com.centit.dde.datafile.TableFileReader;
 import com.centit.dde.datafile.TableFileWriter;
 import com.centit.dde.util.ItemValue;
+import com.centit.framework.common.SysParametersUtils;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.ZipCompressor;
 import com.centit.support.file.FileSystemOpt;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class TestDataWriter {
 
     private static String getAppPath(){
-        return PropertiesReader.getClassPathProperties("system.properties", "app.home");
+        return SysParametersUtils.getAppHome();
     }
     
     private static void testExchange(){

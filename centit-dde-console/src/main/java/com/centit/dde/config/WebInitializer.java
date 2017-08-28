@@ -1,5 +1,6 @@
 package com.centit.dde.config;
 
+import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.config.SystemSpringMvcConfig;
 import com.centit.framework.filter.RequestThreadLocalFilter;
 import com.centit.framework.filter.ResponseCorsFilter;
@@ -103,9 +104,7 @@ public class WebInitializer implements WebApplicationInitializer {
      * @param servletContext ServletContext
      */
     private void registerSingleSignOutHttpSessionListener(ServletContext servletContext) {
-        if( StringRegularOpt.isTrue(
-                PropertiesReader.getClassPathProperties(
-                        "/system.properties", "cas.sso"))) {
+        if( StringRegularOpt.isTrue(SysParametersUtils.getStringValue("cas.sso"))) {
             servletContext.addListener(SingleSignOutHttpSessionListener.class);
         }
     }

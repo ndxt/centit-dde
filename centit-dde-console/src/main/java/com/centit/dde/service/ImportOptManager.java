@@ -4,7 +4,7 @@ package com.centit.dde.service;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ImportField;
 import com.centit.dde.po.ImportOpt;
-import com.centit.framework.core.service.BaseEntityManager;
+import com.centit.framework.hibernate.service.BaseEntityManager;
 import com.centit.framework.model.basedata.IUserInfo;
 
 import java.util.List;

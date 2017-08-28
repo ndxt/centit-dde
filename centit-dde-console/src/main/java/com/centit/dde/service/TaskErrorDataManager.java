@@ -1,7 +1,7 @@
 package com.centit.dde.service;
 
 import com.centit.dde.po.TaskErrorData;
-import com.centit.framework.core.service.BaseEntityManager;
+import com.centit.framework.hibernate.service.BaseEntityManager;
 
 /**
  * create by scaffold

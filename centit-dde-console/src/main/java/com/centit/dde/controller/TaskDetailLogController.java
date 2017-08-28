@@ -4,7 +4,7 @@ import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskErrorData;
 import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.service.TaskDetailLogManager;
-import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

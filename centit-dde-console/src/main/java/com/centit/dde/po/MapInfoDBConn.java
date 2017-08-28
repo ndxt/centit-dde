@@ -2,8 +2,8 @@ package com.centit.dde.po;
 
 import com.centit.dde.util.ConnPool;
 import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.support.database.DataSourceDescription;
-import com.centit.support.database.DbcpConnect;
+import com.centit.support.database.utils.DataSourceDescription;
+
 
 import javax.persistence.Transient;
 import java.sql.Connection;
@@ -43,11 +43,11 @@ public class MapInfoDBConn {
         ConnPool.closeConn(conn);
     }
 
-    public DbcpConnect getLeftDBConn() throws Exception {
+    public Connection getLeftDBConn() throws Exception {
         return ConnPool.getConn(leftDBC);
     }
 
-    public DbcpConnect getRightDBConn() throws Exception {
+    public Connection getRightDBConn() throws Exception {
         return ConnPool.getConn(rightDBC);
     }
 

@@ -4,8 +4,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 
-import com.centit.support.database.DataSourceDescription;
-import com.centit.support.database.DbcpConnectPools;
+import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.support.database.utils.DbcpConnectPools;
 
 /**
  * Created by sx on 2014/12/11.

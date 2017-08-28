@@ -6,7 +6,7 @@ import com.centit.dde.dataio.ImportData;
 import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.service.ExchangeTaskManager;
 import com.centit.dde.service.TransferManager;
-import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.security.model.CentitUserDetails;
 import org.slf4j.Logger;

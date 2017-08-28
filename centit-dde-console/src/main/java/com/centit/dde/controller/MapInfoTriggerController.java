@@ -2,8 +2,8 @@ package com.centit.dde.controller;
 
 import com.centit.dde.po.MapInfoTrigger;
 import com.centit.dde.service.MapInfoTriggerManager;
-import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.common.ResponseMapData;
+import com.centit.framework.common.JsonResultUtils;
+import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
 import org.apache.commons.logging.Log;

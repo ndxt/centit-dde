@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.centit.dde.po.ExchangeTaskDetail;
 import com.centit.dde.po.ExchangeTaskDetailId;
-import com.centit.framework.core.service.BaseEntityManager;
+import com.centit.framework.hibernate.service.BaseEntityManager;
 
 public interface ExchangeTaskdetailManager extends BaseEntityManager<ExchangeTaskDetail,ExchangeTaskDetailId> {
     public List<Long> getMapinfoIdUsed(Long taskId);

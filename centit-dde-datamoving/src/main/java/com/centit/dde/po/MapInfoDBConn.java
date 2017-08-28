@@ -2,7 +2,7 @@
 //
 //import com.centit.dde.util.ConnPool;
 //import com.centit.framework.ip.po.DatabaseInfo;
-//import com.centit.support.database.DataSourceDescription;
+//import com.centit.support.database.utils.DataSourceDescription;
 //import com.centit.support.database.DbcpConnect;
 //
 //import java.sql.Connection;
