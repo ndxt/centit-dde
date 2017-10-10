@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Controller
 @RequestMapping("/transfer")
@@ -69,26 +70,22 @@ public class TransferController extends BaseController {
         final String taskType = Type;
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-        executorService.execute(new Runnable() {
-            @SuppressWarnings("synthetic-access")
-            @Override
-            public void run() {
-                try {
-                    if ("1".equals(taskType)) {
-                        transferManager.runTransferTask(taskId, userDetails.getUserCode(), "1",taskType);
-                    } else if ("2".equals(taskType)) {
-                        exportData.runExportTask(taskId, userDetails.getUserCode(), "1",taskType);
-                    } else if ("3".equals(taskType)) {
-                        importData.runImportTask(taskId, userDetails.getUserCode(), "1");
-                    } else if("4".equals(taskType)) {
-                        callWebService.runCallServiceTask(taskId, userDetails.getUserCode(), "1",taskType);
-                    }
-                } catch (RuntimeException e) {
-                    logger.error(e.getMessage());
+        //ThreadPoolExecutor
+        executorService.execute(() -> {
+            try {
+                if ("1".equals(taskType)) {
+                    transferManager.runTransferTask(taskId, userDetails.getUserCode(), "1",taskType);
+                } else if ("2".equals(taskType)) {
+                    exportData.runExportTask(taskId, userDetails.getUserCode(), "1",taskType);
+                } else if ("3".equals(taskType)) {
+                    importData.runImportTask(taskId, userDetails.getUserCode(), "1");
+                } else if("4".equals(taskType)) {
+                    callWebService.runCallServiceTask(taskId, userDetails.getUserCode(), "1",taskType);
                 }
-
+            } catch (RuntimeException e) {
+                logger.error(e.getMessage());
             }
+
         });
 
 //        dwzResultParam = new DwzResultParam();
