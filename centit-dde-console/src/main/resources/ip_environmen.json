@@ -1,6 +1,14 @@
 {
   "osInfos": [
     {
+      "osId": "JIRA",
+      "osName": "研发工作日志",
+      "osUrl": "http://developwork.centit.com/jira/secure/Dashboard.jspa",
+      "ddeSyncUrl": "",
+      "sysDataPushOption": "NONE",
+      "created": "u0000000"
+    },
+    {
       "osId": "CONTRACT",
       "osName": "公司经营数据管理",
       "osUrl": "http://productsvr.centit.com:8080/contract",
@@ -12,23 +20,23 @@
   "databaseInfos": [
     {
       "databaseCode": "0000000081",
-      "osId": "CONTRACT",
-      "databaseName": "DDE",
-      "databaseUrl": "jdbc:oracle:thin:@192.168.128.13:1521:centora",
-      "username": "dde",
-      "password": "zp1FDwMeg18=",
-      "databaseDesc": "DDE",
+      "osId": "JIRA",
+      "databaseName": "JIRA项目管理数据库",
+      "databaseUrl": "jdbc:oracle:thin:@192.168.128.65:1521:developwork2",
+      "username": "jirauser",
+      "password": "O8E3nT8FpZOAFfnuCAMQvg==",
+      "databaseDesc": "JIRA项目管理数据库",
       "created": "u0000000"
     },
     {
-      "databaseCode": "0000000082",
+      "databaseCode": "0000001316",
       "osId": "CONTRACT",
-      "databaseName": "DDE2",
-      "databaseUrl": "jdbc:oracle:thin:@192.168.128.13:1521:centora",
-      "username": "dde2",
-      "password": "hY1DPROHxoY=",
-      "databaseDesc": "DDE2",
-      "created": "admin"
+      "databaseName": "经营数据管理数据库",
+      "databaseUrl": "jdbc:mysql://192.168.131.6/bizdata?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true",
+      "username": "bizdata",
+      "password": "zbL/mjeJY/kAhH/Wu8QMEQ==",
+      "databaseDesc": "经营数据管理数据库",
+      "created": "u0000000"
     }
   ]
 }

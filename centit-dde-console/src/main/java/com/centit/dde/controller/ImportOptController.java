@@ -7,7 +7,7 @@ import com.centit.dde.service.ImportOptManager;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
-import com.centit.framework.core.dao.PageDesc;
+import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.security.model.CentitUserDetails;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;

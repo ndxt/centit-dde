@@ -3,7 +3,7 @@ package com.centit.dde.service;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExchangeMapInfo;
 import com.centit.dde.po.MapInfoDetail;
-import com.centit.framework.core.dao.PageDesc;
+import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.hibernate.service.BaseEntityManager;
 import com.centit.framework.ip.po.DatabaseInfo;
 

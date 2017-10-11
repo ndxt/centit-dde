@@ -9,7 +9,7 @@ import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
-import com.centit.framework.core.dao.PageDesc;
+import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.staticsystem.po.DataDictionary;
 import org.apache.commons.io.IOUtils;
