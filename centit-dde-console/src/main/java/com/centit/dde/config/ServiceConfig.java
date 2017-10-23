@@ -1,6 +1,7 @@
 package com.centit.dde.config;
 
-import com.centit.framework.hibernate.config.DataSourceConfig;
+
+import com.centit.framework.core.config.DataSourceConfig;
 import com.centit.framework.ip.app.config.IPAppSystemBeanConfig;
 import com.centit.framework.listener.InitialWebRuntimeEnvironment;
 import org.springframework.context.annotation.*;
