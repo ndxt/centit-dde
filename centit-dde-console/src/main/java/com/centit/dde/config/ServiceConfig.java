@@ -1,9 +1,15 @@
 package com.centit.dde.config;
 
 
+import com.centit.dde.listener.InstantiationServiceBeanPostProcessor;
+import com.centit.framework.components.impl.NotificationCenterImpl;
+import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.core.config.DataSourceConfig;
 import com.centit.framework.ip.app.config.IPAppSystemBeanConfig;
 import com.centit.framework.listener.InitialWebRuntimeEnvironment;
+import com.centit.framework.model.adapter.NotificationCenter;
+import com.centit.framework.model.adapter.OperationLogWriter;
+import com.centit.framework.staticsystem.config.SpringSecurityDaoConfig;
 import org.springframework.context.annotation.*;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -11,15 +17,32 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableAsync
 @EnableScheduling
-@Import({IPAppSystemBeanConfig.class, DataSourceConfig.class})
+@Import({IPAppSystemBeanConfig.class,
+        SpringSecurityDaoConfig.class,
+         DataSourceConfig.class})
 @ComponentScan(basePackages={"com.centit.dde"},
         excludeFilters=@ComponentScan.Filter(value=org.springframework.stereotype.Controller.class))
 public class ServiceConfig {
-    @Bean(initMethod = "initialEnvironment")
-    @Lazy(value = false)
-    public InitialWebRuntimeEnvironment initialEnvironment() {
-        return new InitialWebRuntimeEnvironment();
+
+    @Bean
+    public NotificationCenter notificationCenter() {
+        NotificationCenterImpl notificationCenter = new NotificationCenterImpl();
+        notificationCenter.initMsgSenders();
+        //notificationCenter.registerMessageSender("innerMsg",innerMessageManager);
+        return notificationCenter;
     }
 
+    @Bean
+    @Lazy(value = false)
+    public OperationLogWriter operationLogWriter() {
+        TextOperationLogWriterImpl operationLog =  new TextOperationLogWriterImpl();
+        operationLog.init();
+        return operationLog;
+    }
+
+    @Bean
+    public InstantiationServiceBeanPostProcessor instantiationServiceBeanPostProcessor() {
+        return new InstantiationServiceBeanPostProcessor();
+    }
 
 }

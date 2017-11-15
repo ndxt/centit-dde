@@ -237,7 +237,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
 
         }
         if (rowData.get(fieldName).getValue() instanceof java.util.Date) {
-            souce.setObject(pn, DatetimeOpt.convertSqlDate((java.util.Date) rowData.get(fieldName).getValue()));
+            souce.setObject(pn, DatetimeOpt.convertToSqlDate((java.util.Date) rowData.get(fieldName).getValue()));
         } else {
             souce.setObject(pn, rowData.get(fieldName).getValue());
         }
