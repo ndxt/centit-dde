@@ -51,7 +51,7 @@ public class ImportOptController extends BaseController {
     public void save(ImportOpt object,HttpServletRequest request,HttpServletResponse response) {
 
         CentitUserDetails user = getLoginUser(request);
-        importOptManager.saveObject(object, user);
+        importOptManager.saveObject(object, user.getUserInfo());
 
         JsonResultUtils.writeSuccessJson(response);
     }

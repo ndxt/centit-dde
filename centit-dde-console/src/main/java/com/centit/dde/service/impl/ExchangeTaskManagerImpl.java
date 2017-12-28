@@ -191,7 +191,7 @@ public class ExchangeTaskManagerImpl
             object.setIsvalid("1");
             if (user != null) {
                 object.setCreated(user.getUserCode());
-                object.setCreatedName(user.getUserName());
+                object.setCreatedName(user.getUserInfo().getUserName());
             }
 //                saveMessage("添加交换任务成功！");
         } else {

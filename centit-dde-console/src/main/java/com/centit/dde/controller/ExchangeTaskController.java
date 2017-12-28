@@ -193,7 +193,7 @@ public class ExchangeTaskController extends BaseController {
 
         UserInfo usesInfo = (UserInfo)CodeRepositoryUtil.getUserInfoByCode(exchangeTask.getCreated());
         if (usesInfo != null){
-            exchangeTask.setCreatedName(usesInfo.getUsername());
+            exchangeTask.setCreatedName(usesInfo.getUserName());
         }
         JsonResultUtils.writeSingleDataJson(exchangeTask, response);
     }
@@ -279,7 +279,7 @@ public class ExchangeTaskController extends BaseController {
                 // 调用sysconfig下的manager 通过id查询创建人姓名
                 UserInfo usesInfo = (UserInfo)CodeRepositoryUtil.getUserInfoByCode(o.getCreated());
                 if (usesInfo != null) {
-                    object.setCreatedName(usesInfo.getUsername());
+                    object.setCreatedName(usesInfo.getUserName());
                 }
                 // 查询数据交换关系列表
                 String taskType = WebUtils.findParameterValue(request, "s_taskType");

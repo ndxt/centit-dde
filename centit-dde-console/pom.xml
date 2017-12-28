@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>centit-dde-console</artifactId>
+    <packaging>war</packaging>
 
     <dependencies>
         <dependency>
@@ -34,11 +35,11 @@
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-        <dependency>
+      <!--  <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
             <version>${ojdbc6.version}</version>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>mysql</groupId>

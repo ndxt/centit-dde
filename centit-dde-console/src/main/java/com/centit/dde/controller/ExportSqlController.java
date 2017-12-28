@@ -55,7 +55,7 @@ public class ExportSqlController extends BaseController {
     public void save(ExportSql object, HttpServletRequest request,HttpServletResponse response) {
 
         CentitUserDetails user = getLoginUser(request);
-        exportSqlManager.saveObject(object, user);
+        exportSqlManager.saveObject(object, user.getUserInfo());
 
         JsonResultUtils.writeSuccessJson(response);
     }

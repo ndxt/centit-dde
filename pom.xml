@@ -22,7 +22,7 @@
         <centit.framework.version>4.0.5-SNAPSHOT</centit.framework.version>
         <centit.persistence.version>1.0.1-SNAPSHOT</centit.persistence.version>
         <centit.ui.version>3.0.1-SNAPSHOT</centit.ui.version>
-        <centit.ip.version>1.0.1-SNAPSHOT</centit.ip.version>
+        <centit.ip.version>1.0.2-SNAPSHOT</centit.ip.version>
         <centit.search.version>0.1.1-SNAPSHOT</centit.search.version>
 
         <cxf.version>2.7.3</cxf.version>
