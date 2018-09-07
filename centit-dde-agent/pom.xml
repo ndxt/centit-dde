@@ -10,7 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>centit-dde-agent</artifactId>
 
-    <dependencies>
+
+    <!--<dependencies>
         <dependency>
             <groupId>com.sun</groupId>
             <artifactId>tools</artifactId>
@@ -18,5 +19,5 @@
             <version>${jdk.version}</version>
             <scope>system</scope>
         </dependency>
-    </dependencies>
+    </dependencies>-->
 </project>
