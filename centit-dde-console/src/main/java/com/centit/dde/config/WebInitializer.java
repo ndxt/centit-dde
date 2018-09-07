@@ -1,28 +1,15 @@
 package com.centit.dde.config;
 
-import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.config.SystemSpringMvcConfig;
 import com.centit.framework.config.WebConfig;
-import com.centit.framework.filter.RequestThreadLocalFilter;
-import com.centit.framework.filter.ResponseCorsFilter;
-import com.centit.support.algorithm.StringRegularOpt;
-import com.centit.support.file.PropertiesReader;
-import org.jasig.cas.client.session.SingleSignOutHttpSessionListener;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
-import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
-import org.springframework.web.filter.DelegatingFilterProxy;
-import org.springframework.web.filter.HiddenHttpMethodFilter;
-import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
-import java.util.EnumSet;
 
 /**
  * Created by zou_wy on 2017/3/29.
@@ -33,32 +20,19 @@ public class WebInitializer implements WebApplicationInitializer {
 
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
-
         initializeSpringConfig(servletContext);
-
         initializeSystemSpringMvcConfig(servletContext);
-
         initializeSpringMvcConfig(servletContext);
 
-
         WebConfig.registerSpringSessionRepositoryFilter(servletContext);
-
         WebConfig.registerRequestContextListener(servletContext);
-
         WebConfig.registerSingleSignOutHttpSessionListener(servletContext);
-
-        WebConfig.registerResponseCorsFilter(servletContext);
-
+        //WebConfig.registerResponseCorsFilter(servletContext);
         WebConfig.registerCharacterEncodingFilter(servletContext);
-
         WebConfig.registerHttpPutFormContentFilter(servletContext);
-
         WebConfig.registerHiddenHttpMethodFilter(servletContext);
-
         WebConfig.registerRequestThreadLocalFilter(servletContext);
-
         WebConfig.registerSpringSecurityFilter(servletContext);
-
     }
     /**
      * 加载Spring 配置

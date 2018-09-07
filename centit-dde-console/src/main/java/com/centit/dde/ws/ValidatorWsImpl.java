@@ -55,9 +55,9 @@ public class ValidatorWsImpl implements ValidatorWs {
         if (!"T".equals(userInfo.getIsValid())) {
             return "1：用户已被禁用";
         }
-        //List<? extends IUserUnit> listObjects =  CodeRepositoryUtil.listUserUnits(userInfo.getUserCode());
+        List<? extends IUserUnit> listObjects =  CodeRepositoryUtil.listUserUnits(userInfo.getUserCode());
         boolean flag = false;
-        for (IUserUnit userunit : userInfo.getUserUnits()) {
+        for (IUserUnit userunit : listObjects) {
             if (wsUnitCode.equals(userunit.getUnitCode())) {
                 flag = true;
             }

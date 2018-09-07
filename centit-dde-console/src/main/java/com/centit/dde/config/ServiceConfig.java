@@ -26,7 +26,7 @@ public class ServiceConfig {
     @Bean
     public NotificationCenter notificationCenter() {
         NotificationCenterImpl notificationCenter = new NotificationCenterImpl();
-        notificationCenter.initMsgSenders();
+        notificationCenter.initDummyMsgSenders();
         //notificationCenter.registerMessageSender("innerMsg",innerMessageManager);
         return notificationCenter;
     }

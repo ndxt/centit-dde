@@ -2,6 +2,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.centit.framework</groupId>
+        <artifactId>framework-release-dependencies</artifactId>
+        <version>1.1.1808</version>
+    </parent>
+
 	<groupId>com.centit.product</groupId>
 	<artifactId>centit-dde3</artifactId>
 	<version>3.0.1-SNAPSHOT</version>
@@ -9,33 +16,14 @@
         <module>centit-dde-console</module>
         <module>centit-dde-datamoving</module>
         <module>centit-dde-client</module>
+        <module>centit-dde-commons</module>
+        <module>centit-dde-agent</module>
     </modules>
     <name>com.centit.product:centit-dde</name>
 	<packaging>pom</packaging>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <centit.dde.version>3.0.1-SNAPSHOT</centit.dde.version>
-        <jdk.version>1.8</jdk.version>
-
-        <centit.commons.version>2.2.5-SNAPSHOT</centit.commons.version>
-        <centit.framework.version>4.0.5-SNAPSHOT</centit.framework.version>
-        <centit.persistence.version>1.0.1-SNAPSHOT</centit.persistence.version>
-        <centit.ui.version>3.0.1-SNAPSHOT</centit.ui.version>
-        <centit.ip.version>1.0.2-SNAPSHOT</centit.ip.version>
-        <centit.search.version>0.1.1-SNAPSHOT</centit.search.version>
-
         <cxf.version>2.7.3</cxf.version>
-        <commons-fileupload.version>1.3.3</commons-fileupload.version>
-        <quartz.version>2.3.0</quartz.version>
-        <zip4j.version>1.3.2</zip4j.version>
-        <ojdbc6.version>11.2.0.4</ojdbc6.version>
-        <junit.version>4.12</junit.version>
-        <mysql.version>6.0.6</mysql.version>
-        <persistence-api.version>2.2</persistence-api.version>
-        <aliyun-sdk-oss.version>2.8.1</aliyun-sdk-oss.version>
-        <servlet-api.version>3.1.0</servlet-api.version>
-        <ehcache.version>2.10.4</ehcache.version>
 	</properties>
 
     <description> 数据交换工具，分三部分，一个控制台，一个数据交换程序 和 一个调用交换服务的客户端
@@ -83,34 +71,6 @@
         <tag>v1.12</tag>
     </scm>
 
-    <!-- mvn deploy -DpomFile=pom.xml -->
-    <!--
-            <distributionManagement>
-               <repository>
-                   <id>ossrh</id>
-                   <name>sonatype-releases</name>
-                   <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-               </repository>
-               <snapshotRepository>
-                   <id>ossrh</id>
-                   <name>sonatype-snapshots</name>
-                   <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-               </snapshotRepository>
-           </distributionManagement>
-    -->
-
-    <distributionManagement>
-        <repository>
-            <id>centit-releases</id>
-            <name>centit-release</name>
-            <url>http://develop.centit.com:8080/nexus/content/repositories/centit-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>centit-snapshots</id>
-            <name>centit-snapshots</name>
-            <url>http://develop.centit.com:8080/nexus/content/repositories/centit-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <build>
         <plugins>
