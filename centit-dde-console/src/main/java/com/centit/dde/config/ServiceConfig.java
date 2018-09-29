@@ -1,7 +1,6 @@
 package com.centit.dde.config;
 
 
-import com.centit.dde.listener.InstantiationServiceBeanPostProcessor;
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.hibernate.config.HibernateConfig;

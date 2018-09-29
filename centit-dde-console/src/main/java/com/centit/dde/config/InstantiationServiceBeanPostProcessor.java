@@ -1,4 +1,4 @@
-package com.centit.dde.listener;
+package com.centit.dde.config;
 
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.model.adapter.MessageSender;

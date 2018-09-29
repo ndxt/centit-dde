@@ -6,6 +6,10 @@ import java.util.List;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.compiler.Lexer;
 
+/**
+ * 这个类中的代码 将全部删除，使用 Database jar包中的QueryUtils中对应的方法
+ */
+@Deprecated
 public class SQLUtils {
     
     public static String removeOrderBy(String sql){
