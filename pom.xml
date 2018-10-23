@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.centit.framework</groupId>
         <artifactId>framework-release-dependencies</artifactId>
-        <version>1.1.1808</version>
+        <version>1.1.1809</version>
     </parent>
 
 	<groupId>com.centit.product</groupId>
