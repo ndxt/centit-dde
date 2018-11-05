@@ -13,6 +13,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
         </dependency>

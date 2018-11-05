@@ -11,13 +11,19 @@
     <artifactId>centit-dde-agent</artifactId>
 
 
-    <!--<dependencies>
+    <dependencies>
         <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!--<dependency>
             <groupId>com.sun</groupId>
             <artifactId>tools</artifactId>
             <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
             <version>${jdk.version}</version>
             <scope>system</scope>
-        </dependency>
-    </dependencies>-->
+        </dependency>-->
+    </dependencies>
 </project>
