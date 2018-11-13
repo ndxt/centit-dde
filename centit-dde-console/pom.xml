@@ -82,6 +82,30 @@
             <artifactId>centit-ip-app</artifactId>
         </dependency>
 
+        <!--<dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-system-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-persistence-hibernate</artifactId>
+        </dependency>-->
+
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-core-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-system-static</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-system-static-config</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-ip-app-config</artifactId>
