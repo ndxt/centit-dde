@@ -10,11 +10,11 @@ import com.centit.dde.service.TaskDetailLogManager;
 import com.centit.dde.service.TaskErrorDataManager;
 import com.centit.dde.service.TaskLogManager;
 import com.centit.dde.service.TransferManager;
-import com.centit.dde.util.SQLUtils;
 import com.centit.dde.util.TaskConsoleWriteUtils;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.database.utils.QueryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -234,7 +234,7 @@ public class TransferManagerImpl implements TransferManager {
         } else {
             PreparedStatement pSouce = null;
             try {
-                List<String> sqlParameters = SQLUtils.getSqlNamedParameters(sql);
+                List<String> sqlParameters = QueryUtils.getSqlNamedParameters(sql);
                 pSouce = souce.prepareStatement(sqlParameters.get(sqlParameters.size() - 1));
                 for (int i = 1; i <= pSouce.getParameterMetaData().getParameterCount(); i++) {
                     String sPN = sqlParameters.get(i - 1);
