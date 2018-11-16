@@ -9,7 +9,6 @@ import com.centit.dde.po.MapInfoDetailId;
 import com.centit.dde.po.MapInfoTrigger;
 import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.util.ConnPool;
-import com.centit.dde.util.SQLUtils;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
@@ -206,10 +205,7 @@ public class ExchangeMapInfoManagerImpl
         Connection connection = null;
         Statement statement = null;
         ResultSet rs = null;
-
-        List<String> list = SQLUtils.splitSqlByFields(sql);
-
-
+        List<String> list = QueryUtils.splitSqlByFields(sql);
         if (databaseInfo != null) {
             try {
                 connection = ConnPool.getConn(databaseInfo);
@@ -221,7 +217,7 @@ public class ExchangeMapInfoManagerImpl
                 while(pk.next()){
                     pks.add(pk.getString("COLUMN_NAME"));
                 }
-                List<String> fields = SQLUtils.getSqlFileds(sql);
+                List<String> fields = QueryUtils.getSqlFiledNames(sql);
                 rs = statement.executeQuery(sql);
                 ResultSetMetaData rsmd = rs.getMetaData();
                 for(int i = 1; i <= rsmd.getColumnCount(); i++){

@@ -5,14 +5,14 @@ import com.centit.dde.po.MapInfoDetail;
 import com.centit.dde.po.MapInfoDetailId;
 import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.service.MapInfoDetailManager;
-import com.centit.dde.util.SQLUtils;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
-import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.support.compiler.Lexer;
+import com.centit.support.database.utils.PageDesc;
+import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
@@ -652,7 +652,7 @@ public class MapInfoDetailController extends BaseController {
     private static String createSql(String sourceSql, String[] SourceColumnName, String[] SourceColumnSentence, String soueceTableName) {
         List<String> sqlPieces = new ArrayList<String>();
         if (sourceSql != null) {
-            sqlPieces = SQLUtils.splitSqlByFields(sourceSql);
+            sqlPieces = QueryUtils.splitSqlByFields(sourceSql);
         }
 
         StringBuffer sql = new StringBuffer();
@@ -699,7 +699,7 @@ public class MapInfoDetailController extends BaseController {
         List<Object> sStrsAndsFieldDescs = new ArrayList<Object>();
         Map<String, Object> structs = new HashMap<String, Object>();
 
-        List<String> sqlPieces = SQLUtils.splitSqlByFields(sql);
+        List<String> sqlPieces = QueryUtils.splitSqlByFields(sql);
         if (sqlPieces.get(0).contains("with") && sqlPieces.get(0).contains("select")) {
             sql = "select " + sqlPieces.get(1);
         }

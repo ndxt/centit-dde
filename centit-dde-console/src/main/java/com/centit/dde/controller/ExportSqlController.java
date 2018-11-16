@@ -4,14 +4,14 @@ import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportSql;
 import com.centit.dde.service.ExportSqlManager;
-import com.centit.dde.util.SQLUtils;
-import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
+import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.controller.BaseController;
-import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.staticsystem.po.DataDictionary;
+import com.centit.support.database.utils.PageDesc;
+import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -97,8 +97,8 @@ public class ExportSqlController extends BaseController {
     @RequestMapping(value="/splitQuerySql")
     public void splitQuerySql(ExportSql object,HttpServletResponse response) throws IOException {
         ResponseMapData resData = new ResponseMapData();
-        resData.addResponseData("splitsql", SQLUtils.splitSqlByFields(object.getQuerySql()));
-        resData.addResponseData("sqlfields", SQLUtils.getSqlFileds(object.getQuerySql()));
+        resData.addResponseData("splitsql", QueryUtils.splitSqlByFields(object.getQuerySql()));
+        resData.addResponseData("sqlfields", QueryUtils.getSqlFiledNames(object.getQuerySql()));
         JsonResultUtils.writeResponseDataAsJson(resData, response);
 
     }
