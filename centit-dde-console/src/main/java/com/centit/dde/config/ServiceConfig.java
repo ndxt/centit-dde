@@ -9,6 +9,7 @@ import com.centit.framework.hibernate.config.HibernateConfig;
 import com.centit.framework.ip.app.config.IPOrStaticAppSystemBeanConfig;
 import com.centit.framework.ip.app.service.impl.IntegrationEnvironmentProxy;
 import com.centit.framework.ip.service.IntegrationEnvironment;
+import com.centit.framework.ip.service.impl.JsonIntegrationEnvironment;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.security.model.MemorySessionRegistryImpl;
@@ -68,7 +69,7 @@ public class ServiceConfig {
     }
     @Bean
     public IntegrationEnvironment integrationEnvironment(){
-        return new IntegrationEnvironmentProxy();
+        return new JsonIntegrationEnvironment();
     }
 
 }
