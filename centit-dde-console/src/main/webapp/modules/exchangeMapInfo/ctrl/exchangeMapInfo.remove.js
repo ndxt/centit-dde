@@ -8,7 +8,7 @@ define(function(require) {
 		
 		// @override
 		this.submit = function(table, data) {
-			Core.ajax(Config.ContextPath+'service/flow/optprocinfo/'+data.cid, {
+			Core.ajax(Config.ContextPath+'service/exchangemapinfo/delete/'+data.mapInfoId, {
             	type: 'json',
                 method: 'post',
                 data: {
