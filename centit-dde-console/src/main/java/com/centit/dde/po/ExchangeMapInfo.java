@@ -51,15 +51,15 @@ public class ExchangeMapInfo implements java.io.Serializable {
     @Transient
     private Long mapInfoOrder;
 
-    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
     @JoinColumn(name="MAPINFO_ID")
     private List<MapInfoDetail> mapInfoDetails;
 
-    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
     @JoinColumn(name="MAPINFO_ID")
     private List<MapInfoTrigger> mapInfoTriggers;
 
-    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
     @JoinColumn(name="MAPINFO_ID")
     private List<ExchangeTaskDetail> exchangeTaskDetails;
 

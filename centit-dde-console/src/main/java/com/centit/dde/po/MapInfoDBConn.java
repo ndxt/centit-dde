@@ -25,11 +25,13 @@ public class MapInfoDBConn {
             rightDBC = new DataSourceDescription();
             leftDBC.setConnUrl(sourceDatabaseInfo.getDatabaseUrl());
             leftDBC.setUsername(sourceDatabaseInfo.getUsername());
-            leftDBC.setPassword(sourceDatabaseInfo.getClearPassword());
+            //leftDBC.setPassword(sourceDatabaseInfo.getClearPassword());
+            leftDBC.setPassword(sourceDatabaseInfo.getPassword());
 
             rightDBC.setConnUrl(desDatabaseInfo.getDatabaseUrl());
             rightDBC.setUsername(desDatabaseInfo.getUsername());
-            rightDBC.setPassword(desDatabaseInfo.getClearPassword());
+            //rightDBC.setPassword(desDatabaseInfo.getClearPassword());
+            rightDBC.setPassword(desDatabaseInfo.getPassword());
 
         } catch (Exception e) {
             e.printStackTrace();
