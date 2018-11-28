@@ -39,10 +39,10 @@ define(function(require) {
 			$("#db").combobox({
 				valueField: 'databaseCode',
 				textField: 'databaseName',
-				url:'service/common/listDb',
+				url:'service/platform/listDb',
 				onSelect: function(rec) {
 					databaseCode = rec.databaseCode;
-					var url = Config.ContextPath + 'service/common/listTable/' + databaseCode;
+					var url = Config.ContextPath + 'service/platform/listTable/' + databaseCode;
 					$('#table').combobox('reload', url);
 				}
 			});
@@ -68,8 +68,8 @@ define(function(require) {
 			$("#field").combobox({
 				valueField: 'fieldType',
 				textField: 'fieldName',
-				method:'get',
-				multiple: true,
+                method:'get',
+                multiple: true,
 				onSelect: function(rec) {
 					Core.ajax({
 						url: Config.ContextPath + 'service/exportsql/resolveQuerySql/',

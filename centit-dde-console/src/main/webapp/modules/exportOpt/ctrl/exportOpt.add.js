@@ -28,13 +28,56 @@ define(function(require) {
 			var tab1table = panel.find('table.tab1');
 			tab1table.cdatagrid({
 				controller:_self,
-				editable: true
+				editable: true,
 			});
 			var tab2table = panel.find('table.tab2');
 			tab2table.cdatagrid({
 				controller:_self,
 				editable: true
 			});
+      var databaseCode = "";
+      $("#db").combobox({
+        valueField: 'databaseCode',
+        textField: 'databaseName',
+        url:'service/platform/listDb',
+        onSelect: function(rec) {
+          databaseCode = rec.databaseCode;
+          var url = Config.ContextPath + 'service/platform/listTable/' + databaseCode;
+          $('#table').combobox('reload', url);
+        }
+      });
+      $("#table").combobox({
+        valueField: 'tableName',
+        textField: 'tableName',
+        onSelect: function(rec) {
+          // var url = Config.ContextPath + 'service/common/listField/' + databaseCode +"/" + rec.tableName;
+          // $('#field').combobox('reload', url);
+          Core.ajax(Config.ContextPath + 'service/importopt/getFields/'+ databaseCode +"/" + rec.tableName,{
+            method:'get',
+          }).then(function(data){
+
+            var tab1table = panel.find('table.tab1');
+            tab1table.cdatagrid({
+              controller:_self,
+              editable: true,
+              data:data
+            });
+          });
+        }
+      });
+      $("#querySql").blur(function(){
+        Core.ajax(Config.ContextPath + 'service/importopt/getFields/',{
+          method:'get',
+        }).then(function(data){
+
+          var tab1table = panel.find('table.tab1');
+          tab1table.cdatagrid({
+            controller:_self,
+            editable: true,
+            data:data
+          });
+        });
+      })
 		};
 		
 		// @override
@@ -45,15 +88,14 @@ define(function(require) {
 			if (isValid) {
 				var exportFields = panel.find('table.tab1').datagrid("getData").rows;
 				var exportTriggers = panel.find('table.tab2').datagrid("getData").rows;
-				data.exportOpt.exportFields = exportFields;
-				data.exportOpt.exportTriggers = exportTriggers;
-
-				Core.ajax(Config.ContextPath + 'service/exportsql/save/' + data.exportSql.exportId, {
-					data: data.exportOpt,
-					method: 'put'
-				}).then(function() {
-					closeCallback();
-				});
+        data.exportFields = exportFields;
+        data.exportTriggers = exportTriggers;
+        form.form('ajax', {
+          url: Config.ContextPath + 'service/exportsql/save',
+          method: 'put',
+          data: data
+//					提交成功后调用closeCallback关闭对话框
+        }).then(closeCallback);
 			}
 			return false;
 		};
@@ -63,6 +105,29 @@ define(function(require) {
 			table.datagrid('reload');
         };
 	});
-	
+
+   this.sync = function() {
+     var form = $("form");
+     form.form('enableValidation');
+     var isValid = form.form('validate');
+     if (isValid) {
+      form.form('ajax', {
+        url: Config.ContextPath + 'service/exportsql/resolveQuerySql',
+        method: 'post',
+        data: {
+          querySql: $("#querySql").val(),
+          sourceDatabaseName: $("#db").combobox('getValue')
+        }
+      }).then(function (data) {
+        var tab1table = $('table.tab1');
+        tab1table.cdatagrid({
+          controller: this,
+          editable: true,
+          data: data
+        });
+      })
+     }
+   }
+
 	return ExportOptAdd;
 });

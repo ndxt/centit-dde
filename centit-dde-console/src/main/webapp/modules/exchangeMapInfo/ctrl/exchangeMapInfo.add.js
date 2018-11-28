@@ -68,13 +68,17 @@ define(function(require) {
 		this.submit = function(panel, data, closeCallback) {
 			var form = panel.find('form');
 			var formData = form.form('value');
-			$.extend(data,formData);
-			
+			formData.querySql = $('#txt_querySql').textbox('getValue');
+      $.extend(data,formData);
 			// 开启校验
 			form.form('enableValidation');
 			var isValid = form.form('validate');
 			
 			if (isValid) {
+        var mapInfoDetails = panel.find('table.source').datagrid("getData").rows;
+        var mapInfoTriggers = panel.find('table.trigger').datagrid("getData").rows;
+        data.mapInfoDetails = mapInfoDetails;
+        data.mapInfoTriggers = mapInfoTriggers;
 				form.form('ajax', {
 					url: Config.ContextPath + 'service/exchangemapinfo/save',
 					method: 'put',
