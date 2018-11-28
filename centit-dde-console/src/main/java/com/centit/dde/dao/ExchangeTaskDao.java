@@ -27,7 +27,7 @@ public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask,Long> {
 
 
             filterField.put("taskName", CodeBook.LIKE_HQL_ID);
-            filterField.put("taskNameEq", "taskName = ?");
+            //filterField.put("taskNameEq", "taskName = ?");
 
             filterField.put("taskType", CodeBook.LIKE_HQL_ID);
 
