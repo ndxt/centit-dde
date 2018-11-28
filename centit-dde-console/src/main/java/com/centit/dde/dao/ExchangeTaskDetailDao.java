@@ -45,8 +45,8 @@ public class ExchangeTaskDetailDao extends BaseDaoImpl<ExchangeTaskDetail,Exchan
 
     public List<ExchangeTaskDetail> getTaskDetails(Long taskId) {
         return listObjects(
-                "from ExchangeTaskDetail where task_id=? order by mapinfoOrder",
-                taskId);
+            "from ExchangeTaskDetail where task_id=? order by mapInfoOrder",
+            taskId);
     }
 
     public Long getMapinfoOrder(Long taskId) {
