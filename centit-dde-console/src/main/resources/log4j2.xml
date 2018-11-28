@@ -4,7 +4,7 @@
     <properties>
         <!--<property name="LOG_HOME">/logs/sample</property>-->
         <property name="LOG_HOME">D:/Projects/RunData/dde_home/logs</property>
-         <property name="FILE_NAME">log</property>
+         <property name="FILE_NAME">D$${date:yyyyMMdd}</property>
     </properties>
 
     <Appenders>

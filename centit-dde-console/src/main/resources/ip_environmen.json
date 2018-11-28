@@ -19,6 +19,26 @@
   ],
   "databaseInfos": [
     {
+      "databaseCode": "0000000082",
+      "osId": "CONTRACT",
+      "databaseName": "0000000082",
+      "databaseUrl": "jdbc:oracle:thin:@192.168.131.26:1521/njzlscs",
+      "username": "jlwater",
+      "password": "jlwater",
+      "databaseDesc": "自来水",
+      "created": "u0000000"
+    },
+    {
+      "databaseCode": "0000000083",
+      "osId": "CONTRACT",
+      "databaseName": "0000000083",
+      "databaseUrl": "jdbc:oracle:thin:@192.168.137.24:1521/zlscs",
+      "username": "jlwater",
+      "password": "jlwater",
+      "databaseDesc": "自来水",
+      "created": "u0000000"
+    },
+    {
       "databaseCode": "0000000081",
       "osId": "JIRA",
       "databaseName": "JIRA项目管理数据库",
