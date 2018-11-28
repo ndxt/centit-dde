@@ -77,7 +77,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
                 dbObject.replaceExportTriggers(object.getExportTriggers());
                 object = dbObject;
             }
-            saveObject(object);
+            saveNewObject(object);
         }catch (SqlResolveException e){
             log.error("保存出错");
         }
@@ -112,7 +112,8 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
         object.setExportName(object.getExportName().trim());
 
         Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("eqExportName", object.getExportName());
+        //filterMap.put("eqExportName", object.getExportName());
+        filterMap.put("exportName", object.getExportName());
         List<ExportSql> listObjects = listObjects(filterMap);
 
         if (!CollectionUtils.isEmpty(listObjects)) {

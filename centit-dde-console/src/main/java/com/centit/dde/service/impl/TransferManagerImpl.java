@@ -18,6 +18,7 @@ import com.centit.support.database.utils.QueryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
@@ -590,7 +591,7 @@ public class TransferManagerImpl implements TransferManager {
 
                             taskDetailLog.setSuccessPieces(nSucceed);
                             taskDetailLog.setErrorPieces(nError);
-                            taskDetailLogManager.saveObject(taskDetailLog);
+                            taskDetailLogManager.saveNewObject(taskDetailLog);
 
                         } catch (SQLException e) {
                             nError++;
@@ -659,7 +660,7 @@ public class TransferManagerImpl implements TransferManager {
                             }
                             taskErrorData.setDataContent(sb.toString());
                             // taskErrorDataManager.saveTaskErrorData(taskErrorData);
-                            taskErrorDataManager.saveObject(taskErrorData);
+                            taskErrorDataManager.saveNewObject(taskErrorData);
                             taskErrorDataManager.flush();
                         }
                     } // while rs.next();
@@ -669,7 +670,7 @@ public class TransferManagerImpl implements TransferManager {
                     //每次循环执行记录一次循环执行的成功失败数据
                     taskDetailLog.setSuccessPieces(nSucceed);
                     taskDetailLog.setErrorPieces(nError);
-                    taskDetailLogManager.saveObject(taskDetailLog);
+                    taskDetailLogManager.saveNewObject(taskDetailLog);
 
 
                     String message = "当前循环执行 " + (++runnum) + " 次，已交换完 " + (preSucceed + curMoved) + " 条数据，本次交换 " + curMoved + " 条数据。";
@@ -745,7 +746,7 @@ public class TransferManagerImpl implements TransferManager {
         taskDetailLog.setRunEndTime(endTime);
         taskDetailLog.setSuccessPieces(nSucceed);
         taskDetailLog.setErrorPieces(nError);
-        taskDetailLogManager.saveObject(taskDetailLog);
+        taskDetailLogManager.saveNewObject(taskDetailLog);
         if (runBreak) {
             transferResult.setRes(-1);
         }
@@ -775,6 +776,7 @@ public class TransferManagerImpl implements TransferManager {
         return nRes;
     }
 
+    @Transactional
     public String runTransferTask(Long taskID, String userCode, String runType, String taskType) {
 
         String msg = null;
@@ -789,7 +791,7 @@ public class TransferManagerImpl implements TransferManager {
             return msg;
         }
         exchangeTask.setLastRunTime(DatetimeOpt.currentSqlDate());
-        exchangeTaskDao.saveObject(exchangeTask);
+        exchangeTaskDao.saveNewObject(exchangeTask);
         msg = "开始执行交换：" + exchangeTask.getTaskName() + "........";
         logger.info(msg);
 
@@ -805,7 +807,7 @@ public class TransferManagerImpl implements TransferManager {
         taskLog.setRunType(runType);
         taskLog.setRunner(userCode);
         taskLog.setTaskType(taskType);
-        taskLogManager.saveObject(taskLog);
+        taskLogManager.saveNewObject(taskLog);
         //taskLogManager.flush();
 //        TaskLogQueue.put(taskLog);
 
@@ -890,7 +892,7 @@ public class TransferManagerImpl implements TransferManager {
         TaskLog taskLogTemp = taskLogManager.getObjectById(taskLogId);
         taskLogTemp.setRunEndTime(DatetimeOpt.currentSqlDate());
         taskLogTemp.setOtherMessage(message);
-        taskLogManager.saveObject(taskLogTemp);
+        taskLogManager.saveNewObject(taskLogTemp);
         return message;
     }
 

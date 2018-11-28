@@ -180,7 +180,7 @@ public class ExchangeTaskManagerImpl
         // 判断是否为新增
         if (null == object.getTaskId() || 0 == object.getTaskId()) {
             Map<String, Object> filterMap = new HashMap<>();
-            filterMap.put("taskNameEq", object.getTaskName());
+            filterMap.put("taskName", object.getTaskName());
             List<ExchangeTask> listObjects = listObjects(filterMap);
             if (!org.springframework.util.CollectionUtils.isEmpty(listObjects)) {
             }
@@ -214,6 +214,7 @@ public class ExchangeTaskManagerImpl
             }
         }
 
-        saveObject(object);
+        //saveObject(object);
+        saveNewObject(object);
     }
 }
