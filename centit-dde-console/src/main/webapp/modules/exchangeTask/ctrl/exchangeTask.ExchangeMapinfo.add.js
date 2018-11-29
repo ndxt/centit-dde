@@ -17,6 +17,9 @@ define(function(require) {
 		this.load = function(panel, data) {
 			data = _self.parent.data;
 			var taskId = data.taskId;
+			if (data.taskId==undefined){
+        taskId = -1;
+      }
 			Core.ajax(Config.ContextPath+'service/exchangetask/ExchangeMapInfolist/1/'+taskId, {
 				method: 'get'
 			}).then(function(data2) {
@@ -34,12 +37,15 @@ define(function(require) {
 			data = _self.parent.data;
 			var panelParent = _self.parent.panel;
 			var taskId = data.taskId;
+      if (data.taskId==undefined){
+        taskId = -1;
+      }
 			var table = panel.find('#dg1');
 			var row = table.datagrid('getSelections');
 	        var i = 0;  
 	        var mapinfoIds = "";  
 	        for(i;i<row.length;i++){  
-	        	mapinfoIds += row[i].mapinfoId;  
+	        	mapinfoIds += row[i].mapInfoId;
 	            if(i < row.length-1){  
 	            	mapinfoIds += ',';  
 	            }else{  
@@ -56,7 +62,7 @@ define(function(require) {
 	                }
 				}).then(function(data2) {
 					var tableparent = panelParent.find('#dlgList');
-					tableparent.datagrid('loadData',data2.exchangeMapinfoList);
+					tableparent.datagrid('loadData',data2.exchangeMapInfoList);
 				});
 				closeCallback();
 			});

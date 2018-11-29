@@ -47,7 +47,7 @@ define(function(require) {
 					editable: true,
 					data:data.exportSqlList
 				});
-				table.datagrid('reload');
+				//table.datagrid('reload');
 			});
 		};
 		

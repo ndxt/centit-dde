@@ -2,9 +2,22 @@ define(function(require) {
 
 	var Config = require('config');
 	var Page = require('core/page');
-	
+
+  var webServiceTaskExchangeMapinfoAdd = require('../ctrl/webServiceTask.ExchangeMapinfo.add');
+  var webServiceTaskexportSqlEdit = require('../ctrl/webServiceTask.exportSql.edit');
+  var webServiceTaskExchangeTaskdetailIdRemove = require('../ctrl/webServiceTask.ExchangeTaskdetailId.remove');
+  var webServiceTaskRun = require('../ctrl/webServiceTask.run');
+
 	var webServiceTaskAdd = Page.extend(function() {
-		
+    var _self = this;
+
+    this.injecte([
+      new webServiceTaskExchangeMapinfoAdd('webServiceTask_ExchangeMapinfo_add'),
+      new webServiceTaskexportSqlEdit('webServiceTask_exportSql_edit'),
+      new webServiceTaskExchangeTaskdetailIdRemove('webServiceTask_ExchangeTaskdetailId_remove'),
+      new webServiceTaskRun('webServiceTask_transfer_run'),
+    ]);
+
 		// @override
 		// 加载页面时调用
 		this.load = function(panel, data) {
@@ -13,6 +26,17 @@ define(function(require) {
 			// 
 			form.form('disableValidation')
 			.form('focus');
+      var tab2table = panel.find('table.tab2');
+      tab2table.cdatagrid({
+        controller:_self,
+        editable: true,
+      });
+
+      var tab1table = panel.find('table.tab1');
+      tab1table.cdatagrid({
+        controller:_self,
+        editable: true,
+      });
 		};
 		
 		// @override

@@ -1,6 +1,7 @@
 define(function(require) {
 	var Config = require('config');
 	var Core = require('core/core');
+  var Page = require('core/page');
 	
 	var ExchangeTaskEditConAdd = require('./exchangeTask.edit.conAdd');
 	var ExchangeTaskAdd = require('./exchangeTask.add');
@@ -26,7 +27,7 @@ define(function(require) {
 			var form = panel.find('form');
 			
 			Core.ajax(Config.ContextPath+'service/exchangetask/edit/'+data.taskId, {
-				method: 'get',
+			  method: 'get',
 				data: {
                     _method: 'get'
                 }
@@ -42,9 +43,9 @@ define(function(require) {
 				tab1table.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.exchangeMapinfoList
+					data:data.exchangeMapInfoList,
 				});
-				table.datagrid('reload');
+				//tab1table.datagrid('reload');
 			});
 		};
 		
