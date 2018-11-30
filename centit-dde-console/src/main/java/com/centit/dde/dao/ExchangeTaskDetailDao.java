@@ -26,9 +26,9 @@ public class ExchangeTaskDetailDao extends BaseDaoImpl<ExchangeTaskDetail,Exchan
             filterField.put("taskId", CodeBook.EQUAL_HQL_ID);
 
 
-            filterField.put("mapinfoOrder", CodeBook.LIKE_HQL_ID);
+            filterField.put("mapInfoOrder", CodeBook.LIKE_HQL_ID);
 
-            filterField.put(CodeBook.ORDER_BY_HQL_ID, "mapinfoOrder");
+            filterField.put(CodeBook.ORDER_BY_HQL_ID, "mapInfoOrder");
 
             filterField.put("task_Id", CodeBook.EQUAL_HQL_ID);
 
@@ -39,7 +39,7 @@ public class ExchangeTaskDetailDao extends BaseDaoImpl<ExchangeTaskDetail,Exchan
 
     @SuppressWarnings("unchecked")
     public List<Long> getMapinfoIdUsed(Long taskId) {
-        String hql = "select e.cid.mapInfoId from ExchangeTaskDetail e where e.cid.taskId=" + taskId + " order by e.mapinfoOrder";
+        String hql = "select e.cid.mapInfoId from ExchangeTaskDetail e where e.cid.taskId=" + taskId + " order by e.mapInfoOrder";
         return (List<Long>) DatabaseOptUtils.findObjectsByHql(this,hql);
     }
 

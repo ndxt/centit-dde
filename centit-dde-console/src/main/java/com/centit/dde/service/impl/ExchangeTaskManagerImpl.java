@@ -171,6 +171,7 @@ public class ExchangeTaskManagerImpl
     public void save(ExchangeTask object, CentitUserDetails user) {
         Long taskId = object.getTaskId();
         object.setTaskName(object.getTaskName().trim());
+        object.setTaskType("1");
         ExchangeTask dbObject = getObjectById(taskId);
         if (dbObject != null) {
             dbObject.copyNotNullProperty(object);
@@ -202,7 +203,7 @@ public class ExchangeTaskManagerImpl
         }
 
         //更新下次执行时间
-        if (object.getTaskCron() != null) {
+        if (object.getTaskCron() != null && !"".equals(object.getTaskCron())) {
             try {
                 CronSequenceGenerator generator = new CronSequenceGenerator(object.getTaskCron(), TimeZone.getDefault());
                 object.setNextRunTime(generator.next(new Date()));
@@ -210,7 +211,7 @@ public class ExchangeTaskManagerImpl
 //                    saveError("定时任务表达式不正确");
 
 //                    return ERROR;
-                return;
+                //return;
             }
         }
 

@@ -160,9 +160,15 @@ public class ExchangeTaskController extends BaseController {
     @RequestMapping(value="/edit/{taskId}" , method = {RequestMethod.GET})
     public  void edit(@PathVariable Long taskId, HttpServletResponse response) {
         ExchangeTask exchangeTask = exchangeTaskMag.getObjectById(taskId);
-
-        String taskType = exchangeTask.getTaskType();
-
+        String taskType ="";
+        if(exchangeTask!=null){
+             taskType = exchangeTask.getTaskType();
+        }
+        if("".equals(taskType)){
+            taskType ="1";
+        }
+        if(exchangeTask==null)
+            exchangeTask =new ExchangeTask();
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("task_Id", taskId);
         List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailManager.listObjects(filterMap);
