@@ -42,10 +42,10 @@
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-      <!--  <dependency>
+       <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
-        </dependency>-->
+        </dependency>
 
         <dependency>
             <groupId>mysql</groupId>
