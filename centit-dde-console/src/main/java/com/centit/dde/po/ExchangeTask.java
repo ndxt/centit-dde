@@ -318,7 +318,7 @@ public class ExchangeTask implements java.io.Serializable {
             ExchangeTaskDetail odt = it.next();
             found = false;
             for (ExchangeTaskDetail newdt : newObjs) {
-                if (odt.getCid().equals(newdt.getCid())) {
+                if (odt.getMapInfoId().equals(newdt.getMapInfoId()) && odt.getTaskId().equals(newdt.getTaskId())) {
                     found = true;
                     break;
                 }
@@ -333,7 +333,7 @@ public class ExchangeTask implements java.io.Serializable {
             for (Iterator<ExchangeTaskDetail> it = getExchangeTaskDetails()
                     .iterator(); it.hasNext(); ) {
                 ExchangeTaskDetail odt = it.next();
-                if (odt.getCid().equals(newdt.getCid())) {
+                if (odt.getMapInfoId().equals(newdt.getMapInfoId()) && odt.getTaskId().equals(newdt.getTaskId())) {
                     odt.copy(newdt);
                     found = true;
                     break;

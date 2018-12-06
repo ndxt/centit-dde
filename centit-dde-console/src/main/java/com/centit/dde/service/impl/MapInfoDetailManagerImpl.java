@@ -2,7 +2,6 @@ package com.centit.dde.service.impl;
 
 import com.centit.dde.dao.MapInfoDetailDao;
 import com.centit.dde.po.MapInfoDetail;
-import com.centit.dde.po.MapInfoDetailId;
 import com.centit.dde.service.MapInfoDetailManager;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
@@ -12,10 +11,11 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 @Service
-public class MapInfoDetailManagerImpl extends BaseEntityManagerImpl<MapInfoDetail,MapInfoDetailId, MapInfoDetailDao>
+public class MapInfoDetailManagerImpl extends BaseEntityManagerImpl<MapInfoDetail,Serializable, MapInfoDetailDao>
         implements MapInfoDetailManager {
     public static final Log log = LogFactory.getLog(MapInfoDetailManager.class);
 
@@ -81,6 +81,11 @@ public class MapInfoDetailManagerImpl extends BaseEntityManagerImpl<MapInfoDetai
 
     public void saveMapinfoDetails(MapInfoDetail mapInfoDetail) {
         this.mapInfoDetailDao.saveMapinfoDetails(mapInfoDetail);
+    }
+
+    @Override
+    public MapInfoDetail getObjectById(MapInfoDetail mapInfoDetail) {
+        return mapInfoDetailDao.getObjectById(mapInfoDetail);
     }
 
 }

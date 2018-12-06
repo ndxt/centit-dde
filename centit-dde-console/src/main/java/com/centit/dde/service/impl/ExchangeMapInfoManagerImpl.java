@@ -5,7 +5,6 @@ import com.centit.dde.dao.MapInfoTriggerDao;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExchangeMapInfo;
 import com.centit.dde.po.MapInfoDetail;
-import com.centit.dde.po.MapInfoDetailId;
 import com.centit.dde.po.MapInfoTrigger;
 import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.util.ConnPool;
@@ -190,7 +189,8 @@ public class ExchangeMapInfoManagerImpl
         MapInfoTrigger mt = null;
         for (int i = 0; i < object.getMapInfoDetails().size(); i++) {
             md = object.getMapInfoDetails().get(i);
-            md.setCid(new MapInfoDetailId(object.getMapInfoId(), (long) i));
+            md.setMapInfoId(object.getMapInfoId());
+            md.setColumnNo((long)i);
         }
         for (int i = 0; i < object.getMapInfoTriggers().size(); i++) {
             mt = object.getMapInfoTriggers().get(i);

@@ -88,12 +88,13 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
         ExportTrigger er = null;
         for (int i = 0; i < object.getExportFields().size(); i++) {
             ef = object.getExportFields().get(i);
-
-            ef.setCid(new ExportFieldId(object.getExportId(), (long) i));
+            ef.setColumnNo((long)i);
+            ef.setExportId(object.getExportId());
         }
         for (int i = 0; i < object.getExportTriggers().size(); i++) {
             er = object.getExportTriggers().get(i);
-            er.setCid(new ExportTriggerId((long) i, object.getExportId()));
+            er.setExportId(object.getExportId());
+            er.setTriggerId((long)i);
         }
     }
 

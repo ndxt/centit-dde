@@ -1,7 +1,6 @@
 package com.centit.dde.dao;
 
 import com.centit.dde.po.MapInfoDetail;
-import com.centit.dde.po.MapInfoDetailId;
 import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.ip.po.DatabaseInfo;
@@ -13,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
 
+import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId> {
+public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail, Serializable> {
     
     public static final Log log = LogFactory.getLog(MapInfoDetailDao.class);
 

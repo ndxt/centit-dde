@@ -139,7 +139,7 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
             for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                 String columnName = rsmd.getColumnName(i);
                 //select * from talbeName 时sqlFields解析字段长度为1 * ，与rsmd.getColumnCount() 解析长度不一致
-                ExportField ef = new ExportField(new ExportFieldId(exportSql.getExportId(), (long) (i - 1)), columnName,
+                ExportField ef = new ExportField(exportSql.getExportId(), (long) (i - 1), columnName,
                         sqlFileds.size() != rsmd.getColumnCount() ? columnName : sqlFileds.get(i - 1));
                 ef.setFieldType(rsmd.getColumnTypeName(i));
                 ef.setIsNull(ResultSetMetaData.columnNoNulls == rsmd.isNullable(i) ? "0" : "1");

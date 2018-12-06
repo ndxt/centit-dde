@@ -2,7 +2,6 @@ package com.centit.dde.controller;
 
 import com.centit.dde.po.ExchangeMapInfo;
 import com.centit.dde.po.MapInfoDetail;
-import com.centit.dde.po.MapInfoDetailId;
 import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.service.MapInfoDetailManager;
 import com.centit.framework.common.JsonResultUtils;
@@ -549,10 +548,8 @@ public class MapInfoDetailController extends BaseController {
                 continue;
             }
             MapInfoDetail mapInfoDetail = new MapInfoDetail();
-            MapInfoDetailId cid = new MapInfoDetailId();
-            cid.setMapInfoId(mapInfoId);
-            cid.setColumnNo(Long.valueOf(i + 1));
-            mapInfoDetail.setCid(cid);
+            mapInfoDetail.setMapInfoId(mapInfoId);
+            mapInfoDetail.setColumnNo(Long.valueOf(i + 1));
             if (StringUtils.hasText(SourceColumnSentence[i])) {
                 mapInfoDetail.setSourceFieldName(SourceColumnSentence[i].split(" ")[SourceColumnSentence[i].split(" ").length - 1]);
             } else {
@@ -758,10 +755,7 @@ public class MapInfoDetailController extends BaseController {
     public void edit(String s_columnNo,String s_mapinfoId,
             HttpServletRequest request,HttpServletResponse response) {
         try {
-            MapInfoDetailId cid = new MapInfoDetailId();
-            cid.setColumnNo(Long.valueOf(s_columnNo));
-            cid.setMapInfoId(Long.valueOf(s_mapinfoId));
-            MapInfoDetail object = mapinfoDetailMag.getObjectById(cid);
+            MapInfoDetail object = mapinfoDetailMag.getObjectById(new MapInfoDetail(Long.valueOf(s_mapinfoId),Long.valueOf(s_columnNo)));
             JsonResultUtils.writeSingleDataJson(object, response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -774,10 +768,7 @@ public class MapInfoDetailController extends BaseController {
     public void edit_add(String s_columnNo,String s_mapinfoId,
             HttpServletRequest request,HttpServletResponse response) {
         try {
-            MapInfoDetailId cid = new MapInfoDetailId();
-            cid.setColumnNo(Long.valueOf(s_columnNo));
-            cid.setMapInfoId(Long.valueOf(s_mapinfoId));
-            MapInfoDetail object = mapinfoDetailMag.getObjectById(cid);
+            MapInfoDetail object = mapinfoDetailMag.getObjectById(new MapInfoDetail(Long.valueOf(s_mapinfoId),Long.valueOf(s_columnNo)));
             JsonResultUtils.writeSingleDataJson(object, response);
         } catch (Exception e) {
             e.printStackTrace();

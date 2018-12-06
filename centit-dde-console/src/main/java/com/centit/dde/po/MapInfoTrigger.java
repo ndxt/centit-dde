@@ -1,9 +1,9 @@
 package com.centit.dde.po;
 
-import com.centit.support.database.orm.GeneratorType;
-import com.centit.support.database.orm.ValueGenerator;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 /**
  * create by scaffold
@@ -14,11 +14,14 @@ import javax.persistence.*;
 @Table(name="D_MAPINFO_TRIGGER")
 public class MapInfoTrigger implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
-    
-    @EmbeddedId
-    @Column(name="CID")
-    @ValueGenerator(strategy = GeneratorType.AUTO)
-    private MapInfoTriggerId cid;
+
+    @Column(name="TRIGGER_ID")
+    @NotBlank(message = "字段不能为空")
+    private Long triggerId;
+
+    @Column(name="MAPINFO_ID")
+    @NotBlank(message = "字段不能为空")
+    private Long mapInfoId;
 
     @Column(name="TRIGGER_SQL")
     private String triggerSql;
@@ -149,23 +152,14 @@ public class MapInfoTrigger implements java.io.Serializable {
     /**
      * minimal constructor
      */
-    public MapInfoTrigger(MapInfoTriggerId id
-
-    ) {
-        this.cid = id;
-
-
+    public MapInfoTrigger(@NotBlank(message = "字段不能为空") Long triggerId, @NotBlank(message = "字段不能为空") Long mapInfoId) {
+        this.triggerId = triggerId;
+        this.mapInfoId = mapInfoId;
     }
 
-    /**
-     * full constructor
-     */
-    public MapInfoTrigger(MapInfoTriggerId id
-
-            , String triggerSql, String triggerDesc, String triggerType, String triggerTime, String triggerDatabase, Long tiggerOrder, String isprocedure) {
-        this.cid = id;
-
-
+    public MapInfoTrigger(@NotBlank(message = "字段不能为空") Long triggerId, @NotBlank(message = "字段不能为空") Long mapInfoId, String triggerSql, String triggerDesc, String triggerType, String triggerTime, String triggerDatabase, Long tiggerOrder, String isprocedure) {
+        this.triggerId = triggerId;
+        this.mapInfoId = mapInfoId;
         this.triggerSql = triggerSql;
         this.triggerDesc = triggerDesc;
         this.triggerType = triggerType;
@@ -175,40 +169,21 @@ public class MapInfoTrigger implements java.io.Serializable {
         this.isprocedure = isprocedure;
     }
 
-    public MapInfoTriggerId getCid() {
-        return this.cid;
-    }
-
-    public void setCid(MapInfoTriggerId id) {
-        this.cid = id;
-    }
-
     public Long getTriggerId() {
-        if (this.cid == null)
-            this.cid = new MapInfoTriggerId();
-        return this.cid.getTriggerId();
+        return triggerId;
     }
 
     public void setTriggerId(Long triggerId) {
-        if (this.cid == null)
-            this.cid = new MapInfoTriggerId();
-        this.cid.setTriggerId(triggerId);
+        this.triggerId = triggerId;
     }
 
-    public Long getMapinfoId() {
-        if (this.cid == null)
-            this.cid = new MapInfoTriggerId();
-        return this.cid.getMapInfoId();
+    public Long getMapInfoId() {
+        return mapInfoId;
     }
 
-    public void setMapinfoId(Long mapinfoId) {
-        if (this.cid == null)
-            this.cid = new MapInfoTriggerId();
-        this.cid.setMapInfoId(mapinfoId);
+    public void setMapInfoId(Long mapInfoId) {
+        this.mapInfoId = mapInfoId;
     }
-
-
-    // Property accessors
 
     public String getTriggerSql() {
         return this.triggerSql;
@@ -262,7 +237,7 @@ public class MapInfoTrigger implements java.io.Serializable {
     public void copy(MapInfoTrigger other) {
 
         this.setTriggerId(other.getTriggerId());
-        this.setMapinfoId(other.getMapinfoId());
+        this.setMapInfoId(other.getMapInfoId());
 
         this.triggerSql = other.getTriggerSql();
         this.triggerDesc = other.getTriggerDesc();
@@ -278,8 +253,8 @@ public class MapInfoTrigger implements java.io.Serializable {
 
         if (other.getTriggerId() != null)
             this.setTriggerId(other.getTriggerId());
-        if (other.getMapinfoId() != null)
-            this.setMapinfoId(other.getMapinfoId());
+        if (other.getMapInfoId() != null)
+            this.setMapInfoId(other.getMapInfoId());
 
         if (other.getTriggerSql() != null)
             this.triggerSql = other.getTriggerSql();

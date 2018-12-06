@@ -5,16 +5,22 @@ import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name="D_MAPINFO_DETAIL")
 public class MapInfoDetail implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
-    
-    @EmbeddedId
-    @Column(name="CID")
-    @ValueGenerator(strategy = GeneratorType.AUTO)
-    private MapInfoDetailId cid;
+
+    @Id
+    @Column(name="MAPINFO_ID")
+    @NotBlank(message = "字段不能为空")
+    private Long mapInfoId;
+
+    @Id
+    @Column(name="COLUMN_NO")
+    @NotBlank(message = "字段不能为空")
+    private Long columnNo;
 
     @Column(name="SOURCE_FIELD_NAME")
     private String sourceFieldName;
@@ -95,74 +101,52 @@ public class MapInfoDetail implements java.io.Serializable {
     public MapInfoDetail() {
     }
 
-    /**
-     * minimal constructor
-     */
-    public MapInfoDetail(MapInfoDetailId id
-
-            , String sourceFieldName, String sourceFieldSentence, String destFieldName) {
-        this.cid = id;
-
-
-        this.sourceFieldName = sourceFieldName;
-        this.sourceFieldSentence = sourceFieldSentence;
-        this.destFieldName = destFieldName;
+    public MapInfoDetail(@NotBlank(message = "字段不能为空") Long mapInfoId, @NotBlank(message = "字段不能为空") Long columnNo) {
+        this.mapInfoId = mapInfoId;
+        this.columnNo = columnNo;
     }
 
-    /**
-     * full constructor
-     */
-    public MapInfoDetail(MapInfoDetailId id, Long orderNo, String sourceFieldName,
-                         String sourceFieldSentence, String sourceFieldType, String destFieldName,
-                         String destFieldType, String isPk, String destFieldDefault, String isNull, String querySql) {
-        this.cid = id;
-
+    public MapInfoDetail(@NotBlank(message = "字段不能为空") Long mapInfoId, @NotBlank(message = "字段不能为空") Long columnNo, String sourceFieldName, String destFieldName, String sourceFieldSentence) {
+        this.mapInfoId = mapInfoId;
+        this.columnNo = columnNo;
         this.sourceFieldName = sourceFieldName;
+        this.destFieldName = destFieldName;
+        this.sourceFieldSentence = sourceFieldSentence;
+    }
+
+
+    public MapInfoDetail(@NotBlank(message = "字段不能为空") Long mapInfoId, @NotBlank(message = "字段不能为空") Long columnNo, String sourceFieldName, String destFieldName, String sourceFieldSentence, String sourceFieldType, String destFieldType, String isPk, String destFieldDefault, String isNull, String sourceTableName, String goalTableName, String sourceUrl, String goalUrl) {
+        this.mapInfoId = mapInfoId;
+        this.columnNo = columnNo;
+        this.sourceFieldName = sourceFieldName;
+        this.destFieldName = destFieldName;
         this.sourceFieldSentence = sourceFieldSentence;
         this.sourceFieldType = sourceFieldType;
-        this.destFieldName = destFieldName;
         this.destFieldType = destFieldType;
         this.isPk = isPk;
         this.destFieldDefault = destFieldDefault;
         this.isNull = isNull;
-    }
-
-    public MapInfoDetailId getCid() {
-        return this.cid;
-    }
-
-    public void setCid(MapInfoDetailId id) {
-        this.cid = id;
+        this.sourceTableName = sourceTableName;
+        this.goalTableName = goalTableName;
+        this.sourceUrl = sourceUrl;
+        this.goalUrl = goalUrl;
     }
 
     public Long getMapInfoId() {
-        if (this.cid == null)
-            this.cid = new MapInfoDetailId();
-        return this.cid.getMapInfoId();
+        return mapInfoId;
     }
 
-    public void setMapinfoId(Long mapinfoId) {
-        if (this.cid == null)
-            this.cid = new MapInfoDetailId();
-        this.cid.setMapInfoId(mapinfoId);
+    public void setMapInfoId(Long mapInfoId) {
+        this.mapInfoId = mapInfoId;
     }
 
-    public Long getColumnNo(){
-        if(this.cid == null)
-            this.cid = new MapInfoDetailId();
-        return this.cid.getColumnNo();
+    public Long getColumnNo() {
+        return columnNo;
     }
 
     public void setColumnNo(Long columnNo) {
-        if(this.cid == null){
-            this.cid = new MapInfoDetailId();
-        }
-        this.cid.setColumnNo(columnNo);
+        this.columnNo = columnNo;
     }
-
-
-    // Property accessors
-
 
     public String getSourceFieldName() {
         return this.sourceFieldName;
@@ -231,8 +215,8 @@ public class MapInfoDetail implements java.io.Serializable {
 
     public void copy(MapInfoDetail other) {
 
-        this.setMapinfoId(other.getMapInfoId());
-
+        this.setColumnNo(other.getColumnNo());
+        this.setMapInfoId(other.getMapInfoId());
         this.sourceFieldName = other.getSourceFieldName();
         this.sourceFieldSentence = other.getSourceFieldSentence();
         this.sourceFieldType = other.getSourceFieldType();
@@ -246,10 +230,10 @@ public class MapInfoDetail implements java.io.Serializable {
 
     public void copyNotNullProperty(MapInfoDetail other) {
 
-//        if (other.getMapInfoId() != null)
-//            this.setMapinfoId(other.getMapInfoId());
-        if(other.getCid() != null)
-            this.setCid(other.getCid());
+        if(other.getColumnNo() != null)
+            this.setColumnNo(other.getColumnNo());
+        if(other.getMapInfoId() != null)
+            this.setMapInfoId(other.getMapInfoId());
         if (other.getSourceFieldName() != null)
             this.sourceFieldName = other.getSourceFieldName();
         if (other.getSourceFieldSentence() != null)

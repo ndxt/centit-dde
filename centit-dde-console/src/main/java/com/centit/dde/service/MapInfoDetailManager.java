@@ -1,14 +1,14 @@
 package com.centit.dde.service;
 
 import com.centit.dde.po.MapInfoDetail;
-import com.centit.dde.po.MapInfoDetailId;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.jdbc.service.BaseEntityManager;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public interface MapInfoDetailManager extends BaseEntityManager<MapInfoDetail,MapInfoDetailId> {
+public interface MapInfoDetailManager extends BaseEntityManager<MapInfoDetail, Serializable> {
     public List<Map<String, String>> getGoalTableStruct(DatabaseInfo DatabaseInfo, String tableName);
 
     public List<Map<String, String>> getSourceTableStruct(DatabaseInfo DatabaseInfo, String tableName);
@@ -34,5 +34,7 @@ public interface MapInfoDetailManager extends BaseEntityManager<MapInfoDetail,Ma
     public void saveMapinfoDetails(MapInfoDetail mapInfoDetail);
     
     public List<MapInfoDetail> listByMapinfoId(Long mapinfoId);
+
+    MapInfoDetail getObjectById(MapInfoDetail mapInfoDetail);
     
 }

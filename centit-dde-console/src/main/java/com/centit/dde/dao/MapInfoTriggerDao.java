@@ -1,7 +1,6 @@
 package com.centit.dde.dao;
 
 import com.centit.dde.po.MapInfoTrigger;
-import com.centit.dde.po.MapInfoTriggerId;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
@@ -9,12 +8,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Repository
-public class MapInfoTriggerDao extends BaseDaoImpl<MapInfoTrigger,MapInfoTriggerId> {
+public class MapInfoTriggerDao extends BaseDaoImpl<MapInfoTrigger, Serializable> {
 
     public static final Log log = LogFactory.getLog(MapInfoTriggerDao.class);
     @Override

@@ -322,7 +322,7 @@ public class ExportSql implements java.io.Serializable {
             ExportTrigger odt = it.next();
             found = false;
             for (ExportTrigger newdt : newObjs) {
-                if (odt.getCid().equals(newdt.getCid())) {
+                if (odt.getExportId().equals(newdt.getExportId()) && odt.getTriggerId().equals(newdt.getTriggerId())) {
                     found = true;
                     break;
                 }
@@ -336,7 +336,7 @@ public class ExportSql implements java.io.Serializable {
             found = false;
             for (Iterator<ExportTrigger> it = getExportTriggers().iterator(); it.hasNext(); ) {
                 ExportTrigger odt = it.next();
-                if (odt.getCid().equals(newdt.getCid())) {
+                if (odt.getExportId().equals(newdt.getExportId()) && odt.getTriggerId().equals(newdt.getTriggerId())) {
                     odt.copy(newdt);
                     found = true;
                     break;
@@ -411,7 +411,7 @@ public class ExportSql implements java.io.Serializable {
             ExportField odt = it.next();
             found = false;
             for (ExportField newdt : newObjs) {
-                if (odt.getCid().equals(newdt.getCid())) {
+                if (odt.getColumnNo().equals(newdt.getColumnNo()) && odt.getExportId().equals(newdt.getExportId())) {
                     found = true;
                     break;
                 }
@@ -425,7 +425,7 @@ public class ExportSql implements java.io.Serializable {
             found = false;
             for (Iterator<ExportField> it = getExportFields().iterator(); it.hasNext(); ) {
                 ExportField odt = it.next();
-                if (odt.getCid().equals(newdt.getCid())) {
+                if (odt.getColumnNo().equals(newdt.getColumnNo()) && odt.getExportId().equals(newdt.getExportId())) {
                     odt.copy(newdt);
                     found = true;
                     break;

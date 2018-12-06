@@ -1,18 +1,18 @@
 package com.centit.dde.dao;
 
 import com.centit.dde.po.ExportField;
-import com.centit.dde.po.ExportFieldId;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 @Repository
-public class ExportFieldDao extends BaseDaoImpl<ExportField,ExportFieldId> {
+public class ExportFieldDao extends BaseDaoImpl<ExportField, Serializable> {
 
     public static final Log log = LogFactory.getLog(ExportFieldDao.class);
     @Override

@@ -241,7 +241,7 @@ public class ExchangeMapInfo implements java.io.Serializable {
     public MapInfoDetail newMapInfoDetail() {
         MapInfoDetail res = new MapInfoDetail();
 
-        res.setMapinfoId(this.getMapInfoId());
+        res.setMapInfoId(this.getMapInfoId());
 
         return res;
     }
@@ -268,7 +268,7 @@ public class ExchangeMapInfo implements java.io.Serializable {
             MapInfoDetail odt = it.next();
             found = false;
             for (MapInfoDetail newdt : newObjs) {
-                if (odt.getCid().equals(newdt.getCid())) {
+                if (odt.getMapInfoId().equals(newdt.getMapInfoId()) && odt.getColumnNo().equals(newdt.getColumnNo())) {
                     found = true;
                     break;
                 }
@@ -283,7 +283,7 @@ public class ExchangeMapInfo implements java.io.Serializable {
             found = false;
             for (Iterator<MapInfoDetail> it = getMapInfoDetails().iterator(); it.hasNext(); ) {
                 MapInfoDetail odt = it.next();
-                if (odt.getCid().equals(newdt.getCid())) {
+                if (odt.getMapInfoId().equals(newdt.getMapInfoId()) && odt.getColumnNo().equals(newdt.getColumnNo())) {
                     odt.copy(newdt);
                     found = true;
                     break;
@@ -309,7 +309,7 @@ public class ExchangeMapInfo implements java.io.Serializable {
     public MapInfoTrigger newMapInfoTrigger() {
         MapInfoTrigger res = new MapInfoTrigger();
 
-        res.setMapinfoId(this.getMapInfoId());
+        res.setMapInfoId(this.getMapInfoId());
 
         return res;
     }
@@ -336,7 +336,7 @@ public class ExchangeMapInfo implements java.io.Serializable {
             MapInfoTrigger odt = it.next();
             found = false;
             for (MapInfoTrigger newdt : newObjs) {
-                if (odt.getCid().equals(newdt.getCid())) {
+                if (odt.getMapInfoId().equals(newdt.getMapInfoId()) && odt.getTriggerId().equals(newdt.getTriggerId())) {
                     found = true;
                     break;
                 }
@@ -350,7 +350,7 @@ public class ExchangeMapInfo implements java.io.Serializable {
             found = false;
             for (Iterator<MapInfoTrigger> it = getMapInfoTriggers().iterator(); it.hasNext(); ) {
                 MapInfoTrigger odt = it.next();
-                if (odt.getCid().equals(newdt.getCid())) {
+                if (odt.getMapInfoId().equals(newdt.getMapInfoId()) && odt.getTriggerId().equals(newdt.getTriggerId())) {
                     odt.copy(newdt);
                     found = true;
                     break;

@@ -1,9 +1,10 @@
 package com.centit.dde.po;
 
-import com.centit.support.database.orm.GeneratorType;
-import com.centit.support.database.orm.ValueGenerator;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 
 /**
@@ -17,10 +18,15 @@ import javax.persistence.*;
 public class ExchangeTaskDetail implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-    @EmbeddedId
-    @Column(name="CID")
-    @ValueGenerator(strategy = GeneratorType.AUTO)
-    private ExchangeTaskDetailId cid;
+    @Id
+    @Column(name="MAPINFO_ID")
+    @NotBlank(message = "字段不能为空")
+    private Long mapInfoId;
+
+    @Id
+    @Column(name="TASK_ID")
+    @NotBlank(message = "字段不能为空")
+    private Long taskId;
 
     @Column(name="MAPINFO_ORDER")
     private Long mapInfoOrder;
@@ -33,54 +39,16 @@ public class ExchangeTaskDetail implements java.io.Serializable {
     public ExchangeTaskDetail() {
     }
 
-    /**
-     * minimal constructor
-     */
-    public ExchangeTaskDetail(ExchangeTaskDetailId id) {
-        this.cid = id;
+    public ExchangeTaskDetail(@NotBlank(message = "字段不能为空") Long mapInfoId, @NotBlank(message = "字段不能为空") Long taskId) {
+        this.mapInfoId = mapInfoId;
+        this.taskId = taskId;
     }
 
-    /**
-     * full constructor
-     */
-    public ExchangeTaskDetail(ExchangeTaskDetailId id, Long mapInfoOrder) {
-        this.cid = id;
-
+    public ExchangeTaskDetail(@NotBlank(message = "字段不能为空") Long mapInfoId, @NotBlank(message = "字段不能为空") Long taskId, Long mapInfoOrder) {
+        this.mapInfoId = mapInfoId;
+        this.taskId = taskId;
         this.mapInfoOrder = mapInfoOrder;
     }
-
-    public ExchangeTaskDetailId getCid() {
-        return this.cid;
-    }
-
-    public void setCid(ExchangeTaskDetailId id) {
-        this.cid = id;
-    }
-
-    public Long getMapInfoId() {
-        if (this.cid == null)
-            this.cid = new ExchangeTaskDetailId();
-        return this.cid.getMapInfoId();
-    }
-
-    public void setMapInfoId(Long mapInfoId) {
-        if (this.cid == null)
-            this.cid = new ExchangeTaskDetailId();
-        this.cid.setMapInfoId(mapInfoId);
-    }
-
-    public Long getTaskId() {
-        if (this.cid == null)
-            this.cid = new ExchangeTaskDetailId();
-        return this.cid.getTaskId();
-    }
-
-    public void setTaskId(Long taskId) {
-        if (this.cid == null)
-            this.cid = new ExchangeTaskDetailId();
-        this.cid.setTaskId(taskId);
-    }
-
 
     // Property accessors
 
@@ -112,6 +80,22 @@ public class ExchangeTaskDetail implements java.io.Serializable {
         if (other.getMapInfoOrder() != null)
             this.mapInfoOrder = other.getMapInfoOrder();
 
+    }
+
+    public Long getMapInfoId() {
+        return mapInfoId;
+    }
+
+    public void setMapInfoId(Long mapInfoId) {
+        this.mapInfoId = mapInfoId;
+    }
+
+    public Long getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
     }
 
     public void clearProperties() {

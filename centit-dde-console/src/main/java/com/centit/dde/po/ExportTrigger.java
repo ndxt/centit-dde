@@ -1,9 +1,10 @@
 package com.centit.dde.po;
 
-import com.centit.support.database.orm.GeneratorType;
-import com.centit.support.database.orm.ValueGenerator;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 
 /**
@@ -15,11 +16,16 @@ import javax.persistence.*;
 @Table(name="D_EXPORT_TRIGGER")
 public class ExportTrigger implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
-    
-    @EmbeddedId
-    @Column(name="CID")
-    @ValueGenerator(strategy = GeneratorType.AUTO)
-    private ExportTriggerId cid;
+
+    @Id
+    @Column(name="TRIGGER_ID")
+    @NotBlank(message = "字段不能为空")
+    private Long triggerId;
+
+    @Id
+    @Column(name="EXPORT_ID")
+    @NotBlank(message = "字段不能为空")
+    private Long exportId;
     
     @Column(name="TRIGGER_SQL")
     private String triggerSql;
@@ -99,69 +105,22 @@ public class ExportTrigger implements java.io.Serializable {
     public ExportTrigger() {
     }
 
-    /**
-     * minimal constructor
-     */
-    public ExportTrigger(ExportTriggerId id
-
-    ) {
-        this.cid = id;
-
-
+    public ExportTrigger(@NotBlank(message = "字段不能为空") Long triggerId, @NotBlank(message = "字段不能为空") Long exportId) {
+        this.triggerId = triggerId;
+        this.exportId = exportId;
     }
 
-    /**
-     * full constructor
-     */
-    public ExportTrigger(ExportTriggerId id
-            , String triggerSql, String triggerDesc, String triggerType,
-                         String triggerTime, Long tiggerOrder, String isprocedure) {
-        this.cid = id;
-
-
+    public ExportTrigger(@NotBlank(message = "字段不能为空") Long triggerId, @NotBlank(message = "字段不能为空") Long exportId, String triggerSql, String triggerDesc, String triggerType, String triggerTime, Long tiggerOrder, String isprocedure) {
+        this.triggerId = triggerId;
+        this.exportId = exportId;
         this.triggerSql = triggerSql;
         this.triggerDesc = triggerDesc;
         this.triggerType = triggerType;
         this.triggerTime = triggerTime;
-
         this.tiggerOrder = tiggerOrder;
         this.isprocedure = isprocedure;
     }
-
-    public ExportTriggerId getCid() {
-        return this.cid;
-    }
-
-    public void setCid(ExportTriggerId id) {
-        this.cid = id;
-    }
-
-    public Long getTriggerId() {
-        if (this.cid == null)
-            this.cid = new ExportTriggerId();
-        return this.cid.getTriggerId();
-    }
-
-    public void setTriggerId(Long triggerId) {
-        if (this.cid == null)
-            this.cid = new ExportTriggerId();
-        this.cid.setTriggerId(triggerId);
-    }
-
-    public Long getExportId() {
-        if (this.cid == null)
-            this.cid = new ExportTriggerId();
-        return this.cid.getExportId();
-    }
-
-    public void setExportId(Long exportId) {
-        if (this.cid == null)
-            this.cid = new ExportTriggerId();
-        this.cid.setExportId(exportId);
-    }
-
-
-    // Property accessors
+// Property accessors
 
     public String getTriggerSql() {
         return this.triggerSql;
@@ -204,6 +163,21 @@ public class ExportTrigger implements java.io.Serializable {
         this.tiggerOrder = tiggerOrder;
     }
 
+    public Long getTriggerId() {
+        return triggerId;
+    }
+
+    public void setTriggerId(Long triggerId) {
+        this.triggerId = triggerId;
+    }
+
+    public Long getExportId() {
+        return exportId;
+    }
+
+    public void setExportId(Long exportId) {
+        this.exportId = exportId;
+    }
 
     public void copy(ExportTrigger other) {
 

@@ -1,7 +1,6 @@
 package com.centit.dde.dao;
 
 import com.centit.dde.po.ExchangeTaskDetail;
-import com.centit.dde.po.ExchangeTaskDetailId;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
@@ -9,11 +8,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @Repository
-public class ExchangeTaskDetailDao extends BaseDaoImpl<ExchangeTaskDetail,ExchangeTaskDetailId> {
+public class ExchangeTaskDetailDao extends BaseDaoImpl<ExchangeTaskDetail, Serializable> {
 
     public static final Log log = LogFactory.getLog(ExchangeTaskDetailDao.class);
     @Override
@@ -64,7 +64,7 @@ public class ExchangeTaskDetailDao extends BaseDaoImpl<ExchangeTaskDetail,Exchan
 
     public void deleteDetails(Long taskId, Long mapinfoId) {
         //String hql = "delete ExchangeTaskDetail e where e.cid.taskId="+taskId+" and e.cid.mapinfoId="+mapinfoId;
-        this.deleteObjectById(new ExchangeTaskDetailId(mapinfoId, taskId));
+        this.deleteObjectById(new ExchangeTaskDetail(mapinfoId, taskId));
     }
 
     public void deleteDetailsByMapinfoId(Long mapinfoId) {

@@ -1,9 +1,7 @@
 package com.centit.dde.po;
 
-import com.centit.support.database.orm.GeneratorType;
-import com.centit.support.database.orm.ValueGenerator;
-
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 /**
  * create by scaffold
@@ -15,10 +13,15 @@ import javax.persistence.*;
 public class ExportField implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-    @EmbeddedId
-    @Column(name="CID")
-    @ValueGenerator(strategy = GeneratorType.AUTO)
-    private ExportFieldId cid;
+    @Id
+    @Column(name="EXPORT_ID")
+    @NotBlank(message = "字段不能为空")
+    private Long exportId;
+
+    @Id
+    @Column(name="COLUMN_NO")
+    @NotBlank(message = "字段不能为空")
+    private Long columnNo;
 
     /**
      * 字段名称
@@ -67,67 +70,48 @@ public class ExportField implements java.io.Serializable {
     public ExportField() {
     }
 
-    /**
-     * minimal constructor
-     */
-    public ExportField(ExportFieldId id
+    public ExportField(@NotBlank(message = "字段不能为空") Long exportId, @NotBlank(message = "字段不能为空") Long columnNo) {
+        this.exportId = exportId;
+        this.columnNo = columnNo;
+    }
 
-            , String fieldName, String fieldSentence) {
-        this.cid = id;
-
+    public ExportField(@NotBlank(message = "字段不能为空") Long exportId,
+                       @NotBlank(message = "字段不能为空") Long columnNo,
+                        String fieldName, String fieldSentence) {
+        this.exportId = exportId;
+        this.columnNo = columnNo;
         this.fieldName = fieldName;
         this.fieldSentence = fieldSentence;
     }
 
-    /**
-     * full constructor
-     */
-    public ExportField(ExportFieldId id
-
-            , String fieldName, String fieldSentence, String fieldType, String fieldFormat, String fieldStoreType, String isPk) {
-        this.cid = id;
-
+    public ExportField(@NotBlank(message = "字段不能为空") Long exportId, @NotBlank(message = "字段不能为空") Long columnNo, String fieldName, String fieldSentence, String fieldType, String fieldFormat, String fieldStoreType, String isPk, String isNull) {
+        this.exportId = exportId;
+        this.columnNo = columnNo;
         this.fieldName = fieldName;
         this.fieldSentence = fieldSentence;
         this.fieldType = fieldType;
         this.fieldFormat = fieldFormat;
         this.fieldStoreType = fieldStoreType;
         this.isPk = isPk;
-    }
-
-    public ExportFieldId getCid() {
-        return this.cid;
-    }
-
-    public void setCid(ExportFieldId id) {
-        this.cid = id;
+        this.isNull = isNull;
     }
 
     public Long getExportId() {
-        if (this.cid == null)
-            this.cid = new ExportFieldId();
-        return this.cid.getExportId();
+        return exportId;
     }
 
     public void setExportId(Long exportId) {
-        if (this.cid == null)
-            this.cid = new ExportFieldId();
-        this.cid.setExportId(exportId);
+        this.exportId = exportId;
     }
 
     public Long getColumnNo() {
-        if (this.cid == null)
-            this.cid = new ExportFieldId();
-        return this.cid.getColumnNo();
+        return columnNo;
     }
 
     public void setColumnNo(Long columnNo) {
-        if (this.cid == null)
-            this.cid = new ExportFieldId();
-        this.cid.setColumnNo(columnNo);
+        this.columnNo = columnNo;
     }
-
-    // Property accessors
+// Property accessors
 
     public String getFieldName() {
         return this.fieldName;
@@ -266,7 +250,7 @@ public class ExportField implements java.io.Serializable {
 
     @Override
     public int hashCode() {
-        return getCid().hashCode();
+        return String.valueOf(getColumnNo()+getExportId()).hashCode();
     }
 
     @Override
@@ -278,7 +262,8 @@ public class ExportField implements java.io.Serializable {
             return false;
         }
 
-        return this.getCid().equals(((ExportField) obj).getCid());
+        return this.getColumnNo().equals(((ExportField) obj).getColumnNo()) &&
+            this.getExportId().equals(((ExportField) obj).getExportId());
     }
 
 }

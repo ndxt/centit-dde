@@ -47,7 +47,7 @@ public class MapInfoTriggerController extends BaseController {
         if (object == null) {
 //                object = getEntityClass().newInstance();
         } else {
-            MapInfoTrigger o = mapinfoTriggerMag.getObjectById(object.getCid());
+            MapInfoTrigger o = mapinfoTriggerMag.getObjectById(object);
             if (o != null)
                 object.copy(o);
             else
@@ -60,13 +60,13 @@ public class MapInfoTriggerController extends BaseController {
     @RequestMapping(value="/saveTrigger",method = {RequestMethod.PUT})
     public void saveTrigger(MapInfoTrigger object, HttpServletResponse response) {
         try {
-            MapInfoTrigger dbObject = mapinfoTriggerMag.getObjectById(object.getCid());
+            MapInfoTrigger dbObject = mapinfoTriggerMag.getObjectById(object);
             if (dbObject != null) {
                 object.copyNotNullProperty(dbObject);
                 object = dbObject;
             }
-            if (object.getCid().getTriggerId() == null) {
-                object.getCid().setTriggerId(
+            if (object.getTriggerId() == null) {
+                object.setTriggerId(
                         this.mapinfoTriggerMag.getTriggerId());
             }
             mapinfoTriggerMag.saveNewObject(object);
@@ -83,13 +83,13 @@ public class MapInfoTriggerController extends BaseController {
     @RequestMapping(value="/addAndsaveTrigger",method = {RequestMethod.PUT})
     public void addAndsaveTrigger(MapInfoTrigger object, HttpServletRequest request, HttpServletResponse response) {
         try {
-            MapInfoTrigger dbObject = mapinfoTriggerMag.getObjectById(object.getCid());
+            MapInfoTrigger dbObject = mapinfoTriggerMag.getObjectById(object);
             if (dbObject != null) {
                 object.copyNotNullProperty(dbObject);
                 object = dbObject;
             }
-            if (object.getCid().getTriggerId() == null) {
-                object.getCid().setTriggerId(
+            if (object.getTriggerId() == null) {
+                object.setTriggerId(
                         this.mapinfoTriggerMag.getTriggerId());
             }
             mapinfoTriggerMag.saveNewObject(object);
@@ -105,7 +105,7 @@ public class MapInfoTriggerController extends BaseController {
 
     @RequestMapping(value="/delete",method = {RequestMethod.DELETE})
     public void delete(MapInfoTrigger object, HttpServletRequest request, HttpServletResponse response) {
-        mapinfoTriggerMag.deleteObjectById(object.getCid());
+        mapinfoTriggerMag.deleteObject(object);
 
         JsonResultUtils.writeSuccessJson(response);
     }

@@ -126,7 +126,7 @@ public class TableMapInfo {
                 } else {
                     map.setNullable(false);
                 }
-                map.setOrder(mapInfoDetail.getCid().getColumnNo().intValue());
+                map.setOrder(mapInfoDetail.getColumnNo().intValue());
                 map.setRightName(mapInfoDetail.getDestFieldName());
                 fieldsMap.add(map);
             }
