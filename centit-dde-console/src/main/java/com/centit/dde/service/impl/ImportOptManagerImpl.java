@@ -6,10 +6,10 @@ import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.*;
 import com.centit.dde.service.ImportOptManager;
 import com.centit.dde.util.ConnPool;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
-import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
+import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
+import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -154,7 +154,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
                     object.setImportId(importOptDao.getNextLongSequence());
 
                     setImportFieldTriggerCid(object);
-                    saveObject(object);
+                    saveNewObject(object);
 
                     // importOptDao.flush();
                 } else {
@@ -178,7 +178,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
                     object = dbObject;
 
                 }
-                saveObject(object);
+                saveNewObject(object);
             }
         }catch(SqlResolveException e){
             log.error("保存失败", e);

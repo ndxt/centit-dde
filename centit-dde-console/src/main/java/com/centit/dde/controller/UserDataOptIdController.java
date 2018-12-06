@@ -33,7 +33,7 @@ public class UserDataOptIdController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> searchColumn = convertSearchColumn(request);
-        List<UserDataOptId> objList = userDataOptIdManager.listObjects(searchColumn, pageDesc);
+        List<UserDataOptId> objList = userDataOptIdManager.listObjects(searchColumn);
         ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, objList);
         resData.addResponseData(PAGE_DESC, pageDesc);
@@ -48,7 +48,7 @@ public class UserDataOptIdController extends BaseController {
         } else {
             object.setLastModifyDate(new Date());
         }
-        userDataOptIdManager.saveObject(object);
+        userDataOptIdManager.saveNewObject(object);
         JsonResultUtils.writeSuccessJson(response);
     }
 

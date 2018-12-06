@@ -3,7 +3,7 @@ package com.centit.dde.service;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportSql;
-import com.centit.framework.hibernate.service.BaseEntityManager;
+import com.centit.framework.jdbc.service.BaseEntityManager;
 import com.centit.framework.model.basedata.IUserInfo;
 
 import java.util.List;

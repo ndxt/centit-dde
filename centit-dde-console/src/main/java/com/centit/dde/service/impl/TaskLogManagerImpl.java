@@ -1,18 +1,16 @@
 package com.centit.dde.service.impl;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
-
+import com.centit.dde.dao.TaskLogDao;
+import com.centit.dde.po.TaskLog;
+import com.centit.dde.service.TaskLogManager;
+import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
-import com.centit.dde.dao.TaskLogDao;
-import com.centit.dde.po.TaskLog;
-import com.centit.dde.service.TaskLogManager;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 @Service
 public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog,Long,TaskLogDao>
         implements TaskLogManager {
@@ -38,7 +36,7 @@ public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog,Long,TaskL
 
     @Override
     public void flush() {
-        taskLogDao.flush();
+        //taskLogDao.flush();
     }
 }
 

@@ -167,7 +167,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         taskDetailLog.setOsId(osInfo.getOsId());
         Date beginTime = DatetimeOpt.currentSqlDate();
         taskDetailLog.setRunBeginTime(beginTime);
-        taskDetailLogManager.saveObject(taskDetailLog);
+        taskDetailLogManager.saveNewObject(taskDetailLog);
 
 
         TaskLog taskLog = taskLogManager.getObjectById(taskLogId);
@@ -197,12 +197,12 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         if ("0:ok".equals(res)) {
             taskDetailLog.setSuccessPieces(1l);
             taskDetailLog.setErrorPieces(0l);
-            taskDetailLogManager.saveObject(taskDetailLog);
+            taskDetailLogManager.saveNewObject(taskDetailLog);
             return 0;
         } else {// write log
             taskDetailLog.setSuccessPieces(0l);
             taskDetailLog.setErrorPieces(1l);
-            taskDetailLogManager.saveObject(taskDetailLog);
+            taskDetailLogManager.saveNewObject(taskDetailLog);
             return -3;
         }
     }
@@ -435,7 +435,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         taskDetailLog.setMapinfoId(importOpt.getImportId());
         Date beginTime = DatetimeOpt.currentSqlDate();
         taskDetailLog.setRunBeginTime(beginTime);
-        taskDetailLogManager.saveObject(taskDetailLog);
+        taskDetailLogManager.saveNewObject(taskDetailLog);
 
         String msg = null;
         TaskLog taskLog = taskLogManager.getObjectById(taskLogId);
@@ -593,7 +593,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
                         taskErrorData.setErrorMessage(sLastErrorMsg);
                         taskErrorData.setDataContent(xmlData.getRowElement(i).asXML());
                         // taskErrorDataManager.saveTaskErrorData(taskErrorData);
-                        taskErrorDataManager.saveObject(taskErrorData);
+                        taskErrorDataManager.saveNewObject(taskErrorData);
                         // e.printStackTrace();
 
                         se = e;
@@ -637,7 +637,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         taskDetailLog.setSuccessPieces(nRows - nErrors);
         taskDetailLog.setErrorPieces(nErrors);
         taskDetailLog.setRunEndTime(endTime);
-        taskDetailLogManager.saveObject(taskDetailLog);
+        taskDetailLogManager.saveNewObject(taskDetailLog);
 
         if (null != se) {
             TaskConsoleWriteUtils.writeError(taskId, se.getMessage());

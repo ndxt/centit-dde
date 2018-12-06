@@ -3,8 +3,8 @@ package com.centit.dde.dao;
 import com.centit.dde.po.MapInfoTrigger;
 import com.centit.dde.po.MapInfoTriggerId;
 import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
@@ -50,10 +50,10 @@ public class MapInfoTriggerDao extends BaseDaoImpl<MapInfoTrigger,MapInfoTrigger
         sql.append("from MapInfoTrigger t where  t.cid.mapInfoId=");
         sql.append(mapinfoId);
         sql.append(" order by t.triggerTime, t.tiggerOrder");
-        return listObjects(sql.toString());
+        return this.listTriggerByMapinfoId(mapinfoId);
     }
 
     public Long getTriggerId() {
-        return DatabaseOptUtils.getNextLongSequence(this,"D_TRIGGERID");
+        return DatabaseOptUtils.getSequenceNextValue(this, "D_TRIGGERID");
     }
 }

@@ -9,12 +9,12 @@ import com.centit.dde.po.MapInfoDetailId;
 import com.centit.dde.po.MapInfoTrigger;
 import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.util.ConnPool;
-import com.centit.support.database.utils.PageDesc;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
+import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.database.utils.PageDesc;
 import com.centit.support.database.utils.QueryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +104,7 @@ public class ExchangeMapInfoManagerImpl
 
             fields.add(sourceFieldName.toUpperCase());
 
-            if ("1".equals(ef.getIsPk())) {
+            if ("Y".equals(ef.getIsPk())) {
                 pkNum++;
             }
         }
@@ -169,10 +169,10 @@ public class ExchangeMapInfoManagerImpl
         sql.append("select count(*) as mapCount from D_EXCHANGE_MAPINFO t where t.mapinfo_name = ? ");
         if(id != null){
             sql.append("and t.mapinfo_id <> ?");
-            obj  = DatabaseOptUtils.getSingleObjectBySql(baseDao, sql.toString(),
-                    new Object[]{name, id} );
+            obj  = DatabaseOptUtils.getScalarObjectQuery(baseDao, sql.toString(),
+                new Object[]{name, id});
         }else{
-            obj  = DatabaseOptUtils.getSingleObjectBySql(baseDao, sql.toString(),
+            obj  = DatabaseOptUtils.getScalarObjectQuery(baseDao, sql.toString(),
                     new Object[]{name} );
         }
         Long uc = NumberBaseOpt.castObjectToLong(obj);
@@ -241,5 +241,9 @@ public class ExchangeMapInfoManagerImpl
             }
         }
         return mapInfoDetails;
+    }
+
+    public ExchangeMapInfo getObjectById(Long mapInfoId){
+        return  exchangeMapInfoDao.getObjectById(mapInfoId);
     }
 }

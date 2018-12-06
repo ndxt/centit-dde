@@ -4,7 +4,7 @@ import com.centit.dde.dao.MapInfoTriggerDao;
 import com.centit.dde.po.MapInfoTrigger;
 import com.centit.dde.po.MapInfoTriggerId;
 import com.centit.dde.service.MapInfoTriggerManager;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;

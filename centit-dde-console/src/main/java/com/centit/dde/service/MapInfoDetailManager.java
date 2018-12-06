@@ -1,13 +1,12 @@
 package com.centit.dde.service;
 
-import java.util.List;
-import java.util.Map;
-
-
 import com.centit.dde.po.MapInfoDetail;
 import com.centit.dde.po.MapInfoDetailId;
-import com.centit.framework.hibernate.service.BaseEntityManager;
 import com.centit.framework.ip.po.DatabaseInfo;
+import com.centit.framework.jdbc.service.BaseEntityManager;
+
+import java.util.List;
+import java.util.Map;
 
 public interface MapInfoDetailManager extends BaseEntityManager<MapInfoDetail,MapInfoDetailId> {
     public List<Map<String, String>> getGoalTableStruct(DatabaseInfo DatabaseInfo, String tableName);

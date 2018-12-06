@@ -72,7 +72,7 @@ public class ImportDataImpl implements ImportData {
         taskLog.setRunType(runType);
         taskLog.setRunner(userCode);
         taskLog.setTaskType("3");
-        taskLogManager.saveObject(taskLog);
+        taskLogManager.saveNewObject(taskLog);
         int nError = 0;
         int nSucceed = 0;
         reader.setDataDirPath(filePath);
@@ -125,7 +125,7 @@ public class ImportDataImpl implements ImportData {
 
         taskLog.setRunEndTime(DatetimeOpt.currentSqlDate());
         taskLog.setOtherMessage(message);
-        taskLogManager.saveObject(taskLog);
+        taskLogManager.saveNewObject(taskLog);
         return 0;
     }
 
@@ -166,7 +166,7 @@ public class ImportDataImpl implements ImportData {
 
         ExchangeTask exchangeTask = exchangeTaskDao.getObjectById(taskID);
         exchangeTask.setLastRunTime(DatetimeOpt.currentSqlDate());
-        exchangeTaskDao.saveObject(exchangeTask);
+        exchangeTaskDao.saveNewObject(exchangeTask);
         msg = "开始执行导入：" + exchangeTask.getTaskName() + "........";
         logger.info(msg);
 

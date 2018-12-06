@@ -30,7 +30,8 @@ public class DataOptInfoController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> searchColumn = convertSearchColumn(request);
-        List<DataOptInfo> objList = dataOptInfoManager.listObjects(searchColumn, pageDesc);
+        //List<DataOptInfo> objList = dataOptInfoManager.listObjects(searchColumn, pageDesc);
+        List<DataOptInfo> objList = dataOptInfoManager.listObjects(searchColumn);
         ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, objList);
         resData.addResponseData(PAGE_DESC, pageDesc);

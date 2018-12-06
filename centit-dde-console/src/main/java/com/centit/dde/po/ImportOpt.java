@@ -1,6 +1,8 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
+import com.centit.support.database.orm.GeneratorType;
+import com.centit.support.database.orm.Lazy;
+import com.centit.support.database.orm.ValueGenerator;
 
 import javax.persistence.*;
 import java.util.*;
@@ -17,8 +19,7 @@ public class ImportOpt implements java.io.Serializable {
 
     @Id
     @Column(name="IMPORT_ID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
+    @ValueGenerator(strategy = GeneratorType.AUTO)
     private Long importId;
 
     /**
@@ -66,12 +67,14 @@ public class ImportOpt implements java.io.Serializable {
     @Column(name="RECORD_OPERATE")
     private String recordOperate;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-    @JoinColumn(name="import_Id") //这里表示数据库的外键 在t_street里面创建
+    @Lazy
+    @OneToMany(targetEntity=ImportTrigger.class)
+    @JoinColumn(name="IMPORT_ID",referencedColumnName="IMPORT_ID") //这里表示数据库的外键 在t_street里面创建
     private List<ImportTrigger> importTriggers = null;
-    
-    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-    @JoinColumn(name="import_Id") //这里表示数据库的外键 在t_street里面创建
+
+    @Lazy
+    @OneToMany(targetEntity=ImportField.class)
+    @JoinColumn(name="IMPORT_ID",referencedColumnName="IMPORT_ID") //这里表示数据库的外键 在t_street里面创建
     private List<ImportField> importFields = null;// new
 
     // Constructors

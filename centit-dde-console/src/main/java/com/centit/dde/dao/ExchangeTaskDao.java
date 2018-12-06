@@ -2,9 +2,9 @@ package com.centit.dde.dao;
 
 import com.centit.dde.po.ExchangeTask;
 import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.framework.ip.po.DatabaseInfo;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.DbcpConnectPools;
 import org.apache.commons.logging.Log;
@@ -157,7 +157,7 @@ public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask,Long> {
 
     public String getMapinfoName(Long mapinfoId) {
         String hql = "select t.mapinfoName from ExchangeMapInfo t where t.mapinfoId=" + mapinfoId;
-        Object o = DatabaseOptUtils.getSingleObjectByHql(this,hql);
+        Object o = DatabaseOptUtils.getObjectBySqlAsJson(this, hql);
         if (o == null)
             return "";
         return o.toString();
@@ -165,7 +165,7 @@ public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask,Long> {
     }
 
     public Long getNewTaskId() {
-        return DatabaseOptUtils.getNextLongSequence(this,"D_TASK_ID");
+        return DatabaseOptUtils.getSequenceNextValue(this,"D_TASK_ID");
     }
 
 

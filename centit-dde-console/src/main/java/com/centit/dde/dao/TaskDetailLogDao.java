@@ -2,8 +2,8 @@ package com.centit.dde.dao;
 
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
@@ -40,7 +40,7 @@ public class TaskDetailLogDao extends BaseDaoImpl<TaskDetailLog,Long> {
     }
 
     public Long getTaskDetailLogId() {
-        return DatabaseOptUtils.getNextLongSequence(this,"D_TASKDETAILLOGID");
+        return DatabaseOptUtils.getSequenceNextValue(this, "D_TASKDETAILLOGID");
     }
 
 }

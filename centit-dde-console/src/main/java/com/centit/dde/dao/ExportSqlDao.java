@@ -5,9 +5,9 @@ import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportFieldId;
 import com.centit.dde.po.ExportSql;
 import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.framework.ip.po.DatabaseInfo;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,23 +63,25 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
     }
 
     public void flush() {
-        DatabaseOptUtils.flush(this.getCurrentSession());
+        //DatabaseOptUtils.flush(this.getCurrentSession());
     }
 
-    @Override
+    //@Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void saveObject(ExportSql o) {
         if (null == o.getExportId()) {
             o.setExportId(getNextLongSequence());
         }
-        super.saveObject(o);
+        super.saveNewObject(o);
     }
 
     @SuppressWarnings("unchecked")
     public String getMapinfoName(Long mapinfoId) {
         String hql = "select t.exportName from ExportSql t where t.exportId=?" ;
-        List<String> listObjects = (List<String>)DatabaseOptUtils.findObjectsByHql(
-                this,hql, new Object[]{mapinfoId});
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("exportId",mapinfoId);
+        List<Object[]> listObjects = DatabaseOptUtils.listObjectsByNamedSql(
+            this, hql, filterMap);
 
         if (!CollectionUtils.isEmpty(listObjects)) {
             return listObjects.get(0).toString();
@@ -88,7 +90,7 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
 
     }
     public Long getNextLongSequence() {
-        return DatabaseOptUtils.getNextLongSequence(this,"D_MAPINFOID");
+        return DatabaseOptUtils.getSequenceNextValue(this,"D_MAPINFOID");
     }
 
     public List<String> listDbTables(DatabaseInfo dbinfo) throws SqlResolveException {
@@ -164,8 +166,9 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
 
     public ExportSql fetchObjectById(Long exportId) {
         String hql = "select distinct s from ExportSql s join fetch s.exportTriggers join fetch s.exportFields where s.exportId = ?";
-
-        List<ExportSql> listObjects = this.listObjects(hql, exportId);
+        Map<String,Object> filterMap = new HashMap<>();
+        filterMap.put("exportId",exportId);
+        List<ExportSql> listObjects = this.listObjectsBySql(hql, filterMap);
 
         if (!CollectionUtils.isEmpty(listObjects)) {
             return listObjects.get(0);
@@ -173,7 +176,7 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
 
         hql = "select distinct s from ExportSql s join fetch s.exportFields where s.exportId = ?";
 
-        listObjects = this.listObjects(hql, exportId);
+        listObjects = this.listObjectsBySql(hql, filterMap);
 
         if (CollectionUtils.isEmpty(listObjects)) {
             ExportSql exportSql = getObjectById(exportId);
@@ -194,7 +197,8 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
             return null;
         // Type[] params = getClass().getTypeParameters();
         try {
-            return (ExportSql) getCurrentSession().load(ExportSql.class, id);
+            //return (ExportSql) getCurrentSession().load(ExportSql.class, id);
+            return  this.getObjectById((Object)id);
             //return (T) getCurrentSession().get(getClassTName(), id);
         } catch (Exception e) {
             logger.error(e.getMessage());

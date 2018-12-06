@@ -1,6 +1,7 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
+import com.centit.support.database.orm.GeneratorType;
+import com.centit.support.database.orm.ValueGenerator;
 
 import javax.persistence.*;
 
@@ -15,10 +16,10 @@ import javax.persistence.*;
 @Table(name="D_DATA_OPT_STEP")
 public class DataOptStep implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
+
     @Id
     @Column(name = "OPT_STEP_ID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
+    @ValueGenerator(strategy = GeneratorType.AUTO)
     private Long optStepId;
     
     @Column(name = "IMPORT_ID")

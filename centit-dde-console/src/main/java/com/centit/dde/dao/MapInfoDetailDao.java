@@ -4,9 +4,9 @@ import com.centit.dde.po.MapInfoDetail;
 import com.centit.dde.po.MapInfoDetailId;
 import com.centit.dde.util.ConnPool;
 import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.framework.ip.po.DatabaseInfo;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.database.utils.DBType;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.logging.Log;
@@ -68,7 +68,7 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId>
         sql.append("from MapInfoDetail t where  t.cid.mapInfoId=");
         sql.append(mapinfoId);
         sql.append(" order by t.cid.columnNo ");
-        return listObjects(sql.toString());
+        return this.listByMapinfoId(mapinfoId);
     }
     
     /**
@@ -239,7 +239,7 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId>
     public List<Map<String, String>> getSourceTableStructFromDatabase(Long mapinfoId) {
         String sql = "select t.source_field_name as ColumnName,t.source_field_type as ColumnType,"
                 + "t.source_field_sentence as SOURCECOLUMNSENTENCE from D_MAPINFO_DETAIL t where t.mapinfo_id=?  order by t.column_no";
-        return  (List<Map<String, String>>)DatabaseOptUtils.findObjectsBySql(this, sql,new Object[]{mapinfoId});
+        return  (List<Map<String, String>>) DatabaseOptUtils.getScalarObjectQuery(this, sql, new Object[]{mapinfoId});
     }
 
 
@@ -248,7 +248,7 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId>
                 + "t.is_pk as isPk,t.is_null as isNullable,t.dest_field_default as destfielddefault from D_MAPINFO_DETAIL "
                 + "t where t.mapinfo_id=? order by t.column_no";
 
-        return  (List<Map<String, String>>)DatabaseOptUtils.findObjectsBySql(this, sql,new Object[]{mapinfoId});
+        return  (List<Map<String, String>>)DatabaseOptUtils.getScalarObjectQuery(this, sql,new Object[]{mapinfoId});
     }
 
     /**
@@ -344,9 +344,9 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId>
     public void deleteMapinfoDetails(Long mapinfoId) {
         // this.deleteObjectById(mapinfoId);
 
-        String hql = "delete from MapInfoDetail d where d.cid.mapInfoId = ?";
+        String hql = "delete from MapInfoDetail d where d.cid.mapInfoId = "+mapinfoId;
 
-        DatabaseOptUtils.doExecuteHql(this,hql, mapinfoId);
+        DatabaseOptUtils.doExecuteSql(this,hql);
     }
 
     /**
@@ -357,7 +357,7 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId>
                 + QueryUtils.buildStringForQuery(soueceTableName) + ",t.dest_tablename="
                 + QueryUtils.buildStringForQuery(goalTableName) + ",t.QUERY_SQL="
                 + QueryUtils.buildStringForQuery(createSql) + " where t.mapinfo_id=" + mapinfoId;
-        DatabaseOptUtils.doExecuteHql(this,sql);
+        DatabaseOptUtils.doExecuteSql(this,sql);
     }
 
     @SuppressWarnings("unchecked")
@@ -373,7 +373,7 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId>
                         + QueryUtils.buildStringForQuery(sFieldDescs.get(i)) + ",t.source_field_name="
                         + QueryUtils.buildStringForQuery(sStrs.get(i)) + "  where t.column_no=" + (i + 1)
                         + " and t.mapinfo_id=" + mapinfoId;
-                DatabaseOptUtils.doExecuteHql(this,sql);
+                DatabaseOptUtils.doExecuteSql(this,sql);
                 i++;
             }
             while (i >= length && i < sStrs.size()) {
@@ -385,7 +385,7 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId>
                         + QueryUtils.buildStringForQuery(sFieldDescs.get(i))
                         + ","
                         + QueryUtils.buildStringForQuery(sStrs.get(i)) + ")";
-                DatabaseOptUtils.doExecuteHql(this,sql);
+                DatabaseOptUtils.doExecuteSql(this,sql);
                 i++;
             }
 
@@ -399,7 +399,7 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId>
                         + QueryUtils.buildStringForQuery(sFieldDescs.get(i)) + ",t.source_field_name="
                         + QueryUtils.buildStringForQuery(sStrs.get(i)) + " where t.column_no=" + (i + 1)
                         + " and t.mapinfo_id=" + mapinfoId;
-                DatabaseOptUtils.doExecuteHql(this,sql);
+                DatabaseOptUtils.doExecuteSql(this,sql);
             }
         }
     }
@@ -407,24 +407,27 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail,MapInfoDetailId>
     private long countSourceField() {
         String hql = "select count(t.sourceFieldName) as length from MapInfoDetail t";
 
-        return DatabaseOptUtils.getSingleIntByHql(this,hql);
+        //DatabaseOptUtils.getScalarObjectQuery(this,hql);
+        return  1;
     }
 
     public Long getMapinfoId() {
-        return DatabaseOptUtils.getNextLongSequence(this,"D_MAPINFOID");
+        return DatabaseOptUtils.getSequenceNextValue(this,"D_MAPINFOID");
     }
 
     @SuppressWarnings("unchecked")
     public List<String> getGoalColumnStrut(Long mapinfoId) {
         String sql = "select t.dest_field_name from D_MAPINFO_DETAIL t where t.mapinfo_id=" + mapinfoId
                 + " order by t.column_no";
-        return (List<String>) DatabaseOptUtils.findObjectsBySql(this,sql);
 
+        //List<Object[]> statResults = DatabaseOptUtils.listObjectsBySql(this,sql,(Object) mapinfoId);
+        //return (List<String>) DatabaseOptUtils.getScalarObjectQuery(this,sql);
+        return null;
     }
 
     public void saveMapinfoDetails(MapInfoDetail mapInfoDetail) {
-        DatabaseOptUtils.flush(this.getCurrentSession());
-        this.saveObject(mapInfoDetail);
+        //DatabaseOptUtils.flush(this.getCurrentSession());
+        this.saveNewObject(mapInfoDetail);
     }
 
 }

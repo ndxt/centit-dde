@@ -1,6 +1,8 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
+import com.centit.support.database.orm.GeneratorType;
+import com.centit.support.database.orm.Lazy;
+import com.centit.support.database.orm.ValueGenerator;
 
 import javax.persistence.*;
 import java.util.*;
@@ -17,8 +19,7 @@ public class ExportSql implements java.io.Serializable {
 
     @Id
     @Column(name="EXPORT_ID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
+    @ValueGenerator(strategy = GeneratorType.AUTO)
     private Long exportId;
 
     /**
@@ -92,13 +93,15 @@ public class ExportSql implements java.io.Serializable {
      */
     @Column(name="TABLE_STORE_TYPE")
     private String tableStoreType;
-    
-    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-    @JoinColumn(name="EXPORT_ID")
+
+    @Lazy
+    @OneToMany(targetEntity=ExportTrigger.class)
+    @JoinColumn(name="EXPORT_ID", referencedColumnName="EXPORT_ID")
     private List<ExportTrigger> exportTriggers = null;
-    
-    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-    @JoinColumn(name="EXPORT_ID")
+
+    @Lazy
+    @OneToMany(targetEntity=ExportField.class)
+    @JoinColumn(name="EXPORT_ID", referencedColumnName="EXPORT_ID")
     private List<ExportField> exportFields = null;// new
     // ArrayList<ExportField>();
 

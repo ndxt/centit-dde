@@ -40,9 +40,9 @@ public class TaskDetailLogController extends BaseController {
                 TaskDetailLog o = taskDetailLogMag.getObjectById(object.getLogDetailId());
                 if (o != null)
                     // 将对象o copy给object，object自己的属性会保留
-                    taskDetailLogMag.copyObject(object, o);
+                    object.copy(o);
                 else
-                    taskDetailLogMag.clearObjectProperties(object);
+                    object.clearProperties();
             }
             if (null != object.getMapinfoId()) {
 //                ServletActionContext.getContext().put("exchangeMapinfo", exchangeMapInfoManager.getObjectById(object.getMapInfoId()));
@@ -60,7 +60,7 @@ public class TaskDetailLogController extends BaseController {
     public void save(TaskDetailLog object ,HttpServletRequest request,HttpServletResponse response, List<TaskErrorData> taskErrorDatas) {
         object.replaceTaskErrorDatas(taskErrorDatas);
 //        super.save();
-        taskDetailLogMag.saveObject(object);
+        taskDetailLogMag.saveNewObject(object);
         
 //        return super.save();
         JsonResultUtils.writeSuccessJson(response);

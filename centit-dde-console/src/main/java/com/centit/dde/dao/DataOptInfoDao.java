@@ -3,8 +3,8 @@ package com.centit.dde.dao;
 import com.centit.dde.po.DataOptInfo;
 import com.centit.dde.po.DataOptStep;
 import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,11 +38,11 @@ public class DataOptInfoDao extends BaseDaoImpl<DataOptInfo,String> {
     }
 
     public void flush() {
-        DatabaseOptUtils.flush(this.getCurrentSession());
+        //DatabaseOptUtils.flush(this.getCurrentSession());
     }
 
     public Long getNextLongSequence() {
-        return DatabaseOptUtils.getNextLongSequence(this,"D_MAPINFOID");
+        return DatabaseOptUtils.getSequenceNextValue(this,"D_MAPINFOID");
     }
 
     @SuppressWarnings("unchecked")
@@ -51,7 +51,7 @@ public class DataOptInfoDao extends BaseDaoImpl<DataOptInfo,String> {
                 + "from DataOptStep dos, ImportOpt io, DataOptInfo doi "
                 + "where dos.importId = io.importId and dos.dataOptId = doi.dataOptId and doi.dataOptId = :dataOptId order by dos.mapinfoOrder";
 
-        return (List<DataOptStep>) DatabaseOptUtils.findObjectsByHql(this,hql, 
+        return (List<DataOptStep>) DatabaseOptUtils.getObjectBySqlAsJson(this,hql,
                 QueryUtils.createSqlParamsMap("dataOptId", object.getDataOptId()));
     }
 }

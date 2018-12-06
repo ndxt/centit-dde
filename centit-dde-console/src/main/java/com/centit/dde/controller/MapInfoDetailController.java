@@ -517,7 +517,7 @@ public class MapInfoDetailController extends BaseController {
             exchangeMapInfo.setQuerySql(sql);
             exchangeMapInfo.setDestDatabaseName(goaldatabaseName);
             exchangeMapInfo.setDestTableName(goalTableName);
-            exchangeMapInfoManager.saveObject(exchangeMapInfo);
+            exchangeMapInfoManager.saveNewObject(exchangeMapInfo);
         } else {
             mapinfoDetailMag.updateExchangeMapinfo(mapInfoId, soueceTableName, goalTableName, transferWord(sql));
         }

@@ -1,10 +1,10 @@
 package com.centit.dde.service;
 
-import java.util.List;
-
 import com.centit.dde.po.ExchangeTaskDetail;
 import com.centit.dde.po.ExchangeTaskDetailId;
-import com.centit.framework.hibernate.service.BaseEntityManager;
+import com.centit.framework.jdbc.service.BaseEntityManager;
+
+import java.util.List;
 
 public interface ExchangeTaskdetailManager extends BaseEntityManager<ExchangeTaskDetail,ExchangeTaskDetailId> {
     public List<Long> getMapinfoIdUsed(Long taskId);
@@ -16,6 +16,8 @@ public interface ExchangeTaskdetailManager extends BaseEntityManager<ExchangeTas
     public String getMapinfoName(Long mapinfoId);
 
     public void deleteDetailsByMapinfoId(Long mapinfoId);
+
+    public List<ExchangeTaskDetail> getTaskDetails(Long taskId);
 
     /**
      * 添加交换对应关系

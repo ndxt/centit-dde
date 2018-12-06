@@ -4,7 +4,7 @@ import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExchangeMapInfo;
 import com.centit.dde.po.MapInfoDetail;
 import com.centit.support.database.utils.PageDesc;
-import com.centit.framework.hibernate.service.BaseEntityManager;
+import com.centit.framework.jdbc.service.BaseEntityManager;
 import com.centit.framework.ip.po.DatabaseInfo;
 
 import java.util.List;
@@ -19,4 +19,6 @@ public interface ExchangeMapInfoManager extends BaseEntityManager<ExchangeMapInf
     List<ExchangeMapInfo> listObjectExcludeUsed(Map<String, Object> filterMap, PageDesc pageDesc);
 
     List<MapInfoDetail> resolveSQL(DatabaseInfo databaseInfo, String sql);
+
+    public ExchangeMapInfo getObjectById(Long mapInfoId);
 }

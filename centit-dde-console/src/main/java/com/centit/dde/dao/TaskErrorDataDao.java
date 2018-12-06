@@ -2,8 +2,8 @@ package com.centit.dde.dao;
 
 import com.centit.dde.po.TaskErrorData;
 import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
@@ -36,7 +36,7 @@ public class TaskErrorDataDao extends BaseDaoImpl<TaskErrorData,Long> {
     }
 
     public Long getTaskErrorId() {
-        return DatabaseOptUtils.getNextLongSequence(this,"D_TASKERRORID");
+        return DatabaseOptUtils.getSequenceNextValue(this, "D_TASKERRORID");
     }
 
     public void saveTaskErrorData(TaskErrorData taskErrorData) {
@@ -45,7 +45,7 @@ public class TaskErrorDataDao extends BaseDaoImpl<TaskErrorData,Long> {
 	                 +taskErrorData.getErrorMessage()+
 	    		     "')";*/
 
-        saveObject(taskErrorData);
+        saveNewObject(taskErrorData);
     }
 
 }

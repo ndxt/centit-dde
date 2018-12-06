@@ -1,7 +1,7 @@
 package com.centit.dde.service;
 
 import com.centit.dde.po.ExchangeTask;
-import com.centit.framework.hibernate.service.BaseEntityManager;
+import com.centit.framework.jdbc.service.BaseEntityManager;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.ip.po.DatabaseInfo;
 

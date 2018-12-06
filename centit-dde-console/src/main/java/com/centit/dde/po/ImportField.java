@@ -1,6 +1,7 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
+import com.centit.support.database.orm.GeneratorType;
+import com.centit.support.database.orm.ValueGenerator;
 
 import javax.persistence.*;
 
@@ -16,8 +17,7 @@ public class ImportField implements java.io.Serializable {
 
     @EmbeddedId
     @Column(name="CID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
+    @ValueGenerator(strategy = GeneratorType.AUTO)
     private ImportFieldId cid;
 
     /**

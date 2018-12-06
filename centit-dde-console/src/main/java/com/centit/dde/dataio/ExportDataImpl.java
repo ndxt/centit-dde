@@ -284,7 +284,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
                         }
                         taskErrorData.setDataContent(sb.toString());
                         // taskErrorDataManager.saveTaskErrorData(taskErrorData);
-                        taskErrorDataManager.saveObject(taskErrorData);
+                        taskErrorDataManager.saveNewObject(taskErrorData);
                     }
                     // e.printStackTrace();
                 }
@@ -348,7 +348,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
     public String runExportTask(Long taskID, String userCode, String runType,String taskType) {
         ExchangeTask exchangeTask = exchangeTaskDao.getObjectById(taskID);
         exchangeTask.setLastRunTime(DatetimeOpt.currentSqlDate());
-        exchangeTaskDao.saveObject(exchangeTask);
+        exchangeTaskDao.saveNewObject(exchangeTask);
         String msg = "开始执行任务编号 = " + taskID + " 导出任务名称 = " + exchangeTask.getTaskName() + " 的导出任务........";
         logger.info(msg);
 
@@ -364,7 +364,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
         taskLog.setRunType(runType);
         taskLog.setRunner(userCode);
         taskLog.setTaskType(taskType);
-        taskLogManager.saveObject(taskLog);
+        taskLogManager.saveNewObject(taskLog);
 
         ExchangeFileWriter ef = new ExchangeFileWriter();
 
@@ -405,7 +405,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
             taskDetailLog.setExportId(exportSql.getExportId());
             Date beginTime = DatetimeOpt.currentSqlDate();
             taskDetailLog.setRunBeginTime(beginTime);
-            taskDetailLogManager.saveObject(taskDetailLog);
+            taskDetailLogManager.saveNewObject(taskDetailLog);
 
             TableFileWriter tableWriter = new TableFileWriter();
 
@@ -441,7 +441,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
                 TaskConsoleWriteUtils.writeInfo(taskID, msg);
             }
-            taskDetailLogManager.saveObject(taskDetailLog);
+            taskDetailLogManager.saveNewObject(taskDetailLog);
 
         }
         ef.writeDataEnd();
@@ -462,7 +462,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
         // TaskLog taskLogTemp = taskLogManager.getObjectById(taskLogId);
         taskLog.setRunEndTime(DatetimeOpt.currentSqlDate());
         taskLog.setOtherMessage(message);
-        taskLogManager.saveObject(taskLog);
+        taskLogManager.saveNewObject(taskLog);
 
         return message;
 
@@ -497,7 +497,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
     public String runCallServiceTask(Long taskID, String userCode, String runType, String taskType) {
         ExchangeTask exchangeTask = exchangeTaskDao.getObjectById(taskID);
         exchangeTask.setLastRunTime(DatetimeOpt.currentSqlDate());
-        exchangeTaskDao.saveObject(exchangeTask);
+        exchangeTaskDao.saveNewObject(exchangeTask);
         logger.info("开始执行导出：" + exchangeTask.getTaskName() + "........");
         List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskDetailDao.getTaskDetails(taskID);
 
@@ -509,7 +509,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
         taskLog.setRunType(runType);
         taskLog.setRunner(userCode);
         taskLog.setTaskType(taskType);
-        taskLogManager.saveObject(taskLog);
+        taskLogManager.saveNewObject(taskLog);
 
         int nError = 0;
         int nSucceed = 0;
@@ -526,7 +526,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
             taskDetailLog.setExportId(exportSql.getExportId());
             Date beginTime = DatetimeOpt.currentSqlDate();
             taskDetailLog.setRunBeginTime(beginTime);
-            taskDetailLogManager.saveObject(taskDetailLog);
+            taskDetailLogManager.saveNewObject(taskDetailLog);
 
             TableFileWriter tableWriter = new TableFileWriter();
 
@@ -556,7 +556,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
                 taskDetailLog.setSuccessPieces(Long.valueOf(nRes));
 
             }
-            taskDetailLogManager.saveObject(taskDetailLog);
+            taskDetailLogManager.saveNewObject(taskDetailLog);
 
         }
 
@@ -567,7 +567,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
         // TaskLog taskLogTemp = taskLogManager.getObjectById(taskLogId);
         taskLog.setRunEndTime(DatetimeOpt.currentSqlDate());
         taskLog.setOtherMessage(message);
-        taskLogManager.saveObject(taskLog);
+        taskLogManager.saveNewObject(taskLog);
 
         return message;
 

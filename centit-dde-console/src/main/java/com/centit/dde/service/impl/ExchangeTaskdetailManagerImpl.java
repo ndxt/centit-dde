@@ -4,7 +4,7 @@ import com.centit.dde.dao.ExchangeTaskDetailDao;
 import com.centit.dde.po.ExchangeTaskDetail;
 import com.centit.dde.po.ExchangeTaskDetailId;
 import com.centit.dde.service.ExchangeTaskdetailManager;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
@@ -75,9 +75,12 @@ public class ExchangeTaskdetailManagerImpl
             exchangeTaskDetailId.setTaskId(taskId);
             exchangeTaskDetail.setCid(exchangeTaskDetailId);
             exchangeTaskDetail.setMapInfoOrder(used.size() + i + 1L);
-            saveObject(exchangeTaskDetail);
+            saveNewObject(exchangeTaskDetail);
         }
 
     }
 
+    public List<ExchangeTaskDetail> getTaskDetails(Long taskId) {
+        return exchangeTaskDetailDao.getTaskDetails(taskId);
+    }
 }

@@ -1,16 +1,15 @@
 package com.centit.dde.service.impl;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
-
+import com.centit.dde.dao.TaskErrorDataDao;
+import com.centit.dde.po.TaskErrorData;
+import com.centit.dde.service.TaskErrorDataManager;
+import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
-import com.centit.dde.dao.TaskErrorDataDao;
-import com.centit.dde.po.TaskErrorData;
-import com.centit.dde.service.TaskErrorDataManager;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 @Service
 public class TaskErrorDataManagerImpl extends BaseEntityManagerImpl<TaskErrorData,Long,TaskErrorDataDao>
         implements TaskErrorDataManager {
@@ -40,7 +39,7 @@ public class TaskErrorDataManagerImpl extends BaseEntityManagerImpl<TaskErrorDat
 
     @Override
     public void flush() {
-        taskErrorDataDao.flush();
+        //taskErrorDataDao.flush();
     }
 }
 

@@ -2,8 +2,8 @@ package com.centit.dde.dao;
 
 import com.centit.dde.po.UserDataOptId;
 import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
@@ -41,11 +41,11 @@ public class UserDataOptIdDao extends BaseDaoImpl<UserDataOptId,Long> {
         return filterField;
     }
 
-    @Override
+    //@Override
     public void saveObject(UserDataOptId o) {
         if (null == o.getUdId()) {
-            o.setUdId(DatabaseOptUtils.getNextLongSequence(this,"S_USER_DATAOPTID"));
+            o.setUdId(DatabaseOptUtils.getSequenceNextValue(this, "S_USER_DATAOPTID"));
         }
-        super.saveObject(o);
+        super.saveNewObject(o);
     }
 }

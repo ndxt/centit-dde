@@ -4,7 +4,7 @@ import com.centit.dde.dao.DataOptInfoDao;
 import com.centit.dde.po.DataOptInfo;
 import com.centit.dde.po.DataOptStep;
 import com.centit.dde.service.DataOptInfoManager;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import com.centit.framework.model.basedata.IUserInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,14 +41,14 @@ public class DataOptInfoManagerImpl
             object.setCreated(userDetail.getUserCode());
             object.setCreateTime(new Date());
 
-            dataOptInfoDao.saveObject(object);
+            dataOptInfoDao.saveNewObject(object);
         } else {
             dbObject.setLastUpdateTime(new Date());
 
             dbObject.copyNotNullProperty(object);
             dbObject.replaceDataOptSteps(object.getDataOptSteps());
 
-            dataOptInfoDao.saveObject( dbObject);
+            dataOptInfoDao.saveNewObject( dbObject);
         }
     }
 

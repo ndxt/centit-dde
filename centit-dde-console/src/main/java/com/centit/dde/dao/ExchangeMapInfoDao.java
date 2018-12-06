@@ -2,9 +2,9 @@ package com.centit.dde.dao;
 
 import com.centit.dde.po.ExchangeMapInfo;
 import com.centit.framework.core.dao.CodeBook;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.database.utils.PageDesc;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,8 +49,8 @@ public class ExchangeMapInfoDao extends BaseDaoImpl<ExchangeMapInfo,Long> {
 
     @SuppressWarnings("unchecked")
     public List<String> listDatabaseName() {
-        return (List<String>) DatabaseOptUtils.findObjectsByHql(this,
-                "select t.databaseName from DatabaseInfo t");
+        return (List<String>) DatabaseOptUtils.getObjectBySqlAsJson(this,
+            "select t.databaseName from DatabaseInfo t");
         //return this.getHibernateTemplate().getSessionFactory().openSession().createSQLQuery("select t.databaseName from DatabaseInfo t").list();
     }
 
@@ -59,16 +59,17 @@ public class ExchangeMapInfoDao extends BaseDaoImpl<ExchangeMapInfo,Long> {
             mapInfoId.add(Long.valueOf(-1));
         }
         String hql = "from ExchangeMapInfo e where e.mapInfoId not in (?)";
-        return this.listObjects(hql, (Object) mapInfoId);
+        //return this.listObjects(hql, (Object) mapInfoId);
+        return  this.listObjects();
     }
 
     public Long getNextLongSequence() {
-        return DatabaseOptUtils.getNextLongSequence(this,"D_MAPINFOID");
+        return DatabaseOptUtils.getSequenceNextValue(this,"D_MAPINFOID");
     }
 
 
     public void flush() {
-        DatabaseOptUtils.flush(this.getCurrentSession());
+        //DatabaseOptUtils.flush(this.getCurrentSession());
         //getHibernateTemplate().clear();
     }
 
@@ -82,8 +83,21 @@ public class ExchangeMapInfoDao extends BaseDaoImpl<ExchangeMapInfo,Long> {
        /* pageDesc.setTotalRows( Long.valueOf( DatabaseOptUtils.getSingleIntByHql(this,
                 "select count(ma.mapInfoId) " + hql)).intValue()
                 );*/
-        return (List<ExchangeMapInfo>)DatabaseOptUtils.findObjectsByHql(this, "select ma " + hql,
+        return (List<ExchangeMapInfo>)DatabaseOptUtils.getScalarObjectQuery(this, "select ma " + hql,
                 QueryUtils.createSqlParamsMap(
-                        "taskId", filterMap.get("taskId")) , pageDesc);
+                        "taskId", filterMap.get("taskId")));
+    }
+
+    public ExchangeMapInfo getObjectById(Long mapInfoId) {
+        ExchangeMapInfo exchangeMapInfo = new ExchangeMapInfo();
+        if (mapInfoId!=null &&!"".equals(mapInfoId)) {
+            exchangeMapInfo = super.getObjectById(mapInfoId);
+            //exchangeMapInfo = super.fetchObjectReferences(exchangeMapInfo);
+            exchangeMapInfo = super.getObjectWithReferences(mapInfoId);
+            //super.fetchObjectReferences(exchangeMapInfo);
+            //super.fetchObjectReference(exchangeMapInfo,"mapInfoDetails");
+            //super.fetchObjectLazyColumns(exchangeMapInfo);
+        } else exchangeMapInfo=null;
+        return exchangeMapInfo;
     }
 }

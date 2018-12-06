@@ -768,7 +768,7 @@ public class TransferManagerImpl implements TransferManager {
         taskLog.setRunBeginTime(DatetimeOpt.currentSqlDate());
         taskLog.setRunType("1");
         taskLog.setRunner(userCode);
-        taskLogManager.saveObject(taskLog);
+        taskLogManager.saveNewObject(taskLog);
         TransferResult transferResult = runDataMap(exchangeMapInfo, taskLogId);
         int nRes = transferResult.getRes();
         taskLog.setRunEndTime(DatetimeOpt.currentSqlDate());

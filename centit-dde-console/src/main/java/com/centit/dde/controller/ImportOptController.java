@@ -39,7 +39,7 @@ public class ImportOptController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public void list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> filterMap = convertSearchColumn(request);
-        List<ImportOpt> listObjects = importOptManager.listObjects(filterMap, pageDesc);
+        List<ImportOpt> listObjects = importOptManager.listObjects(filterMap);
         ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, listObjects);
         resData.addResponseData(PAGE_DESC, pageDesc);

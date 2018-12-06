@@ -3,9 +3,9 @@ package com.centit.dde.dao;
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ImportOpt;
 import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.framework.ip.po.DatabaseInfo;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.DbcpConnectPools;
 import org.apache.commons.logging.Log;
@@ -58,13 +58,15 @@ public class ImportOptDao extends BaseDaoImpl<ImportOpt,Long> {
     }
 
     public Long getNextLongSequence() {
-        return DatabaseOptUtils.getNextLongSequence(this,"D_MAPINFOID");
+        return DatabaseOptUtils.getSequenceNextValue(this, "D_MAPINFOID");
     }
     public String getMapinfoName(Long mapinfoId) {
         String hql = "select t.importName from ImportOpt t where t.importId=?" ;
         @SuppressWarnings("unchecked")
-        List<String> listObjects = (List<String>)DatabaseOptUtils.findObjectsByHql(
-                this,hql, new Object[]{mapinfoId});
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("importId",mapinfoId);
+        List<Object[]> listObjects = DatabaseOptUtils.listObjectsByNamedSql(
+                this,hql,filterMap);
 
         if (!CollectionUtils.isEmpty(listObjects)) {
             return listObjects.get(0).toString();
@@ -73,7 +75,7 @@ public class ImportOptDao extends BaseDaoImpl<ImportOpt,Long> {
 
     }
     public void flush() {
-        DatabaseOptUtils.flush(this.getCurrentSession());
+        //DatabaseOptUtils.flush(this.getCurrentSession());
 
     }
 

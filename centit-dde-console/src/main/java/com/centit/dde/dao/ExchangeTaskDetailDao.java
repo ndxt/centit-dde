@@ -3,8 +3,8 @@ package com.centit.dde.dao;
 import com.centit.dde.po.ExchangeTaskDetail;
 import com.centit.dde.po.ExchangeTaskDetailId;
 import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
@@ -40,19 +40,26 @@ public class ExchangeTaskDetailDao extends BaseDaoImpl<ExchangeTaskDetail,Exchan
     @SuppressWarnings("unchecked")
     public List<Long> getMapinfoIdUsed(Long taskId) {
         String hql = "select e.cid.mapInfoId from ExchangeTaskDetail e where e.cid.taskId=" + taskId + " order by e.mapInfoOrder";
-        return (List<Long>) DatabaseOptUtils.findObjectsByHql(this,hql);
+        return (List<Long>) DatabaseOptUtils.getObjectBySqlAsJson(this,hql);
     }
 
     public List<ExchangeTaskDetail> getTaskDetails(Long taskId) {
-        return listObjects(
-            "from ExchangeTaskDetail where task_id=? order by mapInfoOrder",
-            taskId);
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("task_Id",taskId);
+        List<ExchangeTaskDetail> list = listObjectsBySql(
+            "select task_id,mapinfo_id,mapinfo_order from D_EXCHANGE_TASKDETAIL where task_Id=:task_Id ",
+            filterMap);
+        return  list;
+//        return this.listObjectsBySql(
+//            "select * from D_EXCHANGE_TASKDETAIL where task_Id=:task_Id ",
+//            filterMap);
     }
 
     public Long getMapinfoOrder(Long taskId) {
 
         String hql = "select nvl(max(e.mapinfoOrder),0) from ExchangeTaskDetail e where e.cid.taskId=" + taskId;
-        return DatabaseOptUtils.getSingleIntByHql(this,hql);
+        //return DatabaseOptUtils.getSingleIntByHql(this,hql);
+        return null;
     }
 
     public void deleteDetails(Long taskId, Long mapinfoId) {
@@ -62,17 +69,17 @@ public class ExchangeTaskDetailDao extends BaseDaoImpl<ExchangeTaskDetail,Exchan
 
     public void deleteDetailsByMapinfoId(Long mapinfoId) {
         String hql = "delete ExchangeTaskDetail e where e.cid.mapinfoId=" + mapinfoId;
-        DatabaseOptUtils.doExecuteHql(this,hql);
+        DatabaseOptUtils.doExecuteSql(this,hql);
     }
 
     public void deleteDetailsByTaskId(Long taskId) {
-        String hql = "delete ExchangeTaskDetail e where e.cid.taskId = ?";
-        DatabaseOptUtils.doExecuteHql(this,hql, taskId);
+        String hql = "delete ExchangeTaskDetail e where e.cid.taskId = "+taskId;
+        DatabaseOptUtils.doExecuteSql(this,hql);
     }
 
     public void updateDetailOrder(Long taskId, Long mapOrder) {
         String hql = "update ExchangeTaskDetail d set d.mapinfoOrder = d.mapinfoOrder - 1 where d.cid.taskId = ? and d.mapinfoOrder > ?";
 
-        DatabaseOptUtils.doExecuteHql(this,hql, new Object[]{taskId, mapOrder});
+        DatabaseOptUtils.doExecuteSql(this,hql, new Object[]{taskId, mapOrder});
     }
 }

@@ -2,8 +2,8 @@ package com.centit.dde.dao;
 
 import com.centit.dde.po.TaskLog;
 import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
@@ -51,7 +51,7 @@ public class TaskLogDao extends BaseDaoImpl<TaskLog,Long> {
     }
 
     public Long getTaskLogId() {
-        return DatabaseOptUtils.getNextLongSequence(this,"D_TASKLOGID");
+        return DatabaseOptUtils.getSequenceNextValue(this, "D_TASKLOGID");
     }
 
   @SuppressWarnings("unchecked")
@@ -73,7 +73,10 @@ public class TaskLogDao extends BaseDaoImpl<TaskLog,Long> {
                   "where to_char(trunc(a.run_begin_time,'mm'),'yyyymm')=? "+
                   "GROUP BY to_char(trunc(a.run_begin_time),'yyyy-mm-dd')";
       }
-      return (List<String[]>)DatabaseOptUtils.findObjectsBySql(this,sql,new Object[]{o});
+
+      //DatabaseOptUtils.listObjectsByNamedSql(this,sql,new Object[]{o});
+
+      return null;
   }
 
 }

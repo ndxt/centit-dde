@@ -1,6 +1,9 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
+
+import com.centit.support.database.orm.GeneratorType;
+import com.centit.support.database.orm.ValueGenerator;
+import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.*;
 import java.util.*;
@@ -17,8 +20,7 @@ public class ExchangeMapInfo implements java.io.Serializable {
 
     @Id
     @Column(name="MAPINFO_ID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
+    @ValueGenerator(strategy = GeneratorType.AUTO)
     private Long mapInfoId;
     
     @Column(name="DEST_DATABASE_NAME")
@@ -51,16 +53,19 @@ public class ExchangeMapInfo implements java.io.Serializable {
     @Transient
     private Long mapInfoOrder;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-    @JoinColumn(name="MAPINFO_ID")
+    //@Lazy
+    @OneToMany(targetEntity=MapInfoDetail.class)
+    @JoinColumn(name="MAPINFO_ID", referencedColumnName="MAPINFO_ID")
     private List<MapInfoDetail> mapInfoDetails;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-    @JoinColumn(name="MAPINFO_ID")
+    //@Lazy
+    @OneToMany(targetEntity=MapInfoTrigger.class)
+    @JoinColumn(name="MAPINFO_ID", referencedColumnName="MAPINFO_ID")
     private List<MapInfoTrigger> mapInfoTriggers;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-    @JoinColumn(name="MAPINFO_ID")
+    //@Lazy
+    @OneToMany(targetEntity=ExchangeTaskDetail.class)
+    @JoinColumn(name="MAPINFO_ID", referencedColumnName="MAPINFO_ID")
     private List<ExchangeTaskDetail> exchangeTaskDetails;
 
     public List<ExchangeTaskDetail> getExchangeTaskDetails() {
@@ -406,4 +411,5 @@ public class ExchangeMapInfo implements java.io.Serializable {
         this.mapInfoDesc = null;
 
     }
+
 }

@@ -49,9 +49,9 @@ public class MapInfoTriggerController extends BaseController {
         } else {
             MapInfoTrigger o = mapinfoTriggerMag.getObjectById(object.getCid());
             if (o != null)
-                mapinfoTriggerMag.copyObject(object, o);
+                object.copy(o);
             else
-                mapinfoTriggerMag.clearObjectProperties(object);
+                object.clearProperties();
         }
 //            return EDIT;
         JsonResultUtils.writeSingleDataJson(object,response);
@@ -62,14 +62,14 @@ public class MapInfoTriggerController extends BaseController {
         try {
             MapInfoTrigger dbObject = mapinfoTriggerMag.getObjectById(object.getCid());
             if (dbObject != null) {
-                mapinfoTriggerMag.copyObjectNotNullProperty(dbObject, object);
+                object.copyNotNullProperty(dbObject);
                 object = dbObject;
             }
             if (object.getCid().getTriggerId() == null) {
                 object.getCid().setTriggerId(
                         this.mapinfoTriggerMag.getTriggerId());
             }
-            mapinfoTriggerMag.saveObject(object);
+            mapinfoTriggerMag.saveNewObject(object);
 //            savedMessage();
 //            return "saveTrigger";
             JsonResultUtils.writeSuccessJson(response);
@@ -85,14 +85,14 @@ public class MapInfoTriggerController extends BaseController {
         try {
             MapInfoTrigger dbObject = mapinfoTriggerMag.getObjectById(object.getCid());
             if (dbObject != null) {
-                mapinfoTriggerMag.copyObjectNotNullProperty(dbObject, object);
+                object.copyNotNullProperty(dbObject);
                 object = dbObject;
             }
             if (object.getCid().getTriggerId() == null) {
                 object.getCid().setTriggerId(
                         this.mapinfoTriggerMag.getTriggerId());
             }
-            mapinfoTriggerMag.saveObject(object);
+            mapinfoTriggerMag.saveNewObject(object);
 //            savedMessage();
 //            return "addAndsaveTrigger";
             JsonResultUtils.writeSuccessJson(response);

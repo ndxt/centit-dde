@@ -52,7 +52,8 @@ public class ExchangeMapInfoController extends BaseController {
     @RequestMapping(value="/list" ,method = {RequestMethod.GET})
     public void list(PageDesc pageDesc,HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> searchColumn = convertSearchColumn(request);
-        List<ExchangeMapInfo> objList = exchangeMapInfoManager.listObjects(searchColumn, pageDesc);
+        List<ExchangeMapInfo> objList = exchangeMapInfoManager.listObjects(searchColumn);//pageDesc
+        pageDesc.setTotalRows(objList.size());
         ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, objList);
         resData.addResponseData(PAGE_DESC, pageDesc);

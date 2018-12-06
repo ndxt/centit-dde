@@ -68,7 +68,7 @@ public class ExchangeTaskController extends BaseController {
         }else{
             searchColumn.put("isvalid", "1");
         }
-        List<ExchangeTask>  objList = exchangeTaskMag.listObjects(searchColumn, pageDesc);
+        List<ExchangeTask>  objList = exchangeTaskMag.listObjects(searchColumn);//pageDesc
 
         ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, objList);
@@ -109,7 +109,8 @@ public class ExchangeTaskController extends BaseController {
                 taskCron = true;
             }
             if (dbObject != null) {
-               exchangeTaskMag.copyObjectNotNullProperty(dbObject, object);
+                dbObject.copyNotNullProperty(object);
+
 //                BeanUtils.copyProperties(object, dbObject, new String[] { "taskLogs" });
 //                dbObject.addAll(object.getTaskLogs());
             }
@@ -171,7 +172,7 @@ public class ExchangeTaskController extends BaseController {
             exchangeTask =new ExchangeTask();
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("task_Id", taskId);
-        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailManager.listObjects(filterMap);
+        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailManager.getTaskDetails(taskId);
 
         List<ExportSql> exportSqlList = new ArrayList<>();
 
@@ -244,9 +245,10 @@ public class ExchangeTaskController extends BaseController {
                 ExchangeTask o = exchangeTaskMag.getObjectById(taskId);
                 if (o != null)
                     // 将对象o copy给object，object自己的属性会保留
-                    exchangeTaskMag.copyObject(object, o);
+                    object.copy(o);
+
                 else
-                    exchangeTaskMag.clearObjectProperties(object);
+                    object.clearProperties();
                     object.setTaskType(s_taskType);
             }
 //            return "add";
@@ -267,7 +269,7 @@ public class ExchangeTaskController extends BaseController {
         try {
             ExchangeTask o = exchangeTaskMag.getObjectById(taskId);
             Map<String, Object> searchColumn = convertSearchColumn(request);
-            List<ExchangeTask> objList = exchangeTaskMag.listObjects(searchColumn, pageDesc);
+            List<ExchangeTask> objList = exchangeTaskMag.listObjects(searchColumn);
             if (object == null) {
 //                /page/dde/mapinfoTriggerList.jsp
 //                return LIST;
@@ -278,7 +280,7 @@ public class ExchangeTaskController extends BaseController {
                 JsonResultUtils.writeResponseDataAsJson(resData, response);
             }
             if (o != null)
-                exchangeTaskMag.copyObject(object, o);
+                object.copy(o);
 
             // 是否为任务编辑，如果为任务编辑则添加创建人姓名
             if (null != object.getTaskId() && !"".equals(object.getTaskId())) {
@@ -366,7 +368,7 @@ public class ExchangeTaskController extends BaseController {
                 exchangeTaskDetail.setMapInfoId(mapInfoId);
                 exchangeTaskDetail.setMapInfoOrder(Long.valueOf(i + 1));
 
-                exchangeTaskdetailManager.saveObject(exchangeTaskDetail);
+                exchangeTaskdetailManager.saveNewObject(exchangeTaskDetail);
             }
 
         }
@@ -392,7 +394,7 @@ public class ExchangeTaskController extends BaseController {
         }
         //为了 去除重复项
         Map<String, Object> searchColumn = convertSearchColumn(request);
-        List<ExportSql> objList = exportSqlManager.listObjects(searchColumn, pageDesc);
+        List<ExportSql> objList = exportSqlManager.listObjects(searchColumn);
         for(ExportSql sql : exportSqlList ){
             for(int i=0;i< objList.size();i++ ){
                 if(sql.getExportId() == objList.get(i).getExportId()){
@@ -424,7 +426,7 @@ public class ExchangeTaskController extends BaseController {
         }
         //为了 去除重复项
         Map<String, Object> searchColumn = convertSearchColumn(request);
-        List<ExchangeMapInfo> objList = exchangeMapInfoManager.listObjects(searchColumn, pageDesc);
+        List<ExchangeMapInfo> objList = exchangeMapInfoManager.listObjects(searchColumn);
         for(ExchangeMapInfo map : exchangeMapInfoList){
             for(int i=0;i< objList.size();i++ ){
                 if(map.getMapInfoId() == objList.get(i).getMapInfoId()){
@@ -467,7 +469,7 @@ public class ExchangeTaskController extends BaseController {
      */
     @RequestMapping(value="/listExportSql", method = {RequestMethod.GET})
     private void listExportSql(Map<String, Object> filterMap, PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
-        List<ExportSql> exportSqls = exportSqlManager.listObjects(filterMap, pageDesc);
+        List<ExportSql> exportSqls = exportSqlManager.listObjects(filterMap);
 
         List<Long> used = exchangeTaskdetailManager.getMapinfoIdUsed((Long) filterMap.get("taskId"));
 
@@ -507,7 +509,7 @@ public class ExchangeTaskController extends BaseController {
             }
         }
         
-        
+
         String[] str = ExchangeIds.split(",");
         for (String s : str) {
             if (NumberUtils.isCreatable(s)) {
@@ -556,7 +558,7 @@ public class ExchangeTaskController extends BaseController {
         List<Object> logs = exchangeTaskMag.insertDatas(databaseInfoGoal, insertSql, datas);
 
         TaskLog TaskLog = this.generateTaskLog(logs, userDetails.getUserCode(), taskId);
-        taskLogManager.saveObject(TaskLog);
+        taskLogManager.saveNewObject(TaskLog);
 
         this.saveTaskErrorData(logs, TaskLog.getLogId());
 

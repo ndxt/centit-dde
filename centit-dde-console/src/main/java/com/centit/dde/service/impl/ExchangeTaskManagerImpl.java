@@ -6,9 +6,9 @@ import com.centit.dde.dataio.ImportData;
 import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.service.ExchangeTaskManager;
 import com.centit.dde.transfer.TransferManager;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
-import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.ip.po.DatabaseInfo;
+import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
+import com.centit.framework.security.model.CentitUserDetails;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.JobExecutionContext;
@@ -108,7 +108,7 @@ public class ExchangeTaskManagerImpl
         //更新下次执行时间
         CronSequenceGenerator generator = new CronSequenceGenerator(object.getTaskCron(), TimeZone.getDefault());
         object.setNextRunTime(generator.next(new Date()));
-        exchangeTaskDao.saveObject(object);
+        exchangeTaskDao.saveNewObject(object);
 
         //执行调试
         executeTask(object,"System","0");

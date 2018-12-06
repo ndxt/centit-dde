@@ -1,6 +1,8 @@
 package com.centit.dde.po;
 
 import com.centit.framework.core.dao.DictionaryMap;
+import com.centit.support.database.orm.GeneratorType;
+import com.centit.support.database.orm.ValueGenerator;
 
 import javax.persistence.*;
 
@@ -11,6 +13,7 @@ public class MapInfoDetail implements java.io.Serializable {
     
     @EmbeddedId
     @Column(name="CID")
+    @ValueGenerator(strategy = GeneratorType.AUTO)
     private MapInfoDetailId cid;
 
     @Column(name="SOURCE_FIELD_NAME")

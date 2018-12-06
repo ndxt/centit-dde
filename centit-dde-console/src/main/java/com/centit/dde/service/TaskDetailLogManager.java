@@ -2,7 +2,7 @@ package com.centit.dde.service;
 
 
 import com.centit.dde.po.TaskDetailLog;
-import com.centit.framework.hibernate.service.BaseEntityManager;
+import com.centit.framework.jdbc.service.BaseEntityManager;
 
 /**
  * create by scaffold

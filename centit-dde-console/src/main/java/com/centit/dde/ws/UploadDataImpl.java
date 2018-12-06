@@ -50,8 +50,8 @@ public class UploadDataImpl implements UploadData {
      *
      * @param userName  用户名
      * @param userPin   密码，加密形式
-     * @param database  目标数据库
-     * @param tableDate 数据格式参见离线文件数据格式，为了控制大小可以将大字段单独上传，也可以一起上传
+     //* @param database  目标数据库
+     //* @param tableDate 数据格式参见离线文件数据格式，为了控制大小可以将大字段单独上传，也可以一起上传
      * @return
      */
     @WebMethod
@@ -75,7 +75,7 @@ public class UploadDataImpl implements UploadData {
         taskLog.setRunBeginTime(DatetimeOpt.currentSqlDate());
         taskLog.setRunType("2");
         taskLog.setRunner("ws");
-        taskLogManager.saveObject(taskLog);
+        taskLogManager.saveNewObject(taskLog);
 
         TxtLogFile.writeLog(SysParametersUtils.getStringValue("wsdata") + "/ws" + taskLogId + ".xml", tableData);
         TableFileReader tr = new TableFileReader();
@@ -108,7 +108,7 @@ public class UploadDataImpl implements UploadData {
         // TaskLog taskLogTemp = taskLogManager.getObjectById(taskLogId);
         taskLog.setRunEndTime(DatetimeOpt.currentSqlDate());
         taskLog.setOtherMessage(message);
-        taskLogManager.saveObject(taskLog);
+        taskLogManager.saveNewObject(taskLog);
 
         if (null != ex) {
             return ex.getMessage();
@@ -123,8 +123,8 @@ public class UploadDataImpl implements UploadData {
      *
      * @param userName  用户名
      * @param userPin   密码，加密形式
-     * @param database  目标数据库
-     * @param tableDate 数据格式参见离线文件数据格式，为了控制大小可以将大字段单独上传，也可以一起上传
+     //* @param database  目标数据库
+     //* @param tableDate 数据格式参见离线文件数据格式，为了控制大小可以将大字段单独上传，也可以一起上传
      * @return
      */
     @WebMethod
@@ -148,7 +148,7 @@ public class UploadDataImpl implements UploadData {
         taskLog.setRunBeginTime(DatetimeOpt.currentSqlDate());
         taskLog.setRunType("2");
         taskLog.setRunner("ws");
-        taskLogManager.saveObject(taskLog);
+        taskLogManager.saveNewObject(taskLog);
 
         TableFileReader tr = new TableFileReader();
         try {
@@ -157,7 +157,7 @@ public class UploadDataImpl implements UploadData {
         } catch (Exception e) {
             taskLog.setRunEndTime(DatetimeOpt.currentSqlDate());
             taskLog.setOtherMessage("-4:" + e.getMessage());
-            taskLogManager.saveObject(taskLog);
+            taskLogManager.saveNewObject(taskLog);
             return "-4:" + e.getMessage();
         }
         
@@ -183,7 +183,7 @@ public class UploadDataImpl implements UploadData {
         // TaskLog taskLogTemp = taskLogManager.getObjectById(taskLogId);
         taskLog.setRunEndTime(DatetimeOpt.currentSqlDate());
         taskLog.setOtherMessage(message);
-        taskLogManager.saveObject(taskLog);
+        taskLogManager.saveNewObject(taskLog);
 
         return message;
     }

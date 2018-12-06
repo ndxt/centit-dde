@@ -115,9 +115,9 @@ public class TaskLogController extends BaseController {
                 TaskLog o = taskLogMag.getObjectById(object.getLogId());
                 if (o != null)
                     // 将对象o copy给object，object自己的属性会保留
-                    taskLogMag.copyObject(object, o);
+                    o.copy(object);
                 else
-                    taskLogMag.clearObjectProperties(object);
+                    object.clearProperties();
             }
             for (TaskDetailLog taskDetailLog : object.getTaskDetailLogs()) {
                 if (object.getTaskType().equals("1")) {
@@ -169,7 +169,7 @@ public class TaskLogController extends BaseController {
 
         searchColumn.put("taskId",  Long.parseLong(String.valueOf(searchColumn.get("taskId"))));
 
-        List<TaskLog> objList = taskLogMag.listObjects(searchColumn, pageDesc);
+        List<TaskLog> objList = taskLogMag.listObjects(searchColumn);
 
         ExchangeTask exchangeTask = exchangeTaskManager
                 .getObjectById((Long) searchColumn.get("taskId"));
@@ -218,7 +218,7 @@ public class TaskLogController extends BaseController {
             }
         }
 //        PageDesc pageDesc = makePageDesc();
-        List<TaskLog> objList = taskLogMag.listObjects(searchColumn, pageDesc);
+        List<TaskLog> objList = taskLogMag.listObjects(searchColumn);
 //        totalRows = pageDesc.getTotalRows();
 //        exchangeTasklist = exchangeTaskManager.listObjects();
         if (!"".equals(s)) {
@@ -263,7 +263,7 @@ public class TaskLogController extends BaseController {
     @RequestMapping(value = "/save", method = { RequestMethod.PUT })
     public void save(TaskLog object,HttpServletRequest request, HttpServletResponse response, List<TaskDetailLog> taskDetailLogs) {
         object.replaceTaskDetailLogs(taskDetailLogs);
-        taskLogMag.saveObject(object);
+        taskLogMag.saveNewObject(object);
 
         JsonResultUtils.writeSuccessJson(response);
     }

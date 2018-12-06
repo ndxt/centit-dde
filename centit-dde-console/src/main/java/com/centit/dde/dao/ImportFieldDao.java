@@ -3,7 +3,7 @@ package com.centit.dde.dao;
 import com.centit.dde.po.ImportField;
 import com.centit.dde.po.ImportFieldId;
 import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;

@@ -1,18 +1,16 @@
 package com.centit.dde.service.impl;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
-
+import com.centit.dde.dao.ExportFieldDao;
+import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportFieldId;
-
+import com.centit.dde.service.ExportFieldManager;
+import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
-import com.centit.dde.dao.ExportFieldDao;
-import com.centit.dde.po.ExportField;
-import com.centit.dde.service.ExportFieldManager;
-import com.centit.framework.hibernate.service.BaseEntityManagerImpl;
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 @Service
 public class ExportFieldManagerImpl extends BaseEntityManagerImpl<ExportField,ExportFieldId,ExportFieldDao>
         implements ExportFieldManager {

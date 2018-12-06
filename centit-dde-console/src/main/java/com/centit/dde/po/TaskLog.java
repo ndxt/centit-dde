@@ -1,6 +1,7 @@
 package com.centit.dde.po;
 
-import org.hibernate.annotations.GenericGenerator;
+import com.centit.support.database.orm.GeneratorType;
+import com.centit.support.database.orm.ValueGenerator;
 
 import javax.persistence.*;
 import java.util.*;
@@ -33,8 +34,7 @@ public class TaskLog implements java.io.Serializable {
 
     @Id
     @Column(name="LOG_ID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
+    @ValueGenerator(strategy = GeneratorType.AUTO)
     private Long logId;
 
     @Column(name="TASK_ID")

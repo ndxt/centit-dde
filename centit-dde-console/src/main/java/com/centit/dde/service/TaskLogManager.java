@@ -1,10 +1,9 @@
 package com.centit.dde.service;
 
-import java.util.List;
-
-
 import com.centit.dde.po.TaskLog;
-import com.centit.framework.hibernate.service.BaseEntityManager;
+import com.centit.framework.jdbc.service.BaseEntityManager;
+
+import java.util.List;
 
 /**
  * create by scaffold
