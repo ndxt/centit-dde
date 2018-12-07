@@ -2,7 +2,6 @@ package com.centit.dde.dao;
 
 import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
-import com.centit.dde.po.ExportFieldId;
 import com.centit.dde.po.ExportSql;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.ip.po.DatabaseInfo;

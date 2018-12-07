@@ -90,14 +90,9 @@ public class ExchangeMapInfoDao extends BaseDaoImpl<ExchangeMapInfo,Long> {
 
     public ExchangeMapInfo getObjectById(Long mapInfoId) {
         ExchangeMapInfo exchangeMapInfo = new ExchangeMapInfo();
-        if (mapInfoId!=null &&!"".equals(mapInfoId)) {
-            exchangeMapInfo = super.getObjectById(mapInfoId);
-            //exchangeMapInfo = super.fetchObjectReferences(exchangeMapInfo);
+        if (mapInfoId != null && !"".equals(mapInfoId)) {
             exchangeMapInfo = super.getObjectWithReferences(mapInfoId);
-            //super.fetchObjectReferences(exchangeMapInfo);
-            //super.fetchObjectReference(exchangeMapInfo,"mapInfoDetails");
-            //super.fetchObjectLazyColumns(exchangeMapInfo);
-        } else exchangeMapInfo=null;
+        } else exchangeMapInfo = null;
         return exchangeMapInfo;
     }
 }

@@ -149,15 +149,16 @@ public class ExchangeMapInfoManagerImpl
             }
             setFieldTriggerCid(object);
             saveNewObject(object);
+            exchangeMapInfoDao.saveObjectReferences(object);
         } else {
             dbObject.copyNotNullProperty(object);
-
 
             setFieldTriggerCid(object);
             dbObject.replaceMapInfoDetails(object.getMapInfoDetails());
             dbObject.replaceMapInfoTriggers(object.getMapInfoTriggers());
 
             updateObject(dbObject);
+            exchangeMapInfoDao.saveObjectReferences(dbObject);
         }
 
     }
@@ -190,10 +191,12 @@ public class ExchangeMapInfoManagerImpl
         for (int i = 0; i < object.getMapInfoDetails().size(); i++) {
             md = object.getMapInfoDetails().get(i);
             md.setMapInfoId(object.getMapInfoId());
-            md.setColumnNo((long)i);
+            md.setColumnNo((long) i);
         }
         for (int i = 0; i < object.getMapInfoTriggers().size(); i++) {
             mt = object.getMapInfoTriggers().get(i);
+            mt.setMapInfoId(object.getMapInfoId());
+            mt.setTriggerId((long) i);
             mt.setTiggerOrder((long) i);
         }
     }
@@ -243,7 +246,15 @@ public class ExchangeMapInfoManagerImpl
         return mapInfoDetails;
     }
 
-    public ExchangeMapInfo getObjectById(Long mapInfoId){
-        return  exchangeMapInfoDao.getObjectById(mapInfoId);
+    public ExchangeMapInfo getObjectById(Long mapInfoId) {
+        return exchangeMapInfoDao.getObjectById(mapInfoId);
+    }
+
+    public void deleteObjectById(Long mapInfoId) {
+        ExchangeMapInfo exchangeMapInfo = exchangeMapInfoDao.getObjectById(mapInfoId);
+        if (exchangeMapInfo != null) {
+            exchangeMapInfoDao.deleteObjectById(mapInfoId);
+            exchangeMapInfoDao.deleteObjectReferences(exchangeMapInfo);
+        }
     }
 }

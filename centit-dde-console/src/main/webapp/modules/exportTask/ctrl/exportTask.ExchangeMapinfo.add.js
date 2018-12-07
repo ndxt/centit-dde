@@ -17,6 +17,9 @@ define(function(require) {
 		this.load = function(panel, data) {
 			data = _self.parent.data;
 			var taskId = data.taskId;
+      if (data.taskId==undefined){
+        taskId = -1;
+      }
 			Core.ajax(Config.ContextPath+'service/exchangetask/listExchangeMapInfo/2/'+taskId, {
 				method: 'get'
 			}).then(function(data2) {

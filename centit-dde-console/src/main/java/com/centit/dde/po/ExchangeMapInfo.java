@@ -53,17 +53,17 @@ public class ExchangeMapInfo implements java.io.Serializable {
     @Transient
     private Long mapInfoOrder;
 
-    //@Lazy
+    @Lazy
     @OneToMany(targetEntity=MapInfoDetail.class)
     @JoinColumn(name="MAPINFO_ID", referencedColumnName="MAPINFO_ID")
     private List<MapInfoDetail> mapInfoDetails;
 
-    //@Lazy
+    @Lazy
     @OneToMany(targetEntity=MapInfoTrigger.class)
     @JoinColumn(name="MAPINFO_ID", referencedColumnName="MAPINFO_ID")
     private List<MapInfoTrigger> mapInfoTriggers;
 
-    //@Lazy
+    @Lazy
     @OneToMany(targetEntity=ExchangeTaskDetail.class)
     @JoinColumn(name="MAPINFO_ID", referencedColumnName="MAPINFO_ID")
     private List<ExchangeTaskDetail> exchangeTaskDetails;

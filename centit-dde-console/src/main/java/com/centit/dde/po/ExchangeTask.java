@@ -64,7 +64,9 @@ public class ExchangeTask implements java.io.Serializable {
     private String monitorFolder;//       varchar2(200);
 
     @Transient
-    private Set<ExchangeTaskDetail> exchangeTaskDetails = null;// new
+    @OneToMany(targetEntity=ExchangeTaskDetail.class)
+    @JoinColumn(name="TASK_ID", referencedColumnName="TASK_ID")
+    private List<ExchangeTaskDetail> exchangeTaskDetails = null;// new
     // ArrayList<ExchangeTaskDetail>();
     
     @Transient
@@ -265,20 +267,20 @@ public class ExchangeTask implements java.io.Serializable {
         this.monitorFolder = monitorFolder;
     }
 
-    public Set<ExchangeTaskDetail> getExchangeTaskDetails() {
+    public List<ExchangeTaskDetail> getExchangeTaskDetails() {
         if (this.exchangeTaskDetails == null)
-            this.exchangeTaskDetails = new HashSet<ExchangeTaskDetail>();
+            this.exchangeTaskDetails = new ArrayList<ExchangeTaskDetail>();
         return this.exchangeTaskDetails;
     }
 
     public void setExchangeTaskDetails(
-            Set<ExchangeTaskDetail> exchangeTaskDetails) {
+        List<ExchangeTaskDetail> exchangeTaskDetails) {
         this.exchangeTaskDetails = exchangeTaskDetails;
     }
 
     public void addExchangeTaskdetail(ExchangeTaskDetail exchangeTaskDetail) {
         if (this.exchangeTaskDetails == null)
-            this.exchangeTaskDetails = new HashSet<ExchangeTaskDetail>();
+            this.exchangeTaskDetails = new ArrayList<ExchangeTaskDetail>();
         this.exchangeTaskDetails.add(exchangeTaskDetail);
     }
 
@@ -487,7 +489,7 @@ public class ExchangeTask implements java.io.Serializable {
         this.storeIsolation = null;
         this.monitorFolder = null;
 
-        this.exchangeTaskDetails = new HashSet<ExchangeTaskDetail>();
+        this.exchangeTaskDetails = new ArrayList<ExchangeTaskDetail>();
         this.taskLogs = new ArrayList<TaskLog>();
     }
     public void addAll(){

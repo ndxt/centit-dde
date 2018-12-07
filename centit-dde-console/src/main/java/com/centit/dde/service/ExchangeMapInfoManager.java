@@ -21,4 +21,6 @@ public interface ExchangeMapInfoManager extends BaseEntityManager<ExchangeMapInf
     List<MapInfoDetail> resolveSQL(DatabaseInfo databaseInfo, String sql);
 
     public ExchangeMapInfo getObjectById(Long mapInfoId);
+
+    public void deleteObjectById(Long mapInfoId);
 }

@@ -4,6 +4,7 @@ import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 /**
  * create by scaffold
@@ -15,10 +16,15 @@ import javax.persistence.*;
 public class ImportField implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
-    @EmbeddedId
-    @Column(name="CID")
-    @ValueGenerator(strategy = GeneratorType.AUTO)
-    private ImportFieldId cid;
+    @Id
+    @Column(name="IMPORT_ID")
+    @NotBlank(message = "字段不能为空")
+    private Long importId;
+
+    @Id
+    @Column(name="COLUMN_NO")
+    @NotBlank(message = "字段不能为空")
+    private Long columnNo;
 
     /**
      * 源字段
@@ -67,24 +73,20 @@ public class ImportField implements java.io.Serializable {
     /**
      * minimal constructor
      */
-    public ImportField(ImportFieldId id
-
-            , String sourceFieldName, String destFieldName) {
-        this.cid = id;
-
-        this.sourceFieldName = sourceFieldName;
-        this.destFieldName = destFieldName;
+    public ImportField(@NotBlank(message = "字段不能为空") Long importId, @NotBlank(message = "字段不能为空") Long columnNo) {
+        this.importId = importId;
+        this.columnNo = columnNo;
     }
 
     /**
      * full constructor
      */
-    public ImportField(ImportFieldId id
+    public ImportField(@NotBlank(message = "字段不能为空") Long importId, @NotBlank(message = "字段不能为空") Long columnNo
 
             , String sourceFieldName, String destFieldName, String destFieldType, String isPk, String destFieldDefault,
                        String isNull) {
-        this.cid = id;
-
+        this.importId = importId;
+        this.columnNo = columnNo;
         this.sourceFieldName = sourceFieldName;
         this.destFieldName = destFieldName;
         this.destFieldType = destFieldType;
@@ -93,37 +95,23 @@ public class ImportField implements java.io.Serializable {
         this.isNull = isNull;
     }
 
-    public ImportFieldId getCid() {
-        return this.cid;
-    }
-
-    public void setCid(ImportFieldId id) {
-        this.cid = id;
-    }
-
-    public Long getColumnNo() {
-        if (this.cid == null)
-            this.cid = new ImportFieldId();
-        return this.cid.getColumnNo();
-    }
-
-    public void setColumnNo(Long columnNo) {
-        if (this.cid == null)
-            this.cid = new ImportFieldId();
-        this.cid.setColumnNo(columnNo);
-    }
-
     public Long getImportId() {
-        if (this.cid == null)
-            this.cid = new ImportFieldId();
-        return this.cid.getImportId();
+        return this.importId;
     }
 
     public void setImportId(Long importId) {
-        if (this.cid == null)
-            this.cid = new ImportFieldId();
-        this.cid.setImportId(importId);
+        this.importId = importId;
     }
+
+    public Long getColumnNo() {
+        return this.columnNo;
+    }
+
+    public void setColumnNo(Long columnNo) {
+        this.columnNo = columnNo;
+    }
+
+
 
     // Property accessors
 
@@ -228,7 +216,7 @@ public class ImportField implements java.io.Serializable {
 
     @Override
     public String toString() {
-        return "ImportField [cid=" + cid + ", sourceFieldName=" + sourceFieldName + ", destFieldName=" + destFieldName
+        return "ImportField [importId=" + importId + ", columnNo=" +columnNo +", sourceFieldName=" + sourceFieldName + ", destFieldName=" + destFieldName
                 + ", destFieldType=" + destFieldType + ", isPk=" + isPk + ", destFieldDefault=" + destFieldDefault
                 + ", isNull=" + isNull + "]";
     }

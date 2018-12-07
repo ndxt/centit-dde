@@ -4,6 +4,7 @@ import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.dataio.ExportData;
 import com.centit.dde.dataio.ImportData;
 import com.centit.dde.po.ExchangeTask;
+import com.centit.dde.po.ExchangeTaskDetail;
 import com.centit.dde.service.ExchangeTaskManager;
 import com.centit.dde.transfer.TransferManager;
 import com.centit.framework.ip.po.DatabaseInfo;
@@ -172,7 +173,10 @@ public class ExchangeTaskManagerImpl
         Long taskId = object.getTaskId();
         object.setTaskName(object.getTaskName().trim());
         object.setTaskType("1");
-        ExchangeTask dbObject = getObjectById(taskId);
+        ExchangeTask dbObject = null;
+        if (taskId != null &&!"".equals(taskId)) {
+             dbObject = getObjectById(taskId);
+        }
         if (dbObject != null) {
             dbObject.copyNotNullProperty(object);
             object = dbObject;
@@ -216,6 +220,17 @@ public class ExchangeTaskManagerImpl
         }
 
         //saveObject(object);
+        setFieldTriggerCid(object);
         saveNewObject(object);
+        this.exchangeTaskDao.saveObjectReferences(object);
+    }
+
+    private static void setFieldTriggerCid(ExchangeTask object) {
+        ExchangeTaskDetail md = null;
+        for (int i = 0; i < object.getExchangeTaskDetails().size(); i++) {
+            md = object.getExchangeTaskDetails().get(i);
+            md.setTaskId(object.getTaskId());
+            md.setMapInfoOrder((long) i);
+        }
     }
 }

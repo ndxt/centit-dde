@@ -146,7 +146,9 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
             if (importOptDao.isExistsForTable(object, databaseInfo)) {
 
                 // save exportsql
-                ImportOpt dbObject = importOptDao.getObjectById(object.getImportId());
+                ImportOpt dbObject =  null;
+                if (object.getImportId()!=null)
+                 dbObject = importOptDao.getObjectById(object.getImportId());
                 if (null == dbObject) {
                     object.setCreated(userDetail.getUserCode());
                     object.setCreateTime(new Date());
@@ -178,7 +180,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
                     object = dbObject;
 
                 }
-                saveNewObject(object);
+                this.importOptDao.saveObjectReferences(object);
             }
         }catch(SqlResolveException e){
             log.error("保存失败", e);
@@ -190,7 +192,8 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
         ImportTrigger et = null;
         for (int i = 0; i < object.getImportFields().size(); i++) {
             ef = object.getImportFields().get(i);
-            ef.setCid(new ImportFieldId((long) i, object.getImportId()));
+            ef.setImportId(object.getImportId());
+            ef.setColumnNo((long) i);
         }
         for (int i = 0; i < object.getImportTriggers().size() && !CollectionUtils.isEmpty(object.getImportTriggers());
              i++) {
@@ -245,7 +248,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
         object.setImportName(object.getImportName().trim());
 
         Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("importNameEq", object.getImportName());
+        filterMap.put("importName", object.getImportName());
         //获取同名的配置
         List<ImportOpt> listObjects = listObjects(filterMap);
 

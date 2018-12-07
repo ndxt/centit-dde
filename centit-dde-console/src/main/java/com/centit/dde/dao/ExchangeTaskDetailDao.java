@@ -30,7 +30,7 @@ public class ExchangeTaskDetailDao extends BaseDaoImpl<ExchangeTaskDetail, Seria
 
             filterField.put(CodeBook.ORDER_BY_HQL_ID, "mapInfoOrder");
 
-            filterField.put("task_Id", CodeBook.EQUAL_HQL_ID);
+            //filterField.put("task_Id", CodeBook.EQUAL_HQL_ID);
 
 
         }
@@ -47,12 +47,9 @@ public class ExchangeTaskDetailDao extends BaseDaoImpl<ExchangeTaskDetail, Seria
         Map<String, Object> filterMap = new HashMap<>();
         filterMap.put("task_Id",taskId);
         List<ExchangeTaskDetail> list = listObjectsBySql(
-            "select task_id,mapinfo_id,mapinfo_order from D_EXCHANGE_TASKDETAIL where task_Id=:task_Id ",
+            "select task_id,mapinfo_id,mapinfo_order from D_EXCHANGE_TASKDETAIL where task_Id=:task_Id order by mapinfo_order",
             filterMap);
         return  list;
-//        return this.listObjectsBySql(
-//            "select * from D_EXCHANGE_TASKDETAIL where task_Id=:task_Id ",
-//            filterMap);
     }
 
     public Long getMapinfoOrder(Long taskId) {

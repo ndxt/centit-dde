@@ -350,7 +350,7 @@ public class ImportOpt implements java.io.Serializable {
             ImportField odt = it.next();
             found = false;
             for (ImportField newdt : newObjs) {
-                if (odt.getCid().equals(newdt.getCid())) {
+                if (odt.getImportId().equals(newdt.getImportId()) && odt.getColumnNo().equals(newdt.getColumnNo())) {
                     found = true;
                     break;
                 }
@@ -364,7 +364,7 @@ public class ImportOpt implements java.io.Serializable {
             found = false;
             for (Iterator<ImportField> it = getImportFields().iterator(); it.hasNext(); ) {
                 ImportField odt = it.next();
-                if (odt.getCid().equals(newdt.getCid())) {
+                if (odt.getImportId().equals(newdt.getImportId()) && odt.getColumnNo().equals(newdt.getColumnNo())) {
                     odt.copy(newdt);
                     found = true;
                     break;

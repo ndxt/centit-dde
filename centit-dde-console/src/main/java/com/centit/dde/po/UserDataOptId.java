@@ -50,7 +50,7 @@ public class UserDataOptId implements Serializable {
     /**
      * 描述
      */
-    @Column(name="DESCRIBE")
+    @Column(name="DESCRIBES")
     private String describe;
 
     /**

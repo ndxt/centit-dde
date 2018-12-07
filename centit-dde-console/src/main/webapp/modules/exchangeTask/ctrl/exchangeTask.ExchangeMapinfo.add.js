@@ -17,10 +17,26 @@ define(function(require) {
 		this.load = function(panel, data) {
 			data = _self.parent.data;
 			var taskId = data.taskId;
-			if (data.taskId==undefined){
+			if (taskId==undefined || taskId==""){
         taskId = -1;
       }
-			Core.ajax(Config.ContextPath+'service/exchangetask/ExchangeMapInfolist/1/'+taskId, {
+      var panelParent = _self.parent.panel;
+      var tableparent = panelParent.find('#dlgList');
+      var row = tableparent.datagrid('getRows');
+      var i = 0;
+      var mapinfoIds = "";
+      for(i;i<row.length;i++){
+        mapinfoIds += row[i].mapInfoId;
+        if(i < row.length-1){
+          mapinfoIds += ',';
+        }else{
+          break;
+        }
+      }
+      if (mapinfoIds==""){
+        mapinfoIds =-1;
+      }
+      Core.ajax(Config.ContextPath+'service/exchangetask/ExchangeMapInfolist/1/'+taskId+'/'+mapinfoIds, {
 				method: 'get'
 			}).then(function(data2) {
 				panel.find('table').cdatagrid({
@@ -40,6 +56,18 @@ define(function(require) {
       if (data.taskId==undefined){
         taskId = -1;
       }
+      var tbparent = panelParent.find('#dlgList');
+      var row = tbparent.datagrid('getRows');
+      var i = 0;
+      var omapinfoIds = "";
+      for(i;i<row.length;i++){
+        omapinfoIds += row[i].mapInfoId;
+        if(i < row.length-1){
+          omapinfoIds += ',';
+        }else{
+          break;
+        }
+      }
 			var table = panel.find('#dg1');
 			var row = table.datagrid('getSelections');
 	        var i = 0;  
@@ -51,11 +79,17 @@ define(function(require) {
 	            }else{  
 	                break;  
 	            }  
-	        }  
-			Core.ajax(Config.ContextPath + 'service/exchangetask/importExchangeMapinfo/' + mapinfoIds+'/'+taskId, {
-				method: 'put'
-			}).then(function() {
-				Core.ajax(Config.ContextPath+'service/exchangetask/edit/'+taskId, {
+	        }
+	    if (omapinfoIds!=""){
+        if (mapinfoIds!="") {
+          mapinfoIds = omapinfoIds + "," + mapinfoIds;
+        }else
+          mapinfoIds= omapinfoIds;
+      }
+			// Core.ajax(Config.ContextPath + 'service/exchangetask/importExchangeMapinfo/' + mapinfoIds+'/'+taskId, {
+			// 	method: 'put'
+			// }).then(function() {
+				Core.ajax(Config.ContextPath+'service/exchangetask/edit/'+taskId+'/'+ mapinfoIds, {
 					method: 'get',
 					data: {
 	                    _method: 'get'
@@ -64,9 +98,9 @@ define(function(require) {
 					var tableparent = panelParent.find('#dlgList');
 					tableparent.datagrid('loadData',data2.exchangeMapInfoList);
 				});
-				closeCallback();
-			});
-			return false;
+				//closeCallback();
+			//});
+			//return false;
 		};
 		this.onClose = function(table) {
 			table.datagrid('reload');

@@ -2,6 +2,7 @@ package com.centit.dde.po;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
@@ -15,10 +16,12 @@ import javax.validation.constraints.NotBlank;
 public class MapInfoTrigger implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Id
     @Column(name="TRIGGER_ID")
     @NotBlank(message = "字段不能为空")
     private Long triggerId;
 
+    @Id
     @Column(name="MAPINFO_ID")
     @NotBlank(message = "字段不能为空")
     private Long mapInfoId;

@@ -43,17 +43,21 @@ define(function(require) {
 		// 提交表单时调用
 		this.submit = function(panel, data, closeCallback) {
 			var form = panel.find('form');
-			
+      var formData = form.form('value');
+      $.extend(data,formData);
 			// 开启校验
 			form.form('enableValidation');
 			var isValid = form.form('validate');
-			
-			if (isValid) {
-				form.form('ajax', {
-					url: Config.ContextPath + 'service/exchangetask/save',
-					method: 'put'
-				}).then(closeCallback);
-			}
+
+      if (isValid) {
+        var exchangeTaskDetails = panel.find('table.tab1').datagrid("getData").rows;
+        data.exchangeTaskDetails = exchangeTaskDetails;
+        form.form('ajax', {
+          url: Config.ContextPath + 'service/exchangetask/save',
+          data: data,
+          method: 'put'
+        }).then(closeCallback);
+      }
 			
 			return false;
 		};

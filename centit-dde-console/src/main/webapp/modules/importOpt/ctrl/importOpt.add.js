@@ -111,7 +111,7 @@ define(function(require) {
 				data.importFields = importFields;
 				data.importTriggers = importTriggers;
 				form.form('ajax', {
-					url: Config.ContextPath + 'service/importopt/save/'+ data.importOpt.importId,
+					url: Config.ContextPath + 'service/importopt/save',
 					method: 'put',
 					data: data
 //					提交成功后调用closeCallback关闭对话框

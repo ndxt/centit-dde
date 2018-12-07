@@ -37,7 +37,7 @@ public class ImportOptDao extends BaseDaoImpl<ImportOpt,Long> {
             filterField.put("sourceOsId", CodeBook.LIKE_HQL_ID);
 
             filterField.put("importName", CodeBook.LIKE_HQL_ID);
-            filterField.put("importNameEq", "importName = ?");
+            //filterField.put("importNameEq", "importName = ?");
 
             filterField.put("tableName", CodeBook.LIKE_HQL_ID);
 
