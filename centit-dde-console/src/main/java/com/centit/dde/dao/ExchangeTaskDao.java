@@ -168,5 +168,11 @@ public class ExchangeTaskDao extends BaseDaoImpl<ExchangeTask,Long> {
         return DatabaseOptUtils.getSequenceNextValue(this,"D_TASK_ID");
     }
 
-
+    public ExchangeTask getObjectById(Long taskId) {
+        ExchangeTask exchangeTask = null;
+        if (taskId != null && !"".equals(taskId)) {
+            exchangeTask = getObjectWithReferences(taskId);
+        }
+        return  exchangeTask;
+    }
 }

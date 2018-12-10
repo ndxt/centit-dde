@@ -178,9 +178,10 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
                     }
 
                     object = dbObject;
+                    updateObject(dbObject);
 
                 }
-                this.importOptDao.saveObjectReferences(object);
+                importOptDao.saveObjectReferences(object);
             }
         }catch(SqlResolveException e){
             log.error("保存失败", e);
@@ -213,9 +214,10 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
                 try {
                     connection = ConnPool.getConn(databaseInfo);
                     DatabaseMetaData metaData = connection.getMetaData();
-                    ResultSet resultSet = metaData.getColumns(null, null, tableName, null);
+                    ResultSet resultSet = metaData.getColumns(null, databaseInfo.getUsername().toUpperCase(), tableName, null);
                     while (resultSet.next()) {
                         ImportField field = new ImportField();
+                        field.setSourceFieldName(resultSet.getString("COLUMN_NAME"));
                         field.setDestFieldName(resultSet.getString("COLUMN_NAME"));
                         field.setDestFieldType(resultSet.getString("TYPE_NAME"));
                         field.setIsNull(resultSet.getString("NULLABLE"));
@@ -265,5 +267,18 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
             }
         }
         validator(object);//校验目标数据库不为空、触发器参数存在于字段中
+    }
+
+    public ImportOpt getObjectById(Long importId) {
+        return  importOptDao.getObjectById(importId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteObjectById(Long importId) {
+        ImportOpt importOpt = importOptDao.getObjectById(importId);
+        if (importOpt !=null) {
+            importOptDao.deleteObjectById(importId);
+            importOptDao.deleteObjectReferences(importOpt);
+        }
     }
 }

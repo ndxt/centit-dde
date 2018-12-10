@@ -192,12 +192,13 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
 
     @Transactional
     public ExportSql loadObjectById(Long id) {
-        if (id == null)
+        if (id == null || id.equals(""))
             return null;
         // Type[] params = getClass().getTypeParameters();
         try {
             //return (ExportSql) getCurrentSession().load(ExportSql.class, id);
-            return  this.getObjectById((Object)id);
+            //return  this.getObjectById((Object)id);
+            return  this.getObjectWithReferences(id);
             //return (T) getCurrentSession().get(getClassTName(), id);
         } catch (Exception e) {
             logger.error(e.getMessage());

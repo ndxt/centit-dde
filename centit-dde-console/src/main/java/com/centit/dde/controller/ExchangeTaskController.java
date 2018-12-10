@@ -1,5 +1,6 @@
 package com.centit.dde.controller;
 
+import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.po.*;
 import com.centit.dde.service.*;
 import com.centit.framework.common.JsonResultUtils;
@@ -89,7 +90,7 @@ public class ExchangeTaskController extends BaseController {
         try {
             object.setTaskName(object.getTaskName().trim());
             Map<String, Object> filterMap = new HashMap<String, Object>();
-            filterMap.put("taskNameEq", object.getTaskName());
+            filterMap.put("taskName", object.getTaskName());
             List<ExchangeTask> listObjects = exchangeTaskMag.listObjects(filterMap);
             if (!org.springframework.util.CollectionUtils.isEmpty(listObjects)) {
                 if (1 < listObjects.size() || !listObjects.get(0).getTaskId().equals(object.getTaskId())) {
@@ -115,7 +116,7 @@ public class ExchangeTaskController extends BaseController {
 //                dbObject.addAll(object.getTaskLogs());
             }
             //更新下次执行时间
-            if (dbObject.getTaskCron() != null) {
+            if (dbObject.getTaskCron() != null && !"".equals(object.getTaskCron())) {
                 try {
                     CronSequenceGenerator generator = new CronSequenceGenerator(dbObject.getTaskCron(), TimeZone.getDefault());
                     dbObject.setNextRunTime(generator.next(new Date()));
@@ -140,7 +141,9 @@ public class ExchangeTaskController extends BaseController {
             }
 //            object.getTaskLogs().clear();
 //            object.getTaskLogs().add(e);
-            exchangeTaskMag.mergeObject(dbObject);
+            //exchangeTaskMag.updateObject(dbObject);
+            exchangeTaskMag.editAndsave(dbObject);
+
 
             if ("3".equals(object.getTaskType())) {
 //                return "editAndsaveDialog";
@@ -338,9 +341,9 @@ public class ExchangeTaskController extends BaseController {
 
     @RequestMapping(value="/delete/{taskId}", method = {RequestMethod.DELETE})
     public void delete(@PathVariable Long taskId,ExchangeTask object,HttpServletRequest request,HttpServletResponse response) {
-        ExchangeTask exchangeTask = exchangeTaskMag.getObjectById(taskId);
+        //ExchangeTask exchangeTask = exchangeTaskMag.getObjectById(taskId);
         try {
-            Map<String, Object> filterMap = new HashMap<String, Object>();
+            /*Map<String, Object> filterMap = new HashMap<String, Object>();
             filterMap.put("taskId", taskId);
             List<TaskLog> TaskLogList = taskLogManager.listObjects(filterMap);
             if(TaskLogList!=null){
@@ -355,9 +358,10 @@ public class ExchangeTaskController extends BaseController {
                 }
             }
             exchangeTaskMag.delTimerTask(exchangeTask);
-            exchangeTaskMag.deleteObjectById(taskId);
+            exchangeTaskMag.deleteObjectById(taskId);*/
 //            deletedMessage();
 //            return "delete";
+            exchangeTaskMag.deleteObjectByIdInfo(taskId);
             JsonResultUtils.writeSuccessJson(response);
         } catch (Exception e) {
             log.error("删除交换对应关系："+ e.getMessage(), e);

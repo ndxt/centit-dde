@@ -28,4 +28,8 @@ public interface ExportSqlManager extends BaseEntityManager<ExportSql,Long> {
      * @throws SqlResolveException
      */
     List<ExportField> listExportFieldsByQuerysql(ExportSql object) throws SqlResolveException;
+
+    public ExportSql getObjectById(Long importId);
+
+    public void deleteObjectById(Long importId);
 }

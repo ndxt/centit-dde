@@ -57,11 +57,12 @@ define(function(require) {
 					}).then(function(data){
 
 						var tab1table = panel.find('table.tab1');
-						tab1table.cdatagrid({
+            tab1table.datagrid('loadData',data);
+						/*tab1table.cdatagrid({
 							controller:_self,
 							editable: true,
 							data:data
-						});
+						});*/
 					});
 				}
 			});
@@ -77,11 +78,12 @@ define(function(require) {
 					}).then(function(data){
 
 						var tab1table = panel.find('table.tab1');
-						tab1table.cdatagrid({
+            tab1table.datagrid('loadData',data);
+						/*tab1table.cdatagrid({
 							controller:_self,
 							editable: true,
 							data:data
-						});
+						});*/
 					});
 				}
 			})

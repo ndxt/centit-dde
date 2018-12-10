@@ -70,14 +70,18 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
                 object.setCreateTime(new Date());
                 object.setExportId(exportSqlDao.getNextLongSequence());
                 setExportFieldTriggerCid(object);
+                saveNewObject(object);
             } else {
                 dbObject.copyNotNullProperty(object);
                 dbObject.setLastUpdateTime(new Date());
+                setExportFieldTriggerCid(object);
                 dbObject.replaceExportFields(object.getExportFields());
                 dbObject.replaceExportTriggers(object.getExportTriggers());
                 object = dbObject;
+                updateObject(dbObject);
             }
-            saveNewObject(object);
+            //saveNewObject(object);
+            exportSqlDao.saveObjectReferences(object);
         }catch (SqlResolveException e){
             log.error("保存出错");
         }
@@ -233,4 +237,16 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
         }
     }
 
+    public ExportSql getObjectById(Long importId) {
+        return  exportSqlDao.loadObjectById(importId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteObjectById(Long importId) {
+        ExportSql exportSql = exportSqlDao.loadObjectById(importId);
+        if (exportSql != null) {
+            exportSqlDao.deleteObjectById(importId);
+            exportSqlDao.deleteObjectReferences(exportSql);
+        }
+    }
 }

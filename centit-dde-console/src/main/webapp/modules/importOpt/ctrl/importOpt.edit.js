@@ -28,19 +28,19 @@ define(function(require) {
 			}).then(function(data) {
 				_self.data = data;
 				form.form('disableValidation')
-					.form('load', data.importOpt)
+					.form('load', data)
 					.form('focus');
 				var tab1table = panel.find('table.tab1');
 				tab1table.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.importOpt.importFields
+					data:data.importFields
 				});
 				var tab2table = panel.find('table.tab2');
 				tab2table.cdatagrid({
 					controller:_self,
 					editable: true,
-					data:data.importOpt.importTriggers
+					data:data.importTriggers
 				});
 			});
             var databaseCode = "";
@@ -65,11 +65,12 @@ define(function(require) {
 					}).then(function(data){
 
 						var tab1table = panel.find('table.tab1');
-						tab1table.cdatagrid({
+            tab1table.datagrid('loadData',data);
+						/*tab1table.cdatagrid({
 							controller:_self,
 							editable: true,
 							data:data
-						});
+						});*/
 					});
 				}
 			});
@@ -85,11 +86,12 @@ define(function(require) {
 					}).then(function(data){
 
 						var tab1table = panel.find('table.tab1');
-						tab1table.cdatagrid({
+            tab1table.datagrid('loadData',data);
+						/*tab1table.cdatagrid({
 							controller:_self,
 							editable: true,
 							data:data
-						});
+						});*/
 					});
 				}
 			})

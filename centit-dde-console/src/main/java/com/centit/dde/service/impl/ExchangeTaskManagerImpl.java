@@ -1,10 +1,13 @@
 package com.centit.dde.service.impl;
 
 import com.centit.dde.dao.ExchangeTaskDao;
+import com.centit.dde.dao.ExchangeTaskDetailDao;
+import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.dataio.ExportData;
 import com.centit.dde.dataio.ImportData;
 import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.po.ExchangeTaskDetail;
+import com.centit.dde.po.TaskLog;
 import com.centit.dde.service.ExchangeTaskManager;
 import com.centit.dde.transfer.TransferManager;
 import com.centit.framework.ip.po.DatabaseInfo;
@@ -42,7 +45,6 @@ public class ExchangeTaskManagerImpl
     private ExportData exportData;
 
     private ImportData importData;
-
     
     public void setImportData(ImportData importData) {
         this.importData = importData;
@@ -62,6 +64,12 @@ public class ExchangeTaskManagerImpl
         this.exchangeTaskDao = baseDao;
         setBaseDao(this.exchangeTaskDao);
     }
+
+    @Resource
+    private TaskLogDao taskLogDao;
+
+    @Resource
+    private ExchangeTaskDetailDao exchangeTaskDetailDao;
 
     public List<List<Object>> getSqlValues(DatabaseInfo databaseInfo, String sql) {
         return this.exchangeTaskDao.getSqlValues(databaseInfo, sql);
@@ -222,7 +230,7 @@ public class ExchangeTaskManagerImpl
         //saveObject(object);
         setFieldTriggerCid(object);
         saveNewObject(object);
-        this.exchangeTaskDao.saveObjectReferences(object);
+        exchangeTaskDao.saveObjectReferences(object);
     }
 
     private static void setFieldTriggerCid(ExchangeTask object) {
@@ -232,5 +240,36 @@ public class ExchangeTaskManagerImpl
             md.setTaskId(object.getTaskId());
             md.setMapInfoOrder((long) i);
         }
+    }
+
+    public ExchangeTask getObjectById(Long taskId) {
+        return  exchangeTaskDao.getObjectById(taskId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteObjectByIdInfo(Long taskId) {
+        ExchangeTask exchangeTask = exchangeTaskDao.getObjectById(taskId);
+        Map<String, Object> filterMap = new HashMap<String, Object>();
+        filterMap.put("taskId", taskId);
+        List<TaskLog> TaskLogList = taskLogDao.listObjects(filterMap);
+        if(TaskLogList!=null){
+            for(TaskLog o : TaskLogList){
+                taskLogDao.deleteObject(o);
+            }
+        }
+        List<ExchangeTaskDetail> exchangeTaskDetailList =exchangeTaskDetailDao.listObjects(filterMap);
+        if(exchangeTaskDetailList !=null){
+            for(ExchangeTaskDetail o : exchangeTaskDetailList){
+                exchangeTaskDetailDao.deleteObject(o);
+            }
+        }
+        this.delTimerTask(exchangeTask);
+        exchangeTaskDao.deleteObjectById(taskId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void editAndsave(ExchangeTask exchangeTask) {
+        exchangeTaskDao.updateObject(exchangeTask);
+        exchangeTaskDao.saveObjectReferences(exchangeTask);
     }
 }

@@ -250,6 +250,7 @@ public class ExchangeMapInfoManagerImpl
         return exchangeMapInfoDao.getObjectById(mapInfoId);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public void deleteObjectById(Long mapInfoId) {
         ExchangeMapInfo exchangeMapInfo = exchangeMapInfoDao.getObjectById(mapInfoId);
         if (exchangeMapInfo != null) {

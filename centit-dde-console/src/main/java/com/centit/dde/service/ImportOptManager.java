@@ -15,4 +15,7 @@ public interface ImportOptManager extends BaseEntityManager<ImportOpt,Long> {
     void saveObject(ImportOpt object, IUserInfo loginUser);
     List<ImportField> listFields(String databaseCode, String tableName) throws SqlResolveException;
 
+    public ImportOpt getObjectById(Long importId);
+
+    public void deleteObjectById(Long importId);
 }

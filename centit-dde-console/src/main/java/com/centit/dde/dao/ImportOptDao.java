@@ -122,4 +122,12 @@ public class ImportOptDao extends BaseDaoImpl<ImportOpt,Long> {
         dbc.setPassword(dbinfo.getPassword());
         return DbcpConnectPools.getDbcpConnect(dbc);
     }
+
+    public ImportOpt getObjectById(Long importId) {
+        ImportOpt importOpt = null;
+        if (importId != null && !"".equals(importId)) {
+            importOpt = getObjectWithReferences(importId);
+        }
+        return importOpt;
+    }
 }

@@ -4,6 +4,7 @@ import com.centit.dde.po.ExchangeTask;
 import com.centit.framework.jdbc.service.BaseEntityManager;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.ip.po.DatabaseInfo;
+import sun.rmi.runtime.Log;
 
 import java.util.List;
 
@@ -43,4 +44,9 @@ public interface ExchangeTaskManager extends BaseEntityManager<ExchangeTask,Long
 
     void save(ExchangeTask exchangeTask, CentitUserDetails user);
 
+    public ExchangeTask getObjectById(Long taskId);
+
+    public void deleteObjectByIdInfo(Long taskId);
+
+    public void editAndsave(ExchangeTask exchangeTask);
 }
