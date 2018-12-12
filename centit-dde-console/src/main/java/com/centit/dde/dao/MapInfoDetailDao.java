@@ -37,9 +37,9 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail, Serializable> {
         if (filterField == null) {
             filterField = new HashMap<String, String>();
 
-            filterField.put("cid.mapInfoId", CodeBook.EQUAL_HQL_ID);
+            filterField.put("mapInfoId", CodeBook.EQUAL_HQL_ID);
 
-            filterField.put("cid.columnNo", CodeBook.EQUAL_HQL_ID);
+            filterField.put("columnNo", CodeBook.EQUAL_HQL_ID);
 
             filterField.put("orderNo", CodeBook.LIKE_HQL_ID);
 
@@ -64,11 +64,9 @@ public class MapInfoDetailDao extends BaseDaoImpl<MapInfoDetail, Serializable> {
     }
 
     public List<MapInfoDetail> listByMapinfoId(Long mapinfoId) {
-        StringBuffer sql = new StringBuffer();
-        sql.append("from MapInfoDetail t where  t.cid.mapInfoId=");
-        sql.append(mapinfoId);
-        sql.append(" order by t.cid.columnNo ");
-        return this.listByMapinfoId(mapinfoId);
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("mapinfoId",mapinfoId);
+        return listObjects(filterMap);
     }
     
     /**

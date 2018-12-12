@@ -22,9 +22,9 @@ public class MapInfoTriggerDao extends BaseDaoImpl<MapInfoTrigger, Serializable>
         if (filterField == null) {
             filterField = new HashMap<String, String>();
 
-            filterField.put("cid.triggerId", CodeBook.EQUAL_HQL_ID);
+            filterField.put("triggerId", CodeBook.EQUAL_HQL_ID);
 
-            filterField.put("cid.mapInfoId", CodeBook.EQUAL_HQL_ID);
+            filterField.put("mapInfoId", CodeBook.EQUAL_HQL_ID);
 
 
             filterField.put("triggerSql", CodeBook.LIKE_HQL_ID);
@@ -46,11 +46,9 @@ public class MapInfoTriggerDao extends BaseDaoImpl<MapInfoTrigger, Serializable>
     }
 
     public List<MapInfoTrigger> listTriggerByMapinfoId(Long mapinfoId) {
-        StringBuffer sql = new StringBuffer();
-        sql.append("from MapInfoTrigger t where  t.cid.mapInfoId=");
-        sql.append(mapinfoId);
-        sql.append(" order by t.triggerTime, t.tiggerOrder");
-        return this.listTriggerByMapinfoId(mapinfoId);
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("mapinfoId",mapinfoId);
+        return listObjects(filterMap);
     }
 
     public Long getTriggerId() {

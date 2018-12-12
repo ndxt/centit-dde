@@ -19,11 +19,13 @@ import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.support.algorithm.DatetimeOpt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.sql.*;
 import java.util.List;
 
+@Service
 public class ExportDataImpl implements ExportData, CallWebService {
     private static final Logger logger = LoggerFactory.getLogger(ExportDataImpl.class);
 
@@ -32,21 +34,28 @@ public class ExportDataImpl implements ExportData, CallWebService {
     @Resource
     protected IntegrationEnvironment integrationEnvironment;
 
+    @Resource
     private ExportSqlDao exportSqlDao;
 
+    @Resource
     private ExchangeTaskDao exchangeTaskDao;
 
+    @Resource
     private ExchangeTaskDetailDao exchangeTaskDetailDao;
 
+    @Resource
     private TaskLogManager taskLogManager;
 
+    @Resource
     private TaskDetailLogManager taskDetailLogManager;
 
+    @Resource
     private TaskErrorDataManager taskErrorDataManager;
 
+    @Resource
     private ExecuteDataMap executeDataMap;
 
-    public void setExportSqlDao(ExportSqlDao exportSqlDao) {
+    /*public void setExportSqlDao(ExportSqlDao exportSqlDao) {
         this.exportSqlDao = exportSqlDao;
     }
 
@@ -72,7 +81,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
     public void setExecuteDataMap(ExecuteDataMap executeDataMap) {
         this.executeDataMap = executeDataMap;
-    }
+    }*/
 
     @Override
     public int doExportSql(ExportSql exportSql, TableFileWriter tableWriter, String userCode,
@@ -497,7 +506,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
     public String runCallServiceTask(Long taskID, String userCode, String runType, String taskType) {
         ExchangeTask exchangeTask = exchangeTaskDao.getObjectById(taskID);
         exchangeTask.setLastRunTime(DatetimeOpt.currentSqlDate());
-        exchangeTaskDao.saveNewObject(exchangeTask);
+        exchangeTaskDao.updateObject(exchangeTask);
         logger.info("开始执行导出：" + exchangeTask.getTaskName() + "........");
         List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskDetailDao.getTaskDetails(taskID);
 
@@ -556,7 +565,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
                 taskDetailLog.setSuccessPieces(Long.valueOf(nRes));
 
             }
-            taskDetailLogManager.saveNewObject(taskDetailLog);
+            taskDetailLogManager.updateObject(taskDetailLog);
 
         }
 
@@ -567,7 +576,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
         // TaskLog taskLogTemp = taskLogManager.getObjectById(taskLogId);
         taskLog.setRunEndTime(DatetimeOpt.currentSqlDate());
         taskLog.setOtherMessage(message);
-        taskLogManager.saveNewObject(taskLog);
+        taskLogManager.updateObject(taskLog);
 
         return message;
 

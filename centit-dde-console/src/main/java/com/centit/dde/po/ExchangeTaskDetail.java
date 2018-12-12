@@ -1,9 +1,6 @@
 package com.centit.dde.po;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 
@@ -31,6 +28,8 @@ public class ExchangeTaskDetail implements java.io.Serializable {
     @Column(name="MAPINFO_ORDER")
     private Long mapInfoOrder;
 
+    @Transient
+    private Long exportId;
     // Constructors
 
     /**
@@ -96,6 +95,14 @@ public class ExchangeTaskDetail implements java.io.Serializable {
 
     public void setTaskId(Long taskId) {
         this.taskId = taskId;
+    }
+
+    public Long getExportId() {
+        return exportId;
+    }
+
+    public void setExportId(Long exportId) {
+        this.exportId = exportId;
     }
 
     public void clearProperties() {

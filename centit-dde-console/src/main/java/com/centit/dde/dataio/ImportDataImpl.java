@@ -14,11 +14,14 @@ import com.centit.support.algorithm.ZipCompressor;
 import com.centit.support.file.FileSystemOpt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.List;
 
+@Service
 public class ImportDataImpl implements ImportData {
     public static final Log logger = LogFactory.getLog(ImportDataImpl.class);
 
@@ -26,13 +29,16 @@ public class ImportDataImpl implements ImportData {
 
     private static final String IMPORT = SysParametersUtils.getStringValue("import");
 
+    @Resource
     private ExecuteDataMap executeDataMap;
 
+    @Resource
     private TaskLogManager taskLogManager;
 
+    @Resource
     private ExchangeTaskDao exchangeTaskDao;
 
-    public void setExecuteDataMap(ExecuteDataMap executeDataMap) {
+    /*public void setExecuteDataMap(ExecuteDataMap executeDataMap) {
         this.executeDataMap = executeDataMap;
     }
 
@@ -42,7 +48,7 @@ public class ImportDataImpl implements ImportData {
 
     public void setExchangeTaskDao(ExchangeTaskDao exchangeTaskDao) {
         this.exchangeTaskDao = exchangeTaskDao;
-    }
+    }*/
 
     private static String calcZipFolderPath(String zipFilePath) {
         String dataPath = IMPORT + "/" + DatetimeOpt.currentDate() + "/" + FileSystemOpt.extractFileName(zipFilePath)

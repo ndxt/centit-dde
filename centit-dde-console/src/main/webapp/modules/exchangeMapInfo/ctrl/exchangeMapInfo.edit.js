@@ -37,7 +37,7 @@ define(function(require) {
 					.form('disableValidation')
 					.form('readonly', 'mapInfoId')
 					.form('focus');
-
+        $("#txt_querySql").textbox('setValue', data.querySql);
 				var sourceTable = panel.find('table.source');
 				sourceTable.cdatagrid({
 					controller:_self,

@@ -43,14 +43,17 @@ define(function(require) {
 		// 提交表单时调用
 		this.submit = function(panel, data, closeCallback) {
 			var form = panel.find('form');
-			
+
 			// 开启校验
 			form.form('enableValidation');
 			var isValid = form.form('validate');
-			
+			data.taskType = "4";
 			if (isValid) {
+        var exchangeTaskDetails = panel.find('table.tab1').datagrid("getData").rows;
+        data.exchangeTaskDetails = exchangeTaskDetails;
 				form.form('ajax', {
 					url: Config.ContextPath + 'service/exchangetask/save',
+          data: data,
 					method: 'put'
 				}).then(closeCallback);
 			}

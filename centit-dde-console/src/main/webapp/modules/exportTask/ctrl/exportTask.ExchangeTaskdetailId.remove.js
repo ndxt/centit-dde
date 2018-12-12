@@ -7,9 +7,14 @@ define(function(require) {
 
 	var exportTaskExchangeTaskdetailIdRemove = Page.extend(function() {
 		var _self = this;
+    this.removeListItem = function (table, row) {
+      var index = table.datagrid('getRowIndex', row);
+      table.datagrid('deleteRow', index);
+    }
 		// @override
 		this.submit = function(table, data,panel) {
-			var exportId = data.exportId;
+      this.removeListItem(table, data);
+			/*var exportId = data.exportId;
 			data = _self.parent.data;
 			var taskId = data.taskId;
 			Core.ajax(Config.ContextPath+'service/exchangetaskdetail/delete?taskId='+taskId+"&MapinfoId="+exportId, {
@@ -25,16 +30,16 @@ define(function(require) {
 	                    _method: 'get'
 	                }
 				}).then(function(data2) {
-					/*$("#dg4 tbody").html("");
+					/!*$("#dg4 tbody").html("");
 					var tab1table = panel.find('table.tab1');
 					tab1table.cdatagrid({
 						controller:_self,
 						editable: true,
 						data:data2.exportSqlList
-					});*/
+					});*!/
 					table.datagrid('loadData',data2.exportSqlList);
 				});
-            });
+            });*/
 		}
 	});
 	

@@ -28,6 +28,7 @@ import org.springframework.jdbc.core.support.AbstractLobCreatingPreparedStatemen
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobCreator;
 import org.springframework.jdbc.support.lob.LobHandler;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -35,6 +36,7 @@ import java.sql.*;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class ExecuteDataMapImpl implements ExecuteDataMap {
 
     private static final Logger logger = LoggerFactory.getLogger(ExecuteDataMapImpl.class);
@@ -43,17 +45,22 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
     protected IntegrationEnvironment integrationEnvironment;
     //private static boolean debugEnabled = logger.isDebugEnabled();
 
+    @Resource
     private DataOptInfoDao dataOptInfoDao;
 
+    @Resource
     private ImportOptDao importOptDao;
 
+    @Resource
     private TaskErrorDataManager taskErrorDataManager;
 
+    @Resource
     private TaskDetailLogManager taskDetailLogManager;
 
+    @Resource
     private TaskLogManager taskLogManager;
 
-    public void setTaskLogManager(TaskLogManager taskLogManager) {
+    /*public void setTaskLogManager(TaskLogManager taskLogManager) {
         this.taskLogManager = taskLogManager;
     }
 
@@ -71,7 +78,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
 
     public void setDataOptInfoDao(DataOptInfoDao dataOptInfoDao) {
         this.dataOptInfoDao = dataOptInfoDao;
-    }
+    }*/
 
      /**
      * @param xmlData

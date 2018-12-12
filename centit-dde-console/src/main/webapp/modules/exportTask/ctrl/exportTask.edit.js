@@ -23,7 +23,7 @@ define(function(require) {
 		this.load = function(panel, data) {
 			var form = panel.find('form');
 			
-			Core.ajax(Config.ContextPath+'service/exchangetask/edit/'+data.taskId, {
+			Core.ajax(Config.ContextPath+'service/exchangetask/edit/'+data.taskId+'/2/'+-1, {
 				method: 'get',
 				data: {
                     _method: 'get'
@@ -64,6 +64,8 @@ define(function(require) {
 			var isValid = form.form('validate');
 			
 			if (isValid) {
+        var exchangeTaskDetails = panel.find('table.tab1').datagrid("getData").rows;
+        data.exchangeTaskDetails = exchangeTaskDetails;
 				Core.ajax(Config.ContextPath + 'service/exchangetask/editAndsave/',{
 					data: data,
 					method:'put'

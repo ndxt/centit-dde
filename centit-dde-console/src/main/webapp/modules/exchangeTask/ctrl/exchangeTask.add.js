@@ -48,7 +48,7 @@ define(function(require) {
 			// 开启校验
 			form.form('enableValidation');
 			var isValid = form.form('validate');
-
+      data.taskType = "1";
       if (isValid) {
         var exchangeTaskDetails = panel.find('table.tab1').datagrid("getData").rows;
         data.exchangeTaskDetails = exchangeTaskDetails;

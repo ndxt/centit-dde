@@ -180,7 +180,6 @@ public class ExchangeTaskManagerImpl
     public void save(ExchangeTask object, CentitUserDetails user) {
         Long taskId = object.getTaskId();
         object.setTaskName(object.getTaskName().trim());
-        object.setTaskType("1");
         ExchangeTask dbObject = null;
         if (taskId != null &&!"".equals(taskId)) {
              dbObject = getObjectById(taskId);
@@ -239,7 +238,15 @@ public class ExchangeTaskManagerImpl
             md = object.getExchangeTaskDetails().get(i);
             md.setTaskId(object.getTaskId());
             md.setMapInfoOrder((long) i);
+            if (("".equals(md.getMapInfoId()) || md.getMapInfoId()==null ) &&!"".equals(md.getExportId())) {
+                md.setMapInfoId(md.getExportId());
+            }
         }
+        /*for (int i = 0; i < object.getExportTaskDetails().size(); i++) {
+            mt = object.getExportTaskDetails().get(i);
+            mt.setTaskId(object.getTaskId());
+            mt.setMapInfoOrder((long) i);
+        }*/
     }
 
     public ExchangeTask getObjectById(Long taskId) {
@@ -257,14 +264,15 @@ public class ExchangeTaskManagerImpl
                 taskLogDao.deleteObject(o);
             }
         }
-        List<ExchangeTaskDetail> exchangeTaskDetailList =exchangeTaskDetailDao.listObjects(filterMap);
+        /*List<ExchangeTaskDetail> exchangeTaskDetailList =exchangeTaskDetailDao.listObjects(filterMap);
         if(exchangeTaskDetailList !=null){
             for(ExchangeTaskDetail o : exchangeTaskDetailList){
                 exchangeTaskDetailDao.deleteObject(o);
             }
-        }
+        }*/
         this.delTimerTask(exchangeTask);
         exchangeTaskDao.deleteObjectById(taskId);
+        exchangeTaskDao.deleteObjectReferences(exchangeTask);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

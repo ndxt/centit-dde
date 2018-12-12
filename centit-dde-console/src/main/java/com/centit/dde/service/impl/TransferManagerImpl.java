@@ -410,6 +410,7 @@ public class TransferManagerImpl implements TransferManager {
         taskDetailLog.setLogId(taskLogId);
         taskDetailLog.setMapinfoId(exchangeMapInfo.getMapInfoId());
         taskDetailLog.setRunBeginTime(beginTime);
+        taskDetailLogManager.saveNewObject(taskDetailLog);
 
         // 开始运行
         boolean runBreak = false;
@@ -591,7 +592,7 @@ public class TransferManagerImpl implements TransferManager {
 
                             taskDetailLog.setSuccessPieces(nSucceed);
                             taskDetailLog.setErrorPieces(nError);
-                            taskDetailLogManager.saveNewObject(taskDetailLog);
+                            taskDetailLogManager.updateObject(taskDetailLog);
 
                         } catch (SQLException e) {
                             nError++;
@@ -670,7 +671,7 @@ public class TransferManagerImpl implements TransferManager {
                     //每次循环执行记录一次循环执行的成功失败数据
                     taskDetailLog.setSuccessPieces(nSucceed);
                     taskDetailLog.setErrorPieces(nError);
-                    taskDetailLogManager.saveNewObject(taskDetailLog);
+                    taskDetailLogManager.updateObject(taskDetailLog);
 
 
                     String message = "当前循环执行 " + (++runnum) + " 次，已交换完 " + (preSucceed + curMoved) + " 条数据，本次交换 " + curMoved + " 条数据。";
@@ -746,7 +747,7 @@ public class TransferManagerImpl implements TransferManager {
         taskDetailLog.setRunEndTime(endTime);
         taskDetailLog.setSuccessPieces(nSucceed);
         taskDetailLog.setErrorPieces(nError);
-        taskDetailLogManager.saveNewObject(taskDetailLog);
+        taskDetailLogManager.updateObject(taskDetailLog);
         if (runBreak) {
             transferResult.setRes(-1);
         }
@@ -791,7 +792,7 @@ public class TransferManagerImpl implements TransferManager {
             return msg;
         }
         exchangeTask.setLastRunTime(DatetimeOpt.currentSqlDate());
-        exchangeTaskDao.saveNewObject(exchangeTask);
+        exchangeTaskDao.updateObject(exchangeTask);
         msg = "开始执行交换：" + exchangeTask.getTaskName() + "........";
         logger.info(msg);
 
@@ -892,7 +893,7 @@ public class TransferManagerImpl implements TransferManager {
         TaskLog taskLogTemp = taskLogManager.getObjectById(taskLogId);
         taskLogTemp.setRunEndTime(DatetimeOpt.currentSqlDate());
         taskLogTemp.setOtherMessage(message);
-        taskLogManager.saveNewObject(taskLogTemp);
+        taskLogManager.updateObject(taskLogTemp);
         return message;
     }
 

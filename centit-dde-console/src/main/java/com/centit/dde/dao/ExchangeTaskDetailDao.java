@@ -45,11 +45,8 @@ public class ExchangeTaskDetailDao extends BaseDaoImpl<ExchangeTaskDetail, Seria
 
     public List<ExchangeTaskDetail> getTaskDetails(Long taskId) {
         Map<String, Object> filterMap = new HashMap<>();
-        filterMap.put("task_Id",taskId);
-        List<ExchangeTaskDetail> list = listObjectsBySql(
-            "select task_id,mapinfo_id,mapinfo_order from D_EXCHANGE_TASKDETAIL where task_Id=:task_Id order by mapinfo_order",
-            filterMap);
-        return  list;
+        filterMap.put("taskId",taskId);
+        return listObjects(filterMap);
     }
 
     public Long getMapinfoOrder(Long taskId) {

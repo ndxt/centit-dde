@@ -1,6 +1,5 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.po.*;
 import com.centit.dde.service.*;
 import com.centit.framework.common.JsonResultUtils;
@@ -161,16 +160,9 @@ public class ExchangeTaskController extends BaseController {
         }
     }
 
-    @RequestMapping(value="/edit/{taskId}/{ExchangeIds}" , method = {RequestMethod.GET})
-    public  void edit(@PathVariable Long taskId,@PathVariable String ExchangeIds, HttpServletResponse response) {
+    @RequestMapping(value="/edit/{taskId}/{taskType}/{ExchangeIds}" , method = {RequestMethod.GET})
+    public  void edit(@PathVariable Long taskId,@PathVariable String taskType,@PathVariable String ExchangeIds, HttpServletResponse response) {
         ExchangeTask exchangeTask = exchangeTaskMag.getObjectById(taskId);
-        String taskType ="";
-        if(exchangeTask!=null){
-             taskType = exchangeTask.getTaskType();
-        }
-        if("".equals(taskType)){
-            taskType ="1";
-        }
         if(exchangeTask==null)
             exchangeTask =new ExchangeTask();
         //Map<String, Object> filterMap = new HashMap<>();
@@ -181,7 +173,7 @@ public class ExchangeTaskController extends BaseController {
 
         List<ExchangeMapInfo> exchangeMapInfoList = new ArrayList<>();
 
-        if(taskType.equals("1")){
+        if (taskType.equals("1")) {
             for (ExchangeTaskDetail etd : exchangeTaskDetails) {
                 ExchangeMapInfo exchangeMapInfo = exchangeMapInfoManager.getObjectById(etd.getMapInfoId());
                 if (null != exchangeMapInfo) {
@@ -192,7 +184,7 @@ public class ExchangeTaskController extends BaseController {
             String[] str = ExchangeIds.split(",");
             for (String s : str) {
                 if (NumberUtils.isCreatable(s)) {
-                    if (exchangeTaskDetails.size() >0 ) {
+                    if (exchangeTaskDetails.size() > 0) {
                         for (int i = 0; i < exchangeTaskDetails.size(); i++) {
                             if (Long.valueOf(s) != exchangeTaskDetails.get(i).getMapInfoId()) {
                                 ExchangeMapInfo exchangeMapInfo = exchangeMapInfoManager.getObjectById(Long.valueOf(s));
@@ -210,12 +202,34 @@ public class ExchangeTaskController extends BaseController {
                 }
             }
             exchangeTask.setExchangeMapInfoList(exchangeMapInfoList);
-        }else{
-            for (ExchangeTaskDetail etd : exchangeTaskDetails) {
-                ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapInfoId());
-                if (null != exportSql) {
-                    exportSql.setExportsqlOrder(etd.getMapInfoOrder());
-                    exportSqlList.add(exportSql);
+        } else {
+            if (exchangeTaskDetails.size() > 0) {
+                for (ExchangeTaskDetail etd : exchangeTaskDetails) {
+                    ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapInfoId());
+                    if (null != exportSql) {
+                        exportSql.setExportsqlOrder(etd.getMapInfoOrder());
+                        exportSqlList.add(exportSql);
+                    }
+                }
+            }
+            String[] str = ExchangeIds.split(",");
+            for (String s : str) {
+                if (NumberUtils.isCreatable(s)) {
+                    if (exchangeTaskDetails.size() > 0) {
+                        for (int i = 0; i < exchangeTaskDetails.size(); i++) {
+                            if (Long.valueOf(s) != exchangeTaskDetails.get(i).getMapInfoId()) {
+                                ExportSql exportSql = exportSqlManager.getObjectById(Long.valueOf(s));
+                                if (null != exportSql) {
+                                    exportSqlList.add(exportSql);
+                                }
+                            }
+                        }
+                    } else {
+                        ExportSql exportSql = exportSqlManager.getObjectById(Long.valueOf(s));
+                        if (null != exportSql) {
+                            exportSqlList.add(exportSql);
+                        }
+                    }
                 }
             }
             exchangeTask.setExportSqlList(exportSqlList);
@@ -400,19 +414,29 @@ public class ExchangeTaskController extends BaseController {
     }
 
     @SuppressWarnings("unchecked")
-    @RequestMapping(value="/listExchangeMapInfo/{taskType}/{taskId}", method = {RequestMethod.GET})
-    public void listExchangeMapInfo(@PathVariable String taskType,@PathVariable Long taskId,PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value="/listExchangeMapInfo/{taskType}/{taskId}/{exportId}", method = {RequestMethod.GET})
+    public void listExchangeMapInfo(@PathVariable String taskType,@PathVariable Long taskId,@PathVariable String exportId,
+                                    PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
         
         //做一个判断为了 前面 有的list就不要了
-        Map<String, Object> filterMap = new HashMap<String, Object>();
+        /*Map<String, Object> filterMap = new HashMap<String, Object>();
         filterMap.put("task_Id", taskId);
-        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailManager.listObjects(filterMap);
+        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailManager.listObjects(filterMap);*/
         List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
-        for (ExchangeTaskDetail etd : exchangeTaskDetails) {
+        /*for (ExchangeTaskDetail etd : exchangeTaskDetails) {
             ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapInfoId());
             if (null != exportSql) {
                 exportSql.setExportsqlOrder(etd.getMapInfoOrder());
                 exportSqlList.add(exportSql);
+            }
+        }*/
+        String[] str = exportId.split(",");
+        for (String s : str) {
+            if (NumberUtils.isCreatable(s)) {
+                ExportSql exportSql = exportSqlManager.getObjectById(Long.valueOf(s));
+                if (null != exportSql) {
+                    exportSqlList.add(exportSql);
+                }
             }
         }
         //为了 去除重复项

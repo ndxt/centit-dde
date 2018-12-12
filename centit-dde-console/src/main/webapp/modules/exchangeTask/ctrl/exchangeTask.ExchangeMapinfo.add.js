@@ -56,8 +56,8 @@ define(function(require) {
       if (data.taskId==undefined){
         taskId = -1;
       }
-      var tbparent = panelParent.find('#dlgList');
-      var row = tbparent.datagrid('getRows');
+      var tableparent = panelParent.find('#dlgList');
+      var row = tableparent.datagrid('getRows');
       var i = 0;
       var omapinfoIds = "";
       for(i;i<row.length;i++){
@@ -89,13 +89,13 @@ define(function(require) {
 			// Core.ajax(Config.ContextPath + 'service/exchangetask/importExchangeMapinfo/' + mapinfoIds+'/'+taskId, {
 			// 	method: 'put'
 			// }).then(function() {
-				Core.ajax(Config.ContextPath+'service/exchangetask/edit/'+taskId+'/'+ mapinfoIds, {
+				Core.ajax(Config.ContextPath+'service/exchangetask/edit/'+taskId+'/1/'+ mapinfoIds, {
 					method: 'get',
 					data: {
 	                    _method: 'get'
 	                }
 				}).then(function(data2) {
-					var tableparent = panelParent.find('#dlgList');
+					//var tableparent = panelParent.find('#dlgList');
 					tableparent.datagrid('loadData',data2.exchangeMapInfoList);
 				});
 				//closeCallback();

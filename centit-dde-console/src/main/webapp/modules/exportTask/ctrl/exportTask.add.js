@@ -48,10 +48,13 @@ define(function(require) {
 			// 开启校验
 			form.form('enableValidation');
 			var isValid = form.form('validate');
-			
+      data.taskType = "2";
 			if (isValid) {
+        var exchangeTaskDetails = panel.find('table.tab1').datagrid("getData").rows;
+        data.exchangeTaskDetails = exchangeTaskDetails;
 				form.form('ajax', {
 					url: Config.ContextPath + 'service/exchangetask/save',
+          data: data,
 					method: 'put'
 				}).then(closeCallback);
 			}
