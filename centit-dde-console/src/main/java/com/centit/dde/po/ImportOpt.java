@@ -77,6 +77,8 @@ public class ImportOpt implements java.io.Serializable {
     @JoinColumn(name="IMPORT_ID",referencedColumnName="IMPORT_ID") //这里表示数据库的外键 在t_street里面创建
     private List<ImportField> importFields = null;// new
 
+    @Transient
+    private String optType = "1";
     // Constructors
     /**
      * default constructor
@@ -196,6 +198,13 @@ public class ImportOpt implements java.io.Serializable {
         this.createTime = createTime;
     }
 
+    public String getOptType() {
+        return optType;
+    }
+
+    public void setOptType(String optType) {
+        this.optType = optType;
+    }
 
     public List<ImportTrigger> getImportTriggers() {
         if (this.importTriggers == null)

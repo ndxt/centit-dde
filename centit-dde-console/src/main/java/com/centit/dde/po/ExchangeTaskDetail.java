@@ -32,6 +32,8 @@ public class ExchangeTaskDetail implements java.io.Serializable {
     private Long exportId;
     // Constructors
 
+    @Transient
+    private Long importId;
     /**
      * default constructor
      */
@@ -103,6 +105,14 @@ public class ExchangeTaskDetail implements java.io.Serializable {
 
     public void setExportId(Long exportId) {
         this.exportId = exportId;
+    }
+
+    public Long getImportId() {
+        return importId;
+    }
+
+    public void setImportId(Long importId) {
+        this.importId = importId;
     }
 
     public void clearProperties() {

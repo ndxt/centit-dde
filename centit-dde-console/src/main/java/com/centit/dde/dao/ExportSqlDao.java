@@ -206,4 +206,12 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
             //throw new ObjectException(ObjectException.DATABASE_OPERATE_EXCEPTION,e);
         }
     }
+
+    public ExportSql getObjectById(Long mapInfoId) {
+        ExportSql exportSql = null;
+        if (mapInfoId != null && !"".equals(mapInfoId)) {
+            exportSql = getObjectWithReferences(mapInfoId);
+        }
+        return exportSql;
+    }
 }

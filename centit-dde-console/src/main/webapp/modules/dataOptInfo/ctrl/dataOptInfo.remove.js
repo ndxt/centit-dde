@@ -10,7 +10,7 @@ define(function(require) {
 		// TODO 日志删除
 		// @override
 		this.submit = function(table, data) {
-			Core.ajax(Config.ContextPath+'system/dataoptinfo/'+data.id, {
+			Core.ajax(Config.ContextPath+'service/dataoptinfo/delete/'+data.dataOptId, {
            	type: 'json',
                method: 'post',
                data: {

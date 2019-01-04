@@ -9,13 +9,17 @@ import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.po.ExchangeTaskDetail;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.service.ExchangeTaskManager;
+import com.centit.dde.service.IQuartzJobBean;
+import com.centit.dde.service.SchedulerManager;
 import com.centit.dde.transfer.TransferManager;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import com.centit.framework.security.model.CentitUserDetails;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -28,7 +32,7 @@ import java.util.*;
 @Service
 public class ExchangeTaskManagerImpl
         extends BaseEntityManagerImpl<ExchangeTask,Long,ExchangeTaskDao>
-        implements ExchangeTaskManager, org.quartz.Job {
+        implements ExchangeTaskManager, IQuartzJobBean, org.quartz.Job {
 
     public static final Log logger = LogFactory.getLog(ExchangeTaskManager.class);
 
@@ -45,6 +49,9 @@ public class ExchangeTaskManagerImpl
     private ExportData exportData;
 
     private ImportData importData;
+
+    @Resource
+    private SchedulerManager schedulerManager;
     
     public void setImportData(ImportData importData) {
         this.importData = importData;
@@ -95,6 +102,26 @@ public class ExchangeTaskManagerImpl
                 }
             }
         }
+    }
+
+    @Override
+    public void executeInternal(JobExecutionContext jobexecutioncontext) throws JobExecutionException {
+        Long taskId = jobexecutioncontext.getJobDetail().getJobDataMap().getLong(EXCHANGE_TASK_ID);
+
+        // 判断启用禁用
+        ExchangeTask object = getObjectById(taskId);
+        if ("0".equals(object.getIsvalid())) {
+            return;
+        }
+
+
+        //更新下次执行时间
+        CronSequenceGenerator generator = new CronSequenceGenerator(object.getTaskCron(), TimeZone.getDefault());
+        object.setNextRunTime(generator.next(new Date()));
+        exchangeTaskDao.saveNewObject(object);
+
+        //执行调试
+        executeTask(object,"System","0");
     }
 
     @Override
@@ -150,21 +177,21 @@ public class ExchangeTaskManagerImpl
 
     @Override
     public void saveNewTimerTask(ExchangeTask exchangeTask) {
-        //JobDetail jobDetail = schedulerManager.getJobDetail(JOB_NAME_PREFIX + exchangeTask.getTaskId(),
-        //        JOB_GROUP_EXCHANGETASK);
+        JobDetail jobDetail = schedulerManager.getJobDetail(JOB_NAME_PREFIX + exchangeTask.getTaskId(),
+                JOB_GROUP_EXCHANGETASK);
         // 设置回调
-        //jobDetail.getJobDataMap().put(QuartzJobBean.QUARTZ_JOB_BEAN_KEY, this);
+        jobDetail.getJobDataMap().put(IQuartzJobBean.QUARTZ_JOB_BEAN_KEY, this);
 
-        //jobDetail.getJobDataMap().put(EXCHANGE_TASK_ID, exchangeTask.getTaskId());
-        //schedulerManager.schedule(jobDetail, "Trigger_ExchangeTask_" + exchangeTask.getTaskId(),
-        //       JOB_GROUP_EXCHANGETASK, exchangeTask.getTaskCron());
+        jobDetail.getJobDataMap().put(EXCHANGE_TASK_ID, exchangeTask.getTaskId());
+        schedulerManager.schedule(jobDetail, "Trigger_ExchangeTask_" + exchangeTask.getTaskId(),
+              JOB_GROUP_EXCHANGETASK, exchangeTask.getTaskCron());
 
     }
 
     @Override
     public boolean delTimerTask(ExchangeTask exchangeTask) {
-        return false;
-        //return schedulerManager.deleteJob(JOB_NAME_PREFIX + exchangeTask.getTaskId(), JOB_GROUP_EXCHANGETASK);
+        //return false;
+        return schedulerManager.deleteJob(JOB_NAME_PREFIX + exchangeTask.getTaskId(), JOB_GROUP_EXCHANGETASK);
     }
 
     @Override
@@ -203,7 +230,7 @@ public class ExchangeTaskManagerImpl
             object.setIsvalid("1");
             if (user != null) {
                 object.setCreated(user.getUserCode());
-                object.setCreatedName(user.getUserInfo().getUserName());
+                object.setCreatedName(user.getUsername());
             }
 //                saveMessage("添加交换任务成功！");
         } else {

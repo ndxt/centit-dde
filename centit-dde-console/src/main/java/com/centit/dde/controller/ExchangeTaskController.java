@@ -59,6 +59,9 @@ public class ExchangeTaskController extends BaseController {
     @Resource
     private ExportSqlManager exportSqlManager;
 
+    @Resource
+    private ImportOptManager importOptManager;
+
     @RequestMapping(value="/list/{taskType}" , method = {RequestMethod.GET})
     public void list(@PathVariable String taskType ,PageDesc pageDesc, HttpServletRequest request,HttpServletResponse response) {
         Map<String, Object> searchColumn = convertSearchColumn(request);
@@ -171,6 +174,8 @@ public class ExchangeTaskController extends BaseController {
 
         List<ExportSql> exportSqlList = new ArrayList<>();
 
+        List<ImportOpt> importOptList = new ArrayList<>();
+
         List<ExchangeMapInfo> exchangeMapInfoList = new ArrayList<>();
 
         if (taskType.equals("1")) {
@@ -202,7 +207,38 @@ public class ExchangeTaskController extends BaseController {
                 }
             }
             exchangeTask.setExchangeMapInfoList(exchangeMapInfoList);
-        } else {
+        } else if (taskType.equals("3")) {
+            if (exchangeTaskDetails.size() > 0) {
+                for (ExchangeTaskDetail etd : exchangeTaskDetails) {
+                    ImportOpt importOpt = importOptManager.getObjectById(etd.getMapInfoId());
+                    if (null != importOpt) {
+                        importOptList.add(importOpt);
+                    }
+                }
+            }
+            String[] str = ExchangeIds.split(",");
+            for (String s : str) {
+                if (NumberUtils.isCreatable(s)) {
+                    if (exchangeTaskDetails.size() > 0) {
+                        for (int i = 0; i < exchangeTaskDetails.size(); i++) {
+                            if (Long.valueOf(s) != exchangeTaskDetails.get(i).getMapInfoId()) {
+                                ImportOpt importOpt = importOptManager.getObjectById(Long.valueOf(s));
+                                if (null != importOpt) {
+                                    importOptList.add(importOpt);
+                                }
+                            }
+                        }
+                    } else {
+                        ImportOpt importOpt = importOptManager.getObjectById(Long.valueOf(s));
+                        if (null != importOpt) {
+                            importOptList.add(importOpt);
+                        }
+                    }
+                }
+            }
+            exchangeTask.setImportOptList(importOptList);
+        }
+        else {
             if (exchangeTaskDetails.size() > 0) {
                 for (ExchangeTaskDetail etd : exchangeTaskDetails) {
                     ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapInfoId());
@@ -417,42 +453,58 @@ public class ExchangeTaskController extends BaseController {
     @RequestMapping(value="/listExchangeMapInfo/{taskType}/{taskId}/{exportId}", method = {RequestMethod.GET})
     public void listExchangeMapInfo(@PathVariable String taskType,@PathVariable Long taskId,@PathVariable String exportId,
                                     PageDesc pageDesc,HttpServletRequest request,HttpServletResponse response) {
-        
-        //做一个判断为了 前面 有的list就不要了
-        /*Map<String, Object> filterMap = new HashMap<String, Object>();
-        filterMap.put("task_Id", taskId);
-        List<ExchangeTaskDetail> exchangeTaskDetails = exchangeTaskdetailManager.listObjects(filterMap);*/
-        List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
-        /*for (ExchangeTaskDetail etd : exchangeTaskDetails) {
-            ExportSql exportSql = exportSqlManager.getObjectById(etd.getMapInfoId());
-            if (null != exportSql) {
-                exportSql.setExportsqlOrder(etd.getMapInfoOrder());
-                exportSqlList.add(exportSql);
-            }
-        }*/
-        String[] str = exportId.split(",");
-        for (String s : str) {
-            if (NumberUtils.isCreatable(s)) {
-                ExportSql exportSql = exportSqlManager.getObjectById(Long.valueOf(s));
-                if (null != exportSql) {
-                    exportSqlList.add(exportSql);
+        if (taskType.equals("2")) {
+            List<ExportSql> exportSqlList = new ArrayList<ExportSql>();
+            String[] str = exportId.split(",");
+            for (String s : str) {
+                if (NumberUtils.isCreatable(s)) {
+                    ExportSql exportSql = exportSqlManager.getObjectById(Long.valueOf(s));
+                    if (null != exportSql) {
+                        exportSqlList.add(exportSql);
+                    }
                 }
             }
-        }
-        //为了 去除重复项
-        Map<String, Object> searchColumn = convertSearchColumn(request);
-        List<ExportSql> objList = exportSqlManager.listObjects(searchColumn);
-        for(ExportSql sql : exportSqlList ){
-            for(int i=0;i< objList.size();i++ ){
-                if(sql.getExportId() == objList.get(i).getExportId()){
-                    objList.remove(i);
+            //为了 去除重复项
+            Map<String, Object> searchColumn = convertSearchColumn(request);
+            List<ExportSql> objList = exportSqlManager.listObjects(searchColumn);
+            for (ExportSql sql : exportSqlList) {
+                for (int i = 0; i < objList.size(); i++) {
+                    if (sql.getExportId() == objList.get(i).getExportId()) {
+                        objList.remove(i);
+                    }
                 }
             }
+            ResponseMapData resData = new ResponseMapData();
+            resData.addResponseData(OBJLIST, objList);
+            resData.addResponseData(PAGE_DESC, pageDesc);
+            JsonResultUtils.writeResponseDataAsJson(resData, response);
+        } else
+        if (taskType.equals("3")) {
+            List<ImportOpt> importOptList = new ArrayList<ImportOpt>();
+            String[] str = exportId.split(",");
+            for (String s : str) {
+                if (NumberUtils.isCreatable(s)) {
+                    ImportOpt importOpt = importOptManager.getObjectById(Long.valueOf(s));
+                    if (null != importOpt) {
+                        importOptList.add(importOpt);
+                    }
+                }
+            }
+            //为了 去除重复项
+            Map<String, Object> searchColumn = convertSearchColumn(request);
+            List<ImportOpt> objList = importOptManager.listObjects(searchColumn);
+            for (ImportOpt sql : importOptList) {
+                for (int i = 0; i < objList.size(); i++) {
+                    if (sql.getImportId() == objList.get(i).getImportId()) {
+                        objList.remove(i);
+                    }
+                }
+            }
+            ResponseMapData resData = new ResponseMapData();
+            resData.addResponseData(OBJLIST, objList);
+            resData.addResponseData(PAGE_DESC, pageDesc);
+            JsonResultUtils.writeResponseDataAsJson(resData, response);
         }
-        ResponseMapData resData = new ResponseMapData();
-        resData.addResponseData(OBJLIST, objList);
-        resData.addResponseData(PAGE_DESC, pageDesc);
-        JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
     
     @RequestMapping(value="/ExchangeMapInfolist/{taskType}/{taskId}/{ExchangeIds}", method = {RequestMethod.GET})

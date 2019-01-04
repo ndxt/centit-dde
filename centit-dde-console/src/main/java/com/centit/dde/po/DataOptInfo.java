@@ -56,8 +56,8 @@ public class DataOptInfo implements java.io.Serializable {
     @Column(name = "CREATE_TIME")
     private Date createTime;
     
-    @OneToMany(orphanRemoval=true,fetch=FetchType.LAZY)
-    @JoinColumn(name="DATA_OPT_ID") //这里表示数据库的外键 在t_street里面创建
+    @OneToMany(targetEntity=DataOptStep.class)
+    @JoinColumn(name="DATA_OPT_ID", referencedColumnName="DATA_OPT_ID")
     private List<DataOptStep> dataOptSteps = null;
 
     /**

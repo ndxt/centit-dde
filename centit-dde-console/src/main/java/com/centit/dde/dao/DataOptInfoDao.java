@@ -10,6 +10,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,5 +55,31 @@ public class DataOptInfoDao extends BaseDaoImpl<DataOptInfo,String> {
 
         return (List<DataOptStep>) DatabaseOptUtils.getObjectBySqlAsJson(this,hql,
                 QueryUtils.createSqlParamsMap("dataOptId", object.getDataOptId()));
+    }
+
+    public DataOptInfo getObjectById(String dataOptId) {
+        DataOptInfo dataOptInfo = null;
+        if (dataOptId != null && !"".equals(dataOptId)) {
+            dataOptInfo = getObjectWithReferences(dataOptId);
+        }
+        StringBuilder sql = new StringBuilder();
+        Object obj;
+        sql.append("select import_name from d_import_opt t where t.import_id = ? ");
+        for (DataOptStep dataOptStep : dataOptInfo.getDataOptSteps()) {
+            //obj = DatabaseOptUtils.getScalarObjectQuery(this,sql.toString(),new Object[] {dataOptStep.getImportId()});
+            try {
+                if (dataOptStep.getImportId() != null && !"".equals(dataOptStep.getImportId())) {
+                    obj = DatabaseOptUtils.getScalarObjectQuery(this, sql.toString(), (Object) dataOptStep.getImportId());
+                    if (obj != null) {
+                        dataOptStep.setImportName(obj.toString());
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return dataOptInfo;
     }
 }

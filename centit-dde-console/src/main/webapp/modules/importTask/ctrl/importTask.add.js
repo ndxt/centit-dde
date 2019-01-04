@@ -47,10 +47,11 @@ define(function(require) {
 			// 开启校验
 			form.form('enableValidation');
 			var isValid = form.form('validate');
-			
+      data.taskType = "3";
 			if (isValid) {
 				form.form('ajax', {
 					url: Config.ContextPath + 'service/exchangetask/save',
+          data:data,
 					method: 'put'
 				}).then(closeCallback);
 			}

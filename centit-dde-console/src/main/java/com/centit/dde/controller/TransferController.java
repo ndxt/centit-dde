@@ -38,13 +38,16 @@ public class TransferController extends BaseController {
     @Resource
     private TransferManager transferManager;
 
+    @Resource
     private ExportData exportData;
 
+    @Resource
     private ImportData importData;
 
+    @Resource
     private CallWebService callWebService;
 
-    public void setCallWebService(CallWebService callWebService) {
+    /*public void setCallWebService(CallWebService callWebService) {
         this.callWebService = callWebService;
     }
 
@@ -55,7 +58,7 @@ public class TransferController extends BaseController {
     public void setExportData(ExportData exportData) {
         this.exportData = exportData;
     }
-
+    */
     
     @RequestMapping(value="/doTransfer/{taskIds}", method = {RequestMethod.POST})
     public void doTransfer(@PathVariable Long taskIds,  HttpServletRequest request,HttpServletResponse response) {

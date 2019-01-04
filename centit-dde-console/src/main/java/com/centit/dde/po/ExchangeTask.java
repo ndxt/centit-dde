@@ -71,7 +71,10 @@ public class ExchangeTask implements java.io.Serializable {
     
     @Transient
     private List<ExportSql> exportSqlList = null;
-    
+
+    @Transient
+    private List<ImportOpt> importOptList = null;
+
     @Transient
     private List<ExchangeMapInfo> exchangeMapInfoList = null;
     
@@ -91,7 +94,15 @@ public class ExchangeTask implements java.io.Serializable {
         this.exportSqlList = exportSqlList;
     }
 
-//    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY )
+    public List<ImportOpt> getImportOptList() {
+        return importOptList;
+    }
+
+    public void setImportOptList(List<ImportOpt> importOptList) {
+        this.importOptList = importOptList;
+    }
+
+    //    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY )
 //    @JoinColumn(name="TASK_ID") //这里表示数据库的外键 在t_street里面创建
     @Transient
     private List<TaskLog> taskLogs ;// new ArrayList<TaskLog>();

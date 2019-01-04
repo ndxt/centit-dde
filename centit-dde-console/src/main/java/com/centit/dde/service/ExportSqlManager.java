@@ -4,7 +4,7 @@ import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportSql;
 import com.centit.framework.jdbc.service.BaseEntityManager;
-import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.security.model.CentitUserDetails;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public interface ExportSqlManager extends BaseEntityManager<ExportSql,Long> {
      * @param userDetail
      * @throws SqlResolveException
      */
-    void saveObject(ExportSql object, IUserInfo userDetail);
+    void saveObject(ExportSql object, CentitUserDetails userDetail);
 
     /**
      * 根据 querysql 检查sql语句的有效性并且返回字段信息

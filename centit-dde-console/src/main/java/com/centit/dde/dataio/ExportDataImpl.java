@@ -20,6 +20,8 @@ import com.centit.support.algorithm.DatetimeOpt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.sql.*;
@@ -354,10 +356,11 @@ public class ExportDataImpl implements ExportData, CallWebService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public String runExportTask(Long taskID, String userCode, String runType,String taskType) {
         ExchangeTask exchangeTask = exchangeTaskDao.getObjectById(taskID);
         exchangeTask.setLastRunTime(DatetimeOpt.currentSqlDate());
-        exchangeTaskDao.saveNewObject(exchangeTask);
+        exchangeTaskDao.updateObject(exchangeTask);
         String msg = "开始执行任务编号 = " + taskID + " 导出任务名称 = " + exchangeTask.getTaskName() + " 的导出任务........";
         logger.info(msg);
 
@@ -381,9 +384,9 @@ public class ExportDataImpl implements ExportData, CallWebService {
         String ddeId = SysParametersUtils.getStringValue("dde_id");
         String filePath = SysParametersUtils.getStringValue("app.home") + "/export/temp";
 
-        TaskConsoleWriteUtils.write(taskID, "导出文件目录 = " + export);
+        TaskConsoleWriteUtils.write(taskID, "导出文件目录 = " + filePath);
 
-        ef.setFilePath(export);
+        ef.setFilePath(filePath);
         // FileSystemOpt.createDirect(appPath+"/temp");
         ef.setDdeID(ddeId);
         ef.setExchangeName(exchangeTask.getTaskName());
@@ -450,7 +453,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
 
                 TaskConsoleWriteUtils.writeInfo(taskID, msg);
             }
-            taskDetailLogManager.saveNewObject(taskDetailLog);
+            taskDetailLogManager.updateObject(taskDetailLog);
 
         }
         ef.writeDataEnd();
@@ -465,13 +468,13 @@ public class ExportDataImpl implements ExportData, CallWebService {
         logger.info(msg);
 
         TaskConsoleWriteUtils.writeInfo(taskID, msg);
-        TaskConsoleWriteUtils.writeInfo(taskID, "导出文件目录 = " + export);
+        TaskConsoleWriteUtils.writeInfo(taskID, "导出文件目录 = " + filePath);
         TaskConsoleWriteUtils.stop(taskID);
 
         // TaskLog taskLogTemp = taskLogManager.getObjectById(taskLogId);
         taskLog.setRunEndTime(DatetimeOpt.currentSqlDate());
         taskLog.setOtherMessage(message);
-        taskLogManager.saveNewObject(taskLog);
+        taskLogManager.updateObject(taskLog);
 
         return message;
 
@@ -503,6 +506,7 @@ public class ExportDataImpl implements ExportData, CallWebService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public String runCallServiceTask(Long taskID, String userCode, String runType, String taskType) {
         ExchangeTask exchangeTask = exchangeTaskDao.getObjectById(taskID);
         exchangeTask.setLastRunTime(DatetimeOpt.currentSqlDate());

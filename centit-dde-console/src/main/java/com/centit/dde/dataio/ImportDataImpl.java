@@ -15,6 +15,8 @@ import com.centit.support.file.FileSystemOpt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -131,7 +133,7 @@ public class ImportDataImpl implements ImportData {
 
         taskLog.setRunEndTime(DatetimeOpt.currentSqlDate());
         taskLog.setOtherMessage(message);
-        taskLogManager.saveNewObject(taskLog);
+        taskLogManager.updateObject(taskLog);
         return 0;
     }
 
@@ -167,12 +169,13 @@ public class ImportDataImpl implements ImportData {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public String runImportTask(Long taskID, String userCode, String runType) {
         String msg = null;
 
         ExchangeTask exchangeTask = exchangeTaskDao.getObjectById(taskID);
         exchangeTask.setLastRunTime(DatetimeOpt.currentSqlDate());
-        exchangeTaskDao.saveNewObject(exchangeTask);
+        exchangeTaskDao.updateObject(exchangeTask);
         msg = "开始执行导入：" + exchangeTask.getTaskName() + "........";
         logger.info(msg);
 

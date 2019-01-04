@@ -40,7 +40,7 @@ public class DataOptInfoController extends BaseController {
 
     @RequestMapping(value="/save",method = {RequestMethod.PUT})
     public void save(DataOptInfo object, HttpServletRequest request,HttpServletResponse response) {
-        dataOptInfoManager.saveObject(object, getLoginUser(request).getUserInfo());
+        dataOptInfoManager.saveObject(object, getLoginUser(request));
 
         JsonResultUtils.writeSuccessJson(response);
     }

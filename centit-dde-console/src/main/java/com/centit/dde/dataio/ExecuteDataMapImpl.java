@@ -204,12 +204,12 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         if ("0:ok".equals(res)) {
             taskDetailLog.setSuccessPieces(1l);
             taskDetailLog.setErrorPieces(0l);
-            taskDetailLogManager.saveNewObject(taskDetailLog);
+            taskDetailLogManager.updateObject(taskDetailLog);
             return 0;
         } else {// write log
             taskDetailLog.setSuccessPieces(0l);
             taskDetailLog.setErrorPieces(1l);
-            taskDetailLogManager.saveNewObject(taskDetailLog);
+            taskDetailLogManager.updateObject(taskDetailLog);
             return -3;
         }
     }
@@ -644,7 +644,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         taskDetailLog.setSuccessPieces(nRows - nErrors);
         taskDetailLog.setErrorPieces(nErrors);
         taskDetailLog.setRunEndTime(endTime);
-        taskDetailLogManager.saveNewObject(taskDetailLog);
+        taskDetailLogManager.updateObject(taskDetailLog);
 
         if (null != se) {
             TaskConsoleWriteUtils.writeError(taskId, se.getMessage());

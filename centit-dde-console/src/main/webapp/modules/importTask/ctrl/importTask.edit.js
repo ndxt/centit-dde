@@ -21,7 +21,7 @@ define(function(require) {
 		this.load = function(panel, data) {
 			var form = panel.find('form');
 			
-			Core.ajax(Config.ContextPath+'service/exchangetask/edit/'+data.taskId, {
+			Core.ajax(Config.ContextPath+'service/exchangetask/edit/'+data.taskId+'/3/'+-1, {
 				method: 'get',
 				data: {
                     _method: 'get'

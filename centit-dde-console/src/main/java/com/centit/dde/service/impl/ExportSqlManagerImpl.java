@@ -10,9 +10,11 @@ import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +61,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void saveObject(ExportSql object, IUserInfo userDetail) {
+    public void saveObject(ExportSql object, CentitUserDetails userDetail) {
         DatabaseInfo dbinfo =  integrationEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
         try {
             checkObject(object);

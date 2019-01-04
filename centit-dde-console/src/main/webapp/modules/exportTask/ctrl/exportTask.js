@@ -10,6 +10,7 @@ define(function(require) {
     var exportTaskAdd = require('./exportTask.add');
     var exportTaskEdit = require('./exportTask.edit');
     var exportTaskRemove = require('./exportTask.remove');
+    var exportTaskRun = require('./exportTask.run');
 
     // 业务信息
     var exportTask = Page.extend(function() {
@@ -19,7 +20,8 @@ define(function(require) {
     	this.injecte([
           new exportTaskAdd('exportTask_add'),
           new exportTaskEdit('exportTask_edit'),
-          new exportTaskRemove('exportTask_remove')
+          new exportTaskRemove('exportTask_remove'),
+          new exportTaskRun('exportTask_transfer_run')
     	]);
     	
     	// @override

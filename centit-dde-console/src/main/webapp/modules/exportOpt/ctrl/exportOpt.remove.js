@@ -1,6 +1,5 @@
 define(function(require) {
-	require('plugins/extend');
-
+  var Config = require('config');
 	var Page = require('core/page');
 	var Core = require('core/core');
 	
@@ -9,7 +8,7 @@ define(function(require) {
 		// TODO 日志删除
 		// @override
 		this.submit = function(table, data) {
-			Core.ajax(Config.ContextPath+'system/optinfo/'+data.id, {
+			Core.ajax(Config.ContextPath+'service/exportsql/delete/'+data.exportId, {
            	type: 'json',
                method: 'post',
                data: {
