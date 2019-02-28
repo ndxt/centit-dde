@@ -1,7 +1,5 @@
 package com.centit.dde.po;
 
-import java.beans.Transient;
-
 public class MapInfoDetail implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     

@@ -1,7 +1,6 @@
 package com.centit.dde.po;
 
 import java.util.*;
-
 /**
  * create by scaffold
  *
@@ -92,6 +91,10 @@ public class DataOptInfo implements java.io.Serializable {
         this.optName = optName;
     }
 
+    /**
+     * 用啊方
+     * @return
+     */
     public String getOptDesc() {
         return this.optDesc;
     }

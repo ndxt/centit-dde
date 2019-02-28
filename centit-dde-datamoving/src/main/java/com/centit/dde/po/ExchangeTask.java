@@ -1,6 +1,5 @@
 package com.centit.dde.po;
 
-import java.beans.Transient;
 import java.util.*;
 
 /**

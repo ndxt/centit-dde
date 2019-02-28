@@ -1,6 +1,7 @@
 package com.centit.dde.po;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * create by scaffold
