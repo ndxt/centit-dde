@@ -10,7 +10,6 @@ import com.centit.framework.ip.service.impl.JsonIntegrationEnvironment;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
-import com.centit.framework.security.model.MemorySessionRegistryImpl;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
@@ -36,12 +35,7 @@ public class ServiceConfig {
      */
     @Bean("passwordEncoder")
     public StandardPasswordEncoderImpl passwordEncoder() {
-        return  new StandardPasswordEncoderImpl();
-    }
-    //这个bean必须要有 可以配置不同策略的session保存方案
-    @Bean
-    public SessionRegistry sessionRegistry(){
-        return new MemorySessionRegistryImpl();
+        return new StandardPasswordEncoderImpl();
     }
 
     @Bean
