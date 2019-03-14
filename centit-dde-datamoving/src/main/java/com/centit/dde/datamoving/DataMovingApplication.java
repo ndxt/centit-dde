@@ -1,5 +1,8 @@
 package com.centit.dde.datamoving;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@SpringBootApplication
 public class DataMovingApplication {
     /**
      * 这个只做一个任务的一次交换
@@ -12,5 +15,6 @@ public class DataMovingApplication {
         }
         String taskId = args[0];
         System.out.println(taskId);
+        SpringApplication.run(DataMovingApplication.class, args);
     }
 }
