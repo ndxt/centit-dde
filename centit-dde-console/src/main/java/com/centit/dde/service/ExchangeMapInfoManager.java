@@ -1,6 +1,5 @@
 package com.centit.dde.service;
 
-import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExchangeMapInfo;
 import com.centit.dde.po.MapInfoDetail;
 import com.centit.support.database.utils.PageDesc;
@@ -14,7 +13,7 @@ public interface ExchangeMapInfoManager extends BaseEntityManager<ExchangeMapInf
 
     List<ExchangeMapInfo> listImportExchangeMapinfo(List<Long> mapinfoId);
 
-    void save(ExchangeMapInfo object) throws SqlResolveException;
+    void save(ExchangeMapInfo object);
 
     List<ExchangeMapInfo> listObjectExcludeUsed(Map<String, Object> filterMap, PageDesc pageDesc);
 

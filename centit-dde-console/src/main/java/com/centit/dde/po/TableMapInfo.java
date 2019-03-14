@@ -1,7 +1,7 @@
 package com.centit.dde.po;
 
-import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.util.ItemValue;
+import com.centit.framework.common.ObjectException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
@@ -75,14 +75,14 @@ public class TableMapInfo {
         return outs;
     }
 
-    public void loadMapFromData(ExchangeMapInfo exchangeMapInfo) throws SqlResolveException {
+    public void loadMapFromData(ExchangeMapInfo exchangeMapInfo) {
         if (logger.isDebugEnabled()) {
             logger.debug("解析数据交换对应关系属性值...");
         }
         try {
             sourceSql = exchangeMapInfo.getQuerySql();
             desTable = exchangeMapInfo.getDestTableName();
-            
+
             if ("1".equals(exchangeMapInfo.getRecordOperate())) {
                 rowOptType = "insert";
             } else if ("2".equals(exchangeMapInfo.getRecordOperate())) {
@@ -130,12 +130,12 @@ public class TableMapInfo {
                 map.setRightName(mapInfoDetail.getDestFieldName());
                 fieldsMap.add(map);
             }
-            
+
             fieldCount = fieldsMap.size();// exchangeMapInfo.getMapInfoDetails().size();
-            
+
             makeSqlNoNamedParams();
         } catch (Exception e) {
-            throw new SqlResolveException(e.getMessage(), e);
+            throw new ObjectException(e.getMessage(), e);
         }
     }
 

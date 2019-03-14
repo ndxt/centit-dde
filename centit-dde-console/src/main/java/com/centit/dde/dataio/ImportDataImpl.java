@@ -3,7 +3,6 @@ package com.centit.dde.dataio;
 import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.datafile.ExchangeFileReader;
 import com.centit.dde.datafile.TableFileReader;
-import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.service.TaskLogManager;
@@ -103,12 +102,7 @@ public class ImportDataImpl implements ImportData {
                 logger.debug("执行导入 " + tr.getFilePath() + " 目录文件");
             }
 
-            int nRes = -1;
-            try {
-                nRes = executeDataMap.doExecute(tr, userCode, runType, taskLogId);
-            } catch (SqlResolveException e) {
-                logger.error(e.getMessage(), e);
-            }
+            int nRes = executeDataMap.doExecute(tr, userCode, runType, taskLogId);
 
             if (debugEnabled) {
                 logger.debug("执行导入 " + tr.getFilePath() + " 目录文件结束");
@@ -159,7 +153,7 @@ public class ImportDataImpl implements ImportData {
             logger.debug("解压.zip文件结束");
         }
         int n = doImport(dataPath, userCode, runType, taskId);
-        
+
         FileSystemOpt.deleteDirect(new File(dataPath));
         return n;
     }

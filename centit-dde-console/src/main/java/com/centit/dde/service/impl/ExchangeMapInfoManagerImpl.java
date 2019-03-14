@@ -2,12 +2,12 @@ package com.centit.dde.service.impl;
 
 import com.centit.dde.dao.ExchangeMapInfoDao;
 import com.centit.dde.dao.MapInfoTriggerDao;
-import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExchangeMapInfo;
 import com.centit.dde.po.MapInfoDetail;
 import com.centit.dde.po.MapInfoTrigger;
 import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.util.ConnPool;
+import com.centit.framework.common.ObjectException;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
@@ -54,15 +54,15 @@ public class ExchangeMapInfoManagerImpl
         return exchangeMapInfoDao.listImportExchangeMapinfo(mapinfoId);
     }
 
-    private void validator(ExchangeMapInfo object) throws SqlResolveException {
+    private void validator(ExchangeMapInfo object) {
         if (!StringUtils.hasText(object.getQuerySql())) {
-            throw new SqlResolveException(10001);//源sql语句为空
+            throw new ObjectException(10001, "源sql语句为空");
         }
         object.setQuerySql(object.getQuerySql().toUpperCase());
 
         DatabaseInfo dbinfo = integrationEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
         if (null == dbinfo) {
-            throw new SqlResolveException(10002);
+            throw new ObjectException(10002,"数据库信息找不到");
         }
 
         // 验证触发器的参数是否在字段中存在
@@ -74,7 +74,7 @@ public class ExchangeMapInfoManagerImpl
         for (MapInfoTrigger et : object.getMapInfoTriggers()) {
             triggerSql = et.getTriggerSql();
             if (!StringUtils.hasText(triggerSql)) {
-                throw new SqlResolveException(10003);
+                throw new ObjectException(10003,"验证触发器的参数是否在字段中存在");
             }
             triggerSql = triggerSql.toUpperCase();
             et.setTriggerSql(triggerSql);
@@ -98,7 +98,7 @@ public class ExchangeMapInfoManagerImpl
             }
             //源字段和常量不能同时为空
             if (!StringUtils.hasText(sourceFieldName) && !StringUtils.hasText(ef.getDestFieldDefault())) {
-                throw new SqlResolveException(10003);
+                throw new ObjectException(10003,"源字段和常量不能同时为空");
             }
 
             fields.add(sourceFieldName.toUpperCase());
@@ -110,7 +110,7 @@ public class ExchangeMapInfoManagerImpl
 
         // 未设置主键字段
         if (0 == pkNum) {
-            throw new SqlResolveException(10004);
+            throw new ObjectException(10003,"未设置主键字段");
         }
 
         fields.add("TODAY");
@@ -122,19 +122,19 @@ public class ExchangeMapInfoManagerImpl
 
         for (String param : params) {
             if (!fields.contains(param.toUpperCase())) {
-                throw new SqlResolveException("触发器中参数名[" + param + "]不存在于字段名称中");
+                throw new ObjectException(10003,"触发器中参数名[" + param + "]不存在于字段名称中");
             }
         }
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void save(ExchangeMapInfo object) throws SqlResolveException {
+    public void save(ExchangeMapInfo object)  {
 
         //判断交换名称的唯一性
         if(checkName(object.getMapInfoId(), object.getMapInfoName())){
             log.error("交换名称已存在");
-            throw new SqlResolveException("交换名称"+object.getMapInfoName()+"已存在,请更换！");
+            throw new ObjectException("交换名称"+object.getMapInfoName()+"已存在,请更换！");
         }
 
         validator(object);

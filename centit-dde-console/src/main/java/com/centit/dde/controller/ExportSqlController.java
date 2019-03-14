@@ -1,6 +1,5 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportSql;
 import com.centit.dde.service.ExportSqlManager;
@@ -81,11 +80,7 @@ public class ExportSqlController extends BaseController {
     @RequestMapping(value="/resolveQuerySql" ,method = {RequestMethod.POST})
     public void resolveQuerySql(ExportSql object,HttpServletResponse response) {
         List<ExportField> fields = new ArrayList();
-        try {
-            fields = exportSqlManager.listExportFieldsByQuerysql(object);
-        } catch (SqlResolveException e) {
-        }
-
+        fields = exportSqlManager.listExportFieldsByQuerysql(object);
         JsonResultUtils.writeSingleDataJson(fields, response);
     }
 
@@ -114,7 +109,7 @@ public class ExportSqlController extends BaseController {
 
         List<DataDictionary> dataTypes = (List<DataDictionary>) CodeRepositoryUtil.getDictionary("DATA_TYPE");
 //        Map<String, List<String>> dataTypeMap = new HashMap<String, List<String>>();
-        
+
         ResponseMapData resData = new ResponseMapData();
 
         for (DataDictionary dataType : dataTypes) {

@@ -1,8 +1,8 @@
 package com.centit.dde.dao;
 
-import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExportField;
 import com.centit.dde.po.ExportSql;
+import com.centit.framework.common.ObjectException;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
@@ -92,7 +92,7 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
         return DatabaseOptUtils.getSequenceNextValue(this,"D_MAPINFOID");
     }
 
-    public List<String> listDbTables(DatabaseInfo dbinfo) throws SqlResolveException {
+    public List<String> listDbTables(DatabaseInfo dbinfo){
         List<String> tableNames = new ArrayList<String>();
         Connection conn = null;
         try {
@@ -109,7 +109,7 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
         } catch (SQLException e) {
             logger.error("读取表和视图出错", e);
 
-            throw new SqlResolveException(20000, e);
+            throw new ObjectException(20000, e);
         } finally {
             try {
                 conn.close();
@@ -121,7 +121,7 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
         return tableNames;
     }
 
-    public ExportSql getTableMetadata(ExportSql exportSql, DatabaseInfo dbinfo) throws SqlResolveException {
+    public ExportSql getTableMetadata(ExportSql exportSql, DatabaseInfo dbinfo) {
         Connection conn = null;
         Statement statement = null;
         ResultSet rs = null;
@@ -150,7 +150,7 @@ public class ExportSqlDao extends BaseDaoImpl<ExportSql,Long> {
             //}
         } catch (SQLException e) {
             logger.error("读取表中的数据列及数据类型出错", e);
-            throw new SqlResolveException(20000, e);
+            throw new ObjectException(20000, e);
         } finally {
             try {
                 conn.close();

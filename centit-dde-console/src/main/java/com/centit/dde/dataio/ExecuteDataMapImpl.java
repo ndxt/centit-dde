@@ -3,7 +3,6 @@ package com.centit.dde.dataio;
 import com.centit.dde.dao.DataOptInfoDao;
 import com.centit.dde.dao.ImportOptDao;
 import com.centit.dde.datafile.TableFileReader;
-import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.*;
 import com.centit.dde.service.TaskDetailLogManager;
 import com.centit.dde.service.TaskErrorDataManager;
@@ -11,9 +10,7 @@ import com.centit.dde.service.TaskLogManager;
 import com.centit.dde.util.ConnPool;
 import com.centit.dde.util.ItemValue;
 import com.centit.dde.util.TaskConsoleWriteUtils;
-import com.centit.dde.ws.UploadData;
-import com.centit.dde.ws.WebServiceTransferClient;
-import com.centit.dde.ws.WsDataException;
+import com.centit.framework.common.ObjectException;
 import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
@@ -85,10 +82,9 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
      * @param userCode
      * @param runType  1:手动 0：系统自动 2:WebService接口
      * @return
-     * @throws SqlResolveException
      */
     public int doExecute(TableFileReader xmlData, String userCode, String runType, Long taskLogId)
-            throws SqlResolveException {
+            {
         String msg = null;
 
         TaskLog taskLog = taskLogManager.getObjectById(taskLogId);
@@ -167,7 +163,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
 
     public int doCallWebService(TableFileReader xmlData, OsInfo osInfo, Long taskLogId) {
 
-        TaskDetailLog taskDetailLog = new TaskDetailLog();
+        /*TaskDetailLog taskDetailLog = new TaskDetailLog();
         Long taskDetailLogId = taskDetailLogManager.getTaskDetailLogId();
         taskDetailLog.setLogDetailId(taskDetailLogId);
         taskDetailLog.setLogId(taskLogId);
@@ -211,7 +207,8 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
             taskDetailLog.setErrorPieces(1l);
             taskDetailLogManager.updateObject(taskDetailLog);
             return -3;
-        }
+        }*/
+        return 1;
     }
 
     private static void setAdoParameter(PreparedStatement souce, int pn, String fieldName,
@@ -431,8 +428,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         }
     }
 
-    public int doMergeToDatabase(TableFileReader xmlData, ImportOpt importOpt, Long taskLogId)
-            throws SqlResolveException {
+    public int doMergeToDatabase(TableFileReader xmlData, ImportOpt importOpt, Long taskLogId) {
         // String mapinfoId= xmlData.getMapInfoId();
         // importOpt.
         TaskDetailLog taskDetailLog = new TaskDetailLog();
@@ -648,7 +644,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
 
         if (null != se) {
             TaskConsoleWriteUtils.writeError(taskId, se.getMessage());
-            throw new SqlResolveException(se.getMessage(), se);
+            throw new ObjectException(se.getMessage(), se);
         }
 
         return 0;
@@ -662,12 +658,8 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         TableFileReader table = new TableFileReader();
         table.readTableInfoFromXML(xmlTableData);
 
-        try {
-            return doExecute(table, usercode, runType, taskLogId);
-        } catch (SqlResolveException e) {
-            logger.error(e.getMessage(), e);
-            return -1;
-        }
+        return doExecute(table, usercode, runType, taskLogId);
+
     }
 
     /**
@@ -681,7 +673,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
      * @return
      */
     public int updateLobField(String database, String tableName, String columnName, String keyDesc, final byte[] lobData)
-            throws WsDataException {
+             {
         final LobHandler lobHandler = new DefaultLobHandler();
         return updateLobField(database, tableName, columnName, keyDesc,
                 new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
@@ -695,7 +687,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
 
     @Override
     public int updateLobField(String database, String tableName, String columnName, String keyDesc, final String lobData)
-            throws WsDataException {
+             {
         final LobHandler lobHandler = new DefaultLobHandler();
         return updateLobField(database, tableName, columnName, keyDesc,
                 new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
@@ -708,7 +700,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
     }
 
     private int updateLobField(String database, String tableName, String columnName, String keyDesc,
-                               AbstractLobCreatingPreparedStatementCallback callback) throws WsDataException {
+                               AbstractLobCreatingPreparedStatementCallback callback)  {
         if (logger.isDebugEnabled()) {
             logger.debug("database = " + database + ' ' + "tableName = " + tableName + ' ' + "columnName = "
                     + columnName + " keyDesc = " + keyDesc);
@@ -717,7 +709,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
         DatabaseInfo dbInfo = integrationEnvironment.getDatabaseInfo(database);
         if (null == dbInfo) {
             logger.error(SysParametersUtils.getStringValue("ERR-20002","ERR-20002"));
-            throw new WsDataException(20002, null);
+            throw new ObjectException(20002, "ERR-20002");
         }
 
         if (logger.isDebugEnabled()) {
@@ -729,7 +721,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
             ds = ConnPool.getDataSource(dbInfo);
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
-            throw new WsDataException(-1, e.getMessage(), e);
+            throw new ObjectException(-1, e.getMessage());
         }
 
         String sql = "update " + tableName + " set " + columnName + "=? where " + keyDesc;
@@ -743,7 +735,7 @@ public class ExecuteDataMapImpl implements ExecuteDataMap {
             return jt.execute(sql, callback);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            throw new WsDataException(-1, e.getMessage(), e);
+            throw new ObjectException(-1, e.getMessage());
         }
     }
 }

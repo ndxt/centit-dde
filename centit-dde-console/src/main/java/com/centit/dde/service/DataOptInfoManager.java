@@ -1,6 +1,5 @@
 package com.centit.dde.service;
 
-import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.DataOptInfo;
 import com.centit.dde.po.DataOptStep;
 import com.centit.framework.jdbc.service.BaseEntityManager;
@@ -14,7 +13,6 @@ public interface DataOptInfoManager extends BaseEntityManager<DataOptInfo,String
      *
      * @param object
      * @param userDetail
-     * @throws SqlResolveException
      */
     void saveObject(DataOptInfo object, CentitUserDetails userDetail);
 

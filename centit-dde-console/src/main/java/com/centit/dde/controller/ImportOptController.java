@@ -1,6 +1,5 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ImportField;
 import com.centit.dde.po.ImportOpt;
 import com.centit.dde.service.ImportOptManager;
@@ -103,7 +102,7 @@ public class ImportOptController extends BaseController {
     @RequestMapping(value="/getFields/{databaseCode}/{tableName}")
     public void resolveQuerySql(@PathVariable String databaseCode,
                                 @PathVariable String tableName,
-                                HttpServletResponse response) throws SqlResolveException, IOException {
+                                HttpServletResponse response) {
 
         List<ImportField> fields = importOptManager.listFields(databaseCode, tableName);
 

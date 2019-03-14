@@ -1,20 +1,20 @@
 package com.centit.dde.service.impl;
 
 import com.centit.dde.dao.ExportSqlDao;
-import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.*;
+import com.centit.dde.po.ExportField;
+import com.centit.dde.po.ExportSql;
+import com.centit.dde.po.ExportTrigger;
 import com.centit.dde.service.ExportFieldManager;
 import com.centit.dde.service.ExportSqlManager;
 import com.centit.dde.util.ConnPool;
+import com.centit.framework.common.ObjectException;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
-import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +39,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
 
     // private static final SysOptLog sysOptLog =
     // SysOptLogFactoryImpl.getSysOptLog();
-    
+
     private ExportSqlDao exportSqlDao;
 
     @Resource
@@ -47,7 +47,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
 
     @Resource
     protected IntegrationEnvironment integrationEnvironment;
-    
+
     @Resource(name="exportSqlDao")
     @NotNull
     public void setExportSqlDao(ExportSqlDao baseDao) {
@@ -63,30 +63,28 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
     @Transactional(propagation = Propagation.REQUIRED)
     public void saveObject(ExportSql object, CentitUserDetails userDetail) {
         DatabaseInfo dbinfo =  integrationEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
-        try {
-            checkObject(object);
-            object.setSourceOsId(dbinfo.getOsId());
-            ExportSql dbObject = exportSqlDao.loadObjectById(object.getExportId());
-            if (null == dbObject) {
-                object.setCreated(userDetail.getUserCode());
-                object.setCreateTime(new Date());
-                object.setExportId(exportSqlDao.getNextLongSequence());
-                setExportFieldTriggerCid(object);
-                saveNewObject(object);
-            } else {
-                dbObject.copyNotNullProperty(object);
-                dbObject.setLastUpdateTime(new Date());
-                setExportFieldTriggerCid(object);
-                dbObject.replaceExportFields(object.getExportFields());
-                dbObject.replaceExportTriggers(object.getExportTriggers());
-                object = dbObject;
-                updateObject(dbObject);
-            }
-            //saveNewObject(object);
-            exportSqlDao.saveObjectReferences(object);
-        }catch (SqlResolveException e){
-            log.error("保存出错");
+
+        checkObject(object);
+        object.setSourceOsId(dbinfo.getOsId());
+        ExportSql dbObject = exportSqlDao.loadObjectById(object.getExportId());
+        if (null == dbObject) {
+            object.setCreated(userDetail.getUserCode());
+            object.setCreateTime(new Date());
+            object.setExportId(exportSqlDao.getNextLongSequence());
+            setExportFieldTriggerCid(object);
+            saveNewObject(object);
+        } else {
+            dbObject.copyNotNullProperty(object);
+            dbObject.setLastUpdateTime(new Date());
+            setExportFieldTriggerCid(object);
+            dbObject.replaceExportFields(object.getExportFields());
+            dbObject.replaceExportTriggers(object.getExportTriggers());
+            object = dbObject;
+            updateObject(dbObject);
         }
+        //saveNewObject(object);
+        exportSqlDao.saveObjectReferences(object);
+
     }
 
     private void setExportFieldTriggerCid(ExportSql object) {
@@ -106,7 +104,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<ExportField> listExportFieldsByQuerysql(ExportSql object) throws SqlResolveException {
+    public List<ExportField> listExportFieldsByQuerysql(ExportSql object){
         DatabaseInfo dbinfo =  integrationEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
 
         validateSql(object.getQuerySql(), dbinfo);
@@ -114,7 +112,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
         return exportSqlDao.getTableMetadata(object, dbinfo).getExportFields();
     }
 
-    private void checkObject(ExportSql object) throws SqlResolveException{
+    private void checkObject(ExportSql object) {
         //判断名称的唯一性
         object.setExportName(object.getExportName().trim());
 
@@ -139,17 +137,17 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
         validator(object);
     }
 
-    private void validator(ExportSql object) throws SqlResolveException {
+    private void validator(ExportSql object) {
         if (!StringUtils.hasText(object.getQuerySql())) {
             log.error("sql语句为空");
-            throw new SqlResolveException(10001);
+            throw new ObjectException(10001,"sql语句为空");
         }
         object.setQuerySql(object.getQuerySql().toUpperCase());
 
         DatabaseInfo dbInfo =  integrationEnvironment.getDatabaseInfo(object.getSourceDatabaseName());
         if (null == dbInfo) {
             log.error("数据库信息错误");
-            throw new SqlResolveException(10002);
+            throw new ObjectException(10002,"数据库信息错误");
         }
 
         // 验证sql有效性
@@ -164,7 +162,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
         for (ExportTrigger et : object.getExportTriggers()) {
             triggerSql = et.getTriggerSql();
             if (!StringUtils.hasText(triggerSql)) {
-                throw new SqlResolveException(10003);
+                throw new ObjectException(10003,"数据库信息错误");
             }
             triggerSql = triggerSql.toUpperCase();
             et.setTriggerSql(triggerSql);
@@ -184,7 +182,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
             fieldName = ef.getFieldName();
 
             if (!StringUtils.hasText(fieldName)) {
-                throw new SqlResolveException(10003);
+                throw new ObjectException(10003, "字段找不到");
             }
 
             fields.add(fieldName.toUpperCase());
@@ -196,12 +194,12 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
 
         // 未设置主键字段
         if (0 == pkNum) {
-            throw new SqlResolveException(10004);
+            throw new ObjectException(10004," 未设置主键字段");
         }
 
         for (String param : params) {
             if (!fields.contains(param.toUpperCase())) {
-                throw new SqlResolveException("触发器中参数名[" + param + "]不存在于字段名称中");
+                throw new ObjectException("触发器中参数名[" + param + "]不存在于字段名称中");
             }
         }
     }
@@ -210,12 +208,11 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
      * 验证sql执行的正确性
      * @Param
      * @Param object
-     * @throws SqlResolveException
      */
-    private void validateSql(String querysql, DatabaseInfo dbinfo) throws SqlResolveException {
+    private void validateSql(String querysql, DatabaseInfo dbinfo)  {
         if (!ConnPool.testConn(dbinfo)) {
             logger.error("连接数据库出错");
-            throw new SqlResolveException(10002);
+            throw new ObjectException(10002, "连接数据库出错");
         }
         Connection conn = null;
         Statement statement = null;
@@ -229,7 +226,7 @@ public class ExportSqlManagerImpl extends BaseEntityManagerImpl<ExportSql,Long,E
         } catch (SQLException e) {
             logger.error("验证数据库Sql执行语句报错", e);
 
-            throw new SqlResolveException(10001, e);
+            throw new ObjectException(10001, e);
         } finally {
             try {
                 conn.close();

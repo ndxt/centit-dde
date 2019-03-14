@@ -14,8 +14,7 @@
 	<version>3.0-SNAPSHOT</version>
     <modules>
         <module>centit-dde-console</module>
-        <module>centit-dde-client</module>
-        <module>centit-dde-commons</module>
+        <module>centit-dde-datamoving</module>
         <module>centit-dde-agent</module>
     </modules>
     <name>com.centit.product:centit-dde</name>
@@ -23,6 +22,8 @@
 
     <properties>
         <cxf.version>2.7.3</cxf.version>
+        <metadata.commons.version>1.0-SNAPSHOT</metadata.commons.version>
+        <common.module.version>1.0-SNAPSHOT</common.module.version>
 	</properties>
 
     <description> 数据交换工具，分三部分，一个控制台，一个数据交换程序 和 一个调用交换服务的客户端

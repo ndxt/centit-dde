@@ -14,8 +14,20 @@
     <dependencies>
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-commons</artifactId>
-            <version>${project.version}</version>
+            <artifactId>data-packet-define</artifactId>
+            <version>${metadata.commons.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>data-business-operation</artifactId>
+            <version>${metadata.commons.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>database-metadata</artifactId>
+            <version>${metadata.commons.version}</version>
         </dependency>
 
         <dependency>
@@ -28,15 +40,6 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.centit.support</groupId>
-            <artifactId>centit-database</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.support</groupId>
-            <artifactId>centit-database-datasource</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>javax.persistence</groupId>

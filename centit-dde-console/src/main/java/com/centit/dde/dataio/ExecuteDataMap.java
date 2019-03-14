@@ -1,9 +1,7 @@
 package com.centit.dde.dataio;
 
 import com.centit.dde.datafile.TableFileReader;
-import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ImportOpt;
-import com.centit.dde.ws.WsDataException;
 import com.centit.framework.ip.po.OsInfo;
 
 public interface ExecuteDataMap {
@@ -18,8 +16,7 @@ public interface ExecuteDataMap {
      * @return
      * @throws Exception
      */
-    int doExecute(TableFileReader xmlData, String userCode, String runType, Long taskLogId)
-            throws SqlResolveException;
+    int doExecute(TableFileReader xmlData, String userCode, String runType, Long taskLogId);
 
     /**
      * @param xmlData
@@ -36,8 +33,7 @@ public interface ExecuteDataMap {
      * @param taskLogId
      * @return
      */
-    int doMergeToDatabase(TableFileReader xmlData, ImportOpt importOpt, Long taskLogId)
-            throws SqlResolveException;
+    int doMergeToDatabase(TableFileReader xmlData, ImportOpt importOpt, Long taskLogId);
 
     /**
      * @param xmlData
@@ -59,8 +55,7 @@ public interface ExecuteDataMap {
      * @param lobData
      * @return
      */
-    int updateLobField(String database, String tableName, String columnName, String keyDesc, byte[] lobData)
-            throws WsDataException;
+    int updateLobField(String database, String tableName, String columnName, String keyDesc, byte[] lobData);
 
     /**
      * 修改大字段数据内容
@@ -72,7 +67,6 @@ public interface ExecuteDataMap {
      * @param lobData
      * @return
      */
-    int updateLobField(String database, String tableName, String columnName, String keyDesc, String lobData)
-            throws WsDataException;
+    int updateLobField(String database, String tableName, String columnName, String keyDesc, String lobData);
 
 }

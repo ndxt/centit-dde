@@ -4,7 +4,6 @@ import com.centit.dde.dao.ExchangeMapInfoDao;
 import com.centit.dde.dao.ExchangeTaskDao;
 import com.centit.dde.dao.ExchangeTaskDetailDao;
 import com.centit.dde.dao.MapInfoTriggerDao;
-import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.*;
 import com.centit.dde.service.TaskDetailLogManager;
 import com.centit.dde.service.TaskErrorDataManager;
@@ -70,7 +69,7 @@ public class TransferManagerImpl implements TransferManager {
 
     private static void setAdoParameter(PreparedStatement souce, int pn, int sn, ResultSet rs, TableMapInfo mapinfo)
             throws SQLException {
-        
+
         int rsc = rs.getMetaData().getColumnCount();
         if (sn > rsc) {
             souce.setObject(pn, null);
@@ -111,20 +110,20 @@ public class TransferManagerImpl implements TransferManager {
             if(null == inputStream) {
                 souce.setObject(pn, null);
             }
-        
+
             if(null != inputStream) {
-                BufferedInputStream input = new BufferedInputStream(inputStream);               
+                BufferedInputStream input = new BufferedInputStream(inputStream);
                 ByteArrayOutputStream   io = new ByteArrayOutputStream();
-                byte[] buffer = new byte[2048];  
-                int len;  
+                byte[] buffer = new byte[2048];
+                int len;
                 try {
-                    while ((len = input.read(buffer,0,buffer.length)) > -1 ) {  
-                        io.write(buffer, 0, len);  
+                    while ((len = input.read(buffer,0,buffer.length)) > -1 ) {
+                        io.write(buffer, 0, len);
                     }
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-                }  
+                }
                 try {
                     io.flush();
                 } catch (IOException e) {
@@ -367,17 +366,8 @@ public class TransferManagerImpl implements TransferManager {
         List<MapInfoTrigger> mapInfoTriggers = mapInfoTriggerDao.listTriggerByMapinfoId(exchangeMapInfo.getMapInfoId());
 
         TableMapInfo mapInfo = new TableMapInfo();
-        try {
-            mapInfo.loadMapFromData(exchangeMapInfo);
-        } catch (SqlResolveException e) {
-            msg = e.getMessage();
-            logger.error(msg, e);
+        mapInfo.loadMapFromData(exchangeMapInfo);
 
-            TaskConsoleWriteUtils.writeError(taskId, msg);
-
-            transferResult.setRes(-1);
-            return transferResult;
-        }
         MapInfoDBConn pInfo = loadMapInfoDBConfig(sourceDatabaseInfo, desDatabaseInfo);
 
         msg = "InsertSql = " + mapInfo.getInsertSql();
@@ -417,7 +407,7 @@ public class TransferManagerImpl implements TransferManager {
         String sLastErrorMsg = "";
         try {
             pInfo.connectDB();
-            
+
             Connection lConn = pInfo.getLeftDBConn();
             Connection rConn = pInfo.getRightDBConn();
 

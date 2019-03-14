@@ -1,9 +1,9 @@
 package com.centit.dde.transfer;
 
-import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ExchangeMapInfo;
 import com.centit.dde.po.MapInfoDetail;
 import com.centit.dde.util.ItemValue;
+import com.centit.framework.common.ObjectException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
@@ -60,14 +60,14 @@ public class TableMapInfo {
         return outs;
     }
 
-    public void loadMapFromData(ExchangeMapInfo exchangMapinfo) throws SqlResolveException {
+    public void loadMapFromData(ExchangeMapInfo exchangMapinfo) {
         if (logger.isDebugEnabled()) {
             logger.debug("解析数据交换对应关系属性值...");
         }
         try {
             sourceSql = exchangMapinfo.getQuerySql();
             desTable = exchangMapinfo.getDestTableName();
-            
+
             if ("1".equals(exchangMapinfo.getRecordOperate())) {
                 rowOptType = "insert";
             } else if ("2".equals(exchangMapinfo.getRecordOperate())) {
@@ -115,12 +115,12 @@ public class TableMapInfo {
                 map.setRightName(mapInfoDetail.getDestFieldName());
                 fieldsMap.add(map);
             }
-            
+
             fieldCount = fieldsMap.size();// exchangMapinfo.getMapInfoDetails().size();
-            
+
             makeSqlNoNamedParams();
         } catch (Exception e) {
-            throw new SqlResolveException(e.getMessage(), e);
+            throw new ObjectException(e.getMessage(), e);
         }
     }
 

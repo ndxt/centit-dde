@@ -2,14 +2,16 @@ package com.centit.dde.service.impl;
 
 import com.centit.dde.dao.ImportFieldDao;
 import com.centit.dde.dao.ImportOptDao;
-import com.centit.dde.exception.SqlResolveException;
-import com.centit.dde.po.*;
+import com.centit.dde.po.ImportField;
+import com.centit.dde.po.ImportOpt;
+import com.centit.dde.po.ImportTrigger;
+import com.centit.dde.po.ImportTriggerId;
 import com.centit.dde.service.ImportOptManager;
 import com.centit.dde.util.ConnPool;
+import com.centit.framework.common.ObjectException;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
-import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.logging.Log;
@@ -55,10 +57,10 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
         return this.importOptDao.getMapinfoName(mapinfoId);
     }
 
-    private void validator(ImportOpt object) throws SqlResolveException {
+    private void validator(ImportOpt object) {
         DatabaseInfo dbinfo = integrationEnvironment.getDatabaseInfo(object.getDestDatabaseName());
         if (null == dbinfo) {
-            throw new SqlResolveException(10002);
+            throw new ObjectException(10002,"error");
         }
 
         // 验证触发器的参数是否在字段中存在
@@ -70,7 +72,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
         for (ImportTrigger et : object.getImportTriggers()) {
             triggerSql = et.getTriggerSql();
             if (!StringUtils.hasText(triggerSql)) {
-                throw new SqlResolveException(10003);
+                throw new ObjectException(10003,"error");
             }
             triggerSql = triggerSql.toUpperCase();
             et.setTriggerSql(triggerSql);
@@ -97,12 +99,12 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
             }
             //源字段和常量不能同时为空
             if (!StringUtils.hasText(sourceFieldName) && !StringUtils.hasText(ef.getDestFieldDefault())) {
-                throw new SqlResolveException(10003);
+                throw new ObjectException(10003,"error");
             }
 
             //目标字段为空
             if (!StringUtils.hasText(ef.getDestFieldName())) {
-                throw new SqlResolveException(10003);
+                throw new ObjectException(10003,"error");
             }
 
             fields.add(sourceFieldName.toUpperCase());
@@ -114,7 +116,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
 
         // 未设置主键字段
         if (0 == pkNum) {
-            throw new SqlResolveException(10004);
+            throw new ObjectException(10004,"error");
         }
 
         fields.add("TODAY");
@@ -126,66 +128,63 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
 
         for (String param : params) {
             if (!fields.contains(param.toUpperCase())) {
-                throw new SqlResolveException("触发器中参数名[" + param + "]不存在于字段名称中");
+                throw new ObjectException("触发器中参数名[" + param + "]不存在于字段名称中");
             }
         }
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void saveObject(ImportOpt object, CentitUserDetails userDetail) {
-        try {
-            checkObject(object);
-            // 判断导入的表是否存在
+        checkObject(object);
+        // 判断导入的表是否存在
 
-            DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(object.getDestDatabaseName());
+        DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(object.getDestDatabaseName());
 
-            object.setSourceOsId(databaseInfo.getOsId());
-            //将表名转换为大写
-            object.setTableName(object.getTableName().toUpperCase());
+        object.setSourceOsId(databaseInfo.getOsId());
+        //将表名转换为大写
+        object.setTableName(object.getTableName().toUpperCase());
 
-            if (importOptDao.isExistsForTable(object, databaseInfo)) {
+        if (importOptDao.isExistsForTable(object, databaseInfo)) {
 
-                // save exportsql
-                ImportOpt dbObject =  null;
-                if (object.getImportId()!=null)
-                 dbObject = importOptDao.getObjectById(object.getImportId());
-                if (null == dbObject) {
-                    object.setCreated(userDetail.getUserCode());
-                    object.setCreateTime(new Date());
+            // save exportsql
+            ImportOpt dbObject =  null;
+            if (object.getImportId()!=null)
+             dbObject = importOptDao.getObjectById(object.getImportId());
+            if (null == dbObject) {
+                object.setCreated(userDetail.getUserCode());
+                object.setCreateTime(new Date());
 
-                    object.setImportId(importOptDao.getNextLongSequence());
+                object.setImportId(importOptDao.getNextLongSequence());
 
-                    setImportFieldTriggerCid(object);
-                    saveNewObject(object);
+                setImportFieldTriggerCid(object);
+                saveNewObject(object);
 
-                    // importOptDao.flush();
-                } else {
-                    dbObject.getImportFields().clear();
-                    dbObject.getImportTriggers().clear();
-                    importOptDao.flush();
-                    dbObject.setLastUpdateTime(new Date());
+                // importOptDao.flush();
+            } else {
+                dbObject.getImportFields().clear();
+                dbObject.getImportTriggers().clear();
+                importOptDao.flush();
+                dbObject.setLastUpdateTime(new Date());
 
-                    dbObject.copyNotNullProperty(object);
-                    // copy database fields to convert fields
+                dbObject.copyNotNullProperty(object);
+                // copy database fields to convert fields
 
-                    setImportFieldTriggerCid(object);
+                setImportFieldTriggerCid(object);
 
-                    for (ImportField ef : object.getImportFields()) {
-                        dbObject.addImportField(ef);
-                    }
-                    for (ImportTrigger et : object.getImportTriggers()) {
-                        dbObject.addImportTrigger(et);
-                    }
-
-                    object = dbObject;
-                    updateObject(dbObject);
-
+                for (ImportField ef : object.getImportFields()) {
+                    dbObject.addImportField(ef);
                 }
-                importOptDao.saveObjectReferences(object);
+                for (ImportTrigger et : object.getImportTriggers()) {
+                    dbObject.addImportTrigger(et);
+                }
+
+                object = dbObject;
+                updateObject(dbObject);
+
             }
-        }catch(SqlResolveException e){
-            log.error("保存失败", e);
+            importOptDao.saveObjectReferences(object);
         }
+
     }
 
     private void setImportFieldTriggerCid(ImportOpt object) {
@@ -205,7 +204,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<ImportField> listFields(String databaseCode, String tableName) throws SqlResolveException {
+    public List<ImportField> listFields(String databaseCode, String tableName) {
         List<ImportField> fields = new ArrayList<>();
         Connection connection = null;
         if (databaseCode != null && !"".equals(databaseCode)) {
@@ -245,7 +244,7 @@ public class ImportOptManagerImpl extends BaseEntityManagerImpl<ImportOpt,Long,I
         return fields;
     }
 
-    private void checkObject(ImportOpt object) throws SqlResolveException {
+    private void checkObject(ImportOpt object) {
         //判断名称的唯一性
         object.setImportName(object.getImportName().trim());
 

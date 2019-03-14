@@ -12,10 +12,39 @@
 
 
     <dependencies>
+
         <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-commons</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.centit.support</groupId>
+            <artifactId>centit-quartz-extend</artifactId>
+            <version>${common.module.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.support</groupId>
+            <artifactId>centit-database</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.support</groupId>
+            <artifactId>centit-database-datasource</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!--<dependency>

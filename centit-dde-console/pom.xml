@@ -16,8 +16,20 @@
 
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-commons</artifactId>
-            <version>${project.version}</version>
+            <artifactId>data-packet-define</artifactId>
+            <version>${metadata.commons.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>data-business-operation</artifactId>
+            <version>${metadata.commons.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>database-metadata</artifactId>
+            <version>${metadata.commons.version}</version>
         </dependency>
 
        <!-- <dependency>
@@ -31,27 +43,7 @@
                 </exclusion>
             </exclusions>
         </dependency>-->
-        <dependency>
-            <groupId>opensymphony</groupId>
-            <artifactId>quartz-all</artifactId>
-            <version>1.6.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-            <version>1.7.2</version>
-        </dependency>
-        <!-- cxf -->
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>${cxf.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
-            <version>${cxf.version}</version>
-        </dependency>
+
          <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
@@ -60,11 +52,6 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>framework-base-view-easyui</artifactId>
         </dependency>
 
         <dependency>
@@ -140,12 +127,7 @@
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-commons</artifactId>
-            <version>3.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
+
     </dependencies>
 
     <!--  end -->

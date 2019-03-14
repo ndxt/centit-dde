@@ -9,17 +9,12 @@ import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.po.ExchangeTaskDetail;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.service.ExchangeTaskManager;
-import com.centit.dde.service.IQuartzJobBean;
-import com.centit.dde.service.SchedulerManager;
 import com.centit.dde.transfer.TransferManager;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import com.centit.framework.security.model.CentitUserDetails;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -32,7 +27,7 @@ import java.util.*;
 @Service
 public class ExchangeTaskManagerImpl
         extends BaseEntityManagerImpl<ExchangeTask,Long,ExchangeTaskDao>
-        implements ExchangeTaskManager, IQuartzJobBean, org.quartz.Job {
+        implements ExchangeTaskManager{
 
     public static final Log logger = LogFactory.getLog(ExchangeTaskManager.class);
 
@@ -41,7 +36,7 @@ public class ExchangeTaskManagerImpl
     private static final String JOB_NAME_PREFIX = "Job_ExchangeTask_";
 
     private static final String JOB_GROUP_EXCHANGETASK = "JOB_GROUP_EXCHANGETASK";
-    
+
     private ExchangeTaskDao exchangeTaskDao;
 
     private TransferManager transferManager;
@@ -50,13 +45,11 @@ public class ExchangeTaskManagerImpl
 
     private ImportData importData;
 
-    @Resource
-    private SchedulerManager schedulerManager;
-    
+
     public void setImportData(ImportData importData) {
         this.importData = importData;
     }
-    
+
     public void setExportData(ExportData exportData) {
         this.exportData = exportData;
     }
@@ -104,7 +97,7 @@ public class ExchangeTaskManagerImpl
         }
     }
 
-    @Override
+  /*  @Override
     public void executeInternal(JobExecutionContext jobexecutioncontext) throws JobExecutionException {
         Long taskId = jobexecutioncontext.getJobDetail().getJobDataMap().getLong(EXCHANGE_TASK_ID);
 
@@ -122,7 +115,7 @@ public class ExchangeTaskManagerImpl
 
         //执行调试
         executeTask(object,"System","0");
-    }
+    }*/
 
     @Override
     public Long getNewTaskId() {
@@ -130,7 +123,7 @@ public class ExchangeTaskManagerImpl
     }
 
 
-    public void execute(JobExecutionContext jobexecutioncontext) {
+    /*public void execute(JobExecutionContext jobexecutioncontext) {
 
         Long taskId = jobexecutioncontext.getJobDetail().getJobDataMap().getLong(EXCHANGE_TASK_ID);
 
@@ -148,7 +141,7 @@ public class ExchangeTaskManagerImpl
 
         //执行调试
         executeTask(object,"System","0");
-    }
+    }*/
 
     public boolean executeTask(ExchangeTask exchangeTask,String userCode,String runType) {
         try {
@@ -165,7 +158,7 @@ public class ExchangeTaskManagerImpl
             return false;
         }
     }
-    
+
     public boolean executeTask(Long taskID,String userCode,String runType) {
         ExchangeTask object = getObjectById(taskID);
         if ("0".equals(object.getIsvalid())) {
@@ -173,11 +166,11 @@ public class ExchangeTaskManagerImpl
         }
         return executeTask(object,userCode,runType);
     }
-    
+
 
     @Override
     public void saveNewTimerTask(ExchangeTask exchangeTask) {
-        JobDetail jobDetail = schedulerManager.getJobDetail(JOB_NAME_PREFIX + exchangeTask.getTaskId(),
+        /*JobDetail jobDetail = schedulerManager.getJobDetail(JOB_NAME_PREFIX + exchangeTask.getTaskId(),
                 JOB_GROUP_EXCHANGETASK);
         // 设置回调
         jobDetail.getJobDataMap().put(IQuartzJobBean.QUARTZ_JOB_BEAN_KEY, this);
@@ -185,13 +178,13 @@ public class ExchangeTaskManagerImpl
         jobDetail.getJobDataMap().put(EXCHANGE_TASK_ID, exchangeTask.getTaskId());
         schedulerManager.schedule(jobDetail, "Trigger_ExchangeTask_" + exchangeTask.getTaskId(),
               JOB_GROUP_EXCHANGETASK, exchangeTask.getTaskCron());
-
+*/
     }
 
     @Override
     public boolean delTimerTask(ExchangeTask exchangeTask) {
-        //return false;
-        return schedulerManager.deleteJob(JOB_NAME_PREFIX + exchangeTask.getTaskId(), JOB_GROUP_EXCHANGETASK);
+        return false;
+        //return schedulerManager.deleteJob(JOB_NAME_PREFIX + exchangeTask.getTaskId(), JOB_GROUP_EXCHANGETASK);
     }
 
     @Override

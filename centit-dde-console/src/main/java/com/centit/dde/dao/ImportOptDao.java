@@ -1,6 +1,5 @@
 package com.centit.dde.dao;
 
-import com.centit.dde.exception.SqlResolveException;
 import com.centit.dde.po.ImportOpt;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.ip.po.DatabaseInfo;
@@ -85,7 +84,6 @@ public class ImportOptDao extends BaseDaoImpl<ImportOpt,Long> {
      * @param importOpt
      * @param dbinfo
      * @return
-     * @throws SqlResolveException
      */
     public boolean isExistsForTable(ImportOpt importOpt, DatabaseInfo dbinfo){
         Connection conn = null;
