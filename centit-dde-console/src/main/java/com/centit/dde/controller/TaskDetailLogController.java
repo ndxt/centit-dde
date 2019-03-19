@@ -2,7 +2,6 @@ package com.centit.dde.controller;
 
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskErrorData;
-import com.centit.dde.service.ExchangeMapInfoManager;
 import com.centit.dde.service.TaskDetailLogManager;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
@@ -61,7 +60,7 @@ public class TaskDetailLogController extends BaseController {
         object.replaceTaskErrorDatas(taskErrorDatas);
 //        super.save();
         taskDetailLogMag.saveNewObject(object);
-        
+
 //        return super.save();
         JsonResultUtils.writeSuccessJson(response);
     }

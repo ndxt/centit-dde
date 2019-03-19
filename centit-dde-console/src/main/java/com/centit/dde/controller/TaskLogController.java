@@ -1,11 +1,7 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.po.ExchangeTask;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskLog;
-import com.centit.dde.service.ExchangeTaskManager;
-import com.centit.dde.service.ExportSqlManager;
-import com.centit.dde.service.ImportOptManager;
 import com.centit.dde.service.TaskLogManager;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
@@ -136,7 +132,7 @@ public class TaskLogController extends BaseController {
                 ServletActionContext.getContext().put("exchangeTask",
                         exchangeTaskManager.getObjectById(object.getTaskId()));
             }*/
-            
+
             ExchangeTask exchangeTask = null;
             if (object.getTaskId() != null) {
                 exchangeTask =   exchangeTaskManager.getObjectById(object.getTaskId());

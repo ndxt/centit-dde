@@ -17,6 +17,8 @@
     <properties>
         <metadata.commons.version>1.0-SNAPSHOT</metadata.commons.version>
         <common.module.version>1.0-SNAPSHOT</common.module.version>
+        <centit.dde.version>3.0-SNAPSHOT</centit.dde.version>
+        <centit.ip.version>1.2-SNAPSHOT</centit.ip.version>
     </properties>
 
     <dependencies>
@@ -24,6 +26,18 @@
             <groupId>com.centit.support</groupId>
             <artifactId>centit-quartz-extend</artifactId>
             <version>${common.module.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-core</artifactId>
+            <version>${centit.dde.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>centit-ip-app</artifactId>
+            <version>${centit.ip.version}</version>
         </dependency>
 
         <dependency>
@@ -39,22 +53,10 @@
         </dependency>
 
         <dependency>
-            <groupId>com.centit.support</groupId>
-            <artifactId>centit-database-datasource</artifactId>
-            <version>2.2-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>javax.persistence-api</artifactId>
-            <version>2.2</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
