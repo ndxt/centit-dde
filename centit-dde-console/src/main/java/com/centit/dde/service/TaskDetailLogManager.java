@@ -2,7 +2,12 @@ package com.centit.dde.service;
 
 
 import com.centit.dde.po.TaskDetailLog;
+import com.centit.dde.po.TaskLog;
 import com.centit.framework.jdbc.service.BaseEntityManager;
+import com.centit.support.database.utils.PageDesc;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * create by scaffold
@@ -25,8 +30,15 @@ import com.centit.framework.jdbc.service.BaseEntityManager;
  *
  * @author codefan@hotmail.com
  */
-public interface TaskDetailLogManager extends BaseEntityManager<TaskDetailLog,Long> {
-    public Long getTaskDetailLogId();
+public interface TaskDetailLogManager {
 
-    void flush();
+    TaskDetailLog getTaskDetailLog(String logDetailId);
+
+    List<TaskDetailLog> listTaskDetailLog(Map<String, Object> param, PageDesc pageDesc);
+
+    void createTaskDetailLog(TaskDetailLog detailLog);
+
+    void updateTaskDetailLog(TaskDetailLog detailLog);
+
+    void delTaskDetailLog(String logDetailId);
 }

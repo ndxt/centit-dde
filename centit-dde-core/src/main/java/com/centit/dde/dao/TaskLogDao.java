@@ -16,13 +16,13 @@ import java.util.Map;
 public class TaskLogDao extends BaseDaoImpl<TaskLog,Long> {
 
     public static final Log logger = LogFactory.getLog(TaskLogDao.class);
+
     @Override
     public Map<String, String> getFilterField() {
         if (filterField == null) {
             filterField = new HashMap<String, String>();
 
             filterField.put("logId", CodeBook.EQUAL_HQL_ID);
-
 
             filterField.put("taskId", CodeBook.EQUAL_HQL_ID);
 
@@ -35,16 +35,16 @@ public class TaskLogDao extends BaseDaoImpl<TaskLog,Long> {
 
             filterField.put("runner", CodeBook.LIKE_HQL_ID);
 
+            filterField.put("otherMessage", CodeBook.LIKE_HQL_ID);
+
             filterField.put("successPieces", CodeBook.LIKE_HQL_ID);
 
             filterField.put("errorPieces", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("otherMessage", CodeBook.LIKE_HQL_ID);
-            filterField.put("taskType", CodeBook.EQUAL_HQL_ID);
-            filterField.put("isError", "logId in (select a.logId " +
+            /*filterField.put("isError", "logId in (select a.logId " +
             		"from TaskDetailLog a inner join a.taskErrorDatas b " +
-            		"where a.errorPieces>?)");
-            filterField.put(CodeBook.ORDER_BY_HQL_ID, "runBeginTime desc");
+            "where a.errorPieces>?)");
+            filterField.put(CodeBook.ORDER_BY_HQL_ID, "runBeginTime desc");*/
 
         }
         return filterField;

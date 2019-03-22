@@ -22,14 +22,18 @@ public class TaskDetailLogDao extends BaseDaoImpl<TaskDetailLog,Long> {
 
             filterField.put("logDetailId", CodeBook.EQUAL_HQL_ID);
 
+            filterField.put("taskId", CodeBook.LIKE_HQL_ID);
 
             filterField.put("logId", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("runBeginTime", CodeBook.LIKE_HQL_ID);
+            filterField.put("logType", CodeBook.LIKE_HQL_ID);
+
+            filterField.put("runBeginTime", "runBeginTime>=?");
+            filterField.put("runBeginTime2", "runBeginTime<=?");
 
             filterField.put("runEndTime", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("mapinfoId", CodeBook.LIKE_HQL_ID);
+            filterField.put("logInfo", CodeBook.LIKE_HQL_ID);
 
             filterField.put("successPieces", CodeBook.LIKE_HQL_ID);
 

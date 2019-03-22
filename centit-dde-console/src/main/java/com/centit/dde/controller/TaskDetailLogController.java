@@ -1,75 +1,74 @@
 package com.centit.dde.controller;
 
 import com.centit.dde.po.TaskDetailLog;
-import com.centit.dde.po.TaskErrorData;
 import com.centit.dde.service.TaskDetailLogManager;
-import com.centit.framework.common.JsonResultUtils;
-import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.controller.WrapUpResponseBody;
+import com.centit.framework.core.dao.PageQueryResult;
+import com.centit.support.database.utils.PageDesc;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
 
 
-@Controller
-@RequestMapping("/TaskDetailLog")
-public class TaskDetailLogController extends BaseController {
-    private static final Log log = LogFactory.getLog(TaskDetailLogController.class);
+/**
+ * @ClassName TaskLogController
+ * @Date 2019/3/20 17:06
+ * @Version 1.0
+ */
+@RestController
+@RequestMapping(value = "taskLog")
+@Api(value = "任务明细日志", tags = "任务明细日志")
+public class TaskDetailLogController {
+    private static final Log log = LogFactory.getLog(TaskLogController.class);
 
-    private static final long serialVersionUID = 1L;
-    @Resource
-    private TaskDetailLogManager taskDetailLogMag;
+    @Autowired
+    private TaskDetailLogManager taskDetailLogManager;
 
-    @Resource
-    private ExchangeMapInfoManager exchangeMapInfoManager;
-
-
-    @RequestMapping(value="edit",method = {RequestMethod.PUT})
-    public void edit(TaskDetailLog object ,HttpServletRequest request,HttpServletResponse response) {
-        try {
-            if (object == null) {
-//                object = getEntityClass().newInstance();
-            } else {
-                TaskDetailLog o = taskDetailLogMag.getObjectById(object.getLogDetailId());
-                if (o != null)
-                    // 将对象o copy给object，object自己的属性会保留
-                    object.copy(o);
-                else
-                    object.clearProperties();
-            }
-            if (null != object.getMapinfoId()) {
-//                ServletActionContext.getContext().put("exchangeMapinfo", exchangeMapInfoManager.getObjectById(object.getMapInfoId()));
-            }
-//            return EDIT;
-            JsonResultUtils.writeSingleDataJson(object, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-//            return ERROR;
-            JsonResultUtils.writeErrorMessageJson("error", response);
-        }
+    @PostMapping
+    @ApiOperation(value = "新增明细日志")
+    @WrapUpResponseBody
+    public void createTaskDetailLog(TaskDetailLog detailLog){
+        taskDetailLogManager.createTaskDetailLog(detailLog);
     }
 
-    @RequestMapping(value="save",method = {RequestMethod.PUT})
-    public void save(TaskDetailLog object ,HttpServletRequest request,HttpServletResponse response, List<TaskErrorData> taskErrorDatas) {
-        object.replaceTaskErrorDatas(taskErrorDatas);
-//        super.save();
-        taskDetailLogMag.saveNewObject(object);
-
-//        return super.save();
-        JsonResultUtils.writeSuccessJson(response);
+    @PutMapping(value = "/{logDetailId}")
+    @ApiOperation(value = "编辑明细日志")
+    @ApiImplicitParam(name = "logDetailId", value = "明细日志编号")
+    @WrapUpResponseBody
+    public void updateTaskDetailLog(@PathVariable String logDetailId, TaskDetailLog detailLog){
+        detailLog.setLogId(logDetailId);
+        taskDetailLogManager.updateTaskDetailLog(detailLog);
     }
 
-    @RequestMapping(value="delete",method = {RequestMethod.DELETE})
-    public void delete(TaskDetailLog object ,HttpServletRequest request,HttpServletResponse response) {
-        taskDetailLogMag.deleteObjectById(object.getLogDetailId());
+    @DeleteMapping(value = "/{logDetailId}")
+    @ApiOperation(value = "删除明细日志")
+    @ApiImplicitParam(name = "logDetailId", value = "明细日志编号")
+    @WrapUpResponseBody
+    public void delTaskDetailLog(@PathVariable String logDetailId){
+        taskDetailLogManager.delTaskDetailLog(logDetailId);
+    }
 
-//        return "delete";
-        JsonResultUtils.writeSuccessJson(response);
+    @GetMapping
+    @ApiOperation(value = "查询所有明细日志")
+    @WrapUpResponseBody
+    public PageQueryResult<TaskDetailLog> listTaskDetailLog(PageDesc pageDesc){
+        List<TaskDetailLog> taskDetailLogs = taskDetailLogManager.listTaskDetailLog(new HashMap<String, Object>(), pageDesc);
+        return PageQueryResult.createResult(taskDetailLogs,pageDesc);
+    }
+
+    @GetMapping(value = "/{logDetailId}")
+    @ApiOperation(value = "查询单个明细日志")
+    @ApiImplicitParam(name = "logDetailId", value = "明细日志编号")
+    @WrapUpResponseBody
+    public TaskDetailLog getTaskDetailLog(@PathVariable String logDetailId){
+        TaskDetailLog taskDetailLog = taskDetailLogManager.getTaskDetailLog(logDetailId);
+        return taskDetailLog;
     }
 }
