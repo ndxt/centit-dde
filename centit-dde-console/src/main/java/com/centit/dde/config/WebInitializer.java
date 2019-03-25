@@ -65,7 +65,7 @@ public class WebInitializer implements WebApplicationInitializer {
      */
     private void initializeSpringMvcConfig(ServletContext servletContext) {
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-        context.register(SystemSpringMvcConfig.class, SwaggerConfig.class);
+        context.register(NormalSpringMvcConfig.class, SwaggerConfig.class);
         ServletRegistration.Dynamic dde  = servletContext.addServlet("dde", new DispatcherServlet(context));
         dde.addMapping("/dde/*");
         dde.setLoadOnStartup(1);

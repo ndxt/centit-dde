@@ -17,7 +17,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.core.session.SessionRegistry;
 
-@Configuration
+
 @EnableAsync
 @EnableScheduling
 @Import({IPOrStaticAppSystemBeanConfig.class,
@@ -25,6 +25,7 @@ import org.springframework.security.core.session.SessionRegistry;
         JdbcConfig.class})
 @ComponentScan(basePackages = {"com.centit.dde", "com.centit"},
         excludeFilters = @ComponentScan.Filter(value = org.springframework.stereotype.Controller.class))
+@Configuration
 public class ServiceConfig {
 
     @Value("${app.home:./}")

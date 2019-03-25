@@ -32,35 +32,40 @@ public class TaskExchangeController {
     private TaskExchangeManager taskExchangeManager;
 
     @PostMapping
+    @ApiOperation(value = "新增任务")
     @WrapUpResponseBody
     public void createTaskExchange(TaskExchange taskExchange){
         taskExchangeManager.createTaskExchange(taskExchange);
     }
 
-    @ApiImplicitParam(name = "taskId", value = "任务ID")
     @PutMapping(value = "/{taskId}")
+    @ApiImplicitParam(name = "taskId", value = "任务ID")
+    @ApiOperation(value = "更新任务")
     @WrapUpResponseBody
     public void updateTaskExchange(@PathVariable String taskId, TaskExchange taskExchange){
         taskExchange.setTaskId(taskId);
         taskExchangeManager.updateTaskExchange(taskExchange);
     }
 
+    @DeleteMapping(value = "/{taskId}")
     @ApiImplicitParam(name = "taskId", value = "任务ID")
-    @PutMapping(value = "/{taskId}")
+    @ApiOperation(value = "删除任务")
     @WrapUpResponseBody
-    public void updateTaskExchange(@PathVariable String taskId){
+    public void delTaskExchange(@PathVariable String taskId){
        taskExchangeManager.delTaskExchangeById(taskId);
     }
 
     @GetMapping
+    @ApiOperation(value = "查询所有任务")
     @WrapUpResponseBody
     public PageQueryResult<TaskExchange> listTaskExchange(PageDesc pageDesc){
         List<TaskExchange> taskExchanges = taskExchangeManager.listTaskExchange(new HashMap<String, Object>(), pageDesc);
         return PageQueryResult.createResult(taskExchanges,pageDesc);
     }
 
-    @ApiOperation(value = "查询一个任务")
+
     @GetMapping(value = "/{taskId}")
+    @ApiOperation(value = "查询一个任务")
     @WrapUpResponseBody
     public TaskExchange getTaskExchange(@PathVariable String taskId){
         TaskExchange taskExchange = taskExchangeManager.getTaskExchange(taskId);

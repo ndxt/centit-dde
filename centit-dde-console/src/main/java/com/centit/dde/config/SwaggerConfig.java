@@ -33,10 +33,10 @@ SwaggerConfig extends WebMvcConfigurerAdapter {
     private ApiInfo buildApiInf(){
         return new ApiInfoBuilder()
             .title("数据交换接口")
-            .termsOfServiceUrl("https://ndxt.github.io")//服务条款url
-            .description("数据交换接口")//描述
+            .termsOfServiceUrl("https://ndxt.github.io")
+            .description("数据交换接口")
             .contact(new Contact(
-                "codefan", "https://ndxt.github.io", "codefan@centit.com"))//维护信息
+                "codefan", "https://ndxt.github.io", "codefan@centit.com"))
             .build();
     }
 
