@@ -2,6 +2,7 @@ package com.centit.dde.config;
 
 import com.centit.framework.config.SystemSpringMvcConfig;
 import com.centit.framework.config.WebConfig;
+import com.centit.support.file.PropertiesReader;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -10,6 +11,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
+import java.util.Properties;
 
 /**
  * Created by zou_wy on 2017/3/29.
@@ -50,7 +52,7 @@ public class WebInitializer implements WebApplicationInitializer {
      */
     private void initializeSystemSpringMvcConfig(ServletContext servletContext) {
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-        context.register(SystemSpringMvcConfig.class);
+        context.register(SystemSpringMvcConfig.class, SwaggerConfig.class);
         ServletRegistration.Dynamic system  = servletContext.addServlet("system", new DispatcherServlet(context));
         system.addMapping("/system/*");
         system.setLoadOnStartup(1);
@@ -63,12 +65,11 @@ public class WebInitializer implements WebApplicationInitializer {
      */
     private void initializeSpringMvcConfig(ServletContext servletContext) {
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-        context.register(NormalSpringMvcConfig.class);
-        ServletRegistration.Dynamic system  = servletContext.addServlet("service", new DispatcherServlet(context));
-        system.addMapping("/service/*");
-        system.setLoadOnStartup(1);
-        system.setAsyncSupported(true);
+        context.register(SystemSpringMvcConfig.class, SwaggerConfig.class);
+        ServletRegistration.Dynamic dde  = servletContext.addServlet("dde", new DispatcherServlet(context));
+        dde.addMapping("/dde/*");
+        dde.setLoadOnStartup(1);
+        dde.setAsyncSupported(true);
     }
-
 
 }

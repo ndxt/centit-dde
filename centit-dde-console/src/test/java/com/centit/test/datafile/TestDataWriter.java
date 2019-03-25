@@ -1,9 +1,10 @@
 package com.centit.test.datafile;
 
-import com.centit.dde.datafile.ExchangeFileReader;
+/*import com.centit.dde.datafile.ExchangeFileReader;
 import com.centit.dde.datafile.ExchangeFileWriter;
 import com.centit.dde.datafile.TableFileReader;
-import com.centit.dde.datafile.TableFileWriter;
+import com.centit.dde.datafile.TableFileWriter;*/
+import com.centit.dde.po.TaskLog;
 import com.centit.framework.common.SysParametersUtils;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.ZipCompressor;
@@ -19,7 +20,7 @@ public class TestDataWriter {
         return SysParametersUtils.getAppHome();
     }
 
-    private static void testExchange(){
+    /*private static void testExchange(){
         String appPath = getAppPath();
         ExchangeFileWriter ef = new ExchangeFileWriter();
         ef.setFilePath(appPath+"/temp");
@@ -57,9 +58,9 @@ public class TestDataWriter {
         ef.writeDataEnd();
         ef.writeExchangeEnd();
         ef.closeWriter();
-    }
+    }*/
 
-    private static void testExchange2(){
+   /* private static void testExchange2(){
         String appPath = getAppPath();
         ExchangeFileWriter ef = new ExchangeFileWriter();
         ef.setFilePath(appPath+"/temp");
@@ -105,10 +106,10 @@ public class TestDataWriter {
         ef.closeWriter();
 
         ef.compressExchangeFile();
-    }
+    }*/
 
 
-    private static void testExchange3(){
+   /* private static void testExchange3(){
         String appPath = getAppPath();
         ExchangeFileWriter ef = new ExchangeFileWriter();
         ef.setFilePath(appPath+"/temp");
@@ -153,7 +154,7 @@ public class TestDataWriter {
 
         System.out.println(ef.getMemoryDataXML());
 
-    }
+    }*/
 
 
 
@@ -183,8 +184,7 @@ public class TestDataWriter {
 
     }
 
-
-    private static void testReadExchange(){
+   /* private static void testReadExchange(){
         //ZipCompressor zip = new ZipCompressor();
         ExchangeFileReader reader = new ExchangeFileReader();
         String appPath = getAppPath();
@@ -200,9 +200,9 @@ public class TestDataWriter {
             }
         }
 
-    }
+    }*/
 
-    private static void testReadExchange2(){
+    /*private static void testReadExchange2(){
         //ZipCompressor zip = new ZipCompressor();
         ExchangeFileReader reader = new ExchangeFileReader();
         String appPath = getAppPath();
@@ -212,7 +212,7 @@ public class TestDataWriter {
             TableFileReader tr = reader.getTableFileReader(i);
             System.out.println(tr.getXML());
         }
-    }
+    }*/
 
 
     public static void main(String arg[]){
@@ -220,7 +220,7 @@ public class TestDataWriter {
         //testExchange2();
         //testZip();
         //testFile();
-        testExchange3();
+        //testExchange3();
         //System.out.println(getAppPath());
     }
 }

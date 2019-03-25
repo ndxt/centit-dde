@@ -23,7 +23,7 @@ import java.util.List;
  * @Version 1.0
  */
 @RestController
-@RequestMapping(value = "taskLog")
+@RequestMapping(value = "taskDetailLog")
 @Api(value = "任务明细日志", tags = "任务明细日志")
 public class TaskDetailLogController {
     private static final Log log = LogFactory.getLog(TaskLogController.class);
