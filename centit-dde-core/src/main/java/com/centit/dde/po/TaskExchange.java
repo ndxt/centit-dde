@@ -1,5 +1,7 @@
 package com.centit.dde.po;
 
+import com.centit.support.database.orm.GeneratorCondition;
+import com.centit.support.database.orm.GeneratorTime;
 import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
@@ -32,15 +34,16 @@ public class TaskExchange implements java.io.Serializable{
     @Column(name = "TASK_ID")
     @ApiModelProperty(value = "任务ID", hidden = true)
     @ValueGenerator(strategy = GeneratorType.UUID)
+    @NotBlank
     private String taskId;
 
     @Column(name = "PACKET_ID")
     @ApiModelProperty(value = "包ID", required = true)
-    @NotBlank
-    private String packetId;
 
+    private String packetId;
     @Column(name = "TASK_NAME")
     @ApiModelProperty(value = "任务名称", required = true)
+    @NotBlank
     private String taskName;
 
     @Column(name = "TASK_TYPE")
@@ -49,28 +52,30 @@ public class TaskExchange implements java.io.Serializable{
     private String taskType;
 
     @Column(name = "TASK_CRON")
-    @ApiModelProperty(value = "任务执行定时器", hidden = true)
+    @ApiModelProperty(value = "任务执行定时器")
     private String taskCron;
 
     @Column(name = "TASK_DESC")
-    @ApiModelProperty(value = "任务描述", hidden = true)
+    @ApiModelProperty(value = "任务描述")
     private String taskDesc;
 
     @Column(name = "LAST_RUN_TIME")
-    @ApiModelProperty(value = "上次执行时间", hidden = true)
+    @ApiModelProperty(value = "上次执行时间")
+    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date lastRunTime;
 
     @Column(name = "NEXT_RUN_TIME")
-    @ApiModelProperty(value = "下次执行时间", hidden = true)
+    @ApiModelProperty(value = "下次执行时间")
+    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date nextRunTime;
 
     @Column(name = "IS_VALID")
     @ApiModelProperty(value = "是否启用", required = true)
-    @NotBlank
     private String isValid;
 
     @Column(name = "CREATE_TIME")
     @ApiModelProperty(value = "创建时间", hidden = true)
+    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date createTime;
 
     @Column(name = "CREATED")
@@ -78,6 +83,7 @@ public class TaskExchange implements java.io.Serializable{
     private String created;
 
     @Column(name = "LAST_UPDATE_TIME")
+    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     @ApiModelProperty(value = "最后更新时间", hidden = true)
     private Date lastUpdateTime;
 

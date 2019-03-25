@@ -1,5 +1,7 @@
 package com.centit.dde.po;
 
+import com.centit.support.database.orm.GeneratorCondition;
+import com.centit.support.database.orm.GeneratorTime;
 import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
@@ -7,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.*;
 
 /**
@@ -25,6 +28,7 @@ public class TaskLog implements java.io.Serializable {
     @Column(name="LOG_ID")
     @ValueGenerator(strategy = GeneratorType.UUID)
     @ApiModelProperty(value = "日志ID", hidden = true)
+    @NotBlank
     private String logId;
 
     @Column(name="Task_ID")
@@ -33,10 +37,12 @@ public class TaskLog implements java.io.Serializable {
 
     @Column(name="RUN_BEGIN_TIME")
     @ApiModelProperty(value = "执行开始时间")
+    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date runBeginTime;
 
     @Column(name="RUN_END_TIME")
     @ApiModelProperty(value = "执行结束时间")
+    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date runEndTime;
 
     @Column(name="RUN_TYPE")
@@ -44,7 +50,7 @@ public class TaskLog implements java.io.Serializable {
     private String runType;
 
     @Column(name="RUNNER")
-    @ApiModelProperty(value = "执行人员")
+    @ApiModelProperty(value = "执行人员", hidden = true)
     private String runner;
 
     @Column(name="OTHER_MESSAGE")
@@ -53,13 +59,13 @@ public class TaskLog implements java.io.Serializable {
 
     @Column(name="ERROR_PIECES")
     @ApiModelProperty(value = "失败条数")
-    private Long errorPieces;
+    private String errorPieces;
 
     @Column(name="SUCCESS_PIECES")
     @ApiModelProperty(value = "成功条数")
-    private Long successPieces;
+    private String successPieces;
 
-    @Transient
+   /* @Transient
     private Set<TaskDetailLog> taskDetailLogs;
 
     public Set<TaskDetailLog> getTaskDetailLogs() {
@@ -70,6 +76,6 @@ public class TaskLog implements java.io.Serializable {
 
     public void setTaskDetailLogs(Set<TaskDetailLog> taskDetailLogs) {
         this.taskDetailLogs = taskDetailLogs;
-    }
+    }*/
 
 }

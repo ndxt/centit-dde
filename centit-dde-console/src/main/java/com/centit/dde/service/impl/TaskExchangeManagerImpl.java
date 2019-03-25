@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
@@ -21,6 +22,7 @@ import java.util.Map;
  * @Version 1.0
  */
 @Service
+@Transactional
 public class TaskExchangeManagerImpl extends BaseEntityManagerImpl<TaskExchange,Long, TaskExchangeDao> implements TaskExchangeManager {
 
     public static final Log log = LogFactory.getLog(TaskExchangeManager.class);
