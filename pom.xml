@@ -5,8 +5,8 @@
 
     <parent>
         <groupId>com.centit.framework</groupId>
-        <artifactId>framework-snapshot-dependencies</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <artifactId>framework-release-dependencies</artifactId>
+        <version>1.2.1901</version>
     </parent>
 
 	<groupId>com.centit.product</groupId>
