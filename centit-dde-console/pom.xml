@@ -20,11 +20,11 @@
             <version>${metadata.commons.version}</version>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>data-business-operation</artifactId>
             <version>${metadata.commons.version}</version>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>com.centit.product</groupId>

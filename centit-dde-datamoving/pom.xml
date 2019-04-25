@@ -24,6 +24,21 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <exclusions>&lt;!&ndash; 去掉默认配置 &ndash;&gt;
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>-->
+
+        <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>data-packet-define</artifactId>
             <version>${metadata.commons.version}</version>
@@ -31,7 +46,7 @@
 
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>data-business-operation</artifactId>
+            <artifactId>business-operation-core</artifactId>
             <version>${metadata.commons.version}</version>
         </dependency>
 
@@ -63,11 +78,6 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.9</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
 
         <dependency>
