@@ -2,6 +2,7 @@ package com.centit.dde.controller;
 
 import com.centit.dde.po.TaskExchange;
 import com.centit.dde.service.TaskExchangeManager;
+import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.support.database.utils.PageDesc;
@@ -24,7 +25,7 @@ import java.util.List;
 @RestController
 @Api(value = "交换任务", tags = "交换任务")
 @RequestMapping(value = "taskExchange")
-public class TaskExchangeController {
+public class TaskExchangeController extends BaseController{
 
     private static final Log log = LogFactory.getLog(TaskExchangeController.class);
 

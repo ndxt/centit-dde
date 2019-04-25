@@ -2,6 +2,7 @@ package com.centit.dde.controller;
 
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.service.TaskDetailLogManager;
+import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.support.database.utils.PageDesc;
@@ -25,7 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "taskDetailLog")
 @Api(value = "任务明细日志", tags = "任务明细日志")
-public class TaskDetailLogController {
+public class TaskDetailLogController extends BaseController {
     private static final Log log = LogFactory.getLog(TaskLogController.class);
 
     @Autowired
