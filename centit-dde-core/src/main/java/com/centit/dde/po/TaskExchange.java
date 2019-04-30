@@ -1,5 +1,7 @@
 package com.centit.dde.po;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.support.database.orm.GeneratorCondition;
 import com.centit.support.database.orm.GeneratorTime;
 import com.centit.support.database.orm.GeneratorType;
@@ -9,6 +11,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -59,6 +62,11 @@ public class TaskExchange implements java.io.Serializable{
     @ApiModelProperty(value = "任务描述")
     private String taskDesc;
 
+    @JSONField(serialize=false)
+    @Column(name = "EXCHANGE_DESC_JSON")
+    @ApiModelProperty(value = "数据交换json格式的数据预处理说明", required = true)
+    private String exchangeDescJson;
+
     @Column(name = "LAST_RUN_TIME")
     @ApiModelProperty(value = "上次执行时间")
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
@@ -87,5 +95,10 @@ public class TaskExchange implements java.io.Serializable{
     @ApiModelProperty(value = "最后更新时间", hidden = true)
     private Date lastUpdateTime;
 
-
+    public JSONObject getExchangeDesc() {
+        if(StringUtils.isBlank(exchangeDescJson)) {
+            return null;
+        }
+        return JSONObject.parseObject(exchangeDescJson);
+    }
 }
