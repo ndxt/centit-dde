@@ -12,13 +12,15 @@ import org.apache.commons.lang3.StringUtils;
 public abstract class BizOptFlowUtil {
 
     public static int runDataExchange(
-        DataLoadSupplier loadData, PersistenceOperation saveData){
+        DataLoadSupplier loadData, PersistenceOperation saveData)
+    {
         BizOptFlow bof = new BizOptFlow().setSupplier(loadData).addOperation(saveData);
         return bof.run();
     }
 
     public static int runDataExchange(
-        DataLoadSupplier loadData, BizOperation dataTrans, PersistenceOperation saveData){
+        DataLoadSupplier loadData, BizOperation dataTrans, PersistenceOperation saveData)
+    {
         BizOptFlow bof = new BizOptFlow().setSupplier(loadData)
             .addOperation(dataTrans)
             .addOperation(saveData);
