@@ -85,7 +85,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
         return bizModel;
     }
 
-    protected BizModel runOneStep(BizModel bizModel, JSONObject bizOptJson) {
+    public BizModel runOneStep(BizModel bizModel, JSONObject bizOptJson) {
         String sOptType = bizOptJson.getString("operation");
         if(StringUtils.isBlank(sOptType)) {
             return bizModel;

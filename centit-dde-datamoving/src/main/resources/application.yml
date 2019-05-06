@@ -8,7 +8,7 @@ spring:
   datasource:
     type: org.apache.commons.dbcp2.BasicDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.128.32:3306/dde?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://192.168.128.32:3306/new_stat?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: webim
     password: webim
     dbcp2:
@@ -20,6 +20,7 @@ spring:
   flyway:
           enabled: false
           locations: classpath:migration/mysql
+
 framework:
   app:
     home: /D/Projects/RunData/dde
@@ -30,5 +31,6 @@ framework:
     auth-enable: false
     usercode: admin
     password: 000000
+
 
 

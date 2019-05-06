@@ -60,6 +60,7 @@ public class ServiceConfig {
     public InstantiationServiceBeanPostProcessor instantiationServiceBeanPostProcessor() {
         return new InstantiationServiceBeanPostProcessor();
     }
+
     @Bean
     public IntegrationEnvironment integrationEnvironment(){
         return new JsonIntegrationEnvironment();
