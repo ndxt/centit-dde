@@ -23,11 +23,11 @@ spring:
 
 framework:
   app:
-    home: /D/Projects/RunData/dde
+    home: D:/Projects/RunData/dde
   ip:
-    enable: true
+    enable: false
     topoptid: DDE
-    home: http://192.168.134.9:11000/framework/system
+    home: http://product.centit.com:8080/product-ip/service
     auth-enable: false
     usercode: admin
     password: 000000

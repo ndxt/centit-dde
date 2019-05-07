@@ -34,7 +34,7 @@ private IntegrationEnvironment integrationEnvironment;
         //TODO 设置一个5分钟执行一次 的定时任务调用 refreshTask
        // refreshTask();
     }*/
-    public String runTaks(String logid,JSONObject jsonObject){
+    public BizModel runTaks(String logid,JSONObject jsonObject){
         TaskLog taskLog = taskLogDao.getObjectById(logid);
         TaskExchange taskExchange = taskExchangeDao.getObjectById(taskLog.getTaskId());
         DataPacket dataPacket = dataPacketDao.getObjectWithReferences(taskExchange.getPacketId());
@@ -44,6 +44,6 @@ private IntegrationEnvironment integrationEnvironment;
 
         DatabaseBizOperation databaseBizOperation = new DatabaseBizOperation();
         BizModel bizModel2=databaseBizOperation.runOneStep(bizModel,jsonObject);
-        return  "OK";
+        return  bizModel2;
     }
 }
