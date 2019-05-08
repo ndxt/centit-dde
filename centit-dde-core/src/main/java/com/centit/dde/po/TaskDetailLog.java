@@ -36,25 +36,25 @@ public class TaskDetailLog implements java.io.Serializable {
     @Column(name="LOG_TYPE")
     @ApiModelProperty(value = "日志类别", required = true)
     private String logType;
-    
+
     @Column(name="RUN_BEGIN_TIME")
     @ApiModelProperty(value = "执行开始时间")
-    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
+    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.IFNULL, value = "today()")
     private Date runBeginTime;
-    
+
     @Column(name="RUN_END_TIME")
     @ApiModelProperty(value = "执行结束时间")
-    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
+    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.IFNULL, value = "today()")
     private Date runEndTime;
-    
+
     @Column(name="LOG_INFO")
     @ApiModelProperty(value = "任务明细描述")
     private String logInfo;
-    
+
     @Column(name="SUCCESS_PIECES")
     @ApiModelProperty(value = "成功条数")
     private Long successPieces;
-    
+
     @Column(name="ERROR_PIECES")
     @ApiModelProperty(value = "失败条数")
     private Long errorPieces;

@@ -36,7 +36,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
         if(databaseCode==null || tableName==null){
             throw new ObjectException(bizOptJson,
                 ObjectException.DATABASE_OPERATE_EXCEPTION,
-                "对应的元数据信息找不到，数据库："+databaseCode + " 表:" + databaseCode);
+                "对应的元数据信息找不到，数据库："+databaseCode + " 表:" + tableName);
         }
 
         DatabaseInfo databaseInfo =integrationEnvironment.getDatabaseInfo(databaseCode);
@@ -51,7 +51,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 ObjectException.DATABASE_OPERATE_EXCEPTION,
                 "数据源信息无效："+sourDSName);
         }
-        TableInfo tableInfo = metaDataService.getMetaTable(databaseCode, tableName);
+        TableInfo tableInfo = metaDataService.getMetaTableWithRelations(databaseCode, tableName);
         if(tableInfo==null){
             throw new ObjectException(bizOptJson,
                 ObjectException.DATABASE_OPERATE_EXCEPTION,

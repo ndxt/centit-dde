@@ -70,8 +70,8 @@ public class DataMovingApplication  {
 //        jsObject.put("groupBy","hasDataOpt");
 //        jsObject.put("orderBy","hasDataOpt");
 //        JSONObject jsonObject2 = new JSONObject();
-        //分析函数 :1 表示在同组中向前找，:_1表示向后找还没有实现
-//        jsonObject2.put("owner","(toNumber(hasDataOpt) - 1 / toNumber(hasDataOpt)) * 100 + '%'");
+//
+//        jsonObject2.put("owner","(toNumber(hasDataOpt) - toNumber(hasDataOpt._1) / toNumber(hasDataOpt.1)) * 100 + '%'");
 //        jsObject.put("fieldsMap",jsonObject2);
 //        jsObject.put("operation","cross");
 //        jsObject.put("rowHeader","ownerType");
@@ -94,15 +94,22 @@ public class DataMovingApplication  {
 //        jsonObject2.put("errorMsg","");
 //        jsonArray.add(jsonObject2);
 //        jsObject.put("rules",jsonArray);
-        jsObject.put("operation","static");
-        JSONArray jsonArray = new JSONArray();
-        Map jsonObject2 = new HashMap();
-        jsonObject2.put("dataSetName","test");
-        jsonObject2.put("data",new String[]{"ownerType","1","10"});
-        jsonArray.add(jsonObject2);
-        jsObject.put("data",jsonArray);
+//        jsObject.put("operation","static");
+//        JSONArray jsonArray = new JSONArray();
+//        JSONObject jsonObject2 = new JSONObject();
+//        jsonObject2.put("dataSetName","test");
+//        jsonObject2.put("data","1");
+//        JSONObject jsonObject3 = new JSONObject();
+//        jsonObject3.put("dataSetName","test2");
+//        jsonObject3.put("data","2");
+//        jsonArray.add(jsonObject2);
+//        jsonArray.add(jsonObject3);
+//        jsObject.put("data",jsonArray);
+//        jsObject.put("operation","persistence");
+//        jsObject.put("databaseCode","0000000063");
+//        jsObject.put("tableName","q_data_packet3");
         TaskRun taskRun =context.getBean(TaskRun.class);
-        BizModel bizModel=taskRun.runTaks(taskLogId,jsObject);
+        BizModel bizModel=taskRun.runTask(taskLogId,jsObject);
         System.out.println(bizModel.getModelName());
 
     }
