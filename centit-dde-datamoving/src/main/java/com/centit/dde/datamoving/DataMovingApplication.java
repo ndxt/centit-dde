@@ -105,9 +105,9 @@ public class DataMovingApplication  {
 //        jsonArray.add(jsonObject2);
 //        jsonArray.add(jsonObject3);
 //        jsObject.put("data",jsonArray);
-//        jsObject.put("operation","persistence");
-//        jsObject.put("databaseCode","0000000063");
-//        jsObject.put("tableName","q_data_packet3");
+        jsObject.put("operation","persistence");
+        jsObject.put("databaseCode","0000000063");
+        jsObject.put("tableName","q_data_packet3");
         TaskRun taskRun =context.getBean(TaskRun.class);
         BizModel bizModel=taskRun.runTask(taskLogId,jsObject);
         System.out.println(bizModel.getModelName());
