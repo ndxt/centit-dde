@@ -10,9 +10,8 @@ import com.centit.support.algorithm.CollectionsOpt;
 
 import com.centit.support.quartz.QuartzJobUtils;
 import com.sun.xml.internal.bind.v2.TODO;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.TriggerKey;
+import jdk.nashorn.internal.scripts.JO;
+import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,24 +34,39 @@ public class TaskSchedulers {
     private void refreshTask() throws SchedulerException {
         Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup());
         List<TaskExchange> list = taskExchangeDao.listObjects();
-        //TODO 对于没变cron表达式不用替换
         for (TaskExchange ll : list) {
-            // System.out.println(ll.getTaskName());
-//               QuartzJobUtils.createOrReplaceCronJob(scheduler,ll.getTaskId(),ll.getTaskName(),"exec",ll.getTaskCron(),
-//                   CollectionsOpt.createHashMap("command", "java -jar centit-dde-datamoving.jar logid",
-//                       "envp", CollectionsOpt.createHashMap(ll.getTaskId())));
-            QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getTaskId(), ll.getTaskName(), "task", ll.getTaskCron(),
-                CollectionsOpt.createHashMap("taskId", ll.getTaskId()));
+            if (ll.getTaskCron()==null || ll.getExchangeDescJson()==null)
+                break;
+            int i = 0;
+            for (TriggerKey tKey : triggerKeys) {
+               if (tKey.getName().equals(ll.getTaskId())){
+                   i++;
+                   CronTrigger quatrzTrigger = (CronTrigger)scheduler.getTrigger(tKey);
+//                   JobKey jobKey =quatrzTrigger.getJobKey();
+//                   JobDetail jobDetail=scheduler.getJobDetail(jobKey);
+//                   String json = (String) jobDetail.getJobDataMap().get("jsonExchange");
+                   if (!(quatrzTrigger.getCronExpression().equals(ll.getTaskCron()))){
+                       QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getTaskId(), ll.getTaskName(), "task", ll.getTaskCron(),
+                           CollectionsOpt.createHashMap("taskId", ll.getTaskId()));
+                       break;
+                   }
+                   break;
+               }
+            }
+            if (i==0) {
+                QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getTaskId(), ll.getTaskName(), "task", ll.getTaskCron(),
+                    CollectionsOpt.createHashMap("taskId", ll.getTaskId()));
+            }
         }
         for (TriggerKey tKey : triggerKeys) {
-            int i = 0;
+            int j = 0;
             for (TaskExchange ll : list) {
                 TriggerKey triggerKey = TriggerKey.triggerKey(ll.getTaskId(), ll.getTaskName());
                 if (tKey.equals(triggerKey))
                     break;
-                i++;
+                j++;
             }
-            if (i == list.size()) {
+            if (j == list.size()) {
                 QuartzJobUtils.deleteJob(scheduler, tKey.getName(), tKey.getGroup());
             }
         }
@@ -60,25 +74,15 @@ public class TaskSchedulers {
 
     @PostConstruct
     public void init() throws SchedulerException {
-        //TODO 设置一个5分钟执行一次 的定时任务调用 refreshTask
-        // refreshTask();
-
-
-//           QuartzJobUtils.registerJobType("beanName", JavaBeanJob.class);
-//           QuartzJobUtils.createOrReplaceSimpleJob(scheduler, "testjob",
-//               "test", "beanName", 10,
-//               CollectionsOpt.createHashMap("beanName", "taskExchangeDao","methodName","listObjects"));
-
         TextOperationLogWriterImpl textOperationLogWriter
             = new TextOperationLogWriterImpl();
         textOperationLogWriter.setOptLogHomePath("D:/Projects/RunData/dde/logs");
         OperationLogCenter.initOperationLogWriter(textOperationLogWriter);
         QuartzJobUtils.registerJobType("task", RunTaskJob.class);
-        refreshTask();
         scheduler.start();
     }
 
-    @Scheduled(fixedDelay = 1000 * 10)
+    @Scheduled(fixedDelay = 1000 * 10)//5minute
     public void work() throws SchedulerException {
         refreshTask();
     }

@@ -59,6 +59,9 @@ public class TaskRun {
         DatabaseBizOperation databaseBizOperation = new DatabaseBizOperation();
         databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
         databaseBizOperation.setMetaDataService(metaDataService);
+        if (jsonObject==null){
+            jsonObject =JSON.parseObject(taskExchange.getExchangeDescJson());
+        }
         BizModel bizModel2 = databaseBizOperation.runOneStep(bizModel, jsonObject);
         detailLog.setRunEndTime(new Date());
         detailLog.setTaskId(taskLog.getTaskId());

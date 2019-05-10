@@ -1,5 +1,5 @@
 server:
-  port: 10085
+  port: 10087
   servlet:
    contextPath: /dde
 spring:
