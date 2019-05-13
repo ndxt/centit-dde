@@ -111,6 +111,6 @@ public class DataMovingApplication  {
         TaskRun taskRun =context.getBean(TaskRun.class);
         BizModel bizModel=taskRun.runTask(taskLogId,jsObject);
         System.out.println(bizModel.getModelName());
-        SpringApplication.exit(context);
+        //SpringApplication.exit(context);
     }
 }

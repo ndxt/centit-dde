@@ -1,7 +1,4 @@
-server:
-  port: 10086
-  servlet:
-   contextPath: /dde
+
 spring:
   application:
     name: DDE
