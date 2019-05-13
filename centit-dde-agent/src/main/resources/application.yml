@@ -17,20 +17,10 @@ spring:
       initial-size: 10
       validation-query: SELECT 1
       connection-properties: characterEncoding=utf8
-  flyway:
-          enabled: false
-          locations: classpath:migration/mysql
+centit:
+  dataMovingPath: D:\out\centit-dde-datamoving.jar
 
-framework:
-  app:
-    home: D:/Projects/RunData/dde
-  ip:
-    enable: false
-    topoptid: DDE
-    home: http://product.centit.com:8080/product-ip/service
-    auth-enable: false
-    usercode: admin
-    password: 000000
+
 
 
 
