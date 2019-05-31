@@ -107,6 +107,8 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 return runCompare(bizModel, bizOptJson);
             case "join":
                 return runJoin(bizModel, bizOptJson);
+            case "sort":
+                return runSort(bizModel, bizOptJson);
             case "union":
                 return runUnion(bizModel, bizOptJson);
             case "filterExt":
