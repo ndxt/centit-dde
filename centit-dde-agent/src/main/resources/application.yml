@@ -1,0 +1,26 @@
+server:
+  port: 10087
+  servlet:
+   contextPath: /dde
+spring:
+  application:
+    name: DDE
+  datasource:
+    type: org.apache.commons.dbcp2.BasicDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.128.32:3306/new_stat?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: webim
+    password: webim
+    dbcp2:
+      max-wait-millis: 10000
+      max-idle: 15
+      initial-size: 10
+      validation-query: SELECT 1
+      connection-properties: characterEncoding=utf8
+centit:
+  dataMovingPath: D:\out\centit-dde-datamoving.jar
+
+
+
+
+

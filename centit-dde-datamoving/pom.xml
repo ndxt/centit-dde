@@ -19,7 +19,7 @@
         <metadata.commons.version>1.0-SNAPSHOT</metadata.commons.version>
         <common.module.version>1.0-SNAPSHOT</common.module.version>
         <centit.dde.version>3.0-SNAPSHOT</centit.dde.version>
-        <centit.ip.version>1.2-SNAPSHOT</centit.ip.version>
+        <centit.ip.version>2.0-SNAPSHOT</centit.ip.version>
     </properties>
 
     <dependencies>
@@ -27,6 +27,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+
+        </dependency>
+
         <!--<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
@@ -65,6 +71,12 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-ip-app</artifactId>
+            <version>${centit.ip.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>centit-ip-app-boot-config</artifactId>
             <version>${centit.ip.version}</version>
         </dependency>
 

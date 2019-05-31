@@ -1,0 +1,62 @@
+{
+  "osInfos": [
+    {
+      "osId": "JIRA",
+      "osName": "研发工作日志",
+      "osUrl": "http://developwork.centit.com/jira/secure/Dashboard.jspa",
+      "ddeSyncUrl": "",
+      "sysDataPushOption": "NONE",
+      "created": "u0000000"
+    },
+    {
+      "osId": "CONTRACT",
+      "osName": "公司经营数据管理",
+      "osUrl": "http://productsvr.centit.com:8080/contract",
+      "ddeSyncUrl": "http://productsvr.centit.com:8080/contract/datasync",
+      "sysDataPushOption": "NONE",
+      "created": "u0000000"
+    }
+  ],
+  "databaseInfos": [
+    {
+      "databaseCode": "0000000082",
+      "osId": "CONTRACT",
+      "databaseName": "0000000082",
+      "databaseUrl": "jdbc:oracle:thin:@192.168.131.26:1521/njzlscs",
+      "username": "jlwater",
+      "password": "jlwater",
+      "databaseDesc": "自来水",
+      "created": "u0000000"
+    },
+    {
+      "databaseCode": "0000000083",
+      "osId": "CONTRACT",
+      "databaseName": "0000000083",
+      "databaseUrl": "jdbc:oracle:thin:@192.168.137.24:1521/zlscs",
+      "username": "jlwater",
+      "password": "jlwater",
+      "databaseDesc": "自来水",
+      "created": "u0000000"
+    },
+    {
+      "databaseCode": "0000000081",
+      "osId": "JIRA",
+      "databaseName": "JIRA项目管理数据库",
+      "databaseUrl": "jdbc:oracle:thin:@192.168.128.65:1521:developwork2",
+      "username": "jirauser",
+      "password": "O8E3nT8FpZOAFfnuCAMQvg==",
+      "databaseDesc": "JIRA项目管理数据库",
+      "created": "u0000000"
+    },
+    {
+      "databaseCode": "0000000063",
+      "osId": "CONTRACT",
+      "databaseName": "经营数据管理数据库",
+      "databaseUrl": "jdbc:mysql://192.168.128.32:3306/new_stat?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai",
+      "username": "webim",
+      "password": "webim",
+      "databaseDesc": "经营数据管理数据库",
+      "created": "u0000000"
+    }
+  ]
+}
