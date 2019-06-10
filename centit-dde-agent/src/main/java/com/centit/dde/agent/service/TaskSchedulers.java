@@ -6,6 +6,7 @@ import com.centit.dde.po.TaskExchange;
 
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
+import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.support.algorithm.CollectionsOpt;
 
 import com.centit.support.quartz.QuartzJobUtils;
@@ -31,12 +32,16 @@ public class TaskSchedulers {
     @Autowired
     private Scheduler scheduler;
 
+    @Autowired
+    private OperationLogWriter operationLogWriter;
+
     private void refreshTask() throws SchedulerException {
         Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup());
         List<TaskExchange> list = taskExchangeDao.listObjects();
         for (TaskExchange ll : list) {
-            if (ll.getTaskCron()==null || ll.getExchangeDescJson()==null)
-                break;
+            if (ll.getTaskCron()==null || ll.getExchangeDescJson()==null) {
+                continue;
+            }
             int i = 0;
             for (TriggerKey tKey : triggerKeys) {
                if (tKey.getName().equals(ll.getTaskId())){
@@ -59,14 +64,15 @@ public class TaskSchedulers {
             }
         }
         for (TriggerKey tKey : triggerKeys) {
-            int j = 0;
+            boolean found = false;
             for (TaskExchange ll : list) {
                 TriggerKey triggerKey = TriggerKey.triggerKey(ll.getTaskId(), ll.getTaskName());
-                if (tKey.equals(triggerKey))
+                if (tKey.equals(triggerKey)) {
+                    found = true;
                     break;
-                j++;
+                }
             }
-            if (j == list.size()) {
+            if (!found) {
                 QuartzJobUtils.deleteJob(scheduler, tKey.getName(), tKey.getGroup());
             }
         }
@@ -74,10 +80,7 @@ public class TaskSchedulers {
 
     @PostConstruct
     public void init() throws SchedulerException {
-        TextOperationLogWriterImpl textOperationLogWriter
-            = new TextOperationLogWriterImpl();
-        textOperationLogWriter.setOptLogHomePath("D:/Projects/RunData/dde/logs");
-        OperationLogCenter.initOperationLogWriter(textOperationLogWriter);
+        OperationLogCenter.initOperationLogWriter(operationLogWriter);
         QuartzJobUtils.registerJobType("task", RunTaskJob.class);
         scheduler.start();
     }
