@@ -22,11 +22,13 @@ public class QuartzConfig {
     public Scheduler scheduler() {
         return schedulerFactoryBean().getScheduler();
     }
+    @Autowired
+    public PathConfig pathConfig;
     @Bean
     public OperationLogWriter operationLogWriter() {
         TextOperationLogWriterImpl textOperationLogWriter
             = new TextOperationLogWriterImpl();
-        textOperationLogWriter.setOptLogHomePath("D:/Projects/RunData/dde/logs");
+        textOperationLogWriter.setOptLogHomePath(pathConfig.getLogs());
         return textOperationLogWriter;
     }
 }

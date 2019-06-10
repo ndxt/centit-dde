@@ -19,6 +19,7 @@ spring:
       connection-properties: characterEncoding=utf8
 centit:
   dataMovingPath: D:\out\centit-dde-datamoving.jar
+  logs: D:/Projects/RunData/dde/logs
 
 
 
