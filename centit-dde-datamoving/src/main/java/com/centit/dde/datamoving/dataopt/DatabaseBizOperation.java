@@ -55,7 +55,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
         if(tableInfo==null){
             throw new ObjectException(bizOptJson,
                 ObjectException.DATABASE_OPERATE_EXCEPTION,
-                "对应的元数据信息找不到，数据库："+databaseCode + " 表:" + databaseCode);
+                "对应的元数据信息找不到，数据库："+databaseCode + " 表:" + tableInfo);
         }
         DataSetWriter dataSetWriter = new SQLDataSetWriter(
             JdbcConnect.mapDataSource(databaseInfo),tableInfo);
