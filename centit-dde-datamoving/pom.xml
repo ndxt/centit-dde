@@ -38,7 +38,11 @@
                 </exclusion>
             </exclusions>
         </dependency>-->
-
+        <dependency>
+            <groupId>net.sf.ucanaccess</groupId>
+            <artifactId>ucanaccess</artifactId>
+            <version>4.0.4</version>
+        </dependency>
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>data-packet-define</artifactId>
@@ -92,7 +96,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

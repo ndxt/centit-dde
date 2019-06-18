@@ -5,9 +5,9 @@ spring:
   datasource:
     type: org.apache.commons.dbcp2.BasicDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.128.32:3306/new_stat?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: webim
-    password: webim
+    url: jdbc:mysql://192.168.134.7:3306/stat?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: centit
     dbcp2:
       max-wait-millis: 10000
       max-idle: 15
@@ -15,19 +15,19 @@ spring:
       validation-query: SELECT 1
       connection-properties: characterEncoding=utf8
   flyway:
-          enabled: false
-          locations: classpath:migration/mysql
+    enabled: true
+    locations: classpath:migration/mysql
 
 framework:
   app:
     home: D:/Projects/RunData/dde
   ip:
-    enable: false
+    enable: true
     topoptid: DDE
-    home: http://product.centit.com:8080/product-ip/service
+    home: http://192.168.134.2:11000/framework/system
     auth-enable: false
     usercode: admin
     password: 000000
-
+logging.path: D:/Projects/RunData/dde/log
 
 

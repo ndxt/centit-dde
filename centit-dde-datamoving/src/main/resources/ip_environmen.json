@@ -42,9 +42,9 @@
       "databaseCode": "0000000081",
       "osId": "JIRA",
       "databaseName": "JIRA项目管理数据库",
-      "databaseUrl": "jdbc:oracle:thin:@192.168.128.65:1521:developwork2",
+      "databaseUrl": "jdbc:odbc:driver",
       "username": "jirauser",
-      "password": "O8E3nT8FpZOAFfnuCAMQvg==",
+      "password": "168168",
       "databaseDesc": "JIRA项目管理数据库",
       "created": "u0000000"
     },
