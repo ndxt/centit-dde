@@ -95,6 +95,15 @@ public class TaskExchange implements java.io.Serializable{
     @ApiModelProperty(value = "最后更新时间", hidden = true)
     private Date lastUpdateTime;
 
+    @JSONField(serialize = false)
+    public String getExchangeDescJson() {
+        return exchangeDescJson;
+    }
+
+    public void setExchangeDescJson(String exchangeDescJson) {
+        this.exchangeDescJson = exchangeDescJson;
+    }
+
     public JSONObject getExchangeDesc() {
         if(StringUtils.isBlank(exchangeDescJson)) {
             return null;
