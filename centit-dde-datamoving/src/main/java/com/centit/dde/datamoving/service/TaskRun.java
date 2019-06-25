@@ -43,41 +43,57 @@ public class TaskRun {
     @Autowired
     private IntegrationEnvironment integrationEnvironment;
 
-    /*   @PostConstruct
-       public void init() {
-           //TODO 设置一个5分钟执行一次 的定时任务调用 refreshTask
-          // refreshTask();
-       }*/
-    public BizModel runTask(String logId, JSONObject jsonObject) {
-        TaskLog taskLog = taskLogDao.getObjectById(logId);
-        TaskExchange taskExchange = taskExchangeDao.getObjectById(taskLog.getTaskId());
-        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(taskExchange.getPacketId());
+    private BizModel bizModel;
+    private TaskDetailLog detailLog;
+    private TaskLog taskLog;
+    private TaskExchange taskExchange;
+    private DataSet dataSet;
+    private Date beginTime;
+    public BizModel runTask(String logId) {
+        return runTask(logId, null);
+    }
+
+    private void setBizModel(String packetId) {
+        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
         DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
         dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
-        BizModel bizModel = dbPacketBizSupplier.get();
-        TaskDetailLog detailLog = new TaskDetailLog();
-        detailLog.setRunBeginTime(new Date());
+        bizModel = dbPacketBizSupplier.get();
+    }
+
+    private void runPersisdence(BizModel bizModel, JSONObject bizOptJson) {
         DatabaseBizOperation databaseBizOperation = new DatabaseBizOperation();
         databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
         databaseBizOperation.setMetaDataService(metaDataService);
-        if (jsonObject==null){
-            jsonObject =JSON.parseObject(taskExchange.getExchangeDescJson());
-        }
-        BizModel bizModel2 = databaseBizOperation.runOneStep(bizModel, jsonObject);
-        detailLog.setRunEndTime(new Date());
+        databaseBizOperation.runOneStep(bizModel, bizOptJson);
+    }
+
+    private void saveDetail() {
+        detailLog = new TaskDetailLog();
+        detailLog.setRunBeginTime(beginTime);
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
-        detailLog.setLogType(jsonObject.getString("operation"));
-        DataSet dataSet = bizModel.fetchDataSetByName(jsonObject.getString("source"));
-        String row = (String) dataSet.getFirstRow().get(WRITER_ERROR_TAG);
-        long count = dataSet.getData().size();
-        detailLog.setLogInfo(row);
-        if ("ok".equals(row)) {
-            detailLog.setSuccessPieces(count);
+        detailLog.setLogType(JSON.parseObject(taskExchange.getExchangeDescJson()).getString("operation"));
+        dataSet = bizModel.fetchDataSetByName(JSON.parseObject(taskExchange.getExchangeDescJson()).getString("source"));
+        detailLog.setLogInfo((String) dataSet.getFirstRow().get(WRITER_ERROR_TAG));
+        if ("ok".equals(detailLog.getLogInfo())) {
+            detailLog.setSuccessPieces((long) dataSet.getData().size());
         } else {
-            detailLog.setErrorPieces(count);
+            detailLog.setErrorPieces((long) dataSet.getData().size());
         }
+        detailLog.setRunEndTime(new Date());
         taskDetailLogDao.saveNewObject(detailLog);
-        return bizModel2;
+    }
+
+    public BizModel runTask(String logId, JSONObject runJSON) {
+        beginTime= new Date();
+        taskLog = taskLogDao.getObjectById(logId);
+        taskExchange = taskExchangeDao.getObjectById(taskLog.getTaskId());
+        if (runJSON != null) {
+            taskExchange.setExchangeDescJson(JSON.toJSONString(runJSON));
+        }
+        setBizModel(taskExchange.getPacketId());
+        runPersisdence(bizModel, JSON.parseObject(taskExchange.getExchangeDescJson()));
+        saveDetail();
+        return bizModel;
     }
 }
