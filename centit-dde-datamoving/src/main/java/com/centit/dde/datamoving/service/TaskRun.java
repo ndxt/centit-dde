@@ -17,6 +17,7 @@ import com.centit.product.datapacket.dao.DataPacketDao;
 import com.centit.product.datapacket.po.DataPacket;
 import com.centit.product.datapacket.service.DBPacketBizSupplier;
 import com.centit.product.metadata.service.MetaDataService;
+import com.centit.support.json.JSONOpt;
 import netscape.javascript.JSObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,17 +45,25 @@ public class TaskRun {
     private IntegrationEnvironment integrationEnvironment;
 
     private BizModel bizModel;
-    private TaskDetailLog detailLog;
     private TaskLog taskLog;
     private TaskExchange taskExchange;
     private DataSet dataSet;
     private Date beginTime;
+    private DataPacket dataPacket;
     public BizModel runTask(String logId) {
         return runTask(logId, null);
     }
 
+    public BizModel runStep(String packetId){
+        setBizModel(packetId);
+        JSONArray jsonArray=dataPacket.getDataOptDesc().getJSONArray("steps");
+        for(Object jj:jsonArray){
+            runPersisdence(bizModel, JSONOpt.objectToJSONObject(jj));
+        }
+        return bizModel;
+    }
     private void setBizModel(String packetId) {
-        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
+        dataPacket = dataPacketDao.getObjectWithReferences(packetId);
         DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
         dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
         bizModel = dbPacketBizSupplier.get();
@@ -68,7 +77,7 @@ public class TaskRun {
     }
 
     private void saveDetail() {
-        detailLog = new TaskDetailLog();
+        TaskDetailLog detailLog = new TaskDetailLog();
         detailLog.setRunBeginTime(beginTime);
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());

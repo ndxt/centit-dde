@@ -91,7 +91,8 @@ public class DemoApplicationTests {
 //        jsObject.put("databaseCode","0000000063");
 //        jsObject.put("tableName","q_data_packet3");
         TaskRun taskRun =context.getBean(TaskRun.class);
-        BizModel bizModel=taskRun.runTask(taskLogId,null);
+        BizModel bizModel= taskRun.runStep("082d83be953e4073b0f9995f5b49bfb1");
+            //taskRun.runTask(taskLogId,null);
         System.out.println(bizModel.getModelName());
         //SpringApplication.exit(context);
     }
