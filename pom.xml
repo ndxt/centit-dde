@@ -14,8 +14,8 @@
 	<version>3.0-SNAPSHOT</version>
     <modules>
         <module>centit-dde-console</module>
-        <module>centit-dde-datamoving</module>
-        <module>centit-dde-agent</module>
+        <!--<module>centit-dde-datamoving</module>-->
+        <!--<module>centit-dde-agent</module>-->
         <module>centit-dde-core</module>
     </modules>
     <name>com.centit.product:centit-dde</name>
