@@ -50,6 +50,7 @@ public class TaskRun {
     private DataSet dataSet;
     private Date beginTime;
     private DataPacket dataPacket;
+    private DatabaseBizOperation databaseBizOperation;
     public BizModel runTask(String logId) {
         return runTask(logId, null);
     }
@@ -67,12 +68,12 @@ public class TaskRun {
         DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
         dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
         bizModel = dbPacketBizSupplier.get();
+        databaseBizOperation = new DatabaseBizOperation();
+        databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
+        databaseBizOperation.setMetaDataService(metaDataService);
     }
 
     private void runPersisdence(BizModel bizModel, JSONObject bizOptJson) {
-        DatabaseBizOperation databaseBizOperation = new DatabaseBizOperation();
-        databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
-        databaseBizOperation.setMetaDataService(metaDataService);
         databaseBizOperation.runOneStep(bizModel, bizOptJson);
     }
 
