@@ -9,6 +9,7 @@ import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ public class TaskExchangeController extends BaseController{
     @ApiOperation(value = "新增任务")
     @WrapUpResponseBody
     public void createTaskExchange(TaskExchange taskExchange){
+        taskExchange.setExchangeDescJson(StringEscapeUtils.unescapeHtml4(taskExchange.getExchangeDescJson()));
         taskExchangeManager.createTaskExchange(taskExchange);
     }
 
@@ -43,8 +45,9 @@ public class TaskExchangeController extends BaseController{
     @ApiImplicitParam(name = "taskId", value = "任务ID")
     @ApiOperation(value = "更新任务")
     @WrapUpResponseBody
-    public void updateTaskExchange(@PathVariable String taskId, TaskExchange taskExchange){
+    public void updateTaskExchange(@PathVariable String taskId, @RequestBody TaskExchange taskExchange){
         taskExchange.setTaskId(taskId);
+        taskExchange.setExchangeDescJson(StringEscapeUtils.unescapeHtml4(taskExchange.getExchangeDescJson()));
         taskExchangeManager.updateTaskExchange(taskExchange);
     }
 

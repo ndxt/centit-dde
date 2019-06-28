@@ -108,6 +108,11 @@ public class TaskExchange implements java.io.Serializable{
         if(StringUtils.isBlank(exchangeDescJson)) {
             return null;
         }
-        return JSONObject.parseObject(exchangeDescJson);
+        try {
+            return JSONObject.parseObject(exchangeDescJson);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return  null;
+        }
     }
 }
