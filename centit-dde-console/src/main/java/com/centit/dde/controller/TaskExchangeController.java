@@ -1,10 +1,15 @@
 package com.centit.dde.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.po.TaskExchange;
 import com.centit.dde.service.TaskExchangeManager;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
+import com.centit.product.datapacket.po.DataPacket;
+import com.centit.product.datapacket.service.DataPacketService;
+import com.centit.product.datapacket.utils.DataPacketUtil;
+import com.centit.product.datapacket.vo.DataPacketSchema;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -32,7 +37,8 @@ public class TaskExchangeController extends BaseController{
 
     @Autowired
     private TaskExchangeManager taskExchangeManager;
-
+    @Autowired
+    private DataPacketService dataPacketService;
     @PostMapping
     @ApiOperation(value = "新增任务")
     @WrapUpResponseBody
@@ -74,6 +80,25 @@ public class TaskExchangeController extends BaseController{
     public TaskExchange getTaskExchange(@PathVariable String taskId){
         TaskExchange taskExchange = taskExchangeManager.getTaskExchange(taskId);
         return taskExchange;
+    }
+    @ApiOperation(value = "获取任务的数据包模式")
+    @GetMapping(value = "/schema/{taskId}")
+    @WrapUpResponseBody
+    public DataPacketSchema getDataPacketSchema(@PathVariable String taskId){
+        TaskExchange taskExchange = taskExchangeManager.getTaskExchange(taskId);
+        DataPacket dataPacket = dataPacketService.getDataPacket(taskExchange.getPacketId());
+        DataPacketSchema schema = DataPacketSchema.valueOf(dataPacket);
+        if(dataPacket!=null) {
+            JSONObject obj = dataPacket.getDataOptDesc();
+            if (obj != null) {
+                schema= DataPacketUtil.calcDataPacketSchema(schema, obj);
+            }
+            obj = taskExchange.getExchangeDesc();
+            if (obj != null) {
+                schema= DataPacketUtil.calcDataPacketSchema(schema, obj);
+            }
+        }
+        return schema;
     }
 
 }

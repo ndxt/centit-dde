@@ -16,6 +16,7 @@ import com.centit.product.dataopt.core.DataSet;
 import com.centit.product.datapacket.dao.DataPacketDao;
 import com.centit.product.datapacket.po.DataPacket;
 import com.centit.product.datapacket.service.DBPacketBizSupplier;
+import com.centit.product.datapacket.service.DataPacketService;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.json.JSONOpt;
 import netscape.javascript.JSObject;
@@ -51,18 +52,19 @@ public class TaskRun {
     private Date beginTime;
     private DataPacket dataPacket;
     private DatabaseBizOperation databaseBizOperation;
+
     public BizModel runTask(String logId) {
         return runTask(logId, null);
     }
 
-    public BizModel runStep(String packetId){
-        setBizModel(packetId);
-        JSONArray jsonArray=dataPacket.getDataOptDesc().getJSONArray("steps");
-        for(Object jj:jsonArray){
-            runPersisdence(bizModel, JSONOpt.objectToJSONObject(jj));
+    public BizModel runStep(JSONObject bizOptJson) {
+        JSONArray jsonArray = bizOptJson.getJSONArray("steps");
+        for (Object jj : jsonArray) {
+            databaseBizOperation.runOneStep(bizModel, JSONOpt.objectToJSONObject(jj));
         }
         return bizModel;
     }
+
     private void setBizModel(String packetId) {
         dataPacket = dataPacketDao.getObjectWithReferences(packetId);
         DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
@@ -73,9 +75,6 @@ public class TaskRun {
         databaseBizOperation.setMetaDataService(metaDataService);
     }
 
-    private void runPersisdence(BizModel bizModel, JSONObject bizOptJson) {
-        databaseBizOperation.runOneStep(bizModel, bizOptJson);
-    }
 
     private void saveDetail() {
         TaskDetailLog detailLog = new TaskDetailLog();
@@ -95,14 +94,19 @@ public class TaskRun {
     }
 
     public BizModel runTask(String logId, JSONObject runJSON) {
-        beginTime= new Date();
+        beginTime = new Date();
         taskLog = taskLogDao.getObjectById(logId);
         taskExchange = taskExchangeDao.getObjectById(taskLog.getTaskId());
         if (runJSON != null) {
             taskExchange.setExchangeDescJson(JSON.toJSONString(runJSON));
         }
         setBizModel(taskExchange.getPacketId());
-        runPersisdence(bizModel, JSON.parseObject(taskExchange.getExchangeDescJson()));
+        if (dataPacket.getDataOptDesc() != null) {
+            runStep(dataPacket.getDataOptDesc());
+        }
+        if (taskExchange.getExchangeDesc() != null) {
+            runStep(taskExchange.getExchangeDesc());
+        }
         saveDetail();
         return bizModel;
     }
