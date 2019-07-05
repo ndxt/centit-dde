@@ -16,11 +16,16 @@ metadata:
   name: centit-dde
 spec:
   replicas: 1
+  revisionHistoryLimit: 2
+  minReadySeconds: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: centit-dde
-  strategy:
-    type: RollingUpdate
   template:
     metadata:
       labels:
