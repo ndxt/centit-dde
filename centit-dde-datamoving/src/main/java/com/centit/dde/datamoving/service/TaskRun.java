@@ -27,6 +27,7 @@ import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.Map;
 
+import static com.centit.product.dataopt.bizopt.BuiltInOperation.getJsonFieldString;
 import static com.centit.product.dataopt.dataset.SQLDataSetWriter.WRITER_ERROR_TAG;
 
 @Service
@@ -52,6 +53,7 @@ public class TaskRun {
     private Date beginTime;
     private DataPacket dataPacket;
     private DatabaseBizOperation databaseBizOperation;
+    private String sourDSName;
 
     public BizModel runTask(String logId) {
         return runTask(logId, null);
@@ -61,6 +63,10 @@ public class TaskRun {
         JSONArray jsonArray = bizOptJson.getJSONArray("steps");
         for (Object jj : jsonArray) {
             databaseBizOperation.runOneStep(bizModel, JSONOpt.objectToJSONObject(jj));
+            if ("persistence".equals(JSONOpt.objectToJSONObject(jj).getString("operation"))) {
+                sourDSName = getJsonFieldString(JSONOpt.objectToJSONObject(jj), "source", bizModel.getModelName());
+            }
+
         }
         return bizModel;
     }
@@ -82,7 +88,7 @@ public class TaskRun {
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
         detailLog.setLogType(JSON.parseObject(taskExchange.getExchangeDescJson()).getString("operation"));
-        dataSet = bizModel.fetchDataSetByName(JSON.parseObject(taskExchange.getExchangeDescJson()).getString("source"));
+        dataSet = bizModel.fetchDataSetByName(sourDSName);
         detailLog.setLogInfo((String) dataSet.getFirstRow().get(WRITER_ERROR_TAG));
         if ("ok".equals(detailLog.getLogInfo())) {
             detailLog.setSuccessPieces((long) dataSet.getData().size());
@@ -103,9 +109,6 @@ public class TaskRun {
         setBizModel(taskExchange.getPacketId());
         if (dataPacket.getDataOptDesc() != null) {
             runStep(dataPacket.getDataOptDesc());
-        }
-        if (taskExchange.getExchangeDesc() != null) {
-            runStep(taskExchange.getExchangeDesc());
         }
         saveDetail();
         return bizModel;
