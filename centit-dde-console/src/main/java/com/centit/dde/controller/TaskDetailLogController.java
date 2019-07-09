@@ -14,8 +14,10 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -59,8 +61,9 @@ public class TaskDetailLogController extends BaseController {
     @GetMapping
     @ApiOperation(value = "查询所有明细日志")
     @WrapUpResponseBody
-    public PageQueryResult<TaskDetailLog> listTaskDetailLog(PageDesc pageDesc){
-        List<TaskDetailLog> taskDetailLogs = taskDetailLogManager.listTaskDetailLog(new HashMap<String, Object>(), pageDesc);
+    public PageQueryResult<TaskDetailLog> listTaskDetailLog(PageDesc pageDesc,HttpServletRequest request){
+        Map<String, Object> parameters = collectRequestParameters(request);
+        List<TaskDetailLog> taskDetailLogs = taskDetailLogManager.listTaskDetailLog(parameters, pageDesc);
         return PageQueryResult.createResult(taskDetailLogs,pageDesc);
     }
 
