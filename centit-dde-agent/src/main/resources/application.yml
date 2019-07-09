@@ -1,5 +1,5 @@
 server:
-  port: 10087
+  port: 10089
   servlet:
    contextPath: /dde
 spring:
@@ -8,9 +8,9 @@ spring:
   datasource:
     type: org.apache.commons.dbcp2.BasicDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.128.32:3306/new_stat?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: webim
-    password: webim
+    url: jdbc:mysql://192.168.134.7:3306/stat?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: centit
     dbcp2:
       max-wait-millis: 10000
       max-idle: 15
@@ -18,7 +18,7 @@ spring:
       validation-query: SELECT 1
       connection-properties: characterEncoding=utf8
 centit:
-  dataMovingPath: D:\out\centit-dde-datamoving.jar
+  dataMovingPath: D:\Centit\centit-dde\out\artifacts\centit_dde_datamoving_jar\centit-dde-datamoving.jar
   logs: D:/Projects/RunData/dde/logs
 
 

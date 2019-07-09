@@ -74,7 +74,7 @@ public class TaskSchedulers {
         Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup());
 
         for (TaskExchange ll : list) {
-            if (ll.getTaskCron()==null || ll.getExchangeDescJson()==null) {
+            if ("".equals(ll.getTaskCron())||ll.getTaskCron()==null ) {
                 continue;
             }
             int i = 0;

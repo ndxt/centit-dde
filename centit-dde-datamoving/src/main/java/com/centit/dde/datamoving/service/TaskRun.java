@@ -53,7 +53,6 @@ public class TaskRun {
     private Date beginTime;
     private DataPacket dataPacket;
     private DatabaseBizOperation databaseBizOperation;
-    private String sourDSName;
 
     public BizModel runTask(String logId) {
         return runTask(logId, null);
@@ -63,10 +62,7 @@ public class TaskRun {
         JSONArray jsonArray = bizOptJson.getJSONArray("steps");
         for (Object jj : jsonArray) {
             databaseBizOperation.runOneStep(bizModel, JSONOpt.objectToJSONObject(jj));
-            if ("persistence".equals(JSONOpt.objectToJSONObject(jj).getString("operation"))) {
-                sourDSName = getJsonFieldString(JSONOpt.objectToJSONObject(jj), "source", bizModel.getModelName());
-            }
-
+            saveDetail(JSONOpt.objectToJSONObject(jj));
         }
         return bizModel;
     }
@@ -82,13 +78,13 @@ public class TaskRun {
     }
 
 
-    private void saveDetail() {
+    private void saveDetail(JSONObject runJSON) {
         TaskDetailLog detailLog = new TaskDetailLog();
         detailLog.setRunBeginTime(beginTime);
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
-        detailLog.setLogType(JSON.parseObject(taskExchange.getExchangeDescJson()).getString("operation"));
-        dataSet = bizModel.fetchDataSetByName(sourDSName);
+        detailLog.setLogType(runJSON.getString("operation"));
+        dataSet = bizModel.fetchDataSetByName(runJSON.getString("source"));
         detailLog.setLogInfo((String) dataSet.getFirstRow().get(WRITER_ERROR_TAG));
         if ("ok".equals(detailLog.getLogInfo())) {
             detailLog.setSuccessPieces((long) dataSet.getData().size());
@@ -110,7 +106,8 @@ public class TaskRun {
         if (dataPacket.getDataOptDesc() != null) {
             runStep(dataPacket.getDataOptDesc());
         }
-        saveDetail();
+        taskLog.setRunEndTime(new Date());
+        taskLogDao.updateObject(taskLog);
         return bizModel;
     }
 }
