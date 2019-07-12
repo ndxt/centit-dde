@@ -48,10 +48,7 @@ public class TaskRun {
 
     private BizModel bizModel;
     private TaskLog taskLog;
-    private TaskExchange taskExchange;
-    private DataSet dataSet;
     private Date beginTime;
-    private DataPacket dataPacket;
     private DatabaseBizOperation databaseBizOperation;
 
     public BizModel runTask(String logId) {
@@ -68,7 +65,7 @@ public class TaskRun {
     }
 
     private void setBizModel(String packetId) {
-        dataPacket = dataPacketDao.getObjectWithReferences(packetId);
+        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
         DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
         dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
         bizModel = dbPacketBizSupplier.get();
@@ -84,7 +81,7 @@ public class TaskRun {
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
         detailLog.setLogType(runJSON.getString("operation"));
-        dataSet = bizModel.fetchDataSetByName(runJSON.getString("source"));
+        DataSet dataSet = bizModel.fetchDataSetByName(runJSON.getString("source"));
         detailLog.setLogInfo((String) dataSet.getFirstRow().get(WRITER_ERROR_TAG));
         if ("ok".equals(detailLog.getLogInfo())) {
             detailLog.setSuccessPieces((long) dataSet.getData().size());
@@ -98,13 +95,13 @@ public class TaskRun {
     public BizModel runTask(String logId, JSONObject runJSON) {
         beginTime = new Date();
         taskLog = taskLogDao.getObjectById(logId);
-        taskExchange = taskExchangeDao.getObjectById(taskLog.getTaskId());
+        TaskExchange taskExchange = taskExchangeDao.getObjectById(taskLog.getTaskId());
         if (runJSON != null) {
             taskExchange.setExchangeDescJson(JSON.toJSONString(runJSON));
         }
         setBizModel(taskExchange.getPacketId());
-        if (dataPacket.getDataOptDesc() != null) {
-            runStep(dataPacket.getDataOptDesc());
+        if (taskExchange.getExchangeDescJson() != null) {
+            runStep(taskExchange.getExchangeDesc());
         }
         taskLog.setRunEndTime(new Date());
         taskLogDao.updateObject(taskLog);
