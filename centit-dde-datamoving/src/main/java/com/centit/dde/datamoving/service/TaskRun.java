@@ -50,6 +50,7 @@ public class TaskRun {
     private TaskLog taskLog;
     private Date beginTime;
     private DatabaseBizOperation databaseBizOperation;
+    private DataPacket dataPacket;
 
     public BizModel runTask(String logId) {
         return runTask(logId, null);
@@ -65,7 +66,7 @@ public class TaskRun {
     }
 
     private void setBizModel(String packetId) {
-        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
+        dataPacket = dataPacketDao.getObjectWithReferences(packetId);
         DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
         dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
         bizModel = dbPacketBizSupplier.get();
@@ -100,7 +101,12 @@ public class TaskRun {
             taskExchange.setExchangeDescJson(JSON.toJSONString(runJSON));
         }
         setBizModel(taskExchange.getPacketId());
-        if (taskExchange.getExchangeDescJson() != null) {
+
+        if (taskExchange.getExchangeDesc().getJSONArray("steps").size()==0){
+            taskExchange.setExchangeDescJson(dataPacket.getDataOptDescJson());
+        }
+
+        if (taskExchange.getExchangeDesc() != null) {
             runStep(taskExchange.getExchangeDesc());
         }
         taskLog.setRunEndTime(new Date());
