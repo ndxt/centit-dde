@@ -3,7 +3,10 @@ package com.centit.dde.service.impl;
 import com.centit.dde.dao.TaskExchangeDao;
 import com.centit.dde.po.TaskExchange;
 import com.centit.dde.service.TaskExchangeManager;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
+import com.centit.product.datapacket.po.DataPacket;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,5 +66,13 @@ public class TaskExchangeManagerImpl extends BaseEntityManagerImpl<TaskExchange,
     @Override
     public void delTaskExchangeById(String taskId) {
         this.taskExchangeDao.deleteObjectById(taskId);
+    }
+
+    @Override
+    public void updateExchangeOptJson(String taskId, String exchangeOptJson){
+        DatabaseOptUtils.batchUpdateObject(taskExchangeDao, TaskExchange.class,
+            CollectionsOpt.createHashMap("exchangeDescJson",exchangeOptJson ),
+            CollectionsOpt.createHashMap("taskId",taskId )
+        );
     }
 }

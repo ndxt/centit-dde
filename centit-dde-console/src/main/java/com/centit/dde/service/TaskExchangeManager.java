@@ -19,5 +19,5 @@ public interface TaskExchangeManager {
 
     void delTaskExchangeById(String taskId);
 
-
+    void updateExchangeOptJson(String taskId, String exchangeOptJson);
 }

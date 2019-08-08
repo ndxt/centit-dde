@@ -101,4 +101,10 @@ public class TaskExchangeController extends BaseController{
         return schema;
     }
 
+    @ApiOperation(value = "编辑数据交换数据处理描述信息")
+    @PutMapping(value = "/opt/{taskId}")
+    @WrapUpResponseBody
+    public void updateDataPacketOpt(@PathVariable String taskId, @RequestBody String exchangeOptJson){
+        taskExchangeManager.updateExchangeOptJson(taskId, exchangeOptJson);
+    }
 }
