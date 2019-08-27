@@ -23,16 +23,16 @@ public class WebInitializer implements WebApplicationInitializer {
         initializeSpringConfig(servletContext);
         initializeSystemSpringMvcConfig(servletContext);
         initializeSpringMvcConfig(servletContext);
-
+        String [] servletUrlPatterns = {"/system/*","/dde/*"};
         WebConfig.registerSpringSessionRepositoryFilter(servletContext);
         WebConfig.registerRequestContextListener(servletContext);
         WebConfig.registerSingleSignOutHttpSessionListener(servletContext);
         //WebConfig.registerResponseCorsFilter(servletContext);
-        WebConfig.registerCharacterEncodingFilter(servletContext);
-        WebConfig.registerHttpPutFormContentFilter(servletContext);
-        WebConfig.registerHiddenHttpMethodFilter(servletContext);
+        WebConfig.registerCharacterEncodingFilter(servletContext, servletUrlPatterns);
+        WebConfig.registerHttpPutFormContentFilter(servletContext, servletUrlPatterns);
+        WebConfig.registerHiddenHttpMethodFilter(servletContext, servletUrlPatterns);
         WebConfig.registerRequestThreadLocalFilter(servletContext);
-        WebConfig.registerSpringSecurityFilter(servletContext);
+        WebConfig.registerSpringSecurityFilter(servletContext, servletUrlPatterns);
     }
     /**
      * 加载Spring 配置
