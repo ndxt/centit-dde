@@ -94,7 +94,9 @@ public class TaskExchange implements java.io.Serializable{
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     @ApiModelProperty(value = "最后更新时间", hidden = true)
     private Date lastUpdateTime;
-
+    @ApiModelProperty(value = "业务模块代码")
+    @Column(name = "APPLICATION_ID")
+    private String  applicationId;
     @JSONField(serialize = false)
     public String getExchangeDescJson() {
         return exchangeDescJson;
