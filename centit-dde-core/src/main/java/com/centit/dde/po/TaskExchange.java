@@ -50,7 +50,7 @@ public class TaskExchange implements java.io.Serializable{
     private String taskName;
 
     @Column(name = "TASK_TYPE")
-    @ApiModelProperty(value = "任务类型", required = true)
+    @ApiModelProperty(value = "任务类型,1表示普通任务，2表示定时任务", required = true)
     @NotBlank
     private String taskType;
 
