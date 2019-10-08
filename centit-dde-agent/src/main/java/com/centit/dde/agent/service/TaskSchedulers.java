@@ -1,26 +1,20 @@
 package com.centit.dde.agent.service;
 
 import com.centit.dde.dao.TaskExchangeDao;
-
 import com.centit.dde.po.TaskExchange;
-
 import com.centit.framework.components.OperationLogCenter;
-import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.support.algorithm.CollectionsOpt;
-
 import com.centit.support.quartz.QuartzJobUtils;
-import com.sun.tools.internal.ws.wsdl.parser.DOMForest;
-import com.sun.xml.internal.bind.v2.TODO;
-import jdk.nashorn.internal.scripts.JO;
 import org.apache.commons.codec.binary.Hex;
-import org.quartz.*;
+import org.quartz.CronTrigger;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;

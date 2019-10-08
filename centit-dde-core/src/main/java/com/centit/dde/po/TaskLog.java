@@ -1,16 +1,17 @@
 package com.centit.dde.po;
 
-import com.centit.support.database.orm.GeneratorCondition;
-import com.centit.support.database.orm.GeneratorTime;
 import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
-import java.util.*;
+import java.util.Date;
 
 /**
  * @ClassName TaskExchange

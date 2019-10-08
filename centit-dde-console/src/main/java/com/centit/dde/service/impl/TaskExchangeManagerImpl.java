@@ -5,7 +5,6 @@ import com.centit.dde.po.TaskExchange;
 import com.centit.dde.service.TaskExchangeManager;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
-import com.centit.product.datapacket.po.DataPacket;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.logging.Log;

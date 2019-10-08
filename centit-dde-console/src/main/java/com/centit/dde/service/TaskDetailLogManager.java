@@ -2,8 +2,6 @@ package com.centit.dde.service;
 
 
 import com.centit.dde.po.TaskDetailLog;
-import com.centit.dde.po.TaskLog;
-import com.centit.framework.jdbc.service.BaseEntityManager;
 import com.centit.support.database.utils.PageDesc;
 
 import java.util.List;

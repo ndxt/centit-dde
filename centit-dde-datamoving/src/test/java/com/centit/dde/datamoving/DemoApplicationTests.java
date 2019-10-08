@@ -2,7 +2,6 @@ package com.centit.dde.datamoving;
 
 import com.centit.dde.datamoving.service.TaskRun;
 import com.centit.product.dataopt.core.BizModel;
-import junit.framework.TestSuite;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.SpringApplication;

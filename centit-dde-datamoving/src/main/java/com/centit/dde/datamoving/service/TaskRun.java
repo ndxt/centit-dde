@@ -16,18 +16,13 @@ import com.centit.product.dataopt.core.DataSet;
 import com.centit.product.datapacket.dao.DataPacketDao;
 import com.centit.product.datapacket.po.DataPacket;
 import com.centit.product.datapacket.service.DBPacketBizSupplier;
-import com.centit.product.datapacket.service.DataPacketService;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.json.JSONOpt;
-import netscape.javascript.JSObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Date;
-import java.util.Map;
 
-import static com.centit.product.dataopt.bizopt.BuiltInOperation.getJsonFieldString;
 import static com.centit.product.dataopt.dataset.SQLDataSetWriter.WRITER_ERROR_TAG;
 
 @Service

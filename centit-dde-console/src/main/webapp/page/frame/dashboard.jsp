@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <%@ include file="/page/common/taglibs.jsp"%>
-<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ page language="java" pageEncoding="utf-8"%>
 
 <head>
 <script type="text/javascript">
@@ -95,8 +95,8 @@
 							<a href="#">苏州</a>
 						</h1>
 					</div>
-					
-					
+
+
                      1-6月份，全省新开工各类保障性住房<fmt:formatNumber value="${zib.zib6_1/10000}" pattern="#.##" minFractionDigits="2" />
                                                       万套（户），完成年度目标任务<fmt:formatNumber value="${zib.zib6_1_1 }" type="percent" />；
                                                       竣工各类保障性住房<fmt:formatNumber value="${zib.zib6_2/10000}" pattern="#.##" minFractionDigits="2" />万套，
@@ -169,7 +169,7 @@
 						</tr>
 						<c:forEach var="obj" items="${objects }">
 							<tr>
-								<td align="center" style="white-space: nowrap;">${obj.d_dataname}								
+								<td align="center" style="white-space: nowrap;">${obj.d_dataname}
 								</td>
 								<td align="center" style="white-space: nowrap;">
 								<fmt:formatNumber value="${obj.zib6_2_0}" pattern="#"
@@ -213,7 +213,7 @@
 								<td align="center" style="white-space: nowrap;">
 								<fmt:formatNumber value="${appcant.zia_number_1 }" type="percent" /></td>
 							</tr>
-						</c:forEach>					
+						</c:forEach>
 					</table>
 					<a onClick="change4('sq4')" href="#" class="stylebutton"><img
 						src="${pageContext.request.contextPath}/themes/css/images/frame/Q1.gif"></a>

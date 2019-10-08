@@ -4,15 +4,11 @@ package com.centit.test.datafile;
 import com.centit.dde.datafile.ExchangeFileWriter;
 import com.centit.dde.datafile.TableFileReader;
 import com.centit.dde.datafile.TableFileWriter;*/
-import com.centit.dde.po.TaskLog;
+
 import com.centit.framework.common.SysParametersUtils;
-import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.ZipCompressor;
-import com.centit.support.file.FileSystemOpt;
 
 import java.io.File;
-import java.io.Writer;
-import java.util.Map;
 
 public class TestDataWriter {
 

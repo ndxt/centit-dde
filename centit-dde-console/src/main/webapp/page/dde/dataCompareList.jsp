@@ -1,6 +1,3 @@
-<%@page import="java.util.ArrayList"%>
-<%@page import="java.util.List"%>
-<%@page import="java.util.HashMap"%>
 <%@page import="com.centit.dde.po.TableColumnInfo"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
 <%@ include file="/page/common/taglibs.jsp"%>
@@ -150,7 +147,7 @@
 			return false;
 		}
 	}
-	function addColumn(tablecode,colcode){ 
+	function addColumn(tablecode,colcode){
 		$("#datacompareFrom").loadUrl("${contextPath }/dde/datacompare!addoreditColumn.do", {dealColType: 'addColumn',editTablecode: tablecode,editColcode: colcode,databasename: '${databasename}'});
 	}
 	function editColtype(tablecode,colcode){
@@ -159,7 +156,7 @@
 		}else{
 			return false;
 		}
-	} 
+	}
     function editColLength(tablecode,colcode){
     	$("#datacompareFrom").loadUrl("${contextPath }/dde/datacompare!addoreditColumn.do", {dealColType: 'editColLength',editTablecode: tablecode,editColcode: colcode,databasename: '${databasename}'});
 	}
