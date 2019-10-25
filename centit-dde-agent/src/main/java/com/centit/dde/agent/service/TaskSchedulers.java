@@ -81,7 +81,7 @@ public class TaskSchedulers {
 //                   String json = (String) jobDetail.getJobDataMap().get("jsonExchange");
                    if (!(quatrzTrigger.getCronExpression().equals(ll.getTaskCron()))){
                        QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getTaskId(), ll.getTaskName(), "task", ll.getTaskCron(),
-                           CollectionsOpt.createHashMap("taskId", ll.getTaskId()));
+                           CollectionsOpt.createHashMap("taskExchange", ll));
                        break;
                    }
                    break;
@@ -89,7 +89,7 @@ public class TaskSchedulers {
             }
             if (i==0) {
                 QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getTaskId(), ll.getTaskName(), "task", ll.getTaskCron(),
-                    CollectionsOpt.createHashMap("taskId", ll.getTaskId()));
+                    CollectionsOpt.createHashMap("taskExchange", ll));
             }
         }
         for (TriggerKey tKey : triggerKeys) {

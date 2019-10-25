@@ -76,7 +76,7 @@ public class TaskRun {
         detailLog.setRunBeginTime(beginTime);
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
-        detailLog.setLogType(runJSON.getString("operation"));
+        detailLog.setLogType(runJSON.getString("operation")+":"+runJSON.getString("source"));
         DataSet dataSet = bizModel.fetchDataSetByName(runJSON.getString("source"));
         detailLog.setLogInfo((String) dataSet.getFirstRow().get(WRITER_ERROR_TAG));
         if ("ok".equals(detailLog.getLogInfo())) {

@@ -1,6 +1,7 @@
 package com.centit.dde.agent.service;
 
 import com.centit.dde.dao.TaskLogDao;
+import com.centit.dde.po.TaskExchange;
 import com.centit.dde.po.TaskLog;
 import com.centit.support.quartz.AbstractQuartzJob;
 import org.quartz.JobDataMap;
@@ -15,24 +16,24 @@ import java.util.Date;
 
 
 public class RunTaskJob extends AbstractQuartzJob {
-    private String taskId;
+    private TaskExchange taskExchange;
     public RunTaskJob() {
     }
 
     protected void loadExecutionContext(JobExecutionContext context) {
         JobDataMap paramMap = context.getMergedJobDataMap();
-        this.taskId = paramMap.getString("taskId");
+        this.taskExchange = (TaskExchange)paramMap.get("taskExchange");
     }
 
     protected boolean runRealJob(JobExecutionContext context) throws JobExecutionException {
-        System.out.println(this.taskId);
+        System.out.println(this.taskExchange.getTaskId());
 
 //TODO 生成logid,使用command调用datamoving jar包
         TaskLogDao taskLogDao =ContextUtils.getBean(TaskLogDao.class);
         TaskLog taskLog = new TaskLog();
-        taskLog.setTaskId(this.taskId);
+        taskLog.setTaskId(this.taskExchange.getTaskId());
         taskLog.setRunBeginTime(new Date());
-        taskLog.setRunType("1");
+        taskLog.setRunType(this.taskExchange.getTaskName());
         taskLogDao.saveNewObject(taskLog);
         PathConfig pathConfig = ContextUtils.getBean(PathConfig.class);
         try {
