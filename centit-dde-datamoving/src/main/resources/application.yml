@@ -15,7 +15,7 @@ spring:
       validation-query: SELECT 1
       connection-properties: characterEncoding=utf8
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:migration/mysql
 
 framework:

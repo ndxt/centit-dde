@@ -18,7 +18,7 @@ spring:
       validation-query: SELECT 1
       connection-properties: characterEncoding=utf8
 centit:
-  dataMovingPath: D:\Centit\centit-dde\out\artifacts\centit_dde_datamoving_jar\centit-dde-datamoving.jar
+  dataMovingPath: D:\Centit\code\centit-dde\out\artifacts\centit_dde_datamoving_jar\centit-dde-datamoving.jar
   logs: D:/Projects/RunData/dde/logs
 
 

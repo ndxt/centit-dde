@@ -1,7 +1,7 @@
 package com.centit.dde.datamoving.dataopt;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.framework.common.ObjectException;
+import com.centit.support.common.ObjectException;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.product.dataopt.bizopt.BuiltInOperation;
@@ -32,30 +32,33 @@ public class DatabaseBizOperation extends BuiltInOperation {
         String sourDSName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String databaseCode = getJsonFieldString(bizOptJson,"databaseCode", null);
         String tableId = getJsonFieldString(bizOptJson,"tableId", null);
+        if (StringUtils.isBlank(tableId)) {
+            tableId = getJsonFieldString(bizOptJson,"tableName", null);
+        }
         String writerType = getJsonFieldString(bizOptJson,"writerType", "merge");
         if(databaseCode==null || tableId==null){
             throw new ObjectException(bizOptJson,
-                ObjectException.DATABASE_OPERATE_EXCEPTION,
+                ObjectException.NULL_EXCEPTION,
                 "对应的元数据信息找不到，数据库："+databaseCode + " 表:" + tableId);
         }
 
         DatabaseInfo databaseInfo =integrationEnvironment.getDatabaseInfo(databaseCode);
         if(databaseInfo == null){
             throw new ObjectException(bizOptJson,
-                ObjectException.DATABASE_OPERATE_EXCEPTION,
+                ObjectException.NULL_EXCEPTION,
                 "数据库信息无效："+databaseCode);
         }
         runMap(bizModel, bizOptJson);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDSName);
         if(dataSet == null) {
             throw new ObjectException(bizOptJson,
-                ObjectException.DATABASE_OPERATE_EXCEPTION,
+                ObjectException.NULL_EXCEPTION,
                 "数据源信息无效："+sourDSName);
         }
         TableInfo tableInfo = metaDataService.getMetaTableWithRelations(tableId);
         if(tableInfo==null){
             throw new ObjectException(bizOptJson,
-                ObjectException.DATABASE_OPERATE_EXCEPTION,
+                ObjectException.NULL_EXCEPTION,
                 "对应的元数据信息找不到，数据库："+databaseCode + " 表:" + tableInfo);
         }
         DataSetWriter dataSetWriter = new SQLDataSetWriter(
