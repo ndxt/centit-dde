@@ -63,7 +63,7 @@ public class TaskSchedulers {
         return result;
     }
     private void refreshTask() throws SchedulerException {
-        List<TaskExchange> list = taskExchangeDao.listObjects();
+        List<TaskExchange> list = taskExchangeDao.listObjectsByProperty("taskType","2");
         if (isEqualMD5(list)) return;
         Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup());
 
