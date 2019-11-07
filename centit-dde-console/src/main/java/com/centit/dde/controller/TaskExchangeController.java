@@ -54,6 +54,7 @@ public class TaskExchangeController extends BaseController{
     public void updateTaskExchange(@PathVariable String taskId, @RequestBody TaskExchange taskExchange){
         taskExchange.setTaskId(taskId);
         taskExchange.setExchangeDescJson(StringEscapeUtils.unescapeHtml4(taskExchange.getExchangeDescJson()));
+        if(taskExchange.getTaskCron()==null) taskExchange.setTaskCron("");
         taskExchangeManager.updateTaskExchange(taskExchange);
     }
 
