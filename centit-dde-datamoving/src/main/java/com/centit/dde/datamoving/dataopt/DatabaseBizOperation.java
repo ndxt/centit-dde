@@ -1,7 +1,6 @@
 package com.centit.dde.datamoving.dataopt;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.support.common.ObjectException;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.product.dataopt.bizopt.BuiltInOperation;
@@ -11,8 +10,9 @@ import com.centit.product.dataopt.core.DataSet;
 import com.centit.product.dataopt.core.DataSetWriter;
 import com.centit.product.dataopt.dataset.SQLDataSetWriter;
 import com.centit.product.metadata.service.MetaDataService;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
-import com.centit.support.database.utils.JdbcConnect;
+import com.centit.support.database.utils.DbcpConnectPools;
 import org.apache.commons.lang3.StringUtils;
 
 public class DatabaseBizOperation extends BuiltInOperation {
@@ -62,7 +62,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 "对应的元数据信息找不到，数据库："+databaseCode + " 表:" + tableInfo);
         }
         DataSetWriter dataSetWriter = new SQLDataSetWriter(
-            JdbcConnect.mapDataSource(databaseInfo),tableInfo);
+            DbcpConnectPools.mapDataSourceDesc(databaseInfo), tableInfo);
 
         switch (writerType) {
             case PersistenceOperation.WRITER_INDICATE_APPEND:
