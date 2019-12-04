@@ -12,7 +12,7 @@ import com.centit.product.dataopt.dataset.SQLDataSetWriter;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
-import com.centit.support.database.utils.DbcpConnectPools;
+import com.centit.support.database.utils.DataSourceDescription;
 import org.apache.commons.lang3.StringUtils;
 
 public class DatabaseBizOperation extends BuiltInOperation {
@@ -62,7 +62,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 "对应的元数据信息找不到，数据库："+databaseCode + " 表:" + tableInfo);
         }
         DataSetWriter dataSetWriter = new SQLDataSetWriter(
-            DbcpConnectPools.mapDataSourceDesc(databaseInfo), tableInfo);
+            DataSourceDescription.valueOf(databaseInfo), tableInfo);
 
         switch (writerType) {
             case PersistenceOperation.WRITER_INDICATE_APPEND:
