@@ -8,12 +8,20 @@ import com.centit.product.dataopt.bizopt.PersistenceOperation;
 import com.centit.product.dataopt.core.BizModel;
 import com.centit.product.dataopt.core.DataSet;
 import com.centit.product.dataopt.core.DataSetWriter;
+import com.centit.product.dataopt.dataset.JSONDataSet;
 import com.centit.product.dataopt.dataset.SQLDataSetWriter;
 import com.centit.product.metadata.service.MetaDataService;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.common.ObjectException;
+import com.centit.support.compiler.Pretreatment;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.support.file.FileIOOpt;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
 public class DatabaseBizOperation extends BuiltInOperation {
 
@@ -80,7 +88,27 @@ public class DatabaseBizOperation extends BuiltInOperation {
     }
 
     protected BizModel runSaveFile(BizModel bizModel, JSONObject bizOptJson) {
-
+        String sourDSName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
+        String filePath = getJsonFieldString(bizOptJson,"filePath", null);
+        String fileName= getJsonFieldString(bizOptJson,"fileName", null);
+        if(filePath==null){
+            throw new ObjectException(bizOptJson,
+                ObjectException.NULL_EXCEPTION,"没有设置保存文件路径");
+        }
+        DataSet dataSet = bizModel.fetchDataSetByName(sourDSName);
+        String fileDate=StringUtils.replace(DatetimeOpt.currentDatetime(),":","");
+        File file= new File(filePath+ File.separator+ fileDate);
+        if(!file.exists()){
+            file.mkdir();
+        }
+        for(Map<String, Object> row:dataSet.getData()) {
+            try {
+                FileIOOpt.writeObjectAsJsonToFile(row,filePath+ File.separator+ fileDate
+                    +File.separator+Pretreatment.mapTemplateString(fileName,row));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return bizModel;
     }
 
@@ -88,7 +116,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
 
         return bizModel;
     }
-
+    @Override
     public BizModel runOneStep(BizModel bizModel, JSONObject bizOptJson) {
         String sOptType = bizOptJson.getString("operation");
         if(StringUtils.isBlank(sOptType)) {
