@@ -8,7 +8,6 @@ import com.centit.product.dataopt.bizopt.PersistenceOperation;
 import com.centit.product.dataopt.core.BizModel;
 import com.centit.product.dataopt.core.DataSet;
 import com.centit.product.dataopt.core.DataSetWriter;
-import com.centit.product.dataopt.dataset.JSONDataSet;
 import com.centit.product.dataopt.dataset.SQLDataSetWriter;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.algorithm.DatetimeOpt;
@@ -93,7 +92,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
         String fileName= getJsonFieldString(bizOptJson,"fileName", null);
         if(filePath==null){
             throw new ObjectException(bizOptJson,
-                ObjectException.NULL_EXCEPTION,"没有设置保存文件路径");
+                ObjectException.NULL_EXCEPTION, "没有设置保存文件路径");
         }
         DataSet dataSet = bizModel.fetchDataSetByName(sourDSName);
         String fileDate=StringUtils.replace(DatetimeOpt.currentDatetime(),":","");
