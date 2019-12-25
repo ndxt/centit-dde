@@ -87,20 +87,19 @@ public class DatabaseBizOperation extends BuiltInOperation {
     }
 
     protected BizModel runSaveFile(BizModel bizModel, JSONObject bizOptJson) {
-        String sourDSName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
+        String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String filePath = getJsonFieldString(bizOptJson,"filePath", null);
         String fileName= getJsonFieldString(bizOptJson,"fileName", null);
         if(filePath==null){
             throw new ObjectException(bizOptJson,
                 ObjectException.NULL_EXCEPTION, "没有设置保存文件路径");
         }
-        DataSet dataSet = bizModel.fetchDataSetByName(sourDSName);
         String fileDate=StringUtils.replace(DatetimeOpt.currentDatetime(),":","");
         File file= new File(filePath+ File.separator+ fileDate);
         if(!file.exists()){
             file.mkdir();
         }
-        for(Map<String, Object> row:dataSet.getData()) {
+        for(Map<String, Object> row:runAppend(bizModel,bizOptJson).getBizData().get(sourDsName).getData()) {
             try {
                 FileIOOpt.writeObjectAsJsonToFile(row,filePath+ File.separator+ fileDate
                     +File.separator+Pretreatment.mapTemplateString(fileName,row));
