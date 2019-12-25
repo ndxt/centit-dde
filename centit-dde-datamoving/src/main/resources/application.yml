@@ -29,5 +29,9 @@ framework:
     usercode: admin
     password: 000000
 logging.path: D:/Projects/RunData/dde/log
+os:
+  file:
+    base:
+      dir: D:\D\Projects\RunData\file_home\export
 
 

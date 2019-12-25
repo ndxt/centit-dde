@@ -38,14 +38,13 @@ public class TaskRun {
     private DataPacketDao dataPacketDao;
     @Autowired
     private MetaDataService metaDataService;
-
     @Autowired
     private IntegrationEnvironment integrationEnvironment;
-
+    @Autowired
+    private DatabaseBizOperation databaseBizOperation;
     private BizModel bizModel;
     private TaskLog taskLog;
     private Date beginTime;
-    private DatabaseBizOperation databaseBizOperation;
     private DataPacket dataPacket;
 
     public BizModel runTask(String logId) {
@@ -73,7 +72,6 @@ public class TaskRun {
         DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
         dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
         bizModel = dbPacketBizSupplier.get();
-        databaseBizOperation = new DatabaseBizOperation();
         databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
         databaseBizOperation.setMetaDataService(metaDataService);
     }

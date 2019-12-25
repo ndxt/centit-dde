@@ -17,13 +17,18 @@ import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.file.FileIOOpt;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-
+@Component
 public class DatabaseBizOperation extends BuiltInOperation {
-
+    @Value("${os.file.base.dir}")
+    private String path;
     private IntegrationEnvironment integrationEnvironment;
     private MetaDataService metaDataService;
 
@@ -88,20 +93,19 @@ public class DatabaseBizOperation extends BuiltInOperation {
 
     protected BizModel runSaveFile(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        String filePath = getJsonFieldString(bizOptJson,"filePath", null);
         String fileName= getJsonFieldString(bizOptJson,"fileName", null);
-        if(filePath==null){
+        if(path==null){
             throw new ObjectException(bizOptJson,
-                ObjectException.NULL_EXCEPTION, "没有设置保存文件路径");
+                ObjectException.NULL_EXCEPTION, "配置文件没有设置保存文件路径");
         }
-        String fileDate=StringUtils.replace(DatetimeOpt.currentDatetime(),":","");
-        File file= new File(filePath+ File.separator+ fileDate);
+        String fileDate = DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), "YYYYMMddHHmmss");
+        File file= new File(path+ File.separator+bizModel.getModelName()+ File.separator+ fileDate);
         if(!file.exists()){
-            file.mkdir();
+            file.mkdirs();
         }
         for(Map<String, Object> row:runAppend(bizModel,bizOptJson).getBizData().get(sourDsName).getData()) {
             try {
-                FileIOOpt.writeObjectAsJsonToFile(row,filePath+ File.separator+ fileDate
+                FileIOOpt.writeObjectAsJsonToFile(row,file.getPath()
                     +File.separator+Pretreatment.mapTemplateString(fileName,row));
             } catch (IOException e) {
                 e.printStackTrace();
