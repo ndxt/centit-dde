@@ -1,7 +1,7 @@
 package com.centit.dde.controller;
 
 import com.centit.dde.po.TaskExchange;
-import com.centit.dde.service.TaskExchangeManager;
+import com.centit.dde.services.TaskExchangeManager;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import io.swagger.annotations.Api;

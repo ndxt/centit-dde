@@ -1,8 +1,8 @@
-package com.centit.dde.service.impl;
+package com.centit.dde.services.impl;
 
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.po.TaskDetailLog;
-import com.centit.dde.service.TaskDetailLogManager;
+import com.centit.dde.services.TaskDetailLogManager;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.logging.Log;

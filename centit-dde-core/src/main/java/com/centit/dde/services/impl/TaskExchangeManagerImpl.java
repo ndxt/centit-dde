@@ -1,8 +1,8 @@
-package com.centit.dde.service.impl;
+package com.centit.dde.services.impl;
 
 import com.centit.dde.dao.TaskExchangeDao;
 import com.centit.dde.po.TaskExchange;
-import com.centit.dde.service.TaskExchangeManager;
+import com.centit.dde.services.TaskExchangeManager;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import com.centit.support.algorithm.CollectionsOpt;

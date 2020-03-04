@@ -2,7 +2,7 @@ package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.po.TaskExchange;
-import com.centit.dde.service.TaskExchangeManager;
+import com.centit.dde.services.TaskExchangeManager;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;

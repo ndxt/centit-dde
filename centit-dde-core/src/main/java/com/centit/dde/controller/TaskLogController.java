@@ -1,7 +1,7 @@
 package com.centit.dde.controller;
 
 import com.centit.dde.po.TaskLog;
-import com.centit.dde.service.TaskLogManager;
+import com.centit.dde.services.TaskLogManager;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
