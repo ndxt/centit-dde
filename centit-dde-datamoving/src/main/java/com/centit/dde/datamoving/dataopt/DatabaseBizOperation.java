@@ -17,14 +17,13 @@ import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.file.FileIOOpt;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+
 @Component
 public class DatabaseBizOperation extends BuiltInOperation {
     @Value("${os.file.base.dir}")

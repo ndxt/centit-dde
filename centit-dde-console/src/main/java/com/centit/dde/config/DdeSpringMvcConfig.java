@@ -1,10 +1,7 @@
 package com.centit.dde.config;
 
 import com.centit.framework.config.BaseSpringMvcConfig;
-import com.centit.framework.config.WebConfig;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 /**
  * Created by zou_wy on 2017/3/29.
