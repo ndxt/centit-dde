@@ -16,12 +16,17 @@ import com.centit.support.compiler.Pretreatment;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.file.FileIOOpt;
+import com.csvreader.CsvWriter;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -31,7 +36,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
     private IntegrationEnvironment integrationEnvironment;
     private MetaDataService metaDataService;
 
-    public DatabaseBizOperation(){
+    public DatabaseBizOperation() {
 
     }
 
@@ -41,36 +46,36 @@ public class DatabaseBizOperation extends BuiltInOperation {
 
     private BizModel runPersistence(BizModel bizModel, JSONObject bizOptJson) {
         String sourDSName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        String databaseCode = getJsonFieldString(bizOptJson,"databaseCode", null);
-        String tableId = getJsonFieldString(bizOptJson,"tableId", null);
+        String databaseCode = getJsonFieldString(bizOptJson, "databaseCode", null);
+        String tableId = getJsonFieldString(bizOptJson, "tableId", null);
         if (StringUtils.isBlank(tableId)) {
-            tableId = getJsonFieldString(bizOptJson,"tableName", null);
+            tableId = getJsonFieldString(bizOptJson, "tableName", null);
         }
-        String writerType = getJsonFieldString(bizOptJson,"writerType", "merge");
-        if(databaseCode==null || tableId==null){
+        String writerType = getJsonFieldString(bizOptJson, "writerType", "merge");
+        if (databaseCode == null || tableId == null) {
             throw new ObjectException(bizOptJson,
                 ObjectException.NULL_EXCEPTION,
-                "对应的元数据信息找不到，数据库："+databaseCode + " 表:" + tableId);
+                "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
         }
 
-        DatabaseInfo databaseInfo =integrationEnvironment.getDatabaseInfo(databaseCode);
-        if(databaseInfo == null){
+        DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(databaseCode);
+        if (databaseInfo == null) {
             throw new ObjectException(bizOptJson,
                 ObjectException.NULL_EXCEPTION,
-                "数据库信息无效："+databaseCode);
+                "数据库信息无效：" + databaseCode);
         }
         runMap(bizModel, bizOptJson);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDSName);
-        if(dataSet == null) {
+        if (dataSet == null) {
             throw new ObjectException(bizOptJson,
                 ObjectException.NULL_EXCEPTION,
-                "数据源信息无效："+sourDSName);
+                "数据源信息无效：" + sourDSName);
         }
         TableInfo tableInfo = metaDataService.getMetaTableWithRelations(tableId);
-        if(tableInfo==null){
+        if (tableInfo == null) {
             throw new ObjectException(bizOptJson,
                 ObjectException.NULL_EXCEPTION,
-                "对应的元数据信息找不到，数据库："+databaseCode + " 表:" + tableInfo);
+                "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableInfo);
         }
         DataSetWriter dataSetWriter = new SQLDataSetWriter(
             DataSourceDescription.valueOf(databaseInfo), tableInfo);
@@ -90,26 +95,63 @@ public class DatabaseBizOperation extends BuiltInOperation {
         return bizModel;
     }
 
-    protected BizModel runSaveFile(BizModel bizModel, JSONObject bizOptJson) {
+    protected BizModel runSaveFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        String fileName= getJsonFieldString(bizOptJson,"fileName", null);
-        if(path==null){
+        String fileName = getJsonFieldString(bizOptJson, "fileName", null);
+        if (path == null) {
             throw new ObjectException(bizOptJson,
                 ObjectException.NULL_EXCEPTION, "配置文件没有设置保存文件路径");
         }
         String fileDate = DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), "YYYYMMddHHmmss");
-        File file= new File(path+ File.separator+bizModel.getModelName()+ File.separator+ fileDate);
-        if(!file.exists()){
+        File file = new File(path + File.separator + bizModel.getModelName() + File.separator + fileDate);
+        if (!file.exists()) {
             file.mkdirs();
         }
-        for(Map<String, Object> row:runAppend(bizModel,bizOptJson).getBizData().get(sourDsName).getData()) {
+        OutputStream outputStream = null;
+        outputStream = new FileOutputStream(new File(file.getPath() + File.separator + "1.csv"));
+        BufferedWriter writer = null;
+        writer = new BufferedWriter(new OutputStreamWriter(
+            outputStream, Charset.forName("gbk")));
+        CsvWriter csvWriter = new CsvWriter(writer, ',');
+        csvWriter.setTextQualifier('"');
+        csvWriter.setUseTextQualifier(true);
+        csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR.charAt(0));
+        int iHead = 0;
+        for (Map<String, Object> row : runAppend(bizModel, bizOptJson).getBizData().get(sourDsName).getData()) {
+            if (iHead == 0) {
+                csvWriter.writeRecord(row.keySet().toArray(new String[0]));
+            }
+            iHead++;
             try {
-                FileIOOpt.writeObjectAsJsonToFile(row,file.getPath()
-                    +File.separator+Pretreatment.mapTemplateString(fileName,row));
+                List<String> splitedRows = new ArrayList<String>();
+                for (String key : row.keySet()) {
+                    Object column = row.get(key);
+                    if (null != column) {
+                        if (column instanceof JSONObject) {
+                            File fileJSON = new File(file.getPath()
+                                + File.separator + key);
+                            if (!fileJSON.exists()) {
+                                fileJSON.mkdirs();
+                            }
+                            FileIOOpt.writeObjectAsJsonToFile(row, file.getPath()
+                                + File.separator + key + File.separator + Pretreatment.mapTemplateString(fileName, row));
+                            splitedRows.add("");
+                        } else {
+                            splitedRows.add(column.toString());
+                        }
+                    } else {
+                        splitedRows.add("");
+                    }
+
+                }
+                csvWriter.writeRecord(splitedRows.toArray(new String[0]));
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        csvWriter.close();
+        IOUtils.closeQuietly(outputStream);
         return bizModel;
     }
 
@@ -117,13 +159,14 @@ public class DatabaseBizOperation extends BuiltInOperation {
 
         return bizModel;
     }
+
     @Override
     public BizModel runOneStep(BizModel bizModel, JSONObject bizOptJson) {
         String sOptType = bizOptJson.getString("operation");
-        if(StringUtils.isBlank(sOptType)) {
+        if (StringUtils.isBlank(sOptType)) {
             return bizModel;
         }
-        switch (sOptType){
+        switch (sOptType) {
             case "map":
                 return runMap(bizModel, bizOptJson);
             case "filter":
@@ -153,7 +196,11 @@ public class DatabaseBizOperation extends BuiltInOperation {
             case "persistence":
                 return runPersistence(bizModel, bizOptJson);
             case "save":
-                return runSaveFile(bizModel, bizOptJson);
+                try {
+                    return runSaveFile(bizModel, bizOptJson);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             case "interface":
                 return runHttpPost(bizModel, bizOptJson);
             default:
