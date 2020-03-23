@@ -8,6 +8,9 @@ import com.centit.product.dataopt.bizopt.PersistenceOperation;
 import com.centit.product.dataopt.core.BizModel;
 import com.centit.product.dataopt.core.DataSet;
 import com.centit.product.dataopt.core.DataSetWriter;
+import com.centit.product.dataopt.dataset.CsvDataSet;
+import com.centit.product.dataopt.dataset.ExcelDataSet;
+import com.centit.product.dataopt.dataset.FileDataSet;
 import com.centit.product.dataopt.dataset.SQLDataSetWriter;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.algorithm.DatetimeOpt;
@@ -24,7 +27,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +46,20 @@ public class DatabaseBizOperation extends BuiltInOperation {
         this.bizOptJson = bizOptJson;
     }
 
-    private BizModel runPersistence(BizModel bizModel, JSONObject bizOptJson) {
+    private BizModel runPersistence(BizModel bizModel, JSONObject bizOptJson) throws IOException {
+        String dataType= getJsonFieldString(bizOptJson, "dataType","D");
+        switch (dataType){
+            case "E":
+                return writeExcelFile(bizModel,bizOptJson);
+            case "C":
+                return writeCsvFile(bizModel,bizOptJson);
+            default:
+                return writeDatabase(bizModel,bizOptJson);
+
+        }
+
+    }
+    private BizModel writeDatabase(BizModel bizModel, JSONObject bizOptJson){
         String sourDSName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String databaseCode = getJsonFieldString(bizOptJson, "databaseCode", null);
         String tableId = getJsonFieldString(bizOptJson, "tableId", null);
@@ -94,67 +109,30 @@ public class DatabaseBizOperation extends BuiltInOperation {
         }
         return bizModel;
     }
-
-    protected BizModel runSaveFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
+    protected BizModel writeCsvFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String fileName = getJsonFieldString(bizOptJson, "fileName", null);
         if (path == null) {
             throw new ObjectException(bizOptJson,
                 ObjectException.NULL_EXCEPTION, "配置文件没有设置保存文件路径");
         }
-        String fileDate = DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), "YYYYMMddHHmmss");
-        File file = new File(path + File.separator + bizModel.getModelName() + File.separator + fileDate);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        OutputStream outputStream = null;
-        outputStream = new FileOutputStream(new File(file.getPath() + File.separator + "1.csv"));
-        BufferedWriter writer = null;
-        writer = new BufferedWriter(new OutputStreamWriter(
-            outputStream, Charset.forName("gbk")));
-        CsvWriter csvWriter = new CsvWriter(writer, ',');
-        csvWriter.setTextQualifier('"');
-        csvWriter.setUseTextQualifier(true);
-        csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR.charAt(0));
-        int iHead = 0;
-        for (Map<String, Object> row : runAppend(bizModel, bizOptJson).getBizData().get(sourDsName).getData()) {
-            if (iHead == 0) {
-                csvWriter.writeRecord(row.keySet().toArray(new String[0]));
-            }
-            iHead++;
-            try {
-                List<String> splitedRows = new ArrayList<String>();
-                for (String key : row.keySet()) {
-                    Object column = row.get(key);
-                    if (null != column) {
-                        if (column instanceof JSONObject) {
-                            File fileJSON = new File(file.getPath()
-                                + File.separator + key);
-                            if (!fileJSON.exists()) {
-                                fileJSON.mkdirs();
-                            }
-                            FileIOOpt.writeObjectAsJsonToFile(row, file.getPath()
-                                + File.separator + key + File.separator + Pretreatment.mapTemplateString(fileName, row));
-                            splitedRows.add("");
-                        } else {
-                            splitedRows.add(column.toString());
-                        }
-                    } else {
-                        splitedRows.add("");
-                    }
-
-                }
-                csvWriter.writeRecord(splitedRows.toArray(new String[0]));
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        csvWriter.close();
-        IOUtils.closeQuietly(outputStream);
+        FileDataSet dataSetWriter=new CsvDataSet();
+        dataSetWriter.setFilePath(path);
+        dataSetWriter.save(runAppend(bizModel,bizOptJson).getBizData().get(sourDsName));
         return bizModel;
     }
-
+    protected BizModel writeExcelFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
+        String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
+        String fileName = getJsonFieldString(bizOptJson, "fileName", null);
+        if (path == null) {
+            throw new ObjectException(bizOptJson,
+                ObjectException.NULL_EXCEPTION, "配置文件没有设置保存文件路径");
+        }
+        FileDataSet dataSetWriter=new ExcelDataSet();
+        dataSetWriter.setFilePath(path);
+        dataSetWriter.save(bizModel.getBizData().get(sourDsName));
+        return bizModel;
+    }
     protected BizModel runHttpPost(BizModel bizModel, JSONObject bizOptJson) {
 
         return bizModel;
@@ -194,10 +172,8 @@ public class DatabaseBizOperation extends BuiltInOperation {
             case "static":
                 return runStaticData(bizModel, bizOptJson);
             case "persistence":
-                return runPersistence(bizModel, bizOptJson);
-            case "save":
                 try {
-                    return runSaveFile(bizModel, bizOptJson);
+                    return runPersistence(bizModel, bizOptJson);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
