@@ -69,16 +69,15 @@
 
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-app</artifactId>
+            <artifactId>centit-ip-with-app</artifactId>
             <version>${centit.ip.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-app-boot-config</artifactId>
-            <version>${centit.ip.version}</version>
+            <groupId>com.centit.product</groupId>
+            <artifactId>fileserver-utils</artifactId>
+            <version>3.1-SNAPSHOT</version>
         </dependency>
-
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>

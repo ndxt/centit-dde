@@ -118,7 +118,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
         }
         FileDataSet dataSetWriter=new CsvDataSet();
         dataSetWriter.setFilePath(path);
-        dataSetWriter.save(runAppend(bizModel,bizOptJson).getBizData().get(sourDsName));
+        dataSetWriter.save(bizModel.getBizData().get(sourDsName));
         return bizModel;
     }
     protected BizModel writeExcelFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {

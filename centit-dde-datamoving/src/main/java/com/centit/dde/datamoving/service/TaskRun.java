@@ -10,6 +10,7 @@ import com.centit.dde.datamoving.dataopt.DatabaseBizOperation;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskExchange;
 import com.centit.dde.po.TaskLog;
+import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.product.dataopt.core.BizModel;
 import com.centit.product.dataopt.core.DataSet;
@@ -42,6 +43,8 @@ public class TaskRun {
     private IntegrationEnvironment integrationEnvironment;
     @Autowired
     private DatabaseBizOperation databaseBizOperation;
+    @Autowired(required = false)
+    private FileStore fileStore;
     private BizModel bizModel;
     private TaskLog taskLog;
     private Date beginTime;
@@ -71,6 +74,7 @@ public class TaskRun {
         dataPacket = dataPacketDao.getObjectWithReferences(packetId);
         DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
         dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
+        dbPacketBizSupplier.setFileStore(fileStore);
         bizModel = dbPacketBizSupplier.get();
         databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
         databaseBizOperation.setMetaDataService(metaDataService);

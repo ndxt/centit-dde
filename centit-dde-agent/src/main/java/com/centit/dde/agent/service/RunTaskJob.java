@@ -17,11 +17,13 @@ public class RunTaskJob extends AbstractQuartzJob {
     public RunTaskJob() {
     }
 
+    @Override
     protected void loadExecutionContext(JobExecutionContext context) {
         JobDataMap paramMap = context.getMergedJobDataMap();
         this.taskExchange = (TaskExchange)paramMap.get("taskExchange");
     }
 
+    @Override
     protected boolean runRealJob(JobExecutionContext context) throws JobExecutionException {
         //System.out.println(this.taskExchange.getTaskId());
 

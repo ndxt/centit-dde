@@ -1,10 +1,15 @@
 package com.centit.dde.datamoving;
 
 import com.centit.dde.datamoving.service.TaskRun;
+import com.centit.fileserver.common.FileStore;
+import com.centit.fileserver.utils.OsFileStore;
 import com.centit.product.dataopt.core.BizModel;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 import java.sql.SQLException;
@@ -20,7 +25,12 @@ public class DataMovingApplication  {
      * @param args args[0] 为任务ID
      */
 
-
+    @Value("${framework.app.home}")
+    private String appHome;
+    @Bean
+    public FileStore fileStore() {
+        return new OsFileStore(appHome + "/upload");
+    }
     public static void main(String[] args) throws SQLException {
         if(args==null || args.length<1){
             return;
