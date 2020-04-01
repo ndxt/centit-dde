@@ -13,6 +13,7 @@ import com.centit.product.dataopt.dataset.ExcelDataSet;
 import com.centit.product.dataopt.dataset.FileDataSet;
 import com.centit.product.dataopt.dataset.SQLDataSetWriter;
 import com.centit.product.metadata.service.MetaDataService;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
@@ -116,9 +117,10 @@ public class DatabaseBizOperation extends BuiltInOperation {
             throw new ObjectException(bizOptJson,
                 ObjectException.NULL_EXCEPTION, "配置文件没有设置保存文件路径");
         }
-        FileDataSet dataSetWriter=new CsvDataSet();
+        CsvDataSet dataSetWriter=new CsvDataSet();
         dataSetWriter.setFilePath(path);
-        dataSetWriter.save(bizModel.getBizData().get(sourDsName));
+        dataSetWriter.setParams(CollectionsOpt.createHashMap("fileName",fileName));
+        dataSetWriter.save(runAppend(bizModel,bizOptJson).getBizData().get(sourDsName));
         return bizModel;
     }
     protected BizModel writeExcelFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
