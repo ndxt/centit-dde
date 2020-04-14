@@ -19,34 +19,23 @@ public class TaskLogDao extends BaseDaoImpl<TaskLog,Long> {
 
     @Override
     public Map<String, String> getFilterField() {
-        if (filterField == null) {
-            filterField = new HashMap<String, String>();
+        Map<String, String> filterField = new HashMap<String, String>();
+        filterField.put("logId", CodeBook.EQUAL_HQL_ID);
+        filterField.put("taskId", CodeBook.EQUAL_HQL_ID);
+        filterField.put("runBeginTime", "runBeginTime>=?");
+        filterField.put("runBeginTime2", "runBeginTime<=?");
+        filterField.put("runEndTime", CodeBook.LIKE_HQL_ID);
+        filterField.put("runType", CodeBook.EQUAL_HQL_ID);
+        filterField.put("runner", CodeBook.LIKE_HQL_ID);
+        filterField.put("otherMessage", CodeBook.LIKE_HQL_ID);
+        filterField.put("successPieces", CodeBook.LIKE_HQL_ID);
+        filterField.put("errorPieces", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("logId", CodeBook.EQUAL_HQL_ID);
+        /*filterField.put("isError", "logId in (select a.logId " +
+                "from TaskDetailLog a inner join a.taskErrorDatas b " +
+        "where a.errorPieces>?)");
+        filterField.put(CodeBook.ORDER_BY_HQL_ID, "runBeginTime desc");*/
 
-            filterField.put("taskId", CodeBook.EQUAL_HQL_ID);
-
-            filterField.put("runBeginTime", "runBeginTime>=?");
-            filterField.put("runBeginTime2", "runBeginTime<=?");
-
-            filterField.put("runEndTime", CodeBook.LIKE_HQL_ID);
-
-            filterField.put("runType", CodeBook.EQUAL_HQL_ID);
-
-            filterField.put("runner", CodeBook.LIKE_HQL_ID);
-
-            filterField.put("otherMessage", CodeBook.LIKE_HQL_ID);
-
-            filterField.put("successPieces", CodeBook.LIKE_HQL_ID);
-
-            filterField.put("errorPieces", CodeBook.LIKE_HQL_ID);
-
-            /*filterField.put("isError", "logId in (select a.logId " +
-            		"from TaskDetailLog a inner join a.taskErrorDatas b " +
-            "where a.errorPieces>?)");
-            filterField.put(CodeBook.ORDER_BY_HQL_ID, "runBeginTime desc");*/
-
-        }
         return filterField;
     }
 
