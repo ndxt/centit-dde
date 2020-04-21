@@ -16,43 +16,42 @@ import java.util.Map;
  * @Version 1.0
  */
 @Repository
-public class TaskExchangeDao extends BaseDaoImpl<TaskExchange,Long> {
+public class TaskExchangeDao extends BaseDaoImpl<TaskExchange, Long> {
 
     public static final Log logger = LogFactory.getLog(TaskExchangeDao.class);
 
     @Override
     public Map<String, String> getFilterField() {
 
-        if (filterField == null) {
-            filterField = new HashMap<String, String>();
 
-            filterField.put("taskId", CodeBook.EQUAL_HQL_ID);
+        Map<String, String> filterField = new HashMap<String, String>();
 
-            filterField.put("packetId", CodeBook.LIKE_HQL_ID);
+        filterField.put("taskId", CodeBook.EQUAL_HQL_ID);
 
-            filterField.put("taskName", CodeBook.LIKE_HQL_ID);
+        filterField.put("packetId", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("taskType", CodeBook.LIKE_HQL_ID);
+        filterField.put("taskName", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("taskCron", CodeBook.LIKE_HQL_ID);
+        filterField.put("taskType", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("taskDesc", CodeBook.LIKE_HQL_ID);
+        filterField.put("taskCron", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("lastRunTime", CodeBook.LIKE_HQL_ID);
+        filterField.put("taskDesc", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("nextRunTime", CodeBook.LIKE_HQL_ID);
+        filterField.put("lastRunTime", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("isValid", "logId in (select a.logId " +
-                "from TaskDetailLog a inner join a.taskErrorDatas b " +
-                "where a.errorPieces>?)");
+        filterField.put("nextRunTime", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("createTime", CodeBook.LIKE_HQL_ID);
+        filterField.put("isValid", "logId in (select a.logId " +
+            "from TaskDetailLog a inner join a.taskErrorDatas b " +
+            "where a.errorPieces>?)");
 
-            filterField.put("created", CodeBook.LIKE_HQL_ID);
+        filterField.put("createTime", CodeBook.LIKE_HQL_ID);
 
-            filterField.put("lastUpdateTime", CodeBook.LIKE_HQL_ID);
+        filterField.put("created", CodeBook.LIKE_HQL_ID);
 
-        }
+        filterField.put("lastUpdateTime", CodeBook.LIKE_HQL_ID);
+        filterField.put("applicationId", CodeBook.EQUAL_HQL_ID);
         return filterField;
     }
 }
