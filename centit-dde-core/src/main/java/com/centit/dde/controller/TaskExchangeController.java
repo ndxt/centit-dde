@@ -19,8 +19,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName TaskExchangeController
@@ -68,8 +71,9 @@ public class TaskExchangeController extends BaseController{
     @GetMapping
     @ApiOperation(value = "查询所有任务")
     @WrapUpResponseBody
-    public PageQueryResult<TaskExchange> listTaskExchange(PageDesc pageDesc){
-        List<TaskExchange> taskExchanges = taskExchangeManager.listTaskExchange(new HashMap<String, Object>(), pageDesc);
+    public PageQueryResult<TaskExchange> listTaskExchange(PageDesc pageDesc,HttpServletRequest request){
+        Map<String, Object> parameters = collectRequestParameters(request);
+        List<TaskExchange> taskExchanges = taskExchangeManager.listTaskExchange(parameters, pageDesc);
         return PageQueryResult.createResult(taskExchanges,pageDesc);
     }
 
