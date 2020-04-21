@@ -19,7 +19,8 @@ public class TaskLogDao extends BaseDaoImpl<TaskLog,Long> {
 
     @Override
     public Map<String, String> getFilterField() {
-        Map<String, String> filterField = new HashMap<String, String>();
+        if (filterField == null) {
+            filterField = new HashMap<String, String>();
 
             filterField.put("logId", CodeBook.EQUAL_HQL_ID);
 
@@ -45,6 +46,7 @@ public class TaskLogDao extends BaseDaoImpl<TaskLog,Long> {
             "where a.errorPieces>?)");
             filterField.put(CodeBook.ORDER_BY_HQL_ID, "runBeginTime desc");*/
 
+        }
         return filterField;
     }
 

@@ -17,7 +17,8 @@ public class TaskDetailLogDao extends BaseDaoImpl<TaskDetailLog,Long> {
     public static final Log logger = LogFactory.getLog(TaskDetailLogDao.class);
     @Override
     public Map<String, String> getFilterField() {
-        Map<String, String>   filterField = new HashMap<String, String>();
+        if (filterField == null) {
+            filterField = new HashMap<String, String>();
 
             filterField.put("logDetailId", CodeBook.EQUAL_HQL_ID);
 
@@ -38,6 +39,7 @@ public class TaskDetailLogDao extends BaseDaoImpl<TaskDetailLog,Long> {
 
             filterField.put("errorPieces", CodeBook.LIKE_HQL_ID);
 
+        }
         return filterField;
     }
 
