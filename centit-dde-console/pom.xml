@@ -34,7 +34,7 @@
 
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-core</artifactId>
+            <artifactId>centit-dde-moduler</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

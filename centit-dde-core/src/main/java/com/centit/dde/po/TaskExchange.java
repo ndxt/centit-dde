@@ -55,6 +55,9 @@ public class TaskExchange implements java.io.Serializable{
     @Column(name = "TASK_CRON")
     @ApiModelProperty(value = "任务执行定时器")
     private String taskCron;
+    @Column(name = "INTERFACE_NAME")
+    @ApiModelProperty(value = "接口名称(英文不含特殊字符,唯一性)")
+    private String interfaceName;
 
     @Column(name = "TASK_DESC")
     @ApiModelProperty(value = "任务描述")
