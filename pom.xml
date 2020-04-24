@@ -18,6 +18,7 @@
         <module>centit-dde-agent</module>
         <module>centit-dde-core</module>
         <module>centit-dde-moduler</module>
+        <module>centit-dde-write</module>
     </modules>
     <name>com.centit.product:centit-dde</name>
 	<packaging>pom</packaging>

@@ -29,7 +29,7 @@ public class DataInterfaceController extends BaseController {
 
     @GetMapping(value = "/{taskId}")
     @ApiImplicitParam(name = "taskId", value = "任务ID")
-    @ApiOperation(value = "检验人物")
+    @ApiOperation(value = "检验任务")
     @WrapUpResponseBody
     public boolean checkTaskInfo(@PathVariable String taskId){
         TaskExchange taskExchange = taskExchangeManager.getTaskExchange(taskId);
