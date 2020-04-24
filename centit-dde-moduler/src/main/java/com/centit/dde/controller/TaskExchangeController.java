@@ -1,11 +1,15 @@
 package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.datamoving.service.TaskRun;
 import com.centit.dde.po.TaskExchange;
+import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.TaskExchangeManager;
+import com.centit.dde.services.TaskLogManager;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
+import com.centit.product.dataopt.core.BizModel;
 import com.centit.product.datapacket.po.DataPacket;
 import com.centit.product.datapacket.service.DataPacketService;
 import com.centit.product.datapacket.utils.DataPacketUtil;
@@ -21,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +45,11 @@ public class TaskExchangeController extends BaseController{
     @Autowired
     private TaskExchangeManager taskExchangeManager;
     @Autowired
+    private TaskLogManager taskLogManager;
+    @Autowired
     private DataPacketService dataPacketService;
+    @Autowired
+    private TaskRun taskRun;
     @PostMapping
     @ApiOperation(value = "新增任务")
     @WrapUpResponseBody
@@ -110,5 +119,18 @@ public class TaskExchangeController extends BaseController{
     @WrapUpResponseBody
     public void updateDataPacketOpt(@PathVariable String taskId, @RequestBody String exchangeOptJson){
         taskExchangeManager.updateExchangeOptJson(taskId, exchangeOptJson);
+    }
+    @GetMapping(value = "/run/{taskId}")
+    @ApiOperation(value = "立即执行任务")
+    @WrapUpResponseBody
+    public BizModel runTaskExchange(@PathVariable String taskId){
+        TaskExchange taskExchange = taskExchangeManager.getTaskExchange(taskId);
+        TaskLog taskLog = new TaskLog();
+        taskLog.setTaskId(taskExchange.getTaskId());
+        taskLog.setRunBeginTime(new Date());
+        taskLog.setRunType(taskExchange.getTaskName());
+        taskLogManager.createTaskLog(taskLog);
+        BizModel bizModel=taskRun.runTask(taskLog.getLogId());
+        return bizModel;
     }
 }
