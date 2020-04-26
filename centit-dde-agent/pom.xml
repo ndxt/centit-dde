@@ -16,9 +16,9 @@
 
     <properties>
         <metadata.commons.version>1.0-SNAPSHOT</metadata.commons.version>
-        <common.module.version>1.0-SNAPSHOT</common.module.version>
+        <common.module.version>1.1-SNAPSHOT</common.module.version>
         <centit.dde.version>3.0-SNAPSHOT</centit.dde.version>
-        <centit.ip.version>2.0.1901</centit.ip.version>
+        <centit.ip.version>2.1-SNAPSHOT</centit.ip.version>
     </properties>
 
     <dependencies>
@@ -59,7 +59,7 @@
 
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-app</artifactId>
+            <artifactId>centit-ip-app-boot-config</artifactId>
             <version>${centit.ip.version}</version>
         </dependency>
 

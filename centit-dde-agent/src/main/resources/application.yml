@@ -20,6 +20,21 @@ spring:
 centit:
   dataMovingPath: D:\Centit\code\centit-dde\out\artifacts\centit_dde_datamoving_jar\centit-dde-datamoving.jar
   logs: D:/Projects/RunData/dde/logs
+framework:
+  app:
+    home: D:/Projects/RunData/dde
+  ip:
+    enable: true
+    topoptid: DDE
+    home: http://192.168.134.2:11000/framework/system
+    auth-enable: false
+    usercode: admin
+    password: 000000
+logging.path: D:/Projects/RunData/dde/log
+os:
+  file:
+    base:
+      dir: D:\D\Projects\RunData\file_home\export
 
 
 

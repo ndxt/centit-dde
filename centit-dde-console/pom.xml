@@ -14,32 +14,15 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>data-packet-define</artifactId>
-            <version>${metadata.commons.version}</version>
-        </dependency>
 
-        <!--<dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>data-business-operation</artifactId>
-            <version>${metadata.commons.version}</version>
-        </dependency>-->
 
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>database-metadata</artifactId>
-            <version>${metadata.commons.version}</version>
-        </dependency>
+
+
 
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-moduler</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-app</artifactId>
         </dependency>
 
         <dependency>
@@ -59,32 +42,9 @@
 
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>centit-persistence-jdbc</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.framework</groupId>
             <artifactId>centit-persistence-jdbc-config</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>framework-core-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>framework-base-view-easyui</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>framework-system-static</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>framework-system-static-config</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.centit.framework</groupId>
@@ -106,14 +66,7 @@
             <artifactId>swagger-bootstrap-ui</artifactId>
             <version>1.8.2</version>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
+
 
         <!-- server runtime library -->
         <dependency>

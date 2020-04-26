@@ -18,6 +18,7 @@ import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.database.metadata.TableInfo;
+import com.centit.support.database.transaction.JdbcTransaction;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.file.FileIOOpt;
 import com.csvreader.CsvWriter;
@@ -60,6 +61,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
         }
 
     }
+    @JdbcTransaction
     private BizModel writeDatabase(BizModel bizModel, JSONObject bizOptJson){
         String sourDSName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String databaseCode = getJsonFieldString(bizOptJson, "databaseCode", null);
