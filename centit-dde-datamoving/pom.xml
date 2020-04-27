@@ -99,5 +99,21 @@
 
 
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
 
+        </plugins>
+
+    </build>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>centit-snapshots</id>
+            <name>centit-snapshots</name>
+            <url>http://nexus.centit.com:8081/nexus/content/repositories/centit-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
