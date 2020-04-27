@@ -133,4 +133,18 @@ public class TaskExchangeController extends BaseController{
         BizModel bizModel=taskRun.runTask(taskLog.getLogId());
         return bizModel;
     }
+    @GetMapping(value = "/exist/{applicationId}/{interfaceName}")
+    @ApiOperation(value = "接口名称是否已存在")
+    @WrapUpResponseBody
+    public Boolean isExist(@PathVariable String applicationId, @PathVariable String interfaceName){
+        Map<String, Object> params = new HashMap<>();
+        params.put("interfaceName",interfaceName);
+        params.put("applicationId",applicationId);
+        List<TaskExchange> list = taskExchangeManager.listTaskExchange(params,new PageDesc());
+        if (list.size()>0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

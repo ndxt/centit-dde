@@ -50,6 +50,7 @@ public class TaskExchangeDao extends BaseDaoImpl<TaskExchange,Long> {
 
         filterField.put("lastUpdateTime", CodeBook.LIKE_HQL_ID);
         filterField.put("applicationId", CodeBook.EQUAL_HQL_ID);
+        filterField.put("interfaceName", CodeBook.EQUAL_HQL_ID);
         return filterField;
     }
 }
