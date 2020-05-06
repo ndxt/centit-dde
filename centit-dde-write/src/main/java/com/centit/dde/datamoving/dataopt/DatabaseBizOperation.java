@@ -35,7 +35,7 @@ import java.util.Map;
 
 @Component
 public class DatabaseBizOperation extends BuiltInOperation {
-    @Value("${os.file.base.dir}")
+    @Value("${os.file.base.dir:./file_home/export}")
     private String path;
     private IntegrationEnvironment integrationEnvironment;
     private MetaDataService metaDataService;
@@ -55,6 +55,8 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 return writeExcelFile(bizModel,bizOptJson);
             case "C":
                 return writeCsvFile(bizModel,bizOptJson);
+            case "H":
+                return runHttpPost(bizModel, bizOptJson);
             default:
                 return writeDatabase(bizModel,bizOptJson);
 
@@ -120,8 +122,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 ObjectException.NULL_EXCEPTION, "配置文件没有设置保存文件路径");
         }
         CsvDataSet dataSetWriter=new CsvDataSet();
-        dataSetWriter.setFilePath(path);
-        dataSetWriter.setParams(CollectionsOpt.createHashMap("fileName",fileName));
+        dataSetWriter.setFilePath(path+File.separator+fileName);
         dataSetWriter.save(runAppend(bizModel,bizOptJson).getBizData().get(sourDsName));
         return bizModel;
     }
@@ -133,7 +134,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 ObjectException.NULL_EXCEPTION, "配置文件没有设置保存文件路径");
         }
         FileDataSet dataSetWriter=new ExcelDataSet();
-        dataSetWriter.setFilePath(path);
+        dataSetWriter.setFilePath(path+File.separator+fileName);
         dataSetWriter.save(bizModel.getBizData().get(sourDsName));
         return bizModel;
     }
@@ -181,8 +182,6 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            case "http":
-                return runHttpPost(bizModel, bizOptJson);
             default:
                 return bizModel;
         }
