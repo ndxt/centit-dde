@@ -181,7 +181,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            case "interface":
+            case "http":
                 return runHttpPost(bizModel, bizOptJson);
             default:
                 return bizModel;
