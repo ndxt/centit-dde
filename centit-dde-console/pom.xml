@@ -13,15 +13,9 @@
     <packaging>war</packaging>
 
     <dependencies>
-
-
-
-
-
-
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-moduler</artifactId>
+            <artifactId>centit-dde-module</artifactId>
             <version>${project.version}</version>
         </dependency>
 
