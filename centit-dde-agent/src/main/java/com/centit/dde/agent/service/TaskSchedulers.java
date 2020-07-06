@@ -1,7 +1,7 @@
 package com.centit.dde.agent.service;
 
-import com.centit.dde.dao.TaskExchangeDao;
-import com.centit.dde.po.TaskExchange;
+import com.centit.dde.dao.DataPacketDao;
+import com.centit.dde.po.DataPacket;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -28,7 +28,7 @@ import java.util.Set;
 @Service
 public class TaskSchedulers {
     @Autowired
-    private TaskExchangeDao taskExchangeDao;
+    private DataPacketDao dataPacketDao;
 
     @Autowired
     private Scheduler scheduler;
@@ -36,10 +36,10 @@ public class TaskSchedulers {
     @Autowired
     private OperationLogWriter operationLogWriter;
     private String taskMD5;
-    private boolean isEqualMD5(List<TaskExchange> list){
+    private boolean isEqualMD5(List<DataPacket> list){
         boolean result = false;
         String sList = "";
-        for(TaskExchange i:list){
+        for(DataPacket i:list){
            sList += i.getTaskCron();
         }
         String taskMD5="";
@@ -57,30 +57,35 @@ public class TaskSchedulers {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (taskMD5.equals(this.taskMD5))
+        if (taskMD5.equals(this.taskMD5)) {
             result = true;
-        else this.taskMD5 = taskMD5;
+        } else {
+            this.taskMD5 = taskMD5;
+        }
         return result;
     }
     private void refreshTask() throws SchedulerException {
-        List<TaskExchange> list = taskExchangeDao.listObjectsByProperty("taskType","2");
-        if (isEqualMD5(list)) return;
+        List<DataPacket> list = dataPacketDao.listObjectsByProperties(
+            CollectionsOpt.createHashMap("taskType","2","isValid","T"));
+        if (isEqualMD5(list)) {
+            return;
+        }
         Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup());
 
-        for (TaskExchange ll : list) {
+        for (DataPacket ll : list) {
             if ("".equals(ll.getTaskCron())||ll.getTaskCron()==null ) {
                 continue;
             }
             int i = 0;
             for (TriggerKey tKey : triggerKeys) {
-               if (tKey.getName().equals(ll.getTaskId())){
+               if (tKey.getName().equals(ll.getPacketId())){
                    i++;
                    CronTrigger quatrzTrigger = (CronTrigger)scheduler.getTrigger(tKey);
 //                   JobKey jobKey =quatrzTrigger.getJobKey();
 //                   JobDetail jobDetail=scheduler.getJobDetail(jobKey);
 //                   String json = (String) jobDetail.getJobDataMap().get("jsonExchange");
                    if (!(quatrzTrigger.getCronExpression().equals(ll.getTaskCron()))){
-                       QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getTaskId(), ll.getTaskName(), "task", ll.getTaskCron(),
+                       QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getPacketId(), ll.getPacketName(), "task", ll.getTaskCron(),
                            CollectionsOpt.createHashMap("taskExchange", ll));
                        break;
                    }
@@ -88,14 +93,14 @@ public class TaskSchedulers {
                }
             }
             if (i==0) {
-                QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getTaskId(), ll.getTaskName(), "task", ll.getTaskCron(),
+                QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getPacketId(), ll.getPacketName(), "task", ll.getTaskCron(),
                     CollectionsOpt.createHashMap("taskExchange", ll));
             }
         }
         for (TriggerKey tKey : triggerKeys) {
             boolean found = false;
-            for (TaskExchange ll : list) {
-                TriggerKey triggerKey = TriggerKey.triggerKey(ll.getTaskId(), ll.getTaskName());
+            for (DataPacket ll : list) {
+                TriggerKey triggerKey = TriggerKey.triggerKey(ll.getPacketId(), ll.getPacketName());
                 if (tKey.equals(triggerKey)) {
                     found = true;
                     break;

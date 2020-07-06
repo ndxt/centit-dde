@@ -3,20 +3,18 @@ package com.centit.dde.datamoving.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.TaskDetailLogDao;
-import com.centit.dde.dao.TaskExchangeDao;
 import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.datamoving.dataopt.DatabaseBizOperation;
+import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.TaskDetailLog;
-import com.centit.dde.po.TaskExchange;
 import com.centit.dde.po.TaskLog;
+import com.centit.dde.services.DBPacketBizSupplier;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.product.dataopt.core.BizModel;
 import com.centit.product.dataopt.core.DataSet;
-import com.centit.product.datapacket.dao.DataPacketDao;
-import com.centit.product.datapacket.po.DataPacket;
-import com.centit.product.datapacket.service.DBPacketBizSupplier;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.common.ObjectException;
 import com.centit.support.json.JSONOpt;
@@ -31,8 +29,6 @@ import static com.centit.product.dataopt.dataset.SQLDataSetWriter.WRITER_ERROR_T
 public class TaskRun {
     @Autowired
     private TaskLogDao taskLogDao;
-    @Autowired
-    private TaskExchangeDao taskExchangeDao;
     @Autowired
     private TaskDetailLogDao taskDetailLogDao;
     @Autowired
@@ -50,11 +46,12 @@ public class TaskRun {
     private Date beginTime;
     private DataPacket dataPacket;
 
-    public BizModel runTask(String logId) {
-        return runTask(logId, null);
-    }
+
 
     public BizModel runStep(JSONObject bizOptJson) {
+        if (bizOptJson.isEmpty()){
+            return null;
+        }
         JSONArray jsonArray = bizOptJson.getJSONArray("steps");
         try{
         for (Object jj : jsonArray) {
@@ -114,22 +111,12 @@ public class TaskRun {
         taskDetailLogDao.saveNewObject(detailLog);
     }
 
-    public BizModel runTask(String logId, JSONObject runJSON) {
+    public BizModel runTask(String logId) {
         beginTime = new Date();
         taskLog = taskLogDao.getObjectById(logId);
-        TaskExchange taskExchange = taskExchangeDao.getObjectById(taskLog.getTaskId());
-        if (runJSON != null) {
-            taskExchange.setExchangeDescJson(JSON.toJSONString(runJSON));
-        }
-        setBizModel(taskExchange.getPacketId());
-
-        if (taskExchange.getExchangeDesc().getJSONArray("steps").size()==0){
-            taskExchange.setExchangeDescJson(dataPacket.getDataOptDescJson());
-        }
-
-        if (taskExchange.getExchangeDesc() != null) {
-            runStep(taskExchange.getExchangeDesc());
-        }
+        DataPacket dataPacket = dataPacketDao.getObjectById(taskLog.getTaskId());
+        setBizModel(dataPacket.getPacketId());
+        runStep(dataPacket.getDataOptDescJson());
         taskLog.setRunEndTime(new Date());
         taskLogDao.updateObject(taskLog);
         return bizModel;
