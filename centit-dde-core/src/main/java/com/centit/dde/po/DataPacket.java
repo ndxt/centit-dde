@@ -110,6 +110,11 @@ private String taskType;
     @Column(name = "IS_VALID")
     @ApiModelProperty(value = "是否启用", required = true)
     private Boolean isValid;
+
+    @ApiModelProperty(value = "业务特殊处理脚本")
+    @Column(name = "EXTEND_OPT_JS")
+    @Basic(fetch = FetchType.LAZY)
+    private String  extendOptJs;
     //end
     @OneToMany(targetEntity = DataPacketParam.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")

@@ -32,8 +32,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import lombok.Synchronized;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -62,10 +60,11 @@ public class DataPacketController extends BaseController {
 
     @Autowired
     private IntegrationEnvironment integrationEnvironment;
-@Autowired
-private TaskLogManager taskLogManager;
-@Autowired
-private TaskRun taskRun;
+    @Autowired
+    private TaskLogManager taskLogManager;
+    @Autowired
+    private TaskRun taskRun;
+
     @ApiOperation(value = "新增数据包")
     @PostMapping
     @WrapUpResponseBody
@@ -267,10 +266,11 @@ private TaskRun taskRun;
                 throw new IllegalStateException("Unexpected value: " + query.getSetType());
         }
     }
+
     @GetMapping(value = "/run/{packetId}")
     @ApiOperation(value = "立即执行任务")
     @WrapUpResponseBody
-    public Callable<BizModel> runTaskExchange(@PathVariable String packetId){
+    public Callable<BizModel> runTaskExchange(@PathVariable String packetId) {
         Callable<BizModel> bizModelCallable = () -> {
             DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
             TaskLog taskLog = new TaskLog();
@@ -282,43 +282,46 @@ private TaskRun taskRun;
         };
         return bizModelCallable;
     }
+
     @GetMapping(value = "/exist/{applicationId}/{interfaceName}")
     @ApiOperation(value = "接口名称是否已存在")
     @WrapUpResponseBody
-    public Boolean isExist(@PathVariable String applicationId, @PathVariable String interfaceName){
+    public Boolean isExist(@PathVariable String applicationId, @PathVariable String interfaceName) {
         Map<String, Object> params = new HashMap<>();
-        params.put("interfaceName",interfaceName);
-        params.put("applicationId",applicationId);
-        List<DataPacket> list = dataPacketService.listDataPacket(params,new PageDesc());
-        if (list.size()>0){
+        params.put("interfaceName", interfaceName);
+        params.put("applicationId", applicationId);
+        List<DataPacket> list = dataPacketService.listDataPacket(params, new PageDesc());
+        if (list.size() > 0) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
+
     @GetMapping(value = "/{applicationId}/{interfaceName}/{sourceName}")
     @ApiOperation(value = "获取数据")
     @WrapUpResponseBody
     public DataSet getData(@PathVariable String applicationId, @PathVariable String interfaceName,
-                           @PathVariable String sourceName, HttpServletRequest request){
+                           @PathVariable String sourceName, HttpServletRequest request) {
         Map<String, Object> params = BaseController.collectRequestParameters(request);
         Map<String, Object> params2 = new HashMap<>();
-        params2.put("interfaceName",interfaceName);
-        params2.put("applicationId",applicationId);
-        List<DataPacket> list = dataPacketService.listDataPacket(params2,new PageDesc());
-        if (list.size()>0){
-            DataPacket taskExchange=list.get(0);
-            BizModel bizModel=dataPacketService.fetchDataPacketData(taskExchange.getPacketId(), params, taskExchange.getDataOptDescJson());
-            String sourceCode= getSourceCode(sourceName,taskExchange.getDataOptDescJson());
-            if(StringUtils.isNotBlank(sourceCode)) {
+        params2.put("interfaceName", interfaceName);
+        params2.put("applicationId", applicationId);
+        List<DataPacket> list = dataPacketService.listDataPacket(params2, new PageDesc());
+        if (list.size() > 0) {
+            DataPacket taskExchange = list.get(0);
+            BizModel bizModel = dataPacketService.fetchDataPacketData(taskExchange.getPacketId(), params, taskExchange.getDataOptDescJson());
+            String sourceCode = getSourceCode(sourceName, taskExchange.getDataOptDescJson());
+            if (StringUtils.isNotBlank(sourceCode)) {
                 return bizModel.fetchDataSetByName(sourceCode);
-            }else{
+            } else {
                 return bizModel.getMainDataSet();
             }
         }
         return null;
     }
-    private String getSourceCode(String sourceName, JSONObject bizOptJson){
+
+    private String getSourceCode(String sourceName, JSONObject bizOptJson) {
         JSONArray jsonArray = bizOptJson.getJSONArray("steps");
         for (Object step : jsonArray) {
             if (step instanceof JSONObject) {
