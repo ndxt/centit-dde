@@ -22,8 +22,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Import({IPOrStaticAppSystemBeanConfig.class,
         SpringSecurityDaoConfig.class,
         JdbcConfig.class})
-@ComponentScan(basePackages = {"com.centit.dde", "com.centit"},
-        excludeFilters = @ComponentScan.Filter(value = org.springframework.stereotype.Controller.class))
+@ComponentScan(basePackages = "com.centit",
+    excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION,
+        value = org.springframework.stereotype.Controller.class))
 @Configuration
 public class ServiceConfig {
 

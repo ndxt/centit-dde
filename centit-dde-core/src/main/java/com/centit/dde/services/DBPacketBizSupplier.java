@@ -50,7 +50,7 @@ public class DBPacketBizSupplier implements BizSupplier {
                         sqlDSR.setSqlSen(rdd.getQuerySQL());
                         SimpleDataSet dataset = sqlDSR.load(modelTag);
                         dataset.setDataSetName(rdd.getQueryName());
-                        dataSets.put(rdd.getQueryName(), dataset);
+                        dataSets.put(rdd.getQueryId(), dataset);
                         break;
                     }
                     case "E": {
@@ -63,7 +63,7 @@ public class DBPacketBizSupplier implements BizSupplier {
                         }
                         SimpleDataSet dataset = excelDataSet.load(modelTag);
                         dataset.setDataSetName(rdd.getQueryName());
-                        dataSets.put(rdd.getQueryName(), dataset);
+                        dataSets.put(rdd.getQueryId(), dataset);
                         break;
                     }
                     case "C": {
@@ -76,7 +76,7 @@ public class DBPacketBizSupplier implements BizSupplier {
                         }
                         SimpleDataSet dataset = csvDataSet.load(modelTag);
                         dataset.setDataSetName(rdd.getQueryName());
-                        dataSets.put(rdd.getQueryName(), dataset);
+                        dataSets.put(rdd.getQueryId(), dataset);
                         break;
                     }
                     case "H": {

@@ -61,7 +61,7 @@ public class DataPacket implements Serializable {
     @ApiModelProperty(value = "是否有数据预处理", required = true)
     private String hasDataOpt;
 
-    @JSONField(serialize=false)
+
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "DATA_OPT_DESC_JSON")
     @ApiModelProperty(value = "数据预处理描述 json格式的数据预处理说明", required = true)

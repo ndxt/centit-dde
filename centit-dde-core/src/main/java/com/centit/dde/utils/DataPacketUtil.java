@@ -18,6 +18,10 @@ import java.util.Map;
 
 public abstract class DataPacketUtil {
     public static DataPacketSchema calcDataPacketSchema(DataPacketSchema sourceSchema, JSONObject bizOptJson){
+        JSONObject object=bizOptJson.getJSONObject("optsteps");
+        if (object!=null) {
+            bizOptJson = object;
+        }
         JSONArray optSteps = bizOptJson.getJSONArray("steps");
         if(optSteps==null || optSteps.isEmpty()){
             return sourceSchema;
