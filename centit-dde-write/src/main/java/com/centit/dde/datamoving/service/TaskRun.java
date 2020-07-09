@@ -72,6 +72,8 @@ public class TaskRun {
         DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
         dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
         dbPacketBizSupplier.setFileStore(fileStore);
+        /*添加参数默认值传输*/
+        dbPacketBizSupplier.setQueryParams(dataPacket.getPacketParamsValue());
         bizModel = dbPacketBizSupplier.get();
         databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
         databaseBizOperation.setMetaDataService(metaDataService);

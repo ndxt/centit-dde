@@ -3,6 +3,7 @@ package com.centit.dde.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.aync.service.ExchangeService;
 import com.centit.dde.datamoving.service.TaskRun;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataSetColumnDesc;
@@ -34,6 +35,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +45,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 @Api(value = "数据包", tags = "数据包")
 @RestController
@@ -61,14 +63,11 @@ public class DataPacketController extends BaseController {
     @Autowired
     private IntegrationEnvironment integrationEnvironment;
     @Autowired
-    private TaskLogManager taskLogManager;
-    @Autowired
-    private TaskRun taskRun;
-
+    private ExchangeService exchangeService;
     @ApiOperation(value = "新增数据包")
     @PostMapping
     @WrapUpResponseBody
-    public void createDataPacket(DataPacket dataPacket, HttpServletRequest request) {
+    public void createDataPacket(@RequestBody DataPacket dataPacket, HttpServletRequest request) {
         String userCode = WebOptUtils.getCurrentUserCode(request);
         dataPacket.setRecorder(userCode);
         dataPacket.setDataOptDescJson(dataPacket.getDataOptDescJson());
@@ -270,18 +269,10 @@ public class DataPacketController extends BaseController {
     @GetMapping(value = "/run/{packetId}")
     @ApiOperation(value = "立即执行任务")
     @WrapUpResponseBody
-    public Callable<BizModel> runTaskExchange(@PathVariable String packetId) {
-        Callable<BizModel> bizModelCallable = () -> {
-            DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
-            TaskLog taskLog = new TaskLog();
-            taskLog.setTaskId(packetId);
-            taskLog.setRunBeginTime(new Date());
-            taskLog.setRunType(dataPacket.getPacketName());
-            taskLogManager.createTaskLog(taskLog);
-            return taskRun.runTask(taskLog.getLogId());
-        };
-        return bizModelCallable;
+    public BizModel runTaskExchange(@PathVariable String packetId) {
+        return exchangeService.runTask(packetId);
     }
+
 
     @GetMapping(value = "/exist/{applicationId}/{interfaceName}")
     @ApiOperation(value = "接口名称是否已存在")
