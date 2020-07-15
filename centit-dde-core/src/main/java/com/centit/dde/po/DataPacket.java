@@ -31,7 +31,7 @@ public class DataPacket implements Serializable {
     @ValueGenerator(strategy = GeneratorType.UUID)
     private String packetId;
 
-    @ApiModelProperty(value = "数据包名称模板")
+    @ApiModelProperty(value = "数据包名称")
     @Column(name = "PACKET_NAME")
     @NotBlank(message = "字段不能为空")
     private String packetName;
