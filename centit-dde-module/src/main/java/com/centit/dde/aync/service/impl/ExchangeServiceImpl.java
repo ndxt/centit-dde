@@ -28,6 +28,7 @@ public class ExchangeServiceImpl implements ExchangeService {
         DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
         TaskLog taskLog = new TaskLog();
         taskLog.setTaskId(packetId);
+        taskLog.setApplicationId(dataPacket.getApplicationId());
         taskLog.setRunBeginTime(new Date());
         taskLog.setRunType(dataPacket.getPacketName());
         taskLogManager.createTaskLog(taskLog);

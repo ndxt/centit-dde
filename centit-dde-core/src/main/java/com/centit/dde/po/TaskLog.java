@@ -35,7 +35,9 @@ public class TaskLog implements java.io.Serializable {
     @Column(name="Task_ID")
     @ApiModelProperty(value = "任务ID", hidden = true)
     private String taskId;
-
+    @Column(name="APPLICATION_ID")
+    @ApiModelProperty(value = "任务ID", hidden = true)
+    private String applicationId;
     @Column(name="RUN_BEGIN_TIME")
     @ApiModelProperty(value = "执行开始时间")
     //@ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")

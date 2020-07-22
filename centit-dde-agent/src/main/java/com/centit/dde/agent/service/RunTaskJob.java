@@ -31,6 +31,7 @@ public class RunTaskJob extends AbstractQuartzJob {
         TaskLogDao taskLogDao =ContextUtils.getBean(TaskLogDao.class);
         TaskLog taskLog = new TaskLog();
         taskLog.setTaskId(this.dataPacket.getPacketId());
+        taskLog.setApplicationId(this.dataPacket.getApplicationId());
         taskLog.setRunBeginTime(new Date());
         taskLog.setRunType(this.dataPacket.getPacketName());
         taskLogDao.saveNewObject(taskLog);
