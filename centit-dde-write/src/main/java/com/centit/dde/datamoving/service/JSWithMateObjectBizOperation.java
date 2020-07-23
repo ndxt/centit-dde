@@ -11,23 +11,27 @@ import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
 
+/**
+ * @author zhf
+ */
 public class JSWithMateObjectBizOperation extends JSBizOperation {
     private static final Logger logger = LoggerFactory.getLogger(JSWithMateObjectBizOperation.class);
 
     private MetaObjectService metaObjectService;
+
     @Override
     public BizModel apply(BizModel bizModel) {
-        if(jsRuntimeContext == null){
+        if (jsRuntimeContext == null) {
             jsRuntimeContext = new JSRuntimeContext();
         }
 
-        if(StringUtils.isNotBlank(javaScript)){
+        if (StringUtils.isNotBlank(javaScript)) {
             jsRuntimeContext.compileScript(javaScript);
         }
 
         try {
             Object object = jsRuntimeContext.callJsFunc(
-                StringUtils.isBlank(jsFuncName)? "runOpt" : jsFuncName, metaObjectService, bizModel);
+                StringUtils.isBlank(jsFuncName) ? "runOpt" : jsFuncName, metaObjectService, bizModel);
             return BizOptUtils.castObjectToBizModel(object);
         } catch (ScriptException | NoSuchMethodException e) {
             logger.error(e.getLocalizedMessage());

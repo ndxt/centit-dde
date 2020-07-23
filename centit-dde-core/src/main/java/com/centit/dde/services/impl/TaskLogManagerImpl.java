@@ -5,32 +5,26 @@ import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.TaskLogManager;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import com.centit.support.database.utils.PageDesc;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author zhf
+ */
 @Service
-@Transactional
-public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog,Long,TaskLogDao> implements TaskLogManager {
-    public static final Log log = LogFactory.getLog(TaskLogManager.class);
+@Transactional(rollbackFor = Exception.class)
+public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog, Long, TaskLogDao> implements TaskLogManager {
+
+    private final TaskLogDao taskLogDao;
 
     @Autowired
-    private TaskLogDao taskLogDao;
-
-    @Resource(name="taskLogDao")
-    @NotNull
-    public void setTaskLogDao(TaskLogDao baseDao) {
-        this.taskLogDao = baseDao;
-        setBaseDao(this.taskLogDao);
+    public TaskLogManagerImpl(TaskLogDao taskLogDao) {
+        this.taskLogDao = taskLogDao;
     }
-
 
     @Override
     public TaskLog getLog(String logId) {
@@ -39,8 +33,7 @@ public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog,Long,TaskL
 
     @Override
     public List<TaskLog> listTaskLog(Map<String, Object> param, PageDesc pageDesc) {
-        List<TaskLog> taskLogs = this.taskLogDao.listObjectsByProperties(param, pageDesc);
-        return taskLogs;
+        return this.taskLogDao.listObjectsByProperties(param, pageDesc);
     }
 
     @Override
@@ -51,13 +44,13 @@ public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog,Long,TaskL
 
     @Override
     public void updateTaskLog(TaskLog taskLog) {
-         this.taskLogDao.updateObject(taskLog);
-         this.taskLogDao.saveObjectReferences(taskLog);
+        this.taskLogDao.updateObject(taskLog);
+        this.taskLogDao.saveObjectReferences(taskLog);
     }
 
     @Override
     public void deleteTaskLogById(String logId) {
-         this.taskLogDao.deleteObjectForceById(logId);
+        this.taskLogDao.deleteObjectForceById(logId);
     }
 
 }

@@ -1,6 +1,5 @@
 package com.centit.dde.datamoving.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.dao.DataPacketDao;
@@ -23,52 +22,53 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-import static com.centit.product.dataopt.dataset.SQLDataSetWriter.WRITER_ERROR_TAG;
-
+/**
+ * @author zhf
+ */
 @Service
 public class TaskRun {
-    @Autowired
-    private TaskLogDao taskLogDao;
-    @Autowired
-    private TaskDetailLogDao taskDetailLogDao;
-    @Autowired
-    private DataPacketDao dataPacketDao;
-    @Autowired
-    private MetaDataService metaDataService;
-    @Autowired
-    private IntegrationEnvironment integrationEnvironment;
-    @Autowired
-    private DatabaseBizOperation databaseBizOperation;
+    private final TaskLogDao taskLogDao;
+    private final TaskDetailLogDao taskDetailLogDao;
+    private final DataPacketDao dataPacketDao;
+    private final MetaDataService metaDataService;
+    private final IntegrationEnvironment integrationEnvironment;
+    private final DatabaseBizOperation databaseBizOperation;
     @Autowired(required = false)
-    private FileStore fileStore;
+    private  FileStore fileStore;
     private BizModel bizModel;
     private TaskLog taskLog;
     private Date beginTime;
-    private DataPacket dataPacket;
+    private TaskDetailLog detailLog;
+    @Autowired
+    public TaskRun( TaskLogDao taskLogDao, TaskDetailLogDao taskDetailLogDao, DataPacketDao dataPacketDao, MetaDataService metaDataService, IntegrationEnvironment integrationEnvironment, DatabaseBizOperation databaseBizOperation) {
+        this.taskLogDao = taskLogDao;
+        this.taskDetailLogDao = taskDetailLogDao;
+        this.dataPacketDao = dataPacketDao;
+        this.metaDataService = metaDataService;
+        this.integrationEnvironment = integrationEnvironment;
+        this.databaseBizOperation = databaseBizOperation;
+    }
 
 
-
-    public BizModel runStep(JSONObject bizOptJson) {
-        if (bizOptJson.isEmpty()){
-            return null;
+    private void runStep(JSONObject bizOptJson) {
+        if (bizOptJson.isEmpty()) {
+            return;
         }
         JSONArray jsonArray = bizOptJson.getJSONArray("steps");
-        try{
-        for (Object jj : jsonArray) {
-            databaseBizOperation.runOneStep(bizModel, JSONOpt.objectToJSONObject(jj));
-            saveDetail(JSONOpt.objectToJSONObject(jj));
-        }}
-        catch (ObjectException e){
-            saveDetail(JSONOpt.objectToJSONObject(e.getObjectData()),e.getMessage());
+        try {
+            for (Object jj : jsonArray) {
+                databaseBizOperation.runOneStep(bizModel, JSONOpt.objectToJSONObject(jj));
+                saveDetail(JSONOpt.objectToJSONObject(jj), "");
+            }
+        } catch (ObjectException e) {
+            saveDetail(JSONOpt.objectToJSONObject(e.getObjectData()), e.getMessage());
+        } catch (Exception e) {
+            saveDetail(JSONOpt.objectToJSONObject(jsonArray.get(0)), e.getMessage());
         }
-        catch (Exception e){
-            saveDetail(JSONOpt.objectToJSONObject(jsonArray.get(0)),e.getMessage());
-        }
-        return bizModel;
     }
 
     private void setBizModel(String packetId) {
-        dataPacket = dataPacketDao.getObjectWithReferences(packetId);
+        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
         DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
         dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
         dbPacketBizSupplier.setFileStore(fileStore);
@@ -80,28 +80,11 @@ public class TaskRun {
     }
 
 
-    private void saveDetail(JSONObject runJSON) {
-        TaskDetailLog detailLog = new TaskDetailLog();
+    private void saveDetail(JSONObject runJSON, String error) {
         detailLog.setRunBeginTime(beginTime);
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
-        detailLog.setLogType(runJSON.getString("operation")+":"+runJSON.getString("source"));
-        DataSet dataSet = bizModel.fetchDataSetByName(runJSON.getString("source"));
-        detailLog.setLogInfo((String) dataSet.getFirstRow().get(WRITER_ERROR_TAG));
-        if ("ok".equals(detailLog.getLogInfo())) {
-            detailLog.setSuccessPieces((long) dataSet.getData().size());
-        } else {
-            detailLog.setErrorPieces((long) dataSet.getData().size());
-        }
-        detailLog.setRunEndTime(new Date());
-        taskDetailLogDao.saveNewObject(detailLog);
-    }
-    private void saveDetail(JSONObject runJSON,String error) {
-        TaskDetailLog detailLog = new TaskDetailLog();
-        detailLog.setRunBeginTime(beginTime);
-        detailLog.setTaskId(taskLog.getTaskId());
-        detailLog.setLogId(taskLog.getLogId());
-        detailLog.setLogType(runJSON.getString("operation")+":"+runJSON.getString("source"));
+        detailLog.setLogType(runJSON.getString("operation") + ":" + runJSON.getString("source"));
         DataSet dataSet = bizModel.fetchDataSetByName(runJSON.getString("source"));
         detailLog.setLogInfo(error);
         if ("ok".equals(detailLog.getLogInfo())) {

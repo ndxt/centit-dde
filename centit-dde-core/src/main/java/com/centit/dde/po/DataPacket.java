@@ -10,13 +10,15 @@ import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * @author zhf
+ */
 @ApiModel
 @Data
 @Entity
@@ -36,12 +38,7 @@ public class DataPacket implements Serializable {
     @NotBlank(message = "字段不能为空")
     private String packetName;
 
-    /*
-     * 数据包参数： 查询参数描述
-     */
-    /*@ApiModelProperty(value = "数据包参数： 查询参数描述")
-    @Column(name = "PACKET_PARAMS_JSON")
-    private String packetParamsJSON;*/
+
     /**
      * 详细描述
      */
@@ -84,12 +81,12 @@ public class DataPacket implements Serializable {
 
     @ApiModelProperty(value = "业务模块代码")
     @Column(name = "APPLICATION_ID")
-    private String  applicationId;
-//add column
-@Column(name = "TASK_TYPE")
-@ApiModelProperty(value = "任务类型,1表示普通任务，2表示定时任务", required = true)
-@NotBlank
-private String taskType;
+    private String applicationId;
+
+    @Column(name = "TASK_TYPE")
+    @ApiModelProperty(value = "任务类型,1表示普通任务，2表示定时任务", required = true)
+    @NotBlank
+    private String taskType;
 
     @Column(name = "TASK_CRON")
     @ApiModelProperty(value = "任务执行定时器")
@@ -114,8 +111,8 @@ private String taskType;
     @ApiModelProperty(value = "业务特殊处理脚本")
     @Column(name = "EXTEND_OPT_JS")
     @Basic(fetch = FetchType.LAZY)
-    private String  extendOptJs;
-    //end
+    private String extendOptJs;
+
     @OneToMany(targetEntity = DataPacketParam.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
     private List<DataPacketParam> packetParams;
@@ -124,33 +121,32 @@ private String taskType;
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
     private List<DataSetDefine> dataSetDefines;
 
-    public DataPacket(){
+    public DataPacket() {
         bufferFreshPeriod = -1;
     }
 
     public List<DataSetDefine> getDataSetDefines() {
-            return dataSetDefines;
+        return dataSetDefines;
     }
 
     public List<DataPacketParam> getPacketParams() {
-        if(packetParams==null){
+        if (packetParams == null) {
             packetParams = new ArrayList<>(2);
         }
         return packetParams;
     }
 
     @JSONField(serialize = false)
-    public Map<String, Object> getPacketParamsValue(){
-        Map<String, Object> params = new HashMap<>();
-        if(packetParams == null){
+    public Map<String, Object> getPacketParamsValue() {
+        Map<String, Object> params = new HashMap<>(10);
+        if (packetParams == null) {
             return params;
         }
-        for(DataPacketParam packetParam : packetParams){
+        for (DataPacketParam packetParam : packetParams) {
             params.put(packetParam.getParamName(), packetParam.getParamDefaultValue());
         }
         return params;
     }
-
 
 
 }

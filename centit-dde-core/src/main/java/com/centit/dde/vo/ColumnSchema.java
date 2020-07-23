@@ -6,11 +6,14 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * @author zhf
+ */
 @Data
 @NoArgsConstructor
-public class ColumnSchema{
+public class ColumnSchema {
 
-    public ColumnSchema(String propertyName){
+    public ColumnSchema(String propertyName) {
         this.columnCode = propertyName;
         this.propertyName = propertyName;
         this.columnName = propertyName;
@@ -29,10 +32,10 @@ public class ColumnSchema{
     @ApiModelProperty(value = "是否为统计字段")
     String isStatData;
 
-    public ColumnSchema duplicate(){
+    public ColumnSchema duplicate() {
         ColumnSchema dup = new ColumnSchema();
         dup.columnCode = this.columnCode;
-        dup.propertyName = this.propertyName+":dup";
+        dup.propertyName = this.propertyName + ":dup";
         dup.columnName = this.columnName;
         dup.dataType = this.dataType;
         dup.isStatData = this.isStatData;

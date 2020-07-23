@@ -33,9 +33,10 @@ import java.util.Map;
  * 需要设置的参数有：
  *      数据库连接信息 DatabaseInfo
  *      对应的表信息 SimpleTableInfo
+ * @author zhf
  */
 public class KeyValueTableWriter implements DataSetWriter {
-    public static String WRITER_ERROR_TAG = "rmdb_dataset_writer_result";
+    private static String WRITER_ERROR_TAG = "rmdb_dataset_writer_result";
     private static final Logger logger = LoggerFactory.getLogger(KeyValueTableWriter.class);
 
     private DataSourceDescription dataSource;

@@ -12,6 +12,9 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
+/**
+ * @author zhf
+ */
 @Data
 @Entity
 @Table(name = "Q_DATASET_COLUMNDESC")
@@ -52,16 +55,8 @@ public class DataSetColumnDesc implements Serializable {
     @ApiModelProperty(value = "对应数据字典代码")
     private String catalogCode;
 
-    public DataSetColumnDesc() {
-    }
-
-    public DataSetColumnDesc(String columnCode, String columnName) {
-        this.columnCode = columnCode;
-        this.columnName = columnName;
-    }
-
     @ApiModelProperty(value = "字段属性名")
-    public String getPropertyName(){
+    public String getPropertyName() {
         return FieldType.mapPropName(getColumnCode());
     }
 }

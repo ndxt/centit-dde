@@ -13,26 +13,19 @@ import com.centit.product.dataopt.dataset.ExcelDataSet;
 import com.centit.product.dataopt.dataset.FileDataSet;
 import com.centit.product.dataopt.dataset.SQLDataSetWriter;
 import com.centit.product.metadata.service.MetaDataService;
-import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.common.ObjectException;
-import com.centit.support.compiler.Pretreatment;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.transaction.JdbcTransaction;
 import com.centit.support.database.utils.DataSourceDescription;
-import com.centit.support.file.FileIOOpt;
-import com.csvreader.CsvWriter;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
 
+/**
+ * @author zhf
+ */
 @Component
 public class DatabaseBizOperation extends BuiltInOperation {
     @Value("${os.file.base.dir:./file_home/export}")
@@ -48,24 +41,25 @@ public class DatabaseBizOperation extends BuiltInOperation {
         this.bizOptJson = bizOptJson;
     }
 
-    private BizModel runPersistence(BizModel bizModel, JSONObject bizOptJson) throws IOException {
-        String dataType= getJsonFieldString(bizOptJson, "dataType","D");
-        switch (dataType){
+    private BizModel runPersistence(BizModel bizModel, JSONObject bizOptJson) {
+        String dataType = getJsonFieldString(bizOptJson, "dataType", "D");
+        switch (dataType) {
             case "E":
-                return writeExcelFile(bizModel,bizOptJson);
+                return writeExcelFile(bizModel, bizOptJson);
             case "C":
-                return writeCsvFile(bizModel,bizOptJson);
+                return writeCsvFile(bizModel, bizOptJson);
             case "H":
                 return runHttpPost(bizModel, bizOptJson);
             default:
-                return writeDatabase(bizModel,bizOptJson);
+                return writeDatabase(bizModel, bizOptJson);
 
         }
 
     }
+
     @JdbcTransaction
-    private BizModel writeDatabase(BizModel bizModel, JSONObject bizOptJson){
-        String sourDSName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
+    private BizModel writeDatabase(BizModel bizModel, JSONObject bizOptJson) {
+        String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String databaseCode = getJsonFieldString(bizOptJson, "databaseCode", null);
         String tableId = getJsonFieldString(bizOptJson, "tableId", null);
         if (StringUtils.isBlank(tableId)) {
@@ -85,17 +79,17 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 "数据库信息无效：" + databaseCode);
         }
         runMap(bizModel, bizOptJson);
-        DataSet dataSet = bizModel.fetchDataSetByName(sourDSName);
+        DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet == null) {
             throw new ObjectException(bizOptJson,
                 ObjectException.NULL_EXCEPTION,
-                "数据源信息无效：" + sourDSName);
+                "数据源信息无效：" + sourDsName);
         }
         TableInfo tableInfo = metaDataService.getMetaTableWithRelations(tableId);
         if (tableInfo == null) {
             throw new ObjectException(bizOptJson,
                 ObjectException.NULL_EXCEPTION,
-                "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableInfo);
+                "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
         }
         DataSetWriter dataSetWriter = new SQLDataSetWriter(
             DataSourceDescription.valueOf(databaseInfo), tableInfo);
@@ -114,31 +108,34 @@ public class DatabaseBizOperation extends BuiltInOperation {
         }
         return bizModel;
     }
-    protected BizModel writeCsvFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
+
+    private BizModel writeCsvFile(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String fileName = getJsonFieldString(bizOptJson, "fileName", null);
         if (path == null) {
             throw new ObjectException(bizOptJson,
                 ObjectException.NULL_EXCEPTION, "配置文件没有设置保存文件路径");
         }
-        CsvDataSet dataSetWriter=new CsvDataSet();
-        dataSetWriter.setFilePath(path+File.separator+fileName);
-        dataSetWriter.save(runAppend(bizModel,bizOptJson).getBizData().get(sourDsName));
+        CsvDataSet dataSetWriter = new CsvDataSet();
+        dataSetWriter.setFilePath(path + File.separator + fileName);
+        dataSetWriter.save(runAppend(bizModel, bizOptJson).getBizData().get(sourDsName));
         return bizModel;
     }
-    protected BizModel writeExcelFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
+
+    private BizModel writeExcelFile(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String fileName = getJsonFieldString(bizOptJson, "fileName", null);
         if (path == null) {
             throw new ObjectException(bizOptJson,
                 ObjectException.NULL_EXCEPTION, "配置文件没有设置保存文件路径");
         }
-        FileDataSet dataSetWriter=new ExcelDataSet();
-        dataSetWriter.setFilePath(path+File.separator+fileName);
+        FileDataSet dataSetWriter = new ExcelDataSet();
+        dataSetWriter.setFilePath(path + File.separator + fileName);
         dataSetWriter.save(bizModel.getBizData().get(sourDsName));
         return bizModel;
     }
-    protected BizModel runHttpPost(BizModel bizModel, JSONObject bizOptJson) {
+
+    private BizModel runHttpPost(BizModel bizModel, JSONObject bizOptJson) {
 
         return bizModel;
     }
@@ -177,11 +174,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
             case "static":
                 return runStaticData(bizModel, bizOptJson);
             case "persistence":
-                try {
-                    return runPersistence(bizModel, bizOptJson);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                return runPersistence(bizModel, bizOptJson);
             default:
                 return bizModel;
         }

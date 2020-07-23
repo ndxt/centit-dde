@@ -2,8 +2,11 @@ package com.centit.dde.agent.service;
 
 import org.springframework.context.ApplicationContext;
 
+/**
+ * @author zhf
+ */
 public class ContextUtils {
-    public static ApplicationContext context;
+    private static ApplicationContext context;
 
     private ContextUtils() {
     }
@@ -16,7 +19,7 @@ public class ContextUtils {
         return context.getBean(beanName);
     }
 
-    public static <T> T getBean(Class<T> t) {
+    static <T> T getBean(Class<T> t) {
         return context.getBean(t);
     }
 }

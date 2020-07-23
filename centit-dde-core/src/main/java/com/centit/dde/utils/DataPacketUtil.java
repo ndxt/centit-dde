@@ -10,12 +10,16 @@ import com.centit.product.dataopt.core.DataSet;
 import com.centit.product.dataopt.utils.BizOptUtils;
 import com.centit.product.dataopt.utils.DBBatchUtils;
 import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author zhf
+ */
 public abstract class DataPacketUtil {
     public static DataPacketSchema calcDataPacketSchema(DataPacketSchema sourceSchema, JSONObject bizOptJson){
         JSONObject object=bizOptJson.getJSONObject("optsteps");
@@ -26,83 +30,87 @@ public abstract class DataPacketUtil {
         if(optSteps==null || optSteps.isEmpty()){
             return sourceSchema;
         }
-        DataPacketSchema result = sourceSchema;
         for(Object step : optSteps){
             if(step instanceof JSONObject){
-                calcSchemaOneStep(result, (JSONObject)step);
+                calcSchemaOneStep(sourceSchema, (JSONObject)step);
             }
         }
-        return result;
+        return sourceSchema;
     }
 
-    public static DataPacketSchema  calcSchemaOneStep(DataPacketSchema sourceSchema, JSONObject bizOptJson){
+    private static void calcSchemaOneStep(DataPacketSchema sourceSchema, JSONObject bizOptJson){
         String sOptType = bizOptJson.getString("operation");
         if(StringUtils.isBlank(sOptType)) {
-            return sourceSchema;
+            return;
         }
         switch (sOptType){
             case "map":
-                return calcSchemaMap(sourceSchema, bizOptJson);
+                calcSchemaMap(sourceSchema, bizOptJson);
+                return;
             case "filter":
-                return calcSchemaFilter(sourceSchema, bizOptJson);
+                calcSchemaFilter(sourceSchema, bizOptJson);
+                return;
             case "append":
-                return calcSchemaAppend(sourceSchema, bizOptJson);
+                calcSchemaAppend(sourceSchema, bizOptJson);
+                return;
             case "stat":
-                return calcSchemaStat(sourceSchema, bizOptJson);
+                calcSchemaStat(sourceSchema, bizOptJson);
+                return;
             case "analyse":
-                return calcSchemaAnalyse(sourceSchema, bizOptJson);
+                calcSchemaAnalyse(sourceSchema, bizOptJson);
+                return;
             case "cross":
-                return calcSchemaCross(sourceSchema, bizOptJson);
+                calcSchemaCross(sourceSchema, bizOptJson);
+                return;
             case "compare":
-                return calcSchemaCompare(sourceSchema, bizOptJson);
+                calcSchemaCompare(sourceSchema, bizOptJson);
+                return;
             case "join":
-                return calcSchemaJoin(sourceSchema, bizOptJson);
+                calcSchemaJoin(sourceSchema, bizOptJson);
+                return;
             case "union":
-                return calcSchemaUnion(sourceSchema, bizOptJson);
+                calcSchemaUnion(sourceSchema, bizOptJson);
+                return;
             case "static":
-                return calcSchemaStatic(sourceSchema, bizOptJson);
+                calcSchemaStatic(sourceSchema, bizOptJson);
+                return;
              default:
-                return sourceSchema;
         }
     }
 
-    public static DataPacketSchema calcSchemaMap(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
-        String sourDSName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", sourceSchema.getPacketName());
-        String targetDSName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourDSName);
+    private static void calcSchemaMap(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
+        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", sourceSchema.getPacketName());
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourDsName);
         Object mapInfo = bizOptJson.get("fieldsMap");
         if(mapInfo instanceof Map){
-            DataSetSchema dss = new DataSetSchema(targetDSName);
-            dss.setDataSetTitle(sourDSName+":map");
+            DataSetSchema dss = new DataSetSchema(targetDsName);
+            dss.setDataSetTitle(sourDsName+":map");
             for(Object s : ((Map)mapInfo).keySet()){
                 dss.addColumnIfNotExist(StringBaseOpt.castObjectToString(s));
             }
             sourceSchema.putDataSetSchema(dss);
         }
-        return sourceSchema;
     }
 
-    public static DataPacketSchema calcSchemaAppend(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
-        String sourDSName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", sourceSchema.getPacketName());
-        //String targetDSName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourDSName);
+    private static void calcSchemaAppend(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
+        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", sourceSchema.getPacketName());
         Object mapInfo = bizOptJson.get("fieldsMap");
-        DataSetSchema dss = sourceSchema.fetchDataSetSchema(sourDSName);
+        DataSetSchema dss = sourceSchema.fetchDataSetSchema(sourDsName);
         if(dss != null && mapInfo instanceof Map){
             for(Object s : ((Map)mapInfo).keySet()){
                 dss.addColumnIfNotExist(StringBaseOpt.castObjectToString(s));
             }
         }
-        return sourceSchema;
     }
 
-    public static DataPacketSchema calcSchemaFilter(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
-        String sourDSName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", sourceSchema.getPacketName());
-        String targetDSName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourDSName);
-        DataSetSchema dss = sourceSchema.fetchDataSetSchema(sourDSName);
-        dss.setDataSetTitle(sourDSName+":filter");
-        dss.setDataSetId(targetDSName);
-        dss.setDataSetName(targetDSName);
+    private static void calcSchemaFilter(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
+        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", sourceSchema.getPacketName());
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourDsName);
+        DataSetSchema dss = sourceSchema.fetchDataSetSchema(sourDsName);
+        dss.setDataSetTitle(sourDsName+":filter");
+        dss.setDataSetId(targetDsName);
+        dss.setDataSetName(targetDsName);
         sourceSchema.putDataSetSchema(dss);
-        return sourceSchema;
     }
 
     private static void copySchemaFields(DataSetSchema dist,DataSetSchema source, List<String>  fields){
@@ -113,45 +121,44 @@ public abstract class DataPacketUtil {
         }
     }
 
-    public static DataPacketSchema calcSchemaStat(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
-        String sourDSName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", sourceSchema.getPacketName());
-        String targetDSName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourDSName);
+    private static void calcSchemaStat(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
+        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", sourceSchema.getPacketName());
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourDsName);
         Object groupBy = bizOptJson.get("groupBy");
         List<String> groupFields = StringBaseOpt.objectToStringList(groupBy);
-        DataSetSchema sdss = sourceSchema.fetchDataSetSchema(sourDSName);
-        DataSetSchema dss = new DataSetSchema(targetDSName);
-        copySchemaFields(dss,sdss,groupFields);
-        dss.setDataSetTitle(sourDSName+":stat");
+        DataSetSchema sdes = sourceSchema.fetchDataSetSchema(sourDsName);
+        DataSetSchema dss = new DataSetSchema(targetDsName);
+        copySchemaFields(dss,sdes,groupFields);
+        dss.setDataSetTitle(sourDsName+":stat");
         Object stat = bizOptJson.get("fieldsMap");
         if(stat instanceof Map){
-            for(Map.Entry<String, String> ent : ((Map<String,String>)stat).entrySet()) {
-                String [] optDesc = ent.getValue().split(":");
-                if(optDesc != null && optDesc.length>1) {
-                    ColumnSchema col = sdss.fetchColumn(optDesc[0]);
+            CollectionsOpt.objectToMap(stat).forEach((key, value) -> {
+                String[] optDesc = value.toString().split(":");
+                if (optDesc.length > 1) {
+                    ColumnSchema col = sdes.fetchColumn(optDesc[0]);
                     col = col.duplicate();
-                    col.setPropertyName(ent.getKey());
+                    col.setPropertyName(key);
                     dss.addColumn(col);
                 }
-            }
+            });
         }
         sourceSchema.putDataSetSchema(dss);
-        return sourceSchema;
     }
 
-    public static DataPacketSchema calcSchemaAnalyse(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
-        String sourDSName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", sourceSchema.getPacketName());
-        String targetDSName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourDSName);
+    private static void calcSchemaAnalyse(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
+        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", sourceSchema.getPacketName());
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourDsName);
         Object groupBy = bizOptJson.get("groupBy");
         List<String> groupFields = StringBaseOpt.objectToStringList(groupBy);
-        DataSetSchema sdss = sourceSchema.fetchDataSetSchema(sourDSName);
-        DataSetSchema dss = new DataSetSchema(targetDSName);
+        DataSetSchema sdss = sourceSchema.fetchDataSetSchema(sourDsName);
+        DataSetSchema dss = new DataSetSchema(targetDsName);
         copySchemaFields(dss,sdss,groupFields);
 
         Object orderBy = bizOptJson.get("orderBy");
         List<String> orderFields = StringBaseOpt.objectToStringList(orderBy);
         copySchemaFields(dss,sdss,orderFields);
 
-        dss.setDataSetTitle(sourDSName+":analyse");
+        dss.setDataSetTitle(sourDsName+":analyse");
         Object analyse = bizOptJson.get("fieldsMap");
         if(analyse instanceof Map){
             for(Object s : ((Map)analyse).keySet()){
@@ -159,57 +166,55 @@ public abstract class DataPacketUtil {
             }
             sourceSchema.putDataSetSchema(dss);
         }
-        return sourceSchema;
     }
 
-    public static DataPacketSchema calcSchemaCross(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
-        String sourDSName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", sourceSchema.getPacketName());
-        String targetDSName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourDSName);
+    private static void calcSchemaCross(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
+        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", sourceSchema.getPacketName());
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourDsName);
         Object rowHeader = bizOptJson.get("rowHeader");
         List<String> rows = StringBaseOpt.objectToStringList(rowHeader);
         Object colHeader = bizOptJson.get("colHeader");
         List<String> cols = StringBaseOpt.objectToStringList(colHeader);
 
-        DataSetSchema sdss = sourceSchema.fetchDataSetSchema(sourDSName);
-        DataSetSchema dss = new DataSetSchema(targetDSName);
-        dss.setDataSetTitle(sourDSName+":cross");
-        copySchemaFields(dss,sdss,rows);
+        DataSetSchema sDss = sourceSchema.fetchDataSetSchema(sourDsName);
+        DataSetSchema dss = new DataSetSchema(targetDsName);
+        dss.setDataSetTitle(sourDsName+":cross");
+        copySchemaFields(dss,sDss,rows);
         String colName = StringUtils.join(cols,":*:");
-        //copySchemaFields(dss,sdss,cols);
+        ///copySchemaFields(dss,sdss,cols);
         ColumnSchema colSchema = new ColumnSchema(colName);
         colSchema.setIsStatData(BooleanBaseOpt.ONE_CHAR_TRUE);
         dss.addColumn(colSchema);
 
         sourceSchema.putDataSetSchema(dss);
-        return sourceSchema;
     }
 
-    public static DataPacketSchema calcSchemaCompare(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
-        String sour1DSName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", null);
-        String sour2DSName = BuiltInOperation.getJsonFieldString(bizOptJson,"source2", null);
-        if(sour1DSName == null || sour2DSName ==null ){
-            return sourceSchema;
+    private static void calcSchemaCompare(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
+        String sour1DsName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", null);
+        String sour2DsName = BuiltInOperation.getJsonFieldString(bizOptJson,"source2", null);
+        if(sour1DsName == null || sour2DsName ==null ){
+            return ;
         }
 
-        String targetDSName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourceSchema.getPacketName());
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourceSchema.getPacketName());
         Object primaryKey = bizOptJson.get("primaryKey");
         List<String> pks = StringBaseOpt.objectToStringList(primaryKey);
 
-        DataSetSchema sdss = sourceSchema.fetchDataSetSchema(sour1DSName);
-        DataSetSchema sdss2 = sourceSchema.fetchDataSetSchema(sour2DSName);
+        DataSetSchema sDss = sourceSchema.fetchDataSetSchema(sour1DsName);
+        DataSetSchema sDss2 = sourceSchema.fetchDataSetSchema(sour2DsName);
 
-        DataSetSchema dss = new DataSetSchema(targetDSName);
-        copySchemaFields(dss,sdss,pks);
-        dss.setDataSetName(targetDSName);
-        dss.setDataSetTitle(sour1DSName+":"+sour2DSName+":compare");
-        for(ColumnSchema cs : sdss.getColumns()){
+        DataSetSchema dss = new DataSetSchema(targetDsName);
+        copySchemaFields(dss,sDss,pks);
+        dss.setDataSetName(targetDsName);
+        dss.setDataSetTitle(sour1DsName+":"+sour2DsName+":compare");
+        for(ColumnSchema cs : sDss.getColumns()){
             if(! pks.contains(cs.getPropertyName())){
                 ColumnSchema dup = cs.duplicate();
                 dup.setPropertyName(cs.getPropertyName()+"_left");
                 dss.addColumn(dup);
             }
         }
-        for(ColumnSchema cs : sdss2.getColumns()){
+        for(ColumnSchema cs : sDss2.getColumns()){
             if(! pks.contains(cs.getPropertyName())){
                 ColumnSchema dup = cs.duplicate();
                 dup.setPropertyName(cs.getPropertyName()+"_right");
@@ -217,25 +222,24 @@ public abstract class DataPacketUtil {
             }
         }
         sourceSchema.putDataSetSchema(dss);
-        return sourceSchema;
     }
 
-    private static DataPacketSchema mergeTwoSchemaJoin(DataPacketSchema sourceSchema, JSONObject bizOptJson, String prefix) {
-        String sour1DSName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", null);
-        String sour2DSName = BuiltInOperation.getJsonFieldString(bizOptJson,"source2", null);
-        String targetDSName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourceSchema.getPacketName());
-        DataSetSchema sdss = sourceSchema.fetchDataSetSchema(sour1DSName);
-        DataSetSchema sdss2 = sourceSchema.fetchDataSetSchema(sour2DSName);
+    private static void mergeTwoSchemaJoin(DataPacketSchema sourceSchema, JSONObject bizOptJson, String prefix) {
+        String sour1DsName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", null);
+        String sour2DsName = BuiltInOperation.getJsonFieldString(bizOptJson,"source2", null);
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourceSchema.getPacketName());
+        DataSetSchema sDss = sourceSchema.fetchDataSetSchema(sour1DsName);
+        DataSetSchema sDss2 = sourceSchema.fetchDataSetSchema(sour2DsName);
 
-        DataSetSchema dss = new DataSetSchema(targetDSName);
-        dss.setDataSetName(targetDSName);
-        dss.setDataSetTitle(sour1DSName+":"+sour2DSName+ prefix);
-        for(ColumnSchema cs : sdss.getColumns()){
+        DataSetSchema dss = new DataSetSchema(targetDsName);
+        dss.setDataSetName(targetDsName);
+        dss.setDataSetTitle(sour1DsName+":"+sour2DsName+ prefix);
+        for(ColumnSchema cs : sDss.getColumns()){
             ColumnSchema dup = cs.duplicate();
             dup.setPropertyName(cs.getPropertyName());
             dss.addColumn(dup);
         }
-        for(ColumnSchema cs : sdss2.getColumns()){
+        for(ColumnSchema cs : sDss2.getColumns()){
             ColumnSchema dup = cs.duplicate();
             dup.setPropertyName(cs.getPropertyName());
             if(!dss.existColumn(cs.getPropertyName())) {
@@ -243,29 +247,27 @@ public abstract class DataPacketUtil {
             }
         }
         sourceSchema.putDataSetSchema(dss);
-        return sourceSchema;
     }
 
-    public static DataPacketSchema calcSchemaJoin(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
-        return mergeTwoSchemaJoin(sourceSchema, bizOptJson, ":join");
+    private static void calcSchemaJoin(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
+        mergeTwoSchemaJoin(sourceSchema, bizOptJson, ":join");
     }
 
-    public static DataPacketSchema calcSchemaUnion(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
-        return mergeTwoSchemaJoin(sourceSchema, bizOptJson, ":union");
+    private static void calcSchemaUnion(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
+        mergeTwoSchemaJoin(sourceSchema, bizOptJson, ":union");
     }
 
-    public static DataPacketSchema calcSchemaStatic(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
-        String targetDSName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourceSchema.getPacketName());
+    private static void calcSchemaStatic(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourceSchema.getPacketName());
         JSONArray ja = bizOptJson.getJSONArray("data");
-        DataSet destDS = BizOptUtils.castObjectToDataSet(ja);
-        List<String> fields = DBBatchUtils.achieveAllFields(destDS.getData());
-        DataSetSchema dss = new DataSetSchema(targetDSName);
+        DataSet destDs = BizOptUtils.castObjectToDataSet(ja);
+        List<String> fields = DBBatchUtils.achieveAllFields(destDs.getData());
+        DataSetSchema dss = new DataSetSchema(targetDsName);
 
         for(String s : fields){
             dss.addColumn(new ColumnSchema(s));
         }
         sourceSchema.putDataSetSchema(dss);
-        return sourceSchema;
     }
 
 }

@@ -9,6 +9,9 @@ import com.centit.product.dataopt.core.BizOptFlow;
 import com.centit.product.dataopt.core.BizSupplier;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * @author zhf
+ */
 public abstract class BizOptFlowUtil {
 
     public static int runDataExchange(
@@ -34,7 +37,7 @@ public abstract class BizOptFlowUtil {
         return createOptFlow(bizSupplier, JSONObject.parseObject(optDescJson));
     }
 
-    public static BizOptFlow createOptFlow(BizSupplier bizSupplier, JSONObject optJson){
+    private static BizOptFlow createOptFlow(BizSupplier bizSupplier, JSONObject optJson){
         return new BizOptFlow().setSupplier(bizSupplier)
             .addOperation(new BuiltInOperation(optJson));
     }

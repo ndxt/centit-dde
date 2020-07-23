@@ -4,17 +4,22 @@ import com.centit.framework.config.SystemSpringMvcConfig;
 import com.centit.framework.config.WebConfig;
 import org.springframework.web.WebApplicationInitializer;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.validation.constraints.NotNull;
 
 /**
- * Created by zou_wy on 2017/3/29.
+ *
+ * @author zou_wy
+ * @date 2017/3/29
  */
 
 public class WebInitializer implements WebApplicationInitializer {
 
     @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
+    public void onStartup(@Nonnull ServletContext servletContext) throws ServletException {
         WebConfig.registerSpringConfig(servletContext, ServiceConfig.class);
 
         String [] servletUrlPatterns = {"/system/*","/dde/*"};
@@ -25,10 +30,8 @@ public class WebInitializer implements WebApplicationInitializer {
             "/dde/*",
             DdeSpringMvcConfig.class,SwaggerConfig.class);
 
-        WebConfig.registerSpringSessionRepositoryFilter(servletContext);
         WebConfig.registerRequestContextListener(servletContext);
         WebConfig.registerSingleSignOutHttpSessionListener(servletContext);
-        //WebConfig.registerResponseCorsFilter(servletContext);
         WebConfig.registerCharacterEncodingFilter(servletContext, servletUrlPatterns);
         WebConfig.registerHttpPutFormContentFilter(servletContext, servletUrlPatterns);
         WebConfig.registerHiddenHttpMethodFilter(servletContext, servletUrlPatterns);

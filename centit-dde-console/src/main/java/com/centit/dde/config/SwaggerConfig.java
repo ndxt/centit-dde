@@ -13,15 +13,16 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-//@Configuration
+/**
+ * @author zhf
+ */
 @EnableSwagger2
-public class
-SwaggerConfig implements WebMvcConfigurer {
+public class SwaggerConfig implements WebMvcConfigurer {
 
     @Bean
     public Docket buildDocket(){
         return new Docket(DocumentationType.SWAGGER_2)
-            .apiInfo(buildApiInf())//.pathMapping("../service")
+            .apiInfo(buildApiInf())
             .select()
             .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class) )
             //.apis(RequestHandlerSelectors.basePackage("com.centit.framework.system.controller"))//controller路径
@@ -42,7 +43,6 @@ SwaggerConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        //registry.addResourceHandler("/swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }

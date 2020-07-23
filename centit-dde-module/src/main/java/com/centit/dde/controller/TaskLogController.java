@@ -18,9 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @ClassName TaskLogController
- * @Date 2019/3/20 17:06
- * @Version 1.0
+ * @author zhf
  */
 @RestController
 @RequestMapping(value = "taskLog")
@@ -29,8 +27,11 @@ public class TaskLogController extends BaseController {
 
     private static final Log log = LogFactory.getLog(TaskLogController.class);
 
+    private final TaskLogManager taskLogManager;
     @Autowired
-    private TaskLogManager taskLogManager;
+    public TaskLogController(TaskLogManager taskLogManager) {
+        this.taskLogManager = taskLogManager;
+    }
 
     @PostMapping
     @ApiOperation(value = "新增日志")
@@ -70,7 +71,6 @@ public class TaskLogController extends BaseController {
     @ApiImplicitParam(name = "logId", value = "日志ID")
     @WrapUpResponseBody
     public TaskLog getTaskLog(@PathVariable String logId){
-        TaskLog log = taskLogManager.getLog(logId);
-        return log;
+        return taskLogManager.getLog(logId);
     }
 }

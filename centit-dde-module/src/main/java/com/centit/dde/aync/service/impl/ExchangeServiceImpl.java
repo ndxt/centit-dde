@@ -12,19 +12,26 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.concurrent.CompletableFuture;
 
+/**
+ * @author zhf
+ */
 @Service
 public class ExchangeServiceImpl implements ExchangeService {
+    private final DataPacketService dataPacketService;
+    private final TaskLogManager taskLogManager;
+    private final TaskRun taskRun;
     @Autowired
-    private DataPacketService dataPacketService;
-    @Autowired
-    private TaskLogManager taskLogManager;
-    @Autowired
-    private TaskRun taskRun;
+    public ExchangeServiceImpl(DataPacketService dataPacketService, TaskLogManager taskLogManager, TaskRun taskRun) {
+        this.dataPacketService = dataPacketService;
+        this.taskLogManager = taskLogManager;
+        this.taskRun = taskRun;
+    }
+
     @Async
     @Override
-    public BizModel runTask(String packetId) {
-//        System.out.println("=====" + Thread.currentThread().getName() + "=========");
+    public CompletableFuture<BizModel> runTask(String packetId) {
         DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
         TaskLog taskLog = new TaskLog();
         taskLog.setTaskId(packetId);
@@ -32,6 +39,6 @@ public class ExchangeServiceImpl implements ExchangeService {
         taskLog.setRunBeginTime(new Date());
         taskLog.setRunType(dataPacket.getPacketName());
         taskLogManager.createTaskLog(taskLog);
-        return taskRun.runTask(taskLog.getLogId());
+        return CompletableFuture.completedFuture(taskRun.runTask(taskLog.getLogId()));
     }
 }

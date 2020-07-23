@@ -13,10 +13,9 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
+
 /**
- * @ClassName TaskExchange
- * @Date 2019/3/20 9:21
- * @Version 1.0
+ * @author zhf
  */
 @Data
 @Entity
@@ -40,12 +39,10 @@ public class TaskLog implements java.io.Serializable {
     private String applicationId;
     @Column(name="RUN_BEGIN_TIME")
     @ApiModelProperty(value = "执行开始时间")
-    //@ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date runBeginTime;
 
     @Column(name="RUN_END_TIME")
     @ApiModelProperty(value = "执行结束时间")
-    //@ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date runEndTime;
 
     @Column(name="RUN_TYPE")

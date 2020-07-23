@@ -8,22 +8,27 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+/**
+ * @author zhf
+ */
 @Configuration
 public class QuartzConfig {
+    private final PathConfig pathConfig;
+    @Autowired
+    public QuartzConfig(PathConfig pathConfig) {
+        this.pathConfig = pathConfig;
+    }
 
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() {
-        SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
-
-        return schedulerFactoryBean;
+        return new SchedulerFactoryBean();
     }
 
     @Bean
     public Scheduler scheduler() {
         return schedulerFactoryBean().getScheduler();
     }
-    @Autowired
-    public PathConfig pathConfig;
+
     @Bean
     public OperationLogWriter operationLogWriter() {
         TextOperationLogWriterImpl textOperationLogWriter

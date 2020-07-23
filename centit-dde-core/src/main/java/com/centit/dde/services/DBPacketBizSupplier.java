@@ -15,6 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+/**
+ * @author zhf
+ */
 public class DBPacketBizSupplier implements BizSupplier {
 
     private DataPacket dbPacket;
@@ -44,11 +47,11 @@ public class DBPacketBizSupplier implements BizSupplier {
             for (DataSetDefine rdd : this.dbPacket.getDataSetDefines()) {
                 switch (rdd.getSetType()) {
                     case "D": {
-                        SQLDataSetReader sqlDSR = new SQLDataSetReader();
-                        sqlDSR.setDataSource(DataSourceDescription.valueOf(
+                        SQLDataSetReader sqlDsr = new SQLDataSetReader();
+                        sqlDsr.setDataSource(DataSourceDescription.valueOf(
                             integrationEnvironment.getDatabaseInfo(rdd.getDatabaseCode())));
-                        sqlDSR.setSqlSen(rdd.getQuerySQL());
-                        SimpleDataSet dataset = sqlDSR.load(modelTag);
+                        sqlDsr.setSqlSen(rdd.getQuerySQL());
+                        SimpleDataSet dataset = sqlDsr.load(modelTag);
                         dataset.setDataSetName(rdd.getQueryName());
                         dataSets.put(rdd.getQueryId(), dataset);
                         break;

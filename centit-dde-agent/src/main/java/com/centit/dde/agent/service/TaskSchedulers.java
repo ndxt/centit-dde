@@ -25,49 +25,54 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author zhf
+ */
 @Service
 public class TaskSchedulers {
-    @Autowired
-    private DataPacketDao dataPacketDao;
+    private final DataPacketDao dataPacketDao;
 
-    @Autowired
-    private Scheduler scheduler;
+    private final Scheduler scheduler;
 
+    private final OperationLogWriter operationLogWriter;
+    private String taskMd5;
     @Autowired
-    private OperationLogWriter operationLogWriter;
-    private String taskMD5;
-    private boolean isEqualMD5(List<DataPacket> list){
+    public TaskSchedulers(DataPacketDao dataPacketDao, Scheduler scheduler, OperationLogWriter operationLogWriter) {
+        this.dataPacketDao = dataPacketDao;
+        this.scheduler = scheduler;
+        this.operationLogWriter = operationLogWriter;
+    }
+
+    private boolean isEqualMd5(List<DataPacket> list){
         boolean result = false;
-        String sList = "";
+        StringBuilder sList = new StringBuilder();
         for(DataPacket i:list){
-           sList += i.getTaskCron();
+           sList.append(i.getTaskCron());
         }
-        String taskMD5="";
+        String taskMd5 ="";
         try {
-            MessageDigest MD5 = MessageDigest.getInstance("MD5");
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
             byte[] buffer = new byte[8192];
             int length;
-            InputStream is =new ByteArrayInputStream(sList.getBytes());
+            InputStream is =new ByteArrayInputStream(sList.toString().getBytes());
             while ((length = is.read(buffer)) != -1) {
-                MD5.update(buffer, 0, length);
+                md5.update(buffer, 0, length);
             }
-            taskMD5=new String(Hex.encodeHex(MD5.digest()));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+            taskMd5 =new String(Hex.encodeHex(md5.digest()));
+        } catch (NoSuchAlgorithmException | IOException e) {
             e.printStackTrace();
         }
-        if (taskMD5.equals(this.taskMD5)) {
+        if (taskMd5 .equals(this.taskMd5)) {
             result = true;
         } else {
-            this.taskMD5 = taskMD5;
+            this.taskMd5 = taskMd5 ;
         }
         return result;
     }
     private void refreshTask() throws SchedulerException {
         List<DataPacket> list = dataPacketDao.listObjectsByProperties(
             CollectionsOpt.createHashMap("taskType","2","isValid","T"));
-        if (isEqualMD5(list)) {
+        if (isEqualMd5(list)) {
             return;
         }
         Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup());
@@ -81,9 +86,6 @@ public class TaskSchedulers {
                if (tKey.getName().equals(ll.getPacketId())){
                    i++;
                    CronTrigger quatrzTrigger = (CronTrigger)scheduler.getTrigger(tKey);
-//                   JobKey jobKey =quatrzTrigger.getJobKey();
-//                   JobDetail jobDetail=scheduler.getJobDetail(jobKey);
-//                   String json = (String) jobDetail.getJobDataMap().get("jsonExchange");
                    if (!(quatrzTrigger.getCronExpression().equals(ll.getTaskCron()))){
                        QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getPacketId(), ll.getPacketName(), "task", ll.getTaskCron(),
                            CollectionsOpt.createHashMap("taskExchange", ll));
@@ -118,8 +120,8 @@ public class TaskSchedulers {
         QuartzJobUtils.registerJobType("task", RunTaskJob.class);
         scheduler.start();
     }
-
-    @Scheduled(fixedDelay = 1000 * 50)//5minute
+    /** 5minute */
+    @Scheduled(fixedDelay = 1000 * 50)
     public void work() throws SchedulerException {
         refreshTask();
     }

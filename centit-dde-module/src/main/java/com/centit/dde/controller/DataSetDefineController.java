@@ -13,23 +13,28 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author zhf
+ */
 @Api(value = "数据集查询", tags = "数据集查询")
 @RestController
 @RequestMapping(value = "query")
 public class DataSetDefineController extends BaseController {
 
+    private final DataSetDefineService dataSetDefineService;
     @Autowired
-    private DataSetDefineService dataSetDefineService;
+    public DataSetDefineController(DataSetDefineService dataSetDefineService) {
+        this.dataSetDefineService = dataSetDefineService;
+    }
 
     @ApiOperation(value = "新增数据集")
     @PostMapping
@@ -45,7 +50,6 @@ public class DataSetDefineController extends BaseController {
     @WrapUpResponseBody
     public void updateDbQuery(@PathVariable String queryId, DataSetDefine dataSetDefine){
         dataSetDefine.setQueryId(queryId);
-        //dataSetDefine.setQuerySql(HtmlUtils.htmlUnescape(dataResource.getQuerySql()));
         dataSetDefineService.updateDbQuery(dataSetDefine);
     }
 
@@ -60,7 +64,7 @@ public class DataSetDefineController extends BaseController {
     @GetMapping
     @WrapUpResponseBody
     public PageQueryResult<DataSetDefine> listDbQuery(PageDesc pageDesc){
-        List<DataSetDefine> list = dataSetDefineService.listDbQuery(new HashMap<>(), pageDesc);
+        List<DataSetDefine> list = dataSetDefineService.listDbQuery(null, pageDesc);
         return PageQueryResult.createResult(list, pageDesc);
     }
 
@@ -79,8 +83,7 @@ public class DataSetDefineController extends BaseController {
     @RequestMapping(value = "/reviewdata", method = {RequestMethod.POST})
     @WrapUpResponseBody
     public JSONArray queryViewSqlData(String databaseCode, String sql, HttpServletRequest request){
-        Map<String, Object> params = collectRequestParameters(request);;
-        //table.put("column", dataSetDefineService.generateColumn(databaseCode, HtmlUtils.htmlUnescape(sql)));
+        Map<String, Object> params = collectRequestParameters(request);
         return dataSetDefineService.queryViewSqlData(databaseCode, sql, params);
     }
 

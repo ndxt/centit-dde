@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * @author zhf
+ */
 @ApiModel
 @Data
 @NoArgsConstructor
@@ -88,16 +91,6 @@ public class DataSetDefine implements Serializable {
     @JSONField(serialize = false)
     private Date recordDate;
 
-    /**
-     * 字段名 描述
-     */
-    /*@ApiModelProperty(value = "sql语句字段名定义信息，是一个json格式的字符串")
-    @Column(name = "FIELD_NAMES_JSON")
-    private String fieldNamesJSON;
-
-
-    @Transient
-    private Map<String, String> fieldNames;*/
     @OneToMany(targetEntity = DataSetColumnDesc.class)
     @JoinColumn(name = "queryId", referencedColumnName = "queryId")
     private List<DataSetColumnDesc> columns;

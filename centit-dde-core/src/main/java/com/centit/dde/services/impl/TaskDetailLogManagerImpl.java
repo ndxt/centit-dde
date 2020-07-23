@@ -5,31 +5,25 @@ import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.services.TaskDetailLogManager;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import com.centit.support.database.utils.PageDesc;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author zhf
+ */
 @Service
-@Transactional
-public class TaskDetailLogManagerImpl extends BaseEntityManagerImpl<TaskDetailLog,Long,TaskDetailLogDao> implements TaskDetailLogManager {
+@Transactional(rollbackFor = Exception.class)
+public class TaskDetailLogManagerImpl extends BaseEntityManagerImpl<TaskDetailLog, Long, TaskDetailLogDao> implements TaskDetailLogManager {
 
-    public static final Log log = LogFactory.getLog(TaskDetailLogManager.class);
+    private final TaskDetailLogDao taskDetailLogDao;
 
     @Autowired
-    private TaskDetailLogDao taskDetailLogDao;
-
-    @Resource(name="taskDetailLogDao")
-    @NotNull
-    public void setTaskDetailLogDao(TaskDetailLogDao baseDao) {
-        this.taskDetailLogDao = baseDao;
-        setBaseDao(this.taskDetailLogDao);
+    public TaskDetailLogManagerImpl(TaskDetailLogDao taskDetailLogDao) {
+        this.taskDetailLogDao = taskDetailLogDao;
     }
 
 
@@ -40,7 +34,7 @@ public class TaskDetailLogManagerImpl extends BaseEntityManagerImpl<TaskDetailLo
 
     @Override
     public List<TaskDetailLog> listTaskDetailLog(Map<String, Object> param, PageDesc pageDesc) {
-        return this.taskDetailLogDao.listObjectsByProperties(param,pageDesc);
+        return this.taskDetailLogDao.listObjectsByProperties(param, pageDesc);
     }
 
     @Override

@@ -25,6 +25,7 @@ import java.util.Map;
  * 需要设置的参数有：
  *      数据库连接信息 DatabaseInfo
  *      对应的表信息 SimpleTableInfo
+ * @author zhf
  */
 public class KeyValueTableReader implements DataSetReader {
 

@@ -25,20 +25,25 @@ import java.sql.*;
 import java.util.Date;
 import java.util.*;
 
+/**
+ * @author zhf
+ */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class DataSetDefineServiceImpl implements DataSetDefineService {
 
     private static final Logger logger = LoggerFactory.getLogger(DataSetDefineServiceImpl.class);
-
     @Autowired(required = false)
-    private FileStore fileStore;
+    private  FileStore fileStore;
 
-    @Autowired
-    private DataSetDefineDao resourceColumnDao;
+    private final DataSetDefineDao resourceColumnDao;
 
+    private final IntegrationEnvironment integrationEnvironment;
     @Autowired
-    private IntegrationEnvironment integrationEnvironment;
+    public DataSetDefineServiceImpl( DataSetDefineDao resourceColumnDao, IntegrationEnvironment integrationEnvironment) {
+        this.resourceColumnDao = resourceColumnDao;
+        this.integrationEnvironment = integrationEnvironment;
+    }
 
     @Override
     public void createDbQuery(DataSetDefine dataSetDefine) {

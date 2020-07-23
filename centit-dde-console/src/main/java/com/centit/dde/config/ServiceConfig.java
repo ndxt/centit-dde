@@ -5,8 +5,6 @@ import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.config.SpringSecurityDaoConfig;
 import com.centit.framework.ip.app.config.IPOrStaticAppSystemBeanConfig;
-import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.framework.ip.service.impl.JsonIntegrationEnvironment;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
@@ -17,6 +15,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 
+/**
+ * @author zhf
+ */
 @EnableAsync
 @EnableScheduling
 @Import({IPOrStaticAppSystemBeanConfig.class,
@@ -43,7 +44,7 @@ public class ServiceConfig {
     public NotificationCenter notificationCenter() {
         NotificationCenterImpl notificationCenter = new NotificationCenterImpl();
         notificationCenter.initDummyMsgSenders();
-        //notificationCenter.registerMessageSender("innerMsg",innerMessageManager);
+        ///notificationCenter.registerMessageSender("innerMsg",innerMessageManager);
         return notificationCenter;
     }
 
@@ -56,10 +57,7 @@ public class ServiceConfig {
         return operationLog;
     }
 
-    @Bean
-    public InstantiationServiceBeanPostProcessor instantiationServiceBeanPostProcessor() {
-        return new InstantiationServiceBeanPostProcessor();
-    }
+
 
 
 }

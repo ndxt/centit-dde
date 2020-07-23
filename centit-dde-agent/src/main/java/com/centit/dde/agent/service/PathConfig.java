@@ -3,6 +3,9 @@ package com.centit.dde.agent.service;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author zhf
+ */
 @Component
 @ConfigurationProperties(prefix="centit")
 public class PathConfig {

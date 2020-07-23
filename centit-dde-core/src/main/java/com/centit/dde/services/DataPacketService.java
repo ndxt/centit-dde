@@ -9,11 +9,11 @@ import com.centit.support.database.utils.PageDesc;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author zhf
+ */
 public interface DataPacketService {
 
-    /**
-     * 新增数据包
-     */
     void createDataPacket(DataPacket dataPacket);
 
     void updateDataPacket(DataPacket dataPacket);

@@ -4,14 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.aync.service.ExchangeService;
-import com.centit.dde.datamoving.service.TaskRun;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataSetColumnDesc;
 import com.centit.dde.po.DataSetDefine;
-import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.services.DataSetDefineService;
-import com.centit.dde.services.TaskLogManager;
 import com.centit.dde.utils.DataPacketUtil;
 import com.centit.dde.vo.DataPacketSchema;
 import com.centit.fileserver.common.FileStore;
@@ -35,41 +32,45 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
+/**
+ * @author zhf
+ */
 @Api(value = "数据包", tags = "数据包")
 @RestController
 @RequestMapping(value = "packet")
 public class DataPacketController extends BaseController {
 
     @Autowired(required = false)
-    private FileStore fileStore;
+    private  FileStore fileStore;
 
-    @Autowired
-    private DataPacketService dataPacketService;
+    private final DataPacketService dataPacketService;
 
-    @Autowired
-    private DataSetDefineService dataSetDefineService;
+    private final DataSetDefineService dataSetDefineService;
 
-    @Autowired
-    private IntegrationEnvironment integrationEnvironment;
-    @Autowired
-    private ExchangeService exchangeService;
+    private final IntegrationEnvironment integrationEnvironment;
+    private final ExchangeService exchangeService;
+
+    public DataPacketController( DataPacketService dataPacketService, DataSetDefineService dataSetDefineService, IntegrationEnvironment integrationEnvironment, ExchangeService exchangeService) {
+        this.dataPacketService = dataPacketService;
+        this.dataSetDefineService = dataSetDefineService;
+        this.integrationEnvironment = integrationEnvironment;
+        this.exchangeService = exchangeService;
+    }
+
     @ApiOperation(value = "新增数据包")
     @PostMapping
     @WrapUpResponseBody
     public void createDataPacket(@RequestBody DataPacket dataPacket, HttpServletRequest request) {
-        String userCode = WebOptUtils.getCurrentUserCode(request);
-        dataPacket.setRecorder(userCode);
+        dataPacket.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacket.setDataOptDescJson(dataPacket.getDataOptDescJson());
         dataPacketService.createDataPacket(dataPacket);
     }
@@ -183,8 +184,7 @@ public class DataPacketController extends BaseController {
                                                @RequestBody JSONObject optsteps,
                                                HttpServletRequest request) {
         Map<String, Object> params = BaseController.collectRequestParameters(request);
-        BizModel bizModel = null;
-        //optsteps =StringEscapeUtils.unescapeHtml4(optsteps);
+        BizModel bizModel;
         if (optsteps.isEmpty()) {
             bizModel = dataPacketService.fetchDataPacketData(packetId, params);
         } else {
@@ -197,9 +197,9 @@ public class DataPacketController extends BaseController {
         return bizModel;
     }
 
-    private BizModel getBizModel(String datasets, BizModel bizModel) {
-        if (StringUtils.isNotBlank(datasets)) {
-            String[] dss = datasets.split(",");
+    private BizModel getBizModel(String dataSets, BizModel bizModel) {
+        if (StringUtils.isNotBlank(dataSets)) {
+            String[] dss = dataSets.split(",");
             SimpleBizModel dup = new SimpleBizModel(bizModel.getModelName());
             dup.setModelTag(bizModel.getModelTag());
             Map<String, DataSet> dataMap = new HashMap<>(dss.length + 1);
@@ -220,7 +220,7 @@ public class DataPacketController extends BaseController {
         paramType = "path", dataType = "String")
     @GetMapping(value = "/dbquery/{queryId}")
     @WrapUpResponseBody
-    public SimpleDataSet fetchDBQueryData(@PathVariable String queryId, HttpServletRequest request) {
+    public SimpleDataSet fetchDbQueryData(@PathVariable String queryId, HttpServletRequest request) {
 
         Map<String, Object> params = collectRequestParameters(request);
 
@@ -235,14 +235,12 @@ public class DataPacketController extends BaseController {
 //                }
                 params.put("currentUser", WebOptUtils.getCurrentUserInfo(request));
                 params.put("currentUnitCode", WebOptUtils.getCurrentUnitCode(request));
-                SQLDataSetReader sqlDSR = new SQLDataSetReader();
-                sqlDSR.setDataSource(DataSourceDescription.valueOf(
+                SQLDataSetReader sqlDsr = new SQLDataSetReader();
+                sqlDsr.setDataSource(DataSourceDescription.valueOf(
                     integrationEnvironment.getDatabaseInfo(query.getDatabaseCode())));
-                sqlDSR.setSqlSen(query.getQuerySQL());
-                if (params != null) {
-                    modelTag.putAll(params);
-                }
-                SimpleDataSet simpleDataSet = sqlDSR.load(modelTag);
+                sqlDsr.setSqlSen(query.getQuerySQL());
+                modelTag.putAll(params);
+                SimpleDataSet simpleDataSet = sqlDsr.load(modelTag);
                 simpleDataSet.setDataSetName(query.getQueryName());
                 return simpleDataSet;
             case "E":
@@ -269,7 +267,7 @@ public class DataPacketController extends BaseController {
     @GetMapping(value = "/run/{packetId}")
     @ApiOperation(value = "立即执行任务")
     @WrapUpResponseBody
-    public BizModel runTaskExchange(@PathVariable String packetId) {
+    public CompletableFuture<BizModel> runTaskExchange(@PathVariable String packetId) {
         return exchangeService.runTask(packetId);
     }
 
@@ -278,15 +276,11 @@ public class DataPacketController extends BaseController {
     @ApiOperation(value = "接口名称是否已存在")
     @WrapUpResponseBody
     public Boolean isExist(@PathVariable String applicationId, @PathVariable String interfaceName) {
-        Map<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>(10);
         params.put("interfaceName", interfaceName);
         params.put("applicationId", applicationId);
         List<DataPacket> list = dataPacketService.listDataPacket(params, new PageDesc());
-        if (list.size() > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return list.size() > 0;
     }
 
     @GetMapping(value = "/{applicationId}/{interfaceName}/{sourceName}")
@@ -295,7 +289,7 @@ public class DataPacketController extends BaseController {
     public DataSet getData(@PathVariable String applicationId, @PathVariable String interfaceName,
                            @PathVariable String sourceName, HttpServletRequest request) {
         Map<String, Object> params = BaseController.collectRequestParameters(request);
-        Map<String, Object> params2 = new HashMap<>();
+        Map<String, Object> params2 = new HashMap<>(10);
         params2.put("interfaceName", interfaceName);
         params2.put("applicationId", applicationId);
         List<DataPacket> list = dataPacketService.listDataPacket(params2, new PageDesc());

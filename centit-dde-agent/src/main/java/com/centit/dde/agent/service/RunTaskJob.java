@@ -6,14 +6,15 @@ import com.centit.dde.po.TaskLog;
 import com.centit.support.quartz.AbstractQuartzJob;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-
 import java.io.IOException;
 import java.util.Date;
 
-
+/**
+ * @author zhf
+ */
 public class RunTaskJob extends AbstractQuartzJob {
     private DataPacket dataPacket;
+
     public RunTaskJob() {
     }
 
@@ -24,11 +25,9 @@ public class RunTaskJob extends AbstractQuartzJob {
     }
 
     @Override
-    protected boolean runRealJob(JobExecutionContext context) throws JobExecutionException {
-        //System.out.println(this.taskExchange.getTaskId());
+    protected boolean runRealJob(JobExecutionContext context) {
 
-//TODO 生成logid,使用command调用datamoving jar包
-        TaskLogDao taskLogDao =ContextUtils.getBean(TaskLogDao.class);
+        TaskLogDao taskLogDao = ContextUtils.getBean(TaskLogDao.class);
         TaskLog taskLog = new TaskLog();
         taskLog.setTaskId(this.dataPacket.getPacketId());
         taskLog.setApplicationId(this.dataPacket.getApplicationId());
@@ -37,7 +36,7 @@ public class RunTaskJob extends AbstractQuartzJob {
         taskLogDao.saveNewObject(taskLog);
         PathConfig pathConfig = ContextUtils.getBean(PathConfig.class);
         try {
-            Process p = Runtime.getRuntime().exec("java -jar "+pathConfig.getDataMovingPath()+" "+taskLog.getLogId());
+            Runtime.getRuntime().exec("java -jar " + pathConfig.getDataMovingPath() + " " + taskLog.getLogId());
 //            //取得命令结果的输出流
 //            InputStream fis=p.getInputStream();
 //            //用一个读输出流类去读

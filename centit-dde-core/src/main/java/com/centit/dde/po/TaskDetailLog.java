@@ -15,6 +15,9 @@ import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 
+/**
+ * @author zhf
+ */
 @Data
 @Entity
 @Table(name="D_TASK_DETAIL_LOG")

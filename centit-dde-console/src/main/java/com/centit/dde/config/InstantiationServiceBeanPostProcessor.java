@@ -8,31 +8,42 @@ import com.centit.framework.model.adapter.OperationLogWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Nullable;
 
 /**
- * Created by codefan on 17-7-6.
+ *
+ * @author codefan
+ * @date 17-7-6
  */
+@Component
 public class InstantiationServiceBeanPostProcessor implements ApplicationListener<ContextRefreshedEvent>
 {
 
-    @Autowired
-    protected NotificationCenter notificationCenter;
+    private final NotificationCenter notificationCenter;
 
-    @Autowired
-    private OperationLogWriter optLogManager;
+    private final OperationLogWriter optLogManager;
 
-    @Autowired(required = false)
-    private MessageSender innerMessageManager;
+    private final MessageSender innerMessageManager;
+    @Autowired
+    public InstantiationServiceBeanPostProcessor(NotificationCenter notificationCenter, OperationLogWriter optLogManager, MessageSender innerMessageManager) {
+        this.notificationCenter = notificationCenter;
+        this.optLogManager = optLogManager;
+        this.innerMessageManager = innerMessageManager;
+    }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event)
+    public void onApplicationEvent(@Nullable ContextRefreshedEvent event)
     {
         InitialWebRuntimeEnvironment.configFastjson();
 
-        if(innerMessageManager!=null)
+        if(innerMessageManager!=null) {
             notificationCenter.registerMessageSender("innerMsg", innerMessageManager);
-        if(optLogManager!=null)
+        }
+        if(optLogManager!=null) {
             OperationLogCenter.registerOperationLogWriter(optLogManager);
+        }
     }
 
 }

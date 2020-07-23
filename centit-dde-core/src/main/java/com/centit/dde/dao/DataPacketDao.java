@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 
+/**
+ * @author zhf
+ */
 @Repository
 public class DataPacketDao extends BaseDaoImpl<DataPacket, String> {
     @Override
