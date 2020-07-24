@@ -49,8 +49,11 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping(value = "packet")
 public class DataPacketController extends BaseController {
 
-    @Autowired(required = false)
     private  FileStore fileStore;
+    @Autowired(required = false)
+    public void setFileStore(FileStore fileStore) {
+        this.fileStore = fileStore;
+    }
 
     private final DataPacketService dataPacketService;
 

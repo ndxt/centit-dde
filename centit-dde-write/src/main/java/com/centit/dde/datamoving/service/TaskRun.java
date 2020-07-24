@@ -15,10 +15,12 @@ import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.product.dataopt.core.BizModel;
 import com.centit.product.dataopt.core.DataSet;
 import com.centit.product.metadata.service.MetaDataService;
+import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.json.JSONOpt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -33,12 +35,16 @@ public class TaskRun {
     private final MetaDataService metaDataService;
     private final IntegrationEnvironment integrationEnvironment;
     private final DatabaseBizOperation databaseBizOperation;
-    @Autowired(required = false)
     private  FileStore fileStore;
+    @Autowired(required = false)
+    public void setFileStore(FileStore fileStore) {
+        this.fileStore = fileStore;
+    }
     private BizModel bizModel;
     private TaskLog taskLog;
     private Date beginTime;
     private TaskDetailLog detailLog;
+
     @Autowired
     public TaskRun( TaskLogDao taskLogDao, TaskDetailLogDao taskDetailLogDao, DataPacketDao dataPacketDao, MetaDataService metaDataService, IntegrationEnvironment integrationEnvironment, DatabaseBizOperation databaseBizOperation) {
         this.taskLogDao = taskLogDao;
@@ -47,6 +53,8 @@ public class TaskRun {
         this.metaDataService = metaDataService;
         this.integrationEnvironment = integrationEnvironment;
         this.databaseBizOperation = databaseBizOperation;
+        this.taskLog = new TaskLog();
+        this.detailLog = new TaskDetailLog();
     }
 
 
@@ -80,19 +88,25 @@ public class TaskRun {
     }
 
 
-    private void saveDetail(JSONObject runJSON, String error) {
+    private void saveDetail(JSONObject runJson, String error) {
         detailLog.setRunBeginTime(beginTime);
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
-        detailLog.setLogType(runJSON.getString("operation") + ":" + runJSON.getString("source"));
-        DataSet dataSet = bizModel.fetchDataSetByName(runJSON.getString("source"));
+        detailLog.setLogType(runJson.getString("operation") + ":" + runJson.getString("source"));
+        DataSet dataSet = bizModel.fetchDataSetByName(runJson.getString("source"));
         detailLog.setLogInfo(error);
-        if ("ok".equals(detailLog.getLogInfo())) {
-            detailLog.setSuccessPieces((long) dataSet.getData().size());
-        } else {
-            detailLog.setErrorPieces((long) dataSet.getData().size());
+        String successSign = "ok";
+        if(dataSet!=null) {
+            if (successSign.equals(detailLog.getLogInfo())) {
+                detailLog.setSuccessPieces((long) dataSet.getData().size());
+            } else {
+                detailLog.setErrorPieces((long) dataSet.getData().size());
+            }
+        } else{
+            detailLog.setLogInfo(error+";无对应数据集"+runJson.getString("source"));
         }
         detailLog.setRunEndTime(new Date());
+        detailLog.setLogDetailId(UuidOpt.getUuidAsString32());
         taskDetailLogDao.saveNewObject(detailLog);
     }
 
