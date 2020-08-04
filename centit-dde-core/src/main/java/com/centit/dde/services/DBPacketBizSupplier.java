@@ -23,9 +23,10 @@ public class DBPacketBizSupplier implements BizSupplier {
     private DataPacket dbPacket;
     private IntegrationEnvironment integrationEnvironment;
     private Map<String, Object> queryParams;
-
+    private boolean batchWise;
     private FileStore fileStore;
-    public DBPacketBizSupplier(DataPacket dbPacket){
+
+    public DBPacketBizSupplier(DataPacket dbPacket) {
         this.dbPacket = dbPacket;
     }
 
@@ -37,13 +38,13 @@ public class DBPacketBizSupplier implements BizSupplier {
     @Override
     public BizModel get() {
         SimpleBizModel bizModel = new SimpleBizModel(this.dbPacket.getPacketName());
-        Map<String, DataSet> dataSets = new HashMap<>(this.dbPacket.getDataSetDefines()!=null ?
-            this.dbPacket.getDataSetDefines().size()+1 : 1);
+        Map<String, DataSet> dataSets = new HashMap<>(this.dbPacket.getDataSetDefines() != null ?
+            this.dbPacket.getDataSetDefines().size() + 1 : 1);
         Map<String, Object> modelTag = this.dbPacket.getPacketParamsValue();
-        if(queryParams!=null && queryParams.size()>0) {
+        if (queryParams != null && queryParams.size() > 0) {
             modelTag.putAll(queryParams);
         }
-        if (this.dbPacket.getDataSetDefines() !=null && this.dbPacket.getDataSetDefines().size() >0) {
+        if (this.dbPacket.getDataSetDefines() != null && this.dbPacket.getDataSetDefines().size() > 0) {
             for (DataSetDefine rdd : this.dbPacket.getDataSetDefines()) {
                 switch (rdd.getSetType()) {
                     case "D": {
@@ -113,6 +114,7 @@ public class DBPacketBizSupplier implements BizSupplier {
     public void setFileStore(FileStore fileStore) {
         this.fileStore = fileStore;
     }
+
     /**
      * 业务数据是否是 批量的
      * 如果是，处理器将反复调用 。知道 get() 返回 null 结束
@@ -121,7 +123,10 @@ public class DBPacketBizSupplier implements BizSupplier {
      */
     @Override
     public boolean isBatchWise() {
-        return false;
+        return this.batchWise;
     }
 
+    public void setBatchWise(boolean batchWise) {
+        this.batchWise = batchWise;
+    }
 }

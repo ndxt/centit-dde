@@ -38,7 +38,6 @@ public class DataMovingApplication {
         }
         ConfigurableApplicationContext context = SpringApplication.run(DataMovingApplication.class, args);
         TaskRun taskRun = context.getBean(TaskRun.class);
-        BizModel bizModel = taskRun.runTask(args[0]);
-        System.out.println(bizModel.getModelName());
+        taskRun.runTask(args[0]);
     }
 }

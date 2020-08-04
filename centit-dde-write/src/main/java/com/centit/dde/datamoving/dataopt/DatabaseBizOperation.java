@@ -1,5 +1,6 @@
 package com.centit.dde.datamoving.dataopt;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
@@ -12,6 +13,7 @@ import com.centit.product.dataopt.dataset.CsvDataSet;
 import com.centit.product.dataopt.dataset.ExcelDataSet;
 import com.centit.product.dataopt.dataset.FileDataSet;
 import com.centit.product.dataopt.dataset.SQLDataSetWriter;
+import com.centit.product.dataopt.utils.DataSetOptUtil;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
@@ -22,6 +24,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author zhf
@@ -40,7 +44,21 @@ public class DatabaseBizOperation extends BuiltInOperation {
     public DatabaseBizOperation(JSONObject bizOptJson) {
         this.bizOptJson = bizOptJson;
     }
-
+    @Override
+    @JdbcTransaction
+    public BizModel apply(BizModel bizModel) {
+        JSONArray optSteps = bizOptJson.getJSONArray("steps");
+        if(optSteps==null || optSteps.isEmpty()){
+            return bizModel;
+        }
+        BizModel result = bizModel;
+        for(Object step : optSteps){
+            if(step instanceof JSONObject){
+                runOneStep(result, (JSONObject)step);
+            }
+        }
+        return result;
+    }
     private BizModel runPersistence(BizModel bizModel, JSONObject bizOptJson) {
         String dataType = getJsonFieldString(bizOptJson, "dataType", "D");
         switch (dataType) {
@@ -57,7 +75,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
 
     }
 
-    @JdbcTransaction
+
     private BizModel writeDatabase(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String databaseCode = getJsonFieldString(bizOptJson, "databaseCode", null);
@@ -78,7 +96,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 ObjectException.NULL_EXCEPTION,
                 "数据库信息无效：" + databaseCode);
         }
-        runMap(bizModel, bizOptJson);
+        runPersistenceMap(bizModel, bizOptJson);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet == null) {
             throw new ObjectException(bizOptJson,
@@ -107,6 +125,23 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 break;
         }
         return bizModel;
+    }
+
+    private void runPersistenceMap(BizModel bizModel, JSONObject bizOptJson) {
+        String sourDsName = getJsonFieldString(bizOptJson,"source", bizModel.getModelName());
+        String targetDsName = getJsonFieldString(bizOptJson, "target", sourDsName);
+        Object mapInfo = bizOptJson.get("fieldsMap");
+        if(mapInfo instanceof Map){
+            DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+            HashMap<Object, Object> map=new HashMap<>(((Map) mapInfo).size()+1);
+            ((Map) mapInfo).forEach((key,value)->map.put(value,key));
+            if(dataSet != null) {
+                DataSet destDs = DataSetOptUtil.appendDeriveField(dataSet, ((Map) map).entrySet());
+                //if(destDS != null){
+                bizModel.putDataSet(targetDsName, destDs);
+                //}
+            }
+        }
     }
 
     private BizModel writeCsvFile(BizModel bizModel, JSONObject bizOptJson) {

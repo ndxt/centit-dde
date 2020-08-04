@@ -3,6 +3,8 @@ package com.centit.dde.po;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.core.dao.DictionaryMap;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.database.orm.GeneratorCondition;
 import com.centit.support.database.orm.GeneratorTime;
 import com.centit.support.database.orm.GeneratorType;
@@ -107,6 +109,9 @@ public class DataPacket implements Serializable {
     @Column(name = "IS_VALID")
     @ApiModelProperty(value = "是否启用", required = true)
     private Boolean isValid;
+    @Column(name = "IS_WHILE")
+    @ApiModelProperty(value = "是否循环", required = true)
+    private Boolean isWhile;
 
     @ApiModelProperty(value = "业务特殊处理脚本")
     @Column(name = "EXTEND_OPT_JS")
@@ -143,7 +148,17 @@ public class DataPacket implements Serializable {
             return params;
         }
         for (DataPacketParam packetParam : packetParams) {
-            params.put(packetParam.getParamName(), packetParam.getParamDefaultValue());
+            switch (packetParam.getParamType()) {
+                case "N":
+                    params.put(packetParam.getParamName(), NumberBaseOpt.castObjectToLong(packetParam.getParamDefaultValue()));
+                    break;
+                case "T":
+                    params.put(packetParam.getParamName(), DatetimeOpt.castObjectToSqlDate(packetParam.getParamDefaultValue()));
+                    break;
+                default:
+                    params.put(packetParam.getParamName(), packetParam.getParamDefaultValue());
+                    break;
+            }
         }
         return params;
     }

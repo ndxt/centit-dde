@@ -1,0 +1,1 @@
+alter table q_data_packet add  column  is_while varchar(64) default 'F';

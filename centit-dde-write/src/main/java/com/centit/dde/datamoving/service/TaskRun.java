@@ -1,26 +1,23 @@
 package com.centit.dde.datamoving.service;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.datamoving.dataopt.DatabaseBizOperation;
+import com.centit.dde.datamoving.utils.BizOptFlowUtil;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.DBPacketBizSupplier;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.product.dataopt.core.BizModel;
-import com.centit.product.dataopt.core.DataSet;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.json.JSONOpt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -35,18 +32,20 @@ public class TaskRun {
     private final MetaDataService metaDataService;
     private final IntegrationEnvironment integrationEnvironment;
     private final DatabaseBizOperation databaseBizOperation;
-    private  FileStore fileStore;
+    private FileStore fileStore;
+
     @Autowired(required = false)
     public void setFileStore(FileStore fileStore) {
         this.fileStore = fileStore;
     }
-    private BizModel bizModel;
+
+
     private TaskLog taskLog;
     private Date beginTime;
     private TaskDetailLog detailLog;
 
     @Autowired
-    public TaskRun( TaskLogDao taskLogDao, TaskDetailLogDao taskDetailLogDao, DataPacketDao dataPacketDao, MetaDataService metaDataService, IntegrationEnvironment integrationEnvironment, DatabaseBizOperation databaseBizOperation) {
+    public TaskRun(TaskLogDao taskLogDao, TaskDetailLogDao taskDetailLogDao, DataPacketDao dataPacketDao, MetaDataService metaDataService, IntegrationEnvironment integrationEnvironment, DatabaseBizOperation databaseBizOperation) {
         this.taskLogDao = taskLogDao;
         this.taskDetailLogDao = taskDetailLogDao;
         this.dataPacketDao = dataPacketDao;
@@ -58,66 +57,64 @@ public class TaskRun {
     }
 
 
-    private void runStep(JSONObject bizOptJson) {
+    private int runStep(DataPacket dataPacket) {
+        JSONObject bizOptJson=dataPacket.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
-            return;
+            return 0;
         }
-        JSONArray jsonArray = bizOptJson.getJSONArray("steps");
+        int iResult =0;
         try {
-            for (Object jj : jsonArray) {
-                databaseBizOperation.runOneStep(bizModel, JSONOpt.objectToJSONObject(jj));
-                saveDetail(JSONOpt.objectToJSONObject(jj), "");
-            }
+            DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
+            dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
+            dbPacketBizSupplier.setFileStore(fileStore);
+            dbPacketBizSupplier.setBatchWise(dataPacket.getIsWhile());
+            /*添加参数默认值传输*/
+            dbPacketBizSupplier.setQueryParams(dataPacket.getPacketParamsValue());
+
+            databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
+            databaseBizOperation.setMetaDataService(metaDataService);
+            databaseBizOperation.setBizOptJson(bizOptJson);
+            iResult = BizOptFlowUtil.runDataExchange(dbPacketBizSupplier, databaseBizOperation);
+            saveDetail(bizOptJson, iResult, "");
         } catch (ObjectException e) {
-            saveDetail(JSONOpt.objectToJSONObject(e.getObjectData()), e.getMessage());
+            saveDetail(JSONOpt.objectToJSONObject(e.getObjectData()), 0, e.getMessage());
         } catch (Exception e) {
-            saveDetail(JSONOpt.objectToJSONObject(jsonArray.get(0)), e.getMessage());
+            saveDetail(bizOptJson, 0, e.getMessage());
         }
-    }
-
-    private void setBizModel(String packetId) {
-        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
-        DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
-        dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
-        dbPacketBizSupplier.setFileStore(fileStore);
-        /*添加参数默认值传输*/
-        dbPacketBizSupplier.setQueryParams(dataPacket.getPacketParamsValue());
-        bizModel = dbPacketBizSupplier.get();
-        databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
-        databaseBizOperation.setMetaDataService(metaDataService);
+        return iResult;
     }
 
 
-    private void saveDetail(JSONObject runJson, String error) {
+    private void saveDetail(JSONObject runJson, int iResult, String error) {
         detailLog.setRunBeginTime(beginTime);
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
         detailLog.setLogType(runJson.getString("operation") + ":" + runJson.getString("source"));
-        DataSet dataSet = bizModel.fetchDataSetByName(runJson.getString("source"));
         detailLog.setLogInfo(error);
         String successSign = "ok";
-        if(dataSet!=null) {
-            if (successSign.equals(detailLog.getLogInfo())) {
-                detailLog.setSuccessPieces((long) dataSet.getData().size());
-            } else {
-                detailLog.setErrorPieces((long) dataSet.getData().size());
-            }
-        } else{
-            detailLog.setLogInfo(error+";无对应数据集"+runJson.getString("source"));
+        if (successSign.equals(detailLog.getLogInfo())) {
+            detailLog.setSuccessPieces((long) iResult);
+        } else {
+            detailLog.setErrorPieces((long) iResult);
         }
         detailLog.setRunEndTime(new Date());
         detailLog.setLogDetailId(UuidOpt.getUuidAsString32());
         taskDetailLogDao.saveNewObject(detailLog);
     }
 
-    public BizModel runTask(String logId) {
+    public void runTask(String logId) {
         beginTime = new Date();
         taskLog = taskLogDao.getObjectById(logId);
-        DataPacket dataPacket = dataPacketDao.getObjectById(taskLog.getTaskId());
-        setBizModel(dataPacket.getPacketId());
-        runStep(dataPacket.getDataOptDescJson());
+        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(taskLog.getTaskId());
+        int i=runStep(dataPacket);
         taskLog.setRunEndTime(new Date());
+        if (i>0) {
+            taskLog.setSuccessPieces("成功" + i + "批");
+            taskLog.setErrorPieces("");
+        }else{
+            taskLog.setErrorPieces("失败");
+            taskLog.setSuccessPieces("");
+        }
         taskLogDao.updateObject(taskLog);
-        return bizModel;
     }
 }

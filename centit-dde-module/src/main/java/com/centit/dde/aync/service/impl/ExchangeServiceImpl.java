@@ -31,7 +31,7 @@ public class ExchangeServiceImpl implements ExchangeService {
 
     @Async
     @Override
-    public CompletableFuture<BizModel> runTask(String packetId) {
+    public void runTask(String packetId) {
         DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
         TaskLog taskLog = new TaskLog();
         taskLog.setTaskId(packetId);
@@ -39,6 +39,6 @@ public class ExchangeServiceImpl implements ExchangeService {
         taskLog.setRunBeginTime(new Date());
         taskLog.setRunType(dataPacket.getPacketName());
         taskLogManager.createTaskLog(taskLog);
-        return CompletableFuture.completedFuture(taskRun.runTask(taskLog.getLogId()));
+        taskRun.runTask(taskLog.getLogId());
     }
 }

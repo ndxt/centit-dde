@@ -270,8 +270,8 @@ public class DataPacketController extends BaseController {
     @GetMapping(value = "/run/{packetId}")
     @ApiOperation(value = "立即执行任务")
     @WrapUpResponseBody
-    public CompletableFuture<BizModel> runTaskExchange(@PathVariable String packetId) {
-        return exchangeService.runTask(packetId);
+    public void runTaskExchange(@PathVariable String packetId) {
+         exchangeService.runTask(packetId);
     }
 
 

@@ -9,5 +9,5 @@ import java.util.concurrent.CompletableFuture;
  * @author zhf
  */
 public interface ExchangeService {
-    CompletableFuture<BizModel> runTask(String packetId);
+    void runTask(String packetId);
 }

@@ -1,6 +1,8 @@
 package com.centit.dde.datamoving.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.datamoving.dataopt.DatabaseBizOperation;
+import com.centit.dde.services.DBPacketBizSupplier;
 import com.centit.product.dataopt.bizopt.BuiltInOperation;
 import com.centit.product.dataopt.bizopt.DataLoadSupplier;
 import com.centit.product.dataopt.bizopt.PersistenceOperation;
@@ -16,6 +18,12 @@ public abstract class BizOptFlowUtil {
 
     public static int runDataExchange(
         DataLoadSupplier loadData, PersistenceOperation saveData)
+    {
+        BizOptFlow bof = new BizOptFlow().setSupplier(loadData).addOperation(saveData);
+        return bof.run();
+    }
+    public static int runDataExchange(
+        DBPacketBizSupplier loadData, DatabaseBizOperation saveData)
     {
         BizOptFlow bof = new BizOptFlow().setSupplier(loadData).addOperation(saveData);
         return bof.run();
@@ -37,7 +45,7 @@ public abstract class BizOptFlowUtil {
         return createOptFlow(bizSupplier, JSONObject.parseObject(optDescJson));
     }
 
-    private static BizOptFlow createOptFlow(BizSupplier bizSupplier, JSONObject optJson){
+    public static BizOptFlow createOptFlow(BizSupplier bizSupplier, JSONObject optJson){
         return new BizOptFlow().setSupplier(bizSupplier)
             .addOperation(new BuiltInOperation(optJson));
     }
