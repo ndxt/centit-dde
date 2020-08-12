@@ -5,9 +5,7 @@ import com.centit.dde.po.DataSetDefine;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.product.dataopt.core.*;
-import com.centit.product.dataopt.dataset.CsvDataSet;
-import com.centit.product.dataopt.dataset.ExcelDataSet;
-import com.centit.product.dataopt.dataset.SQLDataSetReader;
+import com.centit.product.dataopt.dataset.*;
 import com.centit.support.database.utils.DataSourceDescription;
 
 import java.io.IOException;
@@ -83,9 +81,25 @@ public class DBPacketBizSupplier implements BizSupplier {
                         dataSets.put(rdd.getQueryId(), dataset);
                         break;
                     }
+                    case "J":{
+                        JSONDataSet jsonDataSet = new JSONDataSet();
+                        try {
+                            jsonDataSet.setFilePath(
+                                fileStore.getFile(rdd.getQuerySQL()).getPath());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        SimpleDataSet dataset = jsonDataSet.load(modelTag);
+                        dataset.setDataSetName(rdd.getQueryName());
+                        dataSets.put(rdd.getQueryId(), dataset);
+                        break;
+                    }
                     case "H": {
-                        //TODO httpget数据集
-
+                        HttpDataSet httpDataSet=new HttpDataSet();
+                        httpDataSet.setSUrl(rdd.getQuerySQL());
+                        SimpleDataSet dataset =httpDataSet.load(modelTag);
+                        dataset.setDataSetName(rdd.getQueryName());
+                        dataSets.put(rdd.getQueryId(), dataset);
                         break;
                     }
                     default:

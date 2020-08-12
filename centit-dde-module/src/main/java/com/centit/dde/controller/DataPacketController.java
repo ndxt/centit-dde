@@ -23,6 +23,7 @@ import com.centit.product.dataopt.core.SimpleBizModel;
 import com.centit.product.dataopt.core.SimpleDataSet;
 import com.centit.product.dataopt.dataset.CsvDataSet;
 import com.centit.product.dataopt.dataset.ExcelDataSet;
+import com.centit.product.dataopt.dataset.JSONDataSet;
 import com.centit.product.dataopt.dataset.SQLDataSetReader;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.PageDesc;
@@ -229,42 +230,10 @@ public class DataPacketController extends BaseController {
 
         DataSetDefine query = dataSetDefineService.getDbQuery(queryId);
         DataPacket dataPacket = dataPacketService.getDataPacket(query.getPacketId());
-        Map<String, Object> modelTag = dataPacket.getPacketParamsValue();
-        switch (query.getSetType()) {
-            case "D":
-//                if (WebOptUtils.getCurrentUserInfo(request) == null) {
-//                    throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,
-//                        "用户没有登录或者超时，请重新登录！");
-//                }
-                params.put("currentUser", WebOptUtils.getCurrentUserInfo(request));
-                params.put("currentUnitCode", WebOptUtils.getCurrentUnitCode(request));
-                SQLDataSetReader sqlDsr = new SQLDataSetReader();
-                sqlDsr.setDataSource(DataSourceDescription.valueOf(
-                    integrationEnvironment.getDatabaseInfo(query.getDatabaseCode())));
-                sqlDsr.setSqlSen(query.getQuerySQL());
-                modelTag.putAll(params);
-                SimpleDataSet simpleDataSet = sqlDsr.load(modelTag);
-                simpleDataSet.setDataSetName(query.getQueryName());
-                return simpleDataSet;
-            case "E":
-                ExcelDataSet excelDataSet = new ExcelDataSet();
-                try {
-                    excelDataSet.setFilePath(fileStore.getFile(query.getQuerySQL()).getPath());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return excelDataSet.load(params);
-            case "C":
-                CsvDataSet csvDataSet = new CsvDataSet();
-                try {
-                    csvDataSet.setFilePath(fileStore.getFile(query.getQuerySQL()).getPath());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return csvDataSet.load(params);
-            default:
-                throw new IllegalStateException("Unexpected value: " + query.getSetType());
-        }
+
+        BizModel bizModel = dataPacketService.fetchDataPacketData(dataPacket.getPacketId(), params);
+
+        return (SimpleDataSet) bizModel.fetchDataSetByName(queryId);
     }
 
     @GetMapping(value = "/run/{packetId}")
