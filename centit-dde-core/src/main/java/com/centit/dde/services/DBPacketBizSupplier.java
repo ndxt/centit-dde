@@ -95,8 +95,7 @@ public class DBPacketBizSupplier implements BizSupplier {
                         break;
                     }
                     case "H": {
-                        HttpDataSet httpDataSet=new HttpDataSet();
-                        httpDataSet.setSUrl(rdd.getQuerySQL());
+                        HttpDataSet httpDataSet=new HttpDataSet(rdd.getQuerySQL());
                         SimpleDataSet dataset =httpDataSet.load(modelTag);
                         dataset.setDataSetName(rdd.getQueryName());
                         dataSets.put(rdd.getQueryId(), dataset);

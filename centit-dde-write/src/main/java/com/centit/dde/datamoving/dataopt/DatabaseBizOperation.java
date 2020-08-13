@@ -66,8 +66,6 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 return writeExcelFile(bizModel, bizOptJson);
             case "C":
                 return writeCsvFile(bizModel, bizOptJson);
-            case "H":
-                return runHttpPost(bizModel, bizOptJson);
             default:
                 return writeDatabase(bizModel, bizOptJson);
 
@@ -170,49 +168,16 @@ public class DatabaseBizOperation extends BuiltInOperation {
         return bizModel;
     }
 
-    private BizModel runHttpPost(BizModel bizModel, JSONObject bizOptJson) {
 
-        return bizModel;
-    }
 
     @Override
     public BizModel runOneStep(BizModel bizModel, JSONObject bizOptJson) {
+        super.runOneStep(bizModel,bizOptJson);
         String sOptType = bizOptJson.getString("operation");
-        if (StringUtils.isBlank(sOptType)) {
-            return bizModel;
-        }
-        switch (sOptType) {
-            case "map":
-                return runMap(bizModel, bizOptJson);
-            case "filter":
-                return runFilter(bizModel, bizOptJson);
-            case "append":
-                return runAppend(bizModel, bizOptJson);
-            case "stat":
-                return runStat(bizModel, bizOptJson);
-            case "analyse":
-                return runAnalyse(bizModel, bizOptJson);
-            case "cross":
-                return runCross(bizModel, bizOptJson);
-            case "compare":
-                return runCompare(bizModel, bizOptJson);
-            case "join":
-                return runJoin(bizModel, bizOptJson);
-            case "sort":
-                return runSort(bizModel, bizOptJson);
-            case "union":
-                return runUnion(bizModel, bizOptJson);
-            case "filterExt":
-                return runFilterExt(bizModel, bizOptJson);
-            case "check":
-                return runCheckData(bizModel, bizOptJson);
-            case "static":
-                return runStaticData(bizModel, bizOptJson);
-            case "persistence":
+        if("persistence".equals(sOptType)){
                 return runPersistence(bizModel, bizOptJson);
-            default:
-                return bizModel;
         }
+        return bizModel;
     }
 
     public void setIntegrationEnvironment(IntegrationEnvironment integrationEnvironment) {
