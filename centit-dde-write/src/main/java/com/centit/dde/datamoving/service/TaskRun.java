@@ -12,7 +12,7 @@ import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.DBPacketBizSupplier;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.product.dataopt.bizopt.JSMateObjectEventRuntime;
+import com.centit.product.dataopt.bizopt.JsMateObjectEventRuntime;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
@@ -42,10 +42,22 @@ public class TaskRun {
         this.fileStore = fileStore;
     }
 
-    @Autowired(required = false)
+
     private MetaObjectService metaObjectService;
+
     @Autowired(required = false)
+    public void setMetaObjectService(MetaObjectService metaObjectService) {
+        this.metaObjectService = metaObjectService;
+    }
+
     private DatabaseRunTime databaseRunTime;
+
+    @Autowired(required = false)
+    public void setDatabaseRunTime(DatabaseRunTime databaseRunTime) {
+        this.databaseRunTime = databaseRunTime;
+    }
+
+
     private TaskLog taskLog;
     private Date beginTime;
     private TaskDetailLog detailLog;
@@ -64,11 +76,11 @@ public class TaskRun {
 
 
     private int runStep(DataPacket dataPacket) {
-        JSONObject bizOptJson=dataPacket.getDataOptDescJson();
+        JSONObject bizOptJson = dataPacket.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
             return 0;
         }
-        int iResult =0;
+        int iResult = 0;
         try {
             DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
             dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
@@ -80,8 +92,8 @@ public class TaskRun {
             databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
             databaseBizOperation.setMetaDataService(metaDataService);
             databaseBizOperation.setBizOptJson(bizOptJson);
-            JSMateObjectEventRuntime jsMateObjectEventRuntime=
-                new JSMateObjectEventRuntime(metaObjectService,databaseRunTime);
+            JsMateObjectEventRuntime jsMateObjectEventRuntime =
+                new JsMateObjectEventRuntime(metaObjectService, databaseRunTime);
             jsMateObjectEventRuntime.setParms(dataPacket.getPacketParamsValue());
             databaseBizOperation.setJsMateObjectEvent(jsMateObjectEventRuntime);
             iResult = BizOptFlowUtil.runDataExchange(dbPacketBizSupplier, databaseBizOperation);
@@ -116,12 +128,12 @@ public class TaskRun {
         beginTime = new Date();
         taskLog = taskLogDao.getObjectById(logId);
         DataPacket dataPacket = dataPacketDao.getObjectWithReferences(taskLog.getTaskId());
-        int i=runStep(dataPacket);
+        int i = runStep(dataPacket);
         taskLog.setRunEndTime(new Date());
-        if (i>0) {
+        if (i > 0) {
             taskLog.setSuccessPieces("成功" + i + "批");
             taskLog.setErrorPieces("");
-        }else{
+        } else {
             taskLog.setErrorPieces("失败");
             taskLog.setSuccessPieces("");
         }
