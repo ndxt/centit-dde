@@ -12,7 +12,10 @@ import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.DBPacketBizSupplier;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
+import com.centit.product.dataopt.bizopt.JSMateObjectEventRuntime;
+import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaDataService;
+import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.json.JSONOpt;
@@ -39,7 +42,10 @@ public class TaskRun {
         this.fileStore = fileStore;
     }
 
-
+    @Autowired(required = false)
+    private MetaObjectService metaObjectService;
+    @Autowired(required = false)
+    private DatabaseRunTime databaseRunTime;
     private TaskLog taskLog;
     private Date beginTime;
     private TaskDetailLog detailLog;
@@ -74,6 +80,10 @@ public class TaskRun {
             databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
             databaseBizOperation.setMetaDataService(metaDataService);
             databaseBizOperation.setBizOptJson(bizOptJson);
+            JSMateObjectEventRuntime jsMateObjectEventRuntime=
+                new JSMateObjectEventRuntime(metaObjectService,databaseRunTime);
+            jsMateObjectEventRuntime.setParms(dataPacket.getPacketParamsValue());
+            databaseBizOperation.setJsMateObjectEvent(jsMateObjectEventRuntime);
             iResult = BizOptFlowUtil.runDataExchange(dbPacketBizSupplier, databaseBizOperation);
             saveDetail(bizOptJson, iResult, "");
         } catch (ObjectException e) {

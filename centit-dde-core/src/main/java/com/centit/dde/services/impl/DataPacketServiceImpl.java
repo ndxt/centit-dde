@@ -15,7 +15,11 @@ import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.product.dataopt.bizopt.BuiltInOperation;
+import com.centit.product.dataopt.bizopt.JSMateObjectEventRuntime;
 import com.centit.product.dataopt.core.BizModel;
+import com.centit.product.dataopt.utils.JSRuntimeContext;
+import com.centit.product.metadata.service.DatabaseRunTime;
+import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.utils.PageDesc;
@@ -40,6 +44,10 @@ public class DataPacketServiceImpl implements DataPacketService {
     private  JedisPool jedisPool;
     @Autowired(required = false)
     private  FileStore fileStore;
+    @Autowired(required = false)
+    private MetaObjectService metaObjectService;
+    @Autowired(required = false)
+    private DatabaseRunTime databaseRunTime;
 
     private final DataPacketDao dataPacketDao;
 
@@ -233,6 +241,10 @@ public class DataPacketServiceImpl implements DataPacketService {
         }
         if(optsteps!=null) {
             BuiltInOperation builtInOperation = new BuiltInOperation(optsteps);
+            JSMateObjectEventRuntime jsMateObjectEventRuntime=
+                new JSMateObjectEventRuntime(metaObjectService,databaseRunTime);
+            jsMateObjectEventRuntime.setParms(paramsMap);
+            builtInOperation.setJsMateObjectEvent(jsMateObjectEventRuntime);
             bizModel = builtInOperation.apply(bizModel);
         }
         setDataPacketBuf(bizModel, dataPacket, paramsMap);
