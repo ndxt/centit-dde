@@ -148,16 +148,18 @@ public class DataPacket implements Serializable {
             return params;
         }
         for (DataPacketParam packetParam : packetParams) {
-            switch (packetParam.getParamType()) {
-                case "N":
-                    params.put(packetParam.getParamName(), NumberBaseOpt.castObjectToLong(packetParam.getParamDefaultValue()));
-                    break;
-                case "T":
-                    params.put(packetParam.getParamName(), DatetimeOpt.castObjectToSqlDate(packetParam.getParamDefaultValue()));
-                    break;
-                default:
-                    params.put(packetParam.getParamName(), packetParam.getParamDefaultValue());
-                    break;
+            if(packetParam.getParamType()!=null) {
+                switch (packetParam.getParamType()) {
+                    case "N":
+                        params.put(packetParam.getParamName(), NumberBaseOpt.castObjectToLong(packetParam.getParamDefaultValue()));
+                        break;
+                    case "T":
+                        params.put(packetParam.getParamName(), DatetimeOpt.castObjectToSqlDate(packetParam.getParamDefaultValue()));
+                        break;
+                    default:
+                        params.put(packetParam.getParamName(), packetParam.getParamDefaultValue());
+                        break;
+                }
             }
         }
         return params;
