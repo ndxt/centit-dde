@@ -39,6 +39,5 @@ public class DataMovingApplication {
         ConfigurableApplicationContext context = SpringApplication.run(DataMovingApplication.class, args);
         TaskRun taskRun = context.getBean(TaskRun.class);
         taskRun.runTask(args[0]);
-        //测试提交
     }
 }
