@@ -97,26 +97,28 @@ public class TaskRun {
             jsMateObjectEventRuntime.setParms(dataPacket.getPacketParamsValue());
             databaseBizOperation.setJsMateObjectEvent(jsMateObjectEventRuntime);
             iResult = BizOptFlowUtil.runDataExchange(dbPacketBizSupplier, databaseBizOperation);
-            saveDetail(bizOptJson, iResult, "");
+            saveDetail( iResult, "ok");
         } catch (ObjectException e) {
-            saveDetail(JSONOpt.objectToJSONObject(e.getObjectData()), 0, e.getMessage());
+            saveDetail( 0, e.getMessage());
         } catch (Exception e) {
-            saveDetail(bizOptJson, 0, e.getMessage());
+            saveDetail(0, e.getMessage());
         }
         return iResult;
     }
 
 
-    private void saveDetail(JSONObject runJson, int iResult, String error) {
+    private void saveDetail(int iResult, String info) {
         detailLog.setRunBeginTime(beginTime);
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
-        detailLog.setLogType(runJson.getString("operation") + ":" + runJson.getString("source"));
-        detailLog.setLogInfo(error);
+        detailLog.setLogType(info);
+        detailLog.setLogInfo(info);
         String successSign = "ok";
         if (successSign.equals(detailLog.getLogInfo())) {
             detailLog.setSuccessPieces((long) iResult);
+            detailLog.setErrorPieces(0L);
         } else {
+            detailLog.setSuccessPieces(0L);
             detailLog.setErrorPieces((long) iResult);
         }
         detailLog.setRunEndTime(new Date());
