@@ -51,17 +51,19 @@ import java.util.concurrent.CompletableFuture;
 public class DataPacketController extends BaseController {
 
     private  FileStore fileStore;
+
     @Autowired(required = false)
     public void setFileStore(FileStore fileStore) {
         this.fileStore = fileStore;
     }
 
     private final DataPacketService dataPacketService;
+    private final ExchangeService exchangeService;
 
     private final DataSetDefineService dataSetDefineService;
 
     private final IntegrationEnvironment integrationEnvironment;
-    private final ExchangeService exchangeService;
+
 
     public DataPacketController( DataPacketService dataPacketService, DataSetDefineService dataSetDefineService, IntegrationEnvironment integrationEnvironment, ExchangeService exchangeService) {
         this.dataPacketService = dataPacketService;
@@ -236,12 +238,6 @@ public class DataPacketController extends BaseController {
         return (SimpleDataSet) bizModel.fetchDataSetByName(queryId);
     }
 
-    @GetMapping(value = "/run/{packetId}")
-    @ApiOperation(value = "立即执行任务")
-    @WrapUpResponseBody
-    public void runTaskExchange(@PathVariable String packetId) {
-         exchangeService.runTask(packetId);
-    }
 
 
     @GetMapping(value = "/exist/{applicationId}/{interfaceName}")
@@ -255,43 +251,5 @@ public class DataPacketController extends BaseController {
         return list.size() > 0;
     }
 
-    @GetMapping(value = "/{applicationId}/{interfaceName}/{sourceName}")
-    @ApiOperation(value = "获取数据")
-    @WrapUpResponseBody
-    public DataSet getData(@PathVariable String applicationId, @PathVariable String interfaceName,
-                           @PathVariable String sourceName, HttpServletRequest request) {
-        Map<String, Object> params = BaseController.collectRequestParameters(request);
-        Map<String, Object> params2 = new HashMap<>(10);
-        params2.put("interfaceName", interfaceName);
-        params2.put("applicationId", applicationId);
-        List<DataPacket> list = dataPacketService.listDataPacket(params2, new PageDesc());
-        if (list.size() > 0) {
-            DataPacket taskExchange = list.get(0);
-            BizModel bizModel = dataPacketService.fetchDataPacketData(taskExchange.getPacketId(), params, taskExchange.getDataOptDescJson());
-            String sourceCode = getSourceCode(sourceName, taskExchange.getDataOptDescJson());
-            if (StringUtils.isNotBlank(sourceCode)) {
-                return bizModel.fetchDataSetByName(sourceCode);
-            } else {
-                return bizModel.getMainDataSet();
-            }
-        }
-        return null;
-    }
 
-    private String getSourceCode(String sourceName, JSONObject bizOptJson) {
-        JSONArray jsonArray = bizOptJson.getJSONArray("steps");
-        for (Object step : jsonArray) {
-            if (step instanceof JSONObject) {
-                if ("interface".equals(((JSONObject) step).getString("operation"))) {
-                    Object mapInfo = ((JSONObject) step).get("fieldsMap");
-                    if (mapInfo instanceof Map) {
-                        return (String) ((Map) mapInfo).get(sourceName);
-                    }
-                } else {
-                    return "";
-                }
-            }
-        }
-        return "";
-    }
 }
