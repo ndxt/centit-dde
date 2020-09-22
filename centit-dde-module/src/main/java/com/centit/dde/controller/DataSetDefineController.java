@@ -105,6 +105,8 @@ public class DataSetDefineController extends BaseController {
                 return dataSetDefineService.generateJsonFields(params);
             case "D":
                 return dataSetDefineService.generateSqlFields(databaseCode, sql, params);
+            case "P":
+                return dataSetDefineService.generatePostFields(sql);
             default:
                 return null;
         }

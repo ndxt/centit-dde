@@ -31,6 +31,7 @@ public interface DataSetDefineService {
     List<ColumnSchema> generateExcelFields(Map<String, Object> params);
     List<ColumnSchema> generateCsvFields(Map<String, Object> params);
     List<ColumnSchema> generateJsonFields(Map<String, Object> params);
+    List<ColumnSchema> generatePostFields(String jsonString);
     JSONArray queryViewSqlData(String databaseCode, String sql, Map<String, Object> params);
 
     Set<String> generateSqlParams(String sql);

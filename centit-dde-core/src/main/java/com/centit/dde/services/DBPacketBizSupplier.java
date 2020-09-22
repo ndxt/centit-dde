@@ -101,6 +101,9 @@ public class DBPacketBizSupplier implements BizSupplier {
                         dataSets.put(rdd.getQueryId(), dataset);
                         break;
                     }
+                    case "P":{
+                        SimpleDataSet dataSet=SimpleDataSet.createSingleObjectSet(rdd.getQuerySQL());
+                    }
                     default:
                         break;
                 }

@@ -1,5 +1,6 @@
 package com.centit.dde.services.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.dao.DataSetDefineDao;
 import com.centit.dde.po.DataSetDefine;
@@ -152,6 +153,12 @@ public class DataSetDefineServiceImpl implements DataSetDefineService {
             columnSchemas.add(col);
         }
         return columnSchemas;
+    }
+
+    @Override
+    public List<ColumnSchema> generatePostFields(String jsonString) {
+        String[] columns = JSON.parseObject(jsonString).keySet().toArray(new String[0]);
+        return getColumnSchemas(columns);
     }
 
     @Override

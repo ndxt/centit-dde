@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.aync.service.ExchangeService;
 import com.centit.dde.po.DataPacket;
+import com.centit.dde.po.DataSetDefine;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.services.DataSetDefineService;
 import com.centit.framework.core.controller.BaseController;
@@ -38,13 +39,15 @@ public class HttpTaskController {
     @ApiOperation(value = "响应post方法")
     @PutMapping(value = "/do/{packetId}")
     @WrapUpResponseBody
-    public Object doHttpTask(@PathVariable String packetId, @RequestBody String jsonString) {
-
-        //dataPacketService.updateDataPacket(dataPacket);
-        //jsonString 加载到 rb http接收数据集
-        //
-
-        return null;
+    public BizModel doHttpTask(@PathVariable String packetId, @RequestBody String jsonString) {
+        DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
+        for(DataSetDefine dataSetDefine:dataPacket.getDataSetDefines()){
+            if("requestBody".equals(dataSetDefine.getQuerySQL())){
+                dataSetDefine.setQueryDesc(jsonString);
+                break;
+            }
+        }
+        return dataPacketService.fetchDataPacketData(packetId, null);
     }
 
     @GetMapping(value = "/run/{packetId}")
