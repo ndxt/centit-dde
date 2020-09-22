@@ -42,8 +42,8 @@ public class HttpTaskController {
     public BizModel doHttpTask(@PathVariable String packetId, @RequestBody String jsonString) {
         DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
         for(DataSetDefine dataSetDefine:dataPacket.getDataSetDefines()){
-            if("requestBody".equals(dataSetDefine.getQuerySQL())){
-                dataSetDefine.setQueryDesc(jsonString);
+            if("requestBody".equals(dataSetDefine.getQueryName())){
+                dataSetDefine.setQuerySQL(jsonString);
                 break;
             }
         }
