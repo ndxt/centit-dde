@@ -113,6 +113,13 @@ public class DataPacket implements Serializable {
     @ApiModelProperty(value = "是否循环", required = true)
     private Boolean isWhile;
 
+    /**
+     * 添加返回数据：
+     * S: 仅仅返回状态 ; code=0 成功 code = ERROR_CODE 错误
+     * D: 返回dataset ;返回所有处理过程中没有使用过的dataset，并接受参数可以之返回部分dataset
+     * A: 返回指定的一个或多个dataset
+     * J: 返回json，通过 json 模板指定
+     */
     @ApiModelProperty(value = "业务特殊处理脚本")
     @Column(name = "EXTEND_OPT_JS")
     @Basic(fetch = FetchType.LAZY)
