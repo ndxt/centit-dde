@@ -17,13 +17,16 @@ import com.centit.product.dataopt.utils.DataSetOptUtil;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
+import com.centit.support.database.transaction.ConnectThreadHolder;
 import com.centit.support.database.transaction.JdbcTransaction;
 import com.centit.support.database.utils.DataSourceDescription;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,21 +47,7 @@ public class DatabaseBizOperation extends BuiltInOperation {
     public DatabaseBizOperation(JSONObject bizOptJson) {
         this.bizOptJson = bizOptJson;
     }
-    @Override
-    @JdbcTransaction
-    public BizModel apply(BizModel bizModel) {
-        JSONArray optSteps = bizOptJson.getJSONArray("steps");
-        if(optSteps==null || optSteps.isEmpty()){
-            return bizModel;
-        }
-        BizModel result = bizModel;
-        for(Object step : optSteps){
-            if(step instanceof JSONObject){
-                runOneStep(result, (JSONObject)step);
-            }
-        }
-        return result;
-    }
+
     private BizModel runPersistence(BizModel bizModel, JSONObject bizOptJson) {
         String dataType = getJsonFieldString(bizOptJson, "dataType", "D");
         switch (dataType) {

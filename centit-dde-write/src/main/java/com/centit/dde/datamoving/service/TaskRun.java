@@ -97,27 +97,41 @@ public class TaskRun {
             jsMateObjectEventRuntime.setParms(dataPacket.getPacketParamsValue());
             databaseBizOperation.setJsMateObjectEvent(jsMateObjectEventRuntime);
             iResult = BizOptFlowUtil.runDataExchange(dbPacketBizSupplier, databaseBizOperation);
-            saveDetail( iResult, "ok");
+            saveDetail(iResult, "ok");
         } catch (ObjectException e) {
-            saveDetail( 0, e.getMessage());
+            saveDetail(0, getStackTrace(e));
         } catch (Exception e) {
-            saveDetail(0, e.getMessage());
+            saveDetail(0, getStackTrace(e));
         }
         return iResult;
     }
 
+    private  String getStackTrace(Exception e) {
+        StringBuffer message = new StringBuffer();
+        StackTraceElement[] exceptionStack = e.getStackTrace();
+        message.append(e.toString());
+        int i=0;
+        for (StackTraceElement ste : exceptionStack) {
+            message.append("\n\tat " + ste);
+            if(i++==4){
+                break;
+            }
+        }
+        return message.toString();
+    }
 
     private void saveDetail(int iResult, String info) {
         detailLog.setRunBeginTime(beginTime);
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
-        detailLog.setLogType(info);
-        detailLog.setLogInfo(info);
         String successSign = "ok";
-        if (successSign.equals(detailLog.getLogInfo())) {
+        if (successSign.equals(info)) {
+            detailLog.setLogType(info);
             detailLog.setSuccessPieces((long) iResult);
             detailLog.setErrorPieces(0L);
         } else {
+            detailLog.setLogType("error");
+            detailLog.setLogInfo(info);
             detailLog.setSuccessPieces(0L);
             detailLog.setErrorPieces((long) iResult);
         }
