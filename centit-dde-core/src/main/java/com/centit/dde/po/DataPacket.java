@@ -120,10 +120,13 @@ public class DataPacket implements Serializable {
      * A: 返回指定的一个或多个dataset
      * J: 返回json，通过 json 模板指定
      */
-    @ApiModelProperty(value = "业务特殊处理脚本")
-    @Column(name = "EXTEND_OPT_JS")
-    @Basic(fetch = FetchType.LAZY)
-    private String extendOptJs;
+    @Column(name = "RETURN_TYPE")
+    @ApiModelProperty(value = "返回数据类型", required = true)
+    private String returnType;
+
+    @ApiModelProperty(value = "返回结果")
+    @Column(name = "RETURN_RESULT")
+    private String returnResult;
 
     @OneToMany(targetEntity = DataPacketParam.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
