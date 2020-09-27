@@ -17,8 +17,8 @@
         </dependency>
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>business-operation-core</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <artifactId>centit-dde-operation-core</artifactId>
+            <version>3.1-SNAPSHOT</version>
         </dependency>
 
 

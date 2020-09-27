@@ -38,6 +38,7 @@ public class DataLoadSupplier implements BizSupplier {
      * 如果是，处理器将反复调用 。知道 get() 返回 null 结束
      * @return 否是 批量的
      */
+    @Override
     public boolean isBatchWise(){
         return this.batchWise;
     }

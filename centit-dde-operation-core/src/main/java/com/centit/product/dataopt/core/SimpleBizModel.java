@@ -7,6 +7,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author zhf
+ */
 public class SimpleBizModel implements BizModel, Serializable {
     private static final long serialVersionUID = 1L;
     /**
@@ -21,7 +24,7 @@ public class SimpleBizModel implements BizModel, Serializable {
     /**
      * 模型数据
      */
-    protected Map<String, DataSet> bizData;
+    private Map<String, DataSet> bizData;
 
     public SimpleBizModel() {
         modelName = BizModel.DEFAULT_MODEL_NAME;
