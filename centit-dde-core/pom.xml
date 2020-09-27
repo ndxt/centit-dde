@@ -50,12 +50,7 @@
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-adapter</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>business-operation-core</artifactId>
-            <version>1.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
+
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
@@ -64,7 +59,11 @@
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-ip-adapter</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-operation-core</artifactId>
+            <version>3.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>
