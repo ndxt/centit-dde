@@ -1,5 +1,6 @@
 package com.centit.product.dataopt.bizopt;
 
+import com.alibaba.fastjson.JSONObject;
 import com.centit.product.dataopt.core.BizModel;
 import com.centit.product.dataopt.core.BizOperation;
 import com.centit.product.dataopt.core.DataSet;
@@ -30,9 +31,9 @@ public class PersistenceOperation implements BizOperation {
 
 
     @Override
-    public BizModel apply(BizModel bizModel) {
+    public void doOpt(BizModel bizModel, JSONObject bizOptJson) {
         if(dataWriters==null || bizModel==null || bizModel.isEmpty()){
-            return bizModel;
+            return ;//bizModel;
         }
         /**
          * 保证写入顺序和 bizModel 的 DataSet的顺序一致
@@ -54,7 +55,7 @@ public class PersistenceOperation implements BizOperation {
                 }
             }
         }
-        return bizModel;
+        //return bizModel;
     }
 
     public PersistenceOperation writerIndicate(String dataSetName, String indicate){

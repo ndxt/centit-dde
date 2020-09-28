@@ -46,4 +46,11 @@ public class JSBizOperation implements BizOperation {
 
     }
 
+    public MetaObjectService getMetaObjectService() {
+        return metaObjectService;
+    }
+
+    public DatabaseRunTime getDatabaseRunTime() {
+        return databaseRunTime;
+    }
 }
