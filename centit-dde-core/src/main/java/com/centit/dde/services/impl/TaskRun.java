@@ -15,7 +15,6 @@ import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.UuidOpt;
-import com.centit.support.common.ObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -89,19 +88,9 @@ public class TaskRun {
             dbPacketBizSupplier.setBatchWise(dataPacket.getIsWhile());
             /*添加参数默认值传输*/
             dbPacketBizSupplier.setQueryParams(dataPacket.getPacketParamsValue());
-
-            /*databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
-            databaseBizOperation.setMetaDataService(metaDataService);
-            databaseBizOperation.setBizOptJson(bizOptJson);
-            JsMateObjectEventRuntime jsMateObjectEventRuntime =
-                new JsMateObjectEventRuntime(metaObjectService, databaseRunTime);
-            jsMateObjectEventRuntime.setParms(dataPacket.getPacketParamsValue());
-            databaseBizOperation.setJsMateObjectEvent(jsMateObjectEventRuntime);*/
             bizOptFlow.run(dbPacketBizSupplier, bizOptJson);
             iResult ++;
             saveDetail(iResult, "ok");
-        } catch (ObjectException e) {
-            saveDetail(0, getStackTrace(e));
         } catch (Exception e) {
             saveDetail(0, getStackTrace(e));
         }

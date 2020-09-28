@@ -44,7 +44,7 @@ public interface BizModel {
 
     default boolean isEmpty(){
         return getBizData() == null ||
-            getBizData().isEmpty()||getMainDataSet().isEmpty();
+            getBizData().isEmpty();
     }
 
     @JSONField(deserialize = false, serialize = false)

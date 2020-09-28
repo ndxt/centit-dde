@@ -35,6 +35,14 @@ public class SimpleBizModel implements BizModel, Serializable {
     }
 
     @Override
+    public boolean isEmpty(){
+        return getBizData() == null ||
+            getBizData().isEmpty()||
+            getMainDataSet() == null||
+            getMainDataSet().isEmpty();
+    }
+
+    @Override
     public void putDataSet(String relationPath, DataSet dataSet) {
         if (this.bizData == null) {
             this.bizData = new HashMap<>(6);
