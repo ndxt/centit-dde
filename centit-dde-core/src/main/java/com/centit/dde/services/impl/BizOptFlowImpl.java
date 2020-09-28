@@ -2,16 +2,25 @@ package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.utils.PersistenceBizOperation;
+import com.centit.framework.ip.service.IntegrationEnvironment;
+import com.centit.product.dataopt.bizopt.JSBizOperation;
 import com.centit.product.dataopt.core.BizModel;
 import com.centit.product.dataopt.core.BizOperation;
 import com.centit.product.dataopt.core.BizOptFlow;
 import com.centit.product.dataopt.core.BizSupplier;
 import com.centit.product.dataopt.utils.BuiltInOperation;
+import com.centit.product.metadata.service.DatabaseRunTime;
+import com.centit.product.metadata.service.MetaDataService;
+import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.transaction.ConnectThreadHolder;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,11 +30,30 @@ import java.util.Map;
  */
 @Service
 public class BizOptFlowImpl implements BizOptFlow {
+    @Value("${os.file.base.dir:./file_home/export}")
+    private String path;
+
+    @Autowired
+    private IntegrationEnvironment integrationEnvironment;
+
+    @Autowired
+    private MetaDataService metaDataService;
+
+    @Autowired(required = false)
+    private MetaObjectService metaObjectService;
+
+    @Autowired(required = false)
+    private DatabaseRunTime databaseRunTime;
 
     public Map<String, BizOperation> allOperations;
 
     public BizOptFlowImpl(){
         allOperations = new HashMap<>(50);
+     }
+
+
+    @PostConstruct
+    public void init(){
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
         allOperations.put("append", BuiltInOperation::runAppend);
@@ -41,6 +69,15 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("static", BuiltInOperation::runStaticData);
         //allOperations.put("js", BuiltInOperation::runJsData);
         allOperations.put("http", BuiltInOperation::runHttpData);
+
+        JSBizOperation jsBizOperation =new JSBizOperation(metaObjectService,
+            databaseRunTime);
+        allOperations.put("js", jsBizOperation);
+
+        PersistenceBizOperation databaseOperation = new PersistenceBizOperation(
+            path, integrationEnvironment, metaDataService);
+
+        allOperations.put("persistence", databaseOperation);
     }
 
     @Override

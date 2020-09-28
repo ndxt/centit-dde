@@ -3,14 +3,13 @@ package com.centit.product.dataopt.utils;
 import com.centit.product.dataopt.core.BizModel;
 import com.centit.product.dataopt.core.DataSet;
 import com.centit.support.algorithm.ReflectionOpt;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.compiler.VariableTranslate;
 import com.centit.support.json.JSONTransformDataSupport;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BizModelJSONTransform
     implements VariableTranslate, JSONTransformDataSupport{

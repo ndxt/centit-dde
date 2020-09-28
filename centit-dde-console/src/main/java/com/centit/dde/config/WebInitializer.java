@@ -5,10 +5,8 @@ import com.centit.framework.config.WebConfig;
 import org.springframework.web.WebApplicationInitializer;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.validation.constraints.NotNull;
 
 /**
  *

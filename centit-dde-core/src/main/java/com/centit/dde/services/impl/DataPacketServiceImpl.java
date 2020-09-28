@@ -14,14 +14,9 @@ import com.centit.dde.utils.Constant;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
-
-import com.centit.product.dataopt.bizopt.JSBizOperation;
 import com.centit.product.dataopt.bizopt.SimpleBizSupplier;
-import com.centit.product.dataopt.core.BizOptFlow;
-import com.centit.product.dataopt.utils.BuiltInOperation;
 import com.centit.product.dataopt.core.BizModel;
-import com.centit.product.metadata.service.DatabaseRunTime;
-import com.centit.product.metadata.service.MetaObjectService;
+import com.centit.product.dataopt.core.BizOptFlow;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.utils.PageDesc;
@@ -32,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-import javax.annotation.PostConstruct;
 import java.io.*;
 import java.util.Date;
 import java.util.List;
@@ -50,12 +44,6 @@ public class DataPacketServiceImpl implements DataPacketService {
     @Autowired(required = false)
     private  FileStore fileStore;
 
-    @Autowired(required = false)
-    private MetaObjectService metaObjectService;
-
-    @Autowired(required = false)
-    private DatabaseRunTime databaseRunTime;
-
     @Autowired
     private DataPacketDao dataPacketDao;
 
@@ -70,13 +58,6 @@ public class DataPacketServiceImpl implements DataPacketService {
 
     public DataPacketServiceImpl( ) {
 
-    }
-
-    @PostConstruct
-    public void init(){
-        JSBizOperation jsBizOperation =new JSBizOperation(metaObjectService,
-            databaseRunTime);
-        bizOptFlow.registOperation("js", jsBizOperation);
     }
 
     @Override
