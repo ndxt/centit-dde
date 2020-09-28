@@ -13,7 +13,6 @@
     <dependencies>
 
 
-
         <!-- server runtime library -->
         <dependency>
             <groupId>com.sun</groupId>
@@ -61,8 +60,35 @@
         </dependency>
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-operation-core</artifactId>
+            <artifactId>fileserver-adapter</artifactId>
             <version>3.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.centit.support</groupId>
+            <artifactId>centit-database-datasource</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>centit-persistence-extend</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.centit.support</groupId>
+            <artifactId>centit-report-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>database-metadata</artifactId>
+            <version>1.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.javacsv</groupId>
+            <artifactId>javacsv</artifactId>
+            <version>2.0</version>
         </dependency>
     </dependencies>
 

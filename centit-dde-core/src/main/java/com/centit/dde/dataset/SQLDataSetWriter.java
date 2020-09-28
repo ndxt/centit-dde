@@ -1,30 +1,21 @@
-package com.centit.dde.utils;
+package com.centit.dde.dataset;
 
-import com.alibaba.fastjson.JSON;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetWriter;
-import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.dde.utils.DBBatchUtils;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
-import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.DbcpConnectPools;
 import com.centit.support.database.utils.PersistenceException;
 import com.centit.support.database.utils.TransactionHandler;
-import com.centit.support.security.Md5Encoder;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,11 +23,10 @@ import java.util.Map;
  * 需要设置的参数有：
  *      数据库连接信息 DatabaseInfo
  *      对应的表信息 SimpleTableInfo
- * @author zhf
  */
-public class KeyValueTableWriter implements DataSetWriter {
-    private static String WRITER_ERROR_TAG = "rmdb_dataset_writer_result";
-    private static final Logger logger = LoggerFactory.getLogger(KeyValueTableWriter.class);
+public class SQLDataSetWriter implements DataSetWriter {
+    public static String WRITER_ERROR_TAG = "rmdb_dataset_writer_result";
+    private static final Logger logger = LoggerFactory.getLogger(SQLDataSetWriter.class);
 
     private DataSourceDescription dataSource;
     private TableInfo tableInfo;
@@ -48,19 +38,19 @@ public class KeyValueTableWriter implements DataSetWriter {
      */
     private boolean saveAsWhole;
 
-    public KeyValueTableWriter(){
+    public SQLDataSetWriter(){
         saveAsWhole = true;
         connection = null;
     }
 
-    public KeyValueTableWriter(DataSourceDescription dataSource, TableInfo tableInfo){
+    public SQLDataSetWriter(DataSourceDescription dataSource, TableInfo tableInfo){
         this.saveAsWhole = true;
         this.connection = null;
         this.tableInfo = tableInfo;
         this.dataSource = dataSource;
     }
 
-    public KeyValueTableWriter(Connection connection, TableInfo tableInfo){
+    public SQLDataSetWriter(Connection connection, TableInfo tableInfo){
         this.saveAsWhole = true;
         this.connection = connection;
         this.tableInfo = tableInfo;
@@ -73,35 +63,6 @@ public class KeyValueTableWriter implements DataSetWriter {
             throw new ObjectException(PersistenceException.DATABASE_OPERATE_EXCEPTION, e);
         }
     }
-
-    private Map<String, Object> transToKeyValue(Map<String, Object> data){
-
-        String pkValue;
-        List<? extends TableField> pkCols = tableInfo.getPkFields();
-        if(pkCols != null && pkCols.size()>1){
-            pkValue = tableInfo.fetchObjectPkAsId(data);
-        }else {
-            pkValue = StringBaseOpt.castObjectToString(data.get("id"));
-        }
-        String fieldValue = JSON.toJSONString(data);
-        if(StringUtils.isBlank(pkValue)){
-            pkValue = Md5Encoder.encodeBase64(fieldValue, true);
-        }
-        Date updateDate = DatetimeOpt.castObjectToDate(data.get("lastUpdateTime"));
-        if(updateDate==null){
-            updateDate = DatetimeOpt.currentUtilDate();
-        }
-        return CollectionsOpt.createHashMap("objectId", pkValue,
-            "objectJson", pkValue, "lastModifyTime", updateDate);
-    }
-
-    private List<Map<String, Object>> transToKeyValueList(List<Map<String, Object>> datas){
-        List<Map<String, Object>> keyValueDatas = new ArrayList<>(datas.size()+1);
-        for(Map<String, Object> data : datas){
-            keyValueDatas.add(transToKeyValue(data));
-        }
-        return keyValueDatas;
-    }
     /**
      * 将 dataSet 数据集 持久化
      * @param dataSet 数据集
@@ -113,11 +74,11 @@ public class KeyValueTableWriter implements DataSetWriter {
                 if (connection == null) {
                     TransactionHandler.executeInTransaction(dataSource,
                         (conn) -> DBBatchUtils.batchInsertObjects(conn,
-                            tableInfo, transToKeyValueList(dataSet.getData())));
+                            tableInfo, dataSet.getData()));
                 } else {
                     TransactionHandler.executeInTransaction(connection,
                         (conn) -> DBBatchUtils.batchInsertObjects(conn,
-                            tableInfo, transToKeyValueList(dataSet.getData())));
+                            tableInfo, dataSet.getData()));
                 }
                 for(Map<String, Object> row : dataSet.getData()){
                     row.put(WRITER_ERROR_TAG,"ok");
@@ -134,17 +95,19 @@ public class KeyValueTableWriter implements DataSetWriter {
                 fetchConnect();
                 createConn = true;
             }
+
             for(Map<String, Object> row : dataSet.getData()){
                 try {
                     TransactionHandler.executeInTransaction(connection,
                         (conn) ->
                             GeneralJsonObjectDao.createJsonObjectDao(connection, tableInfo)
-                                .saveNewObject(transToKeyValue(row)));
+                                .saveNewObject(row));
                     row.put(WRITER_ERROR_TAG,"ok");
                 } catch (SQLException e) {
                     row.put(WRITER_ERROR_TAG,e.getMessage());
                 }
             }
+
             if(createConn){
                 DbcpConnectPools.closeConnect(connection);
             }
@@ -165,11 +128,11 @@ public class KeyValueTableWriter implements DataSetWriter {
                 if (connection == null) {
                     TransactionHandler.executeInTransaction(dataSource,
                         (conn) -> DBBatchUtils.batchMergeObjects(conn,
-                            tableInfo, transToKeyValueList(dataSet.getData())));
+                            tableInfo, dataSet.getData()));
                 } else {
                     TransactionHandler.executeInTransaction(connection,
                         (conn) -> DBBatchUtils.batchMergeObjects(conn,
-                            tableInfo, transToKeyValueList(dataSet.getData())));
+                            tableInfo, dataSet.getData()));
                 }
                 for(Map<String, Object> row : dataSet.getData()){
                     row.put(WRITER_ERROR_TAG, "ok");
@@ -193,7 +156,7 @@ public class KeyValueTableWriter implements DataSetWriter {
                         (conn) ->{
                             try {
                                 return GeneralJsonObjectDao.createJsonObjectDao(connection, tableInfo)
-                                    .mergeObject(transToKeyValue(row));
+                                    .mergeObject(row);
                             } catch (IOException e) {
                                 throw new ObjectException(PersistenceException.DATABASE_OPERATE_EXCEPTION, e);
                             }
