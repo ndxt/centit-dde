@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.vo.ColumnSchema;
 import com.centit.dde.vo.DataPacketSchema;
 import com.centit.dde.vo.DataSetSchema;
-import com.centit.product.dataopt.bizopt.BuiltInOperation;
+import com.centit.product.dataopt.utils.BuiltInOperation;
 import com.centit.product.dataopt.core.DataSet;
 import com.centit.product.dataopt.utils.BizOptUtils;
 import com.centit.product.dataopt.utils.DBBatchUtils;

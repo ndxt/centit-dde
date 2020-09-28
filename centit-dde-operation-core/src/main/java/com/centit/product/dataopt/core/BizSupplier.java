@@ -9,6 +9,9 @@ public interface BizSupplier extends Supplier<BizModel> {
      * 如果是，处理器将反复调用 。知道 get() 返回 null 结束
      * @return 否是 批量的
      */
-    boolean isBatchWise();
+    default boolean isBatchWise(){
+        return false;
+    }
+
 
 }

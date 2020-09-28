@@ -18,7 +18,6 @@
         <module>centit-dde-agent</module>
         <module>centit-dde-core</module>
         <module>centit-dde-module</module>
-        <module>centit-dde-write</module>
         <module>centit-dde-operation-core</module>
     </modules>
     <name>com.centit.product:centit-dde</name>

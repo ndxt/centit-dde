@@ -98,7 +98,7 @@
         </dependency>
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-write</artifactId>
+            <artifactId>centit-dde-core</artifactId>
             <version>3.1-SNAPSHOT</version>
         </dependency>
 

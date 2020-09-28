@@ -15,8 +15,10 @@ import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 
-import com.centit.product.dataopt.bizopt.BuiltInOperation;
-import com.centit.product.dataopt.bizopt.JsMateObjectEventRuntime;
+import com.centit.product.dataopt.bizopt.JSBizOperation;
+import com.centit.product.dataopt.bizopt.SimpleBizSupplier;
+import com.centit.product.dataopt.core.BizOptFlow;
+import com.centit.product.dataopt.utils.BuiltInOperation;
 import com.centit.product.dataopt.core.BizModel;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaObjectService;
@@ -30,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import javax.annotation.PostConstruct;
 import java.io.*;
 import java.util.Date;
 import java.util.List;
@@ -43,25 +46,37 @@ import java.util.Map;
 public class DataPacketServiceImpl implements DataPacketService {
     @Autowired(required = false)
     private  JedisPool jedisPool;
+
     @Autowired(required = false)
     private  FileStore fileStore;
+
     @Autowired(required = false)
     private MetaObjectService metaObjectService;
+
     @Autowired(required = false)
     private DatabaseRunTime databaseRunTime;
 
-    private final DataPacketDao dataPacketDao;
-
-    private final DataSetDefineDao dataSetDefineDao;
-
-    private final IntegrationEnvironment integrationEnvironment;
+    @Autowired
+    private DataPacketDao dataPacketDao;
 
     @Autowired
-    public DataPacketServiceImpl(  DataPacketDao dataPacketDao, DataSetDefineDao dataSetDefineDao, IntegrationEnvironment integrationEnvironment) {
+    private DataSetDefineDao dataSetDefineDao;
 
-        this.dataPacketDao = dataPacketDao;
-        this.dataSetDefineDao = dataSetDefineDao;
-        this.integrationEnvironment = integrationEnvironment;
+    @Autowired
+    private IntegrationEnvironment integrationEnvironment;
+
+    @Autowired
+    private BizOptFlow bizOptFlow;
+
+    public DataPacketServiceImpl( ) {
+
+    }
+
+    @PostConstruct
+    public void init(){
+        JSBizOperation jsBizOperation =new JSBizOperation(metaObjectService,
+            databaseRunTime);
+        bizOptFlow.registOperation("js", jsBizOperation);
     }
 
     @Override
@@ -241,12 +256,7 @@ public class DataPacketServiceImpl implements DataPacketService {
             optsteps = dataPacket.getDataOptDescJson();
         }
         if(optsteps!=null) {
-            BuiltInOperation builtInOperation = new BuiltInOperation(optsteps);
-            JsMateObjectEventRuntime jsMateObjectEventRuntime=
-                new JsMateObjectEventRuntime(metaObjectService,databaseRunTime);
-            jsMateObjectEventRuntime.setParms(paramsMap);
-            builtInOperation.setJsMateObjectEvent(jsMateObjectEventRuntime);
-            bizModel = builtInOperation.apply(bizModel);
+            bizModel = bizOptFlow.run(new SimpleBizSupplier(bizModel) ,optsteps);
         }
         setDataPacketBuf(bizModel, dataPacket, paramsMap);
         return bizModel;

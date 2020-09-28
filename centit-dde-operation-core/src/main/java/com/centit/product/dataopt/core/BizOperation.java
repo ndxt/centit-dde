@@ -1,10 +1,10 @@
 package com.centit.product.dataopt.core;
 
-import java.util.function.Function;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * @author zhf
  */
-public interface BizOperation extends Function<BizModel, BizModel>{
-
+public interface BizOperation{
+    void doOpt(BizModel bizModel, JSONObject bizOptJson);
 }

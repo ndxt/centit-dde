@@ -1,9 +1,8 @@
 package com.centit.dde.datamoving;
 
-import com.centit.dde.datamoving.service.TaskRun;
+import com.centit.dde.services.impl.TaskRun;
 import com.centit.fileserver.common.FileStore;
 import com.centit.fileserver.utils.OsFileStore;
-import com.centit.product.dataopt.core.BizModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,7 +17,6 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = {"com.centit"},
     excludeFilters = @ComponentScan.Filter(value = org.springframework.stereotype.Controller.class))
 public class DataMovingApplication {
-
     /**
      * 这个只做一个任务的一次交换
      * 由 agent 调度

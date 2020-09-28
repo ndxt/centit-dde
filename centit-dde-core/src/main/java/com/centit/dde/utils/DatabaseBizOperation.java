@@ -1,10 +1,9 @@
-package com.centit.dde.datamoving.dataopt;
+package com.centit.dde.utils;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.product.dataopt.bizopt.BuiltInOperation;
+import com.centit.product.dataopt.utils.BuiltInOperation;
 import com.centit.product.dataopt.bizopt.PersistenceOperation;
 import com.centit.product.dataopt.core.BizModel;
 import com.centit.product.dataopt.core.DataSet;
@@ -17,16 +16,12 @@ import com.centit.product.dataopt.utils.DataSetOptUtil;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
-import com.centit.support.database.transaction.ConnectThreadHolder;
-import com.centit.support.database.transaction.JdbcTransaction;
 import com.centit.support.database.utils.DataSourceDescription;
-import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,11 +52,8 @@ public class DatabaseBizOperation extends BuiltInOperation {
                 return writeCsvFile(bizModel, bizOptJson);
             default:
                 return writeDatabase(bizModel, bizOptJson);
-
         }
-
     }
-
 
     private BizModel writeDatabase(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());

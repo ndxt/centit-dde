@@ -1,24 +1,21 @@
-package com.centit.dde.datamoving.service;
+package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.dao.TaskLogDao;
-import com.centit.dde.datamoving.dataopt.DatabaseBizOperation;
-import com.centit.dde.datamoving.utils.BizOptFlowUtil;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.DBPacketBizSupplier;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.product.dataopt.bizopt.JsMateObjectEventRuntime;
+import com.centit.product.dataopt.core.BizOptFlow;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
-import com.centit.support.json.JSONOpt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +31,7 @@ public class TaskRun {
     private final DataPacketDao dataPacketDao;
     private final MetaDataService metaDataService;
     private final IntegrationEnvironment integrationEnvironment;
-    private final DatabaseBizOperation databaseBizOperation;
+    private final BizOptFlow bizOptFlow;
     private FileStore fileStore;
 
     @Autowired(required = false)
@@ -63,17 +60,21 @@ public class TaskRun {
     private TaskDetailLog detailLog;
 
     @Autowired
-    public TaskRun(TaskLogDao taskLogDao, TaskDetailLogDao taskDetailLogDao, DataPacketDao dataPacketDao, MetaDataService metaDataService, IntegrationEnvironment integrationEnvironment, DatabaseBizOperation databaseBizOperation) {
+    public TaskRun(TaskLogDao taskLogDao,
+                   TaskDetailLogDao taskDetailLogDao,
+                   DataPacketDao dataPacketDao,
+                   MetaDataService metaDataService,
+                   IntegrationEnvironment integrationEnvironment,
+                   BizOptFlow bizOptFlow) {
         this.taskLogDao = taskLogDao;
         this.taskDetailLogDao = taskDetailLogDao;
         this.dataPacketDao = dataPacketDao;
         this.metaDataService = metaDataService;
         this.integrationEnvironment = integrationEnvironment;
-        this.databaseBizOperation = databaseBizOperation;
+        this.bizOptFlow = bizOptFlow;
         this.taskLog = new TaskLog();
         this.detailLog = new TaskDetailLog();
     }
-
 
     private int runStep(DataPacket dataPacket) {
         JSONObject bizOptJson = dataPacket.getDataOptDescJson();
@@ -89,14 +90,15 @@ public class TaskRun {
             /*添加参数默认值传输*/
             dbPacketBizSupplier.setQueryParams(dataPacket.getPacketParamsValue());
 
-            databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
+            /*databaseBizOperation.setIntegrationEnvironment(integrationEnvironment);
             databaseBizOperation.setMetaDataService(metaDataService);
             databaseBizOperation.setBizOptJson(bizOptJson);
             JsMateObjectEventRuntime jsMateObjectEventRuntime =
                 new JsMateObjectEventRuntime(metaObjectService, databaseRunTime);
             jsMateObjectEventRuntime.setParms(dataPacket.getPacketParamsValue());
-            databaseBizOperation.setJsMateObjectEvent(jsMateObjectEventRuntime);
-            iResult = BizOptFlowUtil.runDataExchange(dbPacketBizSupplier, databaseBizOperation);
+            databaseBizOperation.setJsMateObjectEvent(jsMateObjectEventRuntime);*/
+            bizOptFlow.run(dbPacketBizSupplier, bizOptJson);
+            iResult ++;
             saveDetail(iResult, "ok");
         } catch (ObjectException e) {
             saveDetail(0, getStackTrace(e));
