@@ -11,8 +11,6 @@
 
     <artifactId>centit-dde-core</artifactId>
     <dependencies>
-
-
         <!-- server runtime library -->
         <dependency>
             <groupId>com.sun</groupId>
