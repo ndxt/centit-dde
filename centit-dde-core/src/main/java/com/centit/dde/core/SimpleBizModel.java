@@ -36,10 +36,20 @@ public class SimpleBizModel implements BizModel, Serializable {
 
     @Override
     public boolean isEmpty(){
-        return getBizData() == null ||
-            getBizData().isEmpty()||
+        return bizData == null ||
+            bizData.isEmpty()||
             getMainDataSet() == null||
             getMainDataSet().isEmpty();
+    }
+    
+    
+    @JSONField(deserialize = false, serialize = false)
+    @Override
+    public DataSet getMainDataSet(){
+        if(bizData!=null){
+            return getBizData().get(getModelName());
+        }
+        return null;
     }
 
     @Override
