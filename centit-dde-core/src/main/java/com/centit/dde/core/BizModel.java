@@ -42,18 +42,10 @@ public interface BizModel {
         putDataSet(this.getModelName(), dataSet);
     }
 
-    default boolean isEmpty(){
-        return getBizData() == null ||
-            getBizData().isEmpty();
-    }
+    boolean isEmpty();
 
     @JSONField(deserialize = false, serialize = false)
-    default DataSet getMainDataSet(){
-        if(!isEmpty()){
-            return getBizData().get(getModelName());
-        }
-        return null;
-    }
+    DataSet getMainDataSet();
 
     default DataSet fetchDataSetByName(String relationPath){
         Map<String, DataSet> dss = getBizData();
