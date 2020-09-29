@@ -11,6 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author zhf
+ */
 public class BizModelJSONTransform
     implements VariableTranslate, JSONTransformDataSupport{
     private BizModel data;

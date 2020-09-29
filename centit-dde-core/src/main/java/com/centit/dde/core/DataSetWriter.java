@@ -1,5 +1,8 @@
 package com.centit.dde.core;
 
+/**
+ * @author zhf
+ */
 public interface DataSetWriter {
     /**
      * 将 dataSet 数据集 持久化

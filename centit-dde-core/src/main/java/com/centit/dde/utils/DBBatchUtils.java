@@ -24,6 +24,7 @@ import java.util.Map;
 /**
  * 数据库批量操作 工具类，
  * 目的是为了提高批量处理的效率
+ * @author zhf
  */
 public abstract class DBBatchUtils {
     protected static final Logger logger = LoggerFactory.getLogger(DBBatchUtils.class);

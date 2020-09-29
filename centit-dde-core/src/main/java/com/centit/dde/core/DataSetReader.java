@@ -2,6 +2,9 @@ package com.centit.dde.core;
 
 import java.util.Map;
 
+/**
+ * @author zhf
+ */
 public interface DataSetReader {
     /**
      * 读取 dataSet 数据集

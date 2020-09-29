@@ -4,6 +4,9 @@ import com.centit.dde.core.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author zhf
+ */
 public class DataLoadSupplier implements BizSupplier {
     private Map<String, DataSetReader> dataReaders;
     private String modelName;

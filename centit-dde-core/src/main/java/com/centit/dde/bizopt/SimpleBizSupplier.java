@@ -3,6 +3,9 @@ package com.centit.dde.bizopt;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizSupplier;
 
+/**
+ * @author zhf
+ */
 public class SimpleBizSupplier implements BizSupplier {
 
     public static final SimpleBizSupplier DUMMY_BIZ_SUPPLIER

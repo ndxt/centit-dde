@@ -6,13 +6,16 @@ import com.centit.support.compiler.VariableTranslate;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author zhf
+ */
 public class DatasetVariableTranslate implements VariableTranslate {
 
     private List<Map<String, Object>> dataSet;
     private int offset;
     private int length;
     private int currentPos;
-    //public
+
     public DatasetVariableTranslate(){
         dataSet = null;
     }
@@ -30,8 +33,9 @@ public class DatasetVariableTranslate implements VariableTranslate {
       */
     @Override
     public Object getVarValue(String varName) {
-        if(dataSet ==null)
+        if(dataSet ==null) {
             return null;
+        }
         int n = varName.lastIndexOf('.');
 
         if(n>0){

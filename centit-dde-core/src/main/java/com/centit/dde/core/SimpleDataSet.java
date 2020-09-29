@@ -15,7 +15,7 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
     private static final long serialVersionUID = 1L;
 
     public SimpleDataSet(){
-        dataSetName = DataSet.SINGLE_DATA_SET_DEFALUT_NAME;
+        dataSetName = DataSet.SINGLE_DATA_SET_DEFAULT_NAME;
         sorted = false;
     }
 
@@ -26,7 +26,7 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
 
     public SimpleDataSet(List<Map<String, Object>> data) {
         this.data = data;
-        this.dataSetName = DataSet.SINGLE_DATA_SET_DEFALUT_NAME;;
+        this.dataSetName = DataSet.SINGLE_DATA_SET_DEFAULT_NAME;;
         this.sorted = false;
     }
     /**

@@ -9,9 +9,10 @@ import java.util.Map;
  * 1. 文件。 xml、json、cvs、excel sheet
  * 2. 数据库中的一个查询
  * 3. 一个返回数据列表的程序接口
+ * @author zhf
  */
 public interface DataSet {
-    String SINGLE_DATA_SET_DEFALUT_NAME = "default";
+    String SINGLE_DATA_SET_DEFAULT_NAME = "default";
     String SINGLE_DATA_FIELD_NAME = "data";
     /**
      * 返回 DataSet 的名称

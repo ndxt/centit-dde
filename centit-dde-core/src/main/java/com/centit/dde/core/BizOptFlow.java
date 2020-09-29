@@ -4,8 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 
 /**
  * 业务流
+ * @author zhf
  */
 public interface BizOptFlow {
-    void registOperation(String key, BizOperation opt);
+    void registerOperation(String key, BizOperation opt);
     BizModel run(BizSupplier supplier, JSONObject bizOptJson);
 }

@@ -2,7 +2,7 @@ package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.utils.PersistenceBizOperation;
+import com.centit.dde.bizopt.PersistenceBizOperation;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.dde.bizopt.JSBizOperation;
 import com.centit.dde.core.BizModel;
@@ -67,7 +67,6 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("filterExt", BuiltInOperation::runFilterExt);
         allOperations.put("check", BuiltInOperation::runCheckData);
         allOperations.put("static", BuiltInOperation::runStaticData);
-        //allOperations.put("js", BuiltInOperation::runJsData);
         allOperations.put("http", BuiltInOperation::runHttpData);
 
         JSBizOperation jsBizOperation =new JSBizOperation(metaObjectService,
@@ -76,12 +75,11 @@ public class BizOptFlowImpl implements BizOptFlow {
 
         PersistenceBizOperation databaseOperation = new PersistenceBizOperation(
             path, integrationEnvironment, metaDataService);
-
         allOperations.put("persistence", databaseOperation);
     }
 
     @Override
-    public void registOperation(String key, BizOperation opt){
+    public void registerOperation(String key, BizOperation opt){
         allOperations.put(key, opt);
     }
     /**

@@ -1,9 +1,6 @@
-package com.centit.dde.utils;
+package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.dde.bizopt.PersistenceOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
@@ -12,6 +9,10 @@ import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.dataset.SQLDataSetWriter;
+import com.centit.dde.utils.BuiltInOperation;
+import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.framework.ip.po.DatabaseInfo;
+import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
@@ -23,10 +24,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+/**
+ * @author zhf
+ */
 public class PersistenceBizOperation implements BizOperation {
 
     private String exportPath;
-
+    private static final String WRITER_INDICATE_APPEND = "append";
+    private static final String WRITER_INDICATE_MERGE = "merge";
+    private static final String WRITER_INDICATE_UPDATE = "update";
     private IntegrationEnvironment integrationEnvironment;
     private MetaDataService metaDataService;
 
@@ -91,11 +97,11 @@ public class PersistenceBizOperation implements BizOperation {
             DataSourceDescription.valueOf(databaseInfo), tableInfo);
 
         switch (writerType) {
-            case PersistenceOperation.WRITER_INDICATE_APPEND:
+            case WRITER_INDICATE_APPEND:
                 dataSetWriter.append(dataSet);
                 break;
-            case PersistenceOperation.WRITER_INDICATE_MERGE:
-            case PersistenceOperation.WRITER_INDICATE_UPDATE:
+            case WRITER_INDICATE_MERGE:
+            case WRITER_INDICATE_UPDATE:
                 dataSetWriter.merge(dataSet);
                 break;
             default:

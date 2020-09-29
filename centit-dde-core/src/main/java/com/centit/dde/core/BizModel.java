@@ -32,9 +32,9 @@ public interface BizModel {
      *                          否则为 JSONArray
      * @return JSONObject
      */
-    JSONObject toJSONObject(boolean singleRowAsObject);
+    JSONObject toJsonObject(boolean singleRowAsObject);
 
-    JSONObject toJSONObject(String [] singleRowDatasets);
+    JSONObject toJsonObject(String [] singleRowDatasets);
 
     void putDataSet(String relationPath, DataSet dataSet);
 

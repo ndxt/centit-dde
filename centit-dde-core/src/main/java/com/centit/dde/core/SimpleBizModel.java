@@ -56,7 +56,7 @@ public class SimpleBizModel implements BizModel, Serializable {
      * @return JSONObject
      */
     @Override
-    public JSONObject toJSONObject(boolean singleRowAsObject) {
+    public JSONObject toJsonObject(boolean singleRowAsObject) {
         JSONObject dataObject = new JSONObject();
         if (bizData != null) {
             for (DataSet dataSet : bizData.values()) {
@@ -75,11 +75,11 @@ public class SimpleBizModel implements BizModel, Serializable {
     }
 
     @Override
-    public JSONObject toJSONObject(String[] singleRowDatasets) {
+    public JSONObject toJsonObject(String[] singleRowDataSets) {
         JSONObject dataObject = new JSONObject();
         if (bizData != null) {
             for (DataSet dataSet : bizData.values()) {
-                if (StringUtils.equalsAny(dataSet.getDataSetName(), singleRowDatasets)) {
+                if (StringUtils.equalsAny(dataSet.getDataSetName(), singleRowDataSets)) {
                     dataObject.put(dataSet.getDataSetName(), dataSet.getFirstRow());
                 } else if (!dataSet.isEmpty()) {
                     dataObject.put(dataSet.getDataSetName(), dataSet.getData());
