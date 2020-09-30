@@ -50,6 +50,13 @@ public interface DataSet {
         return getData()==null || getData().size()==0;
     }
 
+    /**
+     * @return 数据集大小
+     */
+    default int size(){
+        return getData()==null? 0: getData().size();
+    }
+
     default int getRowCount(){
         return getData()==null? 0 : getData().size();
     }

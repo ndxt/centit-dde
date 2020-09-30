@@ -27,6 +27,8 @@ public interface BizModel {
      */
     Map<String, DataSet> getBizData();
 
+    int modelSize();
+
     boolean isEmpty();
 
     void putDataSet(String relationPath, DataSet dataSet);

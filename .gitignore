@@ -4,4 +4,5 @@ target
 *.iml
 web/
 .settings/*
+D:
 /D:

@@ -38,11 +38,21 @@ public class SimpleBizModel implements BizModel, Serializable {
     }
 
     @Override
+    public int modelSize(){
+        if(bizData == null || bizData.isEmpty()) {
+            return 0;
+        }
+        DataSet mainData = bizData.get(modelName);
+        if(mainData== null){
+            return 0;
+        }
+        return bizData.get(modelName).size();
+    }
+
+    @Override
     public boolean isEmpty(){
         return bizData == null ||
-            bizData.isEmpty()||
-            bizData.get(modelName) == null||
-            bizData.get(modelName).isEmpty();
+            bizData.isEmpty();
     }
 
     @JSONField(deserialize = false, serialize = false)
