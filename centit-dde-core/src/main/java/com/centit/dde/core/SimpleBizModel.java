@@ -1,9 +1,12 @@
 package com.centit.dde.core;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.centit.support.algorithm.CollectionsOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,16 +41,15 @@ public class SimpleBizModel implements BizModel, Serializable {
     public boolean isEmpty(){
         return bizData == null ||
             bizData.isEmpty()||
-            getMainDataSet() == null||
-            getMainDataSet().isEmpty();
+            bizData.get(modelName) == null||
+            bizData.get(modelName).isEmpty();
     }
-    
-    
+
     @JSONField(deserialize = false, serialize = false)
     @Override
-    public DataSet getMainDataSet(){
+    public DataSet getDataSet(String relationPath){
         if(bizData!=null){
-            return getBizData().get(getModelName());
+            return getBizData().get(relationPath);
         }
         return null;
     }

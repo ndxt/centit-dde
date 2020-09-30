@@ -27,6 +27,12 @@ public interface BizModel {
      */
     Map<String, DataSet> getBizData();
 
+    boolean isEmpty();
+
+    void putDataSet(String relationPath, DataSet dataSet);
+
+    DataSet getDataSet(String relationPath);
+
     /**
      * @param singleRowAsObject 如果为true DataSet中只有一行记录的就作为JSONObject；
      *                          否则为 JSONArray
@@ -36,16 +42,15 @@ public interface BizModel {
 
     JSONObject toJsonObject(String [] singleRowDatasets);
 
-    void putDataSet(String relationPath, DataSet dataSet);
 
     default void putMainDataSet(DataSet dataSet) {
         putDataSet(this.getModelName(), dataSet);
     }
 
-    boolean isEmpty();
-
     @JSONField(deserialize = false, serialize = false)
-    DataSet getMainDataSet();
+    default DataSet getMainDataSet(){
+        return getDataSet(this.getModelName());
+    }
 
     default DataSet fetchDataSetByName(String relationPath){
         Map<String, DataSet> dss = getBizData();
