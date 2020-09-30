@@ -49,7 +49,7 @@ public class SimpleBizModel implements BizModel, Serializable {
     @Override
     public DataSet getDataSet(String relationPath){
         if(bizData!=null){
-            return getBizData().get(relationPath);
+            return bizData.get(relationPath);
         }
         return null;
     }
