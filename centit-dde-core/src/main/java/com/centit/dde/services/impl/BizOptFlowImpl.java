@@ -100,7 +100,6 @@ public class BizOptFlowImpl implements BizOptFlow {
         return result;
     }
 
-
     protected void runOneStep(BizModel bizModel, JSONObject bizOptJson) {
         String sOptType = bizOptJson.getString("operation");
         BizOperation opt = allOperations.get(sOptType);
