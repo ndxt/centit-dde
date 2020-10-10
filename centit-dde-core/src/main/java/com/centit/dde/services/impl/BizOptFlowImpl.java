@@ -106,7 +106,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         if(opt == null) {
             throw new ObjectException(bizOptJson, "找不到对应的操作："+sOptType);
         }
-        opt.doOpt(bizModel, bizOptJson);
+        opt.runOpt(bizModel, bizOptJson);
     }
 
     @SneakyThrows

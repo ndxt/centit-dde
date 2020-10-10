@@ -7,5 +7,5 @@ import com.alibaba.fastjson.JSONObject;
  */
 @FunctionalInterface
 public interface BizOperation{
-    void doOpt(BizModel bizModel, JSONObject bizOptJson);
+    void runOpt(BizModel bizModel, JSONObject bizOptJson);
 }

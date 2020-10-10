@@ -45,7 +45,7 @@ public class PersistenceBizOperation implements BizOperation {
     }
 
     @Override
-    public void doOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public void runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String dataType = BuiltInOperation.getJsonFieldString(bizOptJson, "dataType", "D");
         switch (dataType) {
             case "E":

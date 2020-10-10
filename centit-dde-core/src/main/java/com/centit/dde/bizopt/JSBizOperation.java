@@ -30,7 +30,7 @@ public class JSBizOperation implements BizOperation {
     }
 
     @Override
-    public void doOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public void runOpt(BizModel bizModel, JSONObject bizOptJson) {
         JSRuntimeContext /*JsMateObjectEventRuntime*/ jsRuntimeContext = new JSRuntimeContext();
 
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", "js");
