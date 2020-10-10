@@ -40,7 +40,7 @@ public class JSBizOperation implements BizOperation {
         }
         try {
             Object object = jsRuntimeContext.callJsFunc("runOpt",
-                bizModel, this);
+                this, bizModel);
             bizModel.putDataSet(targetDsName,
                 BizOptUtils.castObjectToDataSet(object));
         } catch (ScriptException | NoSuchMethodException e) {
