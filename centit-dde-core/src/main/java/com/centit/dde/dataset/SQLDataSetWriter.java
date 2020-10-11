@@ -23,13 +23,23 @@ import java.util.Map;
  * 需要设置的参数有：
  *      数据库连接信息 DatabaseInfo
  *      对应的表信息 SimpleTableInfo
+ * @author zhf
  */
 public class SQLDataSetWriter implements DataSetWriter {
-    public static String WRITER_ERROR_TAG = "rmdb_dataset_writer_result";
+    public static String WRITER_ERROR_TAG = "rmdbDatasetWriterResult";
     private static final Logger logger = LoggerFactory.getLogger(SQLDataSetWriter.class);
 
     private DataSourceDescription dataSource;
     private TableInfo tableInfo;
+    private Map fieldsMap;
+    public Map getFieldsMap() {
+        return fieldsMap;
+    }
+
+    public void setFieldsMap(Map fieldsMap) {
+        this.fieldsMap = fieldsMap;
+    }
+
 
     private Connection connection;
     /** true 数据集整体作为一个事务写入
@@ -74,11 +84,11 @@ public class SQLDataSetWriter implements DataSetWriter {
                 if (connection == null) {
                     TransactionHandler.executeInTransaction(dataSource,
                         (conn) -> DBBatchUtils.batchInsertObjects(conn,
-                            tableInfo, dataSet.getData()));
+                            tableInfo, dataSet.getData(),fieldsMap));
                 } else {
                     TransactionHandler.executeInTransaction(connection,
                         (conn) -> DBBatchUtils.batchInsertObjects(conn,
-                            tableInfo, dataSet.getData()));
+                            tableInfo, dataSet.getData(),fieldsMap));
                 }
                 for(Map<String, Object> row : dataSet.getData()){
                     row.put(WRITER_ERROR_TAG,"ok");
@@ -128,11 +138,11 @@ public class SQLDataSetWriter implements DataSetWriter {
                 if (connection == null) {
                     TransactionHandler.executeInTransaction(dataSource,
                         (conn) -> DBBatchUtils.batchMergeObjects(conn,
-                            tableInfo, dataSet.getData()));
+                            tableInfo, dataSet.getData(),fieldsMap));
                 } else {
                     TransactionHandler.executeInTransaction(connection,
                         (conn) -> DBBatchUtils.batchMergeObjects(conn,
-                            tableInfo, dataSet.getData()));
+                            tableInfo, dataSet.getData(),fieldsMap));
                 }
                 for(Map<String, Object> row : dataSet.getData()){
                     row.put(WRITER_ERROR_TAG, "ok");

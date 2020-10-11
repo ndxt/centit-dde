@@ -7,7 +7,6 @@ import com.centit.support.quartz.AbstractQuartzJob;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 
-import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -37,6 +36,8 @@ public class RunTaskJob extends AbstractQuartzJob {
         taskLogDao.saveNewObject(taskLog);
         PathConfig pathConfig = ContextUtils.getBean(PathConfig.class);
         try {
+//            TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
+//            taskRun.runTask(taskLog.getLogId());
             Runtime.getRuntime().exec("java -jar " + pathConfig.getDataMovingPath() + " " + taskLog.getLogId());
 //            //取得命令结果的输出流
 //            InputStream fis=p.getInputStream();
@@ -50,7 +51,7 @@ public class RunTaskJob extends AbstractQuartzJob {
 //            {
 //                System.out.println(line);
 //            }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return true;

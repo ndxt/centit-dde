@@ -25,7 +25,7 @@ public abstract class DataSetOptUtil {
      * @param formulaMap 字段映射关系
      * @return 新的数据集
      */
-    private static Map<String, Object> mapDataRow(Map<String, Object> inRow,
+    public static Map<String, Object> mapDataRow(Map<String, Object> inRow,
                                                   Collection<Map.Entry<String, String>> formulaMap) {
         VariableFormula formula = new VariableFormula();
         formula.addExtendFunc("toJson", (a) -> JSON.parse(

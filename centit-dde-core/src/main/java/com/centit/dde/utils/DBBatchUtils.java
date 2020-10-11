@@ -16,10 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 数据库批量操作 工具类，
@@ -38,15 +35,21 @@ public abstract class DBBatchUtils {
     }
 
     public static int batchInsertObjects(final Connection conn,
-                                   final TableInfo tableInfo,
-                                   final List<Map<String, Object>> objects) throws SQLException {
-        List<String> fields = achieveAllFields( objects);
+                                         final TableInfo tableInfo,
+                                         final List<Map<String, Object>> objects,Map fieldsMap) throws SQLException {
+        List<String> fields=new ArrayList<>();
+        if(fieldsMap==null) {
+            fields = achieveAllFields(objects);
+        }else{
+            Collections.addAll(fields,(String[])fieldsMap.values().toArray(new String[0]));
+        }
         String sql = GeneralJsonObjectDao.buildInsertSql(tableInfo, fields);
         LeftRightPair<String,List<String>> sqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
         int n = 0;
         QueryLogUtils.printSql(logger,sqlPair.getLeft(), sqlPair.getRight());
         try(PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())){
             for(Map<String, Object> object : objects ) {
+                object=DataSetOptUtil.mapDataRow(object,fieldsMap.entrySet());
                 DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object);
                 n += stmt.executeUpdate();
             }
@@ -57,11 +60,16 @@ public abstract class DBBatchUtils {
     }
 
     public static int batchUpdateObjects(final Connection conn,
-                                  final TableInfo tableInfo,
-                                  //final Collection<String> fields,
-                                  final List<Map<String, Object>> objects) throws SQLException {
+                                         final TableInfo tableInfo,
+                                         //final Collection<String> fields,
+                                         final List<Map<String, Object>> objects,Map fieldsMap) throws SQLException {
         // 这个要重写，需要重新拼写sql语句， 直接拼写为？参数的sql语句据
-        List<String> fields = achieveAllFields( objects);
+        List<String> fields=new ArrayList<>();
+        if(fieldsMap==null) {
+            fields = achieveAllFields(objects);
+        }else{
+            Collections.addAll(fields,(String[])fieldsMap.values().toArray(new String[0]));
+        }
         String sql = GeneralJsonObjectDao.buildUpdateSql(tableInfo, fields) +
             " where " +  GeneralJsonObjectDao.buildFilterSqlByPk(tableInfo,null);
         LeftRightPair<String,List<String>> sqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
@@ -82,14 +90,19 @@ public abstract class DBBatchUtils {
     }
 
     public static int batchMergeObjects(final Connection conn,
-                                  final TableInfo tableInfo,
-                                  final List<Map<String, Object>> objects) throws SQLException {
-        List<String> fields = achieveAllFields( objects);
+                                        final TableInfo tableInfo,
+                                        final List<Map<String, Object>> objects,Map fieldsMap) throws SQLException {
+        List<String> fields=new ArrayList<>();
+        if(fieldsMap==null) {
+            fields = achieveAllFields(objects);
+        }else{
+            Collections.addAll(fields,(String[])fieldsMap.values().toArray(new String[0]));
+        }
         String sql = GeneralJsonObjectDao.buildInsertSql(tableInfo, fields);
         LeftRightPair<String,List<String>> insertSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
         sql = GeneralJsonObjectDao.buildUpdateSql(tableInfo, fields);
         if(null!=sql) {
-             sql+=" where " + GeneralJsonObjectDao.buildFilterSqlByPk(tableInfo, null);
+            sql+=" where " + GeneralJsonObjectDao.buildFilterSqlByPk(tableInfo, null);
         }else{
             sql="";
         }

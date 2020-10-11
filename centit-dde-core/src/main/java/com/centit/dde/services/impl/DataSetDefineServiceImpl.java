@@ -2,16 +2,17 @@ package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dao.DataSetDefineDao;
+import com.centit.dde.dataset.CsvDataSet;
+import com.centit.dde.dataset.ExcelDataSet;
+import com.centit.dde.dataset.SQLDataSetWriter;
 import com.centit.dde.po.DataSetDefine;
 import com.centit.dde.services.DataSetDefineService;
 import com.centit.dde.vo.ColumnSchema;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.dde.core.SimpleDataSet;
-import com.centit.dde.dataset.CsvDataSet;
-import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.*;
 import org.slf4j.Logger;
@@ -184,6 +185,13 @@ public class DataSetDefineServiceImpl implements DataSetDefineService {
                     col.setIsStatData("F");
                     columnSchemas.add(col);
                 }
+                ColumnSchema col = new ColumnSchema();
+                col.setColumnCode(SQLDataSetWriter.WRITER_ERROR_TAG);
+                col.setPropertyName(SQLDataSetWriter.WRITER_ERROR_TAG);
+                col.setColumnName(SQLDataSetWriter.WRITER_ERROR_TAG);
+                col.setDataType(FieldType.STRING);
+                col.setIsStatData("F");
+                columnSchemas.add(col);
             }
         } catch (SQLException e) {
             logger.error("执行查询出错，SQL：{},Param:{}", sSql, qap.getParams());

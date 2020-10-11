@@ -77,7 +77,7 @@ public class DataPacket implements Serializable {
 
     @Column(name = "RECORD_DATE")
     @ApiModelProperty(value = "修改时间", hidden = true)
-    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
+    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW, condition = GeneratorCondition.ALWAYS, value = "today()")
     @JSONField(serialize = false)
     private Date recordDate;
 
@@ -98,12 +98,12 @@ public class DataPacket implements Serializable {
     private String interfaceName;
     @Column(name = "LAST_RUN_TIME")
     @ApiModelProperty(value = "上次执行时间")
-    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
+//    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date lastRunTime;
 
     @Column(name = "NEXT_RUN_TIME")
     @ApiModelProperty(value = "下次执行时间")
-    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
+//    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date nextRunTime;
 
     @Column(name = "IS_VALID")

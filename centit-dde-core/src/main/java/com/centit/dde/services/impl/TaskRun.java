@@ -1,9 +1,12 @@
 package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.core.BizModel;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.dao.TaskLogDao;
+import com.centit.dde.dataset.SQLDataSetWriter;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskLog;
@@ -14,8 +17,10 @@ import com.centit.dde.core.BizOptFlow;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -75,12 +80,12 @@ public class TaskRun {
         this.detailLog = new TaskDetailLog();
     }
 
-    private int runStep(DataPacket dataPacket) {
+    private void runStep(DataPacket dataPacket) {
         JSONObject bizOptJson = dataPacket.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
-            return 0;
+            return ;
         }
-        int iResult = 0;
+        BizModel bizModel = null;
         try {
             DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
             dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
@@ -88,13 +93,12 @@ public class TaskRun {
             dbPacketBizSupplier.setBatchWise(dataPacket.getIsWhile());
             /*添加参数默认值传输*/
             dbPacketBizSupplier.setQueryParams(dataPacket.getPacketParamsValue());
-            bizOptFlow.run(dbPacketBizSupplier, bizOptJson);
-            iResult ++;
-            saveDetail(iResult, "ok");
+            bizModel=bizOptFlow.run(dbPacketBizSupplier, bizOptJson);
+            saveDetail(bizModel, "ok");
         } catch (Exception e) {
-            saveDetail(0, getStackTrace(e));
+            saveDetail(bizModel, getStackTrace(e));
         }
-        return iResult;
+
     }
 
     private  String getStackTrace(Exception e) {
@@ -111,20 +115,34 @@ public class TaskRun {
         return message.toString();
     }
 
-    private void saveDetail(int iResult, String info) {
+    private void saveDetail(BizModel iResult, String info) {
         detailLog.setRunBeginTime(beginTime);
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
+        StringBuilder msg = new StringBuilder();
+        for (DataSet dataset : iResult.getBizData().values()) {
+            if (dataset.getData() != null) {
+                msg.append(dataset.getDataSetName());
+                msg.append(":");
+                msg.append(dataset.size());
+                msg.append("numbers");
+                if(dataset.size()>0) {
+                    msg.append(dataset.getData().get(0).get(SQLDataSetWriter.WRITER_ERROR_TAG));
+                }
+                msg.append(";");
+            }
+        }
         String successSign = "ok";
         if (successSign.equals(info)) {
             detailLog.setLogType(info);
-            detailLog.setSuccessPieces((long) iResult);
+            detailLog.setLogInfo(msg.toString());
+            detailLog.setSuccessPieces((long) iResult.modelSize());
             detailLog.setErrorPieces(0L);
         } else {
             detailLog.setLogType("error");
-            detailLog.setLogInfo(info);
+            detailLog.setLogInfo(msg + ";" + info);
             detailLog.setSuccessPieces(0L);
-            detailLog.setErrorPieces((long) iResult);
+            detailLog.setErrorPieces((long) iResult.modelSize());
         }
         detailLog.setRunEndTime(new Date());
         detailLog.setLogDetailId(UuidOpt.getUuidAsString32());
@@ -135,15 +153,18 @@ public class TaskRun {
         beginTime = new Date();
         taskLog = taskLogDao.getObjectById(logId);
         DataPacket dataPacket = dataPacketDao.getObjectWithReferences(taskLog.getTaskId());
-        int i = runStep(dataPacket);
+        dataPacket.setLastRunTime(new Date());
+        runStep(dataPacket);
         taskLog.setRunEndTime(new Date());
-        if (i > 0) {
-            taskLog.setSuccessPieces("成功" + i + "批");
-            taskLog.setErrorPieces("");
-        } else {
-            taskLog.setErrorPieces("失败");
-            taskLog.setSuccessPieces("");
-        }
         taskLogDao.updateObject(taskLog);
+        dataPacket.setNextRunTime(new Date());
+        if("2".equals(dataPacket.getTaskType())
+            &&dataPacket.getIsValid()
+            && !StringBaseOpt.isNvl(dataPacket.getTaskCron())){
+            CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacket.getTaskCron());
+            dataPacket.setNextRunTime(cronSequenceGenerator.next(dataPacket.getLastRunTime()));
+        }
+
+        dataPacketDao.updateObject(dataPacket);
     }
 }

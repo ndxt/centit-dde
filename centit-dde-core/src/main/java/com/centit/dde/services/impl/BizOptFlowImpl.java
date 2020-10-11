@@ -109,23 +109,17 @@ public class BizOptFlowImpl implements BizOptFlow {
         opt.runOpt(bizModel, bizOptJson);
     }
 
-    @SneakyThrows
+
     public BizModel apply(BizModel bizModel, JSONObject bizOptJson) {
         JSONArray optSteps = bizOptJson.getJSONArray("steps");
         if (optSteps == null || optSteps.isEmpty()) {
             return bizModel;
         }
-        try {
-            for (Object step : optSteps) {
-                if (step instanceof JSONObject) {
-                    /*result =*/
-                    runOneStep(bizModel, (JSONObject) step);
-                }
+        for (Object step : optSteps) {
+            if (step instanceof JSONObject) {
+                /*result =*/
+                runOneStep(bizModel, (JSONObject) step);
             }
-            ConnectThreadHolder.commitAndRelease();
-        }catch (SQLException e){
-            ConnectThreadHolder.rollbackAndRelease();
-            throw e;
         }
         return bizModel;
     }

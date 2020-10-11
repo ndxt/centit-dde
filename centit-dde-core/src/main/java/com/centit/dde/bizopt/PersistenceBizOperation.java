@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.core.DataSetWriter;
 import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.dataset.FileDataSet;
@@ -38,7 +37,7 @@ public class PersistenceBizOperation implements BizOperation {
 
     public PersistenceBizOperation(String exportPath,
                                    IntegrationEnvironment integrationEnvironment,
-                                   MetaDataService metaDataService){
+                                   MetaDataService metaDataService) {
         this.exportPath = exportPath;
         this.integrationEnvironment = integrationEnvironment;
         this.metaDataService = metaDataService;
@@ -61,6 +60,10 @@ public class PersistenceBizOperation implements BizOperation {
     }
 
     public void writeDatabase(BizModel bizModel, JSONObject bizOptJson) {
+        String isRun = BuiltInOperation.getJsonFieldString(bizOptJson, "isRun", "T");
+        if ("F".equalsIgnoreCase(isRun)) {
+            return;
+        }
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseCode", null);
         String tableId = BuiltInOperation.getJsonFieldString(bizOptJson, "tableId", null);
@@ -80,7 +83,7 @@ public class PersistenceBizOperation implements BizOperation {
                 ObjectException.NULL_EXCEPTION,
                 "数据库信息无效：" + databaseCode);
         }
-        runPersistenceMap(bizModel, bizOptJson);
+//        runPersistenceMap(bizModel, bizOptJson);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet == null) {
             throw new ObjectException(bizOptJson,
@@ -93,9 +96,9 @@ public class PersistenceBizOperation implements BizOperation {
                 ObjectException.NULL_EXCEPTION,
                 "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
         }
-        DataSetWriter dataSetWriter = new SQLDataSetWriter(
+        SQLDataSetWriter dataSetWriter = new SQLDataSetWriter(
             DataSourceDescription.valueOf(databaseInfo), tableInfo);
-
+        dataSetWriter.setFieldsMap((Map) bizOptJson.get("fieldsMap"));
         switch (writerType) {
             case WRITER_INDICATE_APPEND:
                 dataSetWriter.append(dataSet);
@@ -112,14 +115,14 @@ public class PersistenceBizOperation implements BizOperation {
     }
 
     private void runPersistenceMap(BizModel bizModel, JSONObject bizOptJson) {
-        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", bizModel.getModelName());
+        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourDsName);
         Object mapInfo = bizOptJson.get("fieldsMap");
-        if(mapInfo instanceof Map){
+        if (mapInfo instanceof Map) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-            HashMap<Object, Object> map=new HashMap<>(((Map) mapInfo).size()+1);
-            ((Map) mapInfo).forEach((key,value)->map.put(value,key));
-            if(dataSet != null) {
+            HashMap<Object, Object> map = new HashMap<>(((Map) mapInfo).size() + 1);
+            ((Map) mapInfo).forEach((key, value) -> map.put(value, key));
+            if (dataSet != null) {
                 DataSet destDs = DataSetOptUtil.appendDeriveField(dataSet, ((Map) map).entrySet());
                 //if(destDS != null){
                 bizModel.putDataSet(targetDsName, destDs);
