@@ -49,8 +49,8 @@ public abstract class DBBatchUtils {
         QueryLogUtils.printSql(logger,sqlPair.getLeft(), sqlPair.getRight());
         try(PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())){
             for(Map<String, Object> object : objects ) {
-                object=DataSetOptUtil.mapDataRow(object,fieldsMap.entrySet());
-                DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object);
+                object=DataSetOptUtil.mapDataRow(object,reverse(fieldsMap).entrySet());
+                DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object,tableInfo);
                 n += stmt.executeUpdate();
             }
         }catch (SQLException e) {
@@ -80,13 +80,20 @@ public abstract class DBBatchUtils {
 //                if (!GeneralJsonObjectDao.checkHasAllPkColumns(tableInfo, object)) {
 //                    throw new SQLException("缺少主键对应的属性。");
 //                }
-                DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object);
+                object=DataSetOptUtil.mapDataRow(object,reverse(fieldsMap).entrySet());
+                DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object,tableInfo);
                 n += stmt.executeUpdate();
             }
         }catch (SQLException e) {
             throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
         }
         return n;
+    }
+
+    private static Map reverse(Map fieldsMap) {
+        HashMap<Object, Object> map = new HashMap<>(fieldsMap.size() + 1);
+        fieldsMap.forEach((key, value) -> map.put(value, key));
+        return map;
     }
 
     public static int batchMergeObjects(final Connection conn,
@@ -118,6 +125,8 @@ public abstract class DBBatchUtils {
 //                if (!GeneralJsonObjectDao.checkHasAllPkColumns(tableInfo, object)) {
 //                    throw new SQLException("缺少主键对应的属性。");
 //                }
+
+                object=DataSetOptUtil.mapDataRow(object,reverse(fieldsMap).entrySet());
                 DatabaseAccess.setQueryStmtParameters(checkStmt, checkSqlPair.getRight(), object);
                 ResultSet rs = checkStmt.executeQuery();
                 boolean exists = false;
@@ -130,12 +139,12 @@ public abstract class DBBatchUtils {
                     e.printStackTrace();
                 }
                 if(exists){
-                    DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), object);
+                    DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), object,tableInfo);
                     if(StringUtils.isNotBlank(updateSqlPair.getLeft())) {
                         n += updateStmt.executeUpdate();
                     }
                 }else{
-                    DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), object);
+                    DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), object,tableInfo);
                     n += insertStmt.executeUpdate();
                 }
             }

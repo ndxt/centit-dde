@@ -187,8 +187,8 @@ public class DataSetDefineServiceImpl implements DataSetDefineService {
                 }
                 ColumnSchema col = new ColumnSchema();
                 col.setColumnCode(SQLDataSetWriter.WRITER_ERROR_TAG);
-                col.setPropertyName(SQLDataSetWriter.WRITER_ERROR_TAG);
-                col.setColumnName(SQLDataSetWriter.WRITER_ERROR_TAG);
+                col.setPropertyName(FieldType.mapPropName(SQLDataSetWriter.WRITER_ERROR_TAG));
+                col.setColumnName(FieldType.mapPropName(SQLDataSetWriter.WRITER_ERROR_TAG));
                 col.setDataType(FieldType.STRING);
                 col.setIsStatData("F");
                 columnSchemas.add(col);

@@ -19,6 +19,7 @@ import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
+import com.centit.support.database.utils.FieldType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
@@ -83,7 +84,7 @@ public class TaskRun {
     private void runStep(DataPacket dataPacket) {
         JSONObject bizOptJson = dataPacket.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
-            return ;
+            return;
         }
         BizModel bizModel = null;
         try {
@@ -93,7 +94,7 @@ public class TaskRun {
             dbPacketBizSupplier.setBatchWise(dataPacket.getIsWhile());
             /*添加参数默认值传输*/
             dbPacketBizSupplier.setQueryParams(dataPacket.getPacketParamsValue());
-            bizModel=bizOptFlow.run(dbPacketBizSupplier, bizOptJson);
+            bizModel = bizOptFlow.run(dbPacketBizSupplier, bizOptJson);
             saveDetail(bizModel, "ok");
         } catch (Exception e) {
             saveDetail(bizModel, getStackTrace(e));
@@ -101,14 +102,14 @@ public class TaskRun {
 
     }
 
-    private  String getStackTrace(Exception e) {
+    private String getStackTrace(Exception e) {
         StringBuffer message = new StringBuffer();
         StackTraceElement[] exceptionStack = e.getStackTrace();
         message.append(e.toString());
-        int i=0;
+        int i = 0;
         for (StackTraceElement ste : exceptionStack) {
             message.append("\n\tat " + ste);
-            if(i++==4){
+            if (i++ == 4) {
                 break;
             }
         }
@@ -120,29 +121,27 @@ public class TaskRun {
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
         StringBuilder msg = new StringBuilder();
-        for (DataSet dataset : iResult.getBizData().values()) {
-            if (dataset.getData() != null) {
-                msg.append(dataset.getDataSetName());
-                msg.append(":");
-                msg.append(dataset.size());
-                msg.append("numbers");
-                if(dataset.size()>0) {
-                    msg.append(dataset.getData().get(0).get(SQLDataSetWriter.WRITER_ERROR_TAG));
+        if (iResult != null) {
+            for (DataSet dataset : iResult.getBizData().values()) {
+                if (dataset.getData() != null) {
+                    msg.append(dataset.getDataSetName());
+                    msg.append(":");
+                    msg.append(dataset.size());
+                    msg.append("numbers");
+                    if (dataset.size() > 0) {
+                        msg.append(dataset.getData().get(0).get(FieldType.mapPropName(SQLDataSetWriter.WRITER_ERROR_TAG)));
+                    }
+                    msg.append(";");
                 }
-                msg.append(";");
             }
         }
         String successSign = "ok";
         if (successSign.equals(info)) {
             detailLog.setLogType(info);
             detailLog.setLogInfo(msg.toString());
-            detailLog.setSuccessPieces((long) iResult.modelSize());
-            detailLog.setErrorPieces(0L);
         } else {
             detailLog.setLogType("error");
             detailLog.setLogInfo(msg + ";" + info);
-            detailLog.setSuccessPieces(0L);
-            detailLog.setErrorPieces((long) iResult.modelSize());
         }
         detailLog.setRunEndTime(new Date());
         detailLog.setLogDetailId(UuidOpt.getUuidAsString32());
@@ -158,9 +157,9 @@ public class TaskRun {
         taskLog.setRunEndTime(new Date());
         taskLogDao.updateObject(taskLog);
         dataPacket.setNextRunTime(new Date());
-        if("2".equals(dataPacket.getTaskType())
-            &&dataPacket.getIsValid()
-            && !StringBaseOpt.isNvl(dataPacket.getTaskCron())){
+        if ("2".equals(dataPacket.getTaskType())
+            && dataPacket.getIsValid()
+            && !StringBaseOpt.isNvl(dataPacket.getTaskCron())) {
             CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacket.getTaskCron());
             dataPacket.setNextRunTime(cronSequenceGenerator.next(dataPacket.getLastRunTime()));
         }

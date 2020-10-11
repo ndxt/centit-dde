@@ -6,10 +6,7 @@ import com.centit.dde.utils.DBBatchUtils;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.metadata.TableInfo;
-import com.centit.support.database.utils.DataSourceDescription;
-import com.centit.support.database.utils.DbcpConnectPools;
-import com.centit.support.database.utils.PersistenceException;
-import com.centit.support.database.utils.TransactionHandler;
+import com.centit.support.database.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +23,7 @@ import java.util.Map;
  * @author zhf
  */
 public class SQLDataSetWriter implements DataSetWriter {
-    public static String WRITER_ERROR_TAG = "rmdbDatasetWriterResult";
+    public static String WRITER_ERROR_TAG = "rmdb_dataset_writer_result";
     private static final Logger logger = LoggerFactory.getLogger(SQLDataSetWriter.class);
 
     private DataSourceDescription dataSource;
@@ -91,12 +88,12 @@ public class SQLDataSetWriter implements DataSetWriter {
                             tableInfo, dataSet.getData(),fieldsMap));
                 }
                 for(Map<String, Object> row : dataSet.getData()){
-                    row.put(WRITER_ERROR_TAG,"ok");
+                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG),"ok");
                 }
             } catch (SQLException e) {
                 logger.error(e.getLocalizedMessage());
                 for(Map<String, Object> row : dataSet.getData()){
-                    row.put(WRITER_ERROR_TAG,e.getMessage());
+                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG),e.getMessage());
                 }
             }
         } else { // 这部分也可以 直接运行sql语句 而不是用 GeneralJsonObjectDao 方式来提高效率
@@ -112,9 +109,9 @@ public class SQLDataSetWriter implements DataSetWriter {
                         (conn) ->
                             GeneralJsonObjectDao.createJsonObjectDao(connection, tableInfo)
                                 .saveNewObject(row));
-                    row.put(WRITER_ERROR_TAG,"ok");
+                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG),"ok");
                 } catch (SQLException e) {
-                    row.put(WRITER_ERROR_TAG,e.getMessage());
+                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG),e.getMessage());
                 }
             }
 
@@ -145,12 +142,12 @@ public class SQLDataSetWriter implements DataSetWriter {
                             tableInfo, dataSet.getData(),fieldsMap));
                 }
                 for(Map<String, Object> row : dataSet.getData()){
-                    row.put(WRITER_ERROR_TAG, "ok");
+                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "ok");
                 }
             } catch (SQLException e) {
                 logger.error(e.getLocalizedMessage());
                 for(Map<String, Object> row : dataSet.getData()){
-                    row.put(WRITER_ERROR_TAG, e.getMessage());
+                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
                 }
             }
         } else {
@@ -171,9 +168,9 @@ public class SQLDataSetWriter implements DataSetWriter {
                                 throw new ObjectException(PersistenceException.DATABASE_OPERATE_EXCEPTION, e);
                             }
                         });
-                    row.put(WRITER_ERROR_TAG, "ok");
+                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "ok");
                 } catch (SQLException | ObjectException e) {
-                    row.put(WRITER_ERROR_TAG, e.getMessage());
+                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
                 }
             }
 
