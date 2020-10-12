@@ -3,6 +3,7 @@ package com.centit.dde.agent.service;
 import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.TaskLog;
+import com.centit.dde.services.impl.TaskRun;
 import com.centit.support.quartz.AbstractQuartzJob;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -36,9 +37,9 @@ public class RunTaskJob extends AbstractQuartzJob {
         taskLogDao.saveNewObject(taskLog);
         PathConfig pathConfig = ContextUtils.getBean(PathConfig.class);
         try {
-//            TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
-//            taskRun.runTask(taskLog.getLogId());
-            Runtime.getRuntime().exec("java -jar " + pathConfig.getDataMovingPath() + " " + taskLog.getLogId());
+            TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
+            taskRun.runTask(taskLog.getLogId());
+//            Runtime.getRuntime().exec("java -jar " + pathConfig.getDataMovingPath() + " " + taskLog.getLogId());
 //            //取得命令结果的输出流
 //            InputStream fis=p.getInputStream();
 //            //用一个读输出流类去读

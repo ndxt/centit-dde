@@ -97,6 +97,10 @@ public class SQLDataSetWriter implements DataSetWriter {
                 for(Map<String, Object> row : dataSet.getData()){
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG),e.getMessage());
                 }
+            }finally {
+                if(connection!=null){
+                    DbcpConnectPools.closeConnect(connection);
+                }
             }
         } else { // 这部分也可以 直接运行sql语句 而不是用 GeneralJsonObjectDao 方式来提高效率
             boolean createConn = false;
@@ -154,6 +158,10 @@ public class SQLDataSetWriter implements DataSetWriter {
                 logger.error(e.getLocalizedMessage());
                 for(Map<String, Object> row : dataSet.getData()){
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
+                }
+            }finally {
+                if(connection!=null){
+                    DbcpConnectPools.closeConnect(connection);
                 }
             }
         } else {
