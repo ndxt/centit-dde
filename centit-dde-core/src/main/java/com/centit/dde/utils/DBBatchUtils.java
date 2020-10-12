@@ -48,8 +48,11 @@ public abstract class DBBatchUtils {
         int n = 0;
         QueryLogUtils.printSql(logger,sqlPair.getLeft(), sqlPair.getRight());
         try(PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())){
+            Map map=reverse(fieldsMap);
             for(Map<String, Object> object : objects ) {
-                object=DataSetOptUtil.mapDataRow(object,reverse(fieldsMap).entrySet());
+                if(map!=null) {
+                    object = DataSetOptUtil.mapDataRow(object, map.entrySet());
+                }
                 DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object,tableInfo);
                 n += stmt.executeUpdate();
             }
@@ -76,11 +79,14 @@ public abstract class DBBatchUtils {
         int n = 0;
         QueryLogUtils.printSql(logger,sqlPair.getLeft(), sqlPair.getRight());
         try(PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())){
+            Map map=reverse(fieldsMap);
             for(Map<String, Object> object : objects ) {
 //                if (!GeneralJsonObjectDao.checkHasAllPkColumns(tableInfo, object)) {
 //                    throw new SQLException("缺少主键对应的属性。");
 //                }
-                object=DataSetOptUtil.mapDataRow(object,reverse(fieldsMap).entrySet());
+                if(map!=null) {
+                    object = DataSetOptUtil.mapDataRow(object, map.entrySet());
+                }
                 DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object,tableInfo);
                 n += stmt.executeUpdate();
             }
@@ -91,6 +97,9 @@ public abstract class DBBatchUtils {
     }
 
     private static Map reverse(Map fieldsMap) {
+        if(fieldsMap==null) {
+            return null;
+        }
         HashMap<Object, Object> map = new HashMap<>(fieldsMap.size() + 1);
         fieldsMap.forEach((key, value) -> map.put(value, key));
         return map;
@@ -121,12 +130,15 @@ public abstract class DBBatchUtils {
         try(PreparedStatement checkStmt = conn.prepareStatement(checkSqlPair.getLeft());
             PreparedStatement insertStmt = conn.prepareStatement(insertSqlPair.getLeft());
             PreparedStatement updateStmt = conn.prepareStatement(updateSqlPair.getLeft())){
+            Map map=reverse(fieldsMap);
             for(Map<String, Object> object : objects ) {
 //                if (!GeneralJsonObjectDao.checkHasAllPkColumns(tableInfo, object)) {
 //                    throw new SQLException("缺少主键对应的属性。");
 //                }
 
-                object=DataSetOptUtil.mapDataRow(object,reverse(fieldsMap).entrySet());
+                if(map!=null) {
+                    object = DataSetOptUtil.mapDataRow(object, map.entrySet());
+                }
                 DatabaseAccess.setQueryStmtParameters(checkStmt, checkSqlPair.getRight(), object);
                 ResultSet rs = checkStmt.executeQuery();
                 boolean exists = false;
