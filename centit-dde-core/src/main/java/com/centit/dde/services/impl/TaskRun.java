@@ -77,7 +77,7 @@ public class TaskRun {
         this.metaDataService = metaDataService;
         this.integrationEnvironment = integrationEnvironment;
         this.bizOptFlow = bizOptFlow;
-        this.taskLog = new TaskLog();
+        //this.taskLog = new TaskLog();
         this.detailLog = new TaskDetailLog();
     }
 
