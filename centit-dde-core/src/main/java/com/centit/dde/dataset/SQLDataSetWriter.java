@@ -3,6 +3,7 @@ package com.centit.dde.dataset;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetWriter;
 import com.centit.dde.utils.DBBatchUtils;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.metadata.TableInfo;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -102,13 +104,17 @@ public class SQLDataSetWriter implements DataSetWriter {
                 fetchConnect();
                 createConn = true;
             }
-
+            Map map=DBBatchUtils.reverse(fieldsMap);
             for(Map<String, Object> row : dataSet.getData()){
+                if(map!=null) {
+                    row = DataSetOptUtil.mapDataRow(row, map.entrySet());
+                }
                 try {
+                    Map<String, Object> finalRow = row;
                     TransactionHandler.executeInTransaction(connection,
                         (conn) ->
                             GeneralJsonObjectDao.createJsonObjectDao(connection, tableInfo)
-                                .saveNewObject(row));
+                                .saveNewObject(finalRow));
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG),"ok");
                 } catch (SQLException e) {
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG),e.getMessage());
@@ -156,14 +162,18 @@ public class SQLDataSetWriter implements DataSetWriter {
                 fetchConnect();
                 createConn = true;
             }
-
+            Map map=DBBatchUtils.reverse(fieldsMap);
             for(Map<String, Object> row : dataSet.getData()){
+                if(map!=null) {
+                    row = DataSetOptUtil.mapDataRow(row, map.entrySet());
+                }
                 try {
+                    Map<String, Object> finalRow = row;
                     TransactionHandler.executeInTransaction(connection,
                         (conn) ->{
                             try {
                                 return GeneralJsonObjectDao.createJsonObjectDao(connection, tableInfo)
-                                    .mergeObject(row);
+                                    .mergeObject(finalRow);
                             } catch (IOException e) {
                                 throw new ObjectException(PersistenceException.DATABASE_OPERATE_EXCEPTION, e);
                             }

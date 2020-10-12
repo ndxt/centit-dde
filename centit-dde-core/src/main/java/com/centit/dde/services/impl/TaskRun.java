@@ -34,31 +34,19 @@ public class TaskRun {
     private final TaskLogDao taskLogDao;
     private final TaskDetailLogDao taskDetailLogDao;
     private final DataPacketDao dataPacketDao;
-    private final MetaDataService metaDataService;
     private final IntegrationEnvironment integrationEnvironment;
-    private final BizOptFlow bizOptFlow;
+    @Autowired(required = false)
+    public void setBizOptFlow(BizOptFlow bizOptFlow) {
+        this.bizOptFlow = bizOptFlow;
+    }
+
+    private BizOptFlow bizOptFlow;
     private FileStore fileStore;
 
     @Autowired(required = false)
     public void setFileStore(FileStore fileStore) {
         this.fileStore = fileStore;
     }
-
-
-    private MetaObjectService metaObjectService;
-
-    @Autowired(required = false)
-    public void setMetaObjectService(MetaObjectService metaObjectService) {
-        this.metaObjectService = metaObjectService;
-    }
-
-    private DatabaseRunTime databaseRunTime;
-
-    @Autowired(required = false)
-    public void setDatabaseRunTime(DatabaseRunTime databaseRunTime) {
-        this.databaseRunTime = databaseRunTime;
-    }
-
 
     private TaskLog taskLog;
     private Date beginTime;
@@ -68,16 +56,12 @@ public class TaskRun {
     public TaskRun(TaskLogDao taskLogDao,
                    TaskDetailLogDao taskDetailLogDao,
                    DataPacketDao dataPacketDao,
-                   MetaDataService metaDataService,
-                   IntegrationEnvironment integrationEnvironment,
-                   BizOptFlow bizOptFlow) {
+                   IntegrationEnvironment integrationEnvironment) {
         this.taskLogDao = taskLogDao;
         this.taskDetailLogDao = taskDetailLogDao;
         this.dataPacketDao = dataPacketDao;
-        this.metaDataService = metaDataService;
         this.integrationEnvironment = integrationEnvironment;
-        this.bizOptFlow = bizOptFlow;
-        //this.taskLog = new TaskLog();
+        this.taskLog = new TaskLog();
         this.detailLog = new TaskDetailLog();
     }
 
@@ -103,12 +87,12 @@ public class TaskRun {
     }
 
     private String getStackTrace(Exception e) {
-        StringBuffer message = new StringBuffer();
+        StringBuilder message = new StringBuilder();
         StackTraceElement[] exceptionStack = e.getStackTrace();
         message.append(e.toString());
         int i = 0;
         for (StackTraceElement ste : exceptionStack) {
-            message.append("\n\tat " + ste);
+            message.append("\n\tat ").append(ste);
             if (i++ == 4) {
                 break;
             }
@@ -117,35 +101,42 @@ public class TaskRun {
     }
 
     private void saveDetail(BizModel iResult, String info) {
-        detailLog.setRunBeginTime(beginTime);
-        detailLog.setTaskId(taskLog.getTaskId());
-        detailLog.setLogId(taskLog.getLogId());
-        StringBuilder msg = new StringBuilder();
         if (iResult != null) {
+            StringBuilder msg = new StringBuilder();
             for (DataSet dataset : iResult.getBizData().values()) {
+                detailLog.setRunBeginTime(beginTime);
+                detailLog.setTaskId(taskLog.getTaskId());
+                detailLog.setLogId(taskLog.getLogId());
                 if (dataset.getData() != null) {
-                    msg.append(dataset.getDataSetName());
-                    msg.append(":");
-                    msg.append(dataset.size());
-                    msg.append("numbers");
+                    msg.append(dataset.getDataSetName()).append(":");
+                    msg.append(dataset.size()).append("nums");
                     if (dataset.size() > 0) {
-                        msg.append(dataset.getData().get(0).get(FieldType.mapPropName(SQLDataSetWriter.WRITER_ERROR_TAG)));
+                        String error= (String) dataset.getData().get(0).get(FieldType.mapPropName(SQLDataSetWriter.WRITER_ERROR_TAG));
+                        msg.append(error);
+                        if("ok".equalsIgnoreCase(error)){
+                            detailLog.setSuccessPieces((long) dataset.size());
+                        }else{
+                            detailLog.setErrorPieces((long) dataset.size());
+                        }
                     }
                     msg.append(";");
                 }
+                detailLog.setLogType(info);
+                detailLog.setLogInfo(msg.toString());
+                detailLog.setRunEndTime(new Date());
+                detailLog.setLogDetailId(UuidOpt.getUuidAsString32());
+                taskDetailLogDao.saveNewObject(detailLog);
             }
-        }
-        String successSign = "ok";
-        if (successSign.equals(info)) {
-            detailLog.setLogType(info);
-            detailLog.setLogInfo(msg.toString());
         } else {
+            detailLog.setRunBeginTime(beginTime);
+            detailLog.setTaskId(taskLog.getTaskId());
+            detailLog.setLogId(taskLog.getLogId());
             detailLog.setLogType("error");
-            detailLog.setLogInfo(msg + ";" + info);
+            detailLog.setLogInfo(info);
+            detailLog.setRunEndTime(new Date());
+            detailLog.setLogDetailId(UuidOpt.getUuidAsString32());
+            taskDetailLogDao.saveNewObject(detailLog);
         }
-        detailLog.setRunEndTime(new Date());
-        detailLog.setLogDetailId(UuidOpt.getUuidAsString32());
-        taskDetailLogDao.saveNewObject(detailLog);
     }
 
     public void runTask(String logId) {

@@ -96,7 +96,7 @@ public abstract class DBBatchUtils {
         return n;
     }
 
-    private static Map reverse(Map fieldsMap) {
+    public static Map reverse(Map fieldsMap) {
         if(fieldsMap==null) {
             return null;
         }
