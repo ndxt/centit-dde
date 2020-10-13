@@ -39,6 +39,7 @@ public class TaskRun {
     private final TaskDetailLogDao taskDetailLogDao;
     private final DataPacketDao dataPacketDao;
     private final IntegrationEnvironment integrationEnvironment;
+
     @Autowired(required = false)
     public void setBizOptFlow(BizOptFlow bizOptFlow) {
         this.bizOptFlow = bizOptFlow;
@@ -52,9 +53,6 @@ public class TaskRun {
         this.fileStore = fileStore;
     }
 
-    private TaskLog taskLog;
-    private Date beginTime;
-
 
     @Autowired
     public TaskRun(TaskLogDao taskLogDao,
@@ -65,28 +63,20 @@ public class TaskRun {
         this.taskDetailLogDao = taskDetailLogDao;
         this.dataPacketDao = dataPacketDao;
         this.integrationEnvironment = integrationEnvironment;
-        this.taskLog = new TaskLog();
     }
 
-    private void runStep(DataPacket dataPacket) {
+    private BizModel runStep(DataPacket dataPacket) throws Exception {
         JSONObject bizOptJson = dataPacket.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
-            return;
+            return null;
         }
-        BizModel bizModel = null;
-        try {
-            DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
-            dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
-            dbPacketBizSupplier.setFileStore(fileStore);
-            dbPacketBizSupplier.setBatchWise(dataPacket.getIsWhile());
-            /*添加参数默认值传输*/
-            dbPacketBizSupplier.setQueryParams(dataPacket.getPacketParamsValue());
-            bizModel = bizOptFlow.run(dbPacketBizSupplier, bizOptJson);
-            saveDetail(bizModel, "ok");
-        } catch (Exception e) {
-            saveDetail(bizModel, getStackTrace(e));
-        }
-
+        DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
+        dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
+        dbPacketBizSupplier.setFileStore(fileStore);
+        dbPacketBizSupplier.setBatchWise(dataPacket.getIsWhile());
+        /*添加参数默认值传输*/
+        dbPacketBizSupplier.setQueryParams(dataPacket.getPacketParamsValue());
+        return bizOptFlow.run(dbPacketBizSupplier, bizOptJson);
     }
 
     private String getStackTrace(Exception e) {
@@ -103,11 +93,11 @@ public class TaskRun {
         return message.toString();
     }
 
-    private void saveDetail(BizModel iResult, String info) {
+    private void saveDetail(BizModel iResult, String info,TaskLog taskLog,Date beginTime) {
         List<TaskDetailLog> taskDetailLogs = new ArrayList<>();
         if (iResult != null) {
             for (DataSet dataset : iResult.getBizData().values()) {
-                TaskDetailLog detailLog=new TaskDetailLog();
+                TaskDetailLog detailLog = new TaskDetailLog();
                 detailLog.setRunBeginTime(beginTime);
                 detailLog.setTaskId(taskLog.getTaskId());
                 detailLog.setLogId(taskLog.getLogId());
@@ -118,11 +108,11 @@ public class TaskRun {
                     msg.append(dataset.getDataSetName()).append(":");
                     msg.append(dataset.size()).append("nums");
                     if (dataset.size() > 0) {
-                        String error= (String) dataset.getData().get(0).get(FieldType.mapPropName(SQLDataSetWriter.WRITER_ERROR_TAG));
+                        String error = (String) dataset.getData().get(0).get(FieldType.mapPropName(SQLDataSetWriter.WRITER_ERROR_TAG));
                         msg.append(error);
-                        if("ok".equalsIgnoreCase(error)){
+                        if ("ok".equalsIgnoreCase(error)) {
                             detailLog.setSuccessPieces((long) dataset.size());
-                        }else{
+                        } else {
                             detailLog.setErrorPieces((long) dataset.size());
                         }
                     }
@@ -135,7 +125,7 @@ public class TaskRun {
                 taskDetailLogs.add(detailLog);
             }
         } else {
-            TaskDetailLog detailLog=new TaskDetailLog();
+            TaskDetailLog detailLog = new TaskDetailLog();
             detailLog.setRunBeginTime(beginTime);
             detailLog.setTaskId(taskLog.getTaskId());
             detailLog.setLogId(taskLog.getLogId());
@@ -145,28 +135,35 @@ public class TaskRun {
             detailLog.setLogDetailId(UuidOpt.getUuidAsString32());
             taskDetailLogs.add(detailLog);
         }
-        DatabaseOptUtils.batchSaveNewObjects(taskDetailLogDao,taskDetailLogs);
+        DatabaseOptUtils.batchSaveNewObjects(taskDetailLogDao, taskDetailLogs);
     }
 
-    public synchronized void runTask(String packetId) {
-        beginTime = new Date();
-        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
-        dataPacket.setLastRunTime(new Date());
-        taskLog.setTaskId(packetId);
-        taskLog.setApplicationId(dataPacket.getApplicationId());
-        taskLog.setRunBeginTime(beginTime);
-        taskLog.setRunType(dataPacket.getPacketName());
-        taskLog.setLogId(UuidOpt.getUuidAsString32());
-        runStep(dataPacket);
-        taskLog.setRunEndTime(new Date());
-        taskLogDao.saveNewObject(taskLog);
-        dataPacket.setNextRunTime(new Date());
-        if ("2".equals(dataPacket.getTaskType())
-            && dataPacket.getIsValid()
-            && !StringBaseOpt.isNvl(dataPacket.getTaskCron())) {
-            CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacket.getTaskCron());
-            dataPacket.setNextRunTime(cronSequenceGenerator.next(dataPacket.getLastRunTime()));
+    public void runTask(String packetId) {
+        BizModel bizModel=null;
+        TaskLog taskLog = new TaskLog();
+        Date beginTime = new Date();
+        try {
+            DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
+            dataPacket.setLastRunTime(new Date());
+            taskLog.setTaskId(packetId);
+            taskLog.setApplicationId(dataPacket.getApplicationId());
+            taskLog.setRunBeginTime(beginTime);
+            taskLog.setRunType(dataPacket.getPacketName());
+            taskLog.setLogId(UuidOpt.getUuidAsString32());
+            bizModel = runStep(dataPacket);
+            taskLog.setRunEndTime(new Date());
+            taskLogDao.saveNewObject(taskLog);
+            dataPacket.setNextRunTime(new Date());
+            if ("2".equals(dataPacket.getTaskType())
+                && dataPacket.getIsValid()
+                && !StringBaseOpt.isNvl(dataPacket.getTaskCron())) {
+                CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacket.getTaskCron());
+                dataPacket.setNextRunTime(cronSequenceGenerator.next(dataPacket.getLastRunTime()));
+            }
+            dataPacketDao.updateObject(dataPacket);
+            saveDetail(bizModel,"ok",taskLog,beginTime);
+        }catch (Exception e){
+            saveDetail(bizModel,getStackTrace(e),taskLog,beginTime);
         }
-        dataPacketDao.updateObject(dataPacket);
     }
 }
