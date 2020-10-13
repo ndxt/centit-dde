@@ -148,14 +148,18 @@ public class TaskRun {
         DatabaseOptUtils.batchSaveNewObjects(taskDetailLogDao,taskDetailLogs);
     }
 
-    public void runTask(String logId) {
+    public synchronized void runTask(String packetId) {
         beginTime = new Date();
-        taskLog = taskLogDao.getObjectById(logId);
-        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(taskLog.getTaskId());
+        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
         dataPacket.setLastRunTime(new Date());
+        taskLog.setTaskId(packetId);
+        taskLog.setApplicationId(dataPacket.getApplicationId());
+        taskLog.setRunBeginTime(beginTime);
+        taskLog.setRunType(dataPacket.getPacketName());
+        taskLog.setLogId(UuidOpt.getUuidAsString32());
         runStep(dataPacket);
         taskLog.setRunEndTime(new Date());
-        taskLogDao.updateObject(taskLog);
+        taskLogDao.saveNewObject(taskLog);
         dataPacket.setNextRunTime(new Date());
         if ("2".equals(dataPacket.getTaskType())
             && dataPacket.getIsValid()
@@ -163,7 +167,6 @@ public class TaskRun {
             CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacket.getTaskCron());
             dataPacket.setNextRunTime(cronSequenceGenerator.next(dataPacket.getLastRunTime()));
         }
-
         dataPacketDao.updateObject(dataPacket);
     }
 }

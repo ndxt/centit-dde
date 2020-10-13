@@ -78,7 +78,6 @@ public class DataPacket implements Serializable {
     @Column(name = "RECORD_DATE")
     @ApiModelProperty(value = "修改时间", hidden = true)
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW, condition = GeneratorCondition.ALWAYS, value = "today()")
-    @JSONField(serialize = false)
     private Date recordDate;
 
     @ApiModelProperty(value = "业务模块代码")

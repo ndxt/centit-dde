@@ -17,26 +17,15 @@ import java.util.Date;
  */
 @Service
 public class ExchangeServiceImpl implements ExchangeService {
-    private final DataPacketService dataPacketService;
-    private final TaskLogManager taskLogManager;
     private final TaskRun taskRun;
     @Autowired
-    public ExchangeServiceImpl(DataPacketService dataPacketService, TaskLogManager taskLogManager, TaskRun taskRun) {
-        this.dataPacketService = dataPacketService;
-        this.taskLogManager = taskLogManager;
+    public ExchangeServiceImpl(TaskRun taskRun) {
         this.taskRun = taskRun;
     }
 
     @Async
     @Override
     public void runTask(String packetId) {
-        DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
-        TaskLog taskLog = new TaskLog();
-        taskLog.setTaskId(packetId);
-        taskLog.setApplicationId(dataPacket.getApplicationId());
-        taskLog.setRunBeginTime(new Date());
-        taskLog.setRunType(dataPacket.getPacketName());
-        taskLogManager.createTaskLog(taskLog);
-        taskRun.runTask(taskLog.getLogId());
+        taskRun.runTask(packetId);
     }
 }
