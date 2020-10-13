@@ -28,4 +28,14 @@ public class PathConfig {
     }
 
     private String logs;
+
+    public String getUseDataMoving() {
+        return useDataMoving;
+    }
+
+    public void setUseDataMoving(String useDataMoving) {
+        this.useDataMoving = useDataMoving;
+    }
+
+    private String useDataMoving;
 }

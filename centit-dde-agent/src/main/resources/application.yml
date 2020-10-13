@@ -18,6 +18,7 @@ spring:
       validation-query: SELECT 1 from dual
       connection-properties: characterEncoding=utf8
 centit:
+  useDataMoving: false
   dataMovingPath: D:\centit-dde-datamoving-3.0-SNAPSHOT.jar
   logs: D:/Projects/RunData/dde/logs
 framework:

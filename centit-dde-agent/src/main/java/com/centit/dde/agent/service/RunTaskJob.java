@@ -23,11 +23,15 @@ public class RunTaskJob extends AbstractQuartzJob {
 
     @Override
     protected boolean runRealJob(JobExecutionContext context) {
+        PathConfig pathConfig = ContextUtils.getBean(PathConfig.class);
+        boolean userMoving="true".equalsIgnoreCase(pathConfig.getUseDataMoving());
         try {
-            TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
-            taskRun.runTask(dataPacket.getPacketId());
-//            PathConfig pathConfig = ContextUtils.getBean(PathConfig.class);
-//            Runtime.getRuntime().exec("java -jar " + pathConfig.getDataMovingPath() + " " + dataPacket.getPacketId());
+            if(userMoving){
+                Runtime.getRuntime().exec("java -jar " + pathConfig.getDataMovingPath() + " " + dataPacket.getPacketId());
+            }else {
+                TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
+                taskRun.runTask(dataPacket.getPacketId());
+            }
 //            //取得命令结果的输出流
 //            InputStream fis=p.getInputStream();
 //            //用一个读输出流类去读
