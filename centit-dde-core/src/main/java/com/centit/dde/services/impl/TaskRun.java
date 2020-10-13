@@ -93,8 +93,9 @@ public class TaskRun {
         return message.toString();
     }
 
-    private void saveDetail(BizModel iResult, String info,TaskLog taskLog,Date beginTime) {
+    private Boolean saveDetail(BizModel iResult, String info,TaskLog taskLog,Date beginTime) {
         List<TaskDetailLog> taskDetailLogs = new ArrayList<>();
+        Boolean result=false;
         if (iResult != null) {
             for (DataSet dataset : iResult.getBizData().values()) {
                 TaskDetailLog detailLog = new TaskDetailLog();
@@ -112,8 +113,10 @@ public class TaskRun {
                         msg.append(error);
                         if ("ok".equalsIgnoreCase(error)) {
                             detailLog.setSuccessPieces((long) dataset.size());
+                            result=true;
                         } else {
                             detailLog.setErrorPieces((long) dataset.size());
+                            result=false;
                         }
                     }
                     msg.append(";");
@@ -136,12 +139,14 @@ public class TaskRun {
             taskDetailLogs.add(detailLog);
         }
         DatabaseOptUtils.batchSaveNewObjects(taskDetailLogDao, taskDetailLogs);
+        return result;
     }
 
     public void runTask(String packetId) {
         BizModel bizModel=null;
         TaskLog taskLog = new TaskLog();
         Date beginTime = new Date();
+        Boolean result=false;
         try {
             DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
             dataPacket.setLastRunTime(new Date());
@@ -152,7 +157,6 @@ public class TaskRun {
             taskLog.setLogId(UuidOpt.getUuidAsString32());
             bizModel = runStep(dataPacket);
             taskLog.setRunEndTime(new Date());
-            taskLogDao.saveNewObject(taskLog);
             dataPacket.setNextRunTime(new Date());
             if ("2".equals(dataPacket.getTaskType())
                 && dataPacket.getIsValid()
@@ -161,9 +165,13 @@ public class TaskRun {
                 dataPacket.setNextRunTime(cronSequenceGenerator.next(dataPacket.getLastRunTime()));
             }
             dataPacketDao.updateObject(dataPacket);
-            saveDetail(bizModel,"ok",taskLog,beginTime);
+            result=saveDetail(bizModel,"ok",taskLog,beginTime);
+            taskLog.setOtherMessage(result?"ok":"error");
+            taskLogDao.saveNewObject(taskLog);
         }catch (Exception e){
             saveDetail(bizModel,getStackTrace(e),taskLog,beginTime);
+            taskLog.setOtherMessage("error");
+            taskLogDao.updateObject(taskLog);
         }
     }
 }
