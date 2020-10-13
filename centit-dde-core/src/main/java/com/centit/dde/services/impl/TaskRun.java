@@ -95,7 +95,7 @@ public class TaskRun {
 
     private Boolean saveDetail(BizModel iResult, String info,TaskLog taskLog,Date beginTime) {
         List<TaskDetailLog> taskDetailLogs = new ArrayList<>();
-        Boolean result=false;
+        boolean result=true;
         if (iResult != null) {
             for (DataSet dataset : iResult.getBizData().values()) {
                 TaskDetailLog detailLog = new TaskDetailLog();
@@ -137,6 +137,7 @@ public class TaskRun {
             detailLog.setRunEndTime(new Date());
             detailLog.setLogDetailId(UuidOpt.getUuidAsString32());
             taskDetailLogs.add(detailLog);
+            result=false;
         }
         DatabaseOptUtils.batchSaveNewObjects(taskDetailLogDao, taskDetailLogs);
         return result;
