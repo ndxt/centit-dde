@@ -59,11 +59,11 @@ public class TaskDetailLog implements java.io.Serializable {
 
     @Column(name="SUCCESS_PIECES")
     @ApiModelProperty(value = "成功条数")
-    private Long successPieces;
+    private Integer successPieces;
 
     @Column(name="ERROR_PIECES")
     @ApiModelProperty(value = "失败条数")
-    private Long errorPieces;
+    private Integer errorPieces;
 
 
 }

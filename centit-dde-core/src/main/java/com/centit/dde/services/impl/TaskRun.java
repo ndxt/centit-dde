@@ -15,10 +15,10 @@ import com.centit.dde.services.DBPacketBizSupplier;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
-import com.centit.support.database.utils.FieldType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhf
@@ -77,39 +78,39 @@ public class TaskRun {
     }
 
 
-    private Boolean saveDetail(BizModel iResult, String info,TaskLog taskLog,Date beginTime) {
+    private Boolean saveDetail(BizModel iResult, String info, TaskLog taskLog, Date beginTime) {
         List<TaskDetailLog> taskDetailLogs = new ArrayList<>();
-        boolean result=true;
+        boolean result = true;
         if (iResult != null) {
             for (DataSet dataset : iResult.getBizData().values()) {
-                TaskDetailLog detailLog = new TaskDetailLog();
-                detailLog.setRunBeginTime(beginTime);
-                detailLog.setTaskId(taskLog.getTaskId());
-                detailLog.setLogId(taskLog.getLogId());
-                detailLog.setSuccessPieces(0L);
-                detailLog.setErrorPieces(0L);
-                StringBuilder msg = new StringBuilder();
-                if (dataset.getData() != null) {
-                    msg.append(dataset.getDataSetName()).append(":");
-                    msg.append(dataset.size()).append("nums");
-                    if (dataset.size() > 0) {
-                        String error = (String) dataset.getData().get(0).get(FieldType.mapPropName(SQLDataSetWriter.WRITER_ERROR_TAG));
+                if (dataset.getDataSetName().equals(SQLDataSetWriter.WRITER_ERROR_TAG)
+                    && dataset.getData() != null && dataset.size() > 0) {
+                    for (Map map : dataset.getData()) {
+                        TaskDetailLog detailLog = new TaskDetailLog();
+                        detailLog.setRunBeginTime(beginTime);
+                        detailLog.setTaskId(taskLog.getTaskId());
+                        detailLog.setLogId(taskLog.getLogId());
+                        detailLog.setSuccessPieces(0);
+                        detailLog.setErrorPieces(0);
+                        StringBuilder msg = new StringBuilder();
+                        msg.append(map.get("processName")).append(":");
+                        msg.append(map.get("size")).append("nums");
+                        String error = (String) map.get("result");
                         msg.append(error);
                         if ("ok".equalsIgnoreCase(error)) {
-                            detailLog.setSuccessPieces((long) dataset.size());
-                            result=true;
+                            detailLog.setSuccessPieces(NumberBaseOpt.castObjectToInteger(map.get("size"), 0));
                         } else {
-                            detailLog.setErrorPieces((long) dataset.size());
-                            result=false;
+                            detailLog.setErrorPieces(NumberBaseOpt.castObjectToInteger(map.get("size"), 0));
+                            result = false;
                         }
+                        msg.append(";");
+                        detailLog.setLogType(info);
+                        detailLog.setLogInfo(msg.toString());
+                        detailLog.setRunEndTime(new Date());
+                        detailLog.setLogDetailId(UuidOpt.getUuidAsString32());
+                        taskDetailLogs.add(detailLog);
                     }
-                    msg.append(";");
                 }
-                detailLog.setLogType(info);
-                detailLog.setLogInfo(msg.toString());
-                detailLog.setRunEndTime(new Date());
-                detailLog.setLogDetailId(UuidOpt.getUuidAsString32());
-                taskDetailLogs.add(detailLog);
             }
         } else {
             TaskDetailLog detailLog = new TaskDetailLog();
@@ -121,17 +122,17 @@ public class TaskRun {
             detailLog.setRunEndTime(new Date());
             detailLog.setLogDetailId(UuidOpt.getUuidAsString32());
             taskDetailLogs.add(detailLog);
-            result=false;
+            result = false;
         }
         DatabaseOptUtils.batchSaveNewObjects(taskDetailLogDao, taskDetailLogs);
         return result;
     }
 
     public void runTask(String packetId) {
-        BizModel bizModel=null;
+        BizModel bizModel = null;
         TaskLog taskLog = new TaskLog();
         Date beginTime = new Date();
-        Boolean result=false;
+        Boolean result;
         try {
             DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
             dataPacket.setLastRunTime(new Date());
@@ -150,10 +151,10 @@ public class TaskRun {
                 dataPacket.setNextRunTime(cronSequenceGenerator.next(dataPacket.getLastRunTime()));
             }
             dataPacketDao.updateObject(dataPacket);
-            result=saveDetail(bizModel,"ok",taskLog,beginTime);
-            taskLog.setOtherMessage(result?"ok":"error");
+            result = saveDetail(bizModel, "ok", taskLog, beginTime);
+            taskLog.setOtherMessage(result ? "ok" : "error");
             taskLogDao.saveNewObject(taskLog);
-        }catch (Exception e){
+        } catch (Exception e) {
             saveDetail(bizModel, ObjectException.extortExceptionMessage(e, 4),
                 taskLog, beginTime);
             taskLog.setOtherMessage("error");

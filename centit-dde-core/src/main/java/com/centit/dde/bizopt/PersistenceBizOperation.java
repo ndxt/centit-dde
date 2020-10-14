@@ -1,9 +1,7 @@
 package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.core.BizModel;
-import com.centit.dde.core.BizOperation;
-import com.centit.dde.core.DataSet;
+import com.centit.dde.core.*;
 import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.dataset.FileDataSet;
@@ -13,9 +11,11 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.product.metadata.service.MetaDataService;
+import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.support.database.utils.FieldType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -113,7 +113,13 @@ public class PersistenceBizOperation implements BizOperation {
                 dataSetWriter.save(dataSet);
                 break;
         }
-        //return bizModel;
+        Map<String,Object> map= new HashMap<>();
+        map.put("processName",BuiltInOperation.getJsonFieldString(bizOptJson, "processName",sourDsName));
+        map.put("result",dataSet.getData().get(0).get(FieldType.mapPropName(SQLDataSetWriter.WRITER_ERROR_TAG)));
+        map.put("size",dataSet.size());
+        SimpleDataSet logDetail=SimpleDataSet.createSingleRowSet(map);
+        logDetail.setDataSetName(SQLDataSetWriter.WRITER_ERROR_TAG);
+        bizModel.putDataSet(UuidOpt.getUuidAsString(),logDetail);
     }
 
     private void runPersistenceMap(BizModel bizModel, JSONObject bizOptJson) {

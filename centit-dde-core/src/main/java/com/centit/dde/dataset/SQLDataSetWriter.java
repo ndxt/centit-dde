@@ -90,7 +90,7 @@ public class SQLDataSetWriter implements DataSetWriter {
                             tableInfo, dataSet.getData(),fieldsMap));
                 }
                 for(Map<String, Object> row : dataSet.getData()){
-                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG),"ok");
+                    dealResultMsg(row);
                 }
             } catch (SQLException e) {
                 logger.error(e.getLocalizedMessage());
@@ -115,7 +115,7 @@ public class SQLDataSetWriter implements DataSetWriter {
                         (conn) ->
                             GeneralJsonObjectDao.createJsonObjectDao(connection, tableInfo)
                                 .saveNewObject(finalRow));
-                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG),"ok");
+                    dealResultMsg(row);
                 } catch (SQLException e) {
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG),e.getMessage());
                 }
@@ -148,7 +148,7 @@ public class SQLDataSetWriter implements DataSetWriter {
                             tableInfo, dataSet.getData(),fieldsMap));
                 }
                 for(Map<String, Object> row : dataSet.getData()){
-                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "ok");
+                    dealResultMsg(row);
                 }
             } catch (SQLException e) {
                 logger.error(e.getLocalizedMessage());
@@ -178,7 +178,7 @@ public class SQLDataSetWriter implements DataSetWriter {
                                 throw new ObjectException(PersistenceException.DATABASE_OPERATE_EXCEPTION, e);
                             }
                         });
-                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "ok");
+                    dealResultMsg(row);
                 } catch (SQLException | ObjectException e) {
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
                 }
@@ -188,6 +188,13 @@ public class SQLDataSetWriter implements DataSetWriter {
                 DbcpConnectPools.closeConnect(connection);
             }
         }
+    }
+
+    private void dealResultMsg(Map<String, Object> row) {
+//        String msg = (String) row.get(FieldType.mapPropName(WRITER_ERROR_TAG));
+//        if (msg == null || msg.length() < 3) {
+            row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "ok");
+//        }
     }
 
     public void setDataSource(DataSourceDescription dataSource) {
