@@ -115,7 +115,11 @@ public class PersistenceBizOperation implements BizOperation {
         }
         Map<String,Object> map= new HashMap<>();
         map.put("processName",BuiltInOperation.getJsonFieldString(bizOptJson, "processName",sourDsName));
-        map.put("result",dataSet.getData().get(0).get(FieldType.mapPropName(SQLDataSetWriter.WRITER_ERROR_TAG)));
+        if(dataSet.size()>0) {
+            map.put("result", dataSet.getData().get(0).get(FieldType.mapPropName(SQLDataSetWriter.WRITER_ERROR_TAG)));
+        }else{
+            map.put("result","ok");
+        }
         map.put("size",dataSet.size());
         SimpleDataSet logDetail=SimpleDataSet.createSingleRowSet(map);
         logDetail.setDataSetName(SQLDataSetWriter.WRITER_ERROR_TAG);

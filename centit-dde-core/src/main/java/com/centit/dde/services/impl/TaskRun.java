@@ -84,7 +84,7 @@ public class TaskRun {
         if (iResult != null) {
             for (DataSet dataset : iResult.getBizData().values()) {
                 if (dataset.getDataSetName().equals(SQLDataSetWriter.WRITER_ERROR_TAG)
-                    && dataset.getData() != null && dataset.size() > 0) {
+                    && dataset.getData() != null) {
                     for (Map map : dataset.getData()) {
                         TaskDetailLog detailLog = new TaskDetailLog();
                         detailLog.setRunBeginTime(beginTime);
@@ -94,7 +94,7 @@ public class TaskRun {
                         detailLog.setErrorPieces(0);
                         StringBuilder msg = new StringBuilder();
                         msg.append(map.get("processName")).append(":");
-                        msg.append(map.get("size")).append("nums");
+                        msg.append(map.get("size")).append("nums;");
                         String error = (String) map.get("result");
                         msg.append(error);
                         if ("ok".equalsIgnoreCase(error)) {
@@ -158,7 +158,7 @@ public class TaskRun {
             saveDetail(bizModel, ObjectException.extortExceptionMessage(e, 4),
                 taskLog, beginTime);
             taskLog.setOtherMessage("error");
-            taskLogDao.updateObject(taskLog);
+            taskLogDao.saveNewObject(taskLog);
         }
     }
 }
