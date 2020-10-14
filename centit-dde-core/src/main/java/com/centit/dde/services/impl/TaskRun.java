@@ -2,6 +2,7 @@ package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
+import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.TaskDetailLogDao;
@@ -11,16 +12,12 @@ import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.DBPacketBizSupplier;
-import com.centit.dde.utils.DBBatchUtils;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.dde.core.BizOptFlow;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
-import com.centit.product.metadata.service.DatabaseRunTime;
-import com.centit.product.metadata.service.MetaDataService;
-import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.FieldType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.support.CronSequenceGenerator;
@@ -79,19 +76,6 @@ public class TaskRun {
         return bizOptFlow.run(dbPacketBizSupplier, bizOptJson);
     }
 
-    private String getStackTrace(Exception e) {
-        StringBuilder message = new StringBuilder();
-        StackTraceElement[] exceptionStack = e.getStackTrace();
-        message.append(e.toString());
-        int i = 0;
-        for (StackTraceElement ste : exceptionStack) {
-            message.append("\n\tat ").append(ste);
-            if (i++ == 4) {
-                break;
-            }
-        }
-        return message.toString();
-    }
 
     private Boolean saveDetail(BizModel iResult, String info,TaskLog taskLog,Date beginTime) {
         List<TaskDetailLog> taskDetailLogs = new ArrayList<>();
@@ -170,7 +154,8 @@ public class TaskRun {
             taskLog.setOtherMessage(result?"ok":"error");
             taskLogDao.saveNewObject(taskLog);
         }catch (Exception e){
-            saveDetail(bizModel,getStackTrace(e),taskLog,beginTime);
+            saveDetail(bizModel, ObjectException.extortExceptionMessage(e, 4),
+                taskLog, beginTime);
             taskLog.setOtherMessage("error");
             taskLogDao.updateObject(taskLog);
         }
