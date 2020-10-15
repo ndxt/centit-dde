@@ -103,7 +103,7 @@ public abstract class DataPacketUtil {
     private static void calcSchemaFilter(DataPacketSchema sourceSchema, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson,"source", sourceSchema.getPacketName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourDsName);
-        DataSetSchema dss = sourceSchema.fetchDataSetSchema(sourDsName);
+        DataSetSchema dss = new DataSetSchema(targetDsName);
         dss.setDataSetTitle(sourDsName+":filter");
         dss.setDataSetId(targetDsName);
         dss.setDataSetName(targetDsName);

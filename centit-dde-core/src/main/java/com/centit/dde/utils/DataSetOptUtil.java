@@ -574,7 +574,7 @@ public abstract class DataSetOptUtil {
             String checkResult = "";
             for (CheckRule rule : rules) {
                 if (!CheckRuleUtils.checkData(obj, rule)) {
-                    checkResult = checkResult + Pretreatment.mapTemplateString(rule.getErrorMsg(), obj) + ";";
+                    checkResult = checkResult + Pretreatment.mapTemplateString(rule.getInfo(), obj) + ";";
                 }
             }
             if (StringUtils.isBlank(checkResult)) {
