@@ -2,26 +2,23 @@ package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.bizopt.PersistenceBizOperation;
-import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.dde.bizopt.JSBizOperation;
+import com.centit.dde.bizopt.PersistenceBizOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.core.BizSupplier;
 import com.centit.dde.utils.BuiltInOperation;
+import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.common.ObjectException;
-import com.centit.support.database.transaction.ConnectThreadHolder;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -104,9 +101,12 @@ public class BizOptFlowImpl implements BizOptFlow {
         String sOptType = bizOptJson.getString("operation");
         BizOperation opt = allOperations.get(sOptType);
         if(opt == null) {
+            //TODO 记录运行错误日志
             throw new ObjectException(bizOptJson, "找不到对应的操作："+sOptType);
         }
+        //TODO 记录运行前日志
         opt.runOpt(bizModel, bizOptJson);
+        //TODO 记录运行后日志
     }
 
 
@@ -124,4 +124,30 @@ public class BizOptFlowImpl implements BizOptFlow {
         return bizModel;
     }
 
+    protected void debugOneStep(BizModel bizModel, JSONObject bizOptJson) {
+        String sOptType = bizOptJson.getString("operation");
+        BizOperation opt = allOperations.get(sOptType);
+        if(opt != null) {
+            //TODO 记录运行前日志
+            opt.debugOpt(bizModel, bizOptJson);
+            //TODO 记录运行后日志
+        } else {
+            //TODO 记录运行错误日志
+        }
+    }
+
+    @Override
+    public BizModel debug(BizSupplier supplier, JSONObject bizOptJson){
+        BizModel bizModel = supplier.get();
+        JSONArray optSteps = bizOptJson.getJSONArray("steps");
+        if (optSteps != null) {
+            for (Object step : optSteps) {
+                if (step instanceof JSONObject) {
+                    /*result =*/
+                    debugOneStep(bizModel, (JSONObject) step);
+                }
+            }
+        }
+        return bizModel;
+    }
 }

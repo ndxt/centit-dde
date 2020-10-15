@@ -9,4 +9,5 @@ import com.alibaba.fastjson.JSONObject;
 public interface BizOptFlow {
     void registerOperation(String key, BizOperation opt);
     BizModel run(BizSupplier supplier, JSONObject bizOptJson);
+    BizModel debug(BizSupplier supplier, JSONObject bizOptJson);
 }
