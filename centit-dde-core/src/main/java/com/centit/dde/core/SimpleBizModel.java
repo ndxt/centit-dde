@@ -40,17 +40,16 @@ public class SimpleBizModel implements BizModel, Serializable {
         if(bizData == null || bizData.isEmpty()) {
             return 0;
         }
-        DataSet mainData = bizData.get(modelName);
+        DataSet mainData = fetchDataSetByName(modelName);
         if(mainData== null){
             return 0;
         }
-        return bizData.get(modelName).size();
+        return mainData.size();
     }
 
     @Override
     public boolean isEmpty(){
-        return bizData == null ||
-            bizData.isEmpty();
+        return modelSize()==0;
     }
 
     @JSONField(deserialize = false, serialize = false)

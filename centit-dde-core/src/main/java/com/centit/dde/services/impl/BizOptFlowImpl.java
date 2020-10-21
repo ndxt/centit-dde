@@ -97,6 +97,16 @@ public class BizOptFlowImpl implements BizOptFlow {
         do {
             BizModel tempBM = supplier.get();
             if (tempBM == null || tempBM.isEmpty()) {
+                TaskDetailLog detailLog = new TaskDetailLog();
+                detailLog.setRunBeginTime(new Date());
+                detailLog.setLogId(logId);
+                detailLog.setSuccessPieces(0);
+                detailLog.setErrorPieces(0);
+                detailLog.setLogType("bizmodel");
+                detailLog.setLogInfo("ok");
+                detailLog.setRunEndTime(new Date());
+                detailLog.setTaskId(StringBaseOpt.castObjectToString(n+1,"0"));
+                taskDetailLogDao.saveNewObject(detailLog);
                 break;
             }
             n++;
@@ -165,10 +175,13 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (optSteps == null || optSteps.isEmpty()) {
             return bizModel;
         }
+        int i=0;
         for (Object step : optSteps) {
             if (step instanceof JSONObject) {
                 /*result =*/
-                runOneStep(bizModel, (JSONObject) step, logId, batchNum);
+                i++;
+                String num=StringBaseOpt.castObjectToString(batchNum).concat(StringBaseOpt.castObjectToString(i));
+                runOneStep(bizModel, (JSONObject) step, logId, NumberBaseOpt.parseInteger(num));
             }
         }
         return bizModel;
