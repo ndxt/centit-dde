@@ -32,7 +32,7 @@ public class JSBizOperation implements BizOperation {
     }
 
     @Override
-    public void runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
         JSRuntimeContext /*JsMateObjectEventRuntime*/ jsRuntimeContext = new JSRuntimeContext();
 
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", "js");
@@ -40,16 +40,18 @@ public class JSBizOperation implements BizOperation {
         if (StringUtils.isNotBlank(javaScript)) {
             jsRuntimeContext.compileScript(javaScript);
         }
+        int count=0;
         try {
             Object object = jsRuntimeContext.callJsFunc("runOpt",
                 this, bizModel);
             ConnectThreadHolder.commitAndRelease();
             bizModel.putDataSet(targetDsName,
                 BizOptUtils.castObjectToDataSet(object));
+            count=bizModel.fetchDataSetByName(targetDsName).size();
         } catch (ScriptException | NoSuchMethodException | SQLException e) {
             logger.error(e.getLocalizedMessage());
         }
-
+        return BuiltInOperation.getJsonObject(count);
     }
 
     public MetaObjectService getMetaObjectService() {

@@ -6,6 +6,7 @@ import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataSetDefine;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.DataSourceDescription;
 
 import java.io.IOException;
@@ -46,6 +47,9 @@ public class DBPacketBizSupplier implements BizSupplier {
             for (DataSetDefine rdd : this.dbPacket.getDataSetDefines()) {
                 switch (rdd.getSetType()) {
                     case "D": {
+                        if(integrationEnvironment.getDatabaseInfo(rdd.getDatabaseCode())==null){
+                            throw new ObjectException(rdd, "找不到对应的集成数据库：" + rdd.getDatabaseCode());
+                        }
                         SQLDataSetReader sqlDsr = new SQLDataSetReader();
                         sqlDsr.setDataSource(DataSourceDescription.valueOf(
                             integrationEnvironment.getDatabaseInfo(rdd.getDatabaseCode())));

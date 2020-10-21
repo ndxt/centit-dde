@@ -8,6 +8,6 @@ import com.alibaba.fastjson.JSONObject;
  */
 public interface BizOptFlow {
     void registerOperation(String key, BizOperation opt);
-    BizModel run(BizSupplier supplier, JSONObject bizOptJson);
+    BizModel run(BizSupplier supplier, JSONObject bizOptJson,String logId);
     BizModel debug(BizSupplier supplier, JSONObject bizOptJson);
 }

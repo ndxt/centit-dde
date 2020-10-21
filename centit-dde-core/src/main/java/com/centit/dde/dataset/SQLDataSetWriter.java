@@ -8,6 +8,7 @@ import com.centit.support.common.ObjectException;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.*;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ import java.util.Map;
  *      对应的表信息 SimpleTableInfo
  * @author zhf
  */
+@Data
 public class SQLDataSetWriter implements DataSetWriter {
     public static String WRITER_ERROR_TAG = "rmdb_dataset_writer_result";
     private static final Logger logger = LoggerFactory.getLogger(SQLDataSetWriter.class);
@@ -30,6 +32,9 @@ public class SQLDataSetWriter implements DataSetWriter {
     private DataSourceDescription dataSource;
     private TableInfo tableInfo;
     private Map fieldsMap;
+    private int successNums;
+    private int errorNums;
+    private String info;
     public Map getFieldsMap() {
         return fieldsMap;
     }
@@ -88,13 +93,21 @@ public class SQLDataSetWriter implements DataSetWriter {
                         (conn) -> DBBatchUtils.batchInsertObjects(conn,
                             tableInfo, dataSet.getData(),fieldsMap));
                 }
+                successNums=0;
+                errorNums=0;
+                info="ok";
                 for(Map<String, Object> row : dataSet.getData()){
                     dealResultMsg(row);
+                    successNums++;
                 }
             } catch (SQLException e) {
                 logger.error(e.getLocalizedMessage());
+                successNums=0;
+                errorNums=0;
+                info=e.getMessage();
                 for(Map<String, Object> row : dataSet.getData()){
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG),e.getMessage());
+                    errorNums++;
                 }
             }
         } else { // 这部分也可以 直接运行sql语句 而不是用 GeneralJsonObjectDao 方式来提高效率
@@ -104,6 +117,9 @@ public class SQLDataSetWriter implements DataSetWriter {
                 createConn = true;
             }
             Map map=DBBatchUtils.reverse(fieldsMap);
+            successNums=0;
+            errorNums=0;
+            info="ok";
             for(Map<String, Object> row : dataSet.getData()){
                 if(map!=null) {
                     row = DataSetOptUtil.mapDataRow(row, map.entrySet());
@@ -115,8 +131,13 @@ public class SQLDataSetWriter implements DataSetWriter {
                             GeneralJsonObjectDao.createJsonObjectDao(connection, tableInfo)
                                 .saveNewObject(finalRow));
                     dealResultMsg(row);
+                    successNums++;
                 } catch (SQLException e) {
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG),e.getMessage());
+                    errorNums++;
+                    if((info.length()+e.getMessage().length())<=2000) {
+                        info= info.concat(e.getMessage());
+                    }
                 }
             }
 
@@ -146,13 +167,21 @@ public class SQLDataSetWriter implements DataSetWriter {
                         (conn) -> DBBatchUtils.batchMergeObjects(conn,
                             tableInfo, dataSet.getData(),fieldsMap));
                 }
+                successNums=0;
+                errorNums=0;
+                info="ok";
                 for(Map<String, Object> row : dataSet.getData()){
                     dealResultMsg(row);
+                    successNums++;
                 }
             } catch (SQLException e) {
                 logger.error(e.getLocalizedMessage());
+                successNums=0;
+                errorNums=0;
+                info=e.getMessage();
                 for(Map<String, Object> row : dataSet.getData()){
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
+                    errorNums++;
                 }
             }
         } else {
@@ -162,6 +191,9 @@ public class SQLDataSetWriter implements DataSetWriter {
                 createConn = true;
             }
             Map map=DBBatchUtils.reverse(fieldsMap);
+            successNums=0;
+            errorNums=0;
+            info="ok";
             for(Map<String, Object> row : dataSet.getData()){
                 if(map!=null) {
                     row = DataSetOptUtil.mapDataRow(row, map.entrySet());
@@ -178,8 +210,13 @@ public class SQLDataSetWriter implements DataSetWriter {
                             }
                         });
                     dealResultMsg(row);
+                    successNums++;
                 } catch (SQLException | ObjectException e) {
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
+                    errorNums++;
+                    if((info.length()+e.getMessage().length())<=2000) {
+                        info= info.concat(e.getMessage());
+                    }
                 }
             }
 

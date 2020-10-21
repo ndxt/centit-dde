@@ -47,8 +47,9 @@ public class PersistenceBizOperation implements BizOperation {
     }
 
     @Override
-    public void runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String dataType = BuiltInOperation.getJsonFieldString(bizOptJson, "dataType", "D");
+        JSONObject jsonObject=new JSONObject();
         switch (dataType) {
             case "E":
                 writeExcelFile(bizModel, bizOptJson);
@@ -57,15 +58,16 @@ public class PersistenceBizOperation implements BizOperation {
                 writeCsvFile(bizModel, bizOptJson);
                 break;
             default:
-                writeDatabase(bizModel, bizOptJson);
+                jsonObject=writeDatabase(bizModel, bizOptJson);
                 break;
         }
+        return jsonObject;
     }
 
-    public void writeDatabase(BizModel bizModel, JSONObject bizOptJson) {
+    public JSONObject writeDatabase(BizModel bizModel, JSONObject bizOptJson) {
         String isRun = BuiltInOperation.getJsonFieldString(bizOptJson, "isRun", "T");
         if ("F".equalsIgnoreCase(isRun)) {
-            return;
+            return new JSONObject();
         }
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseCode", null);
@@ -116,17 +118,16 @@ public class PersistenceBizOperation implements BizOperation {
                 dataSetWriter.save(dataSet);
                 break;
         }
-        Map<String,Object> map= new HashMap<>();
-        map.put("processName",BuiltInOperation.getJsonFieldString(bizOptJson, "processName",sourDsName));
+
+        JSONObject map=new JSONObject();
         if(dataSet.size()>0) {
-            map.put("result", dataSet.getData().get(0).get(FieldType.mapPropName(SQLDataSetWriter.WRITER_ERROR_TAG)));
+            map.put("info",dataSetWriter.getInfo());
         }else{
-            map.put("result","ok");
+            map.put("info","ok");
         }
-        map.put("size",dataSet.size());
-        SimpleDataSet logDetail=SimpleDataSet.createSingleRowSet(map);
-        logDetail.setDataSetName(SQLDataSetWriter.WRITER_ERROR_TAG);
-        bizModel.putDataSet(UuidOpt.getUuidAsString(),logDetail);
+        map.put("success",dataSetWriter.getSuccessNums());
+        map.put("error",dataSetWriter.getErrorNums());
+        return map;
     }
 
     private void runPersistenceMap(BizModel bizModel, JSONObject bizOptJson) {
