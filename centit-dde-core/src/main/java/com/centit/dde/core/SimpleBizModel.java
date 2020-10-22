@@ -49,7 +49,8 @@ public class SimpleBizModel implements BizModel, Serializable {
 
     @Override
     public boolean isEmpty(){
-        return modelSize()==0;
+        return bizData == null ||
+            bizData.isEmpty();
     }
 
     @JSONField(deserialize = false, serialize = false)

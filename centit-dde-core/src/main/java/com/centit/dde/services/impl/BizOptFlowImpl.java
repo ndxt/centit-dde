@@ -96,7 +96,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         BizModel result = null;
         do {
             BizModel tempBM = supplier.get();
-            if (tempBM == null || tempBM.isEmpty()) {
+            if (tempBM == null || tempBM.isEmpty() ||(supplier.isBatchWise() && tempBM.modelSize()==0)) {
                 TaskDetailLog detailLog = new TaskDetailLog();
                 detailLog.setRunBeginTime(new Date());
                 detailLog.setLogId(logId);
