@@ -96,13 +96,15 @@ public class BizOptFlowImpl implements BizOptFlow {
         BizModel result = null;
         do {
             BizModel tempBM = supplier.get();
-            if (tempBM == null || tempBM.isEmpty() ||(supplier.isBatchWise() && tempBM.modelSize()==0)) {
+            boolean empty= tempBM == null || tempBM.isEmpty()
+                ||(supplier.isBatchWise() && tempBM.modelSize()==0);
+            if (empty) {
                 TaskDetailLog detailLog = new TaskDetailLog();
                 detailLog.setRunBeginTime(new Date());
                 detailLog.setLogId(logId);
                 detailLog.setSuccessPieces(0);
                 detailLog.setErrorPieces(0);
-                detailLog.setLogType("bizmodel");
+                detailLog.setLogType("emptyBizModel");
                 detailLog.setLogInfo("ok");
                 detailLog.setRunEndTime(new Date());
                 detailLog.setTaskId(StringBaseOpt.castObjectToString(n+1,"0"));
