@@ -127,6 +127,7 @@ public abstract class DBBatchUtils {
             + " where " +  GeneralJsonObjectDao.buildFilterSqlByPk(tableInfo,null);
         LeftRightPair<String,List<String>> checkSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
         int n =0;
+        boolean exists = false;
         try(PreparedStatement checkStmt = conn.prepareStatement(checkSqlPair.getLeft());
             PreparedStatement insertStmt = conn.prepareStatement(insertSqlPair.getLeft());
             PreparedStatement updateStmt = conn.prepareStatement(updateSqlPair.getLeft())){
@@ -141,7 +142,7 @@ public abstract class DBBatchUtils {
                 }
                 DatabaseAccess.setQueryStmtParameters(checkStmt, checkSqlPair.getRight(), object);
                 ResultSet rs = checkStmt.executeQuery();
-                boolean exists = false;
+                exists = false;
                 try {
                     Object obj = DatabaseAccess.fetchScalarObject(DatabaseAccess.fetchResultSetToObjectsList(rs));
                     if(obj!=null){
@@ -161,7 +162,11 @@ public abstract class DBBatchUtils {
                 }
             }
         }catch (SQLException e) {
-            throw DatabaseAccess.createAccessException(insertSqlPair.getLeft(), e);
+            if(exists) {
+                throw DatabaseAccess.createAccessException(updateSqlPair.getLeft(), e);
+            }else{
+                throw DatabaseAccess.createAccessException(insertSqlPair.getLeft(), e);
+            }
         }
         return n;
     }
