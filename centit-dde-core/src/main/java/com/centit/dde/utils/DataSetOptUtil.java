@@ -27,6 +27,9 @@ public abstract class DataSetOptUtil {
      */
     public static Map<String, Object> mapDataRow(Map<String, Object> inRow,
                                                   Collection<Map.Entry<String, String>> formulaMap) {
+        if(formulaMap==null){
+            return inRow;
+        }
         VariableFormula formula = new VariableFormula();
         formula.addExtendFunc("toJson", (a) -> JSON.parse(
             StringBaseOpt.castObjectToString(a[0])));

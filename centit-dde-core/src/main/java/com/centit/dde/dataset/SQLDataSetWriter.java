@@ -121,11 +121,8 @@ public class SQLDataSetWriter implements DataSetWriter {
             errorNums=0;
             info="ok";
             for(Map<String, Object> row : dataSet.getData()){
-                if(map!=null) {
-                    row = DataSetOptUtil.mapDataRow(row, map.entrySet());
-                }
                 try {
-                    Map<String, Object> finalRow = row;
+                    Map<String, Object> finalRow = DataSetOptUtil.mapDataRow(row, map==null?null:map.entrySet());
                     TransactionHandler.executeInTransaction(connection,
                         (conn) ->
                             GeneralJsonObjectDao.createJsonObjectDao(connection, tableInfo)
@@ -195,11 +192,8 @@ public class SQLDataSetWriter implements DataSetWriter {
             errorNums=0;
             info="ok";
             for(Map<String, Object> row : dataSet.getData()){
-                if(map!=null) {
-                    row = DataSetOptUtil.mapDataRow(row, map.entrySet());
-                }
                 try {
-                    Map<String, Object> finalRow = row;
+                    Map<String, Object> finalRow = DataSetOptUtil.mapDataRow(row, map==null?null:map.entrySet());
                     TransactionHandler.executeInTransaction(connection,
                         (conn) ->{
                             try {
