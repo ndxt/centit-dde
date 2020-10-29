@@ -106,7 +106,7 @@ public class TaskRun {
             saveDetail(ObjectException.extortExceptionMessage(e, 4),
                 taskLog);
             taskLog.setOtherMessage("error");
-            taskLogDao.saveNewObject(taskLog);
+            taskLogDao.mergeObject(taskLog);
         }
     }
 }

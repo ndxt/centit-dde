@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -116,17 +118,22 @@ public class SQLDataSetWriter implements DataSetWriter {
                 fetchConnect();
                 createConn = true;
             }
-            Map map=DBBatchUtils.reverse(fieldsMap);
             successNums=0;
             errorNums=0;
             info="ok";
             for(Map<String, Object> row : dataSet.getData()){
+                List<Map<String,Object>> list=new ArrayList<>();
+                list.add(row);
                 try {
-                    Map<String, Object> finalRow = DataSetOptUtil.mapDataRow(row, map==null?null:map.entrySet());
-                    TransactionHandler.executeInTransaction(connection,
-                        (conn) ->
-                            GeneralJsonObjectDao.createJsonObjectDao(connection, tableInfo)
-                                .saveNewObject(finalRow));
+                    if (connection == null) {
+                        TransactionHandler.executeInTransaction(dataSource,
+                            (conn) -> DBBatchUtils.batchInsertObjects(conn,
+                                tableInfo, list, fieldsMap));
+                    }else{
+                        TransactionHandler.executeInTransaction(connection,
+                            (conn) -> DBBatchUtils.batchInsertObjects(conn,
+                                tableInfo, list, fieldsMap));
+                    }
                     dealResultMsg(row);
                     successNums++;
                 } catch (SQLException e) {
@@ -187,22 +194,22 @@ public class SQLDataSetWriter implements DataSetWriter {
                 fetchConnect();
                 createConn = true;
             }
-            Map map=DBBatchUtils.reverse(fieldsMap);
             successNums=0;
             errorNums=0;
             info="ok";
             for(Map<String, Object> row : dataSet.getData()){
+                List<Map<String,Object>> list=new ArrayList<>();
+                list.add(row);
                 try {
-                    Map<String, Object> finalRow = DataSetOptUtil.mapDataRow(row, map==null?null:map.entrySet());
-                    TransactionHandler.executeInTransaction(connection,
-                        (conn) ->{
-                            try {
-                                return GeneralJsonObjectDao.createJsonObjectDao(connection, tableInfo)
-                                    .mergeObject(finalRow);
-                            } catch (IOException e) {
-                                throw new ObjectException(PersistenceException.DATABASE_OPERATE_EXCEPTION, e);
-                            }
-                        });
+                    if (connection == null) {
+                        TransactionHandler.executeInTransaction(dataSource,
+                            (conn) -> DBBatchUtils.batchMergeObjects(conn,
+                                tableInfo, list, fieldsMap));
+                    }else{
+                        TransactionHandler.executeInTransaction(connection,
+                            (conn) -> DBBatchUtils.batchMergeObjects(conn,
+                                tableInfo, list, fieldsMap));
+                    }
                     dealResultMsg(row);
                     successNums++;
                 } catch (SQLException | ObjectException e) {
