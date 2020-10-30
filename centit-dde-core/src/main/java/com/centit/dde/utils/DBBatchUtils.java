@@ -53,7 +53,7 @@ public abstract class DBBatchUtils {
                 if(map!=null) {
                     object = DataSetOptUtil.mapDataRow(object, map.entrySet());
                 }
-                DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object,tableInfo);
+                DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object);
                 n += stmt.executeUpdate();
             }
         }catch (SQLException e) {
@@ -87,7 +87,7 @@ public abstract class DBBatchUtils {
                 if(map!=null) {
                     object = DataSetOptUtil.mapDataRow(object, map.entrySet());
                 }
-                DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object,tableInfo);
+                DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object);
                 n += stmt.executeUpdate();
             }
         }catch (SQLException e) {
@@ -152,12 +152,12 @@ public abstract class DBBatchUtils {
                     e.printStackTrace();
                 }
                 if(exists){
-                    DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), object,tableInfo);
+                    DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), object);
                     if(StringUtils.isNotBlank(updateSqlPair.getLeft())) {
                         n += updateStmt.executeUpdate();
                     }
                 }else{
-                    DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), object,tableInfo);
+                    DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), object);
                     n += insertStmt.executeUpdate();
                 }
             }
