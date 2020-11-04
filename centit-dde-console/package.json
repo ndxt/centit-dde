@@ -1,0 +1,29 @@
+
+{
+  "steps": [
+    {
+      "fileName": "{modelId}.json",
+      "_highlight": true,
+      "fieldsMap": {
+        "formTemplate": "toJson(formTemplate)"
+      },
+      "dataType": "C",
+      "source": "c418579bc1b7411d9aabbf0f65bf077f",
+      "operation": "persistence"
+    },
+    {
+      "targetName": "aa",
+      "fieldsMap": {
+        "bbbb": "applicationId"
+      },
+      "_index": 1,
+      "source": "metaModel",
+      "operation": "map",
+      "target": "aa",
+      "_rowKey": 54
+    },
+    {
+      "operation": "js"
+    }
+  ]
+}
