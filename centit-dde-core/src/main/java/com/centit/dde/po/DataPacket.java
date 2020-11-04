@@ -122,6 +122,9 @@ public class DataPacket implements Serializable {
     @Column(name = "RETURN_TYPE")
     @ApiModelProperty(value = "返回数据类型", required = true)
     private String returnType;
+    @Column(name = "OWN_GROUP")
+    @ApiModelProperty(value = "所属分组")
+    private String ownGroup;
 
     @ApiModelProperty(value = "返回结果")
     @Column(name = "RETURN_RESULT")
