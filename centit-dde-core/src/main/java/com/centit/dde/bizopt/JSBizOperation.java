@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.utils.BizOptUtils;
-import com.centit.dde.utils.BuiltInOperation;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.database.transaction.ConnectThreadHolder;

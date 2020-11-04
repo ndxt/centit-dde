@@ -8,7 +8,6 @@ import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskLog;
-import com.centit.dde.services.DBPacketBizSupplier;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -55,13 +54,7 @@ public class TaskRun {
         if (bizOptJson.isEmpty()) {
             return;
         }
-        DBPacketBizSupplier dbPacketBizSupplier = new DBPacketBizSupplier(dataPacket);
-        dbPacketBizSupplier.setIntegrationEnvironment(integrationEnvironment);
-        dbPacketBizSupplier.setFileStore(fileStore);
-        dbPacketBizSupplier.setBatchWise(dataPacket.getIsWhile());
-        /*添加参数默认值传输*/
-        dbPacketBizSupplier.setQueryParams(dataPacket.getPacketParamsValue());
-        bizOptFlow.run(dbPacketBizSupplier, bizOptJson, logId);
+        bizOptFlow.run(bizOptJson, logId,dataPacket.getPacketParamsValue());
     }
 
 

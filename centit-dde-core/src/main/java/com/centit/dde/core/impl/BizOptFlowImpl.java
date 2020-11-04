@@ -1,23 +1,20 @@
-package com.centit.dde.services.impl;
+package com.centit.dde.core.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.bizopt.JSBizOperation;
-import com.centit.dde.bizopt.PersistenceBizOperation;
+import com.centit.dde.bizopt.*;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.BizOptFlow;
-import com.centit.dde.core.BizSupplier;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.po.TaskDetailLog;
-import com.centit.dde.utils.BuiltInOperation;
+import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,6 +45,8 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @Autowired(required = false)
     private DatabaseRunTime databaseRunTime;
+    @Autowired(required = false)
+    private FileStore fileStore;
 
     public Map<String, BizOperation> allOperations;
 
@@ -80,6 +79,16 @@ public class BizOptFlowImpl implements BizOptFlow {
         PersistenceBizOperation databaseOperation = new PersistenceBizOperation(
             path, integrationEnvironment, metaDataService);
         allOperations.put("persistence", databaseOperation);
+        DBBizOperation dbBizOperation = new DBBizOperation(integrationEnvironment);
+        allOperations.put("obtain-database", dbBizOperation);
+        ExcelBizOperation excelBizOperation = new ExcelBizOperation(fileStore);
+        allOperations.put("obtain-excel", excelBizOperation);
+        CsvBizOperation csvBizOperation = new CsvBizOperation(fileStore);
+        allOperations.put("obtain-csv", csvBizOperation);
+        JsonBizOperation jsonBizOperation = new JsonBizOperation(fileStore);
+        allOperations.put("obtain-json", jsonBizOperation);
+        HttpBizOperation httpBizOperation = new HttpBizOperation();
+        allOperations.put("obtain-http", httpBizOperation);
     }
 
     @Override
@@ -91,35 +100,38 @@ public class BizOptFlowImpl implements BizOptFlow {
      * @return 返回真正运行的次数, 如果小于 0 表示報錯
      */
     @Override
-    public BizModel run(BizSupplier supplier, JSONObject bizOptJson, String logId) {
-        int n = 0;
-        BizModel result = null;
-        do {
-            BizModel tempBM = supplier.get();
-            boolean empty= tempBM == null || tempBM.isEmpty()
-                ||(supplier.isBatchWise() && tempBM.modelSize()==0);
-            if (empty) {
-                TaskDetailLog detailLog = new TaskDetailLog();
-                detailLog.setRunBeginTime(new Date());
-                detailLog.setLogId(logId);
-                detailLog.setSuccessPieces(0);
-                detailLog.setErrorPieces(0);
-                detailLog.setLogType("emptyBizModel");
-                detailLog.setLogInfo("ok");
-                detailLog.setRunEndTime(new Date());
-                detailLog.setTaskId(StringBaseOpt.castObjectToString(n+1,"0"));
-                taskDetailLogDao.saveNewObject(detailLog);
-                break;
+    public BizModel run(JSONObject bizOptJson, String logId, Map<String, Object> queryParams) {
+        JSONObject dataOptDescJson = bizOptJson.getJSONObject("dataOptDescJson");
+        JSONArray node = dataOptDescJson.getJSONArray("nodeList");
+        JSONArray link = dataOptDescJson.getJSONArray("linkList");
+        String startId = "";
+        for (Object o : node) {
+            if (((JSONObject) o).get("source").equals("obtain")) {
+                startId = ((JSONObject) o).getString("id");
             }
-            n++;
-            result = apply(tempBM, bizOptJson, logId, n);
-        } while (supplier.isBatchWise());
-        return result;
+        }
+        BizModel bizModel = apply(node, link, startId, startId, null, logId, 0, queryParams);
+        if (bizModel.isEmpty()) {
+            TaskDetailLog detailLog = new TaskDetailLog();
+            detailLog.setRunBeginTime(new Date());
+            detailLog.setLogId(logId);
+            detailLog.setSuccessPieces(0);
+            detailLog.setErrorPieces(0);
+            detailLog.setLogType("emptyBizModel");
+            detailLog.setLogInfo("ok");
+            detailLog.setRunEndTime(new Date());
+            detailLog.setTaskId(StringBaseOpt.castObjectToString(0, "0"));
+            taskDetailLogDao.saveNewObject(detailLog);
+        }
+        return bizModel;
     }
 
-    protected void runOneStep(BizModel bizModel, JSONObject bizOptJson, String logId, int batchNum) {
+    protected void runOneStep(BizModel bizModel, JSONObject bizOptJson, String logId, int batchNum, Map<String, Object> queryParams) {
         String sOptType = bizOptJson.getString("operation");
         BizOperation opt = allOperations.get(sOptType);
+        if (opt instanceof DBBizOperation) {
+            ((DBBizOperation) opt).setQueryParams(queryParams);
+        }
         if (opt == null) {
             if (logId != null) {
                 TaskDetailLog detailLog = new TaskDetailLog();
@@ -130,7 +142,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 detailLog.setLogType("error");
                 detailLog.setLogInfo("找不到对应的操作：" + sOptType);
                 detailLog.setRunEndTime(new Date());
-                detailLog.setTaskId(StringBaseOpt.castObjectToString(batchNum,"0"));
+                detailLog.setTaskId(StringBaseOpt.castObjectToString(batchNum, "0"));
                 taskDetailLogDao.saveNewObject(detailLog);
             }
             throw new ObjectException(bizOptJson, "找不到对应的操作：" + sOptType);
@@ -144,14 +156,14 @@ public class BizOptFlowImpl implements BizOptFlow {
                 detailLog.setLogType(sOptType + ":" + processName);
                 detailLog.setSuccessPieces(0);
                 detailLog.setErrorPieces(0);
-                detailLog.setTaskId(StringBaseOpt.castObjectToString(batchNum,"0"));
+                detailLog.setTaskId(StringBaseOpt.castObjectToString(batchNum, "0"));
                 taskDetailLogDao.saveNewObject(detailLog);
             }
-            JSONObject jsonObject=opt.runOpt(bizModel, bizOptJson);
+            JSONObject jsonObject = opt.runOpt(bizModel, bizOptJson);
             if (logId != null) {
                 detailLog.setSuccessPieces(jsonObject.getIntValue("success"));
                 detailLog.setErrorPieces(jsonObject.getIntValue("error"));
-                detailLog.setLogInfo(BuiltInOperation.getJsonFieldString(jsonObject,"info","ok"));
+                detailLog.setLogInfo(BuiltInOperation.getJsonFieldString(jsonObject, "info", "ok"));
                 detailLog.setRunEndTime(new Date());
                 taskDetailLogDao.updateObject(detailLog);
             }
@@ -164,7 +176,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 detailLog.setErrorPieces(0);
                 detailLog.setLogType("error");
                 detailLog.setLogInfo(ObjectException.extortExceptionMessage(e, 4));
-                detailLog.setTaskId(StringBaseOpt.castObjectToString(batchNum,"0"));
+                detailLog.setTaskId(StringBaseOpt.castObjectToString(batchNum, "0"));
                 detailLog.setRunEndTime(new Date());
                 taskDetailLogDao.saveNewObject(detailLog);
             }
@@ -172,18 +184,28 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
     }
 
-    public BizModel apply(BizModel bizModel, JSONObject bizOptJson, String logId, int batchNum) {
-        JSONArray optSteps = bizOptJson.getJSONArray("steps");
-        if (optSteps == null || optSteps.isEmpty()) {
+    public BizModel apply(JSONArray node, JSONArray link, String startId, String firstId, BizModel bizModel, String logId, int batchNum, Map<String, Object> queryParams) {
+        if (StringBaseOpt.isNvl(startId)) {
             return bizModel;
         }
-        int i=0;
-        for (Object step : optSteps) {
-            if (step instanceof JSONObject) {
-                /*result =*/
-                i++;
-                String num=StringBaseOpt.castObjectToString(batchNum).concat(StringBaseOpt.castObjectToString(i));
-                runOneStep(bizModel, (JSONObject) step, logId, NumberBaseOpt.parseInteger(num));
+        int i = 0;
+        if (startId.equals(firstId)) {
+            batchNum++;
+            i = 0;
+        }
+        for (Object edge : link) {
+            String start = BuiltInOperation.getJsonFieldString((JSONObject) edge, "sourceId", "");
+            String end = BuiltInOperation.getJsonFieldString((JSONObject) edge, "targetId", "");
+            if (start.equals(startId)) {
+                for (Object step : node) {
+                    if (((JSONObject) step).get("id").equals(startId)) {
+                        String num = StringBaseOpt.castObjectToString(batchNum).concat(StringBaseOpt.castObjectToString(i++));
+                        runOneStep(bizModel, (JSONObject) step, logId, NumberBaseOpt.parseInteger(num), queryParams);
+                    }
+                }
+                if (!"".equals(end)) {
+                    apply(node, link, end, firstId, bizModel, logId, batchNum, queryParams);
+                }
             }
         }
         return bizModel;
@@ -202,8 +224,8 @@ public class BizOptFlowImpl implements BizOptFlow {
     }
 
     @Override
-    public BizModel debug(BizSupplier supplier, JSONObject bizOptJson) {
-        BizModel bizModel = supplier.get();
+    public BizModel debug(JSONObject bizOptJson) {
+        BizModel bizModel = null;
         JSONArray optSteps = bizOptJson.getJSONArray("steps");
         if (optSteps != null) {
             for (Object step : optSteps) {

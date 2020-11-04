@@ -3,7 +3,6 @@ package com.centit.dde.services.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.centit.dde.bizopt.SimpleBizSupplier;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.dao.DataPacketDao;
@@ -11,7 +10,6 @@ import com.centit.dde.dao.DataSetDefineDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataSetColumnDesc;
 import com.centit.dde.po.DataSetDefine;
-import com.centit.dde.services.DBPacketBizSupplier;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.Constant;
 import com.centit.fileserver.common.FileStore;
@@ -123,13 +121,6 @@ public class DataPacketServiceImpl implements DataPacketService {
         return dataPacket;
     }
 
-    private BizModel innerFetchDataPacketData(DataPacket dataPacket, Map<String, Object>  params){
-        DBPacketBizSupplier bizSupplier = new DBPacketBizSupplier(dataPacket);
-        bizSupplier.setFileStore(fileStore);
-        bizSupplier.setIntegrationEnvironment(integrationEnvironment);
-        bizSupplier.setQueryParams(params);
-        return bizSupplier.get();
-    }
 
     private String makeDataPacketBufId(DataPacket dataPacket, Map<String, Object>  paramsMap){
         String dateString = DatetimeOpt.convertTimestampToString(dataPacket.getRecordDate());
@@ -229,17 +220,19 @@ public class DataPacketServiceImpl implements DataPacketService {
 
     private BizModel getBizModel(String packetId, Map<String, Object> paramsMap, JSONObject optsteps) {
         DataPacket dataPacket = this.getDataPacket(packetId);
-        BizModel bizModel = fetchDataPacketDataFromBuf(dataPacket, paramsMap);
-        if(bizModel==null) {
-            bizModel = innerFetchDataPacketData(dataPacket, paramsMap);
+        Map<String, Object> modelTag = dataPacket.getPacketParamsValue();
+        if (paramsMap != null && paramsMap.size() > 0) {
+            modelTag.putAll(paramsMap);
         }
+        BizModel bizModel = fetchDataPacketDataFromBuf(dataPacket, modelTag);
+
         if(optsteps==null){
             optsteps = dataPacket.getDataOptDescJson();
         }
         if(optsteps!=null) {
-            bizModel = bizOptFlow.run(new SimpleBizSupplier(bizModel) ,optsteps,null);
+            bizModel = bizOptFlow.run(optsteps,null,modelTag);
         }
-        setDataPacketBuf(bizModel, dataPacket, paramsMap);
+        setDataPacketBuf(bizModel, dataPacket, modelTag);
         return bizModel;
     }
 }

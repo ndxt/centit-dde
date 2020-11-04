@@ -1,7 +1,7 @@
 package com.centit.dde.core;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.utils.BuiltInOperation;
+import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.support.algorithm.StringBaseOpt;
 import lombok.Data;
 
