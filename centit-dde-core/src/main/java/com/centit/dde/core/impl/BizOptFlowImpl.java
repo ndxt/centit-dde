@@ -6,6 +6,7 @@ import com.centit.dde.bizopt.*;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.BizOptFlow;
+import com.centit.dde.core.DataOptDescJson;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.fileserver.common.FileStore;
@@ -101,15 +102,15 @@ public class BizOptFlowImpl implements BizOptFlow {
      */
     @Override
     public BizModel run(JSONObject bizOptJson, String logId, Map<String, Object> queryParams) {
-        JSONObject dataOptDescJson = bizOptJson.getJSONObject("dataOptDescJson");
-        JSONArray node = dataOptDescJson.getJSONArray("nodeList");
-        JSONArray link = dataOptDescJson.getJSONArray("linkList");
+        DataOptDescJson dataOptDescJson = new DataOptDescJson(bizOptJson.getJSONObject("dataOptDescJson"));
+
         String startId = "";
         for (Object o : node) {
             if (((JSONObject) o).get("source").equals("obtain")) {
                 startId = ((JSONObject) o).getString("id");
             }
         }
+
         BizModel bizModel = apply(node, link, startId, startId, null, logId, 0, queryParams);
         if (bizModel.isEmpty()) {
             TaskDetailLog detailLog = new TaskDetailLog();

@@ -2,9 +2,7 @@ package com.centit.test.datafile;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.core.StepGraph;
-
-import java.sql.*;
+import com.centit.dde.core.DataOptDescJson;
 
 
 public class TestJdbc {
@@ -14,7 +12,7 @@ String s="{\"applicationId\":\"5fJnPolOQD6tbRmth_jFpQ\",\"bufferFreshPeriod\":-1
         JSONObject ss=JSONObject.parseObject(s).getJSONObject("dataOptDescJson");
         JSONArray node=ss.getJSONArray("nodeList");
         JSONArray link=ss.getJSONArray("linkList");
-        StepGraph stepGraph=new StepGraph();
+        DataOptDescJson stepGraph=new DataOptDescJson();
         String startId="";
         for (Object o:node) {
            stepGraph.addVertex((JSONObject) o);
