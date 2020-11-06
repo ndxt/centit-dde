@@ -3,16 +3,13 @@ package com.centit.dde.dataset;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetWriter;
 import com.centit.dde.utils.DBBatchUtils;
-import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.support.common.ObjectException;
-import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.*;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -89,16 +86,16 @@ public class SQLDataSetWriter implements DataSetWriter {
                 if (connection == null) {
                     TransactionHandler.executeInTransaction(dataSource,
                         (conn) -> DBBatchUtils.batchInsertObjects(conn,
-                            tableInfo, dataSet.getData(),fieldsMap));
+                            tableInfo, dataSet.getDataAsList(),fieldsMap));
                 } else {
                     TransactionHandler.executeInTransaction(connection,
                         (conn) -> DBBatchUtils.batchInsertObjects(conn,
-                            tableInfo, dataSet.getData(),fieldsMap));
+                            tableInfo, dataSet.getDataAsList(),fieldsMap));
                 }
                 successNums=0;
                 errorNums=0;
                 info="ok";
-                for(Map<String, Object> row : dataSet.getData()){
+                for(Map<String, Object> row : dataSet.getDataAsList()){
                     dealResultMsg(row);
                     successNums++;
                 }
@@ -107,7 +104,7 @@ public class SQLDataSetWriter implements DataSetWriter {
                 successNums=0;
                 errorNums=0;
                 info=e.getMessage();
-                for(Map<String, Object> row : dataSet.getData()){
+                for(Map<String, Object> row : dataSet.getDataAsList()){
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG),e.getMessage());
                     errorNums++;
                 }
@@ -121,7 +118,7 @@ public class SQLDataSetWriter implements DataSetWriter {
             successNums=0;
             errorNums=0;
             info="ok";
-            for(Map<String, Object> row : dataSet.getData()){
+            for(Map<String, Object> row : dataSet.getDataAsList()){
                 List<Map<String,Object>> list=new ArrayList<>();
                 list.add(row);
                 try {
@@ -165,16 +162,16 @@ public class SQLDataSetWriter implements DataSetWriter {
                 if (connection == null) {
                     TransactionHandler.executeInTransaction(dataSource,
                         (conn) -> DBBatchUtils.batchMergeObjects(conn,
-                            tableInfo, dataSet.getData(),fieldsMap));
+                            tableInfo, dataSet.getDataAsList(),fieldsMap));
                 } else {
                     TransactionHandler.executeInTransaction(connection,
                         (conn) -> DBBatchUtils.batchMergeObjects(conn,
-                            tableInfo, dataSet.getData(),fieldsMap));
+                            tableInfo, dataSet.getDataAsList(),fieldsMap));
                 }
                 successNums=0;
                 errorNums=0;
                 info="ok";
-                for(Map<String, Object> row : dataSet.getData()){
+                for(Map<String, Object> row : dataSet.getDataAsList()){
                     dealResultMsg(row);
                     successNums++;
                 }
@@ -183,7 +180,7 @@ public class SQLDataSetWriter implements DataSetWriter {
                 successNums=0;
                 errorNums=0;
                 info=e.getMessage();
-                for(Map<String, Object> row : dataSet.getData()){
+                for(Map<String, Object> row : dataSet.getDataAsList()){
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
                     errorNums++;
                 }
@@ -197,7 +194,7 @@ public class SQLDataSetWriter implements DataSetWriter {
             successNums=0;
             errorNums=0;
             info="ok";
-            for(Map<String, Object> row : dataSet.getData()){
+            for(Map<String, Object> row : dataSet.getDataAsList()){
                 List<Map<String,Object>> list=new ArrayList<>();
                 list.add(row);
                 try {

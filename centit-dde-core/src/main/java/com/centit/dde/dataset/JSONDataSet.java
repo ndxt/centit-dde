@@ -26,7 +26,7 @@ public class JSONDataSet extends FileDataSet{
             if(params !=null && BooleanBaseOpt.castObjectToBoolean(
                 params.get("isJSONArray"),false)) {
                 JSONArray json = JSON.parseArray(FileIOOpt.readStringFromFile(this.getFilePath()));
-                return SimpleDataSet.fromJsonArray(json);
+                return new SimpleDataSet(json);
             }else {
                 return JSON.parseObject(FileIOOpt.readStringFromFile(this.getFilePath()), SimpleDataSet.class);
             }

@@ -114,7 +114,7 @@ public class CsvDataSet extends FileDataSet {
         csvWriter.setTextQualifier('"');
         csvWriter.setUseTextQualifier(true);
         csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR.charAt(0));
-        List<Map<String, Object>> list=dataSet.getData();
+        List<Map<String, Object>> list=dataSet.getDataAsList();
         Collections.sort(list, (o1, o2) -> Integer.compare(o2.size(), o1.size()));
         int iHead = 0;
         for (Map<String, Object> row : list) {

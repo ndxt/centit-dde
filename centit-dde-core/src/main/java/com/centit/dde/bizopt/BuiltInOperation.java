@@ -255,7 +255,7 @@ public abstract class BuiltInOperation {
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         AppSession appSession = new AppSession();
         RestfulHttpRequest restfulHttpRequest = new RestfulHttpRequest();
-        dataSet.getData().forEach(data -> {
+        dataSet.getDataAsList().forEach(data -> {
             switch (httpMethod.toLowerCase()) {
                 case "post":
                     RestfulHttpRequest.jsonPost(appSession, httpUrl, data);

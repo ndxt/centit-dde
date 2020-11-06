@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,8 +69,8 @@ public class SQLDataSetReader implements DataSetReader {
             JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(
                 conn, qap.getQuery(), paramsMap);
             SimpleDataSet dataSet = new SimpleDataSet();
-            dataSet.setData((List)jsonArray);
-            dataSet.setParms(paramsMap);
+            dataSet.setData(jsonArray);
+            //dataSet.setParms(paramsMap);
             return dataSet;
         } catch (SQLException | IOException e) {
             logger.error(e.getLocalizedMessage());

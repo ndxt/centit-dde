@@ -259,7 +259,7 @@ public abstract class DataPacketUtil {
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", sourceSchema.getPacketName());
         JSONArray ja = bizOptJson.getJSONArray("data");
         DataSet destDs = BizOptUtils.castObjectToDataSet(ja);
-        List<String> fields = DBBatchUtils.achieveAllFields(destDs.getData());
+        List<String> fields = DBBatchUtils.achieveAllFields(destDs.getDataAsList());
         DataSetSchema dss = new DataSetSchema(targetDsName);
 
         for(String s : fields){

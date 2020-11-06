@@ -49,7 +49,7 @@ public abstract class BizOptUtils {
                 JSONObject jobj = (JSONObject)JSON.toJSON(obj);
                 return JSON.toJavaObject(jobj, SimpleDataSet.class);
             } else {
-                return SimpleDataSet.createSingleRowSet(objectMap);
+                return new SimpleDataSet(objectMap);
             }
         } else if(obj instanceof Collection){
             Collection<Object> objs = (Collection<Object>)obj;
@@ -66,7 +66,7 @@ public abstract class BizOptUtils {
             dataSet.setData(data);
             return dataSet;
         } else {
-            return SimpleDataSet.createSingleObjectSet(obj);
+            return new SimpleDataSet(obj);
         }
     }
 }

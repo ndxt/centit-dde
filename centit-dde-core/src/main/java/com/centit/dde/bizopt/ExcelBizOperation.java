@@ -4,15 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
-import com.centit.dde.dataset.*;
+import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.fileserver.common.FileStore;
-import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.support.common.ObjectException;
-import com.centit.support.database.utils.DataSourceDescription;
 
 import java.io.IOException;
-import java.util.Map;
 
 
 /**
@@ -36,6 +31,6 @@ public class ExcelBizOperation implements BizOperation {
         }
         SimpleDataSet dataSet = excelDataSet.load(null);
         bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getJsonObject(dataSet.getRowCount());
+        return BuiltInOperation.getJsonObject(dataSet.size());
     }
 }

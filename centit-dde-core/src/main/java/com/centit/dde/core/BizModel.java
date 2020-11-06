@@ -35,6 +35,7 @@ public interface BizModel {
 
     DataSet getDataSet(String relationPath);
 
+    JSONObject toJsonObject();
     /**
      * @param singleRowAsObject 如果为true DataSet中只有一行记录的就作为JSONObject；
      *                          否则为 JSONArray

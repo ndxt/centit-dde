@@ -1,9 +1,10 @@
 package com.centit.dde.core;
 
-import com.alibaba.fastjson.JSONArray;
 import com.centit.support.algorithm.CollectionsOpt;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -16,47 +17,29 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
 
     public SimpleDataSet(){
         dataSetName = DataSet.SINGLE_DATA_SET_DEFAULT_NAME;
-        sorted = false;
+        //sorted = false;
     }
 
-    public SimpleDataSet(String dataSetName){
-        this.dataSetName = dataSetName;
-        this.sorted = false;
-    }
-
-    public SimpleDataSet(List<Map<String, Object>> data) {
+    public SimpleDataSet(Object data){
+        this.dataSetName = DataSet.SINGLE_DATA_SET_DEFAULT_NAME;
         this.data = data;
-        this.dataSetName = DataSet.SINGLE_DATA_SET_DEFAULT_NAME;;
-        this.sorted = false;
+    }
+
+    public SimpleDataSet(String dataSetName, Object data) {
+        this.data = data;
+        this.dataSetName = dataSetName;
+        //this.sorted = false;
     }
     /**
      * 返回 DataSet 的名称
      */
     protected String dataSetName;
 
-
-    protected boolean sorted;
-
-    /**
-     * 返回 所有数据维度，这个维度是有序的，这个属性不是必须的
-     */
-    protected List<String> dimensions;
     /**
      * 数据集中的数据
      * 是一个 对象（Map）列表；可以类比为JSONArray
      */
-    protected List<Map<String, Object>> data;
-
-    public Map<String, Object> getParms() {
-        return parms;
-    }
-
-    public void setParms(Map<String, Object> parms) {
-        this.parms = parms;
-    }
-
-
-    private Map<String, Object> parms;
+    protected Object data;
 
     @Override
     public String getDataSetName() {
@@ -75,50 +58,106 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
      */
     @Override
     public String getDataSetType() {
-        if(this.data ==null || this.data.size() == 0){
+        if(this.data ==null){
             return "E";//empty
         }
-        if(this.data.size() > 1){
+        if(this.data instanceof Collection){
+            //Collection<?> objects = ((Collection<?>)this.data);
             return "T";//二维表 T(table)
         }
-        if(this.data.get(0) != null && this.data.get(0).size() == 1){
-            return "S"; // 标量数据 S(scalar)
+        if(this.data instanceof Map){
+            return "R"; // 标量数据 S(scalar)
         }
-        return "R"; //单个数据记录 R(row)
+        return "S"; //单个数据记录 R(row)
     }
 
     @Override
-    public List<Map<String, Object>> getData() {
-        return data;
+    public List<Map<String, Object>> getDataAsList() {
+        if(this.data ==null){
+            return null;
+        }
+        if(this.data instanceof List){
+            List<?> objects = (List<?>) this.data;
+            if(objects.size()<1){
+                return (List<Map<String, Object>>) objects;
+            }
+            //只检查第一个，应该检查多个
+            Object firstRow = objects.get(0);
+            if(firstRow instanceof Map){
+                return (List<Map<String, Object>>) objects;
+            } /*else {
+                List<Map<String, Object>> objList = new ArrayList<>(objects.size());
+                for(Object obj : objects) {
+                    objList.add(CollectionsOpt.objectToMap(obj));
+                }
+                return objList;
+            }*/
+        }
+
+        if(this.data instanceof Collection) {
+            Collection<?> objects = (Collection<?>) this.data;
+            List<Map<String, Object>> objList = new ArrayList<>(objects.size());
+            for(Object obj : objects) {
+                objList.add(CollectionsOpt.objectToMap(obj));
+            }
+            return objList;
+        }
+
+        /*if(this.data instanceof Map){
+            return CollectionsOpt.createList((Map<String, Object>)this.data);
+        }*/
+        return CollectionsOpt.createList(CollectionsOpt.objectToMap(this.data));
+    }
+
+    /**
+     * @return 是否为空的数据集
+     */
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    /**
+     * @return 数据集大小
+     */
+    @Override
+    public int size() {
+        if(this.data ==null){
+            return 0;
+        }
+        if(this.data instanceof Collection){
+            return ((Collection<?>)this.data).size();
+        }
+        return 1;
+    }
+
+    @Override
+    public Map<String, Object> getFirstRow() {
+        if(this.data ==null){
+            return null;
+        }
+        if(this.data instanceof Collection) {
+            Collection<?> objects = (Collection<?>) this.data;
+            if(objects.size()==0){
+                return null;
+            }
+            return CollectionsOpt.objectToMap(objects.iterator().next());
+        }
+        return CollectionsOpt.objectToMap(this.data);
     }
 
 
-    public void setData(List<Map<String, Object>> data) {
+    public void setData(Object data) {
         this.data = data;
     }
-
+    /**
+     * 数据集中的数据
+     *
+     * @return 存储的原始对象
+     */
     @Override
-    public boolean isSorted() {
-        return sorted;
-    }
-
-    public void setSorted(boolean sorted) {
-        this.sorted = sorted;
-    }
-
-    @Override
-    public List<String> getDimensions() {
-        return dimensions;
-    }
-
-    public void setDimensions(List<String> dimensions) {
-        this.dimensions = dimensions;
-    }
-
-    public static SimpleDataSet fromJsonArray(JSONArray ja){
-        SimpleDataSet dataSet = new SimpleDataSet();
-        dataSet.setData((List)ja);
-        return dataSet;
+    public Object getData() {
+        return this.data;
     }
 
     /**
@@ -131,16 +170,5 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
         return this;
     }
 
-    public static SimpleDataSet createSingleRowSet(Map<String, Object> rowData) {
-        SimpleDataSet dataSet = new SimpleDataSet();
-        dataSet.data = CollectionsOpt.createList(rowData);
-        return dataSet;
-    }
 
-    public static SimpleDataSet createSingleObjectSet(Object data) {
-        SimpleDataSet dataSet = new SimpleDataSet();
-        dataSet.data = CollectionsOpt.createList(
-            CollectionsOpt.createHashMap(DataSet.SINGLE_DATA_FIELD_NAME, data));
-        return dataSet;
-    }
 }

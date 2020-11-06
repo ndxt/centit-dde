@@ -19,6 +19,7 @@ public class SimpleBizModel implements BizModel, Serializable {
     private String modelName;
     /**
      * 模型的标识， 就是对应的主键
+     * 或者模型的参数
      * 或者对应关系数据库查询的参数（数据源参数）
      */
     private Map<String, Object> modelTag;
@@ -70,6 +71,20 @@ public class SimpleBizModel implements BizModel, Serializable {
         getBizData().put(relationPath, dataSet);
     }
 
+    @Override
+    public JSONObject toJsonObject() {
+        JSONObject dataObject = new JSONObject();
+        if (bizData != null) {
+            for (DataSet dataSet : bizData.values()) {
+                dataObject.put(dataSet.getDataSetName(), dataSet.getData());
+            }
+        }
+        if (modelTag != null && !modelTag.isEmpty()) {
+            dataObject.put("modelTag", modelTag);
+        }
+        dataObject.put("modelName", this.getModelName());
+        return dataObject;
+    }
     /**
      * @param singleRowAsObject 如果为true DataSet中只有一行记录的就作为JSONObject；
      *                          否则为 JSONArray
@@ -80,10 +95,10 @@ public class SimpleBizModel implements BizModel, Serializable {
         JSONObject dataObject = new JSONObject();
         if (bizData != null) {
             for (DataSet dataSet : bizData.values()) {
-                if (dataSet.getRowCount() == 1 && singleRowAsObject) {
+                if (dataSet.size() == 1 && singleRowAsObject) {
                     dataObject.put(dataSet.getDataSetName(), dataSet.getFirstRow());
                 } else if (!dataSet.isEmpty()) {
-                    dataObject.put(dataSet.getDataSetName(), dataSet.getData());
+                    dataObject.put(dataSet.getDataSetName(), dataSet.getDataAsList());
                 }
             }
         }
@@ -102,7 +117,7 @@ public class SimpleBizModel implements BizModel, Serializable {
                 if (StringUtils.equalsAny(dataSet.getDataSetName(), singleRowDataSets)) {
                     dataObject.put(dataSet.getDataSetName(), dataSet.getFirstRow());
                 } else if (!dataSet.isEmpty()) {
-                    dataObject.put(dataSet.getDataSetName(), dataSet.getData());
+                    dataObject.put(dataSet.getDataSetName(), dataSet.getDataAsList());
                 }
             }
         }

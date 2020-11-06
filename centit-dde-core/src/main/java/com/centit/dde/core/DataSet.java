@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public interface DataSet {
     String SINGLE_DATA_SET_DEFAULT_NAME = "default";
-    String SINGLE_DATA_FIELD_NAME = "data";
+    String SINGLE_DATA_FIELD_NAME = "scalar";
     /**
      * 返回 DataSet 的名称
      * @return  DataSet 的名称
@@ -27,44 +27,26 @@ public interface DataSet {
     String getDataSetType();
 
     /**
-     * @return 是否已按照维度属性排序
+     * 数据集中的数据
+     * @return 存储的原始对象
      */
-    boolean isSorted();
-
-    /**
-     * 返回 所有数据维度，这个维度是有序的，这个属性不是必须的
-     * @return 维度
-     */
-    List<String> getDimensions();
+    Object getData();
 
     /**
      * 数据集中的数据
      * @return 是一个 对象（Map）列表；可以类比为JSONArray
      */
-    List<Map<String, Object>> getData();
+    List<Map<String, Object>> getDataAsList();
 
     /**
      * @return 是否为空的数据集
      */
-    default boolean isEmpty(){
-        return getData()==null || getData().size()==0;
-    }
+    boolean isEmpty();
 
     /**
      * @return 数据集大小
      */
-    default int size(){
-        return getData()==null? 0: getData().size();
-    }
+    int size();
 
-    default int getRowCount(){
-        return getData()==null? 0 : getData().size();
-    }
-
-    default Map<String, Object> getFirstRow() {
-        if (!isEmpty()) {
-            return getData().get(0);
-        }
-        return null;
-    }
+    Map<String, Object> getFirstRow();
 }

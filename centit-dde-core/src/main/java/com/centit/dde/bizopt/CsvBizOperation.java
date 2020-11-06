@@ -33,6 +33,6 @@ public class CsvBizOperation implements BizOperation {
         }
         SimpleDataSet dataSet = csvDataSet.load(null);
         bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getJsonObject(dataSet.getRowCount());
+        return BuiltInOperation.getJsonObject(dataSet.size());
     }
 }

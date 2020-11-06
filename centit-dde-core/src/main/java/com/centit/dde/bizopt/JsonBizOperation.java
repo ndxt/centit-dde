@@ -35,6 +35,6 @@ public class JsonBizOperation implements BizOperation {
         }
         SimpleDataSet dataSet = jsonDataSet.load(null);
         bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getJsonObject(dataSet.getRowCount());
+        return BuiltInOperation.getJsonObject(dataSet.size());
     }
 }

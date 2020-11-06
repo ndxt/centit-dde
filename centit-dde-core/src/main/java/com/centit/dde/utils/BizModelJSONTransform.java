@@ -107,10 +107,10 @@ public class BizModelJSONTransform
         DataSet currentDateSet = this.data.fetchDataSetByName(dataSetName);
         if(currentDateSet!=null){
             if(StringUtils.isBlank(valuePath)){
-                return currentDateSet.getData();
+                return currentDateSet.getDataAsList();
             }
             return ReflectionOpt.attainExpressionValue(
-                currentDateSet.getData(),
+                currentDateSet.getDataAsList(),
                 valuePath);
         }
 

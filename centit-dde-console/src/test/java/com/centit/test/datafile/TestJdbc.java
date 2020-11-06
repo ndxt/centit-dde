@@ -1,10 +1,5 @@
 package com.centit.test.datafile;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.core.DataOptDescJson;
-
-
 public class TestJdbc {
 
     public static void main(String[] args) {

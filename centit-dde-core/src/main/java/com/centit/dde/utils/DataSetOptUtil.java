@@ -51,7 +51,7 @@ public abstract class DataSetOptUtil {
      * @return 新的数据集
      */
     public static DataSet mapDateSetByFormula(DataSet inData, Collection<Map.Entry<String, String>> formulaMap) {
-        List<Map<String, Object>> data = inData.getData();
+        List<Map<String, Object>> data = inData.getDataAsList();
         List<Map<String, Object>> newData = new ArrayList<>(data.size());
         for (Map<String, Object> obj : data) {
             newData.add(mapDataRow(obj, formulaMap));
@@ -67,7 +67,7 @@ public abstract class DataSetOptUtil {
      * @return 新的数据集 等同于原始数据集
      */
     public static DataSet appendDeriveField(DataSet inData, Collection<Map.Entry<String, String>> formulaMap) {
-        List<Map<String, Object>> data = inData.getData();
+        List<Map<String, Object>> data = inData.getDataAsList();
         for (Map<String, Object> obj : data) {
             obj.putAll(mapDataRow(obj, formulaMap));
         }
@@ -82,7 +82,7 @@ public abstract class DataSetOptUtil {
      * @return 新的数据集
      */
     public static DataSet filterDateSet(DataSet inData, String formula) {
-        List<Map<String, Object>> data = inData.getData();
+        List<Map<String, Object>> data = inData.getDataAsList();
         List<Map<String, Object>> newData = new ArrayList<>(data.size());
         for (Map<String, Object> obj : data) {
             if (BooleanBaseOpt.castObjectToBoolean(
@@ -103,7 +103,7 @@ public abstract class DataSetOptUtil {
      * @return 排序后的数据集，修改了原始数据集的数据顺序
      */
     public static DataSet sortDataSetByFields(DataSet inData, List<String> fields) {
-        sortByFields(inData.getData(), fields);
+        sortByFields(inData.getDataAsList(), fields);
         return inData;
     }
 
@@ -193,7 +193,7 @@ public abstract class DataSetOptUtil {
         if (inData == null) {
             return null;
         }
-        List<Map<String, Object>> data = inData.getData();
+        List<Map<String, Object>> data = inData.getDataAsList();
         if (data == null || data.size() == 0) {
             return inData;
         }
@@ -241,7 +241,7 @@ public abstract class DataSetOptUtil {
 
     /*public static DataSet sumRollupDataset(DataSet inData,
                                        List<String> groupbyFields, List<String> orderbyFields) {
-        List<Map<String, Object>> data = inData.getData();
+        List<Map<String, Object>> data = inData.getDataAsList();
         List<String> keyRows = ListUtils.union(groupbyFields, orderbyFields);
         //根据维度进行排序 行头、列头
         sortByFields(data, keyRows);
@@ -279,7 +279,7 @@ public abstract class DataSetOptUtil {
                                          List<String> groupbyFields,
                                          List<String> orderbyFields,
                                          Collection<Map.Entry<String, String>> refDesc) {
-        List<Map<String, Object>> data = inData.getData();
+        List<Map<String, Object>> data = inData.getDataAsList();
         List<String> keyRows = ListUtils.union(groupbyFields, orderbyFields);
         //根据维度进行排序 行头、列头
         sortByFields(data, keyRows);
@@ -313,7 +313,7 @@ public abstract class DataSetOptUtil {
         if (inData == null) {
             return null;
         }
-        List<Map<String, Object>> data = inData.getData();
+        List<Map<String, Object>> data = inData.getDataAsList();
         if (data == null || data.size() == 0) {
             return inData;
         }
@@ -392,8 +392,8 @@ public abstract class DataSetOptUtil {
         if (currDataSet == null || lastDataSet == null) {
             return null;
         }
-        List<Map<String, Object>> currData = currDataSet.getData();
-        List<Map<String, Object>> lastData = lastDataSet.getData();
+        List<Map<String, Object>> currData = currDataSet.getDataAsList();
+        List<Map<String, Object>> lastData = lastDataSet.getDataAsList();
         if (currData == null || lastData == null) {
             throw new RuntimeException("数据不合法");
         }
@@ -455,8 +455,8 @@ public abstract class DataSetOptUtil {
             return mainDataSet;
         }
 
-        List<Map<String, Object>> mainData = mainDataSet.getData();
-        List<Map<String, Object>> slaveData = slaveDataSet.getData();
+        List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
+        List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
         sortByFields(mainData, primaryFields);
         sortByFields(slaveData, primaryFields);
         int i = 0;
@@ -524,8 +524,8 @@ public abstract class DataSetOptUtil {
             return null;
         }
 
-        List<Map<String, Object>> mainData = mainDataSet.getData();
-        List<Map<String, Object>> slaveData = slaveDataSet.getData();
+        List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
+        List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
         sortByFields(mainData, primaryFields);
         sortByFields(slaveData, primaryFields);
         boolean notField = StringUtils.isBlank(formula) || StringRegularOpt.isTrue(formula);
@@ -556,8 +556,8 @@ public abstract class DataSetOptUtil {
 
     public static DataSet unionTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet) {
 
-        List<Map<String, Object>> mainData = mainDataSet.getData();
-        List<Map<String, Object>> slaveData = slaveDataSet.getData();
+        List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
+        List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
         if (mainData == null) {
             return new SimpleDataSet(slaveData);
         }
@@ -571,7 +571,7 @@ public abstract class DataSetOptUtil {
     }
 
     public static DataSet checkDateSet(DataSet inData, Collection<CheckRule> rules) {
-        List<Map<String, Object>> data = inData.getData();
+        List<Map<String, Object>> data = inData.getDataAsList();
 
         for (Map<String, Object> obj : data) {
             String checkResult = "";

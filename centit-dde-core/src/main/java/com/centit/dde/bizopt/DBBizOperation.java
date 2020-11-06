@@ -39,6 +39,6 @@ public class DBBizOperation implements BizOperation {
         sqlDsr.setSqlSen(sql);
         SimpleDataSet dataSet = sqlDsr.load(queryParams);
         bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getJsonObject(dataSet.getRowCount());
+        return BuiltInOperation.getJsonObject(dataSet.size());
     }
 }

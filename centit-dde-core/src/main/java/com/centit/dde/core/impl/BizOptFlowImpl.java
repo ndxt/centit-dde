@@ -14,7 +14,6 @@ import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
-import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import org.springframework.beans.factory.annotation.Autowired;

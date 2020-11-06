@@ -48,7 +48,7 @@ public class ExcelDataSet extends FileDataSet {
     @Override
     public void save(DataSet dataSet) {
         List<Object[]> fields = new ArrayList<>();
-        for (Map<String, Object> map : dataSet.getData()) {
+        for (Map<String, Object> map : dataSet.getDataAsList()) {
             fields.add(map.values().toArray());
         }
         String path;
@@ -65,7 +65,7 @@ public class ExcelDataSet extends FileDataSet {
             path = path + File.separator + "sys.xls";
         }
         try {
-            ExcelExportUtil.appendDataToExcelSheet(path, 0, fields, dataSet.getData().get(0).keySet().toArray(new String[0]));
+            ExcelExportUtil.appendDataToExcelSheet(path, 0, fields, dataSet.getDataAsList().get(0).keySet().toArray(new String[0]));
         } catch (IOException e) {
             e.printStackTrace();
         }
