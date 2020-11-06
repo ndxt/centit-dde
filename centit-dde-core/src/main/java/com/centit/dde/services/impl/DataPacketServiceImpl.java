@@ -6,10 +6,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.dao.DataPacketDao;
-import com.centit.dde.dao.DataSetDefineDao;
 import com.centit.dde.po.DataPacket;
-import com.centit.dde.po.DataSetColumnDesc;
-import com.centit.dde.po.DataSetDefine;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.Constant;
 import com.centit.fileserver.common.FileStore;
@@ -46,9 +43,6 @@ public class DataPacketServiceImpl implements DataPacketService {
     private DataPacketDao dataPacketDao;
 
     @Autowired
-    private DataSetDefineDao dataSetDefineDao;
-
-    @Autowired
     private IntegrationEnvironment integrationEnvironment;
 
     @Autowired
@@ -62,14 +56,12 @@ public class DataPacketServiceImpl implements DataPacketService {
     public void createDataPacket(DataPacket dataPacket) {
         dataPacketDao.saveNewObject(dataPacket);
         dataPacketDao.saveObjectReferences(dataPacket);
-        mergeDataPacket(dataPacket);
     }
 
     @Override
     public void updateDataPacket(DataPacket dataPacket) {
         dataPacketDao.updateObject(dataPacket);
         dataPacketDao.saveObjectReferences(dataPacket);
-        mergeDataPacket(dataPacket);
     }
 
     @Override
@@ -80,27 +72,11 @@ public class DataPacketServiceImpl implements DataPacketService {
         );
     }
 
-    private void mergeDataPacket(DataPacket dataPacket) {
-        if (dataPacket.getDataSetDefines()!=null && dataPacket.getDataSetDefines().size() > 0) {
-            for (DataSetDefine db : dataPacket.getDataSetDefines()) {
-                if (db.getColumns() != null && db.getColumns().size() >0) {
-                    for (DataSetColumnDesc column : db.getColumns()) {
-                        column.setPacketId(db.getPacketId());
-                    }
-                    dataSetDefineDao.saveObjectReferences(db);
-                }
-            }
-        }
-    }
+
 
     @Override
     public void deleteDataPacket(String packetId) {
         DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
-        if (dataPacket!=null && dataPacket.getDataSetDefines()!=null && dataPacket.getDataSetDefines().size() > 0) {
-            for (DataSetDefine db : dataPacket.getDataSetDefines()) {
-                dataSetDefineDao.deleteObjectReferences(db);
-            }
-        }
         dataPacketDao.deleteObjectById(packetId);
         dataPacketDao.deleteObjectReferences(dataPacket);
     }
@@ -112,13 +88,7 @@ public class DataPacketServiceImpl implements DataPacketService {
 
     @Override
     public DataPacket getDataPacket(String packetId) {
-        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
-        if (dataPacket!=null && dataPacket.getDataSetDefines()!=null && dataPacket.getDataSetDefines().size() >0 ) {
-            for (DataSetDefine db : dataPacket.getDataSetDefines()) {
-                dataSetDefineDao.fetchObjectReferences(db);
-            }
-        }
-        return dataPacket;
+        return dataPacketDao.getObjectWithReferences(packetId);
     }
 
 

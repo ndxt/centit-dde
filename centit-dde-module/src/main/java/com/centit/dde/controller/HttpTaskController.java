@@ -7,7 +7,6 @@ import com.centit.dde.aync.service.ExchangeService;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.po.DataPacket;
-import com.centit.dde.po.DataSetDefine;
 import com.centit.dde.services.DataPacketService;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
@@ -39,20 +38,6 @@ public class HttpTaskController {
     public HttpTaskController(DataPacketService dataPacketService, ExchangeService exchangeService) {
         this.dataPacketService = dataPacketService;
         this.exchangeService = exchangeService;
-    }
-
-    @ApiOperation(value = "响应post方法")
-    @PutMapping(value = "/do/{packetId}")
-    @WrapUpResponseBody
-    public BizModel doHttpTask(@PathVariable String packetId, @RequestBody String jsonString) {
-        DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
-        for(DataSetDefine dataSetDefine:dataPacket.getDataSetDefines()){
-            if("requestBody".equals(dataSetDefine.getQueryName())){
-                dataSetDefine.setQuerySQL(jsonString);
-                break;
-            }
-        }
-        return dataPacketService.fetchDataPacketData(packetId, null);
     }
 
     @GetMapping(value = "/run/{packetId}")
@@ -107,6 +92,7 @@ public class HttpTaskController {
             "表达式:toJson(),名称:转json,示例:formula:toJson(name);json:{name:\\{sex:'man'}}  \n" +
             "表达式:uuid(),名称:获取uuid,示例:formula:uuid()  \n" +
             "表达式:toString(),名称:转换为String,示例:formula:toString(name)  \n" +
+            "表达式:attr(),名称:获取对象属性,示例:formula:attr(name,'123')  \n" +
             "表达式:getat(),示例:求数组中的一个值,示例:formula:getat (0,\"a\",\"b\")  \n" +
             "表达式:singleton(),名称:返回集合，去重,示例:formula:singleton(name)  \n" +
             "表达式:getpy(),名称:取汉字拼音,示例:formula:getpy(name)  \n" +

@@ -3,12 +3,10 @@ package com.centit.dde.services.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.core.SimpleDataSet;
-import com.centit.dde.dao.DataSetDefineDao;
 import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.dataset.SQLDataSetWriter;
-import com.centit.dde.po.DataSetDefine;
-import com.centit.dde.services.DataSetDefineService;
+import com.centit.dde.services.GenerateFieldsService;
 import com.centit.dde.vo.ColumnSchema;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.po.DatabaseInfo;
@@ -24,57 +22,26 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.*;
-import java.util.Date;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author zhf
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class DataSetDefineServiceImpl implements DataSetDefineService {
+public class GenerateFieldsServiceImpl implements GenerateFieldsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataSetDefineServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(GenerateFieldsServiceImpl.class);
     @Autowired(required = false)
     private  FileStore fileStore;
 
-    private final DataSetDefineDao resourceColumnDao;
-
     private final IntegrationEnvironment integrationEnvironment;
     @Autowired
-    public DataSetDefineServiceImpl( DataSetDefineDao resourceColumnDao, IntegrationEnvironment integrationEnvironment) {
-        this.resourceColumnDao = resourceColumnDao;
+    public GenerateFieldsServiceImpl(IntegrationEnvironment integrationEnvironment) {
         this.integrationEnvironment = integrationEnvironment;
-    }
-
-    @Override
-    public void createDbQuery(DataSetDefine dataSetDefine) {
-        resourceColumnDao.saveNewObject(dataSetDefine);
-        resourceColumnDao.saveObjectReferences(dataSetDefine);
-    }
-
-    @Override
-    public void updateDbQuery(DataSetDefine dataSetDefine) {
-        dataSetDefine.setRecordDate(new Date());
-        resourceColumnDao.updateObject(dataSetDefine);
-        resourceColumnDao.saveObjectReferences(dataSetDefine);
-    }
-
-    @Override
-    public void deleteDbQuery(String queryId) {
-        DataSetDefine dataSetDefine = resourceColumnDao.getObjectById(queryId);
-        resourceColumnDao.deleteObjectById(queryId);
-        resourceColumnDao.deleteObjectReferences(dataSetDefine);
-    }
-
-    @Override
-    public List<DataSetDefine> listDbQuery(Map<String, Object> params, PageDesc pageDesc) {
-        return resourceColumnDao.listObjectsByProperties(params, pageDesc);
-    }
-
-    @Override
-    public DataSetDefine getDbQuery(String queryId) {
-        return resourceColumnDao.getObjectWithReferences(queryId);
     }
 
     @Override

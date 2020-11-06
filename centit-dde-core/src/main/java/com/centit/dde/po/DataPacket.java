@@ -134,16 +134,8 @@ public class DataPacket implements Serializable {
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
     private List<DataPacketParam> packetParams;
 
-    @OneToMany(targetEntity = DataSetDefine.class)
-    @JoinColumn(name = "packetId", referencedColumnName = "packetId")
-    private List<DataSetDefine> dataSetDefines;
-
     public DataPacket() {
         bufferFreshPeriod = -1;
-    }
-
-    public List<DataSetDefine> getDataSetDefines() {
-        return dataSetDefines;
     }
 
     public List<DataPacketParam> getPacketParams() {
@@ -160,7 +152,7 @@ public class DataPacket implements Serializable {
             return params;
         }
         for (DataPacketParam packetParam : packetParams) {
-            if(packetParam.getParamType()!=null) {
+            if (packetParam.getParamType() != null) {
                 switch (packetParam.getParamType()) {
                     case "N":
                         params.put(packetParam.getParamName(), NumberBaseOpt.castObjectToLong(packetParam.getParamDefaultValue()));

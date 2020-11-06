@@ -14,8 +14,10 @@ import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
+import com.centit.support.compiler.VariableFormula;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -102,28 +105,48 @@ public class BizOptFlowImpl implements BizOptFlow {
     @Override
     public BizModel run(JSONObject bizOptJson, String logId, Map<String, Object> queryParams) {
         DataOptDescJson dataOptDescJson = new DataOptDescJson(bizOptJson.getJSONObject("dataOptDescJson"));
-
-        String startId = "";
-//        for (Object o : node) {
-//            if (((JSONObject) o).get("source").equals("obtain")) {
-//                startId = ((JSONObject) o).getString("id");
-//            }
-//        }
-
-        BizModel bizModel = apply( startId, startId, null, logId, 0, queryParams);
+        String startId = dataOptDescJson.getStartId();
+        if (StringBaseOpt.isNvl(startId)) {
+            writeLog(0, 0, logId, "error", "没有start节点", 0);
+            return null;
+        }
+        BizModel bizModel = null;
+        int i = 0;
+        while (!StringBaseOpt.isNvl(startId)) {
+            JSONObject stepJson = dataOptDescJson.getOptStep(startId);
+            if ("branch".equals(stepJson.getString("type"))) {
+                List<JSONObject> linksJson = dataOptDescJson.getNextLinks(startId);
+                for (int j = 0; j < linksJson.size(); j++) {
+                    JSONObject jsonObject = linksJson.get(j);
+                    if (BooleanBaseOpt.castObjectToBoolean(
+                        VariableFormula.calculate(jsonObject.getString("rule"), queryParams), false)) {
+                        startId = dataOptDescJson.getNextId(startId, j);
+                        break;
+                    }
+                }
+            } else {
+                runOneStep(bizModel, stepJson, logId, i++, queryParams);
+                startId = dataOptDescJson.getNextId(startId, 0);
+            }
+        }
         if (bizModel.isEmpty()) {
-            TaskDetailLog detailLog = new TaskDetailLog();
-            detailLog.setRunBeginTime(new Date());
-            detailLog.setLogId(logId);
-            detailLog.setSuccessPieces(0);
-            detailLog.setErrorPieces(0);
-            detailLog.setLogType("emptyBizModel");
-            detailLog.setLogInfo("ok");
-            detailLog.setRunEndTime(new Date());
-            detailLog.setTaskId(StringBaseOpt.castObjectToString(0, "0"));
-            taskDetailLogDao.saveNewObject(detailLog);
+            writeLog(0, 0, logId, "emptyBizModel", "ok", 0);
         }
         return bizModel;
+    }
+
+    private TaskDetailLog writeLog(int success, int error, String logId, String logType, String logInfo, int taskId) {
+        TaskDetailLog detailLog = new TaskDetailLog();
+        detailLog.setRunBeginTime(new Date());
+        detailLog.setLogId(logId);
+        detailLog.setSuccessPieces(success);
+        detailLog.setErrorPieces(error);
+        detailLog.setLogType(logType);
+        detailLog.setLogInfo(logInfo);
+        detailLog.setRunEndTime(new Date());
+        detailLog.setTaskId(StringBaseOpt.castObjectToString(taskId, "0"));
+        taskDetailLogDao.saveNewObject(detailLog);
+        return detailLog;
     }
 
     protected void runOneStep(BizModel bizModel, JSONObject bizOptJson, String logId, int batchNum, Map<String, Object> queryParams) {
@@ -134,16 +157,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
         if (opt == null) {
             if (logId != null) {
-                TaskDetailLog detailLog = new TaskDetailLog();
-                detailLog.setRunBeginTime(new Date());
-                detailLog.setLogId(logId);
-                detailLog.setSuccessPieces(0);
-                detailLog.setErrorPieces(0);
-                detailLog.setLogType("error");
-                detailLog.setLogInfo("找不到对应的操作：" + sOptType);
-                detailLog.setRunEndTime(new Date());
-                detailLog.setTaskId(StringBaseOpt.castObjectToString(batchNum, "0"));
-                taskDetailLogDao.saveNewObject(detailLog);
+                writeLog(0, 0, logId, "error", "找不到对应的操作：" + sOptType, batchNum);
             }
             throw new ObjectException(bizOptJson, "找不到对应的操作：" + sOptType);
         }
@@ -151,13 +165,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             TaskDetailLog detailLog = new TaskDetailLog();
             if (logId != null) {
                 String processName = bizOptJson.getString("processName");
-                detailLog.setRunBeginTime(new Date());
-                detailLog.setLogId(logId);
-                detailLog.setLogType(sOptType + ":" + processName);
-                detailLog.setSuccessPieces(0);
-                detailLog.setErrorPieces(0);
-                detailLog.setTaskId(StringBaseOpt.castObjectToString(batchNum, "0"));
-                taskDetailLogDao.saveNewObject(detailLog);
+                detailLog = writeLog(0, 0, logId, sOptType + ":" + processName, "", batchNum);
             }
             JSONObject jsonObject = opt.runOpt(bizModel, bizOptJson);
             if (logId != null) {
@@ -169,49 +177,10 @@ public class BizOptFlowImpl implements BizOptFlow {
             }
         } catch (Exception e) {
             if (logId != null) {
-                TaskDetailLog detailLog = new TaskDetailLog();
-                detailLog.setRunBeginTime(new Date());
-                detailLog.setLogId(logId);
-                detailLog.setSuccessPieces(0);
-                detailLog.setErrorPieces(0);
-                detailLog.setLogType("error");
-                detailLog.setLogInfo(ObjectException.extortExceptionMessage(e, 4));
-                detailLog.setTaskId(StringBaseOpt.castObjectToString(batchNum, "0"));
-                detailLog.setRunEndTime(new Date());
-                taskDetailLogDao.saveNewObject(detailLog);
+                writeLog(0, 0, logId, "error", ObjectException.extortExceptionMessage(e, 4), batchNum);
             }
             throw new ObjectException(bizOptJson, ObjectException.extortExceptionMessage(e, 4));
         }
-    }
-
-    public BizModel apply( String startId, String firstId, BizModel bizModel, String logId, int batchNum, Map<String, Object> queryParams) {
-        if (StringBaseOpt.isNvl(startId)) {
-            return bizModel;
-        }
-        int i = 0;
-        if (startId.equals(firstId)) {
-            batchNum++;
-            i = 0;
-        }
-//        for (Object edge : link) {
-//            String start = BuiltInOperation.getJsonFieldString((JSONObject) edge, "sourceId", "");
-//            String end = BuiltInOperation.getJsonFieldString((JSONObject) edge, "targetId", "");
-//            String condition= BuiltInOperation.getJsonFieldString((JSONObject) edge, "condition", "");
-//            //TODO 分支条件判断
-//            if(!condition.equals("true")) continue;
-//            if (start.equals(startId)) {
-//                for (Object step : node) {
-//                    if (((JSONObject) step).get("id").equals(startId)) {
-//                        String num = StringBaseOpt.castObjectToString(batchNum).concat(StringBaseOpt.castObjectToString(i++));
-//                        runOneStep(bizModel, (JSONObject) step, logId, NumberBaseOpt.parseInteger(num), queryParams);
-//                    }
-//                }
-//                if (!"".equals(end)) {
-//                    apply(node, link, end, firstId, bizModel, logId, batchNum, queryParams);
-//                }
-//            }
-//        }
-        return bizModel;
     }
 
     protected void debugOneStep(BizModel bizModel, JSONObject bizOptJson) {

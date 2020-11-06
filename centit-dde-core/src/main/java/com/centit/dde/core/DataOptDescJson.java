@@ -44,17 +44,26 @@ public class DataOptDescJson {
 
     }
 
+    public String getStartId() {
+        for (Map.Entry<String, JSONObject> m : nodeMap.entrySet()) {
+            if ("start".equals(m.getValue().getString("type"))) {
+                return m.getKey();
+            }
+        }
+        return null;
+    }
+
     public JSONObject getOptStep(String id) {
         return nodeMap.get(id);
     }
 
-    public JSONObject getNextStep(String id) {
-        List<JSONObject> links = linkMap.get(id);
-        if (links == null || links.size() != 1) {
+    public String getNextId(String id,int i) {
+        List<JSONObject> links = getNextLinks(id);
+        if (links == null) {
             return null;
             //throw new ObjectException("不是有且只有一个后续节点");
         }
-        return nodeMap.get(links.get(0).getString("targetId"));
+        return links.get(i).getString("targetId");
     }
 
     public List<JSONObject> getNextLinks(String id) {

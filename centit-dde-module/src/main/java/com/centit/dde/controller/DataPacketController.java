@@ -1,19 +1,12 @@
 package com.centit.dde.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.aync.service.ExchangeService;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleBizModel;
-import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.po.DataPacket;
-import com.centit.dde.po.DataSetColumnDesc;
-import com.centit.dde.po.DataSetDefine;
 import com.centit.dde.services.DataPacketService;
-import com.centit.dde.services.DataSetDefineService;
-import com.centit.dde.utils.DataPacketUtil;
-import com.centit.dde.vo.DataPacketSchema;
+import com.centit.dde.services.GenerateFieldsService;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
@@ -52,14 +45,14 @@ public class DataPacketController extends BaseController {
     private final DataPacketService dataPacketService;
     private final ExchangeService exchangeService;
 
-    private final DataSetDefineService dataSetDefineService;
+    private final GenerateFieldsService generateFieldsService;
 
     private final IntegrationEnvironment integrationEnvironment;
 
 
-    public DataPacketController( DataPacketService dataPacketService, DataSetDefineService dataSetDefineService, IntegrationEnvironment integrationEnvironment, ExchangeService exchangeService) {
+    public DataPacketController(DataPacketService dataPacketService, GenerateFieldsService generateFieldsService, IntegrationEnvironment integrationEnvironment, ExchangeService exchangeService) {
         this.dataPacketService = dataPacketService;
-        this.dataSetDefineService = dataSetDefineService;
+        this.generateFieldsService = generateFieldsService;
         this.integrationEnvironment = integrationEnvironment;
         this.exchangeService = exchangeService;
     }
@@ -79,12 +72,6 @@ public class DataPacketController extends BaseController {
     public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacket dataPacket) {
         dataPacket.setPacketId(packetId);
         dataPacket.setDataOptDescJson(dataPacket.getDataOptDescJson());
-        for (DataSetDefine setDefine : dataPacket.getDataSetDefines()) {
-            for (DataSetColumnDesc columnDesc : setDefine.getColumns()) {
-                columnDesc.setPacketId(dataPacket.getPacketId());
-                columnDesc.setQueryId(setDefine.getQueryId());
-            }
-        }
         dataPacketService.updateDataPacket(dataPacket);
     }
 
@@ -100,43 +87,6 @@ public class DataPacketController extends BaseController {
     @WrapUpResponseBody
     public void deleteDataPacket(@PathVariable String packetId) {
         dataPacketService.deleteDataPacket(packetId);
-    }
-
-    @ApiOperation(value = "获取数据包初始模式（不包括数据预处理）")
-    @GetMapping(value = "/originschema/{packetId}")
-    @WrapUpResponseBody
-    public DataPacketSchema getDataPacketOriginSchema(@PathVariable String packetId) {
-        return DataPacketSchema.valueOf(dataPacketService.getDataPacket(packetId));
-    }
-
-    @ApiOperation(value = "获取数据包模式")
-    @GetMapping(value = "/schema/{packetId}")
-    @WrapUpResponseBody
-    public DataPacketSchema getDataPacketSchema(@PathVariable String packetId) {
-        DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
-        DataPacketSchema schema = DataPacketSchema.valueOf(dataPacket);
-        if (dataPacket != null) {
-            JSONObject obj = dataPacket.getDataOptDescJson();
-            if (obj != null) {
-                return DataPacketUtil.calcDataPacketSchema(schema, obj);
-            }
-        }
-        return schema;
-    }
-
-    @ApiOperation(value = "根据额外的操作步骤获取数据包模式")
-    @PostMapping(value = "/extendschema/{packetId}")
-    @WrapUpResponseBody
-    public DataPacketSchema getDataPacketSchemaWithOpt(@PathVariable String packetId, @RequestBody String optsteps) {
-        DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
-        DataPacketSchema schema = DataPacketSchema.valueOf(dataPacket);
-        if (dataPacket != null) {
-            JSONObject obj = JSON.parseObject(optsteps);
-            if (obj != null) {
-                return DataPacketUtil.calcDataPacketSchema(schema, obj);
-            }
-        }
-        return schema;
     }
 
     @ApiOperation(value = "查询数据包")
@@ -174,27 +124,6 @@ public class DataPacketController extends BaseController {
         return bizModel;
     }
 
-    @ApiOperation(value = "获取数据包数据并对数据进行业务处理")
-    @PutMapping(value = "/dataopts/{packetId}/{datasets}")
-    @WrapUpResponseBody
-    public BizModel fetchDataPacketDataWithOpt(@PathVariable String packetId,
-                                               @PathVariable String datasets,
-                                               @RequestBody JSONObject optsteps,
-                                               HttpServletRequest request) {
-        Map<String, Object> params = BaseController.collectRequestParameters(request);
-        BizModel bizModel;
-        if (optsteps.isEmpty()) {
-            bizModel = dataPacketService.fetchDataPacketData(packetId, params);
-        } else {
-            bizModel = dataPacketService.fetchDataPacketData(packetId, params, optsteps);
-        }
-        BizModel dup = getBizModel(datasets, bizModel);
-        if (dup != null) {
-            return dup;
-        }
-        return bizModel;
-    }
-
     private BizModel getBizModel(String dataSets, BizModel bizModel) {
         if (StringUtils.isNotBlank(dataSets)) {
             String[] dss = dataSets.split(",");
@@ -212,25 +141,6 @@ public class DataPacketController extends BaseController {
         }
         return null;
     }
-
-    @ApiOperation(value = "获取数据库查询数据")
-    @ApiImplicitParam(name = "queryId", value = "数据查询ID", required = true,
-        paramType = "path", dataType = "String")
-    @GetMapping(value = "/dbquery/{queryId}")
-    @WrapUpResponseBody
-    public SimpleDataSet fetchDbQueryData(@PathVariable String queryId, HttpServletRequest request) {
-
-        Map<String, Object> params = collectRequestParameters(request);
-
-        DataSetDefine query = dataSetDefineService.getDbQuery(queryId);
-        DataPacket dataPacket = dataPacketService.getDataPacket(query.getPacketId());
-
-        BizModel bizModel = dataPacketService.fetchDataPacketData(dataPacket.getPacketId(), params);
-
-        return (SimpleDataSet) bizModel.fetchDataSetByName(queryId);
-    }
-
-
 
     @GetMapping(value = "/exist/{applicationId}/{interfaceName}")
     @ApiOperation(value = "接口名称是否已存在")
