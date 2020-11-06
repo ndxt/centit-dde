@@ -21,7 +21,6 @@ import java.util.Map;
  * @author zhf
  */
 public abstract class BuiltInOperation {
-
     public static String getJsonFieldString(JSONObject bizOptJson, String fieldName, String defaultValue) {
         String targetDsName = bizOptJson.getString(fieldName);
         if (StringUtils.isBlank(targetDsName)) {
@@ -247,6 +246,7 @@ public abstract class BuiltInOperation {
         }
         return getJsonObject(count);
     }
+
 
     public static JSONObject runHttpData(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());

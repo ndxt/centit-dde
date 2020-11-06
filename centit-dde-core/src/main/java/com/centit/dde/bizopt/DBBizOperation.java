@@ -18,13 +18,11 @@ import java.util.Map;
  */
 public class DBBizOperation implements BizOperation {
     private IntegrationEnvironment integrationEnvironment;
-    private Map<String, Object> queryParams;
+
     public DBBizOperation(IntegrationEnvironment integrationEnvironment) {
         this.integrationEnvironment = integrationEnvironment;
     }
-    public void setQueryParams(Map<String, Object> queryParams) {
-        this.queryParams = queryParams;
-    }
+
     @Override
     public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "nodeName", bizModel.getModelName());
@@ -37,7 +35,7 @@ public class DBBizOperation implements BizOperation {
         SQLDataSetReader sqlDsr = new SQLDataSetReader();
         sqlDsr.setDataSource(DataSourceDescription.valueOf(databaseInfo));
         sqlDsr.setSqlSen(sql);
-        SimpleDataSet dataSet = sqlDsr.load(queryParams);
+        SimpleDataSet dataSet = sqlDsr.load(bizModel.getModelTag());
         bizModel.putDataSet(sourDsName, dataSet);
         return BuiltInOperation.getJsonObject(dataSet.size());
     }

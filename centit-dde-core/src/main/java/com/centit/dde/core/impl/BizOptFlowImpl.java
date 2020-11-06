@@ -9,6 +9,7 @@ import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.core.DataOptDescJson;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.po.TaskDetailLog;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.product.metadata.service.DatabaseRunTime;
@@ -99,36 +100,43 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(key, opt);
     }
 
+    public JSONObject getBatchStep(BizModel bizModel, DataOptDescJson dataOptDescJson,String stepId) {
+        List<JSONObject> linksJson = dataOptDescJson.getNextLinks(stepId);
+        for (JSONObject jsonObject:linksJson) {
+            if (BooleanBaseOpt.castObjectToBoolean(
+                VariableFormula.calculate(jsonObject.getString("rule"),
+                    new BizModelJSONTransform(bizModel)), false)) {
+                return jsonObject;
+            }
+        }
+        return null;
+    }
     /**
      * @return 返回真正运行的次数, 如果小于 0 表示報錯
      */
     @Override
     public BizModel run(JSONObject bizOptJson, String logId, Map<String, Object> queryParams) {
         DataOptDescJson dataOptDescJson = new DataOptDescJson(bizOptJson.getJSONObject("dataOptDescJson"));
-        String startId = dataOptDescJson.getStartId();
-        if (StringBaseOpt.isNvl(startId)) {
+        JSONObject stepJson = dataOptDescJson.getStartStep();
+        if (stepJson==null) {
             writeLog(0, 0, logId, "error", "没有start节点", 0);
             return null;
         }
         BizModel bizModel = null;
         int i = 0;
-        while (!StringBaseOpt.isNvl(startId)) {
-            JSONObject stepJson = dataOptDescJson.getOptStep(startId);
-            if ("branch".equals(stepJson.getString("type"))) {
-                List<JSONObject> linksJson = dataOptDescJson.getNextLinks(startId);
-                for (int j = 0; j < linksJson.size(); j++) {
-                    JSONObject jsonObject = linksJson.get(j);
-                    if (BooleanBaseOpt.castObjectToBoolean(
-                        VariableFormula.calculate(jsonObject.getString("rule"), queryParams), false)) {
-                        startId = dataOptDescJson.getNextId(startId, j);
-                        break;
-                    }
-                }
-            } else {
-                runOneStep(bizModel, stepJson, logId, i++, queryParams);
-                startId = dataOptDescJson.getNextId(startId, 0);
+        while (stepJson!=null) {
+            String stepId=stepJson.getString("id");
+            String stepType = stepJson.getString("type");
+            if ("return".equals(stepType)) {
+                return bizModel;
             }
+            if ("branch".equals(stepType)) {
+                stepJson = getBatchStep(bizModel,dataOptDescJson,stepId);
+            }
+            runOneStep(bizModel, stepJson, logId, i++, queryParams);
+            stepJson = dataOptDescJson.getNextStep(stepId);
         }
+
         if (bizModel.isEmpty()) {
             writeLog(0, 0, logId, "emptyBizModel", "ok", 0);
         }
@@ -149,12 +157,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         return detailLog;
     }
 
-    protected void runOneStep(BizModel bizModel, JSONObject bizOptJson, String logId, int batchNum, Map<String, Object> queryParams) {
-        String sOptType = bizOptJson.getString("operation");
+    protected JSONObject runOneStep(BizModel bizModel, JSONObject bizOptJson, String logId, int batchNum, Map<String, Object> queryParams) {
+        String sOptType = bizOptJson.getString("type");
         BizOperation opt = allOperations.get(sOptType);
-        if (opt instanceof DBBizOperation) {
-            ((DBBizOperation) opt).setQueryParams(queryParams);
-        }
         if (opt == null) {
             if (logId != null) {
                 writeLog(0, 0, logId, "error", "找不到对应的操作：" + sOptType, batchNum);
@@ -175,6 +180,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 detailLog.setRunEndTime(new Date());
                 taskDetailLogDao.updateObject(detailLog);
             }
+            return jsonObject;
         } catch (Exception e) {
             if (logId != null) {
                 writeLog(0, 0, logId, "error", ObjectException.extortExceptionMessage(e, 4), batchNum);
