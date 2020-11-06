@@ -105,13 +105,13 @@ public class BizOptFlowImpl implements BizOptFlow {
         DataOptDescJson dataOptDescJson = new DataOptDescJson(bizOptJson.getJSONObject("dataOptDescJson"));
 
         String startId = "";
-        for (Object o : node) {
-            if (((JSONObject) o).get("source").equals("obtain")) {
-                startId = ((JSONObject) o).getString("id");
-            }
-        }
+//        for (Object o : node) {
+//            if (((JSONObject) o).get("source").equals("obtain")) {
+//                startId = ((JSONObject) o).getString("id");
+//            }
+//        }
 
-        BizModel bizModel = apply(node, link, startId, startId, null, logId, 0, queryParams);
+        BizModel bizModel = apply( startId, startId, null, logId, 0, queryParams);
         if (bizModel.isEmpty()) {
             TaskDetailLog detailLog = new TaskDetailLog();
             detailLog.setRunBeginTime(new Date());
@@ -185,7 +185,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
     }
 
-    public BizModel apply(JSONArray node, JSONArray link, String startId, String firstId, BizModel bizModel, String logId, int batchNum, Map<String, Object> queryParams) {
+    public BizModel apply( String startId, String firstId, BizModel bizModel, String logId, int batchNum, Map<String, Object> queryParams) {
         if (StringBaseOpt.isNvl(startId)) {
             return bizModel;
         }
@@ -194,21 +194,24 @@ public class BizOptFlowImpl implements BizOptFlow {
             batchNum++;
             i = 0;
         }
-        for (Object edge : link) {
-            String start = BuiltInOperation.getJsonFieldString((JSONObject) edge, "sourceId", "");
-            String end = BuiltInOperation.getJsonFieldString((JSONObject) edge, "targetId", "");
-            if (start.equals(startId)) {
-                for (Object step : node) {
-                    if (((JSONObject) step).get("id").equals(startId)) {
-                        String num = StringBaseOpt.castObjectToString(batchNum).concat(StringBaseOpt.castObjectToString(i++));
-                        runOneStep(bizModel, (JSONObject) step, logId, NumberBaseOpt.parseInteger(num), queryParams);
-                    }
-                }
-                if (!"".equals(end)) {
-                    apply(node, link, end, firstId, bizModel, logId, batchNum, queryParams);
-                }
-            }
-        }
+//        for (Object edge : link) {
+//            String start = BuiltInOperation.getJsonFieldString((JSONObject) edge, "sourceId", "");
+//            String end = BuiltInOperation.getJsonFieldString((JSONObject) edge, "targetId", "");
+//            String condition= BuiltInOperation.getJsonFieldString((JSONObject) edge, "condition", "");
+//            //TODO 分支条件判断
+//            if(!condition.equals("true")) continue;
+//            if (start.equals(startId)) {
+//                for (Object step : node) {
+//                    if (((JSONObject) step).get("id").equals(startId)) {
+//                        String num = StringBaseOpt.castObjectToString(batchNum).concat(StringBaseOpt.castObjectToString(i++));
+//                        runOneStep(bizModel, (JSONObject) step, logId, NumberBaseOpt.parseInteger(num), queryParams);
+//                    }
+//                }
+//                if (!"".equals(end)) {
+//                    apply(node, link, end, firstId, bizModel, logId, batchNum, queryParams);
+//                }
+//            }
+//        }
         return bizModel;
     }
 
