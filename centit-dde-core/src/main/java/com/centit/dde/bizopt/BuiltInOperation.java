@@ -12,6 +12,7 @@ import com.centit.framework.appclient.RestfulHttpRequest;
 import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,11 +37,21 @@ public abstract class BuiltInOperation {
         map.put("error", 0);
         return map;
     }
-
+    private static Object JSONArrayToMap(Object json,String key,String value){
+        if(json instanceof JSONArray){
+            Map<String,String> map=new HashMap<>();
+            for (Object o : (JSONArray)json) {
+                JSONObject temp=(JSONObject)o;
+                map.put(temp.getString(key),temp.getString(value));
+            }
+            return map;
+        }
+        return json;
+    }
     public static JSONObject runMap(BizModel bizModel, JSONObject bizOptJson) {
         String sourDSName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDSName = getJsonFieldString(bizOptJson, "target", sourDSName);
-        Object mapInfo = bizOptJson.get("fieldsMap");
+        Object mapInfo = JSONArrayToMap(bizOptJson.get("config"),"columnName","paramValidateRegex");
         int count = 0;
         if (mapInfo instanceof Map) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDSName);
@@ -58,7 +69,7 @@ public abstract class BuiltInOperation {
     public static JSONObject runAppend(BizModel bizModel, JSONObject bizOptJson) {
         String sourDSName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         //String targetDSName = getJsonFieldString(bizOptJson, "target", sourDSName);
-        Object mapInfo = bizOptJson.get("fieldsMap");
+        Object mapInfo = JSONArrayToMap(bizOptJson.get("config"),"columnName","paramValidateRegex");;
         int count = 0;
         if (mapInfo instanceof Map) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDSName);
