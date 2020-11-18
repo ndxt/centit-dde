@@ -109,7 +109,8 @@ public class SQLDataSetWriter implements DataSetWriter {
                     errorNums++;
                 }
             }
-        } else { // 这部分也可以 直接运行sql语句 而不是用 GeneralJsonObjectDao 方式来提高效率
+        } else {
+            /* 这部分也可以 直接运行sql语句 而不是用 GeneralJsonObjectDao 方式来提高效率 */
             boolean createConn = false;
             if (connection == null) {
                 fetchConnect();
@@ -118,19 +119,14 @@ public class SQLDataSetWriter implements DataSetWriter {
             successNums=0;
             errorNums=0;
             info="ok";
+
             for(Map<String, Object> row : dataSet.getDataAsList()){
                 List<Map<String,Object>> list=new ArrayList<>();
                 list.add(row);
                 try {
-                    if (connection == null) {
-                        TransactionHandler.executeInTransaction(dataSource,
-                            (conn) -> DBBatchUtils.batchInsertObjects(conn,
-                                tableInfo, list, fieldsMap));
-                    }else{
-                        TransactionHandler.executeInTransaction(connection,
-                            (conn) -> DBBatchUtils.batchInsertObjects(conn,
-                                tableInfo, list, fieldsMap));
-                    }
+                    TransactionHandler.executeInTransaction(connection,
+                        (conn) -> DBBatchUtils.batchInsertObjects(conn,
+                            tableInfo, list, fieldsMap));
                     dealResultMsg(row);
                     successNums++;
                 } catch (SQLException e) {
@@ -198,15 +194,9 @@ public class SQLDataSetWriter implements DataSetWriter {
                 List<Map<String,Object>> list=new ArrayList<>();
                 list.add(row);
                 try {
-                    if (connection == null) {
-                        TransactionHandler.executeInTransaction(dataSource,
-                            (conn) -> DBBatchUtils.batchMergeObjects(conn,
-                                tableInfo, list, fieldsMap));
-                    }else{
-                        TransactionHandler.executeInTransaction(connection,
-                            (conn) -> DBBatchUtils.batchMergeObjects(conn,
-                                tableInfo, list, fieldsMap));
-                    }
+                    TransactionHandler.executeInTransaction(dataSource,
+                        (conn) -> DBBatchUtils.batchMergeObjects(conn,
+                            tableInfo, list, fieldsMap));
                     dealResultMsg(row);
                     successNums++;
                 } catch (SQLException | ObjectException e) {
