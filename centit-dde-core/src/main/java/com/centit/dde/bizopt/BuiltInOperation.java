@@ -182,6 +182,10 @@ public class BuiltInOperation {
         DataSetOptUtil.sortDataSetByFields(dataSet, orderByFields);
         return getJsonObject(dataSet.size());
     }
+    public static JSONObject runClear(BizModel bizModel, JSONObject bizOptJson) {
+        bizModel=BizModel.EMPTY_BIZ_MODEL;
+        return getJsonObject(0);
+    }
 
     public static JSONObject runJoin(BizModel bizModel, JSONObject bizOptJson) {
         String sour1DsName = getJsonFieldString(bizOptJson, "source", null);

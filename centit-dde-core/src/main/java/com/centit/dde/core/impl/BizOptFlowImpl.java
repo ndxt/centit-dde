@@ -31,6 +31,8 @@ import java.util.Map;
 
 /**
  * 业务流
+ *
+ * @author zhf
  */
 @Service
 public class BizOptFlowImpl implements BizOptFlow {
@@ -52,7 +54,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     @Autowired(required = false)
     private FileStore fileStore;
 
-    public Map<String, BizOperation> allOperations;
+    private Map<String, BizOperation> allOperations;
 
     public BizOptFlowImpl() {
         allOperations = new HashMap<>(50);
@@ -75,6 +77,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("check", BuiltInOperation::runCheckData);
         allOperations.put("static", BuiltInOperation::runStaticData);
         allOperations.put("http", BuiltInOperation::runHttpData);
+        allOperations.put("clear",BuiltInOperation::runClear);
 
         JSBizOperation jsBizOperation = new JSBizOperation(metaObjectService,
             databaseRunTime);
@@ -100,9 +103,12 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(key, opt);
     }
 
-    public JSONObject getBatchStep(BizModel bizModel, DataOptDescJson dataOptDescJson,String stepId) {
+    /**
+     * 获取分支
+     */
+    private JSONObject getBatchStep(BizModel bizModel, DataOptDescJson dataOptDescJson, String stepId) {
         List<JSONObject> linksJson = dataOptDescJson.getNextLinks(stepId);
-        for (JSONObject jsonObject:linksJson) {
+        for (JSONObject jsonObject : linksJson) {
             if (BooleanBaseOpt.castObjectToBoolean(
                 VariableFormula.calculate(jsonObject.getString("rule"),
                     new BizModelJSONTransform(bizModel)), false)) {
@@ -111,6 +117,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
         return null;
     }
+
     /**
      * @return 返回真正运行的次数, 如果小于 0 表示報錯
      */
@@ -118,37 +125,39 @@ public class BizOptFlowImpl implements BizOptFlow {
     public BizModel run(JSONObject bizOptJson, String logId, Map<String, Object> queryParams) {
         DataOptDescJson dataOptDescJson = new DataOptDescJson(bizOptJson.getJSONObject("dataOptDescJson"));
         JSONObject stepJson = dataOptDescJson.getStartStep();
-        if (stepJson==null) {
-            writeLog(0, 0, logId, "error", "没有start节点", 0);
+        if (stepJson == null) {
+            writeLog(logId, "error", "没有start节点", 0);
             return null;
         }
-        BizModel bizModel = null;
+        BizModel bizModel = BizModel.EMPTY_BIZ_MODEL;
         int i = 0;
-        while (stepJson!=null) {
-            String stepId=stepJson.getString("id");
+        while (stepJson != null) {
+            String stepId = stepJson.getString("id");
             String stepType = stepJson.getString("type");
             if ("return".equals(stepType)) {
                 return bizModel;
             }
             if ("branch".equals(stepType)) {
-                stepJson = getBatchStep(bizModel,dataOptDescJson,stepId);
+                stepJson = getBatchStep(bizModel, dataOptDescJson, stepId);
             }
-            runOneStep(bizModel, stepJson, logId, i++, queryParams);
+            if(stepJson!=null) {
+                runOneStep(bizModel, stepJson, logId, i++, queryParams);
+            }
             stepJson = dataOptDescJson.getNextStep(stepId);
         }
 
         if (bizModel.isEmpty()) {
-            writeLog(0, 0, logId, "emptyBizModel", "ok", 0);
+            writeLog(logId, "emptyBizModel", "ok", 0);
         }
         return bizModel;
     }
 
-    private TaskDetailLog writeLog(int success, int error, String logId, String logType, String logInfo, int taskId) {
+    private TaskDetailLog writeLog(String logId, String logType, String logInfo, int taskId) {
         TaskDetailLog detailLog = new TaskDetailLog();
         detailLog.setRunBeginTime(new Date());
         detailLog.setLogId(logId);
-        detailLog.setSuccessPieces(success);
-        detailLog.setErrorPieces(error);
+        detailLog.setSuccessPieces(0);
+        detailLog.setErrorPieces(0);
         detailLog.setLogType(logType);
         detailLog.setLogInfo(logInfo);
         detailLog.setRunEndTime(new Date());
@@ -157,12 +166,15 @@ public class BizOptFlowImpl implements BizOptFlow {
         return detailLog;
     }
 
-    protected JSONObject runOneStep(BizModel bizModel, JSONObject bizOptJson, String logId, int batchNum, Map<String, Object> queryParams) {
+    /**
+     * 单步运行
+     */
+    private void runOneStep(BizModel bizModel, JSONObject bizOptJson, String logId, int batchNum, Map<String, Object> queryParams) {
         String sOptType = bizOptJson.getString("type");
         BizOperation opt = allOperations.get(sOptType);
         if (opt == null) {
             if (logId != null) {
-                writeLog(0, 0, logId, "error", "找不到对应的操作：" + sOptType, batchNum);
+                writeLog(logId, "error", "找不到对应的操作：" + sOptType, batchNum);
             }
             throw new ObjectException(bizOptJson, "找不到对应的操作：" + sOptType);
         }
@@ -170,7 +182,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             TaskDetailLog detailLog = new TaskDetailLog();
             if (logId != null) {
                 String processName = bizOptJson.getString("processName");
-                detailLog = writeLog(0, 0, logId, sOptType + ":" + processName, "", batchNum);
+                detailLog = writeLog(logId, sOptType + ":" + processName, "", batchNum);
             }
             JSONObject jsonObject = opt.runOpt(bizModel, bizOptJson);
             if (logId != null) {
@@ -180,10 +192,9 @@ public class BizOptFlowImpl implements BizOptFlow {
                 detailLog.setRunEndTime(new Date());
                 taskDetailLogDao.updateObject(detailLog);
             }
-            return jsonObject;
         } catch (Exception e) {
             if (logId != null) {
-                writeLog(0, 0, logId, "error", ObjectException.extortExceptionMessage(e, 4), batchNum);
+                writeLog(logId, "error", ObjectException.extortExceptionMessage(e, 4), batchNum);
             }
             throw new ObjectException(bizOptJson, ObjectException.extortExceptionMessage(e, 4));
         }

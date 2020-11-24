@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -36,73 +37,80 @@ public class TaskSchedulers {
 
     private final OperationLogWriter operationLogWriter;
     private String taskMd5;
+    private final PathConfig pathConfig;
+
     @Autowired
-    public TaskSchedulers(DataPacketDao dataPacketDao, Scheduler scheduler, OperationLogWriter operationLogWriter) {
+    public TaskSchedulers(DataPacketDao dataPacketDao, Scheduler scheduler, OperationLogWriter operationLogWriter, PathConfig pathConfig) {
         this.dataPacketDao = dataPacketDao;
         this.scheduler = scheduler;
         this.operationLogWriter = operationLogWriter;
+        this.pathConfig = pathConfig;
     }
 
-    private boolean isEqualMd5(List<DataPacket> list){
+    private boolean isEqualMd5(List<DataPacket> list) {
         boolean result = false;
         StringBuilder sList = new StringBuilder();
-        for(DataPacket i:list){
-           sList.append(i.getTaskCron());
+        for (DataPacket i : list) {
+            sList.append(i.getTaskCron());
         }
-        String taskMd5 ="";
+        String taskMd5 = "";
         try {
             MessageDigest md5 = MessageDigest.getInstance("MD5");
             byte[] buffer = new byte[8192];
             int length;
-            InputStream is =new ByteArrayInputStream(sList.toString().getBytes());
+            InputStream is = new ByteArrayInputStream(sList.toString().getBytes());
             while ((length = is.read(buffer)) != -1) {
                 md5.update(buffer, 0, length);
             }
-            taskMd5 =new String(Hex.encodeHex(md5.digest()));
+            taskMd5 = new String(Hex.encodeHex(md5.digest()));
         } catch (NoSuchAlgorithmException | IOException e) {
             e.printStackTrace();
         }
-        if (taskMd5 .equals(this.taskMd5)) {
+        if (taskMd5.equals(this.taskMd5)) {
             result = true;
         } else {
-            this.taskMd5 = taskMd5 ;
+            this.taskMd5 = taskMd5;
         }
         return result;
     }
+
     private void refreshTask() throws SchedulerException {
-        List<DataPacket> list = dataPacketDao.listObjectsByProperties(
-            CollectionsOpt.createHashMap("taskType","2","isValid","T"));
+        Map<String, Object> map = CollectionsOpt.createHashMap("taskType", "2", "isValid", "T");
+        if (pathConfig.getOwnGroups() != null && pathConfig.getOwnGroups().length > 0) {
+            map.put("ownGroup_in", pathConfig.getOwnGroups());
+        }
+        List<DataPacket> list = dataPacketDao.listObjectsByProperties(map);
         if (isEqualMd5(list)) {
             return;
         }
         Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup());
 
         for (DataPacket ll : list) {
-            if ("".equals(ll.getTaskCron())||ll.getTaskCron()==null ) {
+            if ("".equals(ll.getTaskCron()) || ll.getTaskCron() == null) {
                 continue;
             }
             int i = 0;
             for (TriggerKey tKey : triggerKeys) {
-               if (tKey.getName().equals(ll.getPacketId())){
-                   i++;
-                   CronTrigger quatrzTrigger = (CronTrigger)scheduler.getTrigger(tKey);
-                   if (!(quatrzTrigger.getCronExpression().equals(ll.getTaskCron()))){
-                       QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getPacketId(), ll.getPacketName(), "task", ll.getTaskCron(),
-                           CollectionsOpt.createHashMap("taskExchange", ll));
-                       break;
-                   }
-                   break;
-               }
+                if (tKey.getName().equals(ll.getPacketId())) {
+                    i++;
+                    CronTrigger quartzTrigger = (CronTrigger) scheduler.getTrigger(tKey);
+                    if (!(quartzTrigger.getCronExpression().equals(ll.getTaskCron()))) {
+                        QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getPacketId(), ll.getOwnGroup(), "task", ll.getTaskCron(),
+                            CollectionsOpt.createHashMap("taskExchange", ll));
+                        break;
+                    }
+                    break;
+                }
             }
-            if (i==0) {
-                QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getPacketId(), ll.getPacketName(), "task", ll.getTaskCron(),
+            if (i == 0) {
+                QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getPacketId(), ll.getOwnGroup(), "task", ll.getTaskCron(),
                     CollectionsOpt.createHashMap("taskExchange", ll));
             }
         }
         for (TriggerKey tKey : triggerKeys) {
             boolean found = false;
             for (DataPacket ll : list) {
-                TriggerKey triggerKey = TriggerKey.triggerKey(ll.getPacketId(), ll.getPacketName());
+                TriggerKey triggerKey = TriggerKey.triggerKey(ll.getPacketId(), ll.getOwnGroup());
                 if (tKey.equals(triggerKey)) {
                     found = true;
                     break;
@@ -120,7 +128,10 @@ public class TaskSchedulers {
         QuartzJobUtils.registerJobType("task", RunTaskJob.class);
         scheduler.start();
     }
-    /** 5minute */
+
+    /**
+     * 5minute
+     */
     @Scheduled(fixedDelay = 1000 * 50)
     public void work() throws SchedulerException {
         refreshTask();

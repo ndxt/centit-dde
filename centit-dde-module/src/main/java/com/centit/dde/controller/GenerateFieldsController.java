@@ -40,7 +40,7 @@ public class GenerateFieldsController extends BaseController {
         @ApiImplicitParam(name = "databaseCode", value = "数据库代码", required = true),
         @ApiImplicitParam(name = "sql", value = "查询SQL", required = true)
     })
-    @RequestMapping(value = "/reviewdata", method = {RequestMethod.POST})
+    @RequestMapping(value = "/previewdata", method = {RequestMethod.POST})
     @WrapUpResponseBody
     public JSONArray queryViewSqlData(String databaseCode, String sql, HttpServletRequest request) {
         Map<String, Object> params = collectRequestParameters(request);

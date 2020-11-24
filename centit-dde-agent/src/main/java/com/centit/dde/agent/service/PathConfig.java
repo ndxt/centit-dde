@@ -1,5 +1,7 @@
 package com.centit.dde.agent.service;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -38,4 +40,14 @@ public class PathConfig {
     }
 
     private String useDataMoving;
+
+    public String[] getOwnGroups() {
+        return ownGroups;
+    }
+
+    public void setOwnGroups(String[] ownGroups) {
+        this.ownGroups = ownGroups;
+    }
+
+    private String[] ownGroups;
 }
