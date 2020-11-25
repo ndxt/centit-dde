@@ -8,6 +8,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -23,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +32,7 @@ import java.util.Map;
 @Api(value = "Http触发任务响应", tags = "Http触发任务响应")
 @RestController
 @RequestMapping(value = "httpTask")
-public class HttpTaskController {
+public class HttpTaskController extends BaseController {
 
     private final DataPacketService dataPacketService;
     private final ExchangeService exchangeService;
@@ -42,10 +44,30 @@ public class HttpTaskController {
 
     @GetMapping(value = "/run/{packetId}")
     @ApiOperation(value = "立即执行任务")
-    @WrapUpResponseBody
-    public void runTaskExchange(@PathVariable String packetId) {
+    // @WrapUpResponseBody
+    // TODO 需要返回 返回结果的内容
+    public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
+                                HttpServletResponse response) {
+        // 将request中的参数传入 运行上下文
+        //collectRequestParameters(request);
+        exchangeService.runTask(packetId);
+        //JsonResultUtils.
+    }
+
+    @PostMapping(value = "/run/{packetId}")
+    @ApiOperation(value = "立即执行任务Post")
+    //@WrapUpResponseBody
+    // TODO 需要返回 返回结果的内容
+    public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
+                            HttpServletResponse response,
+                            @RequestBody String jsonString) {
+        // 将request中的参数传入 运行上下文
+        //collectRequestParameters(request);
+        //JSON.parse(jsonString)
+
         exchangeService.runTask(packetId);
     }
+
 
     @GetMapping(value = "/{applicationId}/{interfaceName}/{sourceName}")
     @ApiOperation(value = "获取数据")
