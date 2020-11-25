@@ -20,7 +20,7 @@ spring:
 centit:
   useDataMoving: false
   dataMovingPath: D:\centit-dde-datamoving-3.0-SNAPSHOT.jar
-  logs: D:/Projects/RunData/dde/logs
+  logs: D:/Projects/RunData/dde/log
   ownGroups: 1,2
 framework:
   app:
