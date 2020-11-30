@@ -1,6 +1,7 @@
 package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.TaskDetailLogDao;
@@ -18,6 +19,7 @@ import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @author zhf
@@ -49,12 +51,12 @@ public class TaskRun {
         this.bizOptFlow = bizOptFlow;
     }
 
-    private void runStep(DataPacket dataPacket, String logId) {
+    private BizModel runStep(DataPacket dataPacket, String logId, Map<String, Object> queryParams) {
         JSONObject bizOptJson = dataPacket.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
-            return;
+            return null;
         }
-        bizOptFlow.run(bizOptJson, logId,dataPacket.getPacketParamsValue());
+        return bizOptFlow.run(bizOptJson, logId, queryParams == null ? dataPacket.getPacketParamsValue() : queryParams);
     }
 
 
@@ -69,7 +71,7 @@ public class TaskRun {
         taskDetailLogDao.saveNewObject(detailLog);
     }
 
-    public void runTask(String packetId) {
+    public BizModel runTask(String packetId, Map<String, Object> queryParams) {
         TaskLog taskLog = new TaskLog();
         Date beginTime = new Date();
         try {
@@ -80,7 +82,7 @@ public class TaskRun {
             taskLog.setRunBeginTime(beginTime);
             taskLog.setRunType(dataPacket.getPacketName());
             taskLogDao.saveNewObject(taskLog);
-            runStep(dataPacket, taskLog.getLogId());
+            BizModel bizModel = runStep(dataPacket, taskLog.getLogId(), queryParams);
             taskLog.setRunEndTime(new Date());
             dataPacket.setNextRunTime(new Date());
             String two = "2";
@@ -95,11 +97,13 @@ public class TaskRun {
                 CollectionsOpt.createHashMap("logId", taskLog.getLogId(), "logInfo_ne", "ok"));
             taskLog.setOtherMessage(taskDetailLog == null ? "ok" : "error");
             taskLogDao.updateObject(taskLog);
+            return bizModel;
         } catch (Exception e) {
             saveDetail(ObjectException.extortExceptionMessage(e, 4),
                 taskLog);
             taskLog.setOtherMessage("error");
             taskLogDao.mergeObject(taskLog);
         }
+        return null;
     }
 }

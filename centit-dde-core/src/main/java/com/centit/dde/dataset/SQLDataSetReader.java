@@ -21,8 +21,8 @@ import java.util.Map;
 /**
  * 数据库数据集 读取和写入类
  * 需要设置的参数有：
- *      数据库连接信息 DatabaseInfo
- *      对应的表信息 SimpleTableInfo
+ * 数据库连接信息 DatabaseInfo
+ * 对应的表信息 SimpleTableInfo
  */
 public class SQLDataSetReader implements DataSetReader {
 
@@ -36,8 +36,10 @@ public class SQLDataSetReader implements DataSetReader {
     private Connection connection;
 
     private DataScopePowerManager queryDataScopeFilter;
+
     /**
      * 读取 dataSet 数据集
+     *
      * @param params 模块的自定义参数
      * @return dataSet 数据集
      */
@@ -47,23 +49,25 @@ public class SQLDataSetReader implements DataSetReader {
         Connection conn = connection;
         boolean createConnect = false;
         try {
-            if(conn == null){
+            if (conn == null) {
                 conn = DbcpConnectPools.getDbcpConnect(dataSource);
                 createConnect = true;
             }
             QueryAndNamedParams qap;
-            if(params.get("currentUser")!=null) {
-                queryDataScopeFilter=new DataScopePowerManagerImpl();
+            if (params != null && params.get("currentUser") != null) {
+                queryDataScopeFilter = new DataScopePowerManagerImpl();
                 DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
                     (JSONObject) (params.get("currentUser")), params.get("currentUnitCode").toString());
                 dataPowerFilter.addSourceData(params);
-                qap = dataPowerFilter.translateQuery(sqlSen,null);
-            }else {
+                qap = dataPowerFilter.translateQuery(sqlSen, null);
+            } else {
                 qap = QueryUtils.translateQuery(sqlSen, params);
             }
 
-            Map<String, Object> paramsMap = new HashMap<>(params.size() + 6);
-            paramsMap.putAll(params);
+            Map<String, Object> paramsMap = new HashMap<>(params == null ? 0 : params.size() + 6);
+            if (params != null) {
+                paramsMap.putAll(params);
+            }
             paramsMap.putAll(qap.getParams());
 
             JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(
@@ -76,7 +80,7 @@ public class SQLDataSetReader implements DataSetReader {
             logger.error(e.getLocalizedMessage());
             throw new ObjectException(e.getLocalizedMessage());
         } finally {
-            if(createConnect){
+            if (createConnect) {
                 DbcpConnectPools.closeConnect(conn);
             }
         }

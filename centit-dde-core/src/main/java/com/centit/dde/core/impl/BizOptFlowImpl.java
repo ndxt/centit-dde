@@ -3,10 +3,7 @@ package com.centit.dde.core.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.*;
-import com.centit.dde.core.BizModel;
-import com.centit.dde.core.BizOperation;
-import com.centit.dde.core.BizOptFlow;
-import com.centit.dde.core.DataOptDescJson;
+import com.centit.dde.core.*;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.utils.BizModelJSONTransform;
@@ -63,6 +60,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @PostConstruct
     public void init() {
+        allOperations.put("start", BuiltInOperation::runStart);
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
         allOperations.put("append", BuiltInOperation::runAppend);
@@ -77,12 +75,10 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("check", BuiltInOperation::runCheckData);
         allOperations.put("static", BuiltInOperation::runStaticData);
         allOperations.put("http", BuiltInOperation::runHttpData);
-        allOperations.put("clear",BuiltInOperation::runClear);
-
+        allOperations.put("clear", BuiltInOperation::runClear);
         JSBizOperation jsBizOperation = new JSBizOperation(metaObjectService,
             databaseRunTime);
         allOperations.put("js", jsBizOperation);
-
         PersistenceBizOperation databaseOperation = new PersistenceBizOperation(
             path, integrationEnvironment, metaDataService);
         allOperations.put("persistence", databaseOperation);
@@ -123,13 +119,14 @@ public class BizOptFlowImpl implements BizOptFlow {
      */
     @Override
     public BizModel run(JSONObject bizOptJson, String logId, Map<String, Object> queryParams) {
-        DataOptDescJson dataOptDescJson = new DataOptDescJson(bizOptJson.getJSONObject("dataOptDescJson"));
+        DataOptDescJson dataOptDescJson = new DataOptDescJson(bizOptJson);
         JSONObject stepJson = dataOptDescJson.getStartStep();
         if (stepJson == null) {
             writeLog(logId, "error", "没有start节点", 0);
             return null;
         }
-        BizModel bizModel = BizModel.EMPTY_BIZ_MODEL;
+        SimpleBizModel bizModel = BizModel.EMPTY_BIZ_MODEL;
+        bizModel.setModelTag(queryParams);
         int i = 0;
         while (stepJson != null) {
             String stepId = stepJson.getString("id");
@@ -140,12 +137,11 @@ public class BizOptFlowImpl implements BizOptFlow {
             if ("branch".equals(stepType)) {
                 stepJson = getBatchStep(bizModel, dataOptDescJson, stepId);
             }
-            if(stepJson!=null) {
-                runOneStep(bizModel, stepJson, logId, i++, queryParams);
+            if (stepJson != null) {
+                runOneStep(bizModel, stepJson, logId, i++);
             }
             stepJson = dataOptDescJson.getNextStep(stepId);
         }
-
         if (bizModel.isEmpty()) {
             writeLog(logId, "emptyBizModel", "ok", 0);
         }
@@ -169,7 +165,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     /**
      * 单步运行
      */
-    private void runOneStep(BizModel bizModel, JSONObject bizOptJson, String logId, int batchNum, Map<String, Object> queryParams) {
+    private void runOneStep(BizModel bizModel, JSONObject bizOptJson, String logId, int batchNum) {
         String sOptType = bizOptJson.getString("type");
         BizOperation opt = allOperations.get(sOptType);
         if (opt == null) {

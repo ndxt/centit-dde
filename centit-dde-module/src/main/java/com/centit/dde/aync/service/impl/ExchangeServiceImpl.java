@@ -1,10 +1,13 @@
 package com.centit.dde.aync.service.impl;
 
 import com.centit.dde.aync.service.ExchangeService;
+import com.centit.dde.core.BizModel;
 import com.centit.dde.services.impl.TaskRun;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 /**
  * @author zhf
@@ -19,7 +22,7 @@ public class ExchangeServiceImpl implements ExchangeService {
 
     @Async
     @Override
-    public void runTask(String packetId) {
-        taskRun.runTask(packetId);
+    public BizModel runTask(String packetId,Map<String, Object> queryParams) {
+        return taskRun.runTask(packetId,queryParams);
     }
 }

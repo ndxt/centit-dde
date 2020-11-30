@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +13,8 @@ import java.util.Map;
  */
 
 public class DataOptDescJson {
-    private Map<String, JSONObject> nodeMap;
-    private Map<String, List<JSONObject>> linkMap;
+    private Map<String, JSONObject> nodeMap=new HashMap<>(50);
+    private Map<String, List<JSONObject>> linkMap=new HashMap<>(100);
 
     public DataOptDescJson(JSONObject dataOptJson) {
         mapData(dataOptJson);

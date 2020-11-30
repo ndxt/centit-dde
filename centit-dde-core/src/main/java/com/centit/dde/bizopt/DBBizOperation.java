@@ -10,8 +10,6 @@ import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.DataSourceDescription;
 
-import java.util.Map;
-
 
 /**
  * @author zhf
@@ -25,9 +23,9 @@ public class DBBizOperation implements BizOperation {
 
     @Override
     public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
-        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "nodeName", bizModel.getModelName());
-        String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseCode", "");
-        String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "sql", "");
+        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
+        String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", "");
+        String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
         DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(databaseCode);
         if (databaseInfo == null) {
             throw new ObjectException("找不到对应的集成数据库：" + databaseCode);

@@ -8,6 +8,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
+import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
@@ -44,28 +45,23 @@ public class HttpTaskController extends BaseController {
 
     @GetMapping(value = "/run/{packetId}")
     @ApiOperation(value = "立即执行任务")
-    // @WrapUpResponseBody
-    // TODO 需要返回 返回结果的内容
     public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) {
         // 将request中的参数传入 运行上下文
-        //collectRequestParameters(request);
-        exchangeService.runTask(packetId);
-        //JsonResultUtils.
+        BizModel bizModel=exchangeService.runTask(packetId,collectRequestParameters(request));
+        JsonResultUtils.writeSingleDataJson(bizModel,response);
     }
 
-    @PostMapping(value = "/run/{packetId}")
+    @PostMapping(value = "/runPost/{packetId}")
     @ApiOperation(value = "立即执行任务Post")
-    //@WrapUpResponseBody
-    // TODO 需要返回 返回结果的内容
     public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
                             HttpServletResponse response,
                             @RequestBody String jsonString) {
         // 将request中的参数传入 运行上下文
-        //collectRequestParameters(request);
-        //JSON.parse(jsonString)
-
-        exchangeService.runTask(packetId);
+        Map<String, Object> queryParams=collectRequestParameters(request);
+        queryParams.put("requestBody",JSON.parse(jsonString));
+        BizModel bizModel=exchangeService.runTask(packetId,queryParams);
+        JsonResultUtils.writeSingleDataJson(bizModel,response);
     }
 
 

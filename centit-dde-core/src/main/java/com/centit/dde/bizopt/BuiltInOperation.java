@@ -39,16 +39,22 @@ public class BuiltInOperation {
         return map;
     }
 
-    private static Object jsonArrayToMap(Object json, String key, String value) {
+    public static Object jsonArrayToMap(Object json, String key, String value) {
         if (json instanceof JSONArray) {
             Map<String, String> map = new HashMap<>(((JSONArray) json).size());
             for (Object o : (JSONArray) json) {
                 JSONObject temp = (JSONObject) o;
-                map.put(temp.getString(key), temp.getString(value));
+                if (!StringBaseOpt.isNvl(temp.getString(key))) {
+                    map.put(temp.getString(key), temp.getString(value));
+                }
             }
             return map;
         }
         return json;
+    }
+
+    public static JSONObject runStart(BizModel bizModel, JSONObject bizOptJson) {
+        return getJsonObject(0);
     }
 
     public static JSONObject runMap(BizModel bizModel, JSONObject bizOptJson) {
@@ -182,8 +188,9 @@ public class BuiltInOperation {
         DataSetOptUtil.sortDataSetByFields(dataSet, orderByFields);
         return getJsonObject(dataSet.size());
     }
+
     public static JSONObject runClear(BizModel bizModel, JSONObject bizOptJson) {
-        bizModel=BizModel.EMPTY_BIZ_MODEL;
+        bizModel = BizModel.EMPTY_BIZ_MODEL;
         return getJsonObject(0);
     }
 
