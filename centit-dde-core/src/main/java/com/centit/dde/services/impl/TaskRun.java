@@ -56,6 +56,7 @@ public class TaskRun {
         if (bizOptJson.isEmpty()) {
             return null;
         }
+        bizOptFlow.initStep(0);
         return bizOptFlow.run(bizOptJson, logId, queryParams == null ? dataPacket.getPacketParamsValue() : queryParams);
     }
 

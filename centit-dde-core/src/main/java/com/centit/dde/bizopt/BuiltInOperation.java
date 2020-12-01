@@ -56,6 +56,11 @@ public class BuiltInOperation {
     public static JSONObject runStart(BizModel bizModel, JSONObject bizOptJson) {
         return getJsonObject(0);
     }
+    public static JSONObject runRequestBody(BizModel bizModel, JSONObject bizOptJson) {
+        DataSet destDs =BizOptUtils.castObjectToDataSet(bizModel.getModelTag().get("requestBody"));
+        bizModel.putDataSet("requestBody",destDs);
+        return getJsonObject(destDs.size());
+    }
 
     public static JSONObject runMap(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());

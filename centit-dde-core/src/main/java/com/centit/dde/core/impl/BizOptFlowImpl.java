@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.*;
 import com.centit.dde.core.*;
+import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.TaskDetailLogDao;
+import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.fileserver.common.FileStore;
@@ -43,6 +45,8 @@ public class BizOptFlowImpl implements BizOptFlow {
     private MetaDataService metaDataService;
     @Autowired
     private TaskDetailLogDao taskDetailLogDao;
+    @Autowired
+    private DataPacketDao dataPacketDao;
     @Autowired(required = false)
     private MetaObjectService metaObjectService;
 
@@ -51,6 +55,12 @@ public class BizOptFlowImpl implements BizOptFlow {
     @Autowired(required = false)
     private FileStore fileStore;
 
+    @Override
+    public void initStep(int step) {
+        this.step = step;
+    }
+
+    private int step;
     private Map<String, BizOperation> allOperations;
 
     public BizOptFlowImpl() {
@@ -61,6 +71,8 @@ public class BizOptFlowImpl implements BizOptFlow {
     @PostConstruct
     public void init() {
         allOperations.put("start", BuiltInOperation::runStart);
+        allOperations.put("scheduling", BuiltInOperation::runStart);
+        allOperations.put("recuestbody",BuiltInOperation::runRequestBody);
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
         allOperations.put("append", BuiltInOperation::runAppend);
@@ -114,20 +126,16 @@ public class BizOptFlowImpl implements BizOptFlow {
         return null;
     }
 
-    /**
-     * @return 返回真正运行的次数, 如果小于 0 表示報錯
-     */
     @Override
     public BizModel run(JSONObject bizOptJson, String logId, Map<String, Object> queryParams) {
         DataOptDescJson dataOptDescJson = new DataOptDescJson(bizOptJson);
         JSONObject stepJson = dataOptDescJson.getStartStep();
         if (stepJson == null) {
-            writeLog(logId, "error", "没有start节点", 0);
+            writeLog(logId, "error", "没有start节点");
             return null;
         }
         SimpleBizModel bizModel = BizModel.EMPTY_BIZ_MODEL;
         bizModel.setModelTag(queryParams);
-        int i = 0;
         while (stepJson != null) {
             String stepId = stepJson.getString("id");
             String stepType = stepJson.getString("type");
@@ -138,17 +146,21 @@ public class BizOptFlowImpl implements BizOptFlow {
                 stepJson = getBatchStep(bizModel, dataOptDescJson, stepId);
             }
             if (stepJson != null) {
-                runOneStep(bizModel, stepJson, logId, i++);
+                runOneStep(bizModel, stepJson, logId);
+            }
+            if("scheduling".equals(stepType)){
+                DataPacket dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
+                run(dataPacket.getDataOptDescJson(),logId,queryParams);
             }
             stepJson = dataOptDescJson.getNextStep(stepId);
         }
         if (bizModel.isEmpty()) {
-            writeLog(logId, "emptyBizModel", "ok", 0);
+            writeLog(logId, "emptyBizModel", "ok");
         }
         return bizModel;
     }
 
-    private TaskDetailLog writeLog(String logId, String logType, String logInfo, int taskId) {
+    private TaskDetailLog writeLog(String logId, String logType, String logInfo) {
         TaskDetailLog detailLog = new TaskDetailLog();
         detailLog.setRunBeginTime(new Date());
         detailLog.setLogId(logId);
@@ -157,7 +169,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         detailLog.setLogType(logType);
         detailLog.setLogInfo(logInfo);
         detailLog.setRunEndTime(new Date());
-        detailLog.setTaskId(StringBaseOpt.castObjectToString(taskId, "0"));
+        detailLog.setTaskId(StringBaseOpt.castObjectToString(++step, "0"));
         taskDetailLogDao.saveNewObject(detailLog);
         return detailLog;
     }
@@ -165,12 +177,12 @@ public class BizOptFlowImpl implements BizOptFlow {
     /**
      * 单步运行
      */
-    private void runOneStep(BizModel bizModel, JSONObject bizOptJson, String logId, int batchNum) {
+    private void runOneStep(BizModel bizModel, JSONObject bizOptJson, String logId) {
         String sOptType = bizOptJson.getString("type");
         BizOperation opt = allOperations.get(sOptType);
         if (opt == null) {
             if (logId != null) {
-                writeLog(logId, "error", "找不到对应的操作：" + sOptType, batchNum);
+                writeLog(logId, "error", "找不到对应的操作：" + sOptType);
             }
             throw new ObjectException(bizOptJson, "找不到对应的操作：" + sOptType);
         }
@@ -178,7 +190,10 @@ public class BizOptFlowImpl implements BizOptFlow {
             TaskDetailLog detailLog = new TaskDetailLog();
             if (logId != null) {
                 String processName = bizOptJson.getString("processName");
-                detailLog = writeLog(logId, sOptType + ":" + processName, "", batchNum);
+                if(StringBaseOpt.isNvl(processName)){
+                    processName = bizOptJson.getString("nodeName");
+                }
+                detailLog = writeLog(logId, sOptType + ":" + processName, "");
             }
             JSONObject jsonObject = opt.runOpt(bizModel, bizOptJson);
             if (logId != null) {
@@ -190,7 +205,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             }
         } catch (Exception e) {
             if (logId != null) {
-                writeLog(logId, "error", ObjectException.extortExceptionMessage(e, 4), batchNum);
+                writeLog(logId, "error", ObjectException.extortExceptionMessage(e, 4));
             }
             throw new ObjectException(bizOptJson, ObjectException.extortExceptionMessage(e, 4));
         }

@@ -12,4 +12,5 @@ public interface BizOptFlow {
     void registerOperation(String key, BizOperation opt);
     BizModel run(JSONObject bizOptJson,String logId,Map<String, Object> queryParams);
     BizModel debug(JSONObject bizOptJson);
+    void initStep(int step);
 }

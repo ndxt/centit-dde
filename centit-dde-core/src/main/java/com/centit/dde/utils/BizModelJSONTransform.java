@@ -34,7 +34,7 @@ public class BizModelJSONTransform
     private Object peekStackValue(){
         return stackLength>0? stack.get(stackLength-1): null;
     }
-    // n>0
+
     private Object peekStackValue(int n){
         return stackLength>n? stack.get(stackLength-n-1): null;
     }
@@ -66,7 +66,7 @@ public class BizModelJSONTransform
             return ReflectionOpt.attainExpressionValue(
                 peekStackValue(1),
                 labelName.substring(2));
-        } else if(labelName.startsWith(".")){//
+        } else if(labelName.startsWith(".")){
             if(stackLength>0) {
                 return ReflectionOpt.attainExpressionValue(
                     stack.get(stackLength-1),
@@ -74,7 +74,7 @@ public class BizModelJSONTransform
             } else {
                 return fetchRootData(labelName.substring(1));
             }
-        } else {//
+        } else {
             if(stackLength>0) {
                 return ReflectionOpt.attainExpressionValue(
                     stack.get(stackLength-1),
