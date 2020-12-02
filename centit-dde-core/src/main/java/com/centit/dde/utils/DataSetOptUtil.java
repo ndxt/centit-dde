@@ -447,7 +447,7 @@ public abstract class DataSetOptUtil {
      * @param primaryFields 主键列
      * @return DataSet
      */
-    public static DataSet joinTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet, List<String> primaryFields) {
+    public static DataSet joinTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet, List<Map.Entry<String, String>> primaryFields,String join) {
         if (mainDataSet == null) {
             return slaveDataSet;
         }
@@ -457,8 +457,14 @@ public abstract class DataSetOptUtil {
 
         List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
         List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
-        sortByFields(mainData, primaryFields);
-        sortByFields(slaveData, primaryFields);
+        List<String> mainFields=new ArrayList<>();
+        List<String> slaveFields=new ArrayList<>();
+        for (Map.Entry<String, String> field : primaryFields) {
+            mainFields.add(field.getKey());
+            slaveFields.add(field.getValue());
+        }
+        sortByFields(mainData, mainFields);
+        sortByFields(slaveData, slaveFields);
         int i = 0;
         int j = 0;
         List<Map<String, Object>> newData = new ArrayList<>();
@@ -466,7 +472,7 @@ public abstract class DataSetOptUtil {
         int nInsertMain = -1;
         int nInsertSlave = -1;
         while (i < mainData.size() && j < slaveData.size()) {
-            int nc = compareTwoRow(mainData.get(i), slaveData.get(j), primaryFields);
+            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields);
             //匹配
             Map<String, Object> newRow = new LinkedHashMap<>();
             if (nc == 0) {
@@ -474,12 +480,12 @@ public abstract class DataSetOptUtil {
                 newRow.putAll(mainData.get(i));
                 nInsertMain = i;
                 nInsertSlave = j;
-                boolean incI = i < mainData.size() - 1 && compareTwoRow(mainData.get(i), mainData.get(i + 1), primaryFields) != 0;
-                boolean incJ = j < slaveData.size() - 1 && compareTwoRow(slaveData.get(j), slaveData.get(j + 1), primaryFields) != 0;
-                if (!incI && i < mainData.size() - 1) {
+                boolean incI = i < mainData.size() - 1 && compareTwoRowWithMap(mainData.get(i), mainData.get(i + 1), primaryFields) != 0;
+                boolean incJ = j < slaveData.size() - 1 && compareTwoRowWithMap(slaveData.get(j), slaveData.get(j + 1), primaryFields) != 0;
+                if (!incI && i < mainData.size()) {
                     i++;
                 }
-                if (!incJ && j < slaveData.size() - 1) {
+                if (!incJ && j < slaveData.size()) {
                     j++;
                 }
                 if ((incI && incJ) || (!incI && !incJ)) {
@@ -488,32 +494,38 @@ public abstract class DataSetOptUtil {
                 }
             } else if (nc < 0) {
                 if (nInsertMain < i) {
-                    newRow.putAll(mainData.get(i));
+                    if("left".equalsIgnoreCase(join)) {
+                        newRow.putAll(mainData.get(i));
+                    }
                     nInsertMain = i;
                 }
                 i++;
             } else {
                 if (nInsertSlave < j) {
-                    newRow.putAll(slaveData.get(j));
+                    if("right".equalsIgnoreCase(join)) {
+                        newRow.putAll(slaveData.get(j));
+                    }
                     nInsertSlave = j;
                 }
                 j++;
             }
-            newData.add(newRow);
+            if(newRow.size()>0) {
+                newData.add(newRow);
+            }
         }
-
-        while (i < mainData.size()) {
-            Map<String, Object> newRow = new LinkedHashMap<>();
-            newRow.putAll(mainData.get(i));
-            newData.add(newRow);
-            i++;
+        if("left".equalsIgnoreCase(join)) {
+            while (i < mainData.size()) {
+                Map<String, Object> newRow = new LinkedHashMap<>(mainData.get(i));
+                newData.add(newRow);
+                i++;
+            }
         }
-
-        while (j < slaveData.size()) {
-            Map<String, Object> newRow = new LinkedHashMap<>();
-            newRow.putAll(slaveData.get(j));
-            newData.add(newRow);
-            j++;
+        if("right".equalsIgnoreCase(join)) {
+            while (j < slaveData.size()) {
+                Map<String, Object> newRow = new LinkedHashMap<>(slaveData.get(j));
+                newData.add(newRow);
+                j++;
+            }
         }
         return new SimpleDataSet(newData);
     }

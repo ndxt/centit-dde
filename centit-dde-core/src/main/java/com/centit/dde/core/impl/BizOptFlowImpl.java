@@ -87,7 +87,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("check", BuiltInOperation::runCheckData);
         allOperations.put("static", BuiltInOperation::runStaticData);
         allOperations.put("http", BuiltInOperation::runHttpData);
-        allOperations.put("clear", BuiltInOperation::runClear);
+        allOperations.put("clearcache", BuiltInOperation::runClear);
         JSBizOperation jsBizOperation = new JSBizOperation(metaObjectService,
             databaseRunTime);
         allOperations.put("js", jsBizOperation);

@@ -9,12 +9,11 @@ import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.appclient.AppSession;
 import com.centit.framework.appclient.RestfulHttpRequest;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 数据持久化操作
@@ -195,19 +194,21 @@ public class BuiltInOperation {
     }
 
     public static JSONObject runClear(BizModel bizModel, JSONObject bizOptJson) {
-        bizModel = BizModel.EMPTY_BIZ_MODEL;
+        bizModel.getBizData().clear();
         return getJsonObject(0);
     }
 
     public static JSONObject runJoin(BizModel bizModel, JSONObject bizOptJson) {
-        String sour1DsName = getJsonFieldString(bizOptJson, "source", null);
+        String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
         String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
-        List<String> pks = StringBaseOpt.objectToStringList(bizOptJson.get("primaryKey"));
+        String join=getJsonFieldString(bizOptJson, "join", "join");
+        Map<String,String> map = (Map<String, String>) BuiltInOperation.jsonArrayToMap(bizOptJson.get("config"),"primaryKey1","primaryKey2");
+        List<Map.Entry<String, String>> pks = new ArrayList<>(map.entrySet());
         DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
         DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
-        DataSet destDS = DataSetOptUtil.joinTwoDataSet(dataSet, dataSet2, pks);
+        DataSet destDS = DataSetOptUtil.joinTwoDataSet(dataSet, dataSet2, pks,join);
         if (destDS != null) {
-            bizModel.putDataSet(getJsonFieldString(bizOptJson, "target", bizModel.getModelName()), destDS);
+            bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDS);
             return getJsonObject(destDS.size());
         }
         return getJsonObject(0);
