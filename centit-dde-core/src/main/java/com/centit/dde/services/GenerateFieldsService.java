@@ -16,7 +16,7 @@ public interface GenerateFieldsService {
      * 新增数据库查询
      */
 
-    List<ColumnSchema> generateSqlFields(String databaseCode, String sql, Map<String, Object> params);
+    List<ColumnSchema> generateSqlFields(String sql, Map<String, Object> params);
     List<ColumnSchema> generateExcelFields(Map<String, Object> params);
     List<ColumnSchema> generateCsvFields(Map<String, Object> params);
     List<ColumnSchema> generateJsonFields(Map<String, Object> params);

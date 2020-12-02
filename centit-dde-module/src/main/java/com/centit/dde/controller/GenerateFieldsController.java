@@ -51,7 +51,7 @@ public class GenerateFieldsController extends BaseController {
     @ApiImplicitParam(name = "sql", value = "查询SQL", required = true)
     @RequestMapping(value = "/sqlcolumn", method = {RequestMethod.POST})
     @WrapUpResponseBody
-    public List<ColumnSchema> generateSqlcolumn(String databaseCode, String sql, String dataType, HttpServletRequest request) {
+    public List<ColumnSchema> generateSqlcolumn(String sql, String dataType, HttpServletRequest request) {
         sql = StringEscapeUtils.unescapeHtml4(sql);
         Map<String, Object> params = collectRequestParameters(request);
         switch (dataType) {
@@ -64,7 +64,7 @@ public class GenerateFieldsController extends BaseController {
             case "J":
                 return generateFieldsService.generateJsonFields(params);
             case "D":
-                return generateFieldsService.generateSqlFields(databaseCode, sql, params);
+                return generateFieldsService.generateSqlFields(sql, params);
             case "P":
                 return generateFieldsService.generatePostFields(sql);
             default:
