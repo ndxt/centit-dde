@@ -201,8 +201,8 @@ public class BuiltInOperation {
     public static JSONObject runJoin(BizModel bizModel, JSONObject bizOptJson) {
         String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
         String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
-        String join=getJsonFieldString(bizOptJson, "join", "join");
-        Map<String,String> map = (Map<String, String>) BuiltInOperation.jsonArrayToMap(bizOptJson.get("config"),"primaryKey1","primaryKey2");
+        String join=getJsonFieldString(bizOptJson, "operation", "join");
+        Map<String,String> map = (Map<String, String>) BuiltInOperation.jsonArrayToMap(bizOptJson.get("configfield"),"primaryKey1","primaryKey2");
         List<Map.Entry<String, String>> pks = new ArrayList<>(map.entrySet());
         DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
         DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);

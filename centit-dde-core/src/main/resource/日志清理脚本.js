@@ -4,7 +4,7 @@ function runOpt(eventRuntime, entity) {
   return 0;
 }
 //传入requestbody保存到表
-function runOpt(eventRuntime, entity) {
-  eventRuntime.metaObjectService.saveObject('oe27nPnuQ5qJ4CdlXQ7UDQ',entity.fetchDataSetByName('requestBody').getFirstRow());
+function runOpt(eventRuntime, bimodel) {
+  eventRuntime.metaObjectService.saveObject('oe27nPnuQ5qJ4CdlXQ7UDQ',bimodel.fetchDataSetByName('requestBody').getFirstRow());
   return 0;
 }

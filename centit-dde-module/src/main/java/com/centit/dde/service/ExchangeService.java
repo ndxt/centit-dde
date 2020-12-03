@@ -1,4 +1,4 @@
-package com.centit.dde.aync.service;
+package com.centit.dde.service;
 
 
 import com.centit.dde.core.BizModel;
@@ -9,5 +9,5 @@ import java.util.Map;
  * @author zhf
  */
 public interface ExchangeService {
-    BizModel runTask(String packetId, Map<String, Object> queryParams);
+    Object runTask(String packetId, Map<String, Object> queryParams);
 }

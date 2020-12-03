@@ -42,7 +42,7 @@ public abstract class DBBatchUtils {
         if (fieldsMap == null) {
             fields = achieveAllFields(objects);
         } else {
-            Collections.addAll(fields, (String[]) fieldsMap.values().toArray(new String[0]));
+            Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
         }
         String sql = GeneralJsonObjectDao.buildInsertSql(tableInfo, fields);
         LeftRightPair<String, List<String>> sqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
@@ -71,7 +71,7 @@ public abstract class DBBatchUtils {
         if (fieldsMap == null) {
             fields = achieveAllFields(objects);
         } else {
-            Collections.addAll(fields, (String[]) fieldsMap.values().toArray(new String[0]));
+            Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
         }
         String sql = GeneralJsonObjectDao.buildUpdateSql(tableInfo, fields) +
             " where " + GeneralJsonObjectDao.buildFilterSqlByPk(tableInfo, null);

@@ -1,9 +1,6 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.aync.service.ExchangeService;
-import com.centit.dde.core.BizModel;
-import com.centit.dde.core.DataSet;
-import com.centit.dde.core.SimpleBizModel;
+import com.centit.dde.service.ExchangeService;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.services.GenerateFieldsService;
@@ -15,10 +12,7 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -102,44 +96,6 @@ public class DataPacketController extends BaseController {
     @WrapUpResponseBody
     public DataPacket getDataPacket(@PathVariable String packetId) {
         return dataPacketService.getDataPacket(packetId);
-    }
-
-    @ApiOperation(value = "获取数据包数据")
-    @ApiImplicitParams({@ApiImplicitParam(
-        name = "packetId", value = "数据包ID",
-        required = true, paramType = "path", dataType = "String"
-    ), @ApiImplicitParam(
-        name = "datasets", value = "需要返回的数据集名称，用逗号隔开，如果为空返回全部"
-    )})
-    @GetMapping(value = "/packet/{packetId}")
-    @WrapUpResponseBody
-    public BizModel fetchDataPacketData(@PathVariable String packetId, String datasets,
-                                        HttpServletRequest request) {
-        Map<String, Object> params = BaseController.collectRequestParameters(request);
-        BizModel bizModel = dataPacketService.fetchDataPacketData(packetId, params);
-        BizModel dup = getBizModel(datasets, bizModel);
-        if (dup != null) {
-            return dup;
-        }
-        return bizModel;
-    }
-
-    private BizModel getBizModel(String dataSets, BizModel bizModel) {
-        if (StringUtils.isNotBlank(dataSets)) {
-            String[] dss = dataSets.split(",");
-            SimpleBizModel dup = new SimpleBizModel(bizModel.getModelName());
-            dup.setModelTag(bizModel.getModelTag());
-            Map<String, DataSet> dataMap = new HashMap<>(dss.length + 1);
-            for (String dsn : dss) {
-                DataSet ds = bizModel.fetchDataSetByName(dsn);
-                if (ds != null) {
-                    dataMap.put(dsn, ds);
-                }
-            }
-            dup.setBizData(dataMap);
-            return dup;
-        }
-        return null;
     }
 
     @GetMapping(value = "/exist/{applicationId}/{interfaceName}")

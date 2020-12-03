@@ -25,6 +25,4 @@ public interface DataPacketService {
 
     DataPacket getDataPacket(String packetId);
 
-    BizModel fetchDataPacketData(String packetId, Map<String, Object> params);
-    BizModel fetchDataPacketData(String packetId, Map<String, Object> params, JSONObject optsteps);
 }

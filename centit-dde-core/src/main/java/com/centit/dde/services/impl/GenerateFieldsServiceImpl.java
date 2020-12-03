@@ -102,8 +102,30 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     }
 
     @Override
-    public List<ColumnSchema> generateSqlFields(String sql, Map<String, Object> params) {
-        return getColumnSchemas(QueryUtils.getSqlFiledNames(sql));
+    public List<ColumnSchema> generateSqlFields(String databaseCode,String sql, Map<String, Object> params) {
+        List<String> sColumn=QueryUtils.getSqlFiledNames(sql);
+        if(sColumn==null || sColumn.size()==0){
+            DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(databaseCode);
+            QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(QueryUtils.translateQuery(sql, params));
+            String sSql = QueryUtils.buildLimitQuerySQL(qap.getQuery(), 0, 2, false,
+                DBType.mapDBType(databaseInfo.getDatabaseUrl()));
+            List<ColumnSchema> columnSchemas = new ArrayList<>(50);
+            try (Connection conn = DbcpConnectPools.getDbcpConnect(databaseInfo);
+                 PreparedStatement stmt = conn.prepareStatement(sSql)) {
+                DatabaseAccess.setQueryStmtParameters(stmt, qap.getParams());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    ResultSetMetaData rsd = rs.getMetaData();
+                    int nc = rsd.getColumnCount();
+                    sColumn=new ArrayList<>(nc);
+                    for (int i = 1; i <= nc; i++) {
+                        sColumn.add(rsd.getColumnName(i));
+                    }
+                }
+            } catch (SQLException e) {
+                logger.error("执行查询出错，SQL：{},Param:{}", sSql, qap.getParams());
+            }
+        }
+        return getColumnSchemas(sColumn);
     }
 
     private List<ColumnSchema> getColumnSchemas(List<String> columns) {

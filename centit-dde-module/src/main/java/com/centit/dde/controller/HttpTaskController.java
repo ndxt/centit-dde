@@ -1,33 +1,23 @@
 package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.aync.service.ExchangeService;
-import com.centit.dde.core.BizModel;
-import com.centit.dde.core.DataSet;
-import com.centit.dde.po.DataPacket;
+import com.centit.dde.service.ExchangeService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.framework.common.JsonResultUtils;
-import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
-import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Api(value = "Http触发任务响应", tags = "Http触发任务响应")
@@ -48,7 +38,7 @@ public class HttpTaskController extends BaseController {
     public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) {
         // 将request中的参数传入 运行上下文
-        BizModel bizModel=exchangeService.runTask(packetId,collectRequestParameters(request));
+        Object bizModel=exchangeService.runTask(packetId,collectRequestParameters(request));
         JsonResultUtils.writeSingleDataJson(bizModel,response);
     }
 
@@ -60,50 +50,10 @@ public class HttpTaskController extends BaseController {
         // 将request中的参数传入 运行上下文
         Map<String, Object> queryParams=collectRequestParameters(request);
         queryParams.put("requestBody",JSON.parse(jsonString));
-        BizModel bizModel=exchangeService.runTask(packetId,queryParams);
+        Object bizModel=exchangeService.runTask(packetId,queryParams);
         JsonResultUtils.writeSingleDataJson(bizModel,response);
     }
 
-
-    @GetMapping(value = "/{applicationId}/{interfaceName}/{sourceName}")
-    @ApiOperation(value = "获取数据")
-    @WrapUpResponseBody
-    public DataSet getData(@PathVariable String applicationId, @PathVariable String interfaceName,
-                           @PathVariable String sourceName, HttpServletRequest request) {
-        Map<String, Object> params = BaseController.collectRequestParameters(request);
-        Map<String, Object> params2 = new HashMap<>(10);
-        params2.put("interfaceName", interfaceName);
-        params2.put("applicationId", applicationId);
-        List<DataPacket> list = dataPacketService.listDataPacket(params2, new PageDesc());
-        if (list.size() > 0) {
-            DataPacket taskExchange = list.get(0);
-            BizModel bizModel = dataPacketService.fetchDataPacketData(taskExchange.getPacketId(), params, taskExchange.getDataOptDescJson());
-            String sourceCode = getSourceCode(sourceName, taskExchange.getDataOptDescJson());
-            if (StringUtils.isNotBlank(sourceCode)) {
-                return bizModel.fetchDataSetByName(sourceCode);
-            } else {
-                return bizModel.getMainDataSet();
-            }
-        }
-        return null;
-    }
-
-    private String getSourceCode(String sourceName, JSONObject bizOptJson) {
-        JSONArray jsonArray = bizOptJson.getJSONArray("steps");
-        for (Object step : jsonArray) {
-            if (step instanceof JSONObject) {
-                if ("interface".equals(((JSONObject) step).getString("operation"))) {
-                    Object mapInfo = ((JSONObject) step).get("fieldsMap");
-                    if (mapInfo instanceof Map) {
-                        return (String) ((Map) mapInfo).get(sourceName);
-                    }
-                } else {
-                    return "";
-                }
-            }
-        }
-        return "";
-    }
     @GetMapping(value = "/testformula")
     @ApiOperation(value = "测试表达式", notes =
         "可用表达式  \n"+

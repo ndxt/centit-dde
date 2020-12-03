@@ -18,6 +18,9 @@ import org.apache.commons.math3.stat.StatUtils;
 import java.util.*;
 
 public abstract class DataSetOptUtil {
+    private static final String LEFT="leftjoin";
+    private static final String RIGHT="rightjoin";
+    private static final String ALL="alljoin";
     /**
      * 数据集 映射
      *
@@ -494,7 +497,7 @@ public abstract class DataSetOptUtil {
                 }
             } else if (nc < 0) {
                 if (nInsertMain < i) {
-                    if("left".equalsIgnoreCase(join)) {
+                    if(LEFT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
                         newRow.putAll(mainData.get(i));
                     }
                     nInsertMain = i;
@@ -502,7 +505,7 @@ public abstract class DataSetOptUtil {
                 i++;
             } else {
                 if (nInsertSlave < j) {
-                    if("right".equalsIgnoreCase(join)) {
+                    if(RIGHT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
                         newRow.putAll(slaveData.get(j));
                     }
                     nInsertSlave = j;
@@ -513,14 +516,14 @@ public abstract class DataSetOptUtil {
                 newData.add(newRow);
             }
         }
-        if("left".equalsIgnoreCase(join)) {
+        if(LEFT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
             while (i < mainData.size()) {
                 Map<String, Object> newRow = new LinkedHashMap<>(mainData.get(i));
                 newData.add(newRow);
                 i++;
             }
         }
-        if("right".equalsIgnoreCase(join)) {
+        if(RIGHT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
             while (j < slaveData.size()) {
                 Map<String, Object> newRow = new LinkedHashMap<>(slaveData.get(j));
                 newData.add(newRow);

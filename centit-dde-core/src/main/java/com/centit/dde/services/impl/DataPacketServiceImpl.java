@@ -176,33 +176,4 @@ public class DataPacketServiceImpl implements DataPacketService {
         jedis.close();
     }
 
-    @Override
-    public BizModel fetchDataPacketData(String packetId, Map<String, Object> paramsMap){
-        return getBizModel(packetId, paramsMap,null);
-    }
-
-
-
-    @Override
-    public BizModel fetchDataPacketData(String packetId, Map<String, Object> paramsMap,JSONObject optsteps){
-        return getBizModel(packetId, paramsMap, optsteps);
-    }
-
-    private BizModel getBizModel(String packetId, Map<String, Object> paramsMap, JSONObject optsteps) {
-        DataPacket dataPacket = this.getDataPacket(packetId);
-        Map<String, Object> modelTag = dataPacket.getPacketParamsValue();
-        if (paramsMap != null && paramsMap.size() > 0) {
-            modelTag.putAll(paramsMap);
-        }
-        BizModel bizModel = fetchDataPacketDataFromBuf(dataPacket, modelTag);
-
-        if(optsteps==null){
-            optsteps = dataPacket.getDataOptDescJson();
-        }
-        if(optsteps!=null) {
-            bizModel = bizOptFlow.run(optsteps,null,modelTag);
-        }
-        setDataPacketBuf(bizModel, dataPacket, modelTag);
-        return bizModel;
-    }
 }

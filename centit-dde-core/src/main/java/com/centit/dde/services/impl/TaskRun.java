@@ -51,7 +51,7 @@ public class TaskRun {
         this.bizOptFlow = bizOptFlow;
     }
 
-    private BizModel runStep(DataPacket dataPacket, String logId, Map<String, Object> queryParams) {
+    private Object runStep(DataPacket dataPacket, String logId, Map<String, Object> queryParams) {
         JSONObject bizOptJson = dataPacket.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
             return null;
@@ -72,7 +72,7 @@ public class TaskRun {
         taskDetailLogDao.saveNewObject(detailLog);
     }
 
-    public BizModel runTask(String packetId, Map<String, Object> queryParams) {
+    public Object runTask(String packetId, Map<String, Object> queryParams) {
         TaskLog taskLog = new TaskLog();
         Date beginTime = new Date();
         try {
@@ -83,7 +83,7 @@ public class TaskRun {
             taskLog.setRunBeginTime(beginTime);
             taskLog.setRunType(dataPacket.getPacketName());
             taskLogDao.saveNewObject(taskLog);
-            BizModel bizModel = runStep(dataPacket, taskLog.getLogId(), queryParams);
+            Object bizModel = runStep(dataPacket, taskLog.getLogId(), queryParams);
             taskLog.setRunEndTime(new Date());
             dataPacket.setNextRunTime(new Date());
             String two = "2";

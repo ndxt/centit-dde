@@ -18,6 +18,7 @@ import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
+import com.centit.support.json.JSONTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -72,7 +73,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     public void init() {
         allOperations.put("start", BuiltInOperation::runStart);
         allOperations.put("scheduling", BuiltInOperation::runStart);
-        allOperations.put("recuestbody",BuiltInOperation::runRequestBody);
+        allOperations.put("recuestbody", BuiltInOperation::runRequestBody);
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
         allOperations.put("append", BuiltInOperation::runAppend);
@@ -126,21 +127,35 @@ public class BizOptFlowImpl implements BizOptFlow {
         return null;
     }
 
+    private Object returnResult(BizModel bizModel, JSONObject stepJson) {
+        String type = BuiltInOperation.getJsonFieldString(stepJson, "config", "D");
+        String path=BuiltInOperation.getJsonFieldString(stepJson, "path", "D");
+        switch (type) {
+            case "A":
+                return bizModel.fetchDataSetByName(path);
+            case "J":
+                return JSONTransformer.transformer(path,new BizModelJSONTransform(bizModel));
+            case "W":
+                return bizModel;
+            default:return bizModel;
+        }
+    }
+
     @Override
-    public BizModel run(JSONObject bizOptJson, String logId, Map<String, Object> queryParams) {
+    public Object run(JSONObject bizOptJson, String logId, Map<String, Object> queryParams) {
         DataOptDescJson dataOptDescJson = new DataOptDescJson(bizOptJson);
         JSONObject stepJson = dataOptDescJson.getStartStep();
         if (stepJson == null) {
             writeLog(logId, "error", "没有start节点");
             return null;
         }
-        SimpleBizModel bizModel = BizModel.EMPTY_BIZ_MODEL;
+        SimpleBizModel bizModel = new SimpleBizModel(logId);
         bizModel.setModelTag(queryParams);
         while (stepJson != null) {
             String stepId = stepJson.getString("id");
             String stepType = stepJson.getString("type");
-            if ("return".equals(stepType)) {
-                return bizModel;
+            if ("results".equals(stepType)) {
+                return returnResult(bizModel, stepJson);
             }
             if ("branch".equals(stepType)) {
                 stepJson = getBatchStep(bizModel, dataOptDescJson, stepId);
@@ -148,9 +163,9 @@ public class BizOptFlowImpl implements BizOptFlow {
             if (stepJson != null) {
                 runOneStep(bizModel, stepJson, logId);
             }
-            if("scheduling".equals(stepType)){
+            if ("scheduling".equals(stepType)) {
                 DataPacket dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
-                run(dataPacket.getDataOptDescJson(),logId,queryParams);
+                run(dataPacket.getDataOptDescJson(), logId, queryParams);
             }
             stepJson = dataOptDescJson.getNextStep(stepId);
         }
@@ -190,7 +205,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             TaskDetailLog detailLog = new TaskDetailLog();
             if (logId != null) {
                 String processName = bizOptJson.getString("processName");
-                if(StringBaseOpt.isNvl(processName)){
+                if (StringBaseOpt.isNvl(processName)) {
                     processName = bizOptJson.getString("nodeName");
                 }
                 detailLog = writeLog(logId, sOptType + ":" + processName, "");
