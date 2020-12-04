@@ -72,8 +72,8 @@ public class BizOptFlowImpl implements BizOptFlow {
     @PostConstruct
     public void init() {
         allOperations.put("start", BuiltInOperation::runStart);
-        allOperations.put("scheduling", BuiltInOperation::runStart);
-        allOperations.put("recuestbody", BuiltInOperation::runRequestBody);
+        allOperations.put("sche", BuiltInOperation::runStart);
+        allOperations.put("resBody", BuiltInOperation::runRequestBody);
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
         allOperations.put("append", BuiltInOperation::runAppend);
@@ -88,7 +88,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("check", BuiltInOperation::runCheckData);
         allOperations.put("static", BuiltInOperation::runStaticData);
         allOperations.put("http", BuiltInOperation::runHttpData);
-        allOperations.put("clearcache", BuiltInOperation::runClear);
+        allOperations.put("clear", BuiltInOperation::runClear);
         JSBizOperation jsBizOperation = new JSBizOperation(metaObjectService,
             databaseRunTime);
         allOperations.put("js", jsBizOperation);
@@ -96,15 +96,17 @@ public class BizOptFlowImpl implements BizOptFlow {
             path, integrationEnvironment, metaDataService);
         allOperations.put("persistence", databaseOperation);
         DBBizOperation dbBizOperation = new DBBizOperation(integrationEnvironment);
-        allOperations.put("obtain-database", dbBizOperation);
+        allOperations.put("database", dbBizOperation);
         ExcelBizOperation excelBizOperation = new ExcelBizOperation(fileStore);
-        allOperations.put("obtain-excel", excelBizOperation);
+        allOperations.put("excel", excelBizOperation);
         CsvBizOperation csvBizOperation = new CsvBizOperation(fileStore);
-        allOperations.put("obtain-csv", csvBizOperation);
+        allOperations.put("csv", csvBizOperation);
         JsonBizOperation jsonBizOperation = new JsonBizOperation(fileStore);
-        allOperations.put("obtain-json", jsonBizOperation);
+        allOperations.put("json", jsonBizOperation);
         HttpBizOperation httpBizOperation = new HttpBizOperation();
-        allOperations.put("obtain-http", httpBizOperation);
+        allOperations.put("htts", httpBizOperation);
+        //Todo
+        //格式文书allOperations.put("SSD",);
     }
 
     @Override
@@ -128,14 +130,17 @@ public class BizOptFlowImpl implements BizOptFlow {
     }
 
     private Object returnResult(BizModel bizModel, JSONObject stepJson) {
-        String type = BuiltInOperation.getJsonFieldString(stepJson, "config", "D");
-        String path=BuiltInOperation.getJsonFieldString(stepJson, "path", "D");
+        String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
+        String path="";
         switch (type) {
-            case "A":
+            case "2":return "ok";
+            case "3":
+                path=BuiltInOperation.getJsonFieldString(stepJson, "source", "D");
                 return bizModel.fetchDataSetByName(path);
-            case "J":
+            case "4":
+                path=BuiltInOperation.getJsonFieldString(stepJson, "textarea", "D");
                 return JSONTransformer.transformer(path,new BizModelJSONTransform(bizModel));
-            case "W":
+            case "5":
                 return bizModel;
             default:return bizModel;
         }
@@ -163,7 +168,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             if (stepJson != null) {
                 runOneStep(bizModel, stepJson, logId);
             }
-            if ("scheduling".equals(stepType)) {
+            if ("sche".equals(stepType)) {
                 DataPacket dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
                 run(dataPacket.getDataOptDescJson(), logId, queryParams);
             }

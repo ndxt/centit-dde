@@ -84,12 +84,19 @@ public abstract class DataSetOptUtil {
      * @param formula 逻辑表达式
      * @return 新的数据集
      */
-    public static DataSet filterDateSet(DataSet inData, String formula) {
+    public static DataSet filterDateSet(DataSet inData, Map<String,String> formulas) {
         List<Map<String, Object>> data = inData.getDataAsList();
         List<Map<String, Object>> newData = new ArrayList<>(data.size());
         for (Map<String, Object> obj : data) {
-            if (BooleanBaseOpt.castObjectToBoolean(
-                VariableFormula.calculate(formula, obj), false)) {
+            boolean canAdd=true;
+            for(String formula:formulas.values()) {
+                if (!BooleanBaseOpt.castObjectToBoolean(
+                    VariableFormula.calculate(formula, obj), false)) {
+                    canAdd=false;
+                    break;
+                }
+            }
+            if(canAdd){
                 newData.add(obj);
             }
         }

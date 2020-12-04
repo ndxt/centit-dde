@@ -71,14 +71,18 @@ public class DataPacket implements Serializable {
     private Integer bufferFreshPeriod;
 
     @Column(name = "RECORDER")
-    @ApiModelProperty(value = "修改人", hidden = true)
+    @ApiModelProperty(value = "创建人", hidden = true)
     @DictionaryMap(fieldName = "recorderName", value = "userCode")
     private String recorder;
 
     @Column(name = "RECORD_DATE")
-    @ApiModelProperty(value = "修改时间", hidden = true)
+    @ApiModelProperty(value = "创建时间", hidden = true)
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date recordDate;
+    @Column(name = "UPDATE_DATE")
+    @ApiModelProperty(value = "修改时间", hidden = true)
+    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
+    private Date updateDate;
 
     @ApiModelProperty(value = "业务模块代码")
     @Column(name = "APPLICATION_ID")

@@ -63,7 +63,7 @@ public class BuiltInOperation {
 
     public static JSONObject runMap(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        String targetDsName = getJsonFieldString(bizOptJson, "target", sourDsName);
+        String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
         Object mapInfo = jsonArrayToMap(bizOptJson.get("config"), "columnName", "paramValidateRegex");
         int count = 0;
         if (mapInfo instanceof Map) {
@@ -78,8 +78,8 @@ public class BuiltInOperation {
     }
 
     public static JSONObject runAppend(BizModel bizModel, JSONObject bizOptJson) {
-        String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        Object mapInfo = jsonArrayToMap(bizOptJson.get("config"), "columnName", "paramValidateRegex");
+        String sourDsName =getJsonFieldString((JSONObject) bizOptJson.get("source"),"value",bizModel.getModelName());
+        Object mapInfo = jsonArrayToMap(bizOptJson.get("config"), "columnName", "expression");
         int count = 0;
         if (mapInfo instanceof Map) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
@@ -93,13 +93,13 @@ public class BuiltInOperation {
 
     public static JSONObject runFilter(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        String targetDsName = getJsonFieldString(bizOptJson, "target", sourDsName);
-        String formula = bizOptJson.getString("filter");
+        String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
+        Object formula = jsonArrayToMap(bizOptJson.get("config"), "columnName", "paramValidateRegex");;
         int count = 0;
-        if (StringUtils.isNotBlank(formula)) {
+        if (formula!=null) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
             if (dataSet != null) {
-                DataSet destDs = DataSetOptUtil.filterDateSet(dataSet, formula);
+                DataSet destDs = DataSetOptUtil.filterDateSet(dataSet, (Map<String, String>) formula);
                 count = destDs.size();
                 bizModel.putDataSet(targetDsName, destDs);
             }
@@ -109,7 +109,7 @@ public class BuiltInOperation {
 
     public static JSONObject runStat(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        String targetDsName = getJsonFieldString(bizOptJson, "target", sourDsName);
+        String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
         Object groupBy = bizOptJson.get("groupBy");
         List<String> groupFields = StringBaseOpt.objectToStringList(groupBy);
         Object stat = bizOptJson.get("fieldsMap");
@@ -127,7 +127,7 @@ public class BuiltInOperation {
 
     public static JSONObject runAnalyse(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        String targetDsName = getJsonFieldString(bizOptJson, "target", sourDsName);
+        String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
         Object orderBy = bizOptJson.get("orderBy");
         List<String> orderFields = StringBaseOpt.objectToStringList(orderBy);
         Object groupBy = bizOptJson.get("groupBy");
@@ -148,7 +148,7 @@ public class BuiltInOperation {
 
     public static JSONObject runCross(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        String targetDsName = getJsonFieldString(bizOptJson, "target", sourDsName);
+        String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
         Object rowHeader = bizOptJson.get("rowHeader");
         List<String> rows = StringBaseOpt.objectToStringList(rowHeader);
         Object colHeader = bizOptJson.get("colHeader");
@@ -170,7 +170,7 @@ public class BuiltInOperation {
             return getJsonObject(0);
         }
 
-        String targetDsName = getJsonFieldString(bizOptJson, "target", bizModel.getModelName());
+        String targetDsName = getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         Object primaryKey = bizOptJson.get("primaryKey");
         Object analyse = bizOptJson.get("fieldsMap");
         List<String> pks = StringBaseOpt.objectToStringList(primaryKey);
@@ -220,14 +220,14 @@ public class BuiltInOperation {
         DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
         DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
         DataSet destDs = DataSetOptUtil.unionTwoDataSet(dataSet, dataSet2);
-        bizModel.putDataSet(getJsonFieldString(bizOptJson, "target", bizModel.getModelName()), destDs);
+        bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
         return getJsonObject(destDs.size());
     }
 
     public static JSONObject runStaticData(BizModel bizModel, JSONObject bizOptJson) {
         JSONArray ja = bizOptJson.getJSONArray("data");
         DataSet destDS = BizOptUtils.castObjectToDataSet(ja);
-        bizModel.putDataSet(getJsonFieldString(bizOptJson, "target", bizModel.getModelName()), destDS);
+        bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDS);
         return getJsonObject(destDS.size());
     }
 
@@ -237,7 +237,7 @@ public class BuiltInOperation {
         if (sour1DsName == null || sour2DsName == null) {
             return getJsonObject(0);
         }
-        String targetDsName = getJsonFieldString(bizOptJson, "target", bizModel.getModelName());
+        String targetDsName = getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         Object primaryKey = bizOptJson.get("primaryKey");
         List<String> pks = StringBaseOpt.objectToStringList(primaryKey);
         String formula = bizOptJson.getString("filter");
