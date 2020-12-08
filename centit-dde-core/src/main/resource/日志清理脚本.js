@@ -4,7 +4,13 @@ function runOpt(eventRuntime, entity) {
   return 0;
 }
 //传入requestbody保存到表
-function runOpt(eventRuntime, bimodel) {
-  eventRuntime.metaObjectService.saveObject('oe27nPnuQ5qJ4CdlXQ7UDQ',bimodel.fetchDataSetByName('requestBody').getFirstRow());
+function runOpt(eventRuntime, bizmodel) {
+  eventRuntime.metaObjectService.saveObject('oe27nPnuQ5qJ4CdlXQ7UDQ',bizmodel.fetchDataSetByName('requestBody').getFirstRow());
   return 0;
+}
+function runOpt(eventRuntime, bizmodel) {
+  var map = new java.util.HashMap();
+  var size1=bizmodel.fetchDataSetByName('databaseA024a0222').size();
+  map.put('size',size1);
+  return map;
 }

@@ -64,7 +64,7 @@ public class BuiltInOperation {
     public static JSONObject runMap(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
-        Object mapInfo = jsonArrayToMap(bizOptJson.get("config"), "columnName", "paramValidateRegex");
+        Object mapInfo = jsonArrayToMap(bizOptJson.get("config"), "columnName", "expression");
         int count = 0;
         if (mapInfo instanceof Map) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);

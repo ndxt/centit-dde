@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +38,10 @@ public class DataOptDescJson {
                 if (nextNodes != null) {
                     nextNodes.add(linkJson);
                 } else {
+                    List<JSONObject> jsonObjects= new ArrayList<>();
+                    jsonObjects.add(linkJson);
                     linkMap.put(linkJson.getString("sourceId"),
-                        CollectionsOpt.createList(linkJson));
+                        jsonObjects);
                 }
             }
         }

@@ -34,8 +34,8 @@ public class JSBizOperation implements BizOperation {
     public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
         JSRuntimeContext /*JsMateObjectEventRuntime*/ jsRuntimeContext = new JSRuntimeContext();
 
-        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", "js");
-        String javaScript = BuiltInOperation.getJsonFieldString(bizOptJson, "value", "");
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", "js");
+        String javaScript = BuiltInOperation.getJsonFieldString(bizOptJson, "valuejs", "");
         if (StringUtils.isNotBlank(javaScript)) {
             jsRuntimeContext.compileScript(javaScript);
         }
@@ -46,7 +46,9 @@ public class JSBizOperation implements BizOperation {
             ConnectThreadHolder.commitAndRelease();
             bizModel.putDataSet(targetDsName,
                 BizOptUtils.castObjectToDataSet(object));
-            count=bizModel.fetchDataSetByName(targetDsName).size();
+            if(object!=null) {
+                count = bizModel.fetchDataSetByName(targetDsName).size();
+            }
         } catch (ScriptException | NoSuchMethodException | SQLException e) {
             logger.error(e.getLocalizedMessage());
         }

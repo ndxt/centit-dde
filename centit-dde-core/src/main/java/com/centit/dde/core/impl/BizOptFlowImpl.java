@@ -19,6 +19,7 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
+import org.apache.tools.ant.taskdefs.Java;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -121,9 +122,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         List<JSONObject> linksJson = dataOptDescJson.getNextLinks(stepId);
         for (JSONObject jsonObject : linksJson) {
             if (BooleanBaseOpt.castObjectToBoolean(
-                VariableFormula.calculate(jsonObject.getString("rule"),
+                VariableFormula.calculate(jsonObject.getString("expression"),
                     new BizModelJSONTransform(bizModel)), false)) {
-                return jsonObject;
+                return dataOptDescJson.getOptStep(jsonObject.getString("targetId"));
             }
         }
         return null;
