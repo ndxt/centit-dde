@@ -28,6 +28,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         value = org.springframework.stereotype.Controller.class))
 @Configuration
 
+
 public class ServiceConfig {
 
     @Value("${app.home:./}")
