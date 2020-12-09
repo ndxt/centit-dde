@@ -18,7 +18,7 @@ public abstract class CheckRuleUtils {
 
 
     private static Object getObjectProperty(Map<String, Object> object, CheckRule rule) {
-        return object.get(rule.getField());
+        return object.get(rule.getColumnname());
     }
 
 
@@ -28,8 +28,8 @@ public abstract class CheckRuleUtils {
             return true;
         }
         int dataLen = StringBaseOpt.castObjectToString(data).length();
-        return dataLen >= NumberBaseOpt.castObjectToInteger(rule.getMin(), 0)
-            && dataLen <= NumberBaseOpt.castObjectToInteger(rule.getMax(), 0);
+        return dataLen >= NumberBaseOpt.castObjectToInteger(rule.getFmin(), 0)
+            && dataLen <= NumberBaseOpt.castObjectToInteger(rule.getFmax(), 0);
     }
 
     private static boolean checkMinLength(Map<String, Object> object, CheckRule rule) {
@@ -129,20 +129,20 @@ public abstract class CheckRuleUtils {
         if (data == null) {
             return true;
         }
-        return Pattern.matches(rule.getExpression(),
+        return Pattern.matches(rule.getDformulainfo(),
             StringBaseOpt.castObjectToString(data));
     }
 
     private static boolean checkFormula(Map<String, Object> object, CheckRule rule) {
         return BooleanBaseOpt.castObjectToBoolean(
-            VariableFormula.calculate(rule.getExpression(), object), false);
+            VariableFormula.calculate(rule.getDformulainfo(), object), false);
     }
 
     public static boolean checkData(Map<String, Object> object, CheckRule rule) {
-        if (StringUtils.isBlank(rule.getType())) {
+        if (StringUtils.isBlank(rule.getTypes())) {
             return true;
         }
-        switch (rule.getType().toLowerCase()) {
+        switch (rule.getTypes().toLowerCase()) {
             case "length":
                 return checkDataLength(object, rule);
             case "minlength":

@@ -109,7 +109,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         HttpBizOperation httpBizOperation = new HttpBizOperation();
         allOperations.put("htts", httpBizOperation);
         RunSqlSBizOperation runsqlsbizoperation = new RunSqlSBizOperation(databaseRunTime);
-        allOperations.put("sqls", runsqlsbizoperation);
+        allOperations.put("sqlS", runsqlsbizoperation);
         //Todo
         //格式文书allOperations.put("SSD",);
     }
