@@ -3,6 +3,7 @@ package com.centit.dde.core;
 import com.centit.support.algorithm.CollectionsOpt;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -68,6 +69,13 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
         if(this.data instanceof Map){
             return "R"; // 标量数据 S(scalar)
         }
+
+        Class<?> clazz = this.data.getClass();
+        if (clazz.isArray() && !(this.data instanceof byte[])
+            && !(this.data instanceof char[])) {
+            return "T";
+        }
+
         return "S"; //单个数据记录 R(row)
     }
 
@@ -103,9 +111,18 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
             return objList;
         }
 
-        /*if(this.data instanceof Map){
-            return CollectionsOpt.createList((Map<String, Object>)this.data);
-        }*/
+        Class<?> clazz = this.data.getClass();
+        if (clazz.isArray() && !(this.data instanceof byte[])
+                && !(this.data instanceof char[])) {
+            int len = Array.getLength(this.data);
+            if(len>0) {
+                List<Map<String, Object>> objList = new ArrayList<>(len);
+                for(int i=0;i<len;i++) {
+                    objList.add(CollectionsOpt.objectToMap(Array.get(this.data, i)));
+                }
+            }
+        }
+
         return CollectionsOpt.createList(CollectionsOpt.objectToMap(this.data));
     }
 
