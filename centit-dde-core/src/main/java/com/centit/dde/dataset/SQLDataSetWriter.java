@@ -19,8 +19,9 @@ import java.util.Map;
 /**
  * 数据库数据集 读取和写入类
  * 需要设置的参数有：
- *      数据库连接信息 DatabaseInfo
- *      对应的表信息 SimpleTableInfo
+ * 数据库连接信息 DatabaseInfo
+ * 对应的表信息 SimpleTableInfo
+ *
  * @author zhf
  */
 @Data
@@ -34,6 +35,7 @@ public class SQLDataSetWriter implements DataSetWriter {
     private int successNums;
     private int errorNums;
     private String info;
+
     public Map getFieldsMap() {
         return fieldsMap;
     }
@@ -44,68 +46,71 @@ public class SQLDataSetWriter implements DataSetWriter {
 
 
     private Connection connection;
-    /** true 数据集整体作为一个事务写入
+    /**
+     * true 数据集整体作为一个事务写入
      * false 数据集每一条作为一个事物写入
      * 默认为true 主要式为了效率考虑
      */
     private boolean saveAsWhole;
 
-    public SQLDataSetWriter(){
+    public SQLDataSetWriter() {
         saveAsWhole = true;
         connection = null;
     }
 
-    public SQLDataSetWriter(DataSourceDescription dataSource, TableInfo tableInfo){
+    public SQLDataSetWriter(DataSourceDescription dataSource, TableInfo tableInfo) {
         this.saveAsWhole = true;
         this.connection = null;
         this.tableInfo = tableInfo;
         this.dataSource = dataSource;
     }
 
-    public SQLDataSetWriter(Connection connection, TableInfo tableInfo){
+    public SQLDataSetWriter(Connection connection, TableInfo tableInfo) {
         this.saveAsWhole = true;
         this.connection = connection;
         this.tableInfo = tableInfo;
     }
 
-    private void fetchConnect(){
+    private void fetchConnect() {
         try {
             connection = DbcpConnectPools.getDbcpConnect(dataSource);
         } catch (SQLException e) {
             throw new ObjectException(PersistenceException.DATABASE_OPERATE_EXCEPTION, e);
         }
     }
+
     /**
      * 将 dataSet 数据集 持久化
+     *
      * @param dataSet 数据集
      */
     @Override
     public void save(DataSet dataSet) {
-        if(this.saveAsWhole) {
+        if (this.saveAsWhole) {
             try {
                 if (connection == null) {
                     TransactionHandler.executeInTransaction(dataSource,
                         (conn) -> DBBatchUtils.batchInsertObjects(conn,
-                            tableInfo, dataSet.getDataAsList(),fieldsMap));
+                            tableInfo, dataSet.getDataAsList(), fieldsMap));
                 } else {
                     TransactionHandler.executeInTransaction(connection,
                         (conn) -> DBBatchUtils.batchInsertObjects(conn,
-                            tableInfo, dataSet.getDataAsList(),fieldsMap));
+                            tableInfo, dataSet.getDataAsList(), fieldsMap));
                 }
-                successNums=0;
-                errorNums=0;
-                info="ok";
-                for(Map<String, Object> row : dataSet.getDataAsList()){
+                successNums = 0;
+                errorNums = 0;
+                info = "ok";
+                for (Map<String, Object> row : dataSet.getDataAsList()) {
                     dealResultMsg(row);
                     successNums++;
                 }
             } catch (SQLException e) {
                 logger.error(e.getLocalizedMessage());
-                successNums=0;
-                errorNums=0;
-                info=e.getMessage();
-                for(Map<String, Object> row : dataSet.getDataAsList()){
-                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG),e.getMessage());
+                successNums = 0;
+                errorNums = 0;
+                info = e.getMessage();
+                for (Map<String, Object> row : dataSet.getDataAsList()) {
+                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
                     errorNums++;
                 }
             }
@@ -116,29 +121,34 @@ public class SQLDataSetWriter implements DataSetWriter {
                 fetchConnect();
                 createConn = true;
             }
-            successNums=0;
-            errorNums=0;
-            info="ok";
+            successNums = 0;
+            errorNums = 0;
+            info = "ok";
 
-            for(Map<String, Object> row : dataSet.getDataAsList()){
-                List<Map<String,Object>> list=new ArrayList<>();
+            for (Map<String, Object> row : dataSet.getDataAsList()) {
+                List<Map<String, Object>> list = new ArrayList<>();
                 list.add(row);
                 try {
-                    TransactionHandler.executeInTransaction(connection,
+                    int iResult = TransactionHandler.executeInTransaction(connection,
                         (conn) -> DBBatchUtils.batchInsertObjects(conn,
                             tableInfo, list, fieldsMap));
-                    dealResultMsg(row);
-                    successNums++;
+                    if (iResult > 0) {
+                        dealResultMsg(row);
+                        successNums++;
+                    } else {
+                        row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "执行无结果"+iResult);
+                        errorNums++;
+                    }
                 } catch (SQLException e) {
-                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG),e.getMessage());
+                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
                     errorNums++;
-                    if((info.length()+e.getMessage().length())<=2000) {
-                        info= info.concat(e.getMessage());
+                    if ((info.length() + e.getMessage().length()) <= 2000) {
+                        info = info.concat(e.getMessage());
                     }
                 }
             }
 
-            if(createConn){
+            if (createConn) {
                 DbcpConnectPools.closeConnect(connection);
             }
         }
@@ -153,30 +163,30 @@ public class SQLDataSetWriter implements DataSetWriter {
     @Override
     public void merge(DataSet dataSet) {
 
-        if(this.saveAsWhole) {
+        if (this.saveAsWhole) {
             try {
                 if (connection == null) {
                     TransactionHandler.executeInTransaction(dataSource,
                         (conn) -> DBBatchUtils.batchMergeObjects(conn,
-                            tableInfo, dataSet.getDataAsList(),fieldsMap));
+                            tableInfo, dataSet.getDataAsList(), fieldsMap));
                 } else {
                     TransactionHandler.executeInTransaction(connection,
                         (conn) -> DBBatchUtils.batchMergeObjects(conn,
-                            tableInfo, dataSet.getDataAsList(),fieldsMap));
+                            tableInfo, dataSet.getDataAsList(), fieldsMap));
                 }
-                successNums=0;
-                errorNums=0;
-                info="ok";
-                for(Map<String, Object> row : dataSet.getDataAsList()){
+                successNums = 0;
+                errorNums = 0;
+                info = "ok";
+                for (Map<String, Object> row : dataSet.getDataAsList()) {
                     dealResultMsg(row);
                     successNums++;
                 }
             } catch (SQLException e) {
                 logger.error(e.getLocalizedMessage());
-                successNums=0;
-                errorNums=0;
-                info=e.getMessage();
-                for(Map<String, Object> row : dataSet.getDataAsList()){
+                successNums = 0;
+                errorNums = 0;
+                info = e.getMessage();
+                for (Map<String, Object> row : dataSet.getDataAsList()) {
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
                     errorNums++;
                 }
@@ -187,28 +197,33 @@ public class SQLDataSetWriter implements DataSetWriter {
                 fetchConnect();
                 createConn = true;
             }
-            successNums=0;
-            errorNums=0;
-            info="ok";
-            for(Map<String, Object> row : dataSet.getDataAsList()){
-                List<Map<String,Object>> list=new ArrayList<>();
+            successNums = 0;
+            errorNums = 0;
+            info = "ok";
+            for (Map<String, Object> row : dataSet.getDataAsList()) {
+                List<Map<String, Object>> list = new ArrayList<>();
                 list.add(row);
                 try {
-                    TransactionHandler.executeInTransaction(dataSource,
+                    int iResult=TransactionHandler.executeInTransaction(dataSource,
                         (conn) -> DBBatchUtils.batchMergeObjects(conn,
                             tableInfo, list, fieldsMap));
-                    dealResultMsg(row);
-                    successNums++;
+                    if (iResult > 0) {
+                        dealResultMsg(row);
+                        successNums++;
+                    } else {
+                        row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "执行无结果"+iResult);
+                        errorNums++;
+                    }
                 } catch (SQLException | ObjectException e) {
                     row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
                     errorNums++;
-                    if((info.length()+e.getMessage().length())<=2000) {
-                        info= info.concat(e.getMessage());
+                    if ((info.length() + e.getMessage().length()) <= 2000) {
+                        info = info.concat(e.getMessage());
                     }
                 }
             }
 
-            if(createConn){
+            if (createConn) {
                 DbcpConnectPools.closeConnect(connection);
             }
         }
@@ -217,7 +232,7 @@ public class SQLDataSetWriter implements DataSetWriter {
     private void dealResultMsg(Map<String, Object> row) {
 //        String msg = (String) row.get(FieldType.mapPropName(WRITER_ERROR_TAG));
 //        if (msg == null || msg.length() < 3) {
-            row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "ok");
+        row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "ok");
 //        }
     }
 

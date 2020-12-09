@@ -1,5 +1,6 @@
 package com.centit.dde.core.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.*;
@@ -75,6 +76,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("start", BuiltInOperation::runStart);
         allOperations.put("sche", BuiltInOperation::runStart);
         allOperations.put("resBody", BuiltInOperation::runRequestBody);
+        allOperations.put("resFile", BuiltInOperation::runRequestFile);
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
         allOperations.put("append", BuiltInOperation::runAppend);
@@ -106,8 +108,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("json", jsonBizOperation);
         HttpBizOperation httpBizOperation = new HttpBizOperation();
         allOperations.put("htts", httpBizOperation);
-        RunSqlSBizOperation runSqlSBizOperation =new RunSqlSBizOperation(databaseRunTime);
-        allOperations.put("sqls",runSqlSBizOperation);
+        RunSqlSBizOperation runsqlsbizoperation = new RunSqlSBizOperation(databaseRunTime);
+        allOperations.put("sqls", runsqlsbizoperation);
         //Todo
         //格式文书allOperations.put("SSD",);
     }
@@ -134,18 +136,21 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     private Object returnResult(BizModel bizModel, JSONObject stepJson) {
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
-        String path="";
+        String path;
         switch (type) {
-            case "2":return "ok";
+            case "2":
+                return "ok";
             case "3":
-                path=BuiltInOperation.getJsonFieldString(stepJson, "source", "D");
+                path = BuiltInOperation.getJsonFieldString(stepJson, "source", "D");
                 return bizModel.fetchDataSetByName(path);
             case "4":
-                path=BuiltInOperation.getJsonFieldString(stepJson, "textarea", "D");
-                return JSONTransformer.transformer(path,new BizModelJSONTransform(bizModel));
+                path = BuiltInOperation.getJsonFieldString(stepJson, "textarea", "D");
+                return JSONTransformer.transformer(
+                    JSON.parse(path), new BizModelJSONTransform(bizModel));
             case "5":
                 return bizModel;
-            default:return bizModel;
+            default:
+                return bizModel;
         }
     }
 
@@ -173,6 +178,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             }
             if ("sche".equals(stepType)) {
                 DataPacket dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
+                queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "primaryKey1", "primaryKey2"));
                 run(dataPacket.getDataOptDescJson(), logId, queryParams);
             }
             stepJson = dataOptDescJson.getNextStep(stepId);
@@ -234,7 +240,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
     }
 
-    protected void debugOneStep(BizModel bizModel, JSONObject bizOptJson) {
+    private void debugOneStep(BizModel bizModel, JSONObject bizOptJson) {
         String sOptType = bizOptJson.getString("operation");
         BizOperation opt = allOperations.get(sOptType);
         if (opt != null) {
