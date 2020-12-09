@@ -28,7 +28,7 @@
         <common.module.version>1.1-SNAPSHOT</common.module.version>
 	</properties>
 
-    <description> 数据交换工具，分三部分，一个控制台，一个数据交换程序 和 一个调用交换服务的客户端
+    <description> 数据处理平台（data dispose engine），分两部分，一个控制台，一个数据处理程序
     </description>
     <url>https://github.com/ndxt/centit-dde</url>
 
