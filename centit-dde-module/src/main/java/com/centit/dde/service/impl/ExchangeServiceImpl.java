@@ -21,6 +21,6 @@ public class ExchangeServiceImpl implements ExchangeService {
 //    @Async
     @Override
     public Object runTask(String packetId,Map<String, Object> queryParams) {
-        return taskRun.runTask(packetId,queryParams);
+        return taskRun.runTask(packetId, queryParams);
     }
 }

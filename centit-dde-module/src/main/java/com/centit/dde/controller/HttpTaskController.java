@@ -45,12 +45,16 @@ public class HttpTaskController extends BaseController {
     @PostMapping(value = "/runPost/{packetId}")
     @ApiOperation(value = "立即执行任务Post")
     public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
-                            HttpServletResponse response,
-                            @RequestBody String jsonString) {
+                            HttpServletResponse response/*,
+                            @RequestBody String jsonString*/) {
         // 将request中的参数传入 运行上下文
-        Map<String, Object> queryParams=collectRequestParameters(request);
-        queryParams.put("requestBody",JSON.parse(jsonString));
-        Object bizModel=exchangeService.runTask(packetId,queryParams);
+        //获取 http post的数据
+        //WebOptUtils.getRequestBody(request)
+        //获取上传文件
+        //UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request);
+        Map<String, Object> queryParams = collectRequestParameters(request);
+        queryParams.put("request", request);
+        Object bizModel=exchangeService.runTask(packetId, queryParams);
         JsonResultUtils.writeSingleDataJson(bizModel,response);
     }
 
