@@ -3,14 +3,13 @@ package com.centit.dde.agent.service;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.support.quartz.AbstractQuartzJob;
-import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 
 /**
  * @author zhf
  */
-@DisallowConcurrentExecution
+//@DisallowConcurrentExecution
 public class RunTaskJob extends AbstractQuartzJob {
     private DataPacket dataPacket;
 
