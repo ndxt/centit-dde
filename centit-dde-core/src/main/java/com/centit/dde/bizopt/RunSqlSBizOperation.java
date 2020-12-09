@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -7,9 +8,11 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.support.database.transaction.ConnectThreadHolder;
 import com.centit.support.database.utils.QueryAndNamedParams;
+import com.centit.support.database.utils.QueryAndParams;
 import com.centit.support.database.utils.QueryUtils;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,20 +26,23 @@ public class RunSqlSBizOperation implements BizOperation {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
-        Map<String,String> mapInfo = (Map<String, String>) BuiltInOperation.jsonArrayToMap(bizOptJson.get("config"), "columnName", "expression");
-        AtomicInteger count= new AtomicInteger();
-        try {
-            mapInfo.forEach((k,v)-> {
-                QueryAndNamedParams qap = QueryUtils.translateQuery(v, new BizModelJSONTransform(bizModel));
-                count.addAndGet(databaseRunTime.execute(k, qap.getQuery()));
+        JSONArray jsonArray=bizOptJson.getJSONArray("config");
+        if(jsonArray!=null) {
+            int count = 0;
+            try {
+                for(Object object:bizOptJson.getJSONArray("config")){
+                    JSONObject jsonObject=(JSONObject)object;
+                    QueryAndNamedParams qap = QueryUtils.translateQuery(jsonObject.getString(""), new BizModelJSONTransform(bizModel));
+                    QueryAndParams q = QueryAndParams.createFromQueryAndNamedParams(qap);
+                    count+=databaseRunTime.execute(jsonObject.getString(""), q.getQuery(), q.getParams());
                 }
-            );
-            ConnectThreadHolder.commitAndRelease();
-        } catch (SQLException e) {
-            e.printStackTrace();
+                ConnectThreadHolder.commitAndRelease();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return BuiltInOperation.getJsonObject(count);
         }
-        return BuiltInOperation.getJsonObject(count.get());
+        return BuiltInOperation.getJsonObject(0);
     }
 }

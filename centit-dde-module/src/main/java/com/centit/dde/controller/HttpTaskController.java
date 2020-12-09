@@ -3,7 +3,9 @@ package com.centit.dde.controller;
 import com.alibaba.fastjson.JSON;
 import com.centit.dde.service.ExchangeService;
 import com.centit.dde.services.DataPacketService;
+import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 
 @Api(value = "Http触发任务响应", tags = "Http触发任务响应")
@@ -45,13 +48,7 @@ public class HttpTaskController extends BaseController {
     @PostMapping(value = "/runPost/{packetId}")
     @ApiOperation(value = "立即执行任务Post")
     public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
-                            HttpServletResponse response/*,
-                            @RequestBody String jsonString*/) {
-        // 将request中的参数传入 运行上下文
-        //获取 http post的数据
-        //WebOptUtils.getRequestBody(request)
-        //获取上传文件
-        //UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request);
+                            HttpServletResponse response){
         Map<String, Object> queryParams = collectRequestParameters(request);
         queryParams.put("request", request);
         Object bizModel=exchangeService.runTask(packetId, queryParams);

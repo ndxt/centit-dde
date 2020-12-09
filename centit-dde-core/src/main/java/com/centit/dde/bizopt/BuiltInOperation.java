@@ -5,23 +5,21 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.datarule.CheckRule;
-import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.appclient.AppSession;
 import com.centit.framework.appclient.RestfulHttpRequest;
-import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.database.transaction.ConnectThreadHolder;
-import com.centit.support.database.utils.DatabaseAccess;
-import com.centit.support.database.utils.DbcpConnectPools;
-import com.centit.support.database.utils.QueryAndNamedParams;
-import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.sql.SQLException;
-import java.util.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 数据持久化操作
@@ -46,10 +44,10 @@ public class BuiltInOperation {
         return map;
     }
 
-    public static Object jsonArrayToMap(Object json, String key, String value) {
-        if (json instanceof JSONArray) {
-            Map<String, String> map = new HashMap<>(((JSONArray) json).size());
-            for (Object o : (JSONArray) json) {
+    public static Map<String, String> jsonArrayToMap(JSONArray json, String key, String value) {
+        if (json != null) {
+            Map<String, String> map = new HashMap<>(json.size());
+            for (Object o : json) {
                 JSONObject temp = (JSONObject) o;
                 if (!StringBaseOpt.isNvl(temp.getString(key))) {
                     map.put(temp.getString(key), temp.getString(value));
@@ -57,27 +55,51 @@ public class BuiltInOperation {
             }
             return map;
         }
-        return json;
+        return null;
+    }
+
+    private static List<String> jsonArrayToList(JSONArray json, String key, String value, String compare) {
+        if (json != null) {
+            List<String> list = new ArrayList<>(json.size());
+            for (Object o : json) {
+                JSONObject temp = (JSONObject) o;
+                if (!StringBaseOpt.isNvl(temp.getString(key))) {
+                    if (compare.equalsIgnoreCase(temp.getString(value))) {
+                        list.add(temp.getString(key) + " " + temp.getString(value));
+                    } else {
+                        list.add(temp.getString(key));
+                    }
+                }
+            }
+            return list;
+        }
+        return null;
     }
 
     public static JSONObject runStart(BizModel bizModel, JSONObject bizOptJson) {
         return getJsonObject(0);
     }
+
     public static JSONObject runRequestBody(BizModel bizModel, JSONObject bizOptJson) {
-        DataSet destDs =BizOptUtils.castObjectToDataSet(bizModel.getModelTag().get("requestBody"));
-        bizModel.putDataSet("requestBody",destDs);
+        DataSet destDs = BizOptUtils.castObjectToDataSet(WebOptUtils.getRequestBody((HttpServletRequest)bizModel.getModelTag().get("request")));
+        bizModel.putDataSet("requestBody", destDs);
+        return getJsonObject(destDs.size());
+    }
+    public static JSONObject runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
+        DataSet destDs = BizOptUtils.castObjectToDataSet(UploadDownloadUtils.fetchInputStreamFromMultipartResolver((HttpServletRequest)bizModel.getModelTag().get("request")));
+        bizModel.putDataSet("requestFile", destDs);
         return getJsonObject(destDs.size());
     }
 
     public static JSONObject runMap(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
-        Object mapInfo = jsonArrayToMap(bizOptJson.get("config"), "columnName", "expression");
+        Map<String, String> mapInfo = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
         int count = 0;
-        if (mapInfo instanceof Map) {
+        if (mapInfo != null) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
             if (dataSet != null) {
-                DataSet destDs = DataSetOptUtil.mapDateSetByFormula(dataSet, ((Map) mapInfo).entrySet());
+                DataSet destDs = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
                 count = destDs.size();
                 bizModel.putDataSet(targetDsName, destDs);
             }
@@ -86,14 +108,14 @@ public class BuiltInOperation {
     }
 
     public static JSONObject runAppend(BizModel bizModel, JSONObject bizOptJson) {
-        String sourDsName =getJsonFieldString((JSONObject) bizOptJson.get("source"),"value",bizModel.getModelName());
-        Object mapInfo = jsonArrayToMap(bizOptJson.get("config"), "columnName", "expression");
+        String sourDsName = getJsonFieldString((JSONObject) bizOptJson.get("source"), "value", bizModel.getModelName());
+        Map<String, String> mapInfo = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
         int count = 0;
-        if (mapInfo instanceof Map) {
+        if (mapInfo != null) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
             if (dataSet != null) {
                 count = dataSet.size();
-                DataSetOptUtil.appendDeriveField(dataSet, ((Map) mapInfo).entrySet());
+                DataSetOptUtil.appendDeriveField(dataSet, mapInfo.entrySet());
             }
         }
         return getJsonObject(count);
@@ -102,12 +124,12 @@ public class BuiltInOperation {
     public static JSONObject runFilter(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
-        Object formula = jsonArrayToMap(bizOptJson.get("config"), "columnName", "paramValidateRegex");;
+        Map<String, String> formula = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "paramValidateRegex");
         int count = 0;
-        if (formula!=null) {
+        if (formula != null) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
             if (dataSet != null) {
-                DataSet destDs = DataSetOptUtil.filterDateSet(dataSet, (Map<String, String>) formula);
+                DataSet destDs = DataSetOptUtil.filterDateSet(dataSet, formula);
                 count = destDs.size();
                 bizModel.putDataSet(targetDsName, destDs);
             }
@@ -195,9 +217,11 @@ public class BuiltInOperation {
 
     public static JSONObject runSort(BizModel bizModel, JSONObject bizOptJson) {
         String sour1DsName = getJsonFieldString(bizOptJson, "source", null);
-        List<String> orderByFields = StringBaseOpt.objectToStringList(bizOptJson.get("orderBy"));
+        List<String> orderByFields = jsonArrayToList(bizOptJson.getJSONArray("config"), "columnName", "orderBy", "desc");
         DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
-        DataSetOptUtil.sortDataSetByFields(dataSet, orderByFields);
+        if (orderByFields != null) {
+            DataSetOptUtil.sortDataSetByFields(dataSet, orderByFields);
+        }
         return getJsonObject(dataSet.size());
     }
 
@@ -209,15 +233,16 @@ public class BuiltInOperation {
     public static JSONObject runJoin(BizModel bizModel, JSONObject bizOptJson) {
         String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
         String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
-        String join=getJsonFieldString(bizOptJson, "operation", "join");
-        Map<String,String> map = (Map<String, String>) BuiltInOperation.jsonArrayToMap(bizOptJson.get("configfield"),"primaryKey1","primaryKey2");
-        List<Map.Entry<String, String>> pks = new ArrayList<>(map.entrySet());
-        DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
-        DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
-        DataSet destDS = DataSetOptUtil.joinTwoDataSet(dataSet, dataSet2, pks,join);
-        if (destDS != null) {
-            bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDS);
-            return getJsonObject(destDS.size());
+        String join = getJsonFieldString(bizOptJson, "operation", "join");
+        Map<String, String> map = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("configfield"), "primaryKey1", "primaryKey2");
+        if (map != null) {
+            DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
+            DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
+            DataSet destDs = DataSetOptUtil.joinTwoDataSet(dataSet, dataSet2, new ArrayList<>(map.entrySet()), join);
+            if (destDs != null) {
+                bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
+                return getJsonObject(destDs.size());
+            }
         }
         return getJsonObject(0);
     }
