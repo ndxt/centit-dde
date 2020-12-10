@@ -17,10 +17,14 @@ import org.apache.commons.math3.stat.StatUtils;
 
 import java.util.*;
 
+/**
+ * @author zhf
+ */
 public abstract class DataSetOptUtil {
-    private static final String LEFT="leftjoin";
-    private static final String RIGHT="rightjoin";
-    private static final String ALL="alljoin";
+    private static final String LEFT = "leftjoin";
+    private static final String RIGHT = "rightjoin";
+    private static final String ALL = "alljoin";
+
     /**
      * 数据集 映射
      *
@@ -28,9 +32,9 @@ public abstract class DataSetOptUtil {
      * @param formulaMap 字段映射关系
      * @return 新的数据集
      */
-    public static Map<String, Object> mapDataRow(Map<String, Object> inRow,
-                                                  Collection<Map.Entry<String, String>> formulaMap) {
-        if(formulaMap==null){
+    static Map<String, Object> mapDataRow(Map<String, Object> inRow,
+                                          Collection<Map.Entry<String, String>> formulaMap) {
+        if (formulaMap == null) {
             return inRow;
         }
         VariableFormula formula = new VariableFormula();
@@ -67,36 +71,34 @@ public abstract class DataSetOptUtil {
      *
      * @param inData     原始数据集
      * @param formulaMap 字段映射关系， value为计算表达式
-     * @return 新的数据集 等同于原始数据集
      */
-    public static DataSet appendDeriveField(DataSet inData, Collection<Map.Entry<String, String>> formulaMap) {
+    public static void appendDeriveField(DataSet inData, Collection<Map.Entry<String, String>> formulaMap) {
         List<Map<String, Object>> data = inData.getDataAsList();
         for (Map<String, Object> obj : data) {
             obj.putAll(mapDataRow(obj, formulaMap));
         }
-        return inData;
     }
 
     /**
      * 数据集 映射
      *
-     * @param inData  原始数据集
-     * @param formula 逻辑表达式
+     * @param inData   原始数据集
+     * @param formulas 逻辑表达式
      * @return 新的数据集
      */
-    public static DataSet filterDateSet(DataSet inData, Map<String,String> formulas) {
+    public static DataSet filterDateSet(DataSet inData, List<String> formulas) {
         List<Map<String, Object>> data = inData.getDataAsList();
         List<Map<String, Object>> newData = new ArrayList<>(data.size());
         for (Map<String, Object> obj : data) {
-            boolean canAdd=true;
-            for(String formula:formulas.values()) {
+            boolean canAdd = true;
+            for (String formula : formulas) {
                 if (!BooleanBaseOpt.castObjectToBoolean(
                     VariableFormula.calculate(formula, obj), false)) {
-                    canAdd=false;
+                    canAdd = false;
                     break;
                 }
             }
-            if(canAdd){
+            if (canAdd) {
                 newData.add(obj);
             }
         }
@@ -110,11 +112,9 @@ public abstract class DataSetOptUtil {
      *
      * @param inData 原始数据集
      * @param fields 排序字段
-     * @return 排序后的数据集，修改了原始数据集的数据顺序
      */
-    public static DataSet sortDataSetByFields(DataSet inData, List<String> fields) {
+    public static void sortDataSetByFields(DataSet inData, List<String> fields) {
         sortByFields(inData.getDataAsList(), fields);
-        return inData;
     }
 
     private static double[] listDoubleToArray(List<Double> dblist) {
@@ -126,18 +126,18 @@ public abstract class DataSetOptUtil {
         return dbs;
     }
 
-    private static Map<String, Object> makeNewStatRow(List<String> groupbyFields,
+    private static Map<String, Object> makeNewStatRow(List<String> groupByFields,
                                                       List<Triple<String, String, String>> statDesc,
                                                       Map<String, Object> preRow,
                                                       Map<String, List<Double>> tempData) {
-        Map<String, Object> newRow = new HashMap<>();
-        if (groupbyFields != null && groupbyFields.size() > 0) {
-            for (String field : groupbyFields) {
+        Map<String, Object> newRow = new HashMap<>(groupByFields.size());
+        if (groupByFields.size() > 0) {
+            for (String field : groupByFields) {
                 newRow.put(field, preRow.get(field));
             }
         }
         for (Triple<String, String, String> tr : statDesc) {
-            Double db;//= null;
+            double db;
             switch (tr.getRight()) {
                 case "min":
                     db = StatUtils.min(listDoubleToArray(tempData.get(tr.getLeft())));
@@ -168,7 +168,7 @@ public abstract class DataSetOptUtil {
                     break;
                 /* percentile 这个没有实现*/
                 default:
-                    db = (double) tempData.get(tr.getLeft()).size();
+                    db = tempData.get(tr.getLeft()).size();
                     break;
             }
             newRow.put(tr.getLeft(), db);
@@ -176,8 +176,8 @@ public abstract class DataSetOptUtil {
         return newRow;
     }
 
-    public static DataSet statDataset2(DataSet inData,
-                                       List<String> groupbyFields,
+    public static DataSet statDataset(DataSet inData,
+                                       List<String> groupByFields,
                                        Map<String, String> statDesc) {
         List<Triple<String, String, String>> sd = new ArrayList<>(statDesc.size());
         for (Map.Entry<String, String> s : statDesc.entrySet()) {
@@ -186,45 +186,48 @@ public abstract class DataSetOptUtil {
                 sd.add(new MutableTriple<>(s.getKey(), optDesc[0], optDesc[1]));
             }
         }
-        return statDataset(inData, groupbyFields, sd);
+        return statDataset(inData, groupByFields, sd);
     }
 
     /**
      * 分组统计 , 如果 List&gt;String&lt; groupbyFields 为null 或者 空 就是统计所有的（仅返回一行）
      *
      * @param inData        输入数据集
-     * @param groupbyFields 分组（排序）字段
+     * @param groupByFields 分组（排序）字段
      * @param statDesc      统计描述; 新字段名， 源字段名， 统计方式 （求和，最大，最小，平均，方差，标准差）
      * @return 返回数据集
      */
-    public static DataSet statDataset(DataSet inData,
-                                      List<String> groupbyFields,
-                                      List<Triple<String, String, String>> statDesc) {
+    private static DataSet statDataset(DataSet inData,
+                                       List<String> groupByFields,
+                                       List<Triple<String, String, String>> statDesc) {
         if (inData == null) {
             return null;
+        }
+        if (groupByFields == null) {
+            return inData;
         }
         List<Map<String, Object>> data = inData.getDataAsList();
         if (data == null || data.size() == 0) {
             return inData;
         }
         //按group by字段排序
-        if (groupbyFields != null && groupbyFields.size() > 0) {
-            sortByFields(data, groupbyFields);
+        if (groupByFields.size() > 0) {
+            sortByFields(data, groupByFields);
         }
 
         List<Map<String, Object>> newData = new ArrayList<>();
         Map<String, Object> preRow = null;
 
-        Map<String, List<Double>> tempData = new HashMap<>();
+        Map<String, List<Double>> tempData = new HashMap<>(statDesc.size());
         for (Triple<String, String, String> tr : statDesc) {
             tempData.put(tr.getLeft(), new ArrayList<>());
         }
 
         for (Map<String, Object> row : data) {
-            if (compareTwoRow(preRow, row, groupbyFields) != 0) {
+            if (0 != compareTwoRow(preRow, row, groupByFields)) {
                 if (preRow != null) {
                     //保存newRow
-                    Map<String, Object> newRow = makeNewStatRow(groupbyFields,
+                    Map<String, Object> newRow = makeNewStatRow(groupByFields,
                         statDesc, preRow, tempData);
                     newData.add(newRow);
                 }
@@ -242,7 +245,7 @@ public abstract class DataSetOptUtil {
 
         if (preRow != null) {
             //保存newRow
-            Map<String, Object> newRow = makeNewStatRow(groupbyFields,
+            Map<String, Object> newRow = makeNewStatRow(groupByFields,
                 statDesc, preRow, tempData);
             newData.add(newRow);
         }
@@ -260,10 +263,10 @@ public abstract class DataSetOptUtil {
         return inData;
     }*/
 
-    public static void analyseDatasetGroup(List<Map<String, Object>> data,
-                                           int offset, int endPos,
-                                           DatasetVariableTranslate dvt,
-                                           Collection<Map.Entry<String, String>> refDesc) {
+    private static void analyseDatasetGroup(List<Map<String, Object>> data,
+                                            int offset, int endPos,
+                                            DatasetVariableTranslate dvt,
+                                            Collection<Map.Entry<String, String>> refDesc) {
         dvt.setOffset(offset);
         dvt.setLength(endPos - offset);
         for (int j = offset; j < endPos; j++) {
@@ -345,21 +348,22 @@ public abstract class DataSetOptUtil {
                     newData.add(newRow);
                 }
                 // 新建数据临时数据空间
-                newRow = new HashMap<>();
+                newRow = new HashMap<>(rowHeaderFields.size());
                 for (String key : rowHeaderFields) {
                     newRow.put(key, row.get(key));
                 }
             }
-
-            StringBuilder colprefix = new StringBuilder();
+            StringBuilder colPrefix = new StringBuilder();
             for (String key : colHeaderFields) {
-                colprefix.append(key).append(":").append(row.get(key)).append(":");
+                colPrefix.append(key).append(":").append(row.get(key)).append(":");
             }
-
-            String prefix = colprefix.toString();
+            String prefix = colPrefix.toString();
             for (Map.Entry<String, Object> entry : row.entrySet()) {
                 String key = entry.getKey();
                 if (!keyRows.contains(key)) {
+                    if (newRow == null) {
+                        newRow = new HashMap<>(row.size());
+                    }
                     newRow.put(prefix + key, entry.getValue());
                 }
             }
@@ -397,7 +401,7 @@ public abstract class DataSetOptUtil {
      */
     public static DataSet compareTabulation(DataSet currDataSet,
                                             DataSet lastDataSet,
-                                            List<String> primaryFields,
+                                            List<Map.Entry<String, String>> primaryFields,
                                             Collection<Map.Entry<String, String>> formulaMap) {
         if (currDataSet == null || lastDataSet == null) {
             return null;
@@ -409,25 +413,28 @@ public abstract class DataSetOptUtil {
         }
 
         List<Map<String, Object>> newData = new ArrayList<>();
+        List<String> mainFields = new ArrayList<>();
+        List<String> slaveFields = new ArrayList<>();
+        splitMainAndSlave(primaryFields, mainFields, slaveFields);
         // 根据主键排序
-        sortByFields(currData, primaryFields);
-        sortByFields(lastData, primaryFields);
+        sortByFields(currData, mainFields);
+        sortByFields(lastData, slaveFields);
         int i = 0;
         int j = 0;
         while (i < currData.size() && j < lastData.size()) {
-            int nc = compareTwoRow(currData.get(i), lastData.get(j), primaryFields);
+            int nc = compareTwoRowWithMap(currData.get(i), lastData.get(j), primaryFields);
             //匹配
             Map<String, Object> newRow = new LinkedHashMap<>();
             if (nc == 0) {
-                appendData(newRow, currData.get(i), primaryFields, "_left", true);
-                appendData(newRow, lastData.get(j), primaryFields, "_right", false);
+                appendData(newRow, currData.get(i), mainFields, "_left", true);
+                appendData(newRow, lastData.get(j), slaveFields, "_right", false);
                 i++;
                 j++;
             } else if (nc < 0) {
-                appendData(newRow, currData.get(i), primaryFields, "_left", true);
+                appendData(newRow, currData.get(i), mainFields, "_left", true);
                 i++;
             } else {
-                appendData(newRow, lastData.get(j), primaryFields, "_right", true);
+                appendData(newRow, lastData.get(j), slaveFields, "_right", true);
                 j++;
             }
             newData.add(mapDataRow(newRow, formulaMap));
@@ -435,18 +442,25 @@ public abstract class DataSetOptUtil {
 
         while (i < currData.size()) {
             Map<String, Object> newRow = new LinkedHashMap<>();
-            appendData(newRow, currData.get(i), primaryFields, "_left", true);
+            appendData(newRow, currData.get(i), mainFields, "_left", true);
             newData.add(mapDataRow(newRow, formulaMap));
             i++;
         }
 
         while (j < lastData.size()) {
             Map<String, Object> newRow = new LinkedHashMap<>();
-            appendData(newRow, lastData.get(j), primaryFields, "_right", true);
+            appendData(newRow, lastData.get(j), slaveFields, "_right", true);
             newData.add(mapDataRow(newRow, formulaMap));
             j++;
         }
         return new SimpleDataSet(newData);
+    }
+
+    private static void splitMainAndSlave(List<Map.Entry<String, String>> primaryFields, List<String> mainFields, List<String> slaveFields) {
+        for (Map.Entry<String, String> field : primaryFields) {
+            mainFields.add(field.getKey());
+            slaveFields.add(field.getValue());
+        }
     }
 
     /**
@@ -457,54 +471,49 @@ public abstract class DataSetOptUtil {
      * @param primaryFields 主键列
      * @return DataSet
      */
-    public static DataSet joinTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet, List<Map.Entry<String, String>> primaryFields,String join) {
+    public static DataSet joinTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet, List<Map.Entry<String, String>> primaryFields, String join) {
         if (mainDataSet == null) {
             return slaveDataSet;
         }
         if (slaveDataSet == null) {
             return mainDataSet;
         }
-
         List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
         List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
-        List<String> mainFields=new ArrayList<>();
-        List<String> slaveFields=new ArrayList<>();
-        for (Map.Entry<String, String> field : primaryFields) {
-            mainFields.add(field.getKey());
-            slaveFields.add(field.getValue());
-        }
+        List<String> mainFields = new ArrayList<>();
+        List<String> slaveFields = new ArrayList<>();
+        splitMainAndSlave(primaryFields, mainFields, slaveFields);
         sortByFields(mainData, mainFields);
         sortByFields(slaveData, slaveFields);
         int i = 0;
         int j = 0;
         List<Map<String, Object>> newData = new ArrayList<>();
-        // 根据主键排序
         int nInsertMain = -1;
         int nInsertSlave = -1;
         while (i < mainData.size() && j < slaveData.size()) {
             int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields);
-            //匹配
             Map<String, Object> newRow = new LinkedHashMap<>();
             if (nc == 0) {
                 newRow.putAll(slaveData.get(j));
                 newRow.putAll(mainData.get(i));
                 nInsertMain = i;
                 nInsertSlave = j;
-                boolean incI = i < mainData.size() - 1 && compareTwoRowWithMap(mainData.get(i), mainData.get(i + 1), primaryFields) != 0;
-                boolean incJ = j < slaveData.size() - 1 && compareTwoRowWithMap(slaveData.get(j), slaveData.get(j + 1), primaryFields) != 0;
-                if (!incI && i < mainData.size()) {
+                boolean incMain = i < mainData.size() - 1 && compareTwoRowWithMap(mainData.get(i), mainData.get(i + 1), primaryFields) != 0;
+                boolean incSlave = j < slaveData.size() - 1 && compareTwoRowWithMap(slaveData.get(j), slaveData.get(j + 1), primaryFields) != 0;
+                if (!incMain && i < mainData.size()) {
                     i++;
                 }
-                if (!incJ && j < slaveData.size()) {
+                if (!incSlave && j < slaveData.size()) {
                     j++;
                 }
-                if ((incI && incJ) || (!incI && !incJ)) {
+                boolean inc = (incMain && incSlave) || (!incMain && !incSlave);
+                if (inc) {
                     i++;
                     j++;
                 }
             } else if (nc < 0) {
                 if (nInsertMain < i) {
-                    if(LEFT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
+                    if (LEFT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
                         newRow.putAll(mainData.get(i));
                     }
                     nInsertMain = i;
@@ -512,25 +521,25 @@ public abstract class DataSetOptUtil {
                 i++;
             } else {
                 if (nInsertSlave < j) {
-                    if(RIGHT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
+                    if (RIGHT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
                         newRow.putAll(slaveData.get(j));
                     }
                     nInsertSlave = j;
                 }
                 j++;
             }
-            if(newRow.size()>0) {
+            if (newRow.size() > 0) {
                 newData.add(newRow);
             }
         }
-        if(LEFT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
+        if (LEFT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
             while (i < mainData.size()) {
                 Map<String, Object> newRow = new LinkedHashMap<>(mainData.get(i));
                 newData.add(newRow);
                 i++;
             }
         }
-        if(RIGHT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
+        if (RIGHT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
             while (j < slaveData.size()) {
                 Map<String, Object> newRow = new LinkedHashMap<>(slaveData.get(j));
                 newData.add(newRow);
@@ -541,27 +550,37 @@ public abstract class DataSetOptUtil {
     }
 
     public static DataSet filterByOtherDataSet(DataSet mainDataSet, DataSet slaveDataSet,
-                                               List<String> primaryFields, String formula) {
+                                               List<Map.Entry<String, String>> primaryFields, List<String> formulas) {
         if (mainDataSet == null || slaveDataSet == null) {
             return null;
         }
-
         List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
         List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
-        sortByFields(mainData, primaryFields);
-        sortByFields(slaveData, primaryFields);
-        boolean notField = StringUtils.isBlank(formula) || StringRegularOpt.isTrue(formula);
+        List<String> mainFields = new ArrayList<>();
+        List<String> slaveFields = new ArrayList<>();
+        splitMainAndSlave(primaryFields, mainFields, slaveFields);
+        sortByFields(mainData, mainFields);
+        sortByFields(slaveData, slaveFields);
+
         int i = 0;
         int j = 0;
         List<Map<String, Object>> newData = new ArrayList<>();
         // 根据主键排序
         while (i < mainData.size() && j < slaveData.size()) {
-            int nc = compareTwoRow(mainData.get(i), slaveData.get(j), primaryFields);
+            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields);
             //匹配
             Map<String, Object> newRow = new LinkedHashMap<>();
             if (nc == 0) {
-                if (notField || BooleanBaseOpt.castObjectToBoolean(
-                    VariableFormula.calculate(formula, slaveData.get(j)), false)) {
+                boolean canAdd = true;
+                for (String formula : formulas) {
+                    boolean notField = StringUtils.isBlank(formula) || StringRegularOpt.isTrue(formula);
+                    if (!notField ||!BooleanBaseOpt.castObjectToBoolean(
+                        VariableFormula.calculate(formula, slaveData.get(j)), false)) {
+                        canAdd = false;
+                        break;
+                    }
+                }
+                if (canAdd){
                     newRow.putAll(mainData.get(i));
                 }
                 i++;
@@ -592,23 +611,21 @@ public abstract class DataSetOptUtil {
         return new SimpleDataSet(resultData);
     }
 
-    public static DataSet checkDateSet(DataSet inData, Collection<CheckRule> rules) {
+    public static void checkDateSet(DataSet inData, Collection<CheckRule> rules) {
         List<Map<String, Object>> data = inData.getDataAsList();
 
         for (Map<String, Object> obj : data) {
-            String checkResult = "";
+            StringBuilder checkResult = new StringBuilder();
             for (CheckRule rule : rules) {
                 if (!CheckRuleUtils.checkData(obj, rule)) {
-                    checkResult = checkResult + Pretreatment.mapTemplateString(rule.getInfo(), obj) + ";";
+                    checkResult.append(Pretreatment.mapTemplateString(rule.getErrormsg(), obj)).append(";");
                 }
             }
-            if (StringUtils.isBlank(checkResult)) {
-                checkResult = "ok";
+            if (StringUtils.isBlank(checkResult.toString())) {
+                checkResult = new StringBuilder("ok");
             }
-            obj.put(CheckRuleUtils.CHECK_RULE_RESULT_TAG, checkResult);
+            obj.put(CheckRuleUtils.CHECK_RULE_RESULT_TAG, checkResult.toString());
         }
-
-        return inData;
     }
 
     private static int compareTwoRow(Map<String, Object> data1, Map<String, Object> data2, List<String> fields) {
@@ -644,7 +661,9 @@ public abstract class DataSetOptUtil {
     }
 
     private static int compareTwoRowWithMap(Map<String, Object> data1, Map<String, Object> data2, List<Map.Entry<String, String>> fields) {
-        if ((data1 == null && data2 == null) || fields == null) {
+        if (data1 == null && data2 == null) {
+            return 0;
+        } else if (fields == null) {
             return 0;
         }
 

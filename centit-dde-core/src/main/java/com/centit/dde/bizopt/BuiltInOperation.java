@@ -44,13 +44,20 @@ public class BuiltInOperation {
         return map;
     }
 
-    public static Map<String, String> jsonArrayToMap(JSONArray json, String key, String value) {
+    public static Map<String, String> jsonArrayToMap(JSONArray json, String key, String... value) {
         if (json != null) {
             Map<String, String> map = new HashMap<>(json.size());
             for (Object o : json) {
                 JSONObject temp = (JSONObject) o;
                 if (!StringBaseOpt.isNvl(temp.getString(key))) {
-                    map.put(temp.getString(key), temp.getString(value));
+                    StringBuilder values=new StringBuilder();
+                    for(int i=0;i<value.length;i++){
+                        values.append(temp.getString(value[i]));
+                        if(i<value.length-1){
+                            values.append(":");
+                        }
+                    }
+                    map.put(temp.getString(key), values.toString());
                 }
             }
             return map;
@@ -124,7 +131,7 @@ public class BuiltInOperation {
     public static JSONObject runFilter(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
-        Map<String, String> formula = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "paramValidateRegex");
+        List<String> formula = jsonArrayToList(bizOptJson.getJSONArray("config"), "paramValidateRegex","column","");
         int count = 0;
         if (formula != null) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
@@ -140,14 +147,13 @@ public class BuiltInOperation {
     public static JSONObject runStat(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
-        Object groupBy = bizOptJson.get("groupBy");
-        List<String> groupFields = StringBaseOpt.objectToStringList(groupBy);
-        Object stat = bizOptJson.get("fieldsMap");
+        List<String> groupFields = jsonArrayToList(bizOptJson.getJSONArray("exconfig"),"columnName","index","");
+        Map<String,String> stat = jsonArrayToMap(bizOptJson.getJSONArray("config"),"columnName","sourcefd","nodeInstId");
         int count = 0;
-        if (stat instanceof Map) {
+        if (stat != null) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
             if (dataSet != null) {
-                DataSet destDs = DataSetOptUtil.statDataset2(dataSet, groupFields, (Map) stat);
+                DataSet destDs = DataSetOptUtil.statDataset(dataSet,groupFields,stat);
                 count = destDs.size();
                 bizModel.putDataSet(targetDsName, destDs);
             }
@@ -194,23 +200,21 @@ public class BuiltInOperation {
     }
 
     public static JSONObject runCompare(BizModel bizModel, JSONObject bizOptJson) {
-        String sour1DsName = getJsonFieldString(bizOptJson, "source", null);
+        String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
         String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
         if (sour1DsName == null || sour2DsName == null) {
             return getJsonObject(0);
         }
-
         String targetDsName = getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
-        Object primaryKey = bizOptJson.get("primaryKey");
-        Object analyse = bizOptJson.get("fieldsMap");
-        List<String> pks = StringBaseOpt.objectToStringList(primaryKey);
+        Map<String,String> analyse = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
+        Map<String, String> pks = jsonArrayToMap(bizOptJson.getJSONArray("configfield"),"primaryKey1","primaryKey2");
         DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
         DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
         int count = 0;
-        if (dataSet != null && dataSet2 != null) {
-            DataSet destDS = DataSetOptUtil.compareTabulation(dataSet, dataSet2, pks, ((Map) analyse).entrySet());
-            count = destDS.size();
-            bizModel.putDataSet(targetDsName, destDS);
+        if (dataSet != null && dataSet2 != null && analyse!=null && pks!=null) {
+            DataSet destDs = DataSetOptUtil.compareTabulation(dataSet, dataSet2, new ArrayList<>(pks.entrySet()), analyse.entrySet());
+            count = destDs.size();
+            bizModel.putDataSet(targetDsName, destDs);
         }
         return getJsonObject(count);
     }
@@ -265,20 +269,19 @@ public class BuiltInOperation {
     }
 
     public static JSONObject runFilterExt(BizModel bizModel, JSONObject bizOptJson) {
-        String sour1DsName = getJsonFieldString(bizOptJson, "source", null);
+        String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
         String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
         if (sour1DsName == null || sour2DsName == null) {
             return getJsonObject(0);
         }
         String targetDsName = getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
-        Object primaryKey = bizOptJson.get("primaryKey");
-        List<String> pks = StringBaseOpt.objectToStringList(primaryKey);
-        String formula = bizOptJson.getString("filter");
+        List<String> formulas = jsonArrayToList(bizOptJson.getJSONArray("config"), "expression", "expression2","");
+        Map<String, String> pks = jsonArrayToMap(bizOptJson.getJSONArray("configfield"),"primaryKey1","primaryKey2");
         DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
         DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
         int count = 0;
         if (dataSet != null && dataSet2 != null) {
-            DataSet destDS = DataSetOptUtil.filterByOtherDataSet(dataSet, dataSet2, pks, formula);
+            DataSet destDS = DataSetOptUtil.filterByOtherDataSet(dataSet, dataSet2, new ArrayList<>(pks.entrySet()), formulas);
             count = destDS.size();
             bizModel.putDataSet(targetDsName, destDS);
         }
