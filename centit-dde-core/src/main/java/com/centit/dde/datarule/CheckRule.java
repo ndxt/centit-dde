@@ -7,10 +7,12 @@ import lombok.Data;
  */
 @Data
 public class CheckRule {
-    String type;
-    String field;
-    String expression;
+    String types;
+    String columnname;
+    String Dformulainfo;
+    String Fmin;
+    String Fmax;
+    String errormsg;
     String min;
     String max;
-    String info;
 }

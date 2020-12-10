@@ -12,30 +12,28 @@ import com.centit.support.database.utils.QueryAndParams;
 import com.centit.support.database.utils.QueryUtils;
 
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author zhf
  */
 public class RunSqlSBizOperation implements BizOperation {
     private DatabaseRunTime databaseRunTime;
-    public RunSqlSBizOperation(DatabaseRunTime databaseRunTime){
-        this.databaseRunTime=databaseRunTime;
+
+    public RunSqlSBizOperation(DatabaseRunTime databaseRunTime) {
+        this.databaseRunTime = databaseRunTime;
     }
 
     @Override
     public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
-        JSONArray jsonArray=bizOptJson.getJSONArray("config");
-        if(jsonArray!=null) {
+        JSONArray jsonArray = bizOptJson.getJSONArray("config");
+        if (jsonArray != null) {
             int count = 0;
             try {
-                for(Object object:bizOptJson.getJSONArray("config")){
-                    JSONObject jsonObject=(JSONObject)object;
-                    QueryAndNamedParams qap = QueryUtils.translateQuery(jsonObject.getString(""), new BizModelJSONTransform(bizModel));
+                for (Object object : jsonArray) {
+                    JSONObject jsonObject = (JSONObject) object;
+                    QueryAndNamedParams qap = QueryUtils.translateQuery(jsonObject.getString("sql"), new BizModelJSONTransform(bizModel));
                     QueryAndParams q = QueryAndParams.createFromQueryAndNamedParams(qap);
-                    count+=databaseRunTime.execute(jsonObject.getString(""), q.getQuery(), q.getParams());
+                    count += databaseRunTime.execute(jsonObject.getString("databaseName"), q.getQuery(), q.getParams());
                 }
                 ConnectThreadHolder.commitAndRelease();
             } catch (SQLException e) {

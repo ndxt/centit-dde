@@ -287,7 +287,7 @@ public class BuiltInOperation {
 
     public static JSONObject runCheckData(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        Object rulesJson = bizOptJson.get("rules");
+        Object rulesJson = bizOptJson.get("config");
         int count = 0;
         if (rulesJson instanceof JSONArray) {
             List<CheckRule> rules = ((JSONArray) rulesJson).toJavaList(CheckRule.class);
