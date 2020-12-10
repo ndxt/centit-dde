@@ -39,13 +39,12 @@ public class RunTaskJob extends AbstractQuartzJob {
                 logger.error(e.getMessage());
             }
         } else {
-            Boolean isRunning = runningTask.get(dataPacket.getPacketId());
+            Boolean isRunning = runningTask.put(dataPacket.getPacketId(), true);
             if(isRunning!=null && isRunning){
                 logger.info("任务："+dataPacket.getPacketId()+ "仍在执行中或略这个执行周期");
                 return true;
             }
             try {
-                runningTask.put(dataPacket.getPacketId(), true);
                 TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
                 taskRun.runTask(dataPacket.getPacketId(), null); // paramMap
             } finally {
