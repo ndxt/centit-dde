@@ -183,10 +183,8 @@ public class BuiltInOperation {
     public static JSONObject runCross(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
-        Object rowHeader = bizOptJson.get("rowHeader");
-        List<String> rows = StringBaseOpt.objectToStringList(rowHeader);
-        Object colHeader = bizOptJson.get("colHeader");
-        List<String> cols = StringBaseOpt.objectToStringList(colHeader);
+        List<String> rows = jsonArrayToList(bizOptJson.getJSONArray("configfield"),"primaryKey1","primaryKey2","");
+        List<String> cols = jsonArrayToList(bizOptJson.getJSONArray("configfield"),"primaryKey2","primaryKey1","");
         int count = 0;
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet != null) {
