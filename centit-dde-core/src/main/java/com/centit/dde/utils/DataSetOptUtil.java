@@ -263,56 +263,57 @@ public abstract class DataSetOptUtil {
         return inData;
     }*/
 
-    private static void analyseDatasetGroup(List<Map<String, Object>> data,
+    private static void analyseDatasetGroup(List<Map<String, Object>> newData,List<Map<String, Object>> data,
                                             int offset, int endPos,
                                             DatasetVariableTranslate dvt,
                                             Collection<Map.Entry<String, String>> refDesc) {
         dvt.setOffset(offset);
         dvt.setLength(endPos - offset);
         for (int j = offset; j < endPos; j++) {
-            Map<String, Object> newRow = data.get(j);
+            Map<String, Object> newRow = new HashMap<>(data.get(j));
             dvt.setCurrentPos(j);
             for (Map.Entry<String, String> ref : refDesc) {
                 newRow.put(ref.getKey(),
                     VariableFormula.calculate(ref.getValue(), dvt));
             }
+            newData.add(newRow);
         }
     }
 
     /**
-     * 分组统计 , 如果 List&gt;String&lt; groupbyFields 为null 或者 空 就是统计所有的（仅返回一行）
+     * 分组统计 , 如果 List&gt;String&lt; groupByFields 为null 或者 空 就是统计所有的（仅返回一行）
      *
      * @param inData        输入数据集
-     * @param groupbyFields 分组字段
-     * @param orderbyFields 排序字段
+     * @param groupByFields 分组字段
+     * @param orderByFields 排序字段
      * @param refDesc       引用说明; 新字段名， 引用表达式
      * @return 返回数据集
      */
     public static DataSet analyseDataset(DataSet inData,
-                                         List<String> groupbyFields,
-                                         List<String> orderbyFields,
+                                         List<String> groupByFields,
+                                         List<String> orderByFields,
                                          Collection<Map.Entry<String, String>> refDesc) {
         List<Map<String, Object>> data = inData.getDataAsList();
-        List<String> keyRows = ListUtils.union(groupbyFields, orderbyFields);
+        List<String> keyRows = ListUtils.union(groupByFields, orderByFields);
         //根据维度进行排序 行头、列头
         sortByFields(data, keyRows);
         Map<String, Object> preRow = null;
         int n = data.size();
         int prePos = 0;
         DatasetVariableTranslate dvt = new DatasetVariableTranslate(data);
-        //int endPos = 0;
+        List<Map<String, Object>> newData = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             Map<String, Object> row = data.get(i);
-            if (compareTwoRow(preRow, row, groupbyFields) != 0) {
+            if (compareTwoRow(preRow, row, groupByFields) == 0) {
                 if (preRow != null) {
-                    analyseDatasetGroup(data, prePos, i, dvt, refDesc);
+                    analyseDatasetGroup(newData,data, prePos, i, dvt, refDesc);
                 }
                 prePos = i;
             }
             preRow = row;
         }
-        analyseDatasetGroup(data, prePos, n, dvt, refDesc);
-        return new SimpleDataSet(data);
+        analyseDatasetGroup(newData,data, prePos, n, dvt, refDesc);
+        return new SimpleDataSet(newData);
     }
 
     /***
@@ -573,8 +574,7 @@ public abstract class DataSetOptUtil {
             if (nc == 0) {
                 boolean canAdd = true;
                 for (String formula : formulas) {
-                    boolean notField = StringUtils.isBlank(formula) || StringRegularOpt.isTrue(formula);
-                    if (!notField ||!BooleanBaseOpt.castObjectToBoolean(
+                    if (!BooleanBaseOpt.castObjectToBoolean(
                         VariableFormula.calculate(formula, slaveData.get(j)), false)) {
                         canAdd = false;
                         break;
@@ -590,7 +590,9 @@ public abstract class DataSetOptUtil {
             } else {
                 j++;
             }
-            newData.add(newRow);
+            if(newRow.size()!=0) {
+                newData.add(newRow);
+            }
         }
         return new SimpleDataSet(newData);
     }
