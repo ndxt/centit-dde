@@ -28,7 +28,7 @@
         <common.module.version>1.1-SNAPSHOT</common.module.version>
 	</properties>
 
-    <description> 数据处理平台（data dispose engine），分两部分，一个控制台，一个数据处理程序
+    <description> 数据研发引擎（data develop engine），分两部分，一个控制台，一个数据处理程序
     </description>
     <url>https://github.com/ndxt/centit-dde</url>
 
