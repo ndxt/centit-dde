@@ -90,7 +90,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("filterExt", BuiltInOperation::runFilterExt);
         allOperations.put("check", BuiltInOperation::runCheckData);
         allOperations.put("static", BuiltInOperation::runStaticData);
-        allOperations.put("http", BuiltInOperation::runHttpData);
+        allOperations.put("htts", BuiltInOperation::runHttpData);
         allOperations.put("clear", BuiltInOperation::runClear);
         JSBizOperation jsBizOperation = new JSBizOperation(metaObjectService,
             databaseRunTime);
@@ -106,8 +106,6 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("csv", csvBizOperation);
         JsonBizOperation jsonBizOperation = new JsonBizOperation(fileStore);
         allOperations.put("json", jsonBizOperation);
-        HttpBizOperation httpBizOperation = new HttpBizOperation();
-        allOperations.put("htts", httpBizOperation);
         RunSqlSBizOperation runsqlsbizoperation = new RunSqlSBizOperation(databaseRunTime);
         allOperations.put("sqlS", runsqlsbizoperation);
         //Todo
