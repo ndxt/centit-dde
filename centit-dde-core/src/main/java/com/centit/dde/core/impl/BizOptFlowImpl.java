@@ -108,8 +108,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("json", jsonBizOperation);
         RunSqlSBizOperation runsqlsbizoperation = new RunSqlSBizOperation(databaseRunTime);
         allOperations.put("sqlS", runsqlsbizoperation);
-        //Todo
-        //格式文书allOperations.put("SSD",);
+        ReportBizOperation reportBizOperation=new ReportBizOperation(fileStore);
+        allOperations.put("SSD",reportBizOperation);
     }
 
     @Override
@@ -146,7 +146,8 @@ public class BizOptFlowImpl implements BizOptFlow {
                 return JSONTransformer.transformer(
                     JSON.parse(path), new BizModelJSONTransform(bizModel));
             case "5":
-                return bizModel;
+                path = BuiltInOperation.getJsonFieldString(stepJson, "kname", "D");
+                return bizModel.fetchDataSetByName(path);
             default:
                 return bizModel;
         }
