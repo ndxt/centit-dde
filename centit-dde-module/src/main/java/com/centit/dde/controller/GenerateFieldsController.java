@@ -44,7 +44,7 @@ public class GenerateFieldsController extends BaseController {
     @WrapUpResponseBody
     public JSONArray queryViewSqlData(String databaseCode, String sql, HttpServletRequest request) {
         Map<String, Object> params = collectRequestParameters(request);
-        return generateFieldsService.queryViewSqlData(databaseCode, sql, params);
+        return generateFieldsService.queryViewSqlData(databaseCode, StringEscapeUtils.unescapeHtml4(sql), params);
     }
 
     @ApiOperation(value = "生成查询字段列表")
