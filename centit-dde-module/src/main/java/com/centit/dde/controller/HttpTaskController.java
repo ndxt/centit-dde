@@ -3,6 +3,7 @@ package com.centit.dde.controller;
 import com.alibaba.fastjson.JSON;
 import com.centit.dde.service.ExchangeService;
 import com.centit.dde.services.DataPacketService;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.WebOptUtils;
@@ -127,10 +128,7 @@ public class HttpTaskController extends BaseController {
     @WrapUpResponseBody
     public Object testFormula(String formula, String jsonString) {
         Map object = (Map) JSON.parse(jsonString);
-        VariableFormula variableFormula = new VariableFormula();
-        variableFormula.addExtendFunc("toJson", (a) -> JSON.parse(
-            StringBaseOpt.castObjectToString(a[0])));
-        variableFormula.addExtendFunc("uuid", (a) -> UuidOpt.getUuidAsString32());
+        VariableFormula variableFormula = DataSetOptUtil.createFormula();
         variableFormula.setTrans(new ObjectTranslate(object));
         variableFormula.setFormula(formula);
         return variableFormula.calcFormula();

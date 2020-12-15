@@ -5,6 +5,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.datarule.CheckRule;
 import com.centit.dde.datarule.CheckRuleUtils;
+import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.support.algorithm.*;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.Pretreatment;
@@ -25,6 +26,17 @@ public abstract class DataSetOptUtil {
     private static final String RIGHT = "rightjoin";
     private static final String ALL = "alljoin";
 
+    public static VariableFormula createFormula(){
+        VariableFormula formula = new VariableFormula();
+        formula.addExtendFunc("toJson", (a) -> JSON.parse(
+            StringBaseOpt.castObjectToString(a[0])));
+        formula.addExtendFunc("uuid", (a) -> UuidOpt.getUuidAsString32());
+        formula.addExtendFunc("dict", (a) -> a!=null && a.length>1 ?
+            CodeRepositoryUtil.getValue(
+                StringBaseOpt.castObjectToString(a[0]),
+                StringBaseOpt.castObjectToString(a[1])) : null);
+        return formula;
+    }
     /**
      * 数据集 映射
      *
@@ -37,10 +49,7 @@ public abstract class DataSetOptUtil {
         if (formulaMap == null) {
             return inRow;
         }
-        VariableFormula formula = new VariableFormula();
-        formula.addExtendFunc("toJson", (a) -> JSON.parse(
-            StringBaseOpt.castObjectToString(a[0])));
-        formula.addExtendFunc("uuid", (a) -> UuidOpt.getUuidAsString32());
+        VariableFormula formula = createFormula();
         formula.setTrans(new ObjectTranslate(inRow));
         Map<String, Object> newRow = new HashMap<>(formulaMap.size());
         for (Map.Entry<String, String> ent : formulaMap) {
