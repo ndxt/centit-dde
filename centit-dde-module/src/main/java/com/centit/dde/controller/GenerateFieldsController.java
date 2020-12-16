@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,8 +77,16 @@ public class GenerateFieldsController extends BaseController {
     @ApiImplicitParam(name = "sql", value = "查询SQL", required = true)
     @RequestMapping(value = "/param", method = {RequestMethod.POST})
     @WrapUpResponseBody
-    public Set<String> generateParam(String sql) {
-        return generateFieldsService.generateSqlParams(sql);
+    public JSONArray generateParam(String sql) {
+        Set<String> sets= generateFieldsService.generateSqlParams(sql);
+        JSONArray jsonArray=new JSONArray();
+        for(String key:sets){
+            Map<String,String> map= new HashMap<>(2);
+            map.put("key",key);
+            map.put("value","");
+           jsonArray.add(map);
+        }
+        return jsonArray;
     }
 
 }
