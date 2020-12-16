@@ -197,7 +197,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         detailLog.setLogType(logType);
         detailLog.setLogInfo(logInfo);
         detailLog.setRunEndTime(new Date());
-        detailLog.setTaskId(StringBaseOpt.castObjectToString(++step, "0"));
+        detailLog.setTaskId(StringBaseOpt.fillZeroForString(StringBaseOpt.castObjectToString(++step, "0"),6));
         taskDetailLogDao.saveNewObject(detailLog);
         return detailLog;
     }
