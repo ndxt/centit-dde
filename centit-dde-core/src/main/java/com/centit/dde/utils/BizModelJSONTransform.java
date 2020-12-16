@@ -32,11 +32,7 @@ public class BizModelJSONTransform
     }
 
     private Object peekStackValue(){
-        return stackLength>0? stack.get(stackLength-1): null;
-    }
-
-    private Object peekStackValue(int n){
-        return stackLength>n? stack.get(stackLength-n-1): null;
+        return stackLength> 1 ? stack.get(stackLength-2): null;
     }
 
     @Override
@@ -60,13 +56,13 @@ public class BizModelJSONTransform
 
     @Override
     public Object getVarValue(String labelName) {
-        if(labelName.startsWith("/")){
+        if(labelName.startsWith(Constant.BACKSLASH)){
             return fetchRootData(labelName.substring(1));
-        } else if(labelName.startsWith("..")){
+        } else if(labelName.startsWith(Constant.DOUBLE_SPOT)){
             return ReflectionOpt.attainExpressionValue(
-                peekStackValue(1),
+                peekStackValue(),
                 labelName.substring(2));
-        } else if(labelName.startsWith(".")){
+        } else if(labelName.startsWith(Constant.SPOT)){
             if(stackLength>0) {
                 return ReflectionOpt.attainExpressionValue(
                     stack.get(stackLength-1),
@@ -114,15 +110,19 @@ public class BizModelJSONTransform
                 valuePath);
         }
 
-        if("modelTag".equals(dataSetName)){
+        if(Constant.MODEL_TAG.equals(dataSetName)){
             if(StringUtils.isBlank(valuePath)) {
                 return this.data.getModelTag();
             } else {
-                return this.data.getModelTag()
-                    .get(valuePath);
+                if(this.data.getModelTag().containsKey(valuePath)) {
+                    return this.data.getModelTag().get(valuePath);
+                }
+                if(this.data.getModelTag().containsKey(labelName)) {
+                    return this.data.getModelTag().get(labelName);
+                }
             }
         }
-        if("modelName".equals(dataSetName)){
+        if(Constant.MODEL_NAME.equals(dataSetName)){
             return this.data.getModelName();
         }
         return null;
