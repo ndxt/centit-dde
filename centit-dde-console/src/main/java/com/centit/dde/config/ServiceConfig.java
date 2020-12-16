@@ -27,8 +27,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
     excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION,
         value = org.springframework.stereotype.Controller.class))
 @Configuration
-
-
 public class ServiceConfig {
 
     @Value("${app.home:./}")
