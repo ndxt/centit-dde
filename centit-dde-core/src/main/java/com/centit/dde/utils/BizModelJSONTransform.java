@@ -118,7 +118,7 @@ public class BizModelJSONTransform
             if(StringUtils.isBlank(valuePath)) {
                 return this.data.getModelTag();
             } else {
-                this.data.getModelTag()
+                return this.data.getModelTag()
                     .get(valuePath);
             }
         }
