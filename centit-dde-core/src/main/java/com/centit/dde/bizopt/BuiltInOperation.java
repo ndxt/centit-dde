@@ -76,9 +76,13 @@ public class BuiltInOperation {
                 JSONObject temp = (JSONObject) o;
                 if (!StringBaseOpt.isNvl(temp.getString(key))) {
                     if (compare.equalsIgnoreCase(temp.getString(value))) {
-                        list.add(temp.getString(key) + " " + temp.getString(value));
+                        if(!list.contains(temp.getString(key) + " " + temp.getString(value))) {
+                            list.add(temp.getString(key) + " " + temp.getString(value));
+                        }
                     } else {
-                        list.add(temp.getString(key));
+                        if(!list.contains(temp.getString(key))) {
+                            list.add(temp.getString(key));
+                        }
                     }
                 }
             }
