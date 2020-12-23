@@ -177,7 +177,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             }
             if ("sche".equals(stepType)) {
                 DataPacket dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
-                queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "primaryKey1", "primaryKey2"));
+                queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue"));
                 run(dataPacket.getDataOptDescJson(), logId, queryParams);
             }
             stepJson = dataOptDescJson.getNextStep(stepId);
