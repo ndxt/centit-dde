@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
+import com.centit.dde.dataset.JSONDataSet;
 import com.centit.dde.dataset.SQLDataSetWriter;
 import com.centit.dde.services.GenerateFieldsService;
 import com.centit.dde.vo.ColumnSchema;
@@ -56,6 +57,48 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
             logger.error("执行查询出错，SQL：{},Param:{}", qap.getQuery(), qap.getParams());
             throw new ObjectException("执行查询出错!");
         }
+    }
+
+    @Override
+    public JSONArray queryViewCsvData(String fileId) {
+        CsvDataSet csvDataSet = new CsvDataSet();
+        try {
+            csvDataSet.setFilePath(
+                fileStore.getFile(fileId).getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        SimpleDataSet dataSet = csvDataSet.load(null);
+        JSONArray result=new JSONArray();
+        for(int i=0;i<dataSet.getDataAsList().size();i++){
+            if (i >= 20) {
+                break;
+            } else {
+                result.add(dataSet.getDataAsList().get(i));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public JSONArray queryViewJsonData(String fileId) {
+        JSONDataSet jsonDataSet = new JSONDataSet();
+        try {
+            jsonDataSet.setFilePath(
+                fileStore.getFile(fileId).getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        SimpleDataSet dataSet = jsonDataSet.load(null);
+        JSONArray result=new JSONArray();
+        for(int i=0;i<dataSet.getDataAsList().size();i++){
+            if (i >= 20) {
+                break;
+            } else {
+                result.add(dataSet.getDataAsList().get(i));
+            }
+        }
+        return result;
     }
 
     @Override

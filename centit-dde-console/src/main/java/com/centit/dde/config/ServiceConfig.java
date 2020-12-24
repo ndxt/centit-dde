@@ -1,6 +1,8 @@
 package com.centit.dde.config;
 
 
+import com.centit.fileserver.client.ClientAsFileStore;
+import com.centit.fileserver.client.FileClientImpl;
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.config.SpringSecurityDaoConfig;
@@ -9,6 +11,7 @@ import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -31,6 +34,8 @@ public class ServiceConfig {
 
     @Value("${app.home:./}")
     private String appHome;
+    @Value("${fileserver.url}")
+    private String fileserver;
     /**
      * 这个bean必须要有
      * @return CentitPasswordEncoder 密码加密算法
@@ -57,7 +62,17 @@ public class ServiceConfig {
         return operationLog;
     }
 
-
-
+    @Bean
+    public FileClientImpl fileClient() {
+        FileClientImpl fileClient = new FileClientImpl();
+        fileClient.init(fileserver,fileserver,"u0000000", "000000",fileserver);
+        return fileClient;
+    }
+    @Bean
+    public ClientAsFileStore fileStore(@Autowired FileClientImpl fileClient){
+        ClientAsFileStore fileStoreBean = new ClientAsFileStore();
+        fileStoreBean.setFileClient(fileClient);
+        return fileStoreBean;
+    }
 
 }

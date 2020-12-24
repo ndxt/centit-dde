@@ -38,21 +38,31 @@ public class GenerateFieldsController extends BaseController {
 
     @ApiOperation(value = "预览数据值返回前20行")
     @ApiImplicitParams(value = {
-        @ApiImplicitParam(name = "databaseCode", value = "数据库代码", required = true),
-        @ApiImplicitParam(name = "sql", value = "查询SQL", required = true)
+        @ApiImplicitParam(name = "databaseCode", value = "C:csv;J:json;其他为数据库", required = true),
+        @ApiImplicitParam(name = "sql", value = "C,J:fileId;其他sql查询", required = true)
     })
     @RequestMapping(value = "/previewdata", method = {RequestMethod.POST})
     @WrapUpResponseBody
     public JSONArray queryViewSqlData(String databaseCode, String sql, HttpServletRequest request) {
         Map<String, Object> params = collectRequestParameters(request);
-        return generateFieldsService.queryViewSqlData(databaseCode, StringEscapeUtils.unescapeHtml4(sql), params);
+        switch (databaseCode) {
+            case "C":
+                return generateFieldsService.queryViewCsvData(sql);
+            case "J":
+                return generateFieldsService.queryViewJsonData(sql);
+            default:
+                return generateFieldsService.queryViewSqlData(databaseCode, StringEscapeUtils.unescapeHtml4(sql), params);
+        }
     }
 
     @ApiOperation(value = "生成查询字段列表")
-    @ApiImplicitParam(name = "sql", value = "查询SQL", required = true)
+    @ApiImplicitParams(value = {
+        @ApiImplicitParam(name = "dataType", value = "C:csv;J:json;D:数据库", required = true),
+        @ApiImplicitParam(name = "sql", value = "C,J:fileId;其他sql查询", required = true)
+    })
     @RequestMapping(value = "/sqlcolumn", method = {RequestMethod.POST})
     @WrapUpResponseBody
-    public List<ColumnSchema> generateSqlcolumn(String databaseCode,String sql, String dataType, HttpServletRequest request) {
+    public List<ColumnSchema> generateSqlcolumn(String databaseCode, String sql, String dataType, HttpServletRequest request) {
         sql = StringEscapeUtils.unescapeHtml4(sql);
         Map<String, Object> params = collectRequestParameters(request);
         switch (dataType) {
@@ -65,7 +75,7 @@ public class GenerateFieldsController extends BaseController {
             case "J":
                 return generateFieldsService.generateJsonFields(params);
             case "D":
-                return generateFieldsService.generateSqlFields(databaseCode,sql, params);
+                return generateFieldsService.generateSqlFields(databaseCode, sql, params);
             case "P":
                 return generateFieldsService.generatePostFields(sql);
             default:
@@ -78,13 +88,13 @@ public class GenerateFieldsController extends BaseController {
     @RequestMapping(value = "/param", method = {RequestMethod.POST})
     @WrapUpResponseBody
     public JSONArray generateParam(String sql) {
-        Set<String> sets= generateFieldsService.generateSqlParams(sql);
-        JSONArray jsonArray=new JSONArray();
-        for(String key:sets){
-            Map<String,String> map= new HashMap<>(2);
-            map.put("key",key);
-            map.put("value","");
-           jsonArray.add(map);
+        Set<String> sets = generateFieldsService.generateSqlParams(sql);
+        JSONArray jsonArray = new JSONArray();
+        for (String key : sets) {
+            Map<String, String> map = new HashMap<>(2);
+            map.put("key", key);
+            map.put("value", "");
+            jsonArray.add(map);
         }
         return jsonArray;
     }

@@ -23,7 +23,7 @@ public class CsvBizOperation implements BizOperation {
     @Override
     public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "nodeName", bizModel.getModelName());
-        String filePath = BuiltInOperation.getJsonFieldString(bizOptJson, "sql", "");
+        String filePath = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("fileId");
         CsvDataSet csvDataSet = new CsvDataSet();
         try {
             csvDataSet.setFilePath(
