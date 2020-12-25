@@ -1,6 +1,7 @@
 package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.centit.dde.po.DataPacket;
 import com.centit.dde.service.ExchangeService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.DataSetOptUtil;
@@ -41,19 +42,28 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "立即执行任务")
     public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) {
-        // 将request中的参数传入 运行上下文
-        Object bizModel=exchangeService.runTask(packetId,collectRequestParameters(request));
-        JsonResultUtils.writeSingleDataJson(bizModel,response);
+        Map<String,Object> params=collectRequestParameters(request);
+        JsonResultUtils.writeSingleDataJson(getObject(packetId, params),response);
+    }
+
+    private Object getObject(String packetId, Map<String, Object> params) {
+        Object bizModel;
+        DataPacket dataPacket=dataPacketService.getDataPacket(packetId);
+        bizModel=dataPacketService.fetchDataPacketDataFromBuf(dataPacket,params);
+        if(bizModel==null) {
+            bizModel = exchangeService.runTask(packetId,params);
+            dataPacketService.setDataPacketBuf(bizModel,dataPacket,params);
+        }
+        return bizModel;
     }
 
     @PostMapping(value = "/runPost/{packetId}")
     @ApiOperation(value = "立即执行任务Post")
     public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
                             HttpServletResponse response){
-        Map<String, Object> queryParams = collectRequestParameters(request);
-        queryParams.put("request", request);
-        Object bizModel=exchangeService.runTask(packetId, queryParams);
-        JsonResultUtils.writeSingleDataJson(bizModel,response);
+        Map<String, Object> params = collectRequestParameters(request);
+        params.put("request", request);
+        JsonResultUtils.writeSingleDataJson(getObject(packetId, params),response);
     }
 
     @GetMapping(value = "/testformula")

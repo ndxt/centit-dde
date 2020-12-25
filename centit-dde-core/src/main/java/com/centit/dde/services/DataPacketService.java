@@ -24,5 +24,7 @@ public interface DataPacketService {
     List<DataPacket> listDataPacket(Map<String, Object> params, PageDesc pageDesc);
 
     DataPacket getDataPacket(String packetId);
+    void setDataPacketBuf(Object bizModel, DataPacket dataPacket, Map<String, Object>  paramsMap);
+    Object fetchDataPacketDataFromBuf(DataPacket dataPacket, Map<String, Object>  paramsMap);
 
 }

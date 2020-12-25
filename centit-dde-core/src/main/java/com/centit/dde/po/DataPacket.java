@@ -28,14 +28,14 @@ import java.util.*;
 public class DataPacket implements Serializable {
     private static final long serialVersionUID = 1;
 
-    @ApiModelProperty(value = "数据包ID", hidden = true)
+    @ApiModelProperty(value = "数据处理ID", hidden = true)
     @Id
     @Column(name = "PACKET_ID")
     @NotBlank(message = "字段不能为空")
     @ValueGenerator(strategy = GeneratorType.UUID)
     private String packetId;
 
-    @ApiModelProperty(value = "数据包名称")
+    @ApiModelProperty(value = "数据处理名称")
     @Column(name = "PACKET_NAME")
     @NotBlank(message = "字段不能为空")
     private String packetName;
@@ -54,10 +54,6 @@ public class DataPacket implements Serializable {
     @Column(name = "OWNER_CODE")
     @ApiModelProperty(value = "属主代码")
     private String ownerCode;
-
-    @Column(name = "HAS_DATA_OPT")
-    @ApiModelProperty(value = "是否有数据预处理", required = true)
-    private String hasDataOpt;
 
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "DATA_OPT_DESC_JSON")
@@ -96,50 +92,25 @@ public class DataPacket implements Serializable {
     @ApiModelProperty(value = "任务执行定时器")
     private String taskCron;
 
-    @Column(name = "INTERFACE_NAME")
-    @ApiModelProperty(value = "接口名称(英文不含特殊字符,唯一性)")
-    private String interfaceName;
-
     @Column(name = "LAST_RUN_TIME")
     @ApiModelProperty(value = "上次执行时间")
-//    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date lastRunTime;
 
     @Column(name = "NEXT_RUN_TIME")
     @ApiModelProperty(value = "下次执行时间")
-//    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date nextRunTime;
 
     @Column(name = "IS_VALID")
     @ApiModelProperty(value = "是否启用", required = true)
     private Boolean isValid;
 
-    /**
-     * 添加返回数据：
-     * S: 仅仅返回状态 ; code=0 成功 code = ERROR_CODE 错误
-     * D: 返回dataset ;返回所有处理过程中没有使用过的dataset，并接受参数可以之返回部分dataset
-     * A: 返回指定的一个或多个dataset
-     * J: 返回json，通过 json 模板指定
-     */
-    @Column(name = "RETURN_TYPE")
-    @ApiModelProperty(value = "返回数据类型", required = true)
-    private String returnType;
-
     @Column(name = "OWN_GROUP")
     @ApiModelProperty(value = "所属分组")
     private String ownGroup;
 
-    @ApiModelProperty(value = "返回结果")
-    @Column(name = "RETURN_RESULT")
-    private String returnResult;
-
     @OneToMany(targetEntity = DataPacketParam.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
     private List<DataPacketParam> packetParams;
-
-    public DataPacket() {
-        bufferFreshPeriod = -1;
-    }
 
     public List<DataPacketParam> getPacketParams() {
         if (packetParams == null) {

@@ -104,7 +104,8 @@ public class DataPacketServiceImpl implements DataPacketService {
         return Md5Encoder.encode(temp.toString());
     }
 
-    private BizModel fetchDataPacketDataFromBuf(DataPacket dataPacket, Map<String, Object>  paramsMap){
+     @Override
+     public Object fetchDataPacketDataFromBuf(DataPacket dataPacket, Map<String, Object>  paramsMap){
         if(jedisPool==null){
             return null;
         }
@@ -124,16 +125,15 @@ public class DataPacketServiceImpl implements DataPacketService {
                     e.printStackTrace();
                 }
                 jedis.close();
-                if (object instanceof BizModel) {
-                    return (BizModel) object;
-                }
+                return object;
             }
         }
         return null;
     }
 
-    private void setDataPacketBuf(BizModel bizModel, DataPacket dataPacket, Map<String, Object>  paramsMap){
-        if(jedisPool==null){
+    @Override
+    public void setDataPacketBuf(Object bizModel, DataPacket dataPacket, Map<String, Object>  paramsMap){
+        if(jedisPool==null || dataPacket.getBufferFreshPeriod() ==null){
             return;
         }
         String key =makeDataPacketBufId(dataPacket, paramsMap);
@@ -165,7 +165,7 @@ public class DataPacketServiceImpl implements DataPacketService {
                     jedis.expire(key.getBytes(),seconds);
                 } else if (dataPacket.getBufferFreshPeriod() >= Constant.SIXTY) {
                     //按秒
-                    jedis.expire(key.getBytes(),dataPacket.getBufferFreshPeriod());
+                    jedis.expire(key.getBytes(), dataPacket.getBufferFreshPeriod());
                 }
                 bos.close();
                 oos.close();

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import redis.clients.jedis.JedisPool;
 
 
 /**
@@ -24,8 +25,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 @EnableScheduling
 @Import({IPOrStaticAppSystemBeanConfig.class,
-        SpringSecurityDaoConfig.class,
-        JdbcConfig.class})
+    SpringSecurityDaoConfig.class,
+    JdbcConfig.class})
 @ComponentScan(basePackages = "com.centit",
     excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION,
         value = org.springframework.stereotype.Controller.class))
@@ -36,13 +37,25 @@ public class ServiceConfig {
     private String appHome;
     @Value("${fileserver.url}")
     private String fileserver;
+    @Value("${redis.host}")
+    private String redisHost;
+    @Value("${redis.port}")
+    private int redisPort;
+
     /**
      * 这个bean必须要有
+     *
      * @return CentitPasswordEncoder 密码加密算法
      */
     @Bean("passwordEncoder")
     public StandardPasswordEncoderImpl passwordEncoder() {
         return new StandardPasswordEncoderImpl();
+    }
+
+    @Bean
+    public JedisPool jedisPool() {
+        JedisPool jedisPool= new JedisPool(redisHost, redisPort);
+        return jedisPool;
     }
 
     @Bean
@@ -57,7 +70,7 @@ public class ServiceConfig {
     @Lazy(value = false)
     public OperationLogWriter operationLogWriter() {
         TextOperationLogWriterImpl operationLog = new TextOperationLogWriterImpl();
-        operationLog.setOptLogHomePath(appHome+"/logs");
+        operationLog.setOptLogHomePath(appHome + "/logs");
         operationLog.init();
         return operationLog;
     }
@@ -65,11 +78,12 @@ public class ServiceConfig {
     @Bean
     public FileClientImpl fileClient() {
         FileClientImpl fileClient = new FileClientImpl();
-        fileClient.init(fileserver,fileserver,"u0000000", "000000",fileserver);
+        fileClient.init(fileserver, fileserver, "u0000000", "000000", fileserver);
         return fileClient;
     }
+
     @Bean
-    public ClientAsFileStore fileStore(@Autowired FileClientImpl fileClient){
+    public ClientAsFileStore fileStore(@Autowired FileClientImpl fileClient) {
         ClientAsFileStore fileStoreBean = new ClientAsFileStore();
         fileStoreBean.setFileClient(fileClient);
         return fileStoreBean;

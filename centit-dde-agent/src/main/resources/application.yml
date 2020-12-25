@@ -21,7 +21,7 @@ centit:
   useDataMoving: false
   dataMovingPath: D:\centit-dde-datamoving-3.1-SNAPSHOT.jar
   logs: D:/Projects/RunData/dde/log
-  ownGroups: 1,2
+  ownGroups: 考勤
 framework:
   app:
     home: D:/Projects/RunData/dde
