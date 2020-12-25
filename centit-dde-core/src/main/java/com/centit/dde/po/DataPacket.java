@@ -40,7 +40,6 @@ public class DataPacket implements Serializable {
     @NotBlank(message = "字段不能为空")
     private String packetName;
 
-
     /**
      * 详细描述
      */
@@ -60,7 +59,6 @@ public class DataPacket implements Serializable {
     @ApiModelProperty(value = "是否有数据预处理", required = true)
     private String hasDataOpt;
 
-
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "DATA_OPT_DESC_JSON")
     @ApiModelProperty(value = "数据预处理描述 json格式的数据预处理说明", required = true)
@@ -79,6 +77,7 @@ public class DataPacket implements Serializable {
     @ApiModelProperty(value = "创建时间", hidden = true)
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date recordDate;
+
     @Column(name = "UPDATE_DATE")
     @ApiModelProperty(value = "修改时间", hidden = true)
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
@@ -96,9 +95,11 @@ public class DataPacket implements Serializable {
     @Column(name = "TASK_CRON")
     @ApiModelProperty(value = "任务执行定时器")
     private String taskCron;
+
     @Column(name = "INTERFACE_NAME")
     @ApiModelProperty(value = "接口名称(英文不含特殊字符,唯一性)")
     private String interfaceName;
+
     @Column(name = "LAST_RUN_TIME")
     @ApiModelProperty(value = "上次执行时间")
 //    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
@@ -112,9 +113,6 @@ public class DataPacket implements Serializable {
     @Column(name = "IS_VALID")
     @ApiModelProperty(value = "是否启用", required = true)
     private Boolean isValid;
-    @Column(name = "IS_WHILE")
-    @ApiModelProperty(value = "是否循环", required = true)
-    private Boolean isWhile;
 
     /**
      * 添加返回数据：
@@ -126,6 +124,7 @@ public class DataPacket implements Serializable {
     @Column(name = "RETURN_TYPE")
     @ApiModelProperty(value = "返回数据类型", required = true)
     private String returnType;
+
     @Column(name = "OWN_GROUP")
     @ApiModelProperty(value = "所属分组")
     private String ownGroup;
@@ -172,6 +171,5 @@ public class DataPacket implements Serializable {
         }
         return params;
     }
-
 
 }
