@@ -23,8 +23,10 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * @author zhf
@@ -32,33 +34,34 @@ import java.util.Set;
 @Service
 public class TaskSchedulers {
     private final DataPacketDao dataPacketDao;
-
     private final Scheduler scheduler;
-
     private final OperationLogWriter operationLogWriter;
-    private String taskMd5;
-    private final PathConfig pathConfig;
-
+    private static String staticTaskMd5= "";
+    private static ConcurrentHashMap<String, Object> queryParams = new ConcurrentHashMap<>(2);
     @Autowired
     public TaskSchedulers(DataPacketDao dataPacketDao, Scheduler scheduler, OperationLogWriter operationLogWriter, PathConfig pathConfig) {
         this.dataPacketDao = dataPacketDao;
         this.scheduler = scheduler;
         this.operationLogWriter = operationLogWriter;
-        this.pathConfig = pathConfig;
+        queryParams.put("taskType", "2");
+        queryParams.put("isValid", "T");
+        if (pathConfig.getOwnGroups() != null && pathConfig.getOwnGroups().length > 0) {
+            queryParams.put("ownGroup_in", pathConfig.getOwnGroups());
+        }
     }
 
     private boolean isEqualMd5(List<DataPacket> list) {
         boolean result = false;
-        StringBuilder sList = new StringBuilder();
+        StringBuffer stringBuffer = new StringBuffer(100);
         for (DataPacket i : list) {
-            sList.append(i.getTaskCron());
+            stringBuffer.append(i.getTaskCron());
         }
         String taskMd5 = "";
         try {
             MessageDigest md5 = MessageDigest.getInstance("MD5");
             byte[] buffer = new byte[8192];
             int length;
-            InputStream is = new ByteArrayInputStream(sList.toString().getBytes());
+            InputStream is = new ByteArrayInputStream(stringBuffer.toString().getBytes());
             while ((length = is.read(buffer)) != -1) {
                 md5.update(buffer, 0, length);
             }
@@ -66,25 +69,20 @@ public class TaskSchedulers {
         } catch (NoSuchAlgorithmException | IOException e) {
             e.printStackTrace();
         }
-        if (taskMd5.equals(this.taskMd5)) {
+        if (taskMd5.equals(staticTaskMd5)) {
             result = true;
         } else {
-            this.taskMd5 = taskMd5;
+            staticTaskMd5 = taskMd5;
         }
         return result;
     }
 
     private void refreshTask() throws SchedulerException {
-        Map<String, Object> map = CollectionsOpt.createHashMap("taskType", "2", "isValid", "T");
-        if (pathConfig.getOwnGroups() != null && pathConfig.getOwnGroups().length > 0) {
-            map.put("ownGroup_in", pathConfig.getOwnGroups());
-        }
-        List<DataPacket> list = dataPacketDao.listObjectsByProperties(map);
+        List<DataPacket> list =  new CopyOnWriteArrayList<>(dataPacketDao.listObjectsByProperties(queryParams));
         if (isEqualMd5(list)) {
             return;
         }
-        Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup());
-
+        Set<TriggerKey> triggerKeys =  new CopyOnWriteArraySet<>(scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup()));
         for (DataPacket ll : list) {
             if ("".equals(ll.getTaskCron()) || ll.getTaskCron() == null) {
                 continue;
