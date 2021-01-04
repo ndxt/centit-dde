@@ -7,8 +7,12 @@ import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.SQLDataSetReader;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.DataSourceDescription;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -26,6 +30,14 @@ public class DBBizOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", "");
         String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
+        Map<String, String> mapString=BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"),"key","value");
+        Map<String,Object> mapObject=new HashMap<>();
+        for(Map.Entry<String, String> map :mapString.entrySet()){
+          if(!StringBaseOpt.isNvl(map.getValue())){
+              mapObject.put(map.getKey(),map.getValue());
+            }
+        }
+        mapObject.putAll(bizModel.getModelTag());
         DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(databaseCode);
         if (databaseInfo == null) {
             throw new ObjectException("找不到对应的集成数据库：" + databaseCode);
@@ -33,7 +45,7 @@ public class DBBizOperation implements BizOperation {
         SQLDataSetReader sqlDsr = new SQLDataSetReader();
         sqlDsr.setDataSource(DataSourceDescription.valueOf(databaseInfo));
         sqlDsr.setSqlSen(sql);
-        SimpleDataSet dataSet = sqlDsr.load(bizModel.getModelTag());
+        SimpleDataSet dataSet = sqlDsr.load(mapObject);
         bizModel.putDataSet(sourDsName, dataSet);
         return BuiltInOperation.getJsonObject(dataSet.size());
     }
