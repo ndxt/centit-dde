@@ -39,6 +39,11 @@
             <version>4.0.4</version>
         </dependency>
         <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>sqljdbc4</artifactId>
+            <version>4.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-config</artifactId>
         </dependency>
