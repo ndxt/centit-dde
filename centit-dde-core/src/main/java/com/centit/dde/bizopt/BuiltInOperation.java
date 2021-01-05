@@ -235,7 +235,13 @@ public class BuiltInOperation {
     }
 
     public static JSONObject runClear(BizModel bizModel, JSONObject bizOptJson) {
-        bizModel.getBizData().clear();
+        List<String> sets = jsonArrayToList(bizOptJson.getJSONArray("config"), "paramValidateRegex", "index", "");
+        for(String s:sets) {
+            bizModel.putDataSet(s,null);
+        }
+        if (sets.size()==0) {
+            bizModel.getBizData().clear();
+        }
         return getJsonObject(0);
     }
 

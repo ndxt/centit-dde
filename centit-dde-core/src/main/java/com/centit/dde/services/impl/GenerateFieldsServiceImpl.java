@@ -10,8 +10,8 @@ import com.centit.dde.dataset.SQLDataSetWriter;
 import com.centit.dde.services.GenerateFieldsService;
 import com.centit.dde.vo.ColumnSchema;
 import com.centit.fileserver.common.FileStore;
-import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.framework.ip.service.IntegrationEnvironment;
+import com.centit.product.metadata.dao.DatabaseInfoDao;
+import com.centit.product.metadata.po.DatabaseInfo;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.*;
 import org.slf4j.Logger;
@@ -36,16 +36,16 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     @Autowired(required = false)
     private FileStore fileStore;
 
-    private final IntegrationEnvironment integrationEnvironment;
+    private final DatabaseInfoDao databaseInfoDao;
 
     @Autowired
-    public GenerateFieldsServiceImpl(IntegrationEnvironment integrationEnvironment) {
-        this.integrationEnvironment = integrationEnvironment;
+    public GenerateFieldsServiceImpl(DatabaseInfoDao databaseInfoDao) {
+        this.databaseInfoDao = databaseInfoDao;
     }
 
     @Override
     public JSONArray queryViewSqlData(String databaseCode, String sql, Map<String, Object> params) {
-        DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(databaseCode);
+        DatabaseInfo databaseInfo = databaseInfoDao.getDatabaseInfoById(databaseCode);
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(QueryUtils.translateQuery(sql, params));
         try {
             return TransactionHandler.executeQueryInTransaction(DataSourceDescription.valueOf(databaseInfo),
@@ -69,8 +69,8 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
             e.printStackTrace();
         }
         SimpleDataSet dataSet = csvDataSet.load(null);
-        JSONArray result=new JSONArray();
-        for(int i=0;i<dataSet.getDataAsList().size();i++){
+        JSONArray result = new JSONArray();
+        for (int i = 0; i < dataSet.getDataAsList().size(); i++) {
             if (i >= 20) {
                 break;
             } else {
@@ -90,8 +90,8 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
             e.printStackTrace();
         }
         SimpleDataSet dataSet = jsonDataSet.load(null);
-        JSONArray result=new JSONArray();
-        for(int i=0;i<dataSet.getDataAsList().size();i++){
+        JSONArray result = new JSONArray();
+        for (int i = 0; i < dataSet.getDataAsList().size(); i++) {
             if (i >= 20) {
                 break;
             } else {
@@ -132,7 +132,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     public List<ColumnSchema> generateJsonFields(Map<String, Object> params) {
         Class c = SimpleDataSet.class;
         Field[] columns = c.getDeclaredFields();
-        List<String> sColumns=new ArrayList<>();
+        List<String> sColumns = new ArrayList<>();
         for (Field s : columns) {
             sColumns.add(s.getName());
         }
@@ -145,10 +145,10 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     }
 
     @Override
-    public List<ColumnSchema> generateSqlFields(String databaseCode,String sql, Map<String, Object> params) {
-        List<String> sColumn=QueryUtils.getSqlFiledNames(sql);
-        if(sColumn==null || sColumn.size()==0){
-            DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(databaseCode);
+    public List<ColumnSchema> generateSqlFields(String databaseCode, String sql, Map<String, Object> params) {
+        List<String> sColumn = QueryUtils.getSqlFiledNames(sql);
+        if (sColumn == null || sColumn.size() == 0) {
+            DatabaseInfo databaseInfo = databaseInfoDao.getDatabaseInfoById(databaseCode);
             QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(QueryUtils.translateQuery(sql, params));
             String sSql = QueryUtils.buildLimitQuerySQL(qap.getQuery(), 0, 2, false,
                 DBType.mapDBType(databaseInfo.getDatabaseUrl()));
@@ -159,7 +159,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
                 try (ResultSet rs = stmt.executeQuery()) {
                     ResultSetMetaData rsd = rs.getMetaData();
                     int nc = rsd.getColumnCount();
-                    sColumn=new ArrayList<>(nc);
+                    sColumn = new ArrayList<>(nc);
                     for (int i = 1; i <= nc; i++) {
                         sColumn.add(rsd.getColumnName(i));
                     }

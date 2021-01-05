@@ -1,16 +1,13 @@
 package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.Constant;
 import com.centit.fileserver.common.FileStore;
-import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
@@ -34,21 +31,18 @@ import java.util.Map;
 @Transactional(rollbackFor = Exception.class)
 public class DataPacketServiceImpl implements DataPacketService {
     @Autowired(required = false)
-    private  JedisPool jedisPool;
+    private JedisPool jedisPool;
 
     @Autowired(required = false)
-    private  FileStore fileStore;
+    private FileStore fileStore;
 
     @Autowired
     private DataPacketDao dataPacketDao;
 
     @Autowired
-    private IntegrationEnvironment integrationEnvironment;
-
-    @Autowired
     private BizOptFlow bizOptFlow;
 
-    public DataPacketServiceImpl( ) {
+    public DataPacketServiceImpl() {
 
     }
 
@@ -65,13 +59,12 @@ public class DataPacketServiceImpl implements DataPacketService {
     }
 
     @Override
-    public void updateDataPacketOptJson(String packetId, String dataPacketOptJson){
+    public void updateDataPacketOptJson(String packetId, String dataPacketOptJson) {
         DatabaseOptUtils.batchUpdateObject(dataPacketDao, DataPacket.class,
-            CollectionsOpt.createHashMap("dataOptDescJson",dataPacketOptJson ),
-            CollectionsOpt.createHashMap("packetId",packetId )
+            CollectionsOpt.createHashMap("dataOptDescJson", dataPacketOptJson),
+            CollectionsOpt.createHashMap("packetId", packetId)
         );
     }
-
 
 
     @Override
@@ -92,7 +85,7 @@ public class DataPacketServiceImpl implements DataPacketService {
     }
 
 
-    private String makeDataPacketBufId(DataPacket dataPacket, Map<String, Object>  paramsMap){
+    private String makeDataPacketBufId(DataPacket dataPacket, Map<String, Object> paramsMap) {
         String dateString = DatetimeOpt.convertTimestampToString(dataPacket.getRecordDate());
         String params = JSON.toJSONString(paramsMap, SerializerFeature.MapSortField);
         StringBuffer temp;
@@ -104,16 +97,16 @@ public class DataPacketServiceImpl implements DataPacketService {
         return Md5Encoder.encode(temp.toString());
     }
 
-     @Override
-     public Object fetchDataPacketDataFromBuf(DataPacket dataPacket, Map<String, Object>  paramsMap){
-        if(jedisPool==null){
+    @Override
+    public Object fetchDataPacketDataFromBuf(DataPacket dataPacket, Map<String, Object> paramsMap) {
+        if (jedisPool == null) {
             return null;
         }
-        String key =makeDataPacketBufId(dataPacket, paramsMap);
+        String key = makeDataPacketBufId(dataPacket, paramsMap);
         Object object = null;
         if (dataPacket.getBufferFreshPeriod() >= 0) {
             Jedis jedis = jedisPool.getResource();
-            if ((jedis.get(key.getBytes()) != null) && (jedis.get(key.getBytes()).length>0)) {
+            if ((jedis.get(key.getBytes()) != null) && (jedis.get(key.getBytes()).length > 0)) {
                 try {
                     byte[] byt = jedis.get(key.getBytes());
                     ByteArrayInputStream bis = new ByteArrayInputStream(byt);
@@ -132,37 +125,37 @@ public class DataPacketServiceImpl implements DataPacketService {
     }
 
     @Override
-    public void setDataPacketBuf(Object bizModel, DataPacket dataPacket, Map<String, Object>  paramsMap){
-        if(jedisPool==null || dataPacket.getBufferFreshPeriod() ==null){
+    public void setDataPacketBuf(Object bizModel, DataPacket dataPacket, Map<String, Object> paramsMap) {
+        if (jedisPool == null || dataPacket.getBufferFreshPeriod() == null) {
             return;
         }
-        String key =makeDataPacketBufId(dataPacket, paramsMap);
+        String key = makeDataPacketBufId(dataPacket, paramsMap);
         Jedis jedis = jedisPool.getResource();
-        if (jedis.get(key.getBytes())==null || (jedis.get(key.getBytes()).length==0)) {
+        if (jedis.get(key.getBytes()) == null || (jedis.get(key.getBytes()).length == 0)) {
             try {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 ObjectOutputStream oos = new ObjectOutputStream(bos);
                 oos.writeObject(bizModel);
 
-                byte[] byt=bos.toByteArray();
-                jedis.set(key.getBytes(),byt);
+                byte[] byt = bos.toByteArray();
+                jedis.set(key.getBytes(), byt);
                 int seconds;
                 if (dataPacket.getBufferFreshPeriod() == Constant.ONE) {
                     //一日
-                    seconds = 24*3600;
-                    jedis.expire(key.getBytes(),seconds);
+                    seconds = 24 * 3600;
+                    jedis.expire(key.getBytes(), seconds);
                 } else if (dataPacket.getBufferFreshPeriod() == Constant.TWO) {
                     //按周
-                    seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfWeek(new Date()))*24*3600;
-                    jedis.expire(key.getBytes(),seconds);
+                    seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfWeek(new Date())) * 24 * 3600;
+                    jedis.expire(key.getBytes(), seconds);
                 } else if (dataPacket.getBufferFreshPeriod() == Constant.THREE) {
                     //按月
-                    seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfMonth(new Date()))*24*3600;
-                    jedis.expire(key.getBytes(),seconds);
+                    seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfMonth(new Date())) * 24 * 3600;
+                    jedis.expire(key.getBytes(), seconds);
                 } else if (dataPacket.getBufferFreshPeriod() == Constant.FOUR) {
                     //按年
-                    seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfYear(new Date()))*24*3600;
-                    jedis.expire(key.getBytes(),seconds);
+                    seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfYear(new Date())) * 24 * 3600;
+                    jedis.expire(key.getBytes(), seconds);
                 } else if (dataPacket.getBufferFreshPeriod() >= Constant.SIXTY) {
                     //按秒
                     jedis.expire(key.getBytes(), dataPacket.getBufferFreshPeriod());

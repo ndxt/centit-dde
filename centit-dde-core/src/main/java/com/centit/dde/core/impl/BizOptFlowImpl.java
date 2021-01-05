@@ -11,7 +11,7 @@ import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.fileserver.common.FileStore;
-import com.centit.framework.ip.service.IntegrationEnvironment;
+import com.centit.product.metadata.dao.DatabaseInfoDao;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
@@ -20,7 +20,6 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
-import org.apache.tools.ant.taskdefs.Java;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -42,7 +41,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     private String path;
 
     @Autowired
-    private IntegrationEnvironment integrationEnvironment;
+    private DatabaseInfoDao databaseInfoDao;
 
     @Autowired
     private MetaDataService metaDataService;
@@ -96,9 +95,9 @@ public class BizOptFlowImpl implements BizOptFlow {
             databaseRunTime);
         allOperations.put("js", jsBizOperation);
         PersistenceBizOperation databaseOperation = new PersistenceBizOperation(
-            path, integrationEnvironment, metaDataService);
+            path, databaseInfoDao, metaDataService);
         allOperations.put("persistence", databaseOperation);
-        DBBizOperation dbBizOperation = new DBBizOperation(integrationEnvironment);
+        DBBizOperation dbBizOperation = new DBBizOperation(databaseInfoDao);
         allOperations.put("database", dbBizOperation);
         ExcelBizOperation excelBizOperation = new ExcelBizOperation(fileStore);
         allOperations.put("excel", excelBizOperation);

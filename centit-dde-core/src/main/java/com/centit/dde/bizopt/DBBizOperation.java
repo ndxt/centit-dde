@@ -5,8 +5,8 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.SQLDataSetReader;
-import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.framework.ip.service.IntegrationEnvironment;
+import com.centit.product.metadata.dao.DatabaseInfoDao;
+import com.centit.product.metadata.po.DatabaseInfo;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.DataSourceDescription;
@@ -19,10 +19,10 @@ import java.util.Map;
  * @author zhf
  */
 public class DBBizOperation implements BizOperation {
-    private IntegrationEnvironment integrationEnvironment;
+    private DatabaseInfoDao databaseInfoDao;
 
-    public DBBizOperation(IntegrationEnvironment integrationEnvironment) {
-        this.integrationEnvironment = integrationEnvironment;
+    public DBBizOperation(DatabaseInfoDao databaseInfoDao) {
+        this.databaseInfoDao = databaseInfoDao;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class DBBizOperation implements BizOperation {
             }
         }
         mapObject.putAll(bizModel.getModelTag());
-        DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(databaseCode);
+        DatabaseInfo databaseInfo = databaseInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
             throw new ObjectException("找不到对应的集成数据库：" + databaseCode);
         }

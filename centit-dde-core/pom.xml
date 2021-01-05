@@ -45,17 +45,14 @@
         </dependency>
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>framework-adapter</artifactId>
+            <artifactId>framework-core</artifactId>
         </dependency>
 
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-adapter</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>fileserver-utils</artifactId>

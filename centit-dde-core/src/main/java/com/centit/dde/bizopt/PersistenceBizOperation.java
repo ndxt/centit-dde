@@ -8,8 +8,8 @@ import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.dataset.SQLDataSetWriter;
-import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.framework.ip.service.IntegrationEnvironment;
+import com.centit.product.metadata.dao.DatabaseInfoDao;
+import com.centit.product.metadata.po.DatabaseInfo;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
@@ -28,14 +28,14 @@ public class PersistenceBizOperation implements BizOperation {
     private static final String WRITER_INDICATE_APPEND = "append";
     private static final String WRITER_INDICATE_MERGE = "merge";
     private static final String WRITER_INDICATE_UPDATE = "update";
-    private IntegrationEnvironment integrationEnvironment;
+    private DatabaseInfoDao databaseInfoDao ;
     private MetaDataService metaDataService;
 
     public PersistenceBizOperation(String exportPath,
-                                   IntegrationEnvironment integrationEnvironment,
+                                   DatabaseInfoDao databaseInfoDao,
                                    MetaDataService metaDataService) {
         this.exportPath = exportPath;
-        this.integrationEnvironment = integrationEnvironment;
+        this.databaseInfoDao = databaseInfoDao;
         this.metaDataService = metaDataService;
     }
 
@@ -71,7 +71,7 @@ public class PersistenceBizOperation implements BizOperation {
                 ObjectException.NULL_EXCEPTION,
                 "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
         }
-        DatabaseInfo databaseInfo = integrationEnvironment.getDatabaseInfo(databaseCode);
+        DatabaseInfo databaseInfo = databaseInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
             throw new ObjectException(bizOptJson,
                 ObjectException.NULL_EXCEPTION,

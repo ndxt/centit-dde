@@ -1,15 +1,12 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.service.ExchangeService;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
-import com.centit.dde.services.GenerateFieldsService;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
-import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,7 +26,7 @@ import java.util.Map;
 @RequestMapping(value = "packet")
 public class DataPacketController extends BaseController {
 
-    private  FileStore fileStore;
+    private FileStore fileStore;
 
     @Autowired(required = false)
     public void setFileStore(FileStore fileStore) {
@@ -37,18 +34,10 @@ public class DataPacketController extends BaseController {
     }
 
     private final DataPacketService dataPacketService;
-    private final ExchangeService exchangeService;
-
-    private final GenerateFieldsService generateFieldsService;
-
-    private final IntegrationEnvironment integrationEnvironment;
 
 
-    public DataPacketController(DataPacketService dataPacketService, GenerateFieldsService generateFieldsService, IntegrationEnvironment integrationEnvironment, ExchangeService exchangeService) {
+    public DataPacketController(DataPacketService dataPacketService) {
         this.dataPacketService = dataPacketService;
-        this.generateFieldsService = generateFieldsService;
-        this.integrationEnvironment = integrationEnvironment;
-        this.exchangeService = exchangeService;
     }
 
     @ApiOperation(value = "新增数据包")
