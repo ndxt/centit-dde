@@ -15,10 +15,9 @@
     <artifactId>centit-dde-agent</artifactId>
 
     <properties>
-        <metadata.commons.version>1.0-SNAPSHOT</metadata.commons.version>
-        <common.module.version>1.1-SNAPSHOT</common.module.version>
+        <metadata.commons.version>1.1-SNAPSHOT</metadata.commons.version>
+        <common.module.version>1.2-SNAPSHOT</common.module.version>
         <centit.dde.version>3.1-SNAPSHOT</centit.dde.version>
-        <centit.ip.version>2.1-SNAPSHOT</centit.ip.version>
     </properties>
 
     <dependencies>
@@ -58,11 +57,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-with-app</artifactId>
-            <version>${centit.ip.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.dm</groupId>
             <artifactId>dmjdbc7</artifactId>
             <version>1.7.0</version>
@@ -80,17 +74,14 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.9</version>
+            <version>5.1.49</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>sqljdbc4</artifactId>
             <version>4.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>

@@ -8,9 +8,9 @@ spring:
   datasource:
     type: org.apache.commons.dbcp2.BasicDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.134.7:3306/stat?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: stat
-    password: stat
+    url: jdbc:mysql://192.168.134.7:3308/stat?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
     dbcp2:
       max-wait-millis: 10000
       max-idle: 15
@@ -22,21 +22,8 @@ centit:
   dataMovingPath: D:\centit-dde-datamoving-3.1-SNAPSHOT.jar
   logs: D:/Projects/RunData/dde/log
   ownGroups: 考勤
-framework:
-  app:
-    home: D:/Projects/RunData/dde
-  ip:
-    enable: true
-    topoptid: DDE
-    home: http://192.168.134.2:11000/framework/system
-    auth-enable: false
-    usercode: admin
-    password: 000000
 logging.path: D:/Projects/RunData/dde/log
-os:
-  file:
-    base:
-      dir: D:\D\Projects\RunData\file_home\export
+
 
 
 
