@@ -32,9 +32,11 @@ public class DBBizOperation implements BizOperation {
         String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
         Map<String, String> mapString=BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"),"key","value");
         Map<String,Object> mapObject=new HashMap<>();
-        for(Map.Entry<String, String> map :mapString.entrySet()){
-          if(!StringBaseOpt.isNvl(map.getValue())){
-              mapObject.put(map.getKey(),map.getValue());
+        if(mapString!=null) {
+            for (Map.Entry<String, String> map : mapString.entrySet()) {
+                if (!StringBaseOpt.isNvl(map.getValue())) {
+                    mapObject.put(map.getKey(), map.getValue());
+                }
             }
         }
         mapObject.putAll(bizModel.getModelTag());
