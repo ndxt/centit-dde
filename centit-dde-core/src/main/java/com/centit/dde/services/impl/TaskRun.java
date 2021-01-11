@@ -47,13 +47,7 @@ public class TaskRun {
         }
         bizOptFlow.initStep(0);
         Map<String, Object> mapObject = new HashMap<>(dataPacket.getPacketParamsValue());
-        if(queryParams!=null) {
-            for (Map.Entry<String, Object> map : queryParams.entrySet()) {
-                if (!StringBaseOpt.isNvl((String) map.getValue())) {
-                    mapObject.put(map.getKey(), map.getValue());
-                }
-            }
-        }
+        mapObject.putAll(queryParams);
         return bizOptFlow.run(bizOptJson, logId,mapObject);
     }
 
