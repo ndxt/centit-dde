@@ -16,6 +16,7 @@ import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -45,7 +46,15 @@ public class TaskRun {
             return null;
         }
         bizOptFlow.initStep(0);
-        return bizOptFlow.run(bizOptJson, logId, queryParams == null || queryParams.size()==0 ? dataPacket.getPacketParamsValue() : queryParams);
+        Map<String, Object> mapObject = new HashMap<>(dataPacket.getPacketParamsValue());
+        if(queryParams!=null) {
+            for (Map.Entry<String, Object> map : queryParams.entrySet()) {
+                if (!StringBaseOpt.isNvl((String) map.getValue())) {
+                    mapObject.put(map.getKey(), map.getValue());
+                }
+            }
+        }
+        return bizOptFlow.run(bizOptJson, logId,mapObject);
     }
 
 
