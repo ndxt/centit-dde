@@ -99,7 +99,7 @@ public class DataPacketServiceImpl implements DataPacketService {
 
     @Override
     public Object fetchDataPacketDataFromBuf(DataPacket dataPacket, Map<String, Object> paramsMap) {
-        if (jedisPool == null) {
+        if (jedisPool == null || dataPacket.getBufferFreshPeriod()==null) {
             return null;
         }
         String key = makeDataPacketBufId(dataPacket, paramsMap);
