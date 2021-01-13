@@ -14,4 +14,5 @@ public abstract class Constant {
     static final  String BACKSLASH="/";
     static final  String SPOT=".";
     static final  String DOUBLE_SPOT="..";
+    public static final String ELSE="else";
 }

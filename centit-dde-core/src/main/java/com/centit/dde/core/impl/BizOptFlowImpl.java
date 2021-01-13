@@ -10,6 +10,7 @@ import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.Constant;
 import com.centit.fileserver.common.FileStore;
 import com.centit.product.metadata.dao.DatabaseInfoDao;
 import com.centit.product.metadata.service.DatabaseRunTime;
@@ -125,6 +126,11 @@ public class BizOptFlowImpl implements BizOptFlow {
             if (BooleanBaseOpt.castObjectToBoolean(
                 VariableFormula.calculate(jsonObject.getString("expression"),
                     new BizModelJSONTransform(bizModel)), false)) {
+                return dataOptDescJson.getOptStep(jsonObject.getString("targetId"));
+            }
+        }
+        for (JSONObject jsonObject : linksJson) {
+            if (Constant.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
                 return dataOptDescJson.getOptStep(jsonObject.getString("targetId"));
             }
         }
