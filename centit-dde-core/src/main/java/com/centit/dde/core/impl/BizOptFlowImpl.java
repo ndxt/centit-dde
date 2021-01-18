@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -137,7 +138,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         return null;
     }
 
-    private Object returnResult(BizModel bizModel, JSONObject stepJson) {
+    private Object returnResult(BizModel bizModel, JSONObject stepJson) throws IOException {
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
         String path;
         switch (type) {
@@ -151,15 +152,14 @@ public class BizOptFlowImpl implements BizOptFlow {
                 return JSONTransformer.transformer(
                     JSON.parse(path), new BizModelJSONTransform(bizModel));
             case "5":
-                path = BuiltInOperation.getJsonFieldString(stepJson, "kname", "D");
-                return bizModel.fetchDataSetByName(path);
+                return allOperations.get("SSD").runOpt(bizModel,stepJson);
             default:
                 return bizModel;
         }
     }
 
     @Override
-    public Object run(JSONObject bizOptJson, String logId, Map<String, Object> queryParams) {
+    public Object run(JSONObject bizOptJson, String logId, Map<String, Object> queryParams) throws IOException {
         DataOptDescJson dataOptDescJson = new DataOptDescJson(bizOptJson);
         JSONObject stepJson = dataOptDescJson.getStartStep();
         if (stepJson == null) {

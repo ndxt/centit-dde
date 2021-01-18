@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class TaskRun {
         this.bizOptFlow = bizOptFlow;
     }
 
-    private Object runStep(DataPacket dataPacket, String logId, Map<String, Object> queryParams) {
+    private Object runStep(DataPacket dataPacket, String logId, Map<String, Object> queryParams) throws IOException {
         JSONObject bizOptJson = dataPacket.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
             return null;
