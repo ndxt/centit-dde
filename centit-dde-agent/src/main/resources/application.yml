@@ -23,6 +23,15 @@ centit:
   logs: D:/Projects/RunData/dde/log
   ownGroups: 考勤
 logging.path: D:/Projects/RunData/dde/log
+email:
+ hostName: mail.centit.com
+ smtpPort: 25
+ userName: alertmail@centit.com
+ userPassword: 131511.cn
+ serverEmail: no-reply@centit.com
+ emailTo: zhf@centit.com
+
+
 
 
 

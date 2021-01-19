@@ -11,11 +11,15 @@ import com.centit.dde.po.TaskLog;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.MultiPartEmail;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +33,22 @@ public class TaskRun {
     private final TaskDetailLogDao taskDetailLogDao;
     private final DataPacketDao dataPacketDao;
     private final BizOptFlow bizOptFlow;
+    @Value("${email.hostName:}")
+    private String hostName;
 
+    @Value("${email.smtpPort:25}")
+    private int smtpPort;
+
+    @Value("${email.userName:}")
+    private String userName;
+
+    @Value("${email.userPassword:}")
+    private String userPassword;
+
+    @Value("${email.serverEmail:}")
+    private String serverEmail;
+    @Value("${email.emailTo:}")
+    private String mailTo;
     @Autowired
     public TaskRun(TaskLogDao taskLogDao,
                    TaskDetailLogDao taskDetailLogDao,
@@ -64,11 +83,11 @@ public class TaskRun {
         taskDetailLogDao.saveNewObject(detailLog);
     }
 
-    public Object runTask(String packetId, Map<String, Object> queryParams) {
+    public Object runTask(String packetId, Map<String, Object> queryParams) throws EmailException {
         TaskLog taskLog = new TaskLog();
         Date beginTime = new Date();
+        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
         try {
-            DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
             dataPacket.setLastRunTime(new Date());
             taskLog.setTaskId(packetId);
             taskLog.setApplicationId(dataPacket.getApplicationId());
@@ -95,8 +114,30 @@ public class TaskRun {
             saveDetail(ObjectException.extortExceptionMessage(e, 4),
                 taskLog);
             taskLog.setOtherMessage("error");
+            taskLog.setRunEndTime(new Date());
             taskLogDao.mergeObject(taskLog);
+            sendEmailMessage("任务执行异常",dataPacket.getPacketId()+dataPacket.getPacketName());
         }
         return null;
+    }
+    private void sendEmailMessage(String msgSubject,String msgContent)
+        throws EmailException {
+        if(StringBaseOpt.isNvl(mailTo)){
+            return;
+        }
+        MultiPartEmail multMail = new MultiPartEmail();
+        multMail.setHostName(hostName);
+        multMail.setSmtpPort(smtpPort);
+        multMail.setAuthentication(userName, userPassword);
+        multMail.setFrom(serverEmail);
+        multMail.addTo(mailTo);
+        multMail.setCharset("utf-8");
+        multMail.setSubject(msgSubject);
+        if(msgContent.endsWith("</html>") || msgContent.endsWith("</HTML>")){
+            multMail.addPart(msgContent, "text/html;charset=utf-8");
+        }else{
+            multMail.setContent(msgContent, "text/plain;charset=gb2312");
+        }
+        multMail.send();
     }
 }

@@ -3,6 +3,7 @@ package com.centit.dde.agent.service;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.support.quartz.AbstractQuartzJob;
+import org.apache.commons.mail.EmailException;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 
@@ -47,6 +48,8 @@ public class RunTaskJob extends AbstractQuartzJob {
             try {
                 TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
                 taskRun.runTask(dataPacket.getPacketId(), null);
+            } catch (EmailException e) {
+                e.printStackTrace();
             } finally {
                 runningTask.put(dataPacket.getPacketId(), false);
             }
