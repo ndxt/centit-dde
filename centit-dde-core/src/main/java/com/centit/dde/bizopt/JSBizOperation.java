@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.utils.BizOptUtils;
+import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.database.transaction.ConnectThreadHolder;
@@ -31,7 +32,7 @@ public class JSBizOperation implements BizOperation {
     }
 
     @Override
-    public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         JSRuntimeContext /*JsMateObjectEventRuntime*/ jsRuntimeContext = new JSRuntimeContext();
 
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", "js");
@@ -52,7 +53,7 @@ public class JSBizOperation implements BizOperation {
         } catch (ScriptException | NoSuchMethodException | SQLException e) {
             logger.error(e.getLocalizedMessage());
         }
-        return BuiltInOperation.getJsonObject(count);
+        return BuiltInOperation.getResponseSuccessData(count);
     }
 
     public MetaObjectService getMetaObjectService() {

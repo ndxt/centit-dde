@@ -8,6 +8,8 @@ import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.dataset.SQLDataSetWriter;
+import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.ResponseSingleData;
 import com.centit.product.metadata.dao.DatabaseInfoDao;
 import com.centit.product.metadata.po.DatabaseInfo;
 import com.centit.product.metadata.service.MetaDataService;
@@ -40,9 +42,9 @@ public class PersistenceBizOperation implements BizOperation {
     }
 
     @Override
-    public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String dataType = BuiltInOperation.getJsonFieldString(bizOptJson, "dataType", "D");
-        JSONObject jsonObject = new JSONObject();
+        ResponseData jsonObject = new ResponseSingleData();
         switch (dataType) {
             case "E":
                 writeExcelFile(bizModel, bizOptJson);
@@ -57,45 +59,41 @@ public class PersistenceBizOperation implements BizOperation {
         return jsonObject;
     }
 
-    public JSONObject writeDatabase(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData writeDatabase(BizModel bizModel, JSONObject bizOptJson) {
         String isRun = BuiltInOperation.getJsonFieldString(bizOptJson, "isRun", "T");
         if ("F".equalsIgnoreCase(isRun)) {
-            return new JSONObject();
+            return new ResponseSingleData();
         }
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
         String tableId = BuiltInOperation.getJsonFieldString(bizOptJson, "tableLabelName", null);
         String writerType = BuiltInOperation.getJsonFieldString(bizOptJson, "writerType", "merge");
         if (databaseCode == null || tableId == null) {
-            throw new ObjectException(bizOptJson,
-                ObjectException.NULL_EXCEPTION,
+            return BuiltInOperation.getResponseData(0,0,
                 "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
         }
         DatabaseInfo databaseInfo = databaseInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
-            throw new ObjectException(bizOptJson,
-                ObjectException.NULL_EXCEPTION,
+            return BuiltInOperation.getResponseData(0,0,
                 "数据库信息无效：" + databaseCode);
         }
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet == null) {
-            throw new ObjectException(bizOptJson,
-                ObjectException.NULL_EXCEPTION,
+            return BuiltInOperation.getResponseData(0,0,
                 "数据源信息无效：" + sourDsName);
         }
         TableInfo tableInfo = metaDataService.getMetaTableWithRelations(tableId);
         if (tableInfo == null) {
-            throw new ObjectException(bizOptJson,
-                ObjectException.NULL_EXCEPTION,
+            return BuiltInOperation.getResponseData(0,0,
                 "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
         }
         if (bizOptJson.get("config") == null) {
-            throw new ObjectException(bizOptJson,
-                ObjectException.NULL_EXCEPTION, "没有配置交换字段");
+            return BuiltInOperation.getResponseData(0,0,
+                "没有配置交换字段");
         }
         SQLDataSetWriter dataSetWriter = new SQLDataSetWriter(
             DataSourceDescription.valueOf(databaseInfo), tableInfo);
-        dataSetWriter.setFieldsMap((Map) BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "propertyName", "primaryKey1"));
+        dataSetWriter.setFieldsMap(BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "propertyName", "primaryKey1"));
         String saveAsWhole = BuiltInOperation.getJsonFieldString(bizOptJson, "saveAsWhole", "T");
         dataSetWriter.setSaveAsWhole("T".equalsIgnoreCase(saveAsWhole));
         switch (writerType) {
@@ -110,16 +108,11 @@ public class PersistenceBizOperation implements BizOperation {
                 dataSetWriter.save(dataSet);
                 break;
         }
-
-        JSONObject map = new JSONObject();
+        String info="ok";
         if (dataSet.size() > 0) {
-            map.put("info", dataSetWriter.getInfo());
-        } else {
-            map.put("info", "ok");
+            info= dataSetWriter.getInfo();
         }
-        map.put("success", dataSetWriter.getSuccessNums());
-        map.put("error", dataSetWriter.getErrorNums());
-        return map;
+        return BuiltInOperation.getResponseData(dataSetWriter.getSuccessNums(),dataSetWriter.getErrorNums(),info);
     }
 
     public void writeCsvFile(BizModel bizModel, JSONObject bizOptJson) {

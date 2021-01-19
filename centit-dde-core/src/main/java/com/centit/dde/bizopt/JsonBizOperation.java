@@ -6,6 +6,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.JSONDataSet;
 import com.centit.fileserver.common.FileStore;
+import com.centit.framework.common.ResponseData;
 
 import java.io.IOException;
 
@@ -23,7 +24,7 @@ public class JsonBizOperation implements BizOperation {
     }
 
     @Override
-    public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "nodeName", bizModel.getModelName());
         String filePath = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("fileId");
         JSONDataSet jsonDataSet = new JSONDataSet();
@@ -35,6 +36,6 @@ public class JsonBizOperation implements BizOperation {
         }
         SimpleDataSet dataSet = jsonDataSet.load(null);
         bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getJsonObject(dataSet.size());
+        return BuiltInOperation.getResponseSuccessData(dataSet.size());
     }
 }

@@ -35,14 +35,14 @@ public class ReportBizOperation implements BizOperation {
     }
 
     @Override
-    public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String filePath = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("fileId");
         String fileName = Pretreatment.mapTemplateString(BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()), bizModel);
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName");
         DataSet dataSet = BizOptUtils.castObjectToDataSet(generateWord(bizModel, filePath, params));
         bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getJsonObject(dataSet.size());
+        return BuiltInOperation.getResponseSuccessData(dataSet.size());
     }
 
     private FieldsMetadata getFieldsMetadata(Map<String, String> params, JSONObject docData) {

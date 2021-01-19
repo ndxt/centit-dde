@@ -5,6 +5,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.SQLDataSetReader;
+import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.DatabaseInfoDao;
 import com.centit.product.metadata.po.DatabaseInfo;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -26,7 +27,7 @@ public class DBBizOperation implements BizOperation {
     }
 
     @Override
-    public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", "");
         String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
@@ -42,13 +43,13 @@ public class DBBizOperation implements BizOperation {
         mapObject.putAll(bizModel.getModelTag());
         DatabaseInfo databaseInfo = databaseInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
-            throw new ObjectException("找不到对应的集成数据库：" + databaseCode);
+            return BuiltInOperation.getResponseData(0,0,"找不到对应的集成数据库：" + databaseCode);
         }
         SQLDataSetReader sqlDsr = new SQLDataSetReader();
         sqlDsr.setDataSource(DataSourceDescription.valueOf(databaseInfo));
         sqlDsr.setSqlSen(sql);
         SimpleDataSet dataSet = sqlDsr.load(mapObject);
         bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getJsonObject(dataSet.size());
+        return BuiltInOperation.getResponseSuccessData(dataSet.size());
     }
 }

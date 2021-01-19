@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.support.database.transaction.ConnectThreadHolder;
 import com.centit.support.database.utils.QueryAndNamedParams;
@@ -24,7 +25,7 @@ public class RunSqlSBizOperation implements BizOperation {
     }
 
     @Override
-    public JSONObject runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         JSONArray jsonArray = bizOptJson.getJSONArray("config");
         if (jsonArray != null) {
             int count = 0;
@@ -39,8 +40,8 @@ public class RunSqlSBizOperation implements BizOperation {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            return BuiltInOperation.getJsonObject(count);
+            return BuiltInOperation.getResponseSuccessData(count);
         }
-        return BuiltInOperation.getJsonObject(0);
+        return BuiltInOperation.getResponseSuccessData(0);
     }
 }

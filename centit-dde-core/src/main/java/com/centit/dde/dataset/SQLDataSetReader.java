@@ -8,6 +8,7 @@ import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
 import com.centit.support.common.ObjectException;
+import com.centit.support.database.transaction.ConnectThreadHolder;
 import com.centit.support.database.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +76,7 @@ public class SQLDataSetReader implements DataSetReader {
             SimpleDataSet dataSet = new SimpleDataSet();
             dataSet.setData(jsonArray);
             //dataSet.setParms(paramsMap);
+            ConnectThreadHolder.commitAndRelease();
             return dataSet;
         } catch (SQLException | IOException e) {
             logger.error(e.getLocalizedMessage());

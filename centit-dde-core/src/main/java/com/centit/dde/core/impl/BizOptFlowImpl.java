@@ -12,6 +12,7 @@ import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.Constant;
 import com.centit.fileserver.common.FileStore;
+import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.DatabaseInfoDao;
 import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaDataService;
@@ -217,7 +218,6 @@ public class BizOptFlowImpl implements BizOptFlow {
             if (logId != null) {
                 writeLog(logId, "error", "找不到对应的操作：" + sOptType);
             }
-            throw new ObjectException(bizOptJson, "找不到对应的操作：" + sOptType);
         }
         try {
             TaskDetailLog detailLog = new TaskDetailLog();
@@ -228,7 +228,8 @@ public class BizOptFlowImpl implements BizOptFlow {
                 }
                 detailLog = writeLog(logId, sOptType + ":" + processName, "");
             }
-            JSONObject jsonObject = opt.runOpt(bizModel, bizOptJson);
+            ResponseData responseData = opt.runOpt(bizModel, bizOptJson);
+            JSONObject jsonObject=JSONObject.parseObject(responseData.getData().toString());
             if (logId != null) {
                 detailLog.setSuccessPieces(jsonObject.getIntValue("success"));
                 detailLog.setErrorPieces(jsonObject.getIntValue("error"));
@@ -240,7 +241,6 @@ public class BizOptFlowImpl implements BizOptFlow {
             if (logId != null) {
                 writeLog(logId, "error", ObjectException.extortExceptionMessage(e, 4));
             }
-            throw new ObjectException(bizOptJson, ObjectException.extortExceptionMessage(e, 4));
         }
     }
 
