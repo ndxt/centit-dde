@@ -3,7 +3,6 @@ package com.centit.dde.agent.service;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.support.quartz.AbstractQuartzJob;
-import org.apache.commons.mail.EmailException;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 
@@ -41,15 +40,13 @@ public class RunTaskJob extends AbstractQuartzJob {
             }
         } else {
             Boolean isRunning = runningTask.put(dataPacket.getPacketId(), true);
-            if(isRunning!=null && isRunning){
-                logger.info("任务："+dataPacket.getPacketId()+ "仍在执行中忽略这个执行周期");
+            if (isRunning != null && isRunning) {
+                logger.info("任务：" + dataPacket.getPacketId() + "仍在执行中忽略这个执行周期");
                 return true;
             }
             try {
                 TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
                 taskRun.runTask(dataPacket.getPacketId(), null);
-            } catch (EmailException e) {
-                e.printStackTrace();
             } finally {
                 runningTask.put(dataPacket.getPacketId(), false);
             }

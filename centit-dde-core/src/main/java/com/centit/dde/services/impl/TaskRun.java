@@ -11,7 +11,6 @@ import com.centit.dde.po.TaskLog;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
-import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.MultiPartEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +18,6 @@ import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,11 +47,12 @@ public class TaskRun {
     private String serverEmail;
     @Value("${email.emailTo:}")
     private String mailTo;
+
     @Autowired
     public TaskRun(TaskLogDao taskLogDao,
                    TaskDetailLogDao taskDetailLogDao,
                    DataPacketDao dataPacketDao,
-                    BizOptFlow bizOptFlow) {
+                   BizOptFlow bizOptFlow) {
         this.taskLogDao = taskLogDao;
         this.taskDetailLogDao = taskDetailLogDao;
         this.dataPacketDao = dataPacketDao;
@@ -68,7 +67,7 @@ public class TaskRun {
         bizOptFlow.initStep(0);
         Map<String, Object> mapObject = new HashMap<>(dataPacket.getPacketParamsValue());
         mapObject.putAll(queryParams);
-        return bizOptFlow.run(bizOptJson, logId,mapObject);
+        return bizOptFlow.run(bizOptJson, logId, mapObject);
     }
 
 
@@ -83,7 +82,7 @@ public class TaskRun {
         taskDetailLogDao.saveNewObject(detailLog);
     }
 
-    public Object runTask(String packetId, Map<String, Object> queryParams) throws EmailException {
+    public Object runTask(String packetId, Map<String, Object> queryParams) {
         TaskLog taskLog = new TaskLog();
         Date beginTime = new Date();
         DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
@@ -116,28 +115,32 @@ public class TaskRun {
             taskLog.setOtherMessage("error");
             taskLog.setRunEndTime(new Date());
             taskLogDao.mergeObject(taskLog);
-            sendEmailMessage("任务执行异常",dataPacket.getPacketId()+dataPacket.getPacketName());
+            sendEmailMessage("任务执行异常", dataPacket.getPacketId() + dataPacket.getPacketName());
         }
         return null;
     }
-    private void sendEmailMessage(String msgSubject,String msgContent)
-        throws EmailException {
-        if(StringBaseOpt.isNvl(mailTo)){
+
+    private void sendEmailMessage(String msgSubject, String msgContent) {
+        if (StringBaseOpt.isNvl(mailTo)) {
             return;
         }
-        MultiPartEmail multMail = new MultiPartEmail();
-        multMail.setHostName(hostName);
-        multMail.setSmtpPort(smtpPort);
-        multMail.setAuthentication(userName, userPassword);
-        multMail.setFrom(serverEmail);
-        multMail.addTo(mailTo);
-        multMail.setCharset("utf-8");
-        multMail.setSubject(msgSubject);
-        if(msgContent.endsWith("</html>") || msgContent.endsWith("</HTML>")){
-            multMail.addPart(msgContent, "text/html;charset=utf-8");
-        }else{
-            multMail.setContent(msgContent, "text/plain;charset=gb2312");
+        try {
+            MultiPartEmail multMail = new MultiPartEmail();
+            multMail.setHostName(hostName);
+            multMail.setSmtpPort(smtpPort);
+            multMail.setAuthentication(userName, userPassword);
+            multMail.setFrom(serverEmail);
+            multMail.addTo(mailTo);
+            multMail.setCharset("utf-8");
+            multMail.setSubject(msgSubject);
+            if (msgContent.endsWith("</html>") || msgContent.endsWith("</HTML>")) {
+                multMail.addPart(msgContent, "text/html;charset=utf-8");
+            } else {
+                multMail.setContent(msgContent, "text/plain;charset=gb2312");
+            }
+            multMail.send();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        multMail.send();
     }
 }
