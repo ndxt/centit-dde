@@ -90,6 +90,11 @@
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>message-sender-utils</artifactId>
+            <version>${centit.oa.modules.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
