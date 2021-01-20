@@ -25,7 +25,6 @@
     <properties>
         <cxf.version>2.7.3</cxf.version>
         <metadata.commons.version>1.1-SNAPSHOT</metadata.commons.version>
-        <common.module.version>1.1-SNAPSHOT</common.module.version>
 	</properties>
 
     <description> 数据研发引擎（data develop engine），分两部分，一个控制台，一个数据处理程序
