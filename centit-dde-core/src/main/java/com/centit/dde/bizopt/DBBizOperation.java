@@ -9,7 +9,6 @@ import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.DatabaseInfoDao;
 import com.centit.product.metadata.po.DatabaseInfo;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.DataSourceDescription;
 
 import java.util.HashMap;

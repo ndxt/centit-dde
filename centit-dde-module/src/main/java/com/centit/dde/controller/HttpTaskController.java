@@ -5,13 +5,9 @@ import com.centit.dde.po.DataPacket;
 import com.centit.dde.service.ExchangeService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.DataSetOptUtil;
-import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
-import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
-import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
 import io.swagger.annotations.Api;
@@ -22,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Map;
 
 @Api(value = "Http触发任务响应", tags = "Http触发任务响应")
