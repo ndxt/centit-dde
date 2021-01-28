@@ -18,6 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -137,10 +138,10 @@ public class HttpTaskController extends BaseController {
     )})
     @WrapUpResponseBody
     public Object testFormula(String formula, String jsonString) {
-        Map object = (Map) JSON.parse(jsonString);
+        Map object = (Map) JSON.parse(StringEscapeUtils.unescapeHtml4(jsonString));
         VariableFormula variableFormula = DataSetOptUtil.createFormula();
         variableFormula.setTrans(new ObjectTranslate(object));
-        variableFormula.setFormula(formula);
+        variableFormula.setFormula(StringEscapeUtils.unescapeHtml4(formula));
         return variableFormula.calcFormula();
     }
 }
