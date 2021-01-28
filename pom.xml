@@ -13,7 +13,6 @@
 	<artifactId>centit-dde3</artifactId>
 	<version>3.1-SNAPSHOT</version>
     <modules>
-        <module>centit-dde-console</module>
         <module>centit-dde-datamoving</module>
         <module>centit-dde-agent</module>
         <module>centit-dde-core</module>
