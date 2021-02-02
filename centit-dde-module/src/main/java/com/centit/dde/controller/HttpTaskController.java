@@ -5,13 +5,9 @@ import com.centit.dde.po.DataPacket;
 import com.centit.dde.service.ExchangeService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.DataSetOptUtil;
-import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
-import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
-import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
 import io.swagger.annotations.Api;
@@ -23,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Map;
 
 @Api(value = "Http触发任务响应", tags = "Http触发任务响应")
@@ -43,17 +38,17 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "立即执行任务")
     public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) {
-        Map<String,Object> params=collectRequestParameters(request);
-        JsonResultUtils.writeSingleDataJson(getObject(packetId, params),response);
+        Map<String, Object> params = collectRequestParameters(request);
+        JsonResultUtils.writeSingleDataJson(getObject(packetId, params), response);
     }
 
     private Object getObject(String packetId, Map<String, Object> params) {
         Object bizModel;
-        DataPacket dataPacket=dataPacketService.getDataPacket(packetId);
-        bizModel=dataPacketService.fetchDataPacketDataFromBuf(dataPacket,params);
-        if(bizModel==null) {
-            bizModel = exchangeService.runTask(packetId,params);
-            dataPacketService.setDataPacketBuf(bizModel,dataPacket,params);
+        DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
+        bizModel = dataPacketService.fetchDataPacketDataFromBuf(dataPacket, params);
+        if (bizModel == null) {
+            bizModel = exchangeService.runTask(packetId, params);
+            dataPacketService.setDataPacketBuf(bizModel, dataPacket, params);
         }
         return bizModel;
     }
@@ -61,15 +56,15 @@ public class HttpTaskController extends BaseController {
     @PostMapping(value = "/runPost/{packetId}")
     @ApiOperation(value = "立即执行任务Post")
     public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
-                            HttpServletResponse response){
+                            HttpServletResponse response) {
         Map<String, Object> params = collectRequestParameters(request);
         params.put("request", request);
-        JsonResultUtils.writeSingleDataJson(getObject(packetId, params),response);
+        JsonResultUtils.writeSingleDataJson(getObject(packetId, params), response);
     }
 
     @GetMapping(value = "/testformula")
     @ApiOperation(value = "测试表达式", notes =
-        "可用表达式  \n"+
+        "可用表达式  \n" +
             "表达式:toJson(),名称:转json,示例:formula:toJson(name);json:{name:\\{sex:'man'}}  \n" +
             "表达式:uuid(),名称:获取uuid,示例:formula:uuid()  \n" +
             "表达式:toString(),名称:转换为String,示例:formula:toString(name)  \n" +
