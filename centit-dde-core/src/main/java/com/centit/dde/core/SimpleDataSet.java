@@ -60,14 +60,14 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
     @Override
     public String getDataSetType() {
         if(this.data ==null){
-            return "E";//empty
+            return "E"; //empty
         }
         if(this.data instanceof Collection){
             //Collection<?> objects = ((Collection<?>)this.data);
-            return "T";//二维表 T(table)
+            return "T"; //二维表 T(table)
         }
         if(this.data instanceof Map){
-            return "R"; // 标量数据 S(scalar)
+            return "R"; // 单个数据记录 R(row)
         }
 
         Class<?> clazz = this.data.getClass();
@@ -75,8 +75,7 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
             && !(this.data instanceof char[])) {
             return "T";
         }
-
-        return "S"; //单个数据记录 R(row)
+        return "S"; //标量数据 S(scalar)
     }
 
     @Override
