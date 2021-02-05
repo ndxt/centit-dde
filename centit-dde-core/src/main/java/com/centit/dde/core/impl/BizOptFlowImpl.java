@@ -123,7 +123,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     /**
      * 获取分支
      */
-    private JSONObject getBatchStep(BizModel bizModel, DataOptDescJson dataOptDescJson, String stepId) {
+    private JSONObject getBatchStep(BizModel bizModel, DataOptDescJson dataOptDescJson, String stepId, Object preResult) {
         List<JSONObject> linksJson = dataOptDescJson.getNextLinks(stepId);
         for (JSONObject jsonObject : linksJson) {
             if (BooleanBaseOpt.castObjectToBoolean(
@@ -160,10 +160,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
     }
 
-    private Object runStep(DataOptDescJson dataOptDescJson, String logId, SimpleBizModel bizModel, JSONObject stepJson) throws IOException{
+    private Object runStep(DataOptDescJson dataOptDescJson, String logId, SimpleBizModel bizModel, JSONObject stepJson, Object preResult) throws IOException{
         String stepId = stepJson.getString("id");
         String stepType = stepJson.getString("type");
-        Object responseData = ResponseData.successResponse;
         if ("results".equals(stepType)) {
             return returnResult(bizModel, stepJson);
         }
@@ -172,20 +171,20 @@ public class BizOptFlowImpl implements BizOptFlow {
             DataPacket dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
             Map<String, Object> queryParams = CollectionsOpt.cloneHashMap(bizModel.getModelTag());
             queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue"));
-            responseData = run(dataPacket.getDataOptDescJson(), logId, queryParams);
+            preResult = run(dataPacket.getDataOptDescJson(), logId, queryParams);
         }
 
         if ("branch".equals(stepType)) {
-            stepJson = getBatchStep(bizModel, dataOptDescJson, stepId);
+            stepJson = getBatchStep(bizModel, dataOptDescJson, stepId, preResult);
         } else /*if (stepJson != null)*/ {
-            responseData = runOneStepOpt(bizModel, stepJson, logId);
+            preResult = runOneStepOpt(bizModel, stepJson, logId);
             stepJson = dataOptDescJson.getNextStep(stepId);
         }
 
         if(stepJson!=null){
-            return runStep(dataOptDescJson, logId, bizModel, stepJson);
+            return runStep(dataOptDescJson, logId, bizModel, stepJson, preResult);
         } else {
-            return responseData;
+            return preResult;
         }
     }
 
@@ -199,7 +198,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
         SimpleBizModel bizModel = new SimpleBizModel(logId);
         bizModel.setModelTag(queryParams);
-        return runStep(dataOptDescJson, logId, bizModel, stepJson);
+        Object responseData = ResponseData.successResponse;
+        return runStep(dataOptDescJson, logId, bizModel, stepJson, responseData);
     }
 
     private TaskDetailLog writeLog(String logId, String logType, String logInfo) {
