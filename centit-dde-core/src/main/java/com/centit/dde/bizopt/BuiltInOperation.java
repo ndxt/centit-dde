@@ -329,22 +329,31 @@ public class BuiltInOperation {
         String httpUrl = getJsonFieldString(bizOptJson, "httpUrl", "");
         Object requestBody = VariableFormula.calculate(getJsonFieldString(bizOptJson, "requestText", ""),
             new BizModelJSONTransform(bizModel));
-        Map<String, String> params = jsonArrayToMap(bizOptJson.getJSONArray("config"), "urlname", "urlvalue");
+        Map<String, String> params = jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlvalue");
+        Map<String,Object> mapObject=new HashMap<>();
+        if(params!=null) {
+            for (Map.Entry<String, String> map : params.entrySet()) {
+                if (!StringBaseOpt.isNvl(map.getValue())) {
+                    mapObject.put(map.getKey(), map.getValue());
+                }
+            }
+        }
+        mapObject.putAll(bizModel.getModelTag());
         DataSet dataSet = new SimpleDataSet();
         AppSession appSession = new AppSession();
         RestfulHttpRequest restfulHttpRequest = new RestfulHttpRequest();
         switch (httpMethod.toLowerCase()) {
             case "post":
-                dataSet=BizOptUtils.castObjectToDataSet(RestfulHttpRequest.jsonPost(appSession, UrlOptUtils.appendParamsToUrl(httpUrl, (Map) params), requestBody));
+                dataSet=BizOptUtils.castObjectToDataSet(RestfulHttpRequest.jsonPost(appSession, UrlOptUtils.appendParamsToUrl(httpUrl,mapObject), requestBody));
                 break;
             case "put":
-                dataSet=BizOptUtils.castObjectToDataSet(RestfulHttpRequest.jsonPut(appSession, UrlOptUtils.appendParamsToUrl(httpUrl, (Map) params), requestBody));
+                dataSet=BizOptUtils.castObjectToDataSet(RestfulHttpRequest.jsonPut(appSession, UrlOptUtils.appendParamsToUrl(httpUrl,mapObject), requestBody));
                 break;
             case "get":
-                dataSet=BizOptUtils.castObjectToDataSet(RestfulHttpRequest.getResponseData(appSession, httpUrl, (Map) params));
+                dataSet=BizOptUtils.castObjectToDataSet(RestfulHttpRequest.getResponseData(appSession, httpUrl,mapObject));
                 break;
             case "delete":
-                dataSet=BizOptUtils.castObjectToDataSet(restfulHttpRequest.doDelete(appSession, httpUrl, (Map) params));
+                dataSet=BizOptUtils.castObjectToDataSet(restfulHttpRequest.doDelete(appSession, httpUrl,mapObject));
             default:
                 break;
         }
