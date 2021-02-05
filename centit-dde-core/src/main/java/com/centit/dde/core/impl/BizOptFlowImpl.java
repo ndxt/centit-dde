@@ -18,6 +18,7 @@ import com.centit.product.metadata.service.DatabaseRunTime;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
@@ -159,6 +160,35 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
     }
 
+    private Object runStep(DataOptDescJson dataOptDescJson, String logId, SimpleBizModel bizModel, JSONObject stepJson) throws IOException{
+        String stepId = stepJson.getString("id");
+        String stepType = stepJson.getString("type");
+        Object responseData = ResponseData.successResponse;
+        if ("results".equals(stepType)) {
+            return returnResult(bizModel, stepJson);
+        }
+
+        if ("sche".equals(stepType)) {
+            DataPacket dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
+            Map<String, Object> queryParams = CollectionsOpt.cloneHashMap(bizModel.getModelTag());
+            queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue"));
+            responseData = run(dataPacket.getDataOptDescJson(), logId, queryParams);
+        }
+
+        if ("branch".equals(stepType)) {
+            stepJson = getBatchStep(bizModel, dataOptDescJson, stepId);
+        } else /*if (stepJson != null)*/ {
+            responseData = runOneStepOpt(bizModel, stepJson, logId);
+            stepJson = dataOptDescJson.getNextStep(stepId);
+        }
+
+        if(stepJson!=null){
+            return runStep(dataOptDescJson, logId, bizModel, stepJson);
+        } else {
+            return responseData;
+        }
+    }
+
     @Override
     public Object run(JSONObject bizOptJson, String logId, Map<String, Object> queryParams) throws IOException {
         DataOptDescJson dataOptDescJson = new DataOptDescJson(bizOptJson);
@@ -169,29 +199,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
         SimpleBizModel bizModel = new SimpleBizModel(logId);
         bizModel.setModelTag(queryParams);
-        while (stepJson != null) {
-            String stepId = stepJson.getString("id");
-            String stepType = stepJson.getString("type");
-            if ("results".equals(stepType)) {
-                return returnResult(bizModel, stepJson);
-            }
-            if ("branch".equals(stepType)) {
-                stepJson = getBatchStep(bizModel, dataOptDescJson, stepId);
-            }
-            if (stepJson != null) {
-                runOneStep(bizModel, stepJson, logId);
-            }
-            if ("sche".equals(stepType)) {
-                DataPacket dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
-                queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue"));
-                run(dataPacket.getDataOptDescJson(), logId, queryParams);
-            }
-            stepJson = dataOptDescJson.getNextStep(stepId);
-        }
-        if (bizModel.isEmpty()) {
-            writeLog(logId, "emptyBizModel", "ok");
-        }
-        return bizModel;
+        return runStep(dataOptDescJson, logId, bizModel, stepJson);
     }
 
     private TaskDetailLog writeLog(String logId, String logType, String logInfo) {
@@ -211,7 +219,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     /**
      * 单步运行
      */
-    private void runOneStep(BizModel bizModel, JSONObject bizOptJson, String logId) {
+    private ResponseData runOneStepOpt(BizModel bizModel, JSONObject bizOptJson, String logId) {
         String sOptType = bizOptJson.getString("type");
         BizOperation opt = allOperations.get(sOptType);
         if (opt == null) {
@@ -237,14 +245,16 @@ public class BizOptFlowImpl implements BizOptFlow {
                 detailLog.setRunEndTime(new Date());
                 taskDetailLogDao.updateObject(detailLog);
             }
+            return responseData;
         } catch (Exception e) {
             if (logId != null) {
                 writeLog(logId, "error", ObjectException.extortExceptionMessage(e, 4));
             }
+            return ResponseData.makeErrorMessage(e.getMessage());
         }
     }
 
-    private void debugOneStep(BizModel bizModel, JSONObject bizOptJson) {
+    private void debugOneStepOpt(BizModel bizModel, JSONObject bizOptJson) {
         String sOptType = bizOptJson.getString("operation");
         BizOperation opt = allOperations.get(sOptType);
         if (opt != null) {
@@ -264,7 +274,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             for (Object step : optSteps) {
                 if (step instanceof JSONObject) {
                     /*result =*/
-                    debugOneStep(bizModel, (JSONObject) step);
+                    debugOneStepOpt(bizModel, (JSONObject) step);
                 }
             }
         }
