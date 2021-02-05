@@ -180,12 +180,9 @@ public class BizOptFlowImpl implements BizOptFlow {
             preResult = runOneStepOpt(bizModel, stepJson, logId);
             stepJson = dataOptDescJson.getNextStep(stepId);
         }
-
-        if(stepJson!=null){
-            return runStep(dataOptDescJson, logId, bizModel, stepJson, preResult);
-        } else {
-            return preResult;
-        }
+        //尾递归
+        return stepJson!=null? preResult
+            :runStep(dataOptDescJson, logId, bizModel, stepJson, preResult);
     }
 
     @Override
