@@ -94,11 +94,12 @@ public class SimpleBizModel implements BizModel, Serializable {
     public JSONObject toJsonObject(boolean singleRowAsObject) {
         JSONObject dataObject = new JSONObject();
         if (bizData != null) {
-            for (DataSet dataSet : bizData.values()) {
+            for (Map.Entry<String, DataSet> map : bizData.entrySet()) {
+                DataSet dataSet=map.getValue();
                 if (dataSet.size() == 1 && singleRowAsObject) {
-                    dataObject.put(dataSet.getDataSetName(), dataSet.getFirstRow());
+                    dataObject.put(map.getKey(), dataSet.getFirstRow());
                 } else if (!dataSet.isEmpty()) {
-                    dataObject.put(dataSet.getDataSetName(), dataSet.getDataAsList());
+                    dataObject.put(map.getKey(), dataSet.getDataAsList());
                 }
             }
         }

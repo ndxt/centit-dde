@@ -1,10 +1,13 @@
 package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.service.ExchangeService;
 import com.centit.dde.services.DataPacketService;
+import com.centit.dde.utils.Constant;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
@@ -19,6 +22,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 @Api(value = "Http触发任务响应", tags = "Http触发任务响应")
@@ -37,9 +43,17 @@ public class HttpTaskController extends BaseController {
     @GetMapping(value = "/run/{packetId}")
     @ApiOperation(value = "立即执行任务")
     public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
-                                HttpServletResponse response) {
+                                HttpServletResponse response) throws IOException {
         Map<String, Object> params = collectRequestParameters(request);
-        JsonResultUtils.writeSingleDataJson(getObject(packetId, params), response);
+        Object out=getObject(packetId, params);
+        if(out instanceof DataSet && ((DataSet) out).getFirstRow().containsKey(Constant.FILE_CONTENT)
+            && ((DataSet) out).getFirstRow().get(Constant.FILE_CONTENT) instanceof ByteArrayInputStream){
+            InputStream in =(ByteArrayInputStream)((DataSet) out).getFirstRow().get(Constant.FILE_CONTENT);
+            UploadDownloadUtils.downFileRange(request, response,in,
+                in.available(),
+                (String) ((DataSet) out).getFirstRow().get(Constant.FILE_NAME), request.getParameter("downloadType"),null);
+        }
+        JsonResultUtils.writeSingleDataJson(out, response);
     }
 
     private Object getObject(String packetId, Map<String, Object> params) {

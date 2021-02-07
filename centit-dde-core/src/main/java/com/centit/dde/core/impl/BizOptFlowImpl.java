@@ -154,7 +154,8 @@ public class BizOptFlowImpl implements BizOptFlow {
                 return JSONTransformer.transformer(
                     JSON.parse(path), new BizModelJSONTransform(bizModel));
             case "5":
-                return allOperations.get("SSD").runOpt(bizModel,stepJson);
+                path = BuiltInOperation.getJsonFieldString(stepJson, "kname", "D");
+                return bizModel.fetchDataSetByName(path);
             default:
                 return bizModel;
         }
@@ -181,7 +182,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             stepJson = dataOptDescJson.getNextStep(stepId);
         }
         //尾递归
-        return stepJson!=null? preResult
+        return stepJson==null? preResult
             :runStep(dataOptDescJson, logId, bizModel, stepJson, preResult);
     }
 

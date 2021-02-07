@@ -15,4 +15,7 @@ public abstract class Constant {
     static final  String SPOT=".";
     static final  String DOUBLE_SPOT="..";
     public static final String ELSE="else";
+    public static final String FILE_CONTENT ="fileContent";
+    public static final String FILE_SIZE ="fileSize";
+    public static final String FILE_NAME ="fileName";
 }

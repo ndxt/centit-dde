@@ -7,6 +7,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
@@ -38,9 +39,12 @@ public class ReportBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String filePath = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("fileId");
-        String fileName = Pretreatment.mapTemplateString(BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()), bizModel);
+        String fileName = Pretreatment.mapTemplateString(BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()), bizModel)
+            +".docx";
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName");
-        DataSet dataSet = BizOptUtils.castObjectToDataSet(generateWord(bizModel, filePath, params));
+        ByteArrayInputStream in = generateWord(bizModel, filePath, params);
+        DataSet dataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName,
+             "fileContent", in));
         bizModel.putDataSet(sourDsName, dataSet);
         return BuiltInOperation.getResponseSuccessData(dataSet.size());
     }
@@ -110,9 +114,10 @@ public class ReportBizOperation implements BizOperation {
             report.setFieldsMetadata(metadata);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             report.process(context, out);
-            return  new ByteArrayInputStream(out.toByteArray());
+            return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException | XDocReportException e) {
             throw new ObjectException(ResponseData.ERROR_PROCESS_FAILED, e.getMessage());
         }
     }
+
 }
