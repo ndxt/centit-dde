@@ -38,7 +38,6 @@ public class ReportBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
-        OfficeToPdf.word2Pdf("","");
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String filePath = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("fileId");
         String fileName = Pretreatment.mapTemplateString(BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()), bizModel)
