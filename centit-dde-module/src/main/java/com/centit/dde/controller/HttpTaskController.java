@@ -27,6 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+/**
+ * @author zhf
+ */
 @Api(value = "Http触发任务响应", tags = "Http触发任务响应")
 @RestController
 @RequestMapping(value = "httpTask")
@@ -44,14 +47,14 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "立即执行任务")
     public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
-        Map<String, Object> params = collectRequestParameters(request);
+        Map<String, Object> params = null;
         Object out=getObject(packetId, params);
         if(out instanceof DataSet && ((DataSet) out).getFirstRow().containsKey(Constant.FILE_CONTENT)
             && ((DataSet) out).getFirstRow().get(Constant.FILE_CONTENT) instanceof ByteArrayInputStream){
             InputStream in =(ByteArrayInputStream)((DataSet) out).getFirstRow().get(Constant.FILE_CONTENT);
+            String fileName=(String) ((DataSet) out).getFirstRow().get(Constant.FILE_NAME);
             UploadDownloadUtils.downFileRange(request, response,in,
-                in.available(),
-                (String) ((DataSet) out).getFirstRow().get(Constant.FILE_NAME), request.getParameter("downloadType"),null);
+                in.available(), fileName, request.getParameter("downloadType"),null);
         }
         JsonResultUtils.writeSingleDataJson(out, response);
     }
@@ -71,7 +74,7 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "立即执行任务Post")
     public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
                             HttpServletResponse response) {
-        Map<String, Object> params = collectRequestParameters(request);
+        Map<String, Object> params = null;
         params.put("request", request);
         JsonResultUtils.writeSingleDataJson(getObject(packetId, params), response);
     }
