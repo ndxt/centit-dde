@@ -13,6 +13,7 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.file.FileIOOpt;
+import com.centit.support.office.OfficeToPdf;
 import com.centit.support.report.JsonDocxContext;
 import fr.opensagres.xdocreport.core.XDocReportException;
 import fr.opensagres.xdocreport.document.IXDocReport;
@@ -37,6 +38,7 @@ public class ReportBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
+        OfficeToPdf.word2Pdf("","");
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String filePath = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("fileId");
         String fileName = Pretreatment.mapTemplateString(BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()), bizModel)
