@@ -22,9 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Map;
 
 /**
@@ -47,19 +45,11 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "立即执行任务")
     public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
-        Map<String, Object> params = null;
-        Object out=getObject(packetId, params);
-        if(out instanceof DataSet && ((DataSet) out).getFirstRow().containsKey(Constant.FILE_CONTENT)
-            && ((DataSet) out).getFirstRow().get(Constant.FILE_CONTENT) instanceof ByteArrayInputStream){
-            InputStream in =(ByteArrayInputStream)((DataSet) out).getFirstRow().get(Constant.FILE_CONTENT);
-            String fileName=(String) ((DataSet) out).getFirstRow().get(Constant.FILE_NAME);
-            UploadDownloadUtils.downFileRange(request, response,in,
-                in.available(), fileName, request.getParameter("downloadType"),null);
-        }
-        JsonResultUtils.writeSingleDataJson(out, response);
+        returnObject(packetId, request,response);
     }
 
-    private Object getObject(String packetId, Map<String, Object> params) {
+    private void returnObject(String packetId, HttpServletRequest request,HttpServletResponse response) throws IOException {
+        Map<String, Object> params = collectRequestParameters(request);
         Object bizModel;
         DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
         bizModel = dataPacketService.fetchDataPacketDataFromBuf(dataPacket, params);
@@ -67,16 +57,23 @@ public class HttpTaskController extends BaseController {
             bizModel = exchangeService.runTask(packetId, params);
             dataPacketService.setDataPacketBuf(bizModel, dataPacket, params);
         }
-        return bizModel;
+        if(bizModel instanceof DataSet && ((DataSet) bizModel).getFirstRow().containsKey(Constant.FILE_CONTENT)
+            && ((DataSet) bizModel).getFirstRow().get(Constant.FILE_CONTENT) instanceof OutputStream){
+            ByteArrayOutputStream outputStream= (ByteArrayOutputStream) ((DataSet) bizModel).getFirstRow().get(Constant.FILE_CONTENT);
+            InputStream in =new ByteArrayInputStream(outputStream.toByteArray());
+            String fileName=(String) ((DataSet) bizModel).getFirstRow().get(Constant.FILE_NAME);
+            UploadDownloadUtils.downFileRange(request, response,in,
+                in.available(), fileName, request.getParameter("downloadType"),null);
+            return;
+        }
+        JsonResultUtils.writeSingleDataJson(bizModel, response);
     }
 
     @PostMapping(value = "/runPost/{packetId}")
     @ApiOperation(value = "立即执行任务Post")
     public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
-                            HttpServletResponse response) {
-        Map<String, Object> params = null;
-        params.put("request", request);
-        JsonResultUtils.writeSingleDataJson(getObject(packetId, params), response);
+                            HttpServletResponse response) throws IOException {
+        returnObject(packetId, request,response);
     }
 
     @GetMapping(value = "/testformula")

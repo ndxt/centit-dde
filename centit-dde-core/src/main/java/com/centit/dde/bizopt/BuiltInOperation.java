@@ -324,7 +324,7 @@ public class BuiltInOperation {
 
 
     public static ResponseData runHttpData(BizModel bizModel, JSONObject bizOptJson) {
-        String sourDsName = getJsonFieldString(bizOptJson, "processName", bizModel.getModelName());
+        String sourDsName = getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String httpMethod = getJsonFieldString(bizOptJson, "requestMode", "post");
         String httpUrl = getJsonFieldString(bizOptJson, "httpUrl", "");
         Object requestBody = VariableFormula.calculate(getJsonFieldString(bizOptJson, "requestText", ""),
@@ -350,7 +350,7 @@ public class BuiltInOperation {
                 dataSet=BizOptUtils.castObjectToDataSet(RestfulHttpRequest.jsonPut(appSession, UrlOptUtils.appendParamsToUrl(httpUrl,mapObject), requestBody));
                 break;
             case "get":
-                dataSet=BizOptUtils.castObjectToDataSet(RestfulHttpRequest.getResponseData(appSession, httpUrl,mapObject));
+                dataSet=BizOptUtils.castObjectToDataSet(RestfulHttpRequest.getResponseData(appSession, httpUrl,mapObject).getData());
                 break;
             case "delete":
                 dataSet=BizOptUtils.castObjectToDataSet(restfulHttpRequest.doDelete(appSession, httpUrl,mapObject));

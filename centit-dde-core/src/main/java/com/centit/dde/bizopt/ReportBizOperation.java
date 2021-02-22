@@ -41,11 +41,12 @@ public class ReportBizOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String filePath = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("fileId");
         String fileName = Pretreatment.mapTemplateString(BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()), bizModel)
-            +".docx";
+            + ".pdf";
+        String size = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("size");
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName");
         ByteArrayInputStream in = generateWord(bizModel, filePath, params);
         DataSet dataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName,
-             "fileContent", in));
+            "fileSize", size, "fileContent", word2Pdf(in)));
         bizModel.putDataSet(sourDsName, dataSet);
         return BuiltInOperation.getResponseSuccessData(dataSet.size());
     }
@@ -121,4 +122,9 @@ public class ReportBizOperation implements BizOperation {
         }
     }
 
+    private OutputStream word2Pdf(InputStream in) {
+        OutputStream outPdf = new ByteArrayOutputStream();
+        com.centit.support.office.OfficeToPdf.word2Pdf(in, outPdf, "docx");
+        return outPdf;
+    }
 }
