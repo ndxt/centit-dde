@@ -11,6 +11,7 @@ import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.appclient.AppSession;
+import com.centit.framework.appclient.HttpReceiveJSON;
 import com.centit.framework.appclient.RestfulHttpRequest;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
@@ -49,13 +50,15 @@ public class BuiltInOperation {
         map.put("error", 0);
         return ResponseSingleData.makeResponseData(map);
     }
-    static ResponseData getResponseData(int success,int error,String info) {
+
+    static ResponseData getResponseData(int success, int error, String info) {
         JSONObject map = new JSONObject();
         map.put("info", info);
         map.put("success", success);
         map.put("error", error);
         return ResponseSingleData.makeResponseData(map);
     }
+
     public static Map<String, String> jsonArrayToMap(JSONArray json, String key, String... value) {
         if (json != null) {
             Map<String, String> map = new HashMap<>(json.size());
@@ -84,11 +87,11 @@ public class BuiltInOperation {
                 JSONObject temp = (JSONObject) o;
                 if (!StringBaseOpt.isNvl(temp.getString(key))) {
                     if (compare.equalsIgnoreCase(temp.getString(value))) {
-                        if(!list.contains(temp.getString(key) + " " + temp.getString(value))) {
+                        if (!list.contains(temp.getString(key) + " " + temp.getString(value))) {
                             list.add(temp.getString(key) + " " + temp.getString(value));
                         }
                     } else {
-                        if(!list.contains(temp.getString(key))) {
+                        if (!list.contains(temp.getString(key))) {
                             list.add(temp.getString(key));
                         }
                     }
@@ -244,10 +247,10 @@ public class BuiltInOperation {
 
     public static ResponseData runClear(BizModel bizModel, JSONObject bizOptJson) {
         List<String> sets = jsonArrayToList(bizOptJson.getJSONArray("config"), "paramValidateRegex", "index", "");
-        for(String s:sets) {
-            bizModel.putDataSet(s,null);
+        for (String s : sets) {
+            bizModel.putDataSet(s, null);
         }
-        if (sets.size()==0) {
+        if (sets.size() == 0) {
             bizModel.getBizData().clear();
         }
         return getResponseSuccessData(0);
@@ -330,8 +333,8 @@ public class BuiltInOperation {
         Object requestBody = VariableFormula.calculate(getJsonFieldString(bizOptJson, "requestText", ""),
             new BizModelJSONTransform(bizModel));
         Map<String, String> params = jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlvalue");
-        Map<String,Object> mapObject=new HashMap<>();
-        if(params!=null) {
+        Map<String, Object> mapObject = new HashMap<>();
+        if (params != null) {
             for (Map.Entry<String, String> map : params.entrySet()) {
                 if (!StringBaseOpt.isNvl(map.getValue())) {
                     mapObject.put(map.getKey(), map.getValue());
@@ -344,16 +347,21 @@ public class BuiltInOperation {
         RestfulHttpRequest restfulHttpRequest = new RestfulHttpRequest();
         switch (httpMethod.toLowerCase()) {
             case "post":
-                dataSet=BizOptUtils.castObjectToDataSet(RestfulHttpRequest.jsonPost(appSession, UrlOptUtils.appendParamsToUrl(httpUrl,mapObject), requestBody));
+                dataSet = BizOptUtils.castObjectToDataSet(RestfulHttpRequest.jsonPost(appSession, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
                 break;
             case "put":
-                dataSet=BizOptUtils.castObjectToDataSet(RestfulHttpRequest.jsonPut(appSession, UrlOptUtils.appendParamsToUrl(httpUrl,mapObject), requestBody));
+                dataSet = BizOptUtils.castObjectToDataSet(RestfulHttpRequest.jsonPut(appSession, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
                 break;
             case "get":
-                dataSet=BizOptUtils.castObjectToDataSet(RestfulHttpRequest.getResponseData(appSession, httpUrl,mapObject).getData());
+                HttpReceiveJSON receiveJSON = RestfulHttpRequest.getResponseData(appSession, httpUrl, mapObject);
+                if (receiveJSON.getCode() != ResponseData.HTTP_OK) {
+                    return getResponseData(0, receiveJSON.getCode(), receiveJSON.getMessage());
+                } else {
+                    dataSet = BizOptUtils.castObjectToDataSet(receiveJSON.getData());
+                }
                 break;
             case "delete":
-                dataSet=BizOptUtils.castObjectToDataSet(restfulHttpRequest.doDelete(appSession, httpUrl,mapObject));
+                dataSet = BizOptUtils.castObjectToDataSet(restfulHttpRequest.doDelete(appSession, httpUrl, mapObject));
             default:
                 break;
         }
