@@ -354,7 +354,7 @@ public class BuiltInOperation {
                 break;
             case "get":
                 HttpReceiveJSON receiveJSON = RestfulHttpRequest.getResponseData(appSession, httpUrl, mapObject);
-                if (receiveJSON.getCode() != ResponseData.HTTP_OK) {
+                if (receiveJSON.getCode() != ResponseData.RESULT_OK) {
                     return getResponseData(0, receiveJSON.getCode(), receiveJSON.getMessage());
                 } else {
                     dataSet = BizOptUtils.castObjectToDataSet(receiveJSON.getData());
