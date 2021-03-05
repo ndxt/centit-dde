@@ -344,6 +344,8 @@ public class BuiltInOperation {
         mapObject.putAll(bizModel.getModelTag());
         DataSet dataSet = new SimpleDataSet();
         AppSession appSession = new AppSession();
+        appSession.setUserCode(getJsonFieldString(bizOptJson, "userCode", ""));
+        appSession.setPassword(getJsonFieldString(bizOptJson, "password", ""));
         RestfulHttpRequest restfulHttpRequest = new RestfulHttpRequest();
         switch (httpMethod.toLowerCase()) {
             case "post":
