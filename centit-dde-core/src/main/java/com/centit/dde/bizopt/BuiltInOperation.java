@@ -346,6 +346,7 @@ public class BuiltInOperation {
         AppSession appSession = new AppSession();
         appSession.setUserCode(getJsonFieldString(bizOptJson, "userCode", ""));
         appSession.setPassword(getJsonFieldString(bizOptJson, "password", ""));
+        appSession.setAppLoginUrl(getJsonFieldString(bizOptJson, "loginUrl", ""));
         RestfulHttpRequest restfulHttpRequest = new RestfulHttpRequest();
         switch (httpMethod.toLowerCase()) {
             case "post":
