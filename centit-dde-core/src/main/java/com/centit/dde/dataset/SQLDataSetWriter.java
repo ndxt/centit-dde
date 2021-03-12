@@ -44,7 +44,6 @@ public class SQLDataSetWriter implements DataSetWriter {
         this.fieldsMap = fieldsMap;
     }
 
-
     private Connection connection;
     /**
      * true 数据集整体作为一个事务写入
@@ -53,22 +52,11 @@ public class SQLDataSetWriter implements DataSetWriter {
      */
     private boolean saveAsWhole;
 
-    public SQLDataSetWriter() {
-        saveAsWhole = true;
-        connection = null;
-    }
-
     public SQLDataSetWriter(DataSourceDescription dataSource, TableInfo tableInfo) {
         this.saveAsWhole = true;
         this.connection = null;
         this.tableInfo = tableInfo;
         this.dataSource = dataSource;
-    }
-
-    public SQLDataSetWriter(Connection connection, TableInfo tableInfo) {
-        this.saveAsWhole = true;
-        this.connection = connection;
-        this.tableInfo = tableInfo;
     }
 
     private void fetchConnect() {
