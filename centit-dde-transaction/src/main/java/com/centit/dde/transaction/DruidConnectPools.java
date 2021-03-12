@@ -1,0 +1,123 @@
+package com.centit.dde.transaction;
+
+import com.alibaba.druid.pool.DruidDataSource;
+import com.centit.support.database.metadata.IDatabaseInfo;
+import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.support.database.utils.DbcpConnectPools;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+
+public abstract class DruidConnectPools {
+    private static final Logger logger = LoggerFactory.getLogger(DbcpConnectPools.class);
+    private static final
+    Map<DataSourceDescription, DruidDataSource > druidDataSourcePools
+        = new ConcurrentHashMap<>();
+    private DruidConnectPools() {
+        throw new IllegalAccessError("Utility class");
+    }
+
+    private static DruidDataSource  mapDataSource(DataSourceDescription dsDesc) {
+        DruidDataSource ds = new DruidDataSource ();
+        ds.setDriverClassName(dsDesc.getDriver());
+        ds.setUsername(dsDesc.getUsername());
+        ds.setPassword(dsDesc.getPassword());
+        ds.setUrl(dsDesc.getConnUrl());
+        ds.setInitialSize(dsDesc.getInitialSize());
+        ds.setMaxActive(dsDesc.getMaxTotal());
+        ds.setMaxWait(dsDesc.getMaxWaitMillis());
+        ds.setMinIdle(dsDesc.getMinIdle());
+        ds.setValidationQuery("SELECT COUNT(*) FROM DUAL");
+        ds.setTestOnBorrow(true);
+        ds.setTestWhileIdle(true);
+        ds.setTestOnReturn(false);
+        ds.setValidationQueryTimeout(1);
+        ds.setTimeBetweenEvictionRunsMillis(60000);
+        return ds;
+    }
+
+    public static synchronized DruidDataSource  getDataSource(DataSourceDescription dsDesc) {
+        DruidDataSource  ds = druidDataSourcePools.get(dsDesc);
+        if (ds == null) {
+            ds = mapDataSource(dsDesc);
+            druidDataSourcePools.put(dsDesc, ds);
+        }
+        return ds;
+    }
+
+    public static synchronized Connection getDbcpConnect(DataSourceDescription dsDesc) throws SQLException {
+        DruidDataSource ds = getDataSource(dsDesc);
+        Connection conn = ds.getConnection();
+        conn.setAutoCommit(false);
+        ///*dsDesc.getUsername(),dsDesc.getDbType(),*/
+        return conn;
+    }
+
+    public static DruidDataSource getDataSource(IDatabaseInfo dbinfo) {
+        return DruidConnectPools.getDataSource(DataSourceDescription.valueOf(dbinfo));
+    }
+
+    public static Connection getDbcpConnect(IDatabaseInfo dbinfo) throws SQLException {
+        return DbcpConnectPools.getDbcpConnect(DataSourceDescription.valueOf(dbinfo));
+    }
+
+    /* 获得数据源连接状态 */
+    public static Map<String, Integer> getDataSourceStats(DataSourceDescription dsDesc) {
+        DruidDataSource bds = druidDataSourcePools.get(dsDesc);
+        if (bds == null) {
+            return null;
+        }
+        Map<String, Integer> map = new HashMap<>(2);
+        map.put("active_number", bds.getActiveCount());
+        map.put("idle_number", bds.getMaxIdle());
+        return map;
+    }
+
+    /**
+     * 关闭数据源
+     */
+    public static synchronized void shutdownDataSource() {
+        for (Map.Entry<DataSourceDescription, DruidDataSource> dbs : druidDataSourcePools.entrySet()) {
+            dbs.getValue().close();
+        }
+        //dbcpDataSourcePools.clear();
+    }
+
+    public static synchronized boolean testDataSource(DataSourceDescription dsDesc) {
+        DruidDataSource ds = mapDataSource(dsDesc);
+        boolean connOk = false;
+        try {
+            //Class.forName(dsDesc.getDriver());
+            //Connection conn = DriverManager.getConnection(dsDesc.getConnUrl(),
+            //dsDesc.getUsername(),dsDesc.getPassword());
+            Connection conn = ds.getConnection();
+            if (conn != null) {
+                connOk = true;
+                conn.close();
+            }
+            ds.close();
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+        } finally {
+            ds.close();
+        }
+        return connOk;
+    }
+
+    public static void closeConnect(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                logger.error(e.getMessage(), e);//e.printStackTrace();
+            }
+        }
+    }
+}
