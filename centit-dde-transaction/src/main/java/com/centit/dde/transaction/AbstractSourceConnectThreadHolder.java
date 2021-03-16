@@ -3,15 +3,13 @@ package com.centit.dde.transaction;
 import com.centit.support.database.metadata.IDatabaseInfo;
 import com.centit.support.database.utils.DataSourceDescription;
 
-import java.sql.SQLException;
-
 /**
  * @author zhf
  */
-public abstract class SourceConnectThreadHolder {
+public abstract class AbstractSourceConnectThreadHolder {
     private static SourceConnectThreadLocal threadLocal = new SourceConnectThreadLocal();
 
-    private SourceConnectThreadHolder() {
+    private AbstractSourceConnectThreadHolder() {
         super();
     }
 

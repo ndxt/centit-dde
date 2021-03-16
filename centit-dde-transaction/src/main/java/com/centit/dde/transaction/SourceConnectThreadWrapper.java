@@ -23,7 +23,7 @@ class SourceConnectThreadWrapper implements Serializable {
         if (StringBaseOpt.isNvl(description.getSourceType()) || IDatabaseInfo.DATABASE.equals(description.getSourceType())) {
             Connection conn = (Connection) connectPools.get(description);
             if (conn == null) {
-                conn = DruidConnectPools.getDbcpConnect(description);
+                conn = AbstractDruidConnectPools.getDbcpConnect(description);
                 connectPools.put(description, conn);
             }
             return conn;
@@ -62,7 +62,7 @@ class SourceConnectThreadWrapper implements Serializable {
         for (Map.Entry<DataSourceDescription, Object> map : connectPools.entrySet()) {
             if (StringBaseOpt.isNvl(map.getKey().getSourceType()) || IDatabaseInfo.DATABASE.equals(map.getKey().getSourceType())) {
                 Connection conn = (Connection) map.getValue();
-                DruidConnectPools.closeConnect(conn);
+                AbstractDruidConnectPools.closeConnect(conn);
             }
         }
         connectPools.clear();

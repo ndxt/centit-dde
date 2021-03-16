@@ -2,7 +2,7 @@ package com.centit.dde.dataset;
 
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetWriter;
-import com.centit.dde.transaction.SourceConnectThreadHolder;
+import com.centit.dde.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.dde.utils.DBBatchUtils;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.IDatabaseInfo;
@@ -64,7 +64,7 @@ public class SQLDataSetWriter implements DataSetWriter {
 
     private void fetchConnect() {
         try {
-            connection = (Connection) SourceConnectThreadHolder.fetchConnect(dataSource);
+            connection = (Connection) AbstractSourceConnectThreadHolder.fetchConnect(dataSource);
         } catch (Exception e) {
             throw new ObjectException(PersistenceException.DATABASE_OPERATE_EXCEPTION, e);
         }
@@ -113,6 +113,7 @@ public class SQLDataSetWriter implements DataSetWriter {
                 try {
                     int iResult = DBBatchUtils.batchInsertObjects(connection,
                         tableInfo, list, fieldsMap);
+                    connection.commit();
                     if (iResult > 0) {
                         dealResultMsg(row);
                         successNums++;
@@ -175,6 +176,7 @@ public class SQLDataSetWriter implements DataSetWriter {
                 try {
                     int iResult = DBBatchUtils.batchMergeObjects(connection,
                         tableInfo, list, fieldsMap);
+                    connection.commit();
                     if (iResult > 0) {
                         dealResultMsg(row);
                         successNums++;
@@ -196,18 +198,6 @@ public class SQLDataSetWriter implements DataSetWriter {
 
     private void dealResultMsg(Map<String, Object> row) {
         row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "ok");
-    }
-
-    public void setDataSource(IDatabaseInfo dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public void setTableInfo(TableInfo tableInfo) {
-        this.tableInfo = tableInfo;
-    }
-
-    public void setConnection(Connection connection) {
-        this.connection = connection;
     }
 
     public void setSaveAsWhole(boolean saveAsWhole) {

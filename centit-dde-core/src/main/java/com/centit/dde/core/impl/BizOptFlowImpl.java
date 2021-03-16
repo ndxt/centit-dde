@@ -9,7 +9,7 @@ import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.TaskDetailLog;
-import com.centit.dde.transaction.SourceConnectThreadHolder;
+import com.centit.dde.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.Constant;
 import com.centit.fileserver.common.FileStore;
@@ -57,8 +57,6 @@ public class BizOptFlowImpl implements BizOptFlow {
     private MetaObjectService metaObjectService;
 
     @Autowired(required = false)
-    private DatabaseRunTime databaseRunTime;
-    @Autowired(required = false)
     private FileStore fileStore;
 
     @Override
@@ -95,8 +93,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("static", BuiltInOperation::runStaticData);
         allOperations.put("htts", BuiltInOperation::runHttpData);
         allOperations.put("clear", BuiltInOperation::runClear);
-        JSBizOperation jsBizOperation = new JSBizOperation(metaObjectService,
-            databaseRunTime);
+        JSBizOperation jsBizOperation = new JSBizOperation(metaObjectService);
         allOperations.put("js", jsBizOperation);
         PersistenceBizOperation databaseOperation = new PersistenceBizOperation(
             path, databaseInfoDao, metaDataService);
@@ -109,7 +106,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("csv", csvBizOperation);
         JsonBizOperation jsonBizOperation = new JsonBizOperation(fileStore);
         allOperations.put("json", jsonBizOperation);
-        RunSqlSBizOperation runsqlsbizoperation = new RunSqlSBizOperation(databaseRunTime);
+        RunSqlSBizOperation runsqlsbizoperation = new RunSqlSBizOperation(databaseInfoDao);
         allOperations.put("sqlS", runsqlsbizoperation);
         ReportBizOperation reportBizOperation=new ReportBizOperation(fileStore);
         allOperations.put("SSD",reportBizOperation);
@@ -199,9 +196,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         Object responseData = ResponseData.successResponse;
         try {
             responseData= runStep(dataOptDescJson, logId, bizModel, stepJson, responseData);
-            SourceConnectThreadHolder.commitAndRelease();
+            AbstractSourceConnectThreadHolder.commitAndRelease();
         }catch (Exception e){
-            SourceConnectThreadHolder.rollbackAndRelease();
+            AbstractSourceConnectThreadHolder.rollbackAndRelease();
         }
         return responseData;
     }

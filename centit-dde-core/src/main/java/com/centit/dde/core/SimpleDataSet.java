@@ -165,7 +165,7 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
 
 
     public void setData(Object data) {
-        this.data = BizOptUtils.castObjectToDataSet(data);
+        this.data = data;
     }
     /**
      * 数据集中的数据
