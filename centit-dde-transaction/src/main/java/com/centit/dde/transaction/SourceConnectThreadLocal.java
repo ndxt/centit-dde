@@ -1,6 +1,5 @@
 package com.centit.dde.transaction;
 
-import com.centit.support.database.utils.DataSourceDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,13 +8,8 @@ import java.sql.SQLException;
 /**
  * @author zhf
  */
-public class SourceConnectThreadLocal extends ThreadLocal<SourceConnectThreadWrapper> {
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceDescription.class);
-
-    /*@Override
-    protected ConnectThreadWrapper initialValue() {
-        return new ConnectThreadWrapper();
-    }*/
+class SourceConnectThreadLocal extends ThreadLocal<SourceConnectThreadWrapper> {
+    private static final Logger logger = LoggerFactory.getLogger(SourceConnectThreadLocal.class);
 
     @Override
     public void remove() {
@@ -23,7 +17,7 @@ public class SourceConnectThreadLocal extends ThreadLocal<SourceConnectThreadWra
         if (wrapper != null) {
             try {
                 wrapper.rollbackAllWork();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 logger.error(e.getLocalizedMessage());
             } finally {
                 wrapper.releaseAllConnect();
@@ -32,7 +26,7 @@ public class SourceConnectThreadLocal extends ThreadLocal<SourceConnectThreadWra
         super.remove();
     }
 
-    public void superRemove() {
+    void superRemove() {
         super.remove();
     }
 }

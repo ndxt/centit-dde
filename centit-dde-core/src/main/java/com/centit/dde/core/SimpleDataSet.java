@@ -1,5 +1,6 @@
 package com.centit.dde.core;
 
+import com.centit.dde.utils.BizOptUtils;
 import com.centit.support.algorithm.CollectionsOpt;
 
 import java.io.Serializable;
@@ -164,7 +165,7 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
 
 
     public void setData(Object data) {
-        this.data = data;
+        this.data = BizOptUtils.castObjectToDataSet(data);
     }
     /**
      * 数据集中的数据

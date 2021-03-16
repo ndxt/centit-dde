@@ -3,30 +3,27 @@ package com.centit.dde.transaction;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.metadata.IDatabaseInfo;
 import com.centit.support.database.utils.DataSourceDescription;
-import com.centit.support.database.utils.DbcpConnectPools;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author zhf
  */
-public class SourceConnectThreadWrapper implements Serializable {
+class SourceConnectThreadWrapper implements Serializable {
     private final Map<DataSourceDescription, Object> connectPools;
-    public SourceConnectThreadWrapper() {
+
+    SourceConnectThreadWrapper() {
         this.connectPools = new ConcurrentHashMap<>(4);
     }
 
-    public Object fetchConnect(DataSourceDescription description) throws SQLException {
-        if(StringBaseOpt.isNvl(description.getSourceType()) || IDatabaseInfo.DATABASE.equals(description.getSourceType())) {
+    Object fetchConnect(DataSourceDescription description) throws Exception {
+        if (StringBaseOpt.isNvl(description.getSourceType()) || IDatabaseInfo.DATABASE.equals(description.getSourceType())) {
             Connection conn = (Connection) connectPools.get(description);
             if (conn == null) {
-                conn = DbcpConnectPools.getDbcpConnect(description);
+                conn = DruidConnectPools.getDbcpConnect(description);
                 connectPools.put(description, conn);
             }
             return conn;
@@ -34,38 +31,38 @@ public class SourceConnectThreadWrapper implements Serializable {
         return null;
     }
 
-    public void commitAllWork() throws SQLException {
+    void commitAllWork() throws Exception {
         if (connectPools.size() == 0) {
             return;
         }
-        for (Map.Entry<DataSourceDescription, Object> map: connectPools.entrySet()) {
-            if(StringBaseOpt.isNvl(map.getKey().getSourceType()) ||IDatabaseInfo.DATABASE.equals(map.getKey().getSourceType())) {
-                Connection conn =(Connection)map.getValue();
+        for (Map.Entry<DataSourceDescription, Object> map : connectPools.entrySet()) {
+            if (StringBaseOpt.isNvl(map.getKey().getSourceType()) || IDatabaseInfo.DATABASE.equals(map.getKey().getSourceType())) {
+                Connection conn = (Connection) map.getValue();
                 conn.commit();
             }
         }
     }
 
-    public void rollbackAllWork() throws SQLException {
+    void rollbackAllWork() throws Exception {
         if (connectPools.size() == 0) {
             return;
         }
-        for (Map.Entry<DataSourceDescription, Object> map: connectPools.entrySet()) {
-            if(StringBaseOpt.isNvl(map.getKey().getSourceType()) ||IDatabaseInfo.DATABASE.equals(map.getKey().getSourceType())) {
-                Connection conn =(Connection)map.getValue();
+        for (Map.Entry<DataSourceDescription, Object> map : connectPools.entrySet()) {
+            if (StringBaseOpt.isNvl(map.getKey().getSourceType()) || IDatabaseInfo.DATABASE.equals(map.getKey().getSourceType())) {
+                Connection conn = (Connection) map.getValue();
                 conn.rollback();
             }
         }
     }
 
-    public void releaseAllConnect() {
+    void releaseAllConnect() {
         if (connectPools.size() == 0) {
             return;
         }
-        for (Map.Entry<DataSourceDescription, Object> map: connectPools.entrySet()) {
-            if(StringBaseOpt.isNvl(map.getKey().getSourceType()) ||IDatabaseInfo.DATABASE.equals(map.getKey().getSourceType())) {
-                Connection conn =(Connection)map.getValue();
-                DbcpConnectPools.closeConnect(conn);
+        for (Map.Entry<DataSourceDescription, Object> map : connectPools.entrySet()) {
+            if (StringBaseOpt.isNvl(map.getKey().getSourceType()) || IDatabaseInfo.DATABASE.equals(map.getKey().getSourceType())) {
+                Connection conn = (Connection) map.getValue();
+                DruidConnectPools.closeConnect(conn);
             }
         }
         connectPools.clear();

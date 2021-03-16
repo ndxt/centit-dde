@@ -59,7 +59,7 @@ public class TaskRun {
         this.bizOptFlow = bizOptFlow;
     }
 
-    private Object runStep(DataPacket dataPacket, String logId, Map<String, Object> queryParams) throws IOException {
+    private Object runStep(DataPacket dataPacket, String logId, Map<String, Object> queryParams) throws Exception {
         JSONObject bizOptJson = dataPacket.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
             return null;

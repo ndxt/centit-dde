@@ -1,5 +1,6 @@
 package com.centit.dde.core;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -11,5 +12,5 @@ public interface DataSetReader {
      * @param params 模块的自定义参数
      * @return  dataSet 数据集
      */
-    DataSet load(Map<String, Object> params);
+    DataSet load(Map<String, Object> params) throws Exception;
 }

@@ -3,20 +3,19 @@ package com.centit.dde.transaction;
 import com.centit.support.database.metadata.IDatabaseInfo;
 import com.centit.support.database.utils.DataSourceDescription;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
  * @author zhf
  */
-public class SourceConnectThreadHolder {
+public abstract class SourceConnectThreadHolder {
     private static SourceConnectThreadLocal threadLocal = new SourceConnectThreadLocal();
 
     private SourceConnectThreadHolder() {
         super();
     }
 
-    public static SourceConnectThreadWrapper getConnectThreadWrapper() {
+    private static SourceConnectThreadWrapper getConnectThreadWrapper() {
         SourceConnectThreadWrapper wrapper = threadLocal.get();
         if (wrapper == null) {
             wrapper = new SourceConnectThreadWrapper();
@@ -25,16 +24,16 @@ public class SourceConnectThreadHolder {
         return wrapper;
     }
 
-    public static Object fetchConnect(DataSourceDescription description) throws SQLException {
+    private static Object fetchConnect(DataSourceDescription description) throws Exception {
         SourceConnectThreadWrapper wrapper = getConnectThreadWrapper();
         return wrapper.fetchConnect(description);
     }
 
-    public static Object fetchConnect(IDatabaseInfo description) throws SQLException {
+    public static Object fetchConnect(IDatabaseInfo description) throws Exception {
         return fetchConnect(DataSourceDescription.valueOf(description));
     }
 
-    public static void commitAndRelease() throws SQLException {
+    public static void commitAndRelease() throws Exception {
         SourceConnectThreadWrapper wrapper = getConnectThreadWrapper();
         try {
             wrapper.commitAllWork();
@@ -44,7 +43,7 @@ public class SourceConnectThreadHolder {
         }
     }
 
-    public static void rollbackAndRelease() throws SQLException {
+    public static void rollbackAndRelease() throws Exception {
         SourceConnectThreadWrapper wrapper = getConnectThreadWrapper();
         try {
             wrapper.rollbackAllWork();

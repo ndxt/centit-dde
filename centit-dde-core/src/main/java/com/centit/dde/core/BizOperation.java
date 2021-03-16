@@ -11,7 +11,7 @@ import java.io.IOException;
 @FunctionalInterface
 public interface BizOperation{
     //int
-    ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws IOException;
+    ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception;
 
     default void debugOpt(BizModel bizModel, JSONObject bizOptJson){
         //return;

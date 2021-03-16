@@ -15,7 +15,6 @@ import com.centit.product.metadata.po.DatabaseInfo;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
-import com.centit.support.database.utils.DataSourceDescription;
 
 import java.io.File;
 
@@ -29,7 +28,7 @@ public class PersistenceBizOperation implements BizOperation {
     private static final String WRITER_INDICATE_APPEND = "append";
     private static final String WRITER_INDICATE_MERGE = "merge";
     private static final String WRITER_INDICATE_UPDATE = "update";
-    private DatabaseInfoDao databaseInfoDao ;
+    private DatabaseInfoDao databaseInfoDao;
     private MetaDataService metaDataService;
 
     public PersistenceBizOperation(String exportPath,
@@ -68,30 +67,30 @@ public class PersistenceBizOperation implements BizOperation {
         String tableId = BuiltInOperation.getJsonFieldString(bizOptJson, "tableLabelName", null);
         String writerType = BuiltInOperation.getJsonFieldString(bizOptJson, "writerType", "merge");
         if (databaseCode == null || tableId == null) {
-            return BuiltInOperation.getResponseData(0,0,
+            return BuiltInOperation.getResponseData(0, 0,
                 "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
         }
         DatabaseInfo databaseInfo = databaseInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
-            return BuiltInOperation.getResponseData(0,0,
+            return BuiltInOperation.getResponseData(0, 0,
                 "数据库信息无效：" + databaseCode);
         }
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet == null) {
-            return BuiltInOperation.getResponseData(0,0,
+            return BuiltInOperation.getResponseData(0, 0,
                 "数据源信息无效：" + sourDsName);
         }
         TableInfo tableInfo = metaDataService.getMetaTableWithRelations(tableId);
         if (tableInfo == null) {
-            return BuiltInOperation.getResponseData(0,0,
+            return BuiltInOperation.getResponseData(0, 0,
                 "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
         }
         if (bizOptJson.get("config") == null) {
-            return BuiltInOperation.getResponseData(0,0,
+            return BuiltInOperation.getResponseData(0, 0,
                 "没有配置交换字段");
         }
         SQLDataSetWriter dataSetWriter = new SQLDataSetWriter(
-            DataSourceDescription.valueOf(databaseInfo), tableInfo);
+            databaseInfo, tableInfo);
         dataSetWriter.setFieldsMap(BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "propertyName", "primaryKey1"));
         String saveAsWhole = BuiltInOperation.getJsonFieldString(bizOptJson, "saveAsWhole", "T");
         dataSetWriter.setSaveAsWhole("T".equalsIgnoreCase(saveAsWhole));
@@ -107,11 +106,11 @@ public class PersistenceBizOperation implements BizOperation {
                 dataSetWriter.save(dataSet);
                 break;
         }
-        String info="ok";
+        String info = "ok";
         if (dataSet.size() > 0) {
-            info= dataSetWriter.getInfo();
+            info = dataSetWriter.getInfo();
         }
-        return BuiltInOperation.getResponseData(dataSetWriter.getSuccessNums(),dataSetWriter.getErrorNums(),info);
+        return BuiltInOperation.getResponseData(dataSetWriter.getSuccessNums(), dataSetWriter.getErrorNums(), info);
     }
 
     public void writeCsvFile(BizModel bizModel, JSONObject bizOptJson) {

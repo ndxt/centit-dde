@@ -2,10 +2,13 @@ package com.centit.dde.dataset;
 
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetWriter;
+import com.centit.dde.transaction.SourceConnectThreadHolder;
 import com.centit.dde.utils.DBBatchUtils;
 import com.centit.support.common.ObjectException;
+import com.centit.support.database.metadata.IDatabaseInfo;
 import com.centit.support.database.metadata.TableInfo;
-import com.centit.support.database.utils.*;
+import com.centit.support.database.utils.FieldType;
+import com.centit.support.database.utils.PersistenceException;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +32,7 @@ public class SQLDataSetWriter implements DataSetWriter {
     public static String WRITER_ERROR_TAG = "rmdb_dataset_writer_result";
     private static final Logger logger = LoggerFactory.getLogger(SQLDataSetWriter.class);
 
-    private DataSourceDescription dataSource;
+    private IDatabaseInfo dataSource;
     private TableInfo tableInfo;
     private Map fieldsMap;
     private int successNums;
@@ -52,7 +55,7 @@ public class SQLDataSetWriter implements DataSetWriter {
      */
     private boolean saveAsWhole;
 
-    public SQLDataSetWriter(DataSourceDescription dataSource, TableInfo tableInfo) {
+    public SQLDataSetWriter(IDatabaseInfo dataSource, TableInfo tableInfo) {
         this.saveAsWhole = true;
         this.connection = null;
         this.tableInfo = tableInfo;
@@ -61,8 +64,8 @@ public class SQLDataSetWriter implements DataSetWriter {
 
     private void fetchConnect() {
         try {
-            connection = DbcpConnectPools.getDbcpConnect(dataSource);
-        } catch (SQLException e) {
+            connection = (Connection) SourceConnectThreadHolder.fetchConnect(dataSource);
+        } catch (Exception e) {
             throw new ObjectException(PersistenceException.DATABASE_OPERATE_EXCEPTION, e);
         }
     }
@@ -74,17 +77,13 @@ public class SQLDataSetWriter implements DataSetWriter {
      */
     @Override
     public void save(DataSet dataSet) {
+        if (connection == null) {
+            fetchConnect();
+        }
         if (this.saveAsWhole) {
             try {
-                if (connection == null) {
-                    TransactionHandler.executeInTransaction(dataSource,
-                        (conn) -> DBBatchUtils.batchInsertObjects(conn,
-                            tableInfo, dataSet.getDataAsList(), fieldsMap));
-                } else {
-                    TransactionHandler.executeInTransaction(connection,
-                        (conn) -> DBBatchUtils.batchInsertObjects(conn,
-                            tableInfo, dataSet.getDataAsList(), fieldsMap));
-                }
+                DBBatchUtils.batchInsertObjects(connection,
+                    tableInfo, dataSet.getDataAsList(), fieldsMap);
                 successNums = 0;
                 errorNums = 0;
                 info = "ok";
@@ -104,11 +103,6 @@ public class SQLDataSetWriter implements DataSetWriter {
             }
         } else {
             /* 这部分也可以 直接运行sql语句 而不是用 GeneralJsonObjectDao 方式来提高效率 */
-            boolean createConn = false;
-            if (connection == null) {
-                fetchConnect();
-                createConn = true;
-            }
             successNums = 0;
             errorNums = 0;
             info = "ok";
@@ -117,14 +111,13 @@ public class SQLDataSetWriter implements DataSetWriter {
                 List<Map<String, Object>> list = new ArrayList<>();
                 list.add(row);
                 try {
-                    int iResult = TransactionHandler.executeInTransaction(connection,
-                        (conn) -> DBBatchUtils.batchInsertObjects(conn,
-                            tableInfo, list, fieldsMap));
+                    int iResult = DBBatchUtils.batchInsertObjects(connection,
+                        tableInfo, list, fieldsMap);
                     if (iResult > 0) {
                         dealResultMsg(row);
                         successNums++;
                     } else {
-                        row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "执行无结果"+iResult);
+                        row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "执行无结果" + iResult);
                         errorNums++;
                     }
                 } catch (SQLException e) {
@@ -134,10 +127,6 @@ public class SQLDataSetWriter implements DataSetWriter {
                         info = info.concat(e.getMessage());
                     }
                 }
-            }
-
-            if (createConn) {
-                DbcpConnectPools.closeConnect(connection);
             }
         }
     }
@@ -150,18 +139,15 @@ public class SQLDataSetWriter implements DataSetWriter {
      */
     @Override
     public void merge(DataSet dataSet) {
-
+        if (connection == null) {
+            fetchConnect();
+        }
         if (this.saveAsWhole) {
             try {
-                if (connection == null) {
-                    TransactionHandler.executeInTransaction(dataSource,
-                        (conn) -> DBBatchUtils.batchMergeObjects(conn,
-                            tableInfo, dataSet.getDataAsList(), fieldsMap));
-                } else {
-                    TransactionHandler.executeInTransaction(connection,
-                        (conn) -> DBBatchUtils.batchMergeObjects(conn,
-                            tableInfo, dataSet.getDataAsList(), fieldsMap));
-                }
+
+                DBBatchUtils.batchMergeObjects(connection,
+                    tableInfo, dataSet.getDataAsList(), fieldsMap);
+
                 successNums = 0;
                 errorNums = 0;
                 info = "ok";
@@ -180,11 +166,6 @@ public class SQLDataSetWriter implements DataSetWriter {
                 }
             }
         } else {
-            boolean createConn = false;
-            if (connection == null) {
-                fetchConnect();
-                createConn = true;
-            }
             successNums = 0;
             errorNums = 0;
             info = "ok";
@@ -192,14 +173,13 @@ public class SQLDataSetWriter implements DataSetWriter {
                 List<Map<String, Object>> list = new ArrayList<>();
                 list.add(row);
                 try {
-                    int iResult=TransactionHandler.executeInTransaction(dataSource,
-                        (conn) -> DBBatchUtils.batchMergeObjects(conn,
-                            tableInfo, list, fieldsMap));
+                    int iResult = DBBatchUtils.batchMergeObjects(connection,
+                        tableInfo, list, fieldsMap);
                     if (iResult > 0) {
                         dealResultMsg(row);
                         successNums++;
                     } else {
-                        row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "执行无结果"+iResult);
+                        row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "执行无结果" + iResult);
                         errorNums++;
                     }
                 } catch (SQLException | ObjectException e) {
@@ -211,20 +191,14 @@ public class SQLDataSetWriter implements DataSetWriter {
                 }
             }
 
-            if (createConn) {
-                DbcpConnectPools.closeConnect(connection);
-            }
         }
     }
 
     private void dealResultMsg(Map<String, Object> row) {
-//        String msg = (String) row.get(FieldType.mapPropName(WRITER_ERROR_TAG));
-//        if (msg == null || msg.length() < 3) {
         row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "ok");
-//        }
     }
 
-    public void setDataSource(DataSourceDescription dataSource) {
+    public void setDataSource(IDatabaseInfo dataSource) {
         this.dataSource = dataSource;
     }
 

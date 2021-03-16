@@ -4,7 +4,6 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.centit.support.database.metadata.IDatabaseInfo;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.DbcpConnectPools;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,10 +14,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public abstract class DruidConnectPools {
-    private static final Logger logger = LoggerFactory.getLogger(DbcpConnectPools.class);
+/**
+ * @author zhf
+ */
+abstract class DruidConnectPools {
+    private static final Logger logger = LoggerFactory.getLogger(DruidConnectPools.class);
     private static final
-    Map<DataSourceDescription, DruidDataSource > druidDataSourcePools
+    Map<DataSourceDescription, DruidDataSource > DRUID_DATA_SOURCE_POOLS
         = new ConcurrentHashMap<>();
     private DruidConnectPools() {
         throw new IllegalAccessError("Utility class");
@@ -43,34 +45,33 @@ public abstract class DruidConnectPools {
         return ds;
     }
 
-    public static synchronized DruidDataSource  getDataSource(DataSourceDescription dsDesc) {
-        DruidDataSource  ds = druidDataSourcePools.get(dsDesc);
+    private static synchronized DruidDataSource  getDataSource(DataSourceDescription dsDesc) {
+        DruidDataSource  ds = DRUID_DATA_SOURCE_POOLS.get(dsDesc);
         if (ds == null) {
             ds = mapDataSource(dsDesc);
-            druidDataSourcePools.put(dsDesc, ds);
+            DRUID_DATA_SOURCE_POOLS.put(dsDesc, ds);
         }
         return ds;
     }
 
-    public static synchronized Connection getDbcpConnect(DataSourceDescription dsDesc) throws SQLException {
+    static synchronized Connection getDbcpConnect(DataSourceDescription dsDesc) throws SQLException {
         DruidDataSource ds = getDataSource(dsDesc);
         Connection conn = ds.getConnection();
         conn.setAutoCommit(false);
-        ///*dsDesc.getUsername(),dsDesc.getDbType(),*/
         return conn;
     }
 
-    public static DruidDataSource getDataSource(IDatabaseInfo dbinfo) {
-        return DruidConnectPools.getDataSource(DataSourceDescription.valueOf(dbinfo));
+    public static DruidDataSource getDataSource(IDatabaseInfo dbInfo) {
+        return DruidConnectPools.getDataSource(DataSourceDescription.valueOf(dbInfo));
     }
 
-    public static Connection getDbcpConnect(IDatabaseInfo dbinfo) throws SQLException {
-        return DbcpConnectPools.getDbcpConnect(DataSourceDescription.valueOf(dbinfo));
+    public static Connection getDbcpConnect(IDatabaseInfo dbInfo) throws SQLException {
+        return DbcpConnectPools.getDbcpConnect(DataSourceDescription.valueOf(dbInfo));
     }
 
-    /* 获得数据源连接状态 */
+
     public static Map<String, Integer> getDataSourceStats(DataSourceDescription dsDesc) {
-        DruidDataSource bds = druidDataSourcePools.get(dsDesc);
+        DruidDataSource bds = DRUID_DATA_SOURCE_POOLS.get(dsDesc);
         if (bds == null) {
             return null;
         }
@@ -84,19 +85,15 @@ public abstract class DruidConnectPools {
      * 关闭数据源
      */
     public static synchronized void shutdownDataSource() {
-        for (Map.Entry<DataSourceDescription, DruidDataSource> dbs : druidDataSourcePools.entrySet()) {
+        for (Map.Entry<DataSourceDescription, DruidDataSource> dbs : DRUID_DATA_SOURCE_POOLS.entrySet()) {
             dbs.getValue().close();
         }
-        //dbcpDataSourcePools.clear();
     }
 
     public static synchronized boolean testDataSource(DataSourceDescription dsDesc) {
         DruidDataSource ds = mapDataSource(dsDesc);
         boolean connOk = false;
         try {
-            //Class.forName(dsDesc.getDriver());
-            //Connection conn = DriverManager.getConnection(dsDesc.getConnUrl(),
-            //dsDesc.getUsername(),dsDesc.getPassword());
             Connection conn = ds.getConnection();
             if (conn != null) {
                 connOk = true;
@@ -104,19 +101,19 @@ public abstract class DruidConnectPools {
             }
             ds.close();
         } catch (SQLException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             ds.close();
         }
         return connOk;
     }
 
-    public static void closeConnect(Connection conn) {
+    static void closeConnect(Connection conn) {
         if (conn != null) {
             try {
                 conn.close();
             } catch (SQLException e) {
-                logger.error(e.getMessage(), e);//e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
     }

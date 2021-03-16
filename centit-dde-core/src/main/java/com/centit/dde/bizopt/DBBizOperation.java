@@ -26,7 +26,7 @@ public class DBBizOperation implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", "");
         String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
@@ -45,7 +45,7 @@ public class DBBizOperation implements BizOperation {
             return BuiltInOperation.getResponseData(0,0,"找不到对应的集成数据库：" + databaseCode);
         }
         SQLDataSetReader sqlDsr = new SQLDataSetReader();
-        sqlDsr.setDataSource(DataSourceDescription.valueOf(databaseInfo));
+        sqlDsr.setDataSource(databaseInfo);
         sqlDsr.setSqlSen(sql);
         SimpleDataSet dataSet = sqlDsr.load(mapObject);
         bizModel.putDataSet(sourDsName, dataSet);
