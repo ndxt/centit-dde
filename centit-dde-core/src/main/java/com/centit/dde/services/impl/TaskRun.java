@@ -8,6 +8,7 @@ import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskLog;
+import com.centit.dde.utils.Constant;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
@@ -93,7 +94,7 @@ public class TaskRun {
             taskLog.setTaskId(packetId);
             taskLog.setApplicationId(dataPacket.getApplicationId());
             taskLog.setRunBeginTime(beginTime);
-            taskLog.setRunType(dataPacket.getPacketName());
+            taskLog.setRunType("V3"+dataPacket.getPacketName());
             taskLogDao.saveNewObject(taskLog);
             Object bizModel = runStep(dataPacket, taskLog.getLogId(), queryParams);
             taskLog.setRunEndTime(new Date());
