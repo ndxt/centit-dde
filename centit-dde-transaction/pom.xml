@@ -17,8 +17,10 @@
             <version>1.1.18</version>
         </dependency>
         <dependency>
-            <groupId>com.centit.support</groupId>
-            <artifactId>centit-database-datasource</artifactId>
+            <groupId>com.centit.product</groupId>
+            <artifactId>database-metadata</artifactId>
+            <version>1.1-SNAPSHOT</version>
         </dependency>
+
     </dependencies>
 </project>

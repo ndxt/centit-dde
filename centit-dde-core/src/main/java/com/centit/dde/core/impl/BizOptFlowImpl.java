@@ -14,8 +14,7 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.Constant;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
-import com.centit.product.metadata.dao.DatabaseInfoDao;
-import com.centit.product.metadata.service.DatabaseRunTime;
+import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.BooleanBaseOpt;
@@ -45,7 +44,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     private String path;
 
     @Autowired
-    private DatabaseInfoDao databaseInfoDao;
+    private SourceInfoDao sourceInfoDao;
 
     @Autowired
     private MetaDataService metaDataService;
@@ -96,9 +95,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         JSBizOperation jsBizOperation = new JSBizOperation(metaObjectService);
         allOperations.put("js", jsBizOperation);
         PersistenceBizOperation databaseOperation = new PersistenceBizOperation(
-            path, databaseInfoDao, metaDataService);
+            path, sourceInfoDao, metaDataService);
         allOperations.put("persistence", databaseOperation);
-        DBBizOperation dbBizOperation = new DBBizOperation(databaseInfoDao);
+        DbBizOperation dbBizOperation = new DbBizOperation(sourceInfoDao);
         allOperations.put("database", dbBizOperation);
         ExcelBizOperation excelBizOperation = new ExcelBizOperation(fileStore);
         allOperations.put("excel", excelBizOperation);
@@ -106,10 +105,10 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("csv", csvBizOperation);
         JsonBizOperation jsonBizOperation = new JsonBizOperation(fileStore);
         allOperations.put("json", jsonBizOperation);
-        RunSqlSBizOperation runsqlsbizoperation = new RunSqlSBizOperation(databaseInfoDao);
+        RunSqlsBizOperation runsqlsbizoperation = new RunSqlsBizOperation(sourceInfoDao);
         allOperations.put("sqlS", runsqlsbizoperation);
-        ReportBizOperation reportBizOperation=new ReportBizOperation(fileStore);
-        allOperations.put("SSD",reportBizOperation);
+        ReportBizOperation reportBizOperation = new ReportBizOperation(fileStore);
+        allOperations.put("SSD", reportBizOperation);
     }
 
     @Override
@@ -179,8 +178,8 @@ public class BizOptFlowImpl implements BizOptFlow {
             stepJson = dataOptDescJson.getNextStep(stepId);
         }
         //尾递归
-        return stepJson==null? preResult
-            :runStep(dataOptDescJson, logId, bizModel, stepJson, preResult);
+        return stepJson == null ? preResult
+            : runStep(dataOptDescJson, logId, bizModel, stepJson, preResult);
     }
 
     @Override
@@ -195,9 +194,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         bizModel.setModelTag(queryParams);
         Object responseData = ResponseData.successResponse;
         try {
-            responseData= runStep(dataOptDescJson, logId, bizModel, stepJson, responseData);
+            responseData = runStep(dataOptDescJson, logId, bizModel, stepJson, responseData);
             AbstractSourceConnectThreadHolder.commitAndRelease();
-        }catch (Exception e){
+        } catch (Exception e) {
             AbstractSourceConnectThreadHolder.rollbackAndRelease();
         }
         return responseData;
@@ -212,7 +211,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         detailLog.setLogType(logType);
         detailLog.setLogInfo(logInfo);
         detailLog.setRunEndTime(new Date());
-        detailLog.setTaskId(StringBaseOpt.fillZeroForString(StringBaseOpt.castObjectToString(++step, "0"),6));
+        detailLog.setTaskId(StringBaseOpt.fillZeroForString(StringBaseOpt.castObjectToString(++step, "0"), 6));
         taskDetailLogDao.saveNewObject(detailLog);
         return detailLog;
     }
@@ -238,7 +237,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 detailLog = writeLog(logId, sOptType + ":" + processName, "");
             }
             ResponseData responseData = opt.runOpt(bizModel, bizOptJson);
-            JSONObject jsonObject=JSONObject.parseObject(responseData.getData().toString());
+            JSONObject jsonObject = JSONObject.parseObject(responseData.getData().toString());
             if (logId != null) {
                 detailLog.setSuccessPieces(jsonObject.getIntValue("success"));
                 detailLog.setErrorPieces(jsonObject.getIntValue("error"));

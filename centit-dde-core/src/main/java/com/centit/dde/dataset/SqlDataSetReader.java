@@ -9,7 +9,7 @@ import com.centit.dde.utils.Constant;
 import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
-import com.centit.support.database.metadata.IDatabaseInfo;
+import com.centit.product.metadata.vo.ISourceInfo;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
@@ -25,12 +25,13 @@ import java.util.Map;
  * 需要设置的参数有：
  * 数据库连接信息 DatabaseInfo
  * 对应的表信息 SimpleTableInfo
+ *
  * @author zhf
  */
-public class SQLDataSetReader implements DataSetReader {
+public class SqlDataSetReader implements DataSetReader {
 
-    private static final Logger logger = LoggerFactory.getLogger(SQLDataSetReader.class);
-    private IDatabaseInfo databaseInfo;
+    private static final Logger logger = LoggerFactory.getLogger(SqlDataSetReader.class);
+    private ISourceInfo databaseInfo;
     /**
      * 参数驱动sql
      */
@@ -67,7 +68,7 @@ public class SQLDataSetReader implements DataSetReader {
         return dataSet;
     }
 
-    public void setDataSource(IDatabaseInfo databaseInfo) {
+    public void setDataSource(ISourceInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
     }
 

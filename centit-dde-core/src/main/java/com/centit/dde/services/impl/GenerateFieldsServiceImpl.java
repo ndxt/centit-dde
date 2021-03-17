@@ -6,12 +6,12 @@ import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.dataset.JSONDataSet;
-import com.centit.dde.dataset.SQLDataSetWriter;
+import com.centit.dde.dataset.SqlDataSetWriter;
 import com.centit.dde.services.GenerateFieldsService;
 import com.centit.dde.vo.ColumnSchema;
 import com.centit.fileserver.common.FileStore;
-import com.centit.product.metadata.dao.DatabaseInfoDao;
-import com.centit.product.metadata.po.DatabaseInfo;
+import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.*;
 import org.slf4j.Logger;
@@ -36,22 +36,22 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     @Autowired(required = false)
     private FileStore fileStore;
 
-    private final DatabaseInfoDao databaseInfoDao;
+    private final SourceInfoDao sourceInfoDao;
 
     @Autowired
-    public GenerateFieldsServiceImpl(DatabaseInfoDao databaseInfoDao) {
-        this.databaseInfoDao = databaseInfoDao;
+    public GenerateFieldsServiceImpl(SourceInfoDao sourceInfoDao) {
+        this.sourceInfoDao = sourceInfoDao;
     }
 
     @Override
     public JSONArray queryViewSqlData(String databaseCode, String sql, Map<String, Object> params) {
-        DatabaseInfo databaseInfo = databaseInfoDao.getDatabaseInfoById(databaseCode);
+        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(QueryUtils.translateQuery(sql, params));
         try {
-            return TransactionHandler.executeQueryInTransaction(DataSourceDescription.valueOf(databaseInfo),
+            return TransactionHandler.executeQueryInTransaction(DataSourceDescription.valueOf(sourceInfo),
                 (conn) -> DatabaseAccess.findObjectsAsJSON(conn,
                     QueryUtils.buildLimitQuerySQL(qap.getQuery(), 0, 20, false,
-                        DBType.mapDBType(databaseInfo.getDatabaseUrl())),
+                        DBType.mapDBType(sourceInfo.getDatabaseUrl())),
                     qap.getParams()));
         } catch (SQLException | IOException e) {
             logger.error("执行查询出错，SQL：{},Param:{}", qap.getQuery(), qap.getParams());
@@ -148,11 +148,10 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     public List<ColumnSchema> generateSqlFields(String databaseCode, String sql, Map<String, Object> params) {
         List<String> sColumn = QueryUtils.getSqlFiledNames(sql);
         if (sColumn == null || sColumn.size() == 0) {
-            DatabaseInfo databaseInfo = databaseInfoDao.getDatabaseInfoById(databaseCode);
+            SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
             QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(QueryUtils.translateQuery(sql, params));
             String sSql = QueryUtils.buildLimitQuerySQL(qap.getQuery(), 0, 2, false,
                 DBType.mapDBType(databaseInfo.getDatabaseUrl()));
-            List<ColumnSchema> columnSchemas = new ArrayList<>(50);
             try (Connection conn = DbcpConnectPools.getDbcpConnect(databaseInfo);
                  PreparedStatement stmt = conn.prepareStatement(sSql)) {
                 DatabaseAccess.setQueryStmtParameters(stmt, qap.getParams());
@@ -186,8 +185,8 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
                 }
             }
             ColumnSchema col = new ColumnSchema();
-            col.setColumnCode(SQLDataSetWriter.WRITER_ERROR_TAG);
-            col.setPropertyName(FieldType.mapPropName(SQLDataSetWriter.WRITER_ERROR_TAG));
+            col.setColumnCode(SqlDataSetWriter.WRITER_ERROR_TAG);
+            col.setPropertyName(FieldType.mapPropName(SqlDataSetWriter.WRITER_ERROR_TAG));
             col.setColumnName(col.getPropertyName());
             col.setDataType(FieldType.STRING);
             col.setIsStatData("F");

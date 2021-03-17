@@ -4,8 +4,8 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetWriter;
 import com.centit.dde.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.dde.utils.DBBatchUtils;
+import com.centit.product.metadata.vo.ISourceInfo;
 import com.centit.support.common.ObjectException;
-import com.centit.support.database.metadata.IDatabaseInfo;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.FieldType;
 import com.centit.support.database.utils.PersistenceException;
@@ -28,20 +28,16 @@ import java.util.Map;
  * @author zhf
  */
 @Data
-public class SQLDataSetWriter implements DataSetWriter {
+public class SqlDataSetWriter implements DataSetWriter {
     public static String WRITER_ERROR_TAG = "rmdb_dataset_writer_result";
-    private static final Logger logger = LoggerFactory.getLogger(SQLDataSetWriter.class);
+    private static final Logger logger = LoggerFactory.getLogger(SqlDataSetWriter.class);
 
-    private IDatabaseInfo dataSource;
+    private ISourceInfo dataSource;
     private TableInfo tableInfo;
     private Map fieldsMap;
     private int successNums;
     private int errorNums;
     private String info;
-
-    public Map getFieldsMap() {
-        return fieldsMap;
-    }
 
     public void setFieldsMap(Map fieldsMap) {
         this.fieldsMap = fieldsMap;
@@ -55,7 +51,7 @@ public class SQLDataSetWriter implements DataSetWriter {
      */
     private boolean saveAsWhole;
 
-    public SQLDataSetWriter(IDatabaseInfo dataSource, TableInfo tableInfo) {
+    public SqlDataSetWriter(ISourceInfo dataSource, TableInfo tableInfo) {
         this.saveAsWhole = true;
         this.connection = null;
         this.tableInfo = tableInfo;

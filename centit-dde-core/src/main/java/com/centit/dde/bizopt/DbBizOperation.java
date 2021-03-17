@@ -4,12 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
-import com.centit.dde.dataset.SQLDataSetReader;
+import com.centit.dde.dataset.SqlDataSetReader;
 import com.centit.framework.common.ResponseData;
-import com.centit.product.metadata.dao.DatabaseInfoDao;
-import com.centit.product.metadata.po.DatabaseInfo;
+import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.database.utils.DataSourceDescription;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,11 +17,11 @@ import java.util.Map;
 /**
  * @author zhf
  */
-public class DBBizOperation implements BizOperation {
-    private DatabaseInfoDao databaseInfoDao;
+public class DbBizOperation implements BizOperation {
+    private SourceInfoDao sourceInfoDao;
 
-    public DBBizOperation(DatabaseInfoDao databaseInfoDao) {
-        this.databaseInfoDao = databaseInfoDao;
+    public DbBizOperation(SourceInfoDao sourceInfoDao) {
+        this.sourceInfoDao = sourceInfoDao;
     }
 
     @Override
@@ -30,9 +29,9 @@ public class DBBizOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", "");
         String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
-        Map<String, String> mapString=BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"),"key","value");
-        Map<String,Object> mapObject=new HashMap<>();
-        if(mapString!=null) {
+        Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
+        Map<String, Object> mapObject = new HashMap<>();
+        if (mapString != null) {
             for (Map.Entry<String, String> map : mapString.entrySet()) {
                 if (!StringBaseOpt.isNvl(map.getValue())) {
                     mapObject.put(map.getKey(), map.getValue());
@@ -40,11 +39,11 @@ public class DBBizOperation implements BizOperation {
             }
         }
         mapObject.putAll(bizModel.getModelTag());
-        DatabaseInfo databaseInfo = databaseInfoDao.getDatabaseInfoById(databaseCode);
+        SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
-            return BuiltInOperation.getResponseData(0,0,"找不到对应的集成数据库：" + databaseCode);
+            return BuiltInOperation.getResponseData(0, 0, "找不到对应的集成数据库：" + databaseCode);
         }
-        SQLDataSetReader sqlDsr = new SQLDataSetReader();
+        SqlDataSetReader sqlDsr = new SqlDataSetReader();
         sqlDsr.setDataSource(databaseInfo);
         sqlDsr.setSqlSen(sql);
         SimpleDataSet dataSet = sqlDsr.load(mapObject);

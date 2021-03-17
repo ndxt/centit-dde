@@ -1,8 +1,7 @@
 package com.centit.dde.transaction;
 
+import com.centit.product.metadata.vo.ISourceInfo;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.database.metadata.IDatabaseInfo;
-import com.centit.support.database.utils.DataSourceDescription;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -13,14 +12,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author zhf
  */
 class SourceConnectThreadWrapper implements Serializable {
-    private final Map<DataSourceDescription, Object> connectPools;
+    private final Map<ISourceInfo, Object> connectPools;
 
     SourceConnectThreadWrapper() {
         this.connectPools = new ConcurrentHashMap<>(4);
     }
 
-    Object fetchConnect(DataSourceDescription description) throws Exception {
-        if (StringBaseOpt.isNvl(description.getSourceType()) || IDatabaseInfo.DATABASE.equals(description.getSourceType())) {
+    Object fetchConnect(ISourceInfo description) throws Exception {
+        if (StringBaseOpt.isNvl(description.getSourceType()) || ISourceInfo.DATABASE.equals(description.getSourceType())) {
             Connection conn = (Connection) connectPools.get(description);
             if (conn == null) {
                 conn = AbstractDruidConnectPools.getDbcpConnect(description);
@@ -35,8 +34,8 @@ class SourceConnectThreadWrapper implements Serializable {
         if (connectPools.size() == 0) {
             return;
         }
-        for (Map.Entry<DataSourceDescription, Object> map : connectPools.entrySet()) {
-            if (StringBaseOpt.isNvl(map.getKey().getSourceType()) || IDatabaseInfo.DATABASE.equals(map.getKey().getSourceType())) {
+        for (Map.Entry<ISourceInfo, Object> map : connectPools.entrySet()) {
+            if (StringBaseOpt.isNvl(map.getKey().getSourceType()) || ISourceInfo.DATABASE.equals(map.getKey().getSourceType())) {
                 Connection conn = (Connection) map.getValue();
                 conn.commit();
             }
@@ -47,8 +46,8 @@ class SourceConnectThreadWrapper implements Serializable {
         if (connectPools.size() == 0) {
             return;
         }
-        for (Map.Entry<DataSourceDescription, Object> map : connectPools.entrySet()) {
-            if (StringBaseOpt.isNvl(map.getKey().getSourceType()) || IDatabaseInfo.DATABASE.equals(map.getKey().getSourceType())) {
+        for (Map.Entry<ISourceInfo, Object> map : connectPools.entrySet()) {
+            if (StringBaseOpt.isNvl(map.getKey().getSourceType()) || ISourceInfo.DATABASE.equals(map.getKey().getSourceType())) {
                 Connection conn = (Connection) map.getValue();
                 conn.rollback();
             }
@@ -59,8 +58,8 @@ class SourceConnectThreadWrapper implements Serializable {
         if (connectPools.size() == 0) {
             return;
         }
-        for (Map.Entry<DataSourceDescription, Object> map : connectPools.entrySet()) {
-            if (StringBaseOpt.isNvl(map.getKey().getSourceType()) || IDatabaseInfo.DATABASE.equals(map.getKey().getSourceType())) {
+        for (Map.Entry<ISourceInfo, Object> map : connectPools.entrySet()) {
+            if (StringBaseOpt.isNvl(map.getKey().getSourceType()) || ISourceInfo.DATABASE.equals(map.getKey().getSourceType())) {
                 Connection conn = (Connection) map.getValue();
                 AbstractDruidConnectPools.closeConnect(conn);
             }

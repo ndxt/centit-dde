@@ -1,7 +1,6 @@
 package com.centit.dde.transaction;
 
-import com.centit.support.database.metadata.IDatabaseInfo;
-import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.product.metadata.vo.ISourceInfo;
 
 /**
  * @author zhf
@@ -22,13 +21,10 @@ public abstract class AbstractSourceConnectThreadHolder {
         return wrapper;
     }
 
-    private static Object fetchConnect(DataSourceDescription description) throws Exception {
+
+    public static Object fetchConnect(ISourceInfo description) throws Exception {
         SourceConnectThreadWrapper wrapper = getConnectThreadWrapper();
         return wrapper.fetchConnect(description);
-    }
-
-    public static Object fetchConnect(IDatabaseInfo description) throws Exception {
-        return fetchConnect(DataSourceDescription.valueOf(description));
     }
 
     public static void commitAndRelease() throws Exception {

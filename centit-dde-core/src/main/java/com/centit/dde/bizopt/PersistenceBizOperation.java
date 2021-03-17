@@ -7,11 +7,12 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.dataset.FileDataSet;
-import com.centit.dde.dataset.SQLDataSetWriter;
+import com.centit.dde.dataset.SqlDataSetWriter;
+import com.centit.dde.utils.Constant;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
-import com.centit.product.metadata.dao.DatabaseInfoDao;
-import com.centit.product.metadata.po.DatabaseInfo;
+import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
@@ -28,14 +29,14 @@ public class PersistenceBizOperation implements BizOperation {
     private static final String WRITER_INDICATE_APPEND = "append";
     private static final String WRITER_INDICATE_MERGE = "merge";
     private static final String WRITER_INDICATE_UPDATE = "update";
-    private DatabaseInfoDao databaseInfoDao;
+    private SourceInfoDao sourceInfoDao;
     private MetaDataService metaDataService;
 
     public PersistenceBizOperation(String exportPath,
-                                   DatabaseInfoDao databaseInfoDao,
+                                   SourceInfoDao sourceInfoDao,
                                    MetaDataService metaDataService) {
         this.exportPath = exportPath;
-        this.databaseInfoDao = databaseInfoDao;
+        this.sourceInfoDao = sourceInfoDao;
         this.metaDataService = metaDataService;
     }
 
@@ -57,9 +58,9 @@ public class PersistenceBizOperation implements BizOperation {
         return jsonObject;
     }
 
-    public ResponseData writeDatabase(BizModel bizModel, JSONObject bizOptJson) {
+    private ResponseData writeDatabase(BizModel bizModel, JSONObject bizOptJson) {
         String isRun = BuiltInOperation.getJsonFieldString(bizOptJson, "isRun", "T");
-        if ("F".equalsIgnoreCase(isRun)) {
+        if (Constant.FALSE.equalsIgnoreCase(isRun)) {
             return new ResponseSingleData();
         }
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
@@ -70,7 +71,7 @@ public class PersistenceBizOperation implements BizOperation {
             return BuiltInOperation.getResponseData(0, 0,
                 "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
         }
-        DatabaseInfo databaseInfo = databaseInfoDao.getDatabaseInfoById(databaseCode);
+        SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
             return BuiltInOperation.getResponseData(0, 0,
                 "数据库信息无效：" + databaseCode);
@@ -85,11 +86,11 @@ public class PersistenceBizOperation implements BizOperation {
             return BuiltInOperation.getResponseData(0, 0,
                 "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
         }
-        if (bizOptJson.get("config") == null) {
+        if (bizOptJson.get(Constant.CONFIG) == null) {
             return BuiltInOperation.getResponseData(0, 0,
                 "没有配置交换字段");
         }
-        SQLDataSetWriter dataSetWriter = new SQLDataSetWriter(
+        SqlDataSetWriter dataSetWriter = new SqlDataSetWriter(
             databaseInfo, tableInfo);
         dataSetWriter.setFieldsMap(BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "propertyName", "primaryKey1"));
         String saveAsWhole = BuiltInOperation.getJsonFieldString(bizOptJson, "saveAsWhole", "T");
@@ -113,7 +114,7 @@ public class PersistenceBizOperation implements BizOperation {
         return BuiltInOperation.getResponseData(dataSetWriter.getSuccessNums(), dataSetWriter.getErrorNums(), info);
     }
 
-    public void writeCsvFile(BizModel bizModel, JSONObject bizOptJson) {
+    private void writeCsvFile(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String fileName = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", null);
         if (exportPath == null) {
@@ -127,7 +128,7 @@ public class PersistenceBizOperation implements BizOperation {
         //return bizModel;
     }
 
-    public void writeExcelFile(BizModel bizModel, JSONObject bizOptJson) {
+    private void writeExcelFile(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String fileName = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", null);
         if (exportPath == null) {

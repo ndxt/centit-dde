@@ -1,7 +1,11 @@
 package com.centit.dde.transaction;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.product.metadata.vo.ISourceInfo;
+import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.database.utils.DBType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,35 +21,49 @@ import java.util.concurrent.ConcurrentHashMap;
 abstract class AbstractDruidConnectPools {
     private static final Logger logger = LoggerFactory.getLogger(AbstractDruidConnectPools.class);
     private static final
-    Map<DataSourceDescription, DruidDataSource> DRUID_DATA_SOURCE_POOLS
+    Map<ISourceInfo, DruidDataSource> DRUID_DATA_SOURCE_POOLS
         = new ConcurrentHashMap<>();
 
     private AbstractDruidConnectPools() {
         throw new IllegalAccessError("Utility class");
     }
 
-    private static DruidDataSource mapDataSource(DataSourceDescription dsDesc) {
+    private static DruidDataSource mapDataSource(ISourceInfo dsDesc) {
         DruidDataSource ds = new DruidDataSource();
-        ds.setDriverClassName(dsDesc.getDriver());
+        ds.setDriverClassName(DBType.getDbDriver(DBType.mapDBType(dsDesc.getDatabaseUrl())));
         ds.setUsername(dsDesc.getUsername());
-        ds.setPassword(dsDesc.getPassword());
-        ds.setUrl(dsDesc.getConnUrl());
-        ds.setInitialSize(dsDesc.getInitialSize());
-        ds.setMaxActive(dsDesc.getMaxTotal());
-        ds.setMaxWait(dsDesc.getMaxWaitMillis());
-        ds.setMinIdle(dsDesc.getMinIdle());
-        if(dsDesc.getExtProps()==null || dsDesc.getExtProps().get("validationQuery")==null){
-            ds.setValidationQuery("select 1");
-        }else {
-            ds.setValidationQuery((String) dsDesc.getExtProps().get("validationQuery"));
-        }
-        ds.setTestWhileIdle(true);
-        ds.setValidationQueryTimeout(1);
-        ds.setTimeBetweenEvictionRunsMillis(60000);
+        ds.setPassword(dsDesc.getClearPassword());
+        ds.setUrl(dsDesc.getDatabaseUrl());
+        ds.setInitialSize(NumberBaseOpt.castObjectToInteger(
+            dsDesc.getExtProp("initialSize"), 5));
+        ds.setMaxActive(NumberBaseOpt.castObjectToInteger(
+            dsDesc.getExtProp("maxTotal"), 10));
+        ds.setMaxWait(NumberBaseOpt.castObjectToInteger(
+            dsDesc.getExtProp("maxWaitMillis"), 10000));
+        ds.setMinIdle(NumberBaseOpt.castObjectToInteger(
+            dsDesc.getExtProp("minIdle"), 5));
+        ds.setValidationQuery(StringBaseOpt.castObjectToString(dsDesc.getExtProp("validationQuery"),
+            "select 1"));
+        ds.setTestWhileIdle(BooleanBaseOpt.castObjectToBoolean(
+            dsDesc.getExtProp("testWhileIdle"), true));
+        ds.setValidationQueryTimeout(NumberBaseOpt.castObjectToInteger(
+            dsDesc.getExtProp("validationQueryTimeout"), 1000*10));
+        ds.setKeepAlive(BooleanBaseOpt.castObjectToBoolean(
+            dsDesc.getExtProp("keepAlive"), true));
+        ds.setTimeBetweenEvictionRunsMillis(NumberBaseOpt.castObjectToInteger(
+            dsDesc.getExtProp("timeBetweenEvictionRunsMillis"), 600000));
+        ds.setMinEvictableIdleTimeMillis(NumberBaseOpt.castObjectToInteger(
+            dsDesc.getExtProp("timeBetweenEvictionRunsMillis"), 300000));
+        ds.setRemoveAbandoned(BooleanBaseOpt.castObjectToBoolean(
+            dsDesc.getExtProp("removeAbandoned"), true));
+        ds.setRemoveAbandonedTimeout(NumberBaseOpt.castObjectToInteger(
+            dsDesc.getExtProp("removeAbandonedTimeout"), 80));
+        ds.setLogAbandoned(BooleanBaseOpt.castObjectToBoolean(
+            dsDesc.getExtProp("logAbandoned"), true));
         return ds;
     }
 
-    private static synchronized DruidDataSource getDataSource(DataSourceDescription dsDesc) {
+    private static synchronized DruidDataSource getDataSource(ISourceInfo dsDesc) {
         DruidDataSource ds = DRUID_DATA_SOURCE_POOLS.get(dsDesc);
         if (ds == null) {
             ds = mapDataSource(dsDesc);
@@ -54,7 +72,7 @@ abstract class AbstractDruidConnectPools {
         return ds;
     }
 
-    static synchronized Connection getDbcpConnect(DataSourceDescription dsDesc) throws SQLException {
+    static synchronized Connection getDbcpConnect(ISourceInfo dsDesc) throws SQLException {
         DruidDataSource ds = getDataSource(dsDesc);
         Connection conn = ds.getConnection();
         conn.setAutoCommit(false);
