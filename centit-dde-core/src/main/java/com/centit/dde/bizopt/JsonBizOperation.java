@@ -25,7 +25,7 @@ public class JsonBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
-        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "nodeName", bizModel.getModelName());
+        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String filePath = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("fileId");
         JSONDataSet jsonDataSet = new JSONDataSet();
         try {

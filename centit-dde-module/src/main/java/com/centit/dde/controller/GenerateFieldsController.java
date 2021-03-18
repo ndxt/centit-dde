@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +63,7 @@ public class GenerateFieldsController extends BaseController {
     })
     @RequestMapping(value = "/sqlcolumn", method = {RequestMethod.POST})
     @WrapUpResponseBody
-    public List<ColumnSchema> generateSqlcolumn(String databaseCode, String sql, String dataType, HttpServletRequest request) {
+    public List<ColumnSchema> generateSqlColumn(String databaseCode, String sql, String dataType, HttpServletRequest request) throws IOException {
         sql = StringEscapeUtils.unescapeHtml4(sql);
         Map<String, Object> params = collectRequestParameters(request);
         switch (dataType) {

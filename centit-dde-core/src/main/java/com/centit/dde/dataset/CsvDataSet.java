@@ -4,12 +4,16 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
+import lombok.Data;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
-
+/**
+ * @author zhf
+ */
+@Data
 public class CsvDataSet extends FileDataSet {
 
     /**
@@ -19,23 +23,16 @@ public class CsvDataSet extends FileDataSet {
      * @return dataSet 数据集
      */
     private Map<String, Object> params;
+    private InputStream inputStream;
+    @Override
+    public void setFilePath(String filePath) throws FileNotFoundException {
+        inputStream = new FileInputStream(filePath);
+    }
     @Override
     public SimpleDataSet load(Map<String, Object> params) {
         try {
             List<Map<String, Object>> list = new ArrayList<>();
-            File dir = new File(getFilePath());
-            if (dir.isFile()) {
-                readCsvFile(list, getFilePath());
-            } else {
-                File[] files = dir.listFiles();
-                if (null != files) {
-                    for (File subFileNames : files) {
-                        if (!subFileNames.isDirectory()) {
-                            readCsvFile(list, subFileNames.getPath());
-                        }
-                    }
-                }
-            }
+            readCsvFile(list);
             SimpleDataSet dataSet = new SimpleDataSet();
             dataSet.setData(list);
             return dataSet;
@@ -45,8 +42,7 @@ public class CsvDataSet extends FileDataSet {
         return null;
     }
 
-    private void readCsvFile(List<Map<String, Object>> list, String filePath) throws IOException {
-        InputStream inputStream = new FileInputStream(filePath);
+    private void readCsvFile(List<Map<String, Object>> list) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
             Charset.forName("gbk")), 8192);
         CsvReader csvReader = new CsvReader(reader);
@@ -66,8 +62,7 @@ public class CsvDataSet extends FileDataSet {
         csvReader.close();
     }
 
-    private String[] readCsvHead(String filePath) throws IOException {
-        InputStream inputStream = new FileInputStream(filePath);
+    public String[] getColumns() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
             Charset.forName("gbk")), 8192);
         CsvReader csvReader = new CsvReader(reader);
@@ -78,22 +73,7 @@ public class CsvDataSet extends FileDataSet {
         return null;
     }
 
-    public String[] getColumns() {
-        try {
-            File dir = new File(getFilePath());
-            if (dir.isFile()) {
-                return readCsvHead(getFilePath());
-            } else {
-                File[] files = dir.listFiles();
-                if (null != files) {
-                    return readCsvHead(files[0].getPath());
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+
 
     /**
      * 将 dataSet 数据集 持久化
@@ -145,14 +125,5 @@ public class CsvDataSet extends FileDataSet {
         }
         csvWriter.close();
         IOUtils.closeQuietly(outputStream);
-    }
-
-
-    public Map<String, Object> getParams() {
-        return params;
-    }
-
-    public void setParams(Map<String, Object> params) {
-        this.params = params;
     }
 }

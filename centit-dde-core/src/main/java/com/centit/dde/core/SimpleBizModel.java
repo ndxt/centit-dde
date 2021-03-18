@@ -48,12 +48,6 @@ public class SimpleBizModel implements BizModel, Serializable {
         return mainData.size();
     }
 
-    @Override
-    public boolean isEmpty(){
-        return bizData == null ||
-            bizData.isEmpty();
-    }
-
     @JSONField(deserialize = false, serialize = false)
     @Override
     public DataSet getDataSet(String relationPath){
@@ -75,8 +69,8 @@ public class SimpleBizModel implements BizModel, Serializable {
     public JSONObject toJsonObject() {
         JSONObject dataObject = new JSONObject();
         if (bizData != null) {
-            for (DataSet dataSet : bizData.values()) {
-                dataObject.put(dataSet.getDataSetName(), dataSet.getData());
+            for (Map.Entry<String, DataSet> map : bizData.entrySet()) {
+                dataObject.put(map.getKey(),map.getValue()==null?null:map.getValue().getData());
             }
         }
         if (modelTag != null && !modelTag.isEmpty()) {
@@ -98,7 +92,7 @@ public class SimpleBizModel implements BizModel, Serializable {
                 DataSet dataSet=map.getValue();
                 if (dataSet.size() == 1 && singleRowAsObject) {
                     dataObject.put(map.getKey(), dataSet.getFirstRow());
-                } else if (!dataSet.isEmpty()) {
+                } else  {
                     dataObject.put(map.getKey(), dataSet.getDataAsList());
                 }
             }
@@ -117,7 +111,7 @@ public class SimpleBizModel implements BizModel, Serializable {
             for (DataSet dataSet : bizData.values()) {
                 if (StringUtils.equalsAny(dataSet.getDataSetName(), singleRowDataSets)) {
                     dataObject.put(dataSet.getDataSetName(), dataSet.getFirstRow());
-                } else if (!dataSet.isEmpty()) {
+                } else  {
                     dataObject.put(dataSet.getDataSetName(), dataSet.getDataAsList());
                 }
             }

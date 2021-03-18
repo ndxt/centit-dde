@@ -18,6 +18,7 @@ import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 
 /**
@@ -41,7 +42,7 @@ public class PersistenceBizOperation implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws FileNotFoundException {
         String dataType = BuiltInOperation.getJsonFieldString(bizOptJson, "dataType", "D");
         ResponseData jsonObject = new ResponseSingleData();
         switch (dataType) {
@@ -114,7 +115,7 @@ public class PersistenceBizOperation implements BizOperation {
         return BuiltInOperation.getResponseData(dataSetWriter.getSuccessNums(), dataSetWriter.getErrorNums(), info);
     }
 
-    private void writeCsvFile(BizModel bizModel, JSONObject bizOptJson) {
+    private void writeCsvFile(BizModel bizModel, JSONObject bizOptJson) throws FileNotFoundException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String fileName = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", null);
         if (exportPath == null) {
@@ -128,7 +129,7 @@ public class PersistenceBizOperation implements BizOperation {
         //return bizModel;
     }
 
-    private void writeExcelFile(BizModel bizModel, JSONObject bizOptJson) {
+    private void writeExcelFile(BizModel bizModel, JSONObject bizOptJson) throws FileNotFoundException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String fileName = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", null);
         if (exportPath == null) {

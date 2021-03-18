@@ -9,15 +9,18 @@ import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.utils.Constant;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
+import com.centit.support.database.utils.DatabaseAccess;
 import org.apache.commons.mail.MultiPartEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -106,7 +109,8 @@ public class TaskRun {
                 CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacket.getTaskCron());
                 dataPacket.setNextRunTime(cronSequenceGenerator.next(dataPacket.getLastRunTime()));
             }
-            dataPacketDao.updateObject(dataPacket);
+            DatabaseOptUtils.doExecuteSql(dataPacketDao,"update q_data_packet set next_run_time=? where packet_id=?",
+                new Object[]{dataPacket.getNextRunTime(),dataPacket.getPacketId()});
             TaskDetailLog taskDetailLog = taskDetailLogDao.getObjectByProperties(
                 CollectionsOpt.createHashMap("logId", taskLog.getLogId(), "logInfo_ne", "ok"));
             taskLog.setOtherMessage(taskDetailLog == null ? "ok" : "error");

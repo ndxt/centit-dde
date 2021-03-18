@@ -1,5 +1,6 @@
 package com.centit.dde.core;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.support.algorithm.CollectionsOpt;
 
@@ -44,6 +45,7 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
     protected Object data;
 
     @Override
+    @JSONField(serialize = false)
     public String getDataSetName() {
         return dataSetName;
     }
@@ -80,6 +82,7 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
     }
 
     @Override
+    @JSONField(serialize = false)
     public List<Map<String, Object>> getDataAsList() {
         if(this.data ==null){
             return null;
@@ -126,13 +129,7 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
         return CollectionsOpt.createList(CollectionsOpt.objectToMap(this.data));
     }
 
-    /**
-     * @return 是否为空的数据集
-     */
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
+
 
     /**
      * @return 数据集大小
@@ -149,6 +146,7 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
     }
 
     @Override
+    @JSONField(serialize = false)
     public Map<String, Object> getFirstRow() {
         if(this.data ==null){
             return null;

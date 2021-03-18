@@ -118,7 +118,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     }
 
     @Override
-    public List<ColumnSchema> generateCsvFields(Map<String, Object> params) {
+    public List<ColumnSchema> generateCsvFields(Map<String, Object> params) throws IOException {
         CsvDataSet csvDataSet = new CsvDataSet();
         try {
             csvDataSet.setFilePath(fileStore.getFile((String) params.get("FileId")).getPath());

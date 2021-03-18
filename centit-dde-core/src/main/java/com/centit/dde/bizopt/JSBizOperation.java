@@ -7,6 +7,7 @@ import com.centit.dde.utils.BizOptUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.extend.JSRuntimeContext;
+import com.centit.support.json.JSONOpt;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ public class JSBizOperation implements BizOperation {
         int count = 0;
         try {
             Object object = jsRuntimeContext.callJsFunc("runOpt",
-                this, bizModel);
+                this, bizModel,bizModel.toJsonObject());
             bizModel.putDataSet(targetDsName,
                 BizOptUtils.castObjectToDataSet(object));
             if (object != null) {

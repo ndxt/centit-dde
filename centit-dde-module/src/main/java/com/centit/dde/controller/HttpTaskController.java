@@ -21,6 +21,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.Map;
@@ -50,6 +51,7 @@ public class HttpTaskController extends BaseController {
 
     private void returnObject(String packetId, HttpServletRequest request,HttpServletResponse response) throws IOException {
         Map<String, Object> params = collectRequestParameters(request);
+        params.put("requestBizModel", request);
         Object bizModel;
         DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
         bizModel = dataPacketService.fetchDataPacketDataFromBuf(dataPacket, params);

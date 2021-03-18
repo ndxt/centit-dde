@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -139,6 +140,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     private Object returnResult(BizModel bizModel, JSONObject stepJson) {
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
         String path;
+        bizModel.getBizData().remove("requestFile");
         switch (type) {
             case "2":
                 return "ok";
@@ -160,6 +162,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     private Object runStep(DataOptDescJson dataOptDescJson, String logId, SimpleBizModel bizModel, JSONObject stepJson, Object preResult) throws Exception {
         String stepId = stepJson.getString("id");
         String stepType = stepJson.getString("type");
+        Object request= stepJson.get("requestBizModel");
         if (Constant.RESULTS.equals(stepType)) {
             return returnResult(bizModel, stepJson);
         }
@@ -176,6 +179,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         } else {
             preResult = runOneStepOpt(bizModel, stepJson, logId);
             stepJson = dataOptDescJson.getNextStep(stepId);
+            stepJson.put("requestBizModel",request);
         }
         //尾递归
         return stepJson == null ? preResult
@@ -190,6 +194,8 @@ public class BizOptFlowImpl implements BizOptFlow {
             writeLog(logId, "error", "没有start节点");
             return null;
         }
+        stepJson.put("requestBizModel",queryParams.get("requestBizModel"));
+        queryParams.remove("requestBizModel");
         SimpleBizModel bizModel = new SimpleBizModel(logId);
         bizModel.setModelTag(queryParams);
         Object responseData = ResponseData.successResponse;

@@ -7,8 +7,12 @@ import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.CsvDataSet;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
+import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 
 
 /**
@@ -23,12 +27,19 @@ public class CsvBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
-        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "nodeName", bizModel.getModelName());
-        String filePath = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("fileId");
+        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
+        String filePath=null;
+        if(bizOptJson.getJSONArray("upjson").size()>0) {
+            filePath = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("fileId");
+        }
         CsvDataSet csvDataSet = new CsvDataSet();
         try {
-            csvDataSet.setFilePath(
-                fileStore.getFile(filePath).getPath());
+            if(filePath!=null) {
+                csvDataSet.setFilePath(
+                    fileStore.getFile(filePath).getPath());
+            }else {
+                csvDataSet.setInputStream(new ByteArrayInputStream(bizModel.getDataSet("requestFile").getData().toString().getBytes(Charset.forName("gbk"))));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

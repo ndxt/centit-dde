@@ -38,10 +38,6 @@ public interface DataSet {
      */
     List<Map<String, Object>> getDataAsList();
 
-    /**
-     * @return 是否为空的数据集
-     */
-    boolean isEmpty();
 
     /**
      * @return 数据集大小

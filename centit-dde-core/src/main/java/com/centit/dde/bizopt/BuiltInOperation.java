@@ -20,9 +20,12 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.network.UrlOptUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.StreamUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -107,13 +110,16 @@ public class BuiltInOperation {
     }
 
     public static ResponseData runRequestBody(BizModel bizModel, JSONObject bizOptJson) {
-        DataSet destDs = BizOptUtils.castObjectToDataSet(WebOptUtils.getRequestBody((HttpServletRequest) bizModel.getModelTag().get("request")));
+        HttpServletRequest request= (HttpServletRequest) bizOptJson.get("requestBizModel");
+        DataSet destDs = BizOptUtils.castObjectToDataSet(WebOptUtils.getRequestBody(request));
         bizModel.putDataSet("requestBody", destDs);
         return getResponseSuccessData(destDs.size());
     }
 
     public static ResponseData runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
-        DataSet destDs = BizOptUtils.castObjectToDataSet(UploadDownloadUtils.fetchInputStreamFromMultipartResolver((HttpServletRequest) bizModel.getModelTag().get("request")));
+        HttpServletRequest request= (HttpServletRequest) bizOptJson.get("requestBizModel");
+        String bodyString=StreamUtils.copyToString(UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight(),Charset.forName("gbk"));
+        DataSet destDs = BizOptUtils.castObjectToDataSet(bodyString);
         bizModel.putDataSet("requestFile", destDs);
         return getResponseSuccessData(destDs.size());
     }
