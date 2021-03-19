@@ -110,15 +110,14 @@ public class BuiltInOperation {
     }
 
     public static ResponseData runRequestBody(BizModel bizModel, JSONObject bizOptJson) {
-        HttpServletRequest request= (HttpServletRequest) bizOptJson.get("requestBizModel");
-        DataSet destDs = BizOptUtils.castObjectToDataSet(WebOptUtils.getRequestBody(request));
+        String bodyString= (String) bizModel.getModelTag().get("requestBody");
+        DataSet destDs = BizOptUtils.castObjectToDataSet(bodyString);
         bizModel.putDataSet("requestBody", destDs);
         return getResponseSuccessData(destDs.size());
     }
 
     public static ResponseData runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
-        HttpServletRequest request= (HttpServletRequest) bizOptJson.get("requestBizModel");
-        String bodyString=StreamUtils.copyToString(UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight(),Charset.forName("gbk"));
+        String bodyString= (String) bizModel.getModelTag().get("requestFile");
         DataSet destDs = BizOptUtils.castObjectToDataSet(bodyString);
         bizModel.putDataSet("requestFile", destDs);
         return getResponseSuccessData(destDs.size());

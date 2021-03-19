@@ -9,21 +9,26 @@ import com.centit.dde.utils.Constant;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -51,13 +56,22 @@ public class HttpTaskController extends BaseController {
 
     private void returnObject(String packetId, HttpServletRequest request,HttpServletResponse response) throws IOException {
         Map<String, Object> params = collectRequestParameters(request);
+        if(StringUtils.contains(request.getHeader("content-type"),"application")){
+            String bodyString = WebOptUtils.getRequestBody(request);
+            if (!StringBaseOpt.isNvl(bodyString)) {
+                params.put("requestBody", bodyString);
+            }
+        }else{
+            String bodyString = StreamUtils.copyToString(UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight(), Charset.forName("gbk"));
+            if (!StringBaseOpt.isNvl(bodyString)) {
+                params.put("requestFile", bodyString);
+            }
+        }
         Object bizModel;
         DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
         bizModel = dataPacketService.fetchDataPacketDataFromBuf(dataPacket, params);
         if (bizModel == null) {
-            params.put("requestBizModel", request);
             bizModel = exchangeService.runTask(packetId, params);
-            params.remove("requestBizModel");
             dataPacketService.setDataPacketBuf(bizModel, dataPacket, params);
         }
         if(bizModel instanceof DataSet && ((DataSet) bizModel).getFirstRow().containsKey(Constant.FILE_CONTENT)
