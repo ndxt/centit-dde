@@ -51,12 +51,13 @@ public class HttpTaskController extends BaseController {
 
     private void returnObject(String packetId, HttpServletRequest request,HttpServletResponse response) throws IOException {
         Map<String, Object> params = collectRequestParameters(request);
-        params.put("requestBizModel", request);
         Object bizModel;
         DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
         bizModel = dataPacketService.fetchDataPacketDataFromBuf(dataPacket, params);
         if (bizModel == null) {
+            params.put("requestBizModel", request);
             bizModel = exchangeService.runTask(packetId, params);
+            params.remove("requestBizModel");
             dataPacketService.setDataPacketBuf(bizModel, dataPacket, params);
         }
         if(bizModel instanceof DataSet && ((DataSet) bizModel).getFirstRow().containsKey(Constant.FILE_CONTENT)
