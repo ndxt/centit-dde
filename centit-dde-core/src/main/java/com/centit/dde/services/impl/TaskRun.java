@@ -97,7 +97,7 @@ public class TaskRun {
             taskLog.setTaskId(packetId);
             taskLog.setApplicationId(dataPacket.getApplicationId());
             taskLog.setRunBeginTime(beginTime);
-            taskLog.setRunType("V3"+dataPacket.getPacketName());
+            taskLog.setRunType(dataPacket.getPacketName());
             taskLogDao.saveNewObject(taskLog);
             Object bizModel = runStep(dataPacket, taskLog.getLogId(), queryParams);
             taskLog.setRunEndTime(new Date());
