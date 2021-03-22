@@ -349,9 +349,9 @@ public class BuiltInOperation {
         mapObject.putAll(bizModel.getModelTag());
         DataSet dataSet = new SimpleDataSet();
         AppSession appSession = new AppSession();
-        appSession.setUserCode(getJsonFieldString(bizOptJson, "userCode", ""));
-        appSession.setPassword(getJsonFieldString(bizOptJson, "password", ""));
-        appSession.setAppLoginUrl(getJsonFieldString(bizOptJson, "loginUrl", ""));
+        appSession.setUserCode((String) mapObject.get("userCode"));
+        appSession.setPassword((String) mapObject.get("passWord"));
+        appSession.setAppLoginUrl((String) mapObject.get("loginUrl"));
         RestfulHttpRequest restfulHttpRequest = new RestfulHttpRequest();
         switch (httpMethod.toLowerCase()) {
             case "post":

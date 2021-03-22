@@ -63,17 +63,12 @@ abstract class AbstractDruidConnectPools {
         return ds;
     }
 
-    private static synchronized DruidDataSource getDataSource(ISourceInfo dsDesc) {
+    static synchronized Connection getDbcpConnect(ISourceInfo dsDesc) throws SQLException {
         DruidDataSource ds = DRUID_DATA_SOURCE_POOLS.get(dsDesc);
         if (ds == null) {
             ds = mapDataSource(dsDesc);
             DRUID_DATA_SOURCE_POOLS.put(dsDesc, ds);
         }
-        return ds;
-    }
-
-    static synchronized Connection getDbcpConnect(ISourceInfo dsDesc) throws SQLException {
-        DruidDataSource ds = getDataSource(dsDesc);
         Connection conn = ds.getConnection();
         conn.setAutoCommit(false);
         return conn;
