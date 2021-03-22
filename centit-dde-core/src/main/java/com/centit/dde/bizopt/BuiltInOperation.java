@@ -9,23 +9,21 @@ import com.centit.dde.datarule.CheckRule;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.DataSetOptUtil;
-import com.centit.fileserver.utils.UploadDownloadUtils;
-import com.centit.framework.appclient.AppSession;
 import com.centit.framework.appclient.HttpReceiveJSON;
-import com.centit.framework.appclient.RestfulHttpRequest;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
-import com.centit.framework.common.WebOptUtils;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
+import com.centit.support.network.HttpExecutor;
+import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.network.UrlOptUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.StreamUtils;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -110,14 +108,14 @@ public class BuiltInOperation {
     }
 
     public static ResponseData runRequestBody(BizModel bizModel, JSONObject bizOptJson) {
-        String bodyString= (String) bizModel.getModelTag().get("requestBody");
+        String bodyString = (String) bizModel.getModelTag().get("requestBody");
         DataSet destDs = BizOptUtils.castObjectToDataSet(bodyString);
         bizModel.putDataSet("requestBody", destDs);
         return getResponseSuccessData(destDs.size());
     }
 
     public static ResponseData runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
-        String bodyString= (String) bizModel.getModelTag().get("requestFile");
+        String bodyString = (String) bizModel.getModelTag().get("requestFile");
         DataSet destDs = BizOptUtils.castObjectToDataSet(bodyString);
         bizModel.putDataSet("requestFile", destDs);
         return getResponseSuccessData(destDs.size());
@@ -330,8 +328,20 @@ public class BuiltInOperation {
         return getResponseSuccessData(count);
     }
 
+    private static HttpExecutorContext getHttpClientContext(Map<String, Object> map) throws IOException {
+        HttpClientContext context = HttpClientContext.create();
+        BasicCookieStore cookieStore = new BasicCookieStore();
+        CloseableHttpClient httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+        if(map.get("loginUrl")!=null) {
+            HttpExecutor.formPost(HttpExecutorContext.create(httpClient).context(context),
+                (String) map.get("loginUrl"),
+                map, false);
+        }
+        context.setCookieStore(cookieStore);
+        return HttpExecutorContext.create(httpClient).context(context);
+    }
 
-    public static ResponseData runHttpData(BizModel bizModel, JSONObject bizOptJson) {
+    public static ResponseData runHttpData(BizModel bizModel, JSONObject bizOptJson) throws IOException {
         String sourDsName = getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String httpMethod = getJsonFieldString(bizOptJson, "requestMode", "post");
         String httpUrl = getJsonFieldString(bizOptJson, "httpUrl", "");
@@ -348,20 +358,19 @@ public class BuiltInOperation {
         }
         mapObject.putAll(bizModel.getModelTag());
         DataSet dataSet = new SimpleDataSet();
-        AppSession appSession = new AppSession();
-        appSession.setUserCode((String) mapObject.get("userCode"));
-        appSession.setPassword((String) mapObject.get("passWord"));
-        appSession.setAppLoginUrl((String) mapObject.get("loginUrl"));
-        RestfulHttpRequest restfulHttpRequest = new RestfulHttpRequest();
+        HttpReceiveJSON receiveJSON;
+        HttpExecutorContext httpExecutorContext = getHttpClientContext(mapObject);
         switch (httpMethod.toLowerCase()) {
             case "post":
-                dataSet = BizOptUtils.castObjectToDataSet(RestfulHttpRequest.jsonPost(appSession, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
+                receiveJSON= HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
+                dataSet = BizOptUtils.castObjectToDataSet(receiveJSON.getData());
                 break;
             case "put":
-                dataSet = BizOptUtils.castObjectToDataSet(RestfulHttpRequest.jsonPut(appSession, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
+                receiveJSON= HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
+                dataSet = BizOptUtils.castObjectToDataSet(receiveJSON.getData());
                 break;
             case "get":
-                HttpReceiveJSON receiveJSON = RestfulHttpRequest.getResponseData(appSession, httpUrl, mapObject);
+                receiveJSON= HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGet(httpExecutorContext, httpUrl, mapObject));
                 if (receiveJSON.getCode() != ResponseData.RESULT_OK) {
                     return getResponseData(0, receiveJSON.getCode(), receiveJSON.getMessage());
                 } else {
@@ -369,7 +378,7 @@ public class BuiltInOperation {
                 }
                 break;
             case "delete":
-                dataSet = BizOptUtils.castObjectToDataSet(restfulHttpRequest.doDelete(appSession, httpUrl, mapObject));
+                dataSet = BizOptUtils.castObjectToDataSet(HttpExecutor.simpleDelete(httpExecutorContext, httpUrl, mapObject));
             default:
                 break;
         }
