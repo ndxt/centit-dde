@@ -19,6 +19,7 @@
         <module>centit-dde-module</module>
         <module>centit-dde-transaction</module>
         <module>centit-dde-console</module>
+        <module>centit-dde-elasticsearch</module>
     </modules>
     <name>com.centit.product:centit-dde</name>
 	<packaging>pom</packaging>
