@@ -48,7 +48,7 @@ public class ReportBizOperation implements BizOperation {
         DataSet dataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName,
             "fileSize", size, "fileContent", word2Pdf(in)));
         bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getResponseSuccessData(dataSet.size());
+        return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
     }
 
     private FieldsMetadata getFieldsMetadata(Map<String, String> params, JSONObject docData) {

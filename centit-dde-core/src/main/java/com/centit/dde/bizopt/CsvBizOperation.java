@@ -45,6 +45,6 @@ public class CsvBizOperation implements BizOperation {
         }
         SimpleDataSet dataSet = csvDataSet.load(null);
         bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getResponseSuccessData(dataSet.size());
+        return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
     }
 }

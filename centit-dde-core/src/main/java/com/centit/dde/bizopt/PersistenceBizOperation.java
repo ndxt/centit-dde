@@ -109,7 +109,7 @@ public class PersistenceBizOperation implements BizOperation {
                 break;
         }
         String info = "ok";
-        if (dataSet.size() > 0) {
+        if (dataSet.getSize() > 0) {
             info = dataSetWriter.getInfo();
         }
         return BuiltInOperation.getResponseData(dataSetWriter.getSuccessNums(), dataSetWriter.getErrorNums(), info);

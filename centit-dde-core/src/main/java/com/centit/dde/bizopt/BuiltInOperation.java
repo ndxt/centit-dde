@@ -111,14 +111,14 @@ public class BuiltInOperation {
         String bodyString = (String) bizModel.getModelTag().get("requestBody");
         DataSet destDs = BizOptUtils.castObjectToDataSet(bodyString);
         bizModel.putDataSet("requestBody", destDs);
-        return getResponseSuccessData(destDs.size());
+        return getResponseSuccessData(destDs.getSize());
     }
 
     public static ResponseData runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
         String bodyString = (String) bizModel.getModelTag().get("requestFile");
         DataSet destDs = BizOptUtils.castObjectToDataSet(bodyString);
         bizModel.putDataSet("requestFile", destDs);
-        return getResponseSuccessData(destDs.size());
+        return getResponseSuccessData(destDs.getSize());
     }
 
     public static ResponseData runMap(BizModel bizModel, JSONObject bizOptJson) {
@@ -130,7 +130,7 @@ public class BuiltInOperation {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
             if (dataSet != null) {
                 DataSet destDs = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
-                count = destDs.size();
+                count = destDs.getSize();
                 bizModel.putDataSet(targetDsName, destDs);
             }
         }
@@ -144,7 +144,7 @@ public class BuiltInOperation {
         if (mapInfo != null) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
             if (dataSet != null) {
-                count = dataSet.size();
+                count = dataSet.getSize();
                 DataSetOptUtil.appendDeriveField(dataSet, mapInfo.entrySet());
             }
         }
@@ -160,7 +160,7 @@ public class BuiltInOperation {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
             if (dataSet != null) {
                 DataSet destDs = DataSetOptUtil.filterDateSet(dataSet, formula);
-                count = destDs.size();
+                count = destDs.getSize();
                 bizModel.putDataSet(targetDsName, destDs);
             }
         }
@@ -177,7 +177,7 @@ public class BuiltInOperation {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
             if (dataSet != null) {
                 DataSet destDs = DataSetOptUtil.statDataset(dataSet, groupFields, stat);
-                count = destDs.size();
+                count = destDs.getSize();
                 bizModel.putDataSet(targetDsName, destDs);
             }
         }
@@ -196,7 +196,7 @@ public class BuiltInOperation {
             if (dataSet != null) {
                 DataSet destDs = DataSetOptUtil.analyseDataset(dataSet,
                     groupFields, orderFields, ((Map) analyse).entrySet());
-                count = destDs.size();
+                count = destDs.getSize();
                 bizModel.putDataSet(targetDsName, destDs);
             }
         }
@@ -212,7 +212,7 @@ public class BuiltInOperation {
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet != null) {
             DataSet destDs = DataSetOptUtil.crossTabulation(dataSet, rows, cols);
-            count = destDs.size();
+            count = destDs.getSize();
             bizModel.putDataSet(targetDsName, destDs);
         }
         return getResponseSuccessData(count);
@@ -232,7 +232,7 @@ public class BuiltInOperation {
         int count = 0;
         if (dataSet != null && dataSet2 != null && pks != null) {
             DataSet destDs = DataSetOptUtil.compareTabulation(dataSet, dataSet2, new ArrayList<>(pks.entrySet()), analyse == null ? null : analyse.entrySet());
-            count = destDs.size();
+            count = destDs.getSize();
             bizModel.putDataSet(targetDsName, destDs);
         }
         return getResponseSuccessData(count);
@@ -245,7 +245,7 @@ public class BuiltInOperation {
         if (orderByFields != null) {
             DataSetOptUtil.sortDataSetByFields(dataSet, orderByFields);
         }
-        return getResponseSuccessData(dataSet.size());
+        return getResponseSuccessData(dataSet.getSize());
     }
 
     public static ResponseData runClear(BizModel bizModel, JSONObject bizOptJson) {
@@ -270,7 +270,7 @@ public class BuiltInOperation {
             DataSet destDs = DataSetOptUtil.joinTwoDataSet(dataSet, dataSet2, new ArrayList<>(map.entrySet()), join);
             if (destDs != null) {
                 bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
-                return getResponseSuccessData(destDs.size());
+                return getResponseSuccessData(destDs.getSize());
             }
         }
         return getResponseSuccessData(0);
@@ -283,14 +283,14 @@ public class BuiltInOperation {
         DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
         DataSet destDs = DataSetOptUtil.unionTwoDataSet(dataSet, dataSet2);
         bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
-        return getResponseSuccessData(destDs.size());
+        return getResponseSuccessData(destDs.getSize());
     }
 
     public static ResponseData runStaticData(BizModel bizModel, JSONObject bizOptJson) {
         JSONArray ja = bizOptJson.getJSONArray("data");
         DataSet destDS = BizOptUtils.castObjectToDataSet(ja);
         bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDS);
-        return getResponseSuccessData(destDS.size());
+        return getResponseSuccessData(destDS.getSize());
     }
 
     public static ResponseData runFilterExt(BizModel bizModel, JSONObject bizOptJson) {
@@ -307,7 +307,7 @@ public class BuiltInOperation {
         int count = 0;
         if (dataSet != null && dataSet2 != null) {
             DataSet destDs = DataSetOptUtil.filterByOtherDataSet(dataSet, dataSet2, new ArrayList<>(pks.entrySet()), formulas);
-            count = destDs.size();
+            count = destDs.getSize();
             bizModel.putDataSet(targetDsName, destDs);
         }
         return getResponseSuccessData(count);
@@ -322,7 +322,7 @@ public class BuiltInOperation {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
             if (dataSet != null) {
                 DataSetOptUtil.checkDateSet(dataSet, rules);
-                count = dataSet.size();
+                count = dataSet.getSize();
             }
         }
         return getResponseSuccessData(count);
@@ -383,7 +383,7 @@ public class BuiltInOperation {
                 break;
         }
         bizModel.putDataSet(sourDsName, dataSet);
-        return getResponseSuccessData(dataSet.size());
+        return getResponseSuccessData(dataSet.getSize());
     }
 
 }

@@ -42,7 +42,7 @@ public interface DataSet {
     /**
      * @return 数据集大小
      */
-    int size();
+    int getSize();
 
     Map<String, Object> getFirstRow();
 }

@@ -48,6 +48,6 @@ public class DbBizOperation implements BizOperation {
         sqlDsr.setSqlSen(sql);
         SimpleDataSet dataSet = sqlDsr.load(mapObject);
         bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getResponseSuccessData(dataSet.size());
+        return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
     }
 }

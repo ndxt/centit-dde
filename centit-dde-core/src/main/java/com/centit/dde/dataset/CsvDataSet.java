@@ -26,7 +26,10 @@ public class CsvDataSet extends FileDataSet {
     private InputStream inputStream;
     @Override
     public void setFilePath(String filePath) throws FileNotFoundException {
-        inputStream = new FileInputStream(filePath);
+        super.filePath=filePath;
+        if(new File(filePath).exists()) {
+            inputStream = new FileInputStream(filePath);
+        }
     }
     @Override
     public SimpleDataSet load(Map<String, Object> params) {

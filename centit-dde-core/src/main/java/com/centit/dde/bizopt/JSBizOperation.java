@@ -42,7 +42,7 @@ public class JSBizOperation implements BizOperation {
             bizModel.putDataSet(targetDsName,
                 BizOptUtils.castObjectToDataSet(object));
             if (object != null) {
-                count = bizModel.fetchDataSetByName(targetDsName).size();
+                count = bizModel.fetchDataSetByName(targetDsName).getSize();
             }
         } catch (ScriptException | NoSuchMethodException e) {
             logger.error(e.getLocalizedMessage());

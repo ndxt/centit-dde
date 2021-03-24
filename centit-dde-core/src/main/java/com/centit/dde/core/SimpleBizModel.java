@@ -45,7 +45,7 @@ public class SimpleBizModel implements BizModel, Serializable {
         if(mainData== null){
             return 0;
         }
-        return mainData.size();
+        return mainData.getSize();
     }
 
     @JSONField(deserialize = false, serialize = false)
@@ -62,6 +62,7 @@ public class SimpleBizModel implements BizModel, Serializable {
         if (this.bizData == null) {
             this.bizData = new HashMap<>(6);
         }
+        ((SimpleDataSet)dataSet).setDataSetName(relationPath);
         getBizData().put(relationPath, dataSet);
     }
 
@@ -90,7 +91,7 @@ public class SimpleBizModel implements BizModel, Serializable {
         if (bizData != null) {
             for (Map.Entry<String, DataSet> map : bizData.entrySet()) {
                 DataSet dataSet=map.getValue();
-                if (dataSet.size() == 1 && singleRowAsObject) {
+                if (dataSet.getSize() == 1 && singleRowAsObject) {
                     dataObject.put(map.getKey(), dataSet.getFirstRow());
                 } else  {
                     dataObject.put(map.getKey(), dataSet.getDataAsList());

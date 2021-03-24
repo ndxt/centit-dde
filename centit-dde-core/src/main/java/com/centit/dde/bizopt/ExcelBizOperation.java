@@ -32,6 +32,6 @@ public class ExcelBizOperation implements BizOperation {
         }
         SimpleDataSet dataSet = excelDataSet.load(null);
         bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getResponseSuccessData(dataSet.size());
+        return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
     }
 }
