@@ -45,7 +45,7 @@ public class JSBizOperation implements BizOperation {
                 count = bizModel.fetchDataSetByName(targetDsName).getSize();
             }
         } catch (ScriptException | NoSuchMethodException e) {
-            logger.error(e.getLocalizedMessage());
+            return BuiltInOperation.getResponseData(0, 1,e.getLocalizedMessage());
         }
         return BuiltInOperation.getResponseSuccessData(count);
     }

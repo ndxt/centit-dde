@@ -123,10 +123,12 @@ public class BizOptFlowImpl implements BizOptFlow {
     private JSONObject getBatchStep(BizModel bizModel, DataOptDescJson dataOptDescJson, String stepId, Object preResult) {
         List<JSONObject> linksJson = dataOptDescJson.getNextLinks(stepId);
         for (JSONObject jsonObject : linksJson) {
-            if (BooleanBaseOpt.castObjectToBoolean(
-                VariableFormula.calculate(jsonObject.getString("expression"),
-                    new BizModelJSONTransform(bizModel)), false)) {
-                return dataOptDescJson.getOptStep(jsonObject.getString("targetId"));
+            if(!Constant.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
+                if (BooleanBaseOpt.castObjectToBoolean(
+                    VariableFormula.calculate(jsonObject.getString("expression"),
+                        new BizModelJSONTransform(bizModel)), false)) {
+                    return dataOptDescJson.getOptStep(jsonObject.getString("targetId"));
+                }
             }
         }
         for (JSONObject jsonObject : linksJson) {

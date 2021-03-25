@@ -74,9 +74,7 @@ public class SimpleBizModel implements BizModel, Serializable {
                 dataObject.put(map.getKey(),map.getValue()==null?null:map.getValue().getData());
             }
         }
-        if (modelTag != null && !modelTag.isEmpty()) {
-            dataObject.put("modelTag", modelTag);
-        }
+        dataObject.put("modelTag", modelTag);
         dataObject.put("modelName", this.getModelName());
         return dataObject;
     }
