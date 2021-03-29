@@ -1,5 +1,6 @@
-package com.centit.dde.config;
+package com.centit.dde.factory;
 
+import com.centit.dde.config.ElasticSearchConfig;
 import com.centit.product.metadata.po.SourceInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

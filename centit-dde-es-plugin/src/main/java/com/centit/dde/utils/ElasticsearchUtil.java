@@ -1,4 +1,4 @@
-package com.centit.dde.config;
+package com.centit.dde.utils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
