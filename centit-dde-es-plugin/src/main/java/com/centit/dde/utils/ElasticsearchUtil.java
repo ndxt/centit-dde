@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.entity.EsSearchWriteEntity;
 import com.centit.dde.entity.EsSerachReadEntity;
 import com.centit.dde.entity.QueryParameter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.elasticsearch.action.DocWriteResponse;
@@ -89,11 +90,30 @@ public class ElasticsearchUtil {
     }
 
     /**
+     * 组装documentid   如果不指定，直接使用es生成的id
+     * @param jsonData  保存对象
+     * @param fields   作为document文档id的字段 （0个或者多个）
+     * @return documentid
+     */
+    private static String getDocument(JSONObject jsonData,String fields){
+        StringBuilder doucmentId = new StringBuilder();
+        if (StringUtils.isNotBlank(fields)) {
+            String json = JSONObject.toJSONString(jsonData);
+            String[] fieldArr = fields.split(",");
+            JSONObject jsonObject = JSONObject.parseObject(json);
+            for (int i = 0; i < fieldArr.length; i++) {
+                doucmentId.append(jsonObject.get(fieldArr[i]));
+            }
+        }
+        return doucmentId.toString();
+    }
+
+    /**
      * 添加文档
      */
-    public static IndexResponse saveDocument(RestHighLevelClient restHighLevelClient,String jsonData,String indexName){
-        IndexRequest request = new IndexRequest(indexName);
-        request =request.id(UUID.randomUUID().toString().replaceAll("-",""));
+    public static IndexResponse saveDocument(RestHighLevelClient restHighLevelClient,JSONObject jsonData,EsSearchWriteEntity esSearchWriteEntity){
+        IndexRequest request = new IndexRequest(esSearchWriteEntity.getIndexName());
+        request =request.id(getDocument(jsonData,esSearchWriteEntity.getDocumentIds()));
         request.source(jsonData, XContentType.JSON);
         IndexResponse indexResponse = null;
         try {
@@ -111,21 +131,16 @@ public class ElasticsearchUtil {
         BulkRequest requestBulk = new BulkRequest(esSearchWriteEntity.getIndexName());
         for (Object jsonData : jsonDatas) {
             String json = JSONObject.toJSONString(jsonData);
-            StringBuilder doucmentId = new StringBuilder();
-            String documentIds = esSearchWriteEntity.getDocumentIds();
-            String[] fields = documentIds.split(",");
-            JSONObject jsonObject = JSONObject.parseObject(String.valueOf(jsonData));
-            for (int i = 0; i < fields.length; i++) {
-                doucmentId.append(jsonObject.get(fields[i]));
-            }
+            JSONObject jsonObject = JSONObject.parseObject(json);
+            String documentid = getDocument(jsonObject, esSearchWriteEntity.getDocumentIds());
             //判断文档id是否已经存在，如果存在就做更新操作 反之
-            if (documentIdExist(restHighLevelClient, esSearchWriteEntity.getIndexName(),doucmentId.toString())){
-                UpdateRequest updateRequest= new UpdateRequest(esSearchWriteEntity.getIndexName(),doucmentId.toString());
+            if (documentIdExist(restHighLevelClient, esSearchWriteEntity.getIndexName(),documentid)){
+                UpdateRequest updateRequest= new UpdateRequest(esSearchWriteEntity.getIndexName(),documentid);
                 updateRequest.doc(json,XContentType.JSON);
                 requestBulk.add(updateRequest);
             }else {
                 IndexRequest indexReq = new IndexRequest().source(json, XContentType.JSON);
-                indexReq.id(doucmentId.toString());
+                indexReq.id(documentid);
                 requestBulk.add(indexReq);
             }
         }
