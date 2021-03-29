@@ -105,6 +105,9 @@ public class BizModelJSONTransform
             if(StringUtils.isBlank(valuePath)){
                 return currentDateSet.getDataAsList();
             }
+            if(Constant.DATASET_SIZE.equals(valuePath)){
+                return currentDateSet.getSize();
+            }
             return ReflectionOpt.attainExpressionValue(
                 currentDateSet.getDataAsList(),
                 valuePath);

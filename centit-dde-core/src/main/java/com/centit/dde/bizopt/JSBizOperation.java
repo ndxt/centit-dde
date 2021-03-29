@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.utils.BizOptUtils;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.extend.JSRuntimeContext;
@@ -45,7 +46,7 @@ public class JSBizOperation implements BizOperation {
                 count = bizModel.fetchDataSetByName(targetDsName).getSize();
             }
         } catch (ScriptException | NoSuchMethodException e) {
-            return BuiltInOperation.getResponseData(0, 1,e.getLocalizedMessage());
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_PROCESS_FAILED,e.getMessage());
         }
         return BuiltInOperation.getResponseSuccessData(count);
     }

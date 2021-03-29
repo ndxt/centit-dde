@@ -170,4 +170,10 @@ public class HttpTaskController extends BaseController {
         variableFormula.setFormula(StringEscapeUtils.unescapeHtml4(formula));
         return variableFormula.calcFormula();
     }
+    @GetMapping(value = "/getThread")
+    @ApiOperation(value = "获取线程")
+    public Map<Thread, StackTraceElement[]> getMap(){
+        return Thread.getAllStackTraces();
+    }
+
 }
