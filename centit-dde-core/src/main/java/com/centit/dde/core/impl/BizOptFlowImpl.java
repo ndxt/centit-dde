@@ -180,6 +180,9 @@ public class BizOptFlowImpl implements BizOptFlow {
             stepJson = getBatchStep(bizModel, dataOptDescJson, stepId, preResult);
         } else {
             preResult = runOneStepOpt(bizModel, stepJson, logId);
+            if(((ResponseData)preResult).getCode()==ResponseData.ERROR_PROCESS_FAILED){
+                return preResult;
+            }
             stepJson = dataOptDescJson.getNextStep(stepId);
         }
         //尾递归
@@ -228,9 +231,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         String sOptType = bizOptJson.getString("type");
         BizOperation opt = allOperations.get(sOptType);
         if (opt == null) {
-            if (logId != null) {
-                writeLog(logId, "error", "找不到对应的操作：" + sOptType);
-            }
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_OPERATION,"找不到对应的操作：" + sOptType);
         }
         try {
             TaskDetailLog detailLog = new TaskDetailLog();
@@ -252,10 +253,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             }
             return responseData;
         } catch (Exception e) {
-            if (logId != null) {
-                writeLog(logId, "error", ObjectException.extortExceptionMessage(e, 4));
-            }
-            return ResponseData.makeErrorMessage(e.getMessage());
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_OPERATION,e.getMessage());
         }
     }
 

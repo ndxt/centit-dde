@@ -18,10 +18,10 @@ public abstract class Constant {
     public static final String FALSE="F";
     public static final String CONFIG="config";
     public static final String FILE_CONTENT ="fileContent";
-    public static final String FILE_SIZE ="fileSize";
     public static final String FILE_NAME ="fileName";
     public static final String RESULTS="results";
     public static final String SCHEDULER="sche";
     public static final String BRANCH="branch";
     public static final String CURRENT_USER="currentUser";
+    public static final String DATASET_SIZE ="dataSetSize";
 }
