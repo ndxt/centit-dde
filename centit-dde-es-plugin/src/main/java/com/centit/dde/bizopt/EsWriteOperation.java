@@ -64,4 +64,8 @@ public class EsWriteOperation implements BizOperation {
             log.debug("restHighLevelClient放回连接池中");
         }
     }
+
+
+    //es合并
+
 }
