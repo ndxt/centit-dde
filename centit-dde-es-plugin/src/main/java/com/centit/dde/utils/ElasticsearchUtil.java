@@ -90,7 +90,7 @@ public class ElasticsearchUtil {
     }
 
     /**
-     * 组装documentid   如果不指定，直接使用es生成的id
+     * 组装documentid
      * @param jsonData  保存对象
      * @param fields   作为document文档id的字段 （0个或者多个）
      * @return documentid
@@ -104,6 +104,8 @@ public class ElasticsearchUtil {
             for (int i = 0; i < fieldArr.length; i++) {
                 doucmentId.append(jsonObject.get(fieldArr[i]));
             }
+        }else {
+            doucmentId.append(UUID.randomUUID().toString().replaceAll("-",""));
         }
         return doucmentId.toString();
     }
