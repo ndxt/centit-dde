@@ -3,8 +3,10 @@ package com.centit.dde.services.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.dao.DataPacketCopyDao;
+import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.dao.TaskLogDao;
+import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskLog;
@@ -29,7 +31,8 @@ import java.util.Map;
 public class TaskRun {
     private final TaskLogDao taskLogDao;
     private final TaskDetailLogDao taskDetailLogDao;
-    private final DataPacketCopyDao dataPacketDao;
+    private final DataPacketCopyDao dataPacketCopyDao;
+    private final DataPacketDao dataPackeDao;
     private final BizOptFlow bizOptFlow;
     @Value("${email.hostName:}")
     private String hostName;
@@ -51,21 +54,34 @@ public class TaskRun {
     @Autowired
     public TaskRun(TaskLogDao taskLogDao,
                    TaskDetailLogDao taskDetailLogDao,
-                   DataPacketCopyDao dataPacketDao,
-                   BizOptFlow bizOptFlow) {
+                   DataPacketCopyDao dataPacketCopyDao, DataPacketDao dataPackeDao, BizOptFlow bizOptFlow) {
         this.taskLogDao = taskLogDao;
         this.taskDetailLogDao = taskDetailLogDao;
-        this.dataPacketDao = dataPacketDao;
+        this.dataPacketCopyDao = dataPacketCopyDao;
+        this.dataPackeDao = dataPackeDao;
         this.bizOptFlow = bizOptFlow;
     }
 
-    private Object runStep(DataPacketCopy dataPacket, String logId, Map<String, Object> queryParams) throws Exception {
+    private Object runStep(DataPacket dataPacket, String logId, Map<String, Object> queryParams) throws Exception {
         JSONObject bizOptJson = dataPacket.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
             return null;
         }
         bizOptFlow.initStep(0);
         Map<String, Object> mapObject = new HashMap<>(dataPacket.getPacketParamsValue());
+        if(queryParams!=null) {
+            mapObject.putAll(queryParams);
+        }
+        return bizOptFlow.run(bizOptJson, logId, mapObject);
+    }
+
+    private Object runStepCopy(DataPacketCopy dataPacketCopy, String logId, Map<String, Object> queryParams) throws Exception {
+        JSONObject bizOptJson = dataPacketCopy.getDataOptDescJson();
+        if (bizOptJson.isEmpty()) {
+            return null;
+        }
+        bizOptFlow.initStep(0);
+        Map<String, Object> mapObject = new HashMap<>(dataPacketCopy.getPacketParamsValue());
         if(queryParams!=null) {
             mapObject.putAll(queryParams);
         }
@@ -85,9 +101,18 @@ public class TaskRun {
     }
 
     public Object runTask(String packetId, Map<String, Object> queryParams) {
+        String runType = (String)queryParams.get("runType");
         TaskLog taskLog = new TaskLog();
         Date beginTime = new Date();
-        DataPacketCopy dataPacket = dataPacketDao.getObjectWithReferences(packetId);
+        DataPacketCopy dataPacketCopy=null;
+        DataPacket dataPacket=null;
+        if ("N".equals(runType)){
+            taskLog.setRunner("A");
+            dataPacket = dataPackeDao.getObjectWithReferences(packetId);
+        }else {
+            dataPacketCopy = dataPacketCopyDao.getObjectWithReferences(packetId);
+            taskLog.setRunner("T");
+        }
         try {
             dataPacket.setLastRunTime(new Date());
             taskLog.setTaskId(packetId);
@@ -95,7 +120,12 @@ public class TaskRun {
             taskLog.setRunBeginTime(beginTime);
             taskLog.setRunType(dataPacket.getPacketName());
             taskLogDao.saveNewObject(taskLog);
-            Object bizModel = runStep(dataPacket, taskLog.getLogId(), queryParams);
+            Object bizModel;
+            if ("N".equals(runType)){
+                 bizModel = runStep(dataPacket, taskLog.getLogId(), queryParams);
+            }else {
+                 bizModel = runStepCopy(dataPacketCopy, taskLog.getLogId(), queryParams);
+            }
             taskLog.setRunEndTime(new Date());
             dataPacket.setNextRunTime(new Date());
             String two = "2";
@@ -105,8 +135,13 @@ public class TaskRun {
                 CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacket.getTaskCron());
                 dataPacket.setNextRunTime(cronSequenceGenerator.next(dataPacket.getLastRunTime()));
             }
-            DatabaseOptUtils.doExecuteSql(dataPacketDao,"update q_data_packet set next_run_time=? where packet_id=?",
-                new Object[]{dataPacket.getNextRunTime(),dataPacket.getPacketId()});
+            if ("N".equals(runType)){
+                DatabaseOptUtils.doExecuteSql(dataPackeDao,"update q_data_packet set next_run_time=? where packet_id=?",
+                    new Object[]{dataPacket.getNextRunTime(),dataPacket.getPacketId()});
+            }else {
+                DatabaseOptUtils.doExecuteSql(dataPacketCopyDao,"update q_data_packet set next_run_time=? where packet_id=?",
+                    new Object[]{dataPacket.getNextRunTime(),dataPacket.getPacketId()});
+            }
             TaskDetailLog taskDetailLog = taskDetailLogDao.getObjectByProperties(
                 CollectionsOpt.createHashMap("logId", taskLog.getLogId(), "logInfo_ne", "ok"));
             taskLog.setOtherMessage(taskDetailLog == null ? "ok" : "error");

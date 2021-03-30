@@ -1,7 +1,7 @@
 package com.centit.dde.agent.service;
 
-import com.centit.dde.dao.DataPacketCopyDao;
-import com.centit.dde.po.DataPacketCopy;
+import com.centit.dde.dao.DataPacketDao;
+import com.centit.dde.po.DataPacket;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -33,13 +33,13 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 @Service
 public class TaskSchedulers {
-    private final DataPacketCopyDao dataPacketDao;
+    private final DataPacketDao dataPacketDao;
     private final Scheduler scheduler;
     private final OperationLogWriter operationLogWriter;
     private static String staticTaskMd5= "";
     private static ConcurrentHashMap<String, Object> queryParams = new ConcurrentHashMap<>(2);
     @Autowired
-    public TaskSchedulers(DataPacketCopyDao dataPacketDao, Scheduler scheduler, OperationLogWriter operationLogWriter, PathConfig pathConfig) {
+    public TaskSchedulers(DataPacketDao dataPacketDao, Scheduler scheduler, OperationLogWriter operationLogWriter, PathConfig pathConfig) {
         this.dataPacketDao = dataPacketDao;
         this.scheduler = scheduler;
         this.operationLogWriter = operationLogWriter;
@@ -50,10 +50,10 @@ public class TaskSchedulers {
         }
     }
 
-    private boolean isEqualMd5(List<DataPacketCopy> list) {
+    private boolean isEqualMd5(List<DataPacket> list) {
         boolean result = false;
         StringBuffer stringBuffer = new StringBuffer(100);
-        for (DataPacketCopy i : list) {
+        for (DataPacket i : list) {
             stringBuffer.append(i.getTaskCron());
         }
         String taskMd5 = "";
@@ -78,12 +78,12 @@ public class TaskSchedulers {
     }
 
     private void refreshTask() throws SchedulerException {
-        List<DataPacketCopy> list =  new CopyOnWriteArrayList<>(dataPacketDao.listObjectsByProperties(queryParams));
+        List<DataPacket> list =  new CopyOnWriteArrayList<>(dataPacketDao.listObjectsByProperties(queryParams));
         if (isEqualMd5(list)) {
             return;
         }
         Set<TriggerKey> triggerKeys =  new CopyOnWriteArraySet<>(scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup()));
-        for (DataPacketCopy ll : list) {
+        for (DataPacket ll : list) {
             if ("".equals(ll.getTaskCron()) || ll.getTaskCron() == null) {
                 continue;
             }
@@ -107,7 +107,7 @@ public class TaskSchedulers {
         }
         for (TriggerKey tKey : triggerKeys) {
             boolean found = false;
-            for (DataPacketCopy ll : list) {
+            for (DataPacket ll : list) {
                 TriggerKey triggerKey = TriggerKey.triggerKey(ll.getPacketId(), ll.getOwnGroup());
                 if (tKey.equals(triggerKey)) {
                     found = true;

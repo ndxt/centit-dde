@@ -11,9 +11,21 @@ import java.util.Map;
  */
 public interface DataPacketService {
 
+    void createDataPacket(DataPacket dataPacket);
+
+    void updateDataPacket(DataPacket dataPacket);
+
+    void updateDataPacketOptJson(String packetId, String dataPacketOptJson);
+
     void deleteDataPacket(String packetId);
 
     List<DataPacket> listDataPacket(Map<String, Object> params, PageDesc pageDesc);
+
+    DataPacket getDataPacket(String packetId);
+
+    void setDataPacketBuf(Object bizModel, DataPacket dataPacket, Map<String, Object>  paramsMap);
+
+    Object fetchDataPacketDataFromBuf(DataPacket dataPacket, Map<String, Object>  paramsMap);
 
     void releaseDataPacket(DataPacket dataPacket);
 

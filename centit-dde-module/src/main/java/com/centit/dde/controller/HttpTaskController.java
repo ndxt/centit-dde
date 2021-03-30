@@ -2,9 +2,11 @@ package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.service.ExchangeService;
 import com.centit.dde.services.DataPacketCopyService;
+import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.Constant;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.utils.UploadDownloadUtils;
@@ -38,11 +40,13 @@ import java.util.Map;
 @RequestMapping(value = "httpTask")
 public class HttpTaskController extends BaseController {
 
-    private final DataPacketCopyService dataPacketService;
+    private final DataPacketService dataPacketService;
+    private final DataPacketCopyService dataPacketCopyService;
     private final ExchangeService exchangeService;
 
-    public HttpTaskController(DataPacketCopyService dataPacketService, ExchangeService exchangeService) {
+    public HttpTaskController(DataPacketService dataPacketService, DataPacketCopyService dataPacketCopyService, ExchangeService exchangeService) {
         this.dataPacketService = dataPacketService;
+        this.dataPacketCopyService = dataPacketCopyService;
         this.exchangeService = exchangeService;
     }
 
@@ -50,11 +54,20 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "立即执行任务")
     public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
-        returnObject(packetId, request,response);
+        returnObject(packetId,"N", request,response);
     }
 
-    private void returnObject(String packetId, HttpServletRequest request,HttpServletResponse response) throws IOException {
+    @GetMapping(value = "/debugRun/{packetId}")
+    @ApiOperation(value = "DEBUG执行任务")
+    public void debugRunTaskExchange(@PathVariable String packetId, HttpServletRequest request,
+                                     HttpServletResponse response) throws IOException {
+        returnObject(packetId,"D",request,response);
+    }
+
+    //runType  判断是来自debug运行还是在已发布页面执行的运行
+    private void returnObject(String packetId,String runType,HttpServletRequest request,HttpServletResponse response) throws IOException {
         Map<String, Object> params = collectRequestParameters(request);
+        params.put("runType",runType);
         if(StringUtils.contains(request.getHeader("content-type"),"application")){
             String bodyString = WebOptUtils.getRequestBody(request);
             if (!StringBaseOpt.isNvl(bodyString)) {
@@ -67,11 +80,20 @@ public class HttpTaskController extends BaseController {
             }
         }
         Object bizModel;
-        DataPacketCopy dataPacket = dataPacketService.getDataPacket(packetId);
-        bizModel = dataPacketService.fetchDataPacketDataFromBuf(dataPacket, params);
-        if (bizModel == null) {
-            bizModel = exchangeService.runTask(packetId, params);
-            dataPacketService.setDataPacketBuf(bizModel, dataPacket, params);
+        if ("N".equals(runType)){
+            DataPacket  dataPacket = dataPacketService.getDataPacket(packetId);
+            bizModel = dataPacketService.fetchDataPacketDataFromBuf(dataPacket, params);
+            if (bizModel == null) {
+                bizModel = exchangeService.runTask(packetId, params);
+                dataPacketService.setDataPacketBuf(bizModel, dataPacket, params);
+            }
+        }else {
+            DataPacketCopy dataPacketCopy = dataPacketCopyService.getDataPacket(packetId);
+            bizModel = dataPacketCopyService.fetchDataPacketDataFromBuf(dataPacketCopy, params);
+            if (bizModel == null) {
+                bizModel = exchangeService.runTask(packetId, params);
+                dataPacketCopyService.setDataPacketBuf(bizModel, dataPacketCopy, params);
+            }
         }
         if(bizModel instanceof DataSet && ((DataSet) bizModel).getFirstRow().containsKey(Constant.FILE_CONTENT)
             && ((DataSet) bizModel).getFirstRow().get(Constant.FILE_CONTENT) instanceof OutputStream){
@@ -89,7 +111,7 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "立即执行任务Post")
     public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
                             HttpServletResponse response) throws IOException {
-        returnObject(packetId, request,response);
+        returnObject(packetId,"N", request,response);
     }
 
     @GetMapping(value = "/testformula")

@@ -6,7 +6,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.*;
 import com.centit.dde.core.*;
 import com.centit.dde.dao.DataPacketCopyDao;
+import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.TaskDetailLogDao;
+import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.transaction.AbstractSourceConnectThreadHolder;
@@ -52,7 +54,9 @@ public class BizOptFlowImpl implements BizOptFlow {
     @Autowired
     private TaskDetailLogDao taskDetailLogDao;
     @Autowired
-    private DataPacketCopyDao dataPacketDao;
+    private DataPacketCopyDao dataPacketCopyDao;
+    @Autowired
+    private DataPacketDao dataPacketDao;
     @Autowired(required = false)
     private MetaObjectService metaObjectService;
 
@@ -170,12 +174,19 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (Constant.RESULTS.equals(stepType)) {
             return returnResult(bizModel, stepJson);
         }
-
+        String runType = (String)bizModel.getModelTag().get("runType");
+        DataPacketCopy dataPacketCopy;
+        DataPacket dataPacket;
         if (Constant.SCHEDULER.equals(stepType)) {
-            DataPacketCopy dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
             Map<String, Object> queryParams = CollectionsOpt.cloneHashMap(bizModel.getModelTag());
             queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue"));
-            preResult = run(dataPacket.getDataOptDescJson(), logId, queryParams);
+            if ("N".equals(runType)){
+                dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
+                preResult = run(dataPacket.getDataOptDescJson(), logId, queryParams);
+            }else {
+                dataPacketCopy=dataPacketCopyDao.getObjectWithReferences(stepJson.getString("packetName"));
+                preResult = run(dataPacketCopy.getDataOptDescJson(), logId, queryParams);
+            }
         }
 
         if (Constant.BRANCH.equals(stepType)) {

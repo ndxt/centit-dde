@@ -24,8 +24,16 @@ public abstract class Constant {
     public static final String BRANCH="branch";
     public static final String CURRENT_USER="currentUser";
     public static final String DATASET_SIZE ="dataSetSize";
+
+    /**
+     * zc +
+     */
     //结束循环(结束当前循环标识)
     public static final String CYCLE_OVER ="cycleOver";
     //跳出循环(结束整个循环流程标识)
-    public static final String CYCLE__JUMP_OUT ="cycleJumpOut ";
+    public static final String CYCLE_JUMP_OUT ="cycleJumpOut ";
+    //区间循环
+    public static final String RANGE_CYCLE="R";
+    //foreach循环
+    public static final String FOREACH_CYCLE="F";
 }
