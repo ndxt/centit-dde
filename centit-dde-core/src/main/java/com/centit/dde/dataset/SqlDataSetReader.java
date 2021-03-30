@@ -10,9 +10,11 @@ import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
 import com.centit.product.metadata.vo.ISourceInfo;
+import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,8 +63,10 @@ public class SqlDataSetReader implements DataSetReader {
             paramsMap.putAll(params);
         }
         paramsMap.putAll(qap.getParams());
+        String orderBy = GeneralJsonObjectDao.fetchSelfOrderSql(qap.getQuery(), paramsMap);
+        final String querySql=StringUtils.replace(qap.getQuery(),":ORDER_BY",orderBy);
         JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(
-            conn, qap.getQuery(), paramsMap);
+            conn,querySql, paramsMap);
         SimpleDataSet dataSet = new SimpleDataSet();
         dataSet.setData(jsonArray);
         return dataSet;
