@@ -12,18 +12,22 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.appclient.HttpReceiveJSON;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.network.UrlOptUtils;
+import com.centit.support.report.ExcelExportUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -120,7 +124,18 @@ public class BuiltInOperation {
         bizModel.putDataSet("requestFile", destDs);
         return getResponseSuccessData(destDs.getSize());
     }
-
+    public static Object returnExcel(BizModel bizModel, JSONObject bizOptJson) throws IOException {
+        String path = BuiltInOperation.getJsonFieldString(bizOptJson, "source", "");
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        for(Map.Entry<String,DataSet> set:bizModel.getBizData().entrySet()) {
+            if(set.getKey().equals(path) || StringBaseOpt.isNvl(path)) {
+                String[] head=CollectionsOpt.listToArray(set.getValue().getFirstRow().keySet());
+                ExcelExportUtil.generateExcel(bout, set.getKey(), (List<Object>) set.getValue().getData(), head,head);
+            }
+        }
+        return BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", bizModel.getModelName()+".xlsx",
+             "fileContent", bout));
+    }
     public static ResponseData runMap(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);

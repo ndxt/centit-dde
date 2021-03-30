@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -139,7 +140,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         return null;
     }
 
-    private Object returnResult(BizModel bizModel, JSONObject stepJson) {
+    private Object returnResult(BizModel bizModel, JSONObject stepJson) throws IOException {
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
         String path;
         bizModel.getModelTag().remove("requestFile");
@@ -148,7 +149,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             case "2":
                 return "ok";
             case "3":
-                path = BuiltInOperation.getJsonFieldString(stepJson, "source", "D");
+                path = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
                 return bizModel.fetchDataSetByName(path);
             case "4":
                 path = BuiltInOperation.getJsonFieldString(stepJson, "textarea", "D");
@@ -157,6 +158,8 @@ public class BizOptFlowImpl implements BizOptFlow {
             case "5":
                 path = BuiltInOperation.getJsonFieldString(stepJson, "kname", "D");
                 return bizModel.fetchDataSetByName(path);
+            case "6":
+                return BuiltInOperation.returnExcel(bizModel,stepJson);
             default:
                 return bizModel;
         }
