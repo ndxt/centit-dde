@@ -5,9 +5,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.*;
 import com.centit.dde.core.*;
-import com.centit.dde.dao.DataPacketDao;
+import com.centit.dde.dao.DataPacketCopyDao;
 import com.centit.dde.dao.TaskDetailLogDao;
-import com.centit.dde.po.DataPacket;
+import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.dde.utils.BizModelJSONTransform;
@@ -20,7 +20,6 @@ import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +52,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     @Autowired
     private TaskDetailLogDao taskDetailLogDao;
     @Autowired
-    private DataPacketDao dataPacketDao;
+    private DataPacketCopyDao dataPacketDao;
     @Autowired(required = false)
     private MetaObjectService metaObjectService;
 
@@ -173,7 +172,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
 
         if (Constant.SCHEDULER.equals(stepType)) {
-            DataPacket dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
+            DataPacketCopy dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
             Map<String, Object> queryParams = CollectionsOpt.cloneHashMap(bizModel.getModelTag());
             queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue"));
             preResult = run(dataPacket.getDataOptDescJson(), logId, queryParams);
@@ -230,7 +229,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     /**
      * 单步运行
      */
-    private ResponseData runOneStepOpt(BizModel bizModel, JSONObject bizOptJson, String logId) {
+    public ResponseData runOneStepOpt(BizModel bizModel, JSONObject bizOptJson, String logId) {
         String sOptType = bizOptJson.getString("type");
         BizOperation opt = allOperations.get(sOptType);
         if (opt == null) {

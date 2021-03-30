@@ -1,17 +1,16 @@
 package com.centit.dde.dao;
 
-import com.centit.dde.po.DataPacket;
+import com.centit.dde.po.DataPacketCopy;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 
 /**
- * @author zc
+ * @author zhf
  */
 @Repository
-public class DataPacketDao extends BaseDaoImpl<DataPacket, String> {
-
+public class DataPacketCopyDao extends BaseDaoImpl<DataPacketCopy, String> {
     @Override
     public Map<String, String> getFilterField() {
         return null;

@@ -2,26 +2,22 @@ package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizOptFlow;
-import com.centit.dde.dao.DataPacketDao;
+import com.centit.dde.dao.DataPacketCopyDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.dao.TaskLogDao;
-import com.centit.dde.po.DataPacket;
+import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskLog;
-import com.centit.dde.utils.Constant;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
-import com.centit.support.database.utils.DatabaseAccess;
 import org.apache.commons.mail.MultiPartEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Service;
 
-import javax.xml.crypto.Data;
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +29,7 @@ import java.util.Map;
 public class TaskRun {
     private final TaskLogDao taskLogDao;
     private final TaskDetailLogDao taskDetailLogDao;
-    private final DataPacketDao dataPacketDao;
+    private final DataPacketCopyDao dataPacketDao;
     private final BizOptFlow bizOptFlow;
     @Value("${email.hostName:}")
     private String hostName;
@@ -55,7 +51,7 @@ public class TaskRun {
     @Autowired
     public TaskRun(TaskLogDao taskLogDao,
                    TaskDetailLogDao taskDetailLogDao,
-                   DataPacketDao dataPacketDao,
+                   DataPacketCopyDao dataPacketDao,
                    BizOptFlow bizOptFlow) {
         this.taskLogDao = taskLogDao;
         this.taskDetailLogDao = taskDetailLogDao;
@@ -63,7 +59,7 @@ public class TaskRun {
         this.bizOptFlow = bizOptFlow;
     }
 
-    private Object runStep(DataPacket dataPacket, String logId, Map<String, Object> queryParams) throws Exception {
+    private Object runStep(DataPacketCopy dataPacket, String logId, Map<String, Object> queryParams) throws Exception {
         JSONObject bizOptJson = dataPacket.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
             return null;
@@ -91,7 +87,7 @@ public class TaskRun {
     public Object runTask(String packetId, Map<String, Object> queryParams) {
         TaskLog taskLog = new TaskLog();
         Date beginTime = new Date();
-        DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
+        DataPacketCopy dataPacket = dataPacketDao.getObjectWithReferences(packetId);
         try {
             dataPacket.setLastRunTime(new Date());
             taskLog.setTaskId(packetId);

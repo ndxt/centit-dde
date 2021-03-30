@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiModelProperty;
 public class EsSearchWriteEntity {
     @ApiModelProperty(value = "本节点数据集id")
     private String id;
+    @ApiModelProperty(value = "类型")
+    private String type;
     @ApiModelProperty(value = "索引名称")
     private String indexName;
     @ApiModelProperty(value = "数据来源id")
@@ -15,6 +17,14 @@ public class EsSearchWriteEntity {
     private  String documentIds;
     @ApiModelProperty(value = "元数据库中对于业务的数据库连接信息id")
     private String dataSourceId;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getId() {
         return id;

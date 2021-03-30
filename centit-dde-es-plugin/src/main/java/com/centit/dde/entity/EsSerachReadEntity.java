@@ -15,6 +15,8 @@ public class EsSerachReadEntity {
     private String id;
     @ApiModelProperty(value = "索引名称")
     private String indexName;
+    @ApiModelProperty(value = "类型")
+    private String type;
     @ApiModelProperty(value = "查询类型   1：精确查询   2条件查询  3 范围查询  不传值为：分页查询（查询时填写）")
     private String queryType;
     @ApiModelProperty(value = "查询字段 field  查询字段值（查询时填写）")
@@ -37,6 +39,14 @@ public class EsSerachReadEntity {
     private String rangeStartValue;
     @ApiModelProperty(value = "范围查询结束值")
     private String rangeEndValue;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public List<QueryParameter> getQueryFieldMap() {
         return queryFieldMap;

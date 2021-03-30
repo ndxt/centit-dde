@@ -2,9 +2,9 @@ package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.po.DataPacket;
+import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.service.ExchangeService;
-import com.centit.dde.services.DataPacketService;
+import com.centit.dde.services.DataPacketCopyService;
 import com.centit.dde.utils.Constant;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.utils.UploadDownloadUtils;
@@ -25,7 +25,6 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.Charset;
@@ -39,10 +38,10 @@ import java.util.Map;
 @RequestMapping(value = "httpTask")
 public class HttpTaskController extends BaseController {
 
-    private final DataPacketService dataPacketService;
+    private final DataPacketCopyService dataPacketService;
     private final ExchangeService exchangeService;
 
-    public HttpTaskController(DataPacketService dataPacketService, ExchangeService exchangeService) {
+    public HttpTaskController(DataPacketCopyService dataPacketService, ExchangeService exchangeService) {
         this.dataPacketService = dataPacketService;
         this.exchangeService = exchangeService;
     }
@@ -68,7 +67,7 @@ public class HttpTaskController extends BaseController {
             }
         }
         Object bizModel;
-        DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
+        DataPacketCopy dataPacket = dataPacketService.getDataPacket(packetId);
         bizModel = dataPacketService.fetchDataPacketDataFromBuf(dataPacket, params);
         if (bizModel == null) {
             bizModel = exchangeService.runTask(packetId, params);

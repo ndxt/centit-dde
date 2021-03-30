@@ -1,6 +1,6 @@
 package com.centit.dde.agent.service;
 
-import com.centit.dde.po.DataPacket;
+import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.support.quartz.AbstractQuartzJob;
 import org.quartz.JobDataMap;
@@ -27,7 +27,7 @@ public class RunTaskJob extends AbstractQuartzJob {
     @Override
     protected boolean runRealJob(JobExecutionContext context) {
         JobDataMap paramMap = context.getMergedJobDataMap();
-        DataPacket dataPacket = (DataPacket) paramMap.get("taskExchange");
+        DataPacketCopy dataPacket = (DataPacketCopy) paramMap.get("taskExchange");
 
         PathConfig pathConfig = ContextUtils.getBean(PathConfig.class);
         boolean userMoving = "true".equalsIgnoreCase(pathConfig.getUseDataMoving());
