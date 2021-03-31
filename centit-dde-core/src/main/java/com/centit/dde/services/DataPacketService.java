@@ -27,6 +27,6 @@ public interface DataPacketService {
 
     Object fetchDataPacketDataFromBuf(DataPacket dataPacket, Map<String, Object>  paramsMap);
 
-    void releaseDataPacket(DataPacket dataPacket);
+    void publishDataPacket(DataPacket dataPacket);
 
 }

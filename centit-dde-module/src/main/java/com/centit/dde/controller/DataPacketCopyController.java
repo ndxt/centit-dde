@@ -38,8 +38,6 @@ public class DataPacketCopyController extends BaseController {
     public void createDataPacket(@RequestBody DataPacketCopy dataPacketCopy, HttpServletRequest request) {
         dataPacketCopy.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacketCopy.setDataOptDescJson(dataPacketCopy.getDataOptDescJson());
-        //将发布状态改成1，每次编辑后都需要重新发布
-        dataPacketCopy.setState("1");
         dataPacketCopyService.createDataPacket(dataPacketCopy);
     }
 
@@ -49,18 +47,15 @@ public class DataPacketCopyController extends BaseController {
     public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketCopy dataPacket) {
         dataPacket.setPacketId(packetId);
         dataPacket.setDataOptDescJson(dataPacket.getDataOptDescJson());
-        dataPacket.setState("1");
         dataPacketCopyService.updateDataPacket(dataPacket);
     }
 
     @ApiOperation(value = "数据包发布")
     @PutMapping(value = "release/{packetId}")
     @WrapUpResponseBody
-    public void releaseDataPacket(@PathVariable String packetId) {
+    public void publishDataPacket(@PathVariable String packetId) {
         DataPacketCopy dataPacketCopy = dataPacketCopyService.getDataPacket(packetId);
-        //修改发布状态
-        dataPacketCopy.setState("2");
-        dataPacketCopyService.releaseDataPacket(dataPacketCopy);
+        dataPacketCopyService.publishDataPacket(dataPacketCopy);
     }
 
     @ApiOperation(value = "编辑数据包数据处理描述信息")

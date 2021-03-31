@@ -168,7 +168,7 @@ public class DataPacketServiceImpl implements DataPacketService {
     }
 
     @Override
-    public void releaseDataPacket(DataPacket dataPacket) {
+    public void publishDataPacket(DataPacket dataPacket) {
         dataPacketDao.mergeObject(dataPacket);
         dataPacketDao.saveObjectReferences(dataPacket);
     }

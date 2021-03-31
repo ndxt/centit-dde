@@ -69,14 +69,13 @@ public class DataPacketCopyServiceImpl implements DataPacketCopyService {
 
 
     @Override
-    public void releaseDataPacket(DataPacketCopy dataPacketCopy) {
-        dataPacketCopyDao.updateObject(dataPacketCopy);
+    public void publishDataPacket(DataPacketCopy dataPacketCopy) {
         DataPacket dataPacket = new DataPacket();
         BeanUtils.copyProperties(dataPacketCopy,dataPacket);
         List<DataPacketParam> dataPacketParamList = new ArrayList<>();
         BeanUtils.copyProperties(dataPacketCopy.getPacketParams(),dataPacketParamList);
         dataPacket.setPacketParams(dataPacketParamList);
-        dataPacketService.releaseDataPacket(dataPacket);
+        dataPacketService.publishDataPacket(dataPacket);
     }
 
 

@@ -108,9 +108,10 @@ public class DataPacketCopy implements Serializable {
     @ApiModelProperty(value = "所属分组")
     private String ownGroup;
 
-    @Column(name = "state")
-    @ApiModelProperty(value = "发布状态，1：未发布，2：已发布")
-    private String state;
+    @Column(name = "publish_date")
+    @ApiModelProperty(value = "发布时间")
+    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
+    private String publishDate;
 
     @OneToMany(targetEntity = DataPacketParamCopy.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
