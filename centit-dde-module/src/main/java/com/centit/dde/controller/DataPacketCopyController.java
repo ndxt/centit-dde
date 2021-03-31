@@ -24,12 +24,6 @@ import java.util.List;
 @RequestMapping(value = "packetCopy")
 public class DataPacketCopyController extends BaseController {
 
-    private FileStore fileStore;
-
-    @Autowired(required = false)
-    public void setFileStore(FileStore fileStore) {
-        this.fileStore = fileStore;
-    }
 
     private final DataPacketCopyService dataPacketCopyService;
 
