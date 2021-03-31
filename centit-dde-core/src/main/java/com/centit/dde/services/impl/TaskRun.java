@@ -109,12 +109,12 @@ public class TaskRun {
         Date beginTime = new Date();
         DataPacketCopy dataPacketCopy=null;
         DataPacket dataPacket=null;
-        if ("N".equals(runType)){
-            taskLog.setRunner("A");
-            dataPacket = dataPackeDao.getObjectWithReferences(packetId);
-        }else {
+        if ("D".equals(runType)){
             dataPacketCopy = dataPacketCopyDao.getObjectWithReferences(packetId);
             taskLog.setRunner("T");
+        }else {
+            taskLog.setRunner("A");
+            dataPacket = dataPackeDao.getObjectWithReferences(packetId);
         }
         try {
             dataPacket.setLastRunTime(new Date());
@@ -124,10 +124,10 @@ public class TaskRun {
             taskLog.setRunType(dataPacket.getPacketName());
             taskLogDao.saveNewObject(taskLog);
             Object bizModel;
-            if ("N".equals(runType)){
-                 bizModel = runStep(dataPacket, taskLog.getLogId(), queryParams);
+            if ("D".equals(runType)){
+                bizModel = runStepCopy(dataPacketCopy, taskLog.getLogId(), queryParams);
             }else {
-                 bizModel = runStepCopy(dataPacketCopy, taskLog.getLogId(), queryParams);
+                bizModel = runStep(dataPacket, taskLog.getLogId(), queryParams);
             }
             taskLog.setRunEndTime(new Date());
             dataPacket.setNextRunTime(new Date());
@@ -138,11 +138,11 @@ public class TaskRun {
                 CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacket.getTaskCron());
                 dataPacket.setNextRunTime(cronSequenceGenerator.next(dataPacket.getLastRunTime()));
             }
-            if ("N".equals(runType)){
-                DatabaseOptUtils.doExecuteSql(dataPackeDao,"update q_data_packet set next_run_time=? where packet_id=?",
+            if ("D".equals(runType)){
+                DatabaseOptUtils.doExecuteSql(dataPacketCopyDao,"update q_data_packet set next_run_time=? where packet_id=?",
                     new Object[]{dataPacket.getNextRunTime(),dataPacket.getPacketId()});
             }else {
-                DatabaseOptUtils.doExecuteSql(dataPacketCopyDao,"update q_data_packet set next_run_time=? where packet_id=?",
+                DatabaseOptUtils.doExecuteSql(dataPackeDao,"update q_data_packet set next_run_time=? where packet_id=?",
                     new Object[]{dataPacket.getNextRunTime(),dataPacket.getPacketId()});
             }
             TaskDetailLog taskDetailLog = taskDetailLogDao.getObjectByProperties(

@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @Api(value = "COPY数据包", tags = "COPY数据包")
 @RestController
-@RequestMapping(value = "packet")
+@RequestMapping(value = "packetCopy")
 public class DataPacketCopyController extends BaseController {
 
     private FileStore fileStore;

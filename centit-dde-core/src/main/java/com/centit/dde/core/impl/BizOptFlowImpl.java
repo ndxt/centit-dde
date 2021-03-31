@@ -168,7 +168,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
     }
 
-    private Object runStep(DataOptDescJson dataOptDescJson, String logId, SimpleBizModel bizModel, JSONObject stepJson, Object preResult) throws Exception {
+    public Object runStep(DataOptDescJson dataOptDescJson, String logId, BizModel bizModel, JSONObject stepJson, Object preResult) throws Exception {
         String stepId = stepJson.getString("id");
         String stepType = stepJson.getString("type");
         if (Constant.RESULTS.equals(stepType)) {
@@ -180,15 +180,14 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (Constant.SCHEDULER.equals(stepType)) {
             Map<String, Object> queryParams = CollectionsOpt.cloneHashMap(bizModel.getModelTag());
             queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue"));
-            if ("N".equals(runType)){
-                dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
-                preResult = run(dataPacket.getDataOptDescJson(), logId, queryParams);
-            }else {
+            if ("D".equals(runType)){
                 dataPacketCopy=dataPacketCopyDao.getObjectWithReferences(stepJson.getString("packetName"));
                 preResult = run(dataPacketCopy.getDataOptDescJson(), logId, queryParams);
+            }else {
+                dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
+                preResult = run(dataPacket.getDataOptDescJson(), logId, queryParams);
             }
         }
-
         if (Constant.BRANCH.equals(stepType)) {
             stepJson = getBatchStep(bizModel, dataOptDescJson, stepId, preResult);
         } else {
