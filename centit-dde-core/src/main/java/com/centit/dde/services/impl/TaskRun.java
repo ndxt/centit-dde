@@ -101,7 +101,10 @@ public class TaskRun {
     }
 
     public Object runTask(String packetId, Map<String, Object> queryParams) {
-        String runType = (String)queryParams.get("runType");
+        String runType = "N";
+        if(queryParams!=null && queryParams.containsKey("runType")) {
+            runType = (String) queryParams.get("runType");
+        }
         TaskLog taskLog = new TaskLog();
         Date beginTime = new Date();
         DataPacketCopy dataPacketCopy=null;
