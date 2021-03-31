@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author zhf
@@ -34,7 +32,6 @@ public class DataPacketCopyController extends BaseController {
     }
 
     private final DataPacketCopyService dataPacketCopyService;
-
 
 
     public DataPacketCopyController(DataPacketCopyService dataPacketCopyService) {
@@ -100,17 +97,5 @@ public class DataPacketCopyController extends BaseController {
     public DataPacketCopy getDataPacket(@PathVariable String packetId) {
         return dataPacketCopyService.getDataPacket(packetId);
     }
-
-    @GetMapping(value = "/exist/{applicationId}/{interfaceName}")
-    @ApiOperation(value = "接口名称是否已存在")
-    @WrapUpResponseBody
-    public Boolean isExist(@PathVariable String applicationId, @PathVariable String interfaceName) {
-        Map<String, Object> params = new HashMap<>(10);
-        params.put("interfaceName", interfaceName);
-        params.put("applicationId", applicationId);
-        List<DataPacketCopy> list = dataPacketCopyService.listDataPacket(params, new PageDesc());
-        return list.size() > 0;
-    }
-
 
 }

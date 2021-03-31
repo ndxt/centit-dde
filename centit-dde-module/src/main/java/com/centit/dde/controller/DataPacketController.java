@@ -1,10 +1,7 @@
 package com.centit.dde.controller;
 
 import com.centit.dde.po.DataPacket;
-import com.centit.dde.po.DataPacketCopy;
-import com.centit.dde.services.DataPacketCopyService;
 import com.centit.dde.services.DataPacketService;
-import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
@@ -12,13 +9,10 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author zhf
@@ -28,12 +22,6 @@ import java.util.Map;
 @RequestMapping(value = "packet")
 public class DataPacketController extends BaseController {
 
-    private FileStore fileStore;
-
-    @Autowired(required = false)
-    public void setFileStore(FileStore fileStore) {
-        this.fileStore = fileStore;
-    }
 
     private final DataPacketService dataPacketService;
 
@@ -87,17 +75,6 @@ public class DataPacketController extends BaseController {
     @WrapUpResponseBody
     public DataPacket getDataPacket(@PathVariable String packetId) {
         return dataPacketService.getDataPacket(packetId);
-    }
-
-    @GetMapping(value = "/exist/{applicationId}/{interfaceName}")
-    @ApiOperation(value = "接口名称是否已存在")
-    @WrapUpResponseBody
-    public Boolean isExist(@PathVariable String applicationId, @PathVariable String interfaceName) {
-        Map<String, Object> params = new HashMap<>(10);
-        params.put("interfaceName", interfaceName);
-        params.put("applicationId", applicationId);
-        List<DataPacket> list = dataPacketService.listDataPacket(params, new PageDesc());
-        return list.size() > 0;
     }
 
 
