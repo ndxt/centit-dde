@@ -27,6 +27,6 @@ public interface DataPacketCopyService {
 
     Object fetchDataPacketDataFromBuf(DataPacketCopy dataPacketCopy, Map<String, Object>  paramsMap);
 
-    void releaseDataPacket(DataPacketCopy dataPacketCopy);
+    void publishDataPacket(DataPacketCopy dataPacketCopy);
 
 }
