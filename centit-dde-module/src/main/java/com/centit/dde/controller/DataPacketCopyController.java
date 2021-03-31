@@ -55,6 +55,7 @@ public class DataPacketCopyController extends BaseController {
     @WrapUpResponseBody
     public void publishDataPacket(@PathVariable String packetId) {
         DataPacketCopy dataPacketCopy = dataPacketCopyService.getDataPacket(packetId);
+        dataPacketCopyService.updateDataPacket(dataPacketCopy);
         dataPacketCopyService.publishDataPacket(dataPacketCopy);
     }
 
