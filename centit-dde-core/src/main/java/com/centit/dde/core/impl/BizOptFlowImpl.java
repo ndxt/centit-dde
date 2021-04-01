@@ -143,7 +143,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         return null;
     }
 
-    private Object returnResult(BizModel bizModel, JSONObject stepJson) throws IOException {
+    private Object returnResult(BizModel bizModel, JSONObject stepJson) throws Exception {
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
         String path;
         bizModel.getModelTag().remove("requestFile");

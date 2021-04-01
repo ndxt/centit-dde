@@ -9,12 +9,16 @@ import com.centit.dde.datarule.CheckRule;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.fileserver.utils.SystemTempFileUtils;
 import com.centit.framework.appclient.HttpReceiveJSON;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
+import com.centit.support.file.FileIOOpt;
+import com.centit.support.file.FileSystemOpt;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.network.UrlOptUtils;
@@ -25,9 +29,8 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -124,17 +127,20 @@ public class BuiltInOperation {
         bizModel.putDataSet("requestFile", destDs);
         return getResponseSuccessData(destDs.getSize());
     }
-    public static Object returnExcel(BizModel bizModel, JSONObject bizOptJson) throws IOException {
+    public static Object returnExcel(BizModel bizModel, JSONObject bizOptJson) throws Exception{
         String path = BuiltInOperation.getJsonFieldString(bizOptJson, "source", "");
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        File excel= new File(SystemTempFileUtils.getRandomTempFilePath());
         for(Map.Entry<String,DataSet> set:bizModel.getBizData().entrySet()) {
             if(set.getKey().equals(path) || StringBaseOpt.isNvl(path)) {
                 String[] head=CollectionsOpt.listToArray(set.getValue().getFirstRow().keySet());
-                ExcelExportUtil.generateExcel(bout, set.getKey(), (List<Object>) set.getValue().getData(), head,head);
+                ExcelExportUtil.appendDataToExcelSheet(excel.getPath(), set.getKey(), (List<Object>) set.getValue().getData(), head,head);
             }
         }
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        FileIOOpt.writeInputStreamToOutputStream(new FileInputStream(excel),outStream);
+        FileSystemOpt.deleteFile(excel);
         return BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", bizModel.getModelName()+".xlsx",
-             "fileContent", bout));
+             "fileContent", outStream));
     }
     public static ResponseData runMap(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
