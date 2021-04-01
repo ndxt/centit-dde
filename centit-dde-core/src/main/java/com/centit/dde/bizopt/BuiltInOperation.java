@@ -128,7 +128,7 @@ public class BuiltInOperation {
         return getResponseSuccessData(destDs.getSize());
     }
     public static Object returnExcel(BizModel bizModel, JSONObject bizOptJson) throws Exception{
-        String path = BuiltInOperation.getJsonFieldString(bizOptJson, "source", "");
+        String path = BuiltInOperation.getJsonFieldString(bizOptJson, "source2", "");
         File excel= new File(SystemTempFileUtils.getRandomTempFilePath());
         for(Map.Entry<String,DataSet> set:bizModel.getBizData().entrySet()) {
             if(set.getKey().equals(path) || StringBaseOpt.isNvl(path)) {
