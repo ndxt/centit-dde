@@ -43,7 +43,9 @@ public class HttpBizOperation implements BizOperation {
     }
 
     private HttpExecutorContext getHttpClientContext(String databaseCode,Map<String, Object> map) throws IOException {
-        SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+        if(databaseCode!=null) {
+            SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+        }
         //ToDO 根据资源获取session
         HttpClientContext context = HttpClientContext.create();
         BasicCookieStore cookieStore = new BasicCookieStore();
@@ -99,7 +101,11 @@ public class HttpBizOperation implements BizOperation {
             default:
                 break;
         }
-        bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
+        if(dataSet!=null) {
+            bizModel.putDataSet(sourDsName, dataSet);
+            return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
+        }else{
+            return BuiltInOperation.getResponseData(0,0,"无数据");
+        }
     }
 }
