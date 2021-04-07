@@ -95,7 +95,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("filterExt", BuiltInOperation::runFilterExt);
         allOperations.put("check", BuiltInOperation::runCheckData);
         allOperations.put("static", BuiltInOperation::runStaticData);
-        allOperations.put("htts", BuiltInOperation::runHttpData);
+        HttpBizOperation httpBizOperation = new HttpBizOperation(sourceInfoDao);
+        allOperations.put("htts", httpBizOperation);
         allOperations.put("clear", BuiltInOperation::runClear);
         JSBizOperation jsBizOperation = new JSBizOperation(metaObjectService);
         allOperations.put("js", jsBizOperation);

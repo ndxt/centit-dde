@@ -107,6 +107,10 @@ public class DataPacket implements Serializable {
     @Column(name = "OWN_GROUP")
     @ApiModelProperty(value = "所属分组")
     private String ownGroup;
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "RETURN_RESULT")
+    @ApiModelProperty(value = "桩数据", required = true)
+    private JSONObject returnResult;
 
     @Column(name = "publish_date")
     @ApiModelProperty(value = "发布时间")
