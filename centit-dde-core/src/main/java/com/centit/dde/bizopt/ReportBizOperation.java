@@ -13,7 +13,6 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.file.FileIOOpt;
-import com.centit.support.office.OfficeToPdf;
 import com.centit.support.report.JsonDocxContext;
 import fr.opensagres.xdocreport.core.XDocReportException;
 import fr.opensagres.xdocreport.document.IXDocReport;
@@ -44,11 +43,15 @@ public class ReportBizOperation implements BizOperation {
             + ".pdf";
         String size = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("size");
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName");
-        ByteArrayInputStream in = generateWord(bizModel, filePath, params);
-        DataSet dataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName,
-            "fileSize", size, "fileContent", word2Pdf(in)));
-        bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
+        try {
+            ByteArrayInputStream in = generateWord(bizModel, filePath, params);
+            DataSet dataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName,
+                "fileSize", size, "fileContent", word2Pdf(in)));
+            bizModel.putDataSet(sourDsName, dataSet);
+            return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
+        } catch (Exception e) {
+            return BuiltInOperation.getResponseData(0, 0, e.getMessage());
+        }
     }
 
     private FieldsMetadata getFieldsMetadata(Map<String, String> params, JSONObject docData) {
