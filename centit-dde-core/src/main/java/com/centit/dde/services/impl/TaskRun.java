@@ -111,17 +111,20 @@ public class TaskRun {
         DataPacket dataPacket=null;
         if ("D".equals(runType)){
             dataPacketCopy = dataPacketCopyDao.getObjectWithReferences(packetId);
+            dataPacketCopy.setLastRunTime(new Date());
             taskLog.setRunner("T");
+            taskLog.setApplicationId(dataPacketCopy.getApplicationId());
+            taskLog.setRunType(dataPacketCopy.getPacketName());
         }else {
             taskLog.setRunner("A");
             dataPacket = dataPackeDao.getObjectWithReferences(packetId);
+            dataPacket.setLastRunTime(new Date());
+            taskLog.setApplicationId(dataPacket.getApplicationId());
+            taskLog.setRunType(dataPacket.getPacketName());
         }
         try {
-            dataPacket.setLastRunTime(new Date());
             taskLog.setTaskId(packetId);
-            taskLog.setApplicationId(dataPacket.getApplicationId());
             taskLog.setRunBeginTime(beginTime);
-            taskLog.setRunType(dataPacket.getPacketName());
             taskLogDao.saveNewObject(taskLog);
             Object bizModel;
             if ("D".equals(runType)){
@@ -129,18 +132,29 @@ public class TaskRun {
             }else {
                 bizModel = runStep(dataPacket, taskLog.getLogId(), queryParams);
             }
-            taskLog.setRunEndTime(new Date());
-            dataPacket.setNextRunTime(new Date());
             String two = "2";
-            if (two.equals(dataPacket.getTaskType())
-                && dataPacket.getIsValid()
-                && !StringBaseOpt.isNvl(dataPacket.getTaskCron())) {
-                CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacket.getTaskCron());
-                dataPacket.setNextRunTime(cronSequenceGenerator.next(dataPacket.getLastRunTime()));
-            }
+            taskLog.setRunEndTime(new Date());
             if ("D".equals(runType)){
-                DatabaseOptUtils.doExecuteSql(dataPacketCopyDao,"update q_data_packet set next_run_time=? where packet_id=?",
-                    new Object[]{dataPacket.getNextRunTime(),dataPacket.getPacketId()});
+                dataPacketCopy.setNextRunTime(new Date());
+                if (two.equals(dataPacketCopy.getTaskType())
+                    && dataPacketCopy.getIsValid()
+                    && !StringBaseOpt.isNvl(dataPacketCopy.getTaskCron())) {
+                    CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacketCopy.getTaskCron());
+                    dataPacketCopy.setNextRunTime(cronSequenceGenerator.next(dataPacketCopy.getLastRunTime()));
+                }
+            }else {
+                dataPacket.setNextRunTime(new Date());
+                if (two.equals(dataPacket.getTaskType())
+                    && dataPacket.getIsValid()
+                    && !StringBaseOpt.isNvl(dataPacket.getTaskCron())) {
+                    CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacket.getTaskCron());
+                    dataPacket.setNextRunTime(cronSequenceGenerator.next(dataPacket.getLastRunTime()));
+                }
+            }
+
+            if ("D".equals(runType)){
+                DatabaseOptUtils.doExecuteSql(dataPacketCopyDao,"update q_data_packet_copy set next_run_time=? where packet_id=?",
+                    new Object[]{dataPacketCopy.getNextRunTime(),dataPacketCopy.getPacketId()});
             }else {
                 DatabaseOptUtils.doExecuteSql(dataPackeDao,"update q_data_packet set next_run_time=? where packet_id=?",
                     new Object[]{dataPacket.getNextRunTime(),dataPacket.getPacketId()});
@@ -156,7 +170,11 @@ public class TaskRun {
             taskLog.setOtherMessage("error");
             taskLog.setRunEndTime(new Date());
             taskLogDao.mergeObject(taskLog);
-            sendEmailMessage("任务执行异常", dataPacket.getPacketId() + dataPacket.getPacketName());
+            if ("D".equals(runType)){
+                sendEmailMessage("任务执行异常", dataPacketCopy.getPacketId() + dataPacketCopy.getPacketName());
+            }else {
+                sendEmailMessage("任务执行异常", dataPacket.getPacketId() + dataPacket.getPacketName());
+            }
         }
         return null;
     }
