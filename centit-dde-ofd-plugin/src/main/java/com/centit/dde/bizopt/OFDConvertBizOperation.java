@@ -59,13 +59,13 @@ public class OFDConvertBizOperation implements BizOperation {
             FileInfo fileInfo = fileClient.getFileInfo(fileId);
             System.out.println("文件信息："+fileInfo.getFileName());
             System.out.println("文件信息："+fileInfo.toString());
-            String fileName = fileInfo.getFileName();
+            String fileName = System.currentTimeMillis()+"."+fileInfo.getFileType();
             System.out.println("文件名："+fileName);
             File file = fileStore.getFile(fileInfo.getFileId());
             System.out.println("文件："+file.toString());
             String  path = file.getParent();
             System.out.println("路径："+path);
-            boolean b = file.renameTo(new File(path + File.separator + fileName));
+            boolean b = file.renameTo(new File(path + File.separator +fileName));
             System.out.println("重命名结果："+b);
             fileList.add(new File(path + File.separator + fileName));
         }
