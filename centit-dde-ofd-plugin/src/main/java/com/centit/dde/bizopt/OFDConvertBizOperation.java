@@ -45,6 +45,9 @@ public class OFDConvertBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         Map<String, Object> modelTag = bizModel.getModelTag();
         OFDConvertVo ofdConvertVo = bizOptJson.toJavaObject(OFDConvertVo.class);
+        System.out.println("------start");
+        HTTPAgent httpAgent  = new HTTPAgent(ofdConvertVo.getHttpUrl());
+        System.out.println("------end");
         System.out.println(ofdConvertVo.getHttpUrl());
         String fileIdMaps = (String)modelTag.get("fileId");
         String fileids =StringUtils.isNotBlank(fileIdMaps)?fileIdMaps:ofdConvertVo.getFileid();
@@ -72,11 +75,9 @@ public class OFDConvertBizOperation implements BizOperation {
         System.out.println("1");
         TimeInterval timer = DateUtil.timer();
         System.out.println("2");
-        HTTPAgent httpAgent = null;
         ByteArrayOutputStream stream = null;
         try {
             System.out.println(ofdConvertVo.getHttpUrl());
-            httpAgent = new HTTPAgent(ofdConvertVo.getHttpUrl());
             System.out.println("3");
             stream = new ByteArrayOutputStream();
             System.out.println("4");
