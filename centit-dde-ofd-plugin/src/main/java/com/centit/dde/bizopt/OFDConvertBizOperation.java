@@ -42,49 +42,53 @@ public class OFDConvertBizOperation implements BizOperation {
 
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
-        Map<String, Object> modelTag = bizModel.getModelTag();
-        OFDConvertVo ofdConvertVo = bizOptJson.toJavaObject(OFDConvertVo.class);
-        String fileIdMaps = (String)modelTag.get("fileId");
-        String fileids =StringUtils.isNotBlank(fileIdMaps)?fileIdMaps:ofdConvertVo.getFileid();
-        if (StringUtils.isBlank(fileids)) {
-            return ResponseData.makeErrorMessage("文件id不能为空！");
-        }
-        String[] fileidArr = fileids.split(",");
-        List<File> fileList = new ArrayList<>();
-        for (String fileId : fileidArr) {
-            //获取上传文件（文件服务器获取）
-            FileInfo fileInfo = fileClient.getFileInfo(fileId);
-            String fileName = fileInfo.getFileName();
-            File file = fileStore.getFile(fileInfo.getFileId());
-            String  path = file.getParent();
-            boolean b = file.renameTo(new File(path + File.separator + fileName));
-            fileList.add(new File(path + File.separator + fileName));
-        }
-        TimeInterval timer = DateUtil.timer();
-        HTTPAgent httpAgent = null;
-        ByteArrayOutputStream stream = null;
-        try {
-            httpAgent = new HTTPAgent(ofdConvertVo.getHttpUrl());
-            stream = new ByteArrayOutputStream();
-            httpAgent.officesToOFD(fileList, stream);
-            bizModel.putDataSet(ofdConvertVo.getId(),new SimpleDataSet(stream));
-            log.info("请求转换文件服务,请求服务地址："+ofdConvertVo.getHttpUrl()+"，请求耗时："+timer.interval()+"ms");
-        } catch (Exception e) {
-            BuiltInOperation.getResponseData(0,500,"请求转换文件服务异常，异常信息:"+e.getMessage());
-            log.error("请求转换文件服务异常，异常信息："+e.getMessage());
-        } finally {
-            try {
-                if (httpAgent != null) {
-                    httpAgent.close();
-                }
-                if (stream != null) {
-                    stream.close();
-                }
-            } catch (Exception e) {
-                e.getMessage();
-            }
-        }
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
+       try{
+           Map<String, Object> modelTag = bizModel.getModelTag();
+           OFDConvertVo ofdConvertVo = bizOptJson.toJavaObject(OFDConvertVo.class);
+           String fileIdMaps = (String)modelTag.get("fileId");
+           String fileids =StringUtils.isNotBlank(fileIdMaps)?fileIdMaps:ofdConvertVo.getFileid();
+           if (StringUtils.isBlank(fileids)) {
+               return ResponseData.makeErrorMessage("文件id不能为空！");
+           }
+           String[] fileidArr = fileids.split(",");
+           List<File> fileList = new ArrayList<>();
+           for (String fileId : fileidArr) {
+               //获取上传文件（文件服务器获取）
+               FileInfo fileInfo = fileClient.getFileInfo(fileId);
+               String fileName = fileInfo.getFileName();
+               File file = fileStore.getFile(fileInfo.getFileId());
+               String  path = file.getParent();
+               boolean b = file.renameTo(new File(path + File.separator + fileName));
+               fileList.add(new File(path + File.separator + fileName));
+           }
+           TimeInterval timer = DateUtil.timer();
+           HTTPAgent httpAgent = null;
+           ByteArrayOutputStream stream = null;
+           try {
+               httpAgent = new HTTPAgent(ofdConvertVo.getHttpUrl());
+               stream = new ByteArrayOutputStream();
+               httpAgent.officesToOFD(fileList, stream);
+               bizModel.putDataSet(ofdConvertVo.getId(),new SimpleDataSet(stream));
+               log.info("请求转换文件服务,请求服务地址："+ofdConvertVo.getHttpUrl()+"，请求耗时："+timer.interval()+"ms");
+           } catch (Exception e) {
+               BuiltInOperation.getResponseData(0,500,"请求转换文件服务异常，异常信息:"+e.getMessage());
+               log.error("请求转换文件服务异常，异常信息："+e.getMessage());
+           } finally {
+               try {
+                   if (httpAgent != null) {
+                       httpAgent.close();
+                   }
+                   if (stream != null) {
+                       stream.close();
+                   }
+               } catch (Exception e) {
+                   e.getMessage();
+               }
+           }
+       }catch (Exception e){
+           e.printStackTrace();
+       }
         return ResponseData.successResponse;
     }
 }
