@@ -45,35 +45,45 @@ public class OFDConvertBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         Map<String, Object> modelTag = bizModel.getModelTag();
         OFDConvertVo ofdConvertVo = bizOptJson.toJavaObject(OFDConvertVo.class);
+        System.out.println(ofdConvertVo.getHttpUrl());
         String fileIdMaps = (String)modelTag.get("fileId");
         String fileids =StringUtils.isNotBlank(fileIdMaps)?fileIdMaps:ofdConvertVo.getFileid();
         if (StringUtils.isBlank(fileids)) {
             return ResponseData.makeErrorMessage("文件id不能为空！");
         }
+        System.out.println("fildes:"+fileids);
         String[] fileidArr = fileids.split(",");
+        System.out.println("length:"+fileidArr.length);
         List<File> fileList = new ArrayList<>();
         for (String fileId : fileidArr) {
             //获取上传文件（文件服务器获取）
             FileInfo fileInfo = fileClient.getFileInfo(fileId);
+            System.out.println(fileInfo.getFileType());
             String fileName = System.currentTimeMillis()+"."+fileInfo.getFileType();
+            System.out.println("fileName:"+fileName);
             File file = fileStore.getFile(fileInfo.getFileId());
+            System.out.println("filePath:"+file.getParent());
             String  path = file.getParent();
             boolean b = file.renameTo(new File(path + File.separator +fileName));
+            System.out.println("fileboolean:"+b);
             fileList.add(new File(path + File.separator + fileName));
         }
+        System.out.println("fileListsize:"+fileList.size());
+        System.out.println("1");
         TimeInterval timer = DateUtil.timer();
+        System.out.println("2");
         HTTPAgent httpAgent = null;
         ByteArrayOutputStream stream = null;
         try {
+            System.out.println(ofdConvertVo.getHttpUrl());
             httpAgent = new HTTPAgent(ofdConvertVo.getHttpUrl());
-            System.out.println("1");
-            stream = new ByteArrayOutputStream();
-            System.out.println("2");
-            httpAgent.officesToOFD(fileList, stream);
-            System.out.println("----"+fileList.get(0));
             System.out.println("3");
-            bizModel.putDataSet(ofdConvertVo.getId(),new SimpleDataSet(stream));
+            stream = new ByteArrayOutputStream();
             System.out.println("4");
+            httpAgent.officesToOFD(fileList, stream);
+            System.out.println("8");
+            System.out.println("----"+fileList.get(0));
+            bizModel.putDataSet(ofdConvertVo.getId(),new SimpleDataSet(stream));
             log.info("请求转换文件服务,请求服务地址："+ofdConvertVo.getHttpUrl()+"，请求耗时："+timer.interval()+"ms");
         } catch (Exception e) {
             BuiltInOperation.getResponseData(0,500,"请求转换文件服务异常，异常信息:"+e.getMessage());
