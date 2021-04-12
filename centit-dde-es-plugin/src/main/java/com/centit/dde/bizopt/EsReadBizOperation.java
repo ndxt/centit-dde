@@ -23,16 +23,16 @@ import org.elasticsearch.client.RestHighLevelClient;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EsReadOperation implements BizOperation {
-    public static final Log log = LogFactory.getLog(EsReadOperation.class);
+public class EsReadBizOperation implements BizOperation {
+    public static final Log log = LogFactory.getLog(EsReadBizOperation.class);
 
 
     private SourceInfoDao sourceInfoDao;
 
-    public EsReadOperation( ) {
+    public EsReadBizOperation( ) {
     }
 
-    public EsReadOperation(SourceInfoDao sourceInfoDao) {
+    public EsReadBizOperation(SourceInfoDao sourceInfoDao) {
         this.sourceInfoDao = sourceInfoDao;
     }
 

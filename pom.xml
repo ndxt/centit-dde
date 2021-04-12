@@ -21,6 +21,7 @@
         <module>centit-dde-console</module>
         <module>centit-dde-es-plugin</module>
         <module>centit-dde-redis-plugin</module>
+        <module>centit-dde-ofd-plugin</module>
     </modules>
     <name>com.centit.product:centit-dde</name>
 	<packaging>pom</packaging>

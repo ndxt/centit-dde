@@ -21,16 +21,16 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.elasticsearch.client.RestHighLevelClient;
 
-public class EsWriteOperation implements BizOperation {
-    public static final Log log = LogFactory.getLog(EsWriteOperation.class);
+public class EsWriteBizOperation implements BizOperation {
+    public static final Log log = LogFactory.getLog(EsWriteBizOperation.class);
 
 
     private SourceInfoDao sourceInfoDao;
 
-    public EsWriteOperation( ) {
+    public EsWriteBizOperation( ) {
     }
 
-    public EsWriteOperation(SourceInfoDao sourceInfoDao) {
+    public EsWriteBizOperation(SourceInfoDao sourceInfoDao) {
         this.sourceInfoDao = sourceInfoDao;
     }
 
