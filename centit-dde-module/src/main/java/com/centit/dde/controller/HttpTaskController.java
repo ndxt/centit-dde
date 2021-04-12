@@ -50,18 +50,32 @@ public class HttpTaskController extends BaseController {
         this.exchangeService = exchangeService;
     }
 
+    @GetMapping(value = "/runTest/{packetId}")
+    @ApiOperation(value = "测试：立即执行任务")
+    public void runTestTaskExchange(@PathVariable String packetId, HttpServletRequest request,
+                                HttpServletResponse response) throws IOException {
+        returnObject(packetId,"D", request,response);
+    }
+
+    @GetMapping(value = "/debugRunTest/{packetId}")
+    @ApiOperation(value = "测试：DEBUG执行任务")
+    public void debugRunTestTaskExchange(@PathVariable String packetId, HttpServletRequest request,
+                                     HttpServletResponse response) throws IOException {
+        returnObject(packetId,"D",request,response);
+    }
+
     @GetMapping(value = "/run/{packetId}")
-    @ApiOperation(value = "立即执行任务")
+    @ApiOperation(value = "正式：立即执行任务")
     public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
         returnObject(packetId,"N", request,response);
     }
 
     @GetMapping(value = "/debugRun/{packetId}")
-    @ApiOperation(value = "DEBUG执行任务")
+    @ApiOperation(value = "正式：DEBUG执行任务")
     public void debugRunTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                      HttpServletResponse response) throws IOException {
-        returnObject(packetId,"D",request,response);
+        returnObject(packetId,"N",request,response);
     }
 
     //runType  判断是来自debug运行还是在已发布页面执行的运行
