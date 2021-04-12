@@ -24,6 +24,7 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -69,6 +70,9 @@ public class BizOptFlowImpl implements BizOptFlow {
     }
 
     private int step;
+
+    private  String runType="N";
+
     private Map<String, BizOperation> allOperations;
 
     public BizOptFlowImpl() {
@@ -176,12 +180,16 @@ public class BizOptFlowImpl implements BizOptFlow {
             return returnResult(bizModel, stepJson);
         }
         String runType = (String)bizModel.getModelTag().get("runType");
+        if (StringUtils.isNotBlank(runType)){
+            bizModel.getModelTag().remove("runType");
+            this.runType = runType;
+        }
         DataPacketCopy dataPacketCopy;
         DataPacket dataPacket;
         if (Constant.SCHEDULER.equals(stepType)) {
             Map<String, Object> queryParams = CollectionsOpt.cloneHashMap(bizModel.getModelTag());
             queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue"));
-            if ("D".equals(runType)){
+            if ("D".equals(this.runType)){
                 dataPacketCopy=dataPacketCopyDao.getObjectWithReferences(stepJson.getString("packetName"));
                 preResult = run(dataPacketCopy.getDataOptDescJson(), logId, queryParams);
             }else {
@@ -196,7 +204,19 @@ public class BizOptFlowImpl implements BizOptFlow {
             if(((ResponseData)preResult).getCode()==ResponseData.ERROR_PROCESS_FAILED){
                 return preResult;
             }
-            stepJson = dataOptDescJson.getNextStep(stepId);
+            //如果isEnd为true时，代表循环结束，开始后面的节点操作
+            if (Constant.CYCLE_FINISH.equals(stepType)&& !stepJson.getBoolean("isEnd")){//结束循环节点
+                stepJson=dataOptDescJson.getOptStep(stepJson.getString("startNodeId"));
+            }else if(Constant.CYCLE_JUMP_OUT.equals(stepType)){//跳出循环节点
+                String endType = stepJson.getString("endType");
+                if (Constant.CYCLE_END_BREAK.equals(endType)){//break 直接结束循环，进入后面节点操作
+                    stepJson = dataOptDescJson.getNextStep(stepId);
+                }else if(Constant.CYCLE_END_CONTINUE.equals(endType)){//continue  进入下一次循环
+                    stepJson = dataOptDescJson.getNextStep(stepJson.getString("startNodeId"));
+                }
+            } else {
+                stepJson = dataOptDescJson.getNextStep(stepId);
+            }
         }
         //尾递归
         return stepJson == null ? preResult

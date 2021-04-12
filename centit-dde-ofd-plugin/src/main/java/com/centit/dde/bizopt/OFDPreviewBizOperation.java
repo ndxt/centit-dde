@@ -42,7 +42,7 @@ public class OFDPreviewBizOperation implements BizOperation {
         Object data = dataSet.getData();
         if (data instanceof OutputStream){
             ByteArrayOutputStream byteArrayOutputStream =  (ByteArrayOutputStream)data;
-            JSONObject jsonObject = httpPostRequest(httpUrl, byteArrayOutputStream, ofdPreviewVo.getSource()+".ofd");
+            JSONObject jsonObject = httpPostRequest(httpUrl, byteArrayOutputStream, System.currentTimeMillis()+".ofd");
             if (jsonObject==null){
                 return ResponseData.makeErrorMessage("请求预览服务异常！");
             }
