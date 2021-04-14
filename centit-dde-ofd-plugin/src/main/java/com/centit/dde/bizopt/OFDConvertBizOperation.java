@@ -59,9 +59,9 @@ public class OFDConvertBizOperation implements BizOperation {
             if(file.length()==0) {
                 continue;
             }
-            int pos = fileId.indexOf('.');
+            int pos = fileId.lastIndexOf('.');
             String fileType;
-            if (pos > 0) {
+            if (pos >= 0) {
                 fileType = fileId.substring(pos + 1);
             } else {
                 FileInfo fileInfo = fileClient.getFileInfo(fileId);

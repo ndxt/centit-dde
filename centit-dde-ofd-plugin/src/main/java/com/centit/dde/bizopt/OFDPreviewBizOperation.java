@@ -42,11 +42,11 @@ public class OFDPreviewBizOperation implements BizOperation {
         Object data = dataSet.getData();
         if (data instanceof OutputStream){
             ByteArrayOutputStream byteArrayOutputStream =  (ByteArrayOutputStream)data;
+            httpUrl=httpUrl.endsWith("/")?httpUrl:httpUrl+"/";
             JSONObject jsonObject = httpPostRequest(httpUrl, byteArrayOutputStream, System.currentTimeMillis()+".ofd");
             if (jsonObject==null){
                 return ResponseData.makeErrorMessage("请求预览服务异常！");
             }
-            httpUrl=httpUrl.endsWith("/")?httpUrl:httpUrl+File.separator;
             String previewUrl=httpUrl+"reader?file="+jsonObject.getString("name");
             bizModel.putDataSet(ofdPreviewVo.getId(),new SimpleDataSet(previewUrl));
             return ResponseData.makeSuccessResponse("ok");
@@ -57,11 +57,7 @@ public class OFDPreviewBizOperation implements BizOperation {
 
     public static JSONObject httpPostRequest(String urlParam,ByteArrayOutputStream byteArrayOutputStream,String fileName){
         if (StringUtils.isNotBlank(urlParam)){
-            if (StringUtils.isNotBlank(urlParam)) {
-                urlParam=urlParam+"reader?&type=upload";
-            }else {
-                urlParam=urlParam+File.separator+"reader?&type=upload";
-            }
+            urlParam=urlParam+"reader?&type=upload";
         }
         TimeInterval timer = DateUtil.timer();
         CloseableHttpClient httpClient = HttpClients.createDefault();
