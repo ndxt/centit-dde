@@ -200,6 +200,10 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (Constant.BRANCH.equals(stepType)) {
             stepJson = getBatchStep(bizModel, dataOptDescJson, stepId, preResult);
         } else {
+            //当节点为“结束循环”时，将对应的循环节点信息set到json中
+            if (Constant.CYCLE_FINISH.equals(stepType)){
+                stepJson.put("startNodeData",dataOptDescJson.getOptStep(stepJson.getString("startNodeId")));
+            }
             preResult = runOneStepOpt(bizModel, stepJson, logId);
             if(((ResponseData)preResult).getCode()==ResponseData.ERROR_PROCESS_FAILED){
                 return preResult;
@@ -208,12 +212,9 @@ public class BizOptFlowImpl implements BizOptFlow {
             if (Constant.CYCLE_FINISH.equals(stepType)&& !stepJson.getBoolean("isEnd")){//结束循环节点
                 stepJson=dataOptDescJson.getOptStep(stepJson.getString("startNodeId"));
             }else if(Constant.CYCLE_JUMP_OUT.equals(stepType)){//跳出循环节点
-                String endType = stepJson.getString("endType");
-                if (Constant.CYCLE_END_BREAK.equals(endType)){//break 直接结束循环，进入后面节点操作
-                    stepJson = dataOptDescJson.getNextStep(stepId);
-                }else if(Constant.CYCLE_END_CONTINUE.equals(endType)){//continue  进入下一次循环
-                    stepJson = dataOptDescJson.getNextStep(stepJson.getString("startNodeId"));
-                }
+                String endJumpOutNodeData = stepJson.toJSONString();
+                stepJson = dataOptDescJson.getOptStep(stepJson.getString("endNodeId"));
+                stepJson.put("endJumpOutNodeData",endJumpOutNodeData);
             } else {
                 stepJson = dataOptDescJson.getNextStep(stepId);
             }

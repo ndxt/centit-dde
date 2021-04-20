@@ -38,4 +38,7 @@ public abstract class Constant {
     public static final String CYCLE_END_BREAK = "break";
     //循环结束类型 continue；
     public static final String CYCLE_END_CONTINUE = "continue";
+
+    //赋值节点；
+    public static final String ASSIGNMENT = "assignment";
 }

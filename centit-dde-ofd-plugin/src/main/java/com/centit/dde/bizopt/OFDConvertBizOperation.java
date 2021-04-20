@@ -72,7 +72,6 @@ public class OFDConvertBizOperation implements BizOperation {
             file.renameTo(new File(path + File.separator + fileName));
             fileList.add(new File(path + File.separator + fileName));
         }
-        TimeInterval timer = DateUtil.timer();
         HTTPAgent httpAgent = null;
         ByteArrayOutputStream stream = null;
         try {
