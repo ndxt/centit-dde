@@ -187,20 +187,35 @@ public class BizOptFlowImpl implements BizOptFlow {
                 }
             }
         }
+
         while(iter != null) {
             if (ConstantValue.CYCLE_TYPE_RANGE.equals(cycleVo.getCycleType())) {
+                if((cycleVo.getRangeStep()>0 && (Integer)iter >= cycleVo.getRangeEnd()) ||
+                    ((cycleVo.getRangeStep()<0 && (Integer)iter <= cycleVo.getRangeEnd()))){
+                    break;
+                }
                 bizModel.putDataSet(cycleVo.getId(),new SimpleDataSet(iter));
             } else {
-                bizModel.putDataSet(cycleVo.getId(), new SimpleDataSet(((Iterator<Object>)iter).next()));
+                if(!((Iterator<Object>)iter).hasNext()){
+                    break;
+                }
+                Object value = ((Iterator<Object>) iter).next();
+                if("1".equals(cycleVo.getAssignType())){
+                    //clone
+                    bizModel.putDataSet(cycleVo.getId(), new SimpleDataSet(value));
+                } else{
+                    bizModel.putDataSet(cycleVo.getId(), new SimpleDataSet(value));
+                }
             }
+
             dataOptDescJson.setCurrentStep(startNode);
             boolean endCycle = false;
             while(true){
                 JSONObject step = dataOptDescJson.getCurrentStep();
-                String stepType = step.getString("type");
                 if(step == null){
                     break;
                 }
+                String stepType = step.getString("type");
                 if (ConstantValue.CYCLE_FINISH.equals(stepType)) {
                     endNode = step;
                     break;
@@ -218,20 +233,14 @@ public class BizOptFlowImpl implements BizOptFlow {
                 break;
             }
             if (ConstantValue.CYCLE_TYPE_RANGE.equals(cycleVo.getCycleType())) {
-                iter = (Integer)iter + cycleVo.getRangeStep();
-                if((cycleVo.getRangeStep()>0 && (Integer)iter >= cycleVo.getRangeEnd()) ||
-                    ((cycleVo.getRangeStep()<0 && (Integer)iter <= cycleVo.getRangeEnd()))){
-                    break;
-                }
-            } else {
-                if(!((Iterator<Object>)iter).hasNext()){
-                    break;
-                }
+                iter = (Integer) iter + cycleVo.getRangeStep();
             }
         }
+
         if(endNode == null){
             endNode = dataOptDescJson.seekToCycleEnd(cycleVo.getId());
         }
+
         dataOptDescJson.setCurrentStep(endNode);
         return preResult;
     }
@@ -242,8 +251,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         String stepId = stepJson.getString("id");
         String stepType = stepJson.getString("type");
         if (ConstantValue.RESULTS.equals(stepType)) {
+            preResult = returnResult(bizModel, stepJson);
             dataOptDescJson.setCurrentStep(null);
-            return returnResult(bizModel, stepJson);
+            return preResult;
         }
         if (ConstantValue.BRANCH.equals(stepType)) {
             stepJson = getBatchStep(bizModel, dataOptDescJson, stepId, preResult);
