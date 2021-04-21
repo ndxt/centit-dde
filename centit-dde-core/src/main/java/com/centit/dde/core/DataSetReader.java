@@ -1,6 +1,5 @@
 package com.centit.dde.core;
 
-import java.sql.SQLException;
 import java.util.Map;
 
 /**

@@ -2,7 +2,6 @@ package com.centit.dde.controller;
 
 import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.services.DataPacketCopyService;
-import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
@@ -10,7 +9,6 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;

@@ -4,13 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.dao.DataPacketCopyDao;
-import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.po.DataPacketParam;
 import com.centit.dde.services.DataPacketCopyService;
 import com.centit.dde.services.DataPacketService;
-import com.centit.dde.utils.Constant;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -161,23 +160,23 @@ public class DataPacketCopyServiceImpl implements DataPacketCopyService {
                 byte[] byt = bos.toByteArray();
                 jedis.set(key.getBytes(), byt);
                 int seconds;
-                if (dataPacket.getBufferFreshPeriod() == Constant.ONE) {
+                if (dataPacket.getBufferFreshPeriod() == ConstantValue.ONE) {
                     //一日
                     seconds = 24 * 3600;
                     jedis.expire(key.getBytes(), seconds);
-                } else if (dataPacket.getBufferFreshPeriod() == Constant.TWO) {
+                } else if (dataPacket.getBufferFreshPeriod() == ConstantValue.TWO) {
                     //按周
                     seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfWeek(new Date())) * 24 * 3600;
                     jedis.expire(key.getBytes(), seconds);
-                } else if (dataPacket.getBufferFreshPeriod() == Constant.THREE) {
+                } else if (dataPacket.getBufferFreshPeriod() == ConstantValue.THREE) {
                     //按月
                     seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfMonth(new Date())) * 24 * 3600;
                     jedis.expire(key.getBytes(), seconds);
-                } else if (dataPacket.getBufferFreshPeriod() == Constant.FOUR) {
+                } else if (dataPacket.getBufferFreshPeriod() == ConstantValue.FOUR) {
                     //按年
                     seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfYear(new Date())) * 24 * 3600;
                     jedis.expire(key.getBytes(), seconds);
-                } else if (dataPacket.getBufferFreshPeriod() >= Constant.SIXTY) {
+                } else if (dataPacket.getBufferFreshPeriod() >= ConstantValue.SIXTY) {
                     //按秒
                     jedis.expire(key.getBytes(), dataPacket.getBufferFreshPeriod());
                 }

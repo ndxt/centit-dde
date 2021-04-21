@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSetReader;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.transaction.AbstractSourceConnectThreadHolder;
-import com.centit.dde.utils.Constant;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
@@ -49,7 +49,7 @@ public class SqlDataSetReader implements DataSetReader {
     public SimpleDataSet load(final Map<String, Object> params) throws Exception {
         Connection conn = (Connection) AbstractSourceConnectThreadHolder.fetchConnect(databaseInfo);
         QueryAndNamedParams qap;
-        if (params != null && params.get(Constant.CURRENT_USER) != null) {
+        if (params != null && params.get(ConstantValue.CURRENT_USER) != null) {
             DataScopePowerManager queryDataScopeFilter = new DataScopePowerManagerImpl();
             DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
                 (JSONObject) (params.get("currentUser")), params.get("currentUnitCode").toString());

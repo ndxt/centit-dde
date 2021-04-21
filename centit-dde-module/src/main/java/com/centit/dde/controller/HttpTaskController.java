@@ -7,7 +7,7 @@ import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.service.ExchangeService;
 import com.centit.dde.services.DataPacketCopyService;
 import com.centit.dde.services.DataPacketService;
-import com.centit.dde.utils.Constant;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
@@ -109,11 +109,11 @@ public class HttpTaskController extends BaseController {
                 dataPacketCopyService.setDataPacketBuf(bizModel, dataPacketCopy, params);
             }
         }
-        if(bizModel instanceof DataSet && ((DataSet) bizModel).getFirstRow().containsKey(Constant.FILE_CONTENT)
-            && ((DataSet) bizModel).getFirstRow().get(Constant.FILE_CONTENT) instanceof OutputStream){
-            ByteArrayOutputStream outputStream= (ByteArrayOutputStream) ((DataSet) bizModel).getFirstRow().get(Constant.FILE_CONTENT);
+        if(bizModel instanceof DataSet && ((DataSet) bizModel).getFirstRow().containsKey(ConstantValue.FILE_CONTENT)
+            && ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_CONTENT) instanceof OutputStream){
+            ByteArrayOutputStream outputStream= (ByteArrayOutputStream) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_CONTENT);
             InputStream in =new ByteArrayInputStream(outputStream.toByteArray());
-            String fileName=(String) ((DataSet) bizModel).getFirstRow().get(Constant.FILE_NAME);
+            String fileName=(String) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_NAME);
             UploadDownloadUtils.downFileRange(request, response,in,
                 in.available(), fileName, request.getParameter("downloadType"),null);
             return;

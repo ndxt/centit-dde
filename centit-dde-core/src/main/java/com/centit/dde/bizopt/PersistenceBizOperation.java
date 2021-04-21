@@ -8,7 +8,7 @@ import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.dataset.SqlDataSetWriter;
-import com.centit.dde.utils.Constant;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
 import com.centit.product.metadata.dao.SourceInfoDao;
@@ -61,7 +61,7 @@ public class PersistenceBizOperation implements BizOperation {
 
     private ResponseData writeDatabase(BizModel bizModel, JSONObject bizOptJson) {
         String isRun = BuiltInOperation.getJsonFieldString(bizOptJson, "isRun", "T");
-        if (Constant.FALSE.equalsIgnoreCase(isRun)) {
+        if (ConstantValue.FALSE.equalsIgnoreCase(isRun)) {
             return new ResponseSingleData();
         }
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
@@ -87,7 +87,7 @@ public class PersistenceBizOperation implements BizOperation {
             return BuiltInOperation.getResponseData(0, 0,
                 "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
         }
-        if (bizOptJson.get(Constant.CONFIG) == null) {
+        if (bizOptJson.get(ConstantValue.CONFIG) == null) {
             return BuiltInOperation.getResponseData(0, 0,
                 "没有配置交换字段");
         }

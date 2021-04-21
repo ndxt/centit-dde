@@ -56,13 +56,13 @@ public class BizModelJSONTransform
 
     @Override
     public Object getVarValue(String labelName) {
-        if(labelName.startsWith(Constant.BACKSLASH)){
+        if(labelName.startsWith(ConstantValue.BACKSLASH)){
             return fetchRootData(labelName.substring(1));
-        } else if(labelName.startsWith(Constant.DOUBLE_SPOT)){
+        } else if(labelName.startsWith(ConstantValue.DOUBLE_SPOT)){
             return ReflectionOpt.attainExpressionValue(
                 peekStackValue(),
                 labelName.substring(2));
-        } else if(labelName.startsWith(Constant.SPOT)){
+        } else if(labelName.startsWith(ConstantValue.SPOT)){
             if(stackLength>0) {
                 return ReflectionOpt.attainExpressionValue(
                     stack.get(stackLength-1),
@@ -105,7 +105,7 @@ public class BizModelJSONTransform
             if(StringUtils.isBlank(valuePath)){
                 return currentDateSet.getDataAsList();
             }
-            if(Constant.DATASET_SIZE.equals(valuePath)){
+            if(ConstantValue.DATASET_SIZE.equals(valuePath)){
                 return currentDateSet.getSize();
             }
             return ReflectionOpt.attainExpressionValue(
@@ -113,7 +113,7 @@ public class BizModelJSONTransform
                 valuePath);
         }
 
-        if(Constant.MODEL_TAG.equals(dataSetName)){
+        if(ConstantValue.MODEL_TAG.equals(dataSetName)){
             if(StringUtils.isBlank(valuePath)) {
                 return this.data.getModelTag();
             } else {
@@ -125,7 +125,7 @@ public class BizModelJSONTransform
                 }
             }
         }
-        if(Constant.MODEL_NAME.equals(dataSetName)){
+        if(ConstantValue.MODEL_NAME.equals(dataSetName)){
             return this.data.getModelName();
         }
         return null;

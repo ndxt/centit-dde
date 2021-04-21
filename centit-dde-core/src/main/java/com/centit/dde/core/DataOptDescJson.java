@@ -2,11 +2,9 @@ package com.centit.dde.core;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.utils.ConstantValue;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author zhf
@@ -15,8 +13,13 @@ import java.util.Map;
 public class DataOptDescJson {
     private Map<String, JSONObject> nodeMap=new HashMap<>(50);
     private Map<String, List<JSONObject>> linkMap=new HashMap<>(100);
+    private JSONObject currentStep;
+    private int stepNo;
+    private String runType;
 
     public DataOptDescJson(JSONObject dataOptJson) {
+        stepNo = 0;
+        this.runType = ConstantValue.RUN_TYPE_NORMAL;
         mapData(dataOptJson);
     }
 
@@ -44,7 +47,6 @@ public class DataOptDescJson {
                 }
             }
         }
-
     }
 
     public JSONObject getStartStep() {
@@ -71,6 +73,64 @@ public class DataOptDescJson {
 
     public List<JSONObject> getNextLinks(String id) {
         return linkMap.get(id);
+    }
+
+    public JSONObject seekToCycleEnd(String id) {
+        HashSet<String> hasAddedNode = new HashSet<>();
+        ArrayDeque<String> brachNode = new ArrayDeque<>();
+        String curId = id;
+        int cascade = 0;
+        while(true){
+            List<JSONObject> nexts = linkMap.get(curId);
+            if(nexts != null && nexts.size() > 0){
+                for(JSONObject n : nexts){
+                    String nId = n.getString("targetId");
+                    if(hasAddedNode.contains(nId)){
+                        continue;
+                    }
+                    hasAddedNode.add(nId);
+                    JSONObject nextNode =
+                        nodeMap.get(n.getString("targetId"));
+                    String stepType = nextNode.getString("type");
+                    if(ConstantValue.CYCLE_FINISH.equals(stepType)) {
+                        if (cascade == 0) {
+                            return nextNode;
+                        } else {
+                            cascade -- ;
+                        }
+                    } else if(ConstantValue.CYCLE.equals(stepType)) {
+                        cascade ++;
+                    }
+                    brachNode.push(nId);
+                }
+            }
+            if(brachNode.isEmpty()){
+                break;
+            }
+            curId = brachNode.pop();
+        }
+        return null;
+    }
+
+    public JSONObject getCurrentStep() {
+        return currentStep;
+    }
+
+    public void setCurrentStep(JSONObject currentStep) {
+        this.currentStep = currentStep;
+        stepNo ++;
+    }
+
+    public int getStepNo() {
+        return stepNo;
+    }
+
+    public String getRunType() {
+        return runType;
+    }
+
+    public void setRunType(String runType) {
+        this.runType = runType;
     }
 }
 

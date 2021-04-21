@@ -1,7 +1,6 @@
 package com.centit.dde.core;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.centit.dde.utils.BizOptUtils;
 import com.centit.support.algorithm.CollectionsOpt;
 
 import java.io.Serializable;
