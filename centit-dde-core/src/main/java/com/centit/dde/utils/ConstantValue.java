@@ -37,14 +37,11 @@ public abstract class ConstantValue {
     public static final String CYCLE = "cycle";
     //跳出循环
     public static final String CYCLE_JUMP_OUT = "jumpCycle";
-    public static final String CYCLE_JUMP_BREAK = "B";
-    public static final String CYCLE_JUMP_CONTINUE = "C";
+
+    public static final String CYCLE_JUMP_BREAK = "break";
+    public static final String CYCLE_JUMP_CONTINUE = "continue";
     //结束循环
     public static final String CYCLE_FINISH = "finishCycle";
-    //循环结束类型 break；
-    public static final String CYCLE_END_BREAK = "break";
-    //循环结束类型 continue；
-    public static final String CYCLE_END_CONTINUE = "continue";
 
     //赋值节点；
     public static final String ASSIGNMENT = "assignment";

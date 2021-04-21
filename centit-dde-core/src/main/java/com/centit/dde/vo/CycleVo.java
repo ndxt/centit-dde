@@ -17,9 +17,6 @@ public class CycleVo {
     @ApiModelProperty(value = "节点类型")
     private String type;
 
-    @ApiModelProperty(value = "数据对象")
-    private String source;
-
     @ApiModelProperty(value = "循环类型: foreach, range")
     private String cycleType;
 
@@ -31,6 +28,9 @@ public class CycleVo {
 
     @ApiModelProperty(value = "区间循环:每次循环递增值，默认1")
     private Integer rangeStep;
+
+    @ApiModelProperty(value = "数据对象")
+    private String source;
 
     @ApiModelProperty(value = "数组迭代循环:子集数据字段名")
     private String  subsetFieldName;
