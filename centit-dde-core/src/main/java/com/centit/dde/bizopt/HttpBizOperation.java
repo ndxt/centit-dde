@@ -5,6 +5,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.framework.appclient.HttpReceiveJSON;
@@ -16,12 +17,7 @@ import com.centit.support.compiler.VariableFormula;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.network.UrlOptUtils;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,28 +31,23 @@ public class HttpBizOperation implements BizOperation {
         this.sourceInfoDao = sourceInfoDao;
     }
 
-    private HttpExecutorContext getHttpClientContext(String databaseCode,Map<String, Object> map) throws IOException {
-        if(databaseCode!=null) {
-            SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+    private HttpExecutorContext getHttpClientContext(String loginUrl, Map<String, Object> map) throws Exception {
+        if (loginUrl != null) {
+            SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(loginUrl);
+            HttpExecutorContext executorContext = (HttpExecutorContext) AbstractSourceConnectThreadHolder.fetchConnect(databaseInfo);
+            if (executorContext != null) {
+                return executorContext;
+            }
         }
-        //ToDO 根据资源获取session
-        HttpClientContext context = HttpClientContext.create();
-        BasicCookieStore cookieStore = new BasicCookieStore();
-        CloseableHttpClient httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
-        if(map.get("loginUrl")!=null) {
-            HttpExecutor.formPost(HttpExecutorContext.create(httpClient).context(context),
-                (String) map.get("loginUrl"),
-                map, false);
-        }
-        context.setCookieStore(cookieStore);
-        return HttpExecutorContext.create(httpClient).context(context);
+        return HttpExecutorContext.create();
     }
+
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String httpMethod = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post");
         String httpUrl = BuiltInOperation.getJsonFieldString(bizOptJson, "httpUrl", "");
-        String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
+        String loginUrl = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
         Object requestBody = VariableFormula.calculate(BuiltInOperation.getJsonFieldString(bizOptJson, "requestText", ""),
             new BizModelJSONTransform(bizModel));
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlvalue");
@@ -69,24 +60,24 @@ public class HttpBizOperation implements BizOperation {
             }
         }
         mapObject.putAll(bizModel.getModelTag());
+        HttpExecutorContext httpExecutorContext = getHttpClientContext(loginUrl, mapObject);
         DataSet dataSet = new SimpleDataSet();
-        HttpReceiveJSON receiveJSON;
-        HttpExecutorContext httpExecutorContext = getHttpClientContext(databaseCode,mapObject);
+        HttpReceiveJSON receiveJson;
         switch (httpMethod.toLowerCase()) {
             case "post":
-                receiveJSON= HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
-                dataSet = BizOptUtils.castObjectToDataSet(receiveJSON.getData());
+                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
+                dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
                 break;
             case "put":
-                receiveJSON= HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
-                dataSet = BizOptUtils.castObjectToDataSet(receiveJSON.getData());
+                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
+                dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
                 break;
             case "get":
-                receiveJSON= HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGet(httpExecutorContext, httpUrl, mapObject));
-                if (receiveJSON.getCode() != ResponseData.RESULT_OK) {
-                    return BuiltInOperation.getResponseData(0, receiveJSON.getCode(), receiveJSON.getMessage());
+                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGet(httpExecutorContext, httpUrl, mapObject));
+                if (receiveJson.getCode() != ResponseData.RESULT_OK) {
+                    return BuiltInOperation.getResponseData(0, receiveJson.getCode(), receiveJson.getMessage());
                 } else {
-                    dataSet = BizOptUtils.castObjectToDataSet(receiveJSON.getData());
+                    dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
                 }
                 break;
             case "delete":
@@ -94,11 +85,11 @@ public class HttpBizOperation implements BizOperation {
             default:
                 break;
         }
-        if(dataSet!=null) {
+        if (dataSet != null) {
             bizModel.putDataSet(sourDsName, dataSet);
             return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
-        }else{
-            return BuiltInOperation.getResponseData(0,0,"无数据");
+        } else {
+            return BuiltInOperation.getResponseData(0, 0, "无数据");
         }
     }
 }

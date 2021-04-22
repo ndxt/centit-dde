@@ -67,9 +67,8 @@ public class TaskRun {
         if (bizOptJson.isEmpty()) {
             return null;
         }
-        bizOptFlow.initStep(0);
         Map<String, Object> mapObject = new HashMap<>(dataPacket.getPacketParamsValue());
-        if(queryParams!=null) {
+        if (queryParams != null) {
             mapObject.putAll(queryParams);
         }
         return bizOptFlow.run(bizOptJson, logId, mapObject);
@@ -80,9 +79,8 @@ public class TaskRun {
         if (bizOptJson.isEmpty()) {
             return null;
         }
-        bizOptFlow.initStep(0);
         Map<String, Object> mapObject = new HashMap<>(dataPacketCopy.getPacketParamsValue());
-        if(queryParams!=null) {
+        if (queryParams != null) {
             mapObject.putAll(queryParams);
         }
         return bizOptFlow.run(bizOptJson, logId, mapObject);
@@ -102,20 +100,20 @@ public class TaskRun {
 
     public Object runTask(String packetId, Map<String, Object> queryParams) {
         String runType = "N";
-        if(queryParams!=null && queryParams.containsKey("runType")) {
+        if (queryParams != null && queryParams.containsKey("runType")) {
             runType = (String) queryParams.get("runType");
         }
         TaskLog taskLog = new TaskLog();
         Date beginTime = new Date();
-        DataPacketCopy dataPacketCopy=null;
-        DataPacket dataPacket=null;
-        if ("D".equals(runType)){
+        DataPacketCopy dataPacketCopy = null;
+        DataPacket dataPacket = null;
+        if ("D".equals(runType)) {
             dataPacketCopy = dataPacketCopyDao.getObjectWithReferences(packetId);
             dataPacketCopy.setLastRunTime(new Date());
             taskLog.setRunner("T");
             taskLog.setApplicationId(dataPacketCopy.getApplicationId());
             taskLog.setRunType(dataPacketCopy.getPacketName());
-        }else {
+        } else {
             taskLog.setRunner("A");
             dataPacket = dataPackeDao.getObjectWithReferences(packetId);
             dataPacket.setLastRunTime(new Date());
@@ -127,14 +125,14 @@ public class TaskRun {
             taskLog.setRunBeginTime(beginTime);
             taskLogDao.saveNewObject(taskLog);
             Object bizModel;
-            if ("D".equals(runType)){
+            if ("D".equals(runType)) {
                 bizModel = runStepCopy(dataPacketCopy, taskLog.getLogId(), queryParams);
-            }else {
+            } else {
                 bizModel = runStep(dataPacket, taskLog.getLogId(), queryParams);
             }
             String two = "2";
             taskLog.setRunEndTime(new Date());
-            if ("D".equals(runType)){
+            if ("D".equals(runType)) {
                 dataPacketCopy.setNextRunTime(new Date());
                 if (two.equals(dataPacketCopy.getTaskType())
                     && dataPacketCopy.getIsValid()
@@ -142,7 +140,7 @@ public class TaskRun {
                     CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacketCopy.getTaskCron());
                     dataPacketCopy.setNextRunTime(cronSequenceGenerator.next(dataPacketCopy.getLastRunTime()));
                 }
-            }else {
+            } else {
                 dataPacket.setNextRunTime(new Date());
                 if (two.equals(dataPacket.getTaskType())
                     && dataPacket.getIsValid()
@@ -152,12 +150,12 @@ public class TaskRun {
                 }
             }
 
-            if ("D".equals(runType)){
-                DatabaseOptUtils.doExecuteSql(dataPacketCopyDao,"update q_data_packet_copy set next_run_time=? where packet_id=?",
-                    new Object[]{dataPacketCopy.getNextRunTime(),dataPacketCopy.getPacketId()});
-            }else {
-                DatabaseOptUtils.doExecuteSql(dataPackeDao,"update q_data_packet set next_run_time=? where packet_id=?",
-                    new Object[]{dataPacket.getNextRunTime(),dataPacket.getPacketId()});
+            if ("D".equals(runType)) {
+                DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_copy set next_run_time=? where packet_id=?",
+                    new Object[]{dataPacketCopy.getNextRunTime(), dataPacketCopy.getPacketId()});
+            } else {
+                DatabaseOptUtils.doExecuteSql(dataPackeDao, "update q_data_packet set next_run_time=? where packet_id=?",
+                    new Object[]{dataPacket.getNextRunTime(), dataPacket.getPacketId()});
             }
             TaskDetailLog taskDetailLog = taskDetailLogDao.getObjectByProperties(
                 CollectionsOpt.createHashMap("logId", taskLog.getLogId(), "logInfo_ne", "ok"));
@@ -170,9 +168,9 @@ public class TaskRun {
             taskLog.setOtherMessage("error");
             taskLog.setRunEndTime(new Date());
             taskLogDao.mergeObject(taskLog);
-            if ("D".equals(runType)){
+            if ("D".equals(runType)) {
                 sendEmailMessage("任务执行异常", dataPacketCopy.getPacketId() + dataPacketCopy.getPacketName());
-            }else {
+            } else {
                 sendEmailMessage("任务执行异常", dataPacket.getPacketId() + dataPacket.getPacketName());
             }
         }

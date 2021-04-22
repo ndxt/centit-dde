@@ -62,7 +62,7 @@ public class DataPacket implements Serializable {
 
     @Column(name = "BUFFER_FRESH_PERIOD")
     @ApiModelProperty(value = "数据缓存有效期，-1：不缓存（默认值） 0 永不失效 1 一日，2 按周（注意不是一周） 3 按月 4 按年， >=60 代表时间单位为秒", required = true)
-    private Integer bufferFreshPeriod;
+    private String bufferFreshPeriod;
 
     @Column(name = "RECORDER")
     @ApiModelProperty(value = "创建人", hidden = true)

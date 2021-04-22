@@ -2,6 +2,7 @@ package com.centit.dde.transaction;
 
 import com.centit.product.metadata.vo.ISourceInfo;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.network.HttpExecutorContext;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -23,6 +24,14 @@ class SourceConnectThreadWrapper implements Serializable {
             Connection conn = (Connection) connectPools.get(description);
             if (conn == null) {
                 conn = AbstractDruidConnectPools.getDbcpConnect(description);
+                connectPools.put(description, conn);
+            }
+            return conn;
+        }
+        if (ISourceInfo.HTTP.equals(description.getSourceType())) {
+            HttpExecutorContext conn = (HttpExecutorContext) connectPools.get(description);
+            if (conn == null) {
+                conn = AbstractHttpConnectPools.getHttpConnect(description);
                 connectPools.put(description, conn);
             }
             return conn;
@@ -62,6 +71,8 @@ class SourceConnectThreadWrapper implements Serializable {
             if (StringBaseOpt.isNvl(map.getKey().getSourceType()) || ISourceInfo.DATABASE.equals(map.getKey().getSourceType())) {
                 Connection conn = (Connection) map.getValue();
                 AbstractDruidConnectPools.closeConnect(conn);
+            } else if (ISourceInfo.HTTP.equals(map.getKey().getSourceType())) {
+                AbstractHttpConnectPools.releaseHttp(map.getKey());
             }
         }
         connectPools.clear();
