@@ -169,7 +169,7 @@ public class TaskRun {
             taskLog.setOtherMessage("error");
             taskLog.setRunEndTime(new Date());
             taskLogDao.mergeObject(taskLog);
-            if ("D".equals(runType)) {
+            if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
                 sendEmailMessage("任务执行异常", dataPacketCopy.getPacketId() + dataPacketCopy.getPacketName());
             } else {
                 sendEmailMessage("任务执行异常", dataPacket.getPacketId() + dataPacket.getPacketName());

@@ -78,7 +78,6 @@ public class HttpTaskController extends BaseController {
         returnObject(packetId,ConstantValue.RUN_TYPE_NORMAL,request,response);
     }
 
-    //runType  判断是来自debug运行还是在已发布页面执行的运行
     private void returnObject(String packetId,String runType,HttpServletRequest request,HttpServletResponse response) throws IOException {
         Map<String, Object> params = collectRequestParameters(request);
         params.put("runType",runType);
@@ -120,12 +119,17 @@ public class HttpTaskController extends BaseController {
         }
         JsonResultUtils.writeSingleDataJson(bizModel, response);
     }
-
+    @PostMapping(value = "/runPostTest/{packetId}")
+    @ApiOperation(value = "测试：立即执行任务Post")
+    public void runTaskPostTest(@PathVariable String packetId, HttpServletRequest request,
+                            HttpServletResponse response) throws IOException {
+        returnObject(packetId,ConstantValue.RUN_TYPE_COPY, request,response);
+    }
     @PostMapping(value = "/runPost/{packetId}")
-    @ApiOperation(value = "立即执行任务Post")
+    @ApiOperation(value = "正式：立即执行任务Post")
     public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
                             HttpServletResponse response) throws IOException {
-        returnObject(packetId,"N", request,response);
+        returnObject(packetId,ConstantValue.RUN_TYPE_NORMAL, request,response);
     }
 
     @GetMapping(value = "/testformula")

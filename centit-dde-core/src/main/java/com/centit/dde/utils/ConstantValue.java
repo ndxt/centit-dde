@@ -3,7 +3,7 @@ package com.centit.dde.utils;
 /**
  * @author zhf
  */
-public abstract class ConstantValue {
+public class ConstantValue {
     public static final int ONE = 1;
     public static final int TWO = 2;
     public static final int THREE = 3;
@@ -30,19 +30,14 @@ public abstract class ConstantValue {
 
     public static final String CYCLE_TYPE_FOREACH = "E";
     public static final String CYCLE_TYPE_RANGE = "R";
-    /**
-     * zc +
-     */
-    //循环
+
+
     public static final String CYCLE = "cycle";
-    //跳出循环
+
     public static final String CYCLE_JUMP_OUT = "jumpCycle";
 
     public static final String CYCLE_JUMP_BREAK = "break";
     public static final String CYCLE_JUMP_CONTINUE = "continue";
-    //结束循环
     public static final String CYCLE_FINISH = "finishCycle";
-
-    //赋值节点；
     public static final String ASSIGNMENT = "assignment";
 }
