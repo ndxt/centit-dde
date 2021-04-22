@@ -54,28 +54,28 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "测试：立即执行任务")
     public void runTestTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
-        returnObject(packetId,"D", request,response);
+        returnObject(packetId,ConstantValue.RUN_TYPE_COPY, request,response);
     }
 
     @GetMapping(value = "/debugRunTest/{packetId}")
     @ApiOperation(value = "测试：DEBUG执行任务")
     public void debugRunTestTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                      HttpServletResponse response) throws IOException {
-        returnObject(packetId,"D",request,response);
+        returnObject(packetId,ConstantValue.RUN_TYPE_COPY,request,response);
     }
 
     @GetMapping(value = "/run/{packetId}")
     @ApiOperation(value = "正式：立即执行任务")
     public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
-        returnObject(packetId,"N", request,response);
+        returnObject(packetId,ConstantValue.RUN_TYPE_NORMAL, request,response);
     }
 
     @GetMapping(value = "/debugRun/{packetId}")
     @ApiOperation(value = "正式：DEBUG执行任务")
     public void debugRunTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                      HttpServletResponse response) throws IOException {
-        returnObject(packetId,"N",request,response);
+        returnObject(packetId,ConstantValue.RUN_TYPE_NORMAL,request,response);
     }
 
     //runType  判断是来自debug运行还是在已发布页面执行的运行
@@ -94,7 +94,7 @@ public class HttpTaskController extends BaseController {
             }
         }
         Object bizModel;
-        if ("N".equals(runType)){
+        if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)){
             DataPacket  dataPacket = dataPacketService.getDataPacket(packetId);
             bizModel = dataPacketService.fetchDataPacketDataFromBuf(dataPacket, params);
             if (bizModel == null) {

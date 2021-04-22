@@ -26,7 +26,7 @@ public abstract class ConstantValue {
     public static final String DATASET_SIZE = "dataSetSize";
 
     public static final String RUN_TYPE_NORMAL = "N";
-    public static final String RUN_TYPE_DEBUG = "D";
+    public static final String RUN_TYPE_COPY = "D";
 
     public static final String CYCLE_TYPE_FOREACH = "E";
     public static final String CYCLE_TYPE_RANGE = "R";

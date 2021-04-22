@@ -10,6 +10,7 @@ import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.po.TaskLog;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -99,7 +100,7 @@ public class TaskRun {
     }
 
     public Object runTask(String packetId, Map<String, Object> queryParams) {
-        String runType = "N";
+        String runType = ConstantValue.RUN_TYPE_NORMAL;
         if (queryParams != null && queryParams.containsKey("runType")) {
             runType = (String) queryParams.get("runType");
         }
@@ -107,7 +108,7 @@ public class TaskRun {
         Date beginTime = new Date();
         DataPacketCopy dataPacketCopy = null;
         DataPacket dataPacket = null;
-        if ("D".equals(runType)) {
+        if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
             dataPacketCopy = dataPacketCopyDao.getObjectWithReferences(packetId);
             dataPacketCopy.setLastRunTime(new Date());
             taskLog.setRunner("T");
@@ -125,14 +126,14 @@ public class TaskRun {
             taskLog.setRunBeginTime(beginTime);
             taskLogDao.saveNewObject(taskLog);
             Object bizModel;
-            if ("D".equals(runType)) {
+            if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
                 bizModel = runStepCopy(dataPacketCopy, taskLog.getLogId(), queryParams);
             } else {
                 bizModel = runStep(dataPacket, taskLog.getLogId(), queryParams);
             }
             String two = "2";
             taskLog.setRunEndTime(new Date());
-            if ("D".equals(runType)) {
+            if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
                 dataPacketCopy.setNextRunTime(new Date());
                 if (two.equals(dataPacketCopy.getTaskType())
                     && dataPacketCopy.getIsValid()
@@ -150,7 +151,7 @@ public class TaskRun {
                 }
             }
 
-            if ("D".equals(runType)) {
+            if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
                 DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_copy set next_run_time=? where packet_id=?",
                     new Object[]{dataPacketCopy.getNextRunTime(), dataPacketCopy.getPacketId()});
             } else {

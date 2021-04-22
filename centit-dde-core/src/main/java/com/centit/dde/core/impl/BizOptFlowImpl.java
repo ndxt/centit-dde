@@ -267,7 +267,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             Map<String, Object> queryParams = CollectionsOpt.cloneHashMap(bizModel.getModelTag());
             queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"),
                 "paramName", "paramDefaultValue"));
-            if (ConstantValue.RUN_TYPE_DEBUG.equals(dataOptDescJson.getRunType())){
+            if (ConstantValue.RUN_TYPE_COPY.equals(dataOptDescJson.getRunType())){
                 DataPacketCopy dataPacket = dataPacketCopyDao
                     .getObjectWithReferences(stepJson.getString("packetName"));
                 moduleOptJson = dataPacket.getDataOptDescJson();
@@ -297,8 +297,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         bizModel.setModelTag(queryParams);
         DataOptDescJson dataOptDescJson = new DataOptDescJson(bizOptJson);
         String runType = (String)bizModel.getModelTag().get("runType");
-        if (ConstantValue.RUN_TYPE_DEBUG.equals(runType)){
-            dataOptDescJson.setRunType(ConstantValue.RUN_TYPE_DEBUG);
+        if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
+            dataOptDescJson.setRunType(ConstantValue.RUN_TYPE_COPY);
         }
         Object preResult = ResponseData.successResponse;
         dataOptDescJson.setCurrentStep(dataOptDescJson.getStartStep());
