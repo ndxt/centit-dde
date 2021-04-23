@@ -33,10 +33,11 @@ public class DataPacketCopyController extends BaseController {
     @ApiOperation(value = "新增数据包")
     @PostMapping
     @WrapUpResponseBody
-    public void createDataPacket(@RequestBody DataPacketCopy dataPacketCopy, HttpServletRequest request) {
+    public DataPacketCopy createDataPacket(@RequestBody DataPacketCopy dataPacketCopy, HttpServletRequest request) {
         dataPacketCopy.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacketCopy.setDataOptDescJson(dataPacketCopy.getDataOptDescJson());
         dataPacketCopyService.createDataPacket(dataPacketCopy);
+        return dataPacketCopy;
     }
 
     @ApiOperation(value = "编辑数据包")
