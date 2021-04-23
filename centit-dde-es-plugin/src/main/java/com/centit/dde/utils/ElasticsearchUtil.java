@@ -32,6 +32,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -95,12 +96,11 @@ public class ElasticsearchUtil {
      * @param fields   作为document文档id的字段 （0个或者多个）
      * @return documentid
      */
-    private static String getDocument(JSONObject jsonData,String fields){
+    private static String getDocument(String jsonData,String fields){
         StringBuilder doucmentId = new StringBuilder();
         if (StringUtils.isNotBlank(fields)) {
-            String json = JSONObject.toJSONString(jsonData);
             String[] fieldArr = fields.split(",");
-            JSONObject jsonObject = JSONObject.parseObject(json);
+            JSONObject jsonObject = JSONObject.parseObject(jsonData);
             for (int i = 0; i < fieldArr.length; i++) {
                 doucmentId.append(jsonObject.get(fieldArr[i]));
             }
@@ -113,7 +113,7 @@ public class ElasticsearchUtil {
     /**
      * 添加文档
      */
-    public static IndexResponse saveDocument(RestHighLevelClient restHighLevelClient,JSONObject jsonData,EsSearchWriteEntity esSearchWriteEntity){
+    public static IndexResponse saveDocument(RestHighLevelClient restHighLevelClient,String jsonData,EsSearchWriteEntity esSearchWriteEntity){
         IndexRequest request = new IndexRequest(esSearchWriteEntity.getIndexName());
         request =request.id(getDocument(jsonData,esSearchWriteEntity.getDocumentIds()));
         request.source(jsonData, XContentType.JSON);
@@ -129,19 +129,17 @@ public class ElasticsearchUtil {
     /**
      * 批量插入或者更新   es存在就更新，不存在就插入
      */
-    public static Boolean saveDocuments(RestHighLevelClient restHighLevelClient, JSONArray jsonDatas, EsSearchWriteEntity esSearchWriteEntity) throws IOException {
+    public static Boolean saveDocuments(RestHighLevelClient restHighLevelClient, List<String> jsonDatas, EsSearchWriteEntity esSearchWriteEntity) throws IOException {
         BulkRequest requestBulk = new BulkRequest(esSearchWriteEntity.getIndexName());
-        for (Object jsonData : jsonDatas) {
-            String json = JSONObject.toJSONString(jsonData);
-            JSONObject jsonObject = JSONObject.parseObject(json);
-            String documentid = getDocument(jsonObject, esSearchWriteEntity.getDocumentIds());
+        for (String jsonData : jsonDatas) {
+            String documentid = getDocument(jsonData, esSearchWriteEntity.getDocumentIds());
             //判断文档id是否已经存在，如果存在就做更新操作 反之
             if (documentIdExist(restHighLevelClient, esSearchWriteEntity.getIndexName(),documentid)){
                 UpdateRequest updateRequest= new UpdateRequest(esSearchWriteEntity.getIndexName(),documentid);
-                updateRequest.doc(json,XContentType.JSON);
+                updateRequest.doc(jsonData,XContentType.JSON);
                 requestBulk.add(updateRequest);
             }else {
-                IndexRequest indexReq = new IndexRequest().source(json, XContentType.JSON);
+                IndexRequest indexReq = new IndexRequest().source(jsonData, XContentType.JSON);
                 indexReq.id(documentid);
                 requestBulk.add(indexReq);
             }

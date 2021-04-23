@@ -21,6 +21,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.elasticsearch.client.RestHighLevelClient;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 public class EsWriteBizOperation implements BizOperation {
     public static final Log log = LogFactory.getLog(EsWriteBizOperation.class);
 
@@ -42,9 +47,14 @@ public class EsWriteBizOperation implements BizOperation {
 
     //ES插入操作
     private ResponseData insertEs(BizModel bizModel, EsSearchWriteEntity esSearchWriteEntity) throws Exception {
-        String id = esSearchWriteEntity.getSourceId();
-        DataSet dataSet = bizModel.getDataSet(id);
-        JSONArray jsonArray = JSONObject.parseArray(String.valueOf(dataSet.getData()));
+        String source = esSearchWriteEntity.getSource();
+        DataSet dataSet = bizModel.getDataSet(source);
+        List<Map<String, Object>> data = dataSet.getDataAsList();
+        List<String> addData = new ArrayList<>();
+        for (Map<String, Object> datum : data) {
+            String jsonData = JSONObject.toJSONString(datum);
+            addData.add(jsonData);
+        }
         TimeInterval timer = DateUtil.timer();
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(esSearchWriteEntity.getDataSourceId());
         log.debug("获取元数据信息耗时："+timer.intervalRestart()+"ms,获取元数据信息："+sourceInfo.toString());
@@ -53,19 +63,14 @@ public class EsWriteBizOperation implements BizOperation {
         try {
             restHighLevelClient = restHighLevelClientGenericObjectPool.borrowObject();
             log.debug("获restHighLevelClient耗时："+timer.intervalRestart()+"ms");
-            Boolean indexResponse = ElasticsearchUtil.saveDocuments(restHighLevelClient,jsonArray, esSearchWriteEntity);
+            Boolean indexResponse = ElasticsearchUtil.saveDocuments(restHighLevelClient,addData, esSearchWriteEntity);
             log.info("插入ES数据耗时："+timer.intervalRestart()+"ms");
-            SimpleDataSet resultDataSet = new SimpleDataSet();
-            resultDataSet.setData(indexResponse);
-            bizModel.putDataSet(id,resultDataSet);
+            bizModel.putDataSet(esSearchWriteEntity.getId(),new SimpleDataSet(indexResponse));
             return ResponseSingleData.makeResponseData(indexResponse);
         }finally {
             restHighLevelClientGenericObjectPool.returnObject(restHighLevelClient);
             log.debug("restHighLevelClient放回连接池中");
         }
     }
-
-
-    //es合并
 
 }
