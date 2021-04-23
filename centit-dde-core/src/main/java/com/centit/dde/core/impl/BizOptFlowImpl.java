@@ -26,6 +26,7 @@ import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -164,14 +165,26 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
     }
 
+    /**
+     *
+     * @param dataOptDescJson 执行操作的节点信息
+     * @param logId 日志id
+     * @param bizModel  存放数据集的对象
+     * @param preResult 存放返回结果
+     * @return
+     * @throws Exception
+     * 注：循环中的流程控制都是通过DataOptDescJson对象控制，不断的通过变更currentStep对象来实现节点变更
+     */
     public Object runCycle(DataOptDescJson dataOptDescJson, String logId, BizModel bizModel,
                            Object preResult) throws Exception {
         JSONObject stepJson = dataOptDescJson.getCurrentStep();
         CycleVo cycleVo = stepJson.toJavaObject(CycleVo.class);
+        //循环节点的下个节点信息
         JSONObject startNode = dataOptDescJson.getNextStep(cycleVo.getId());
         JSONObject endNode = null;
         Object iter = null;
         //Iterator<Object> rangeObject;
+        //提取出需要操作的数据
         if (ConstantValue.CYCLE_TYPE_RANGE.equals(cycleVo.getCycleType())) {
             iter = cycleVo.getRangeBegin();
         } else {
@@ -189,28 +202,31 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
 
         while(iter != null) {
-            if (ConstantValue.CYCLE_TYPE_RANGE.equals(cycleVo.getCycleType())) {
+            if (ConstantValue.CYCLE_TYPE_RANGE.equals(cycleVo.getCycleType())) {//rang循环
                 if((cycleVo.getRangeStep()>0 && (Integer)iter >= cycleVo.getRangeEnd()) ||
                     ((cycleVo.getRangeStep()<0 && (Integer)iter <= cycleVo.getRangeEnd()))){
                     break;
                 }
                 bizModel.putDataSet(cycleVo.getId(),new SimpleDataSet(iter));
             } else {
+                //foreach循环
                 if(!((Iterator<Object>)iter).hasNext()){
                     break;
                 }
                 Object value = ((Iterator<Object>) iter).next();
                 if("1".equals(cycleVo.getAssignType())){
-                    //clone
-                    bizModel.putDataSet(cycleVo.getId(), new SimpleDataSet(value));
+                    //clone 复制对象数据
+                    bizModel.putDataSet(cycleVo.getId(),SerializationUtils.clone(new SimpleDataSet(value)));
                 } else{
+                    //引用对象数据
                     bizModel.putDataSet(cycleVo.getId(), new SimpleDataSet(value));
                 }
             }
-
+            //设置下个节点信息
             dataOptDescJson.setCurrentStep(startNode);
             boolean endCycle = false;
             while(true){
+                //获取节点信息
                 JSONObject step = dataOptDescJson.getCurrentStep();
                 if(step == null){
                     break;
@@ -226,7 +242,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                     endCycle = ConstantValue.CYCLE_JUMP_BREAK.equals(breakType);
                     break;
                 }
-
+                //执行节点操作，并设置该节点的下个节点信息
                 preResult = runStep(dataOptDescJson, logId, bizModel, preResult);
             }
             if(endCycle){
@@ -285,6 +301,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
         stepJson = dataOptDescJson.getCurrentStep();
         if(stepJson!=null) {
+            //设置下个节点信息
             dataOptDescJson.setCurrentStep(
                 dataOptDescJson.getNextStep(stepJson.getString("id")));
         }

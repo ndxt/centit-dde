@@ -28,8 +28,8 @@ public class ConstantValue {
     public static final String RUN_TYPE_NORMAL = "N";
     public static final String RUN_TYPE_COPY = "D";
 
-    public static final String CYCLE_TYPE_FOREACH = "E";
-    public static final String CYCLE_TYPE_RANGE = "R";
+    public static final String CYCLE_TYPE_FOREACH = "foreach";
+    public static final String CYCLE_TYPE_RANGE = "range";
 
 
     public static final String CYCLE = "cycle";

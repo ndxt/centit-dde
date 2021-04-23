@@ -50,7 +50,7 @@ public class DataPacketCopyController extends BaseController {
     }
 
     @ApiOperation(value = "数据包发布")
-    @PutMapping(value = "release/{packetId}")
+    @PutMapping(value = "publish/{packetId}")
     @WrapUpResponseBody
     public void publishDataPacket(@PathVariable String packetId) {
         DataPacketCopy dataPacketCopy = dataPacketCopyService.getDataPacket(packetId);
