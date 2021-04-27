@@ -5,7 +5,7 @@
     <parent>
         <artifactId>centit-dde3</artifactId>
         <groupId>com.centit.product</groupId>
-        <version>3.1-SNAPSHOT</version>
+        <version>5.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-elasticsearch</artifactId>
+            <artifactId>centit-dde-es-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
