@@ -39,5 +39,5 @@ public class ConstantValue {
     public static final String CYCLE_JUMP_BREAK = "break";
     public static final String CYCLE_JUMP_CONTINUE = "continue";
     public static final String CYCLE_FINISH = "finishCycle";
-    public static final String ASSIGNMENT = "assignment";
+    public static final String ASSIGN = "assign";
 }

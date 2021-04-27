@@ -12,7 +12,7 @@ public class EsSearchWriteEntity {
     @ApiModelProperty(value = "索引名称")
     private String indexName;
     @ApiModelProperty(value = "数据来源id")
-    private String sourceId;
+    private String source;
     @ApiModelProperty(value = "文档id 必填 由一个或者多个字段组成 （新增时填写，多个字段逗号隔开）")
     private  String documentIds;
     @ApiModelProperty(value = "元数据库中对于业务的数据库连接信息id")
@@ -42,12 +42,12 @@ public class EsSearchWriteEntity {
         this.indexName = indexName;
     }
 
-    public String getSourceId() {
-        return sourceId;
+    public String getSource() {
+        return source;
     }
 
-    public void setSourceId(String sourceId) {
-        this.sourceId = sourceId;
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public String getDocumentIds() {
