@@ -52,7 +52,7 @@ public class SqlDataSetReader implements DataSetReader {
         if (params != null && params.get(ConstantValue.CURRENT_USER) != null) {
             DataScopePowerManager queryDataScopeFilter = new DataScopePowerManagerImpl();
             DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
-                (JSONObject) (params.get("currentUser")), params.get("currentUnitCode").toString());
+                (JSONObject) (params.get("currentUser")),params.get("topUnitCode").toString(), params.get("currentUnitCode").toString());
             dataPowerFilter.addSourceData(params);
             qap = dataPowerFilter.translateQuery(sqlSen, null);
         } else {
