@@ -25,19 +25,22 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
     public SimpleDataSet(Object data){
         this.dataSetName = DataSet.SINGLE_DATA_SET_DEFAULT_NAME;
         this.data = data;
-        this.dataSetSize=getSize();
+        this.size=getSize();
+        this.dataSetType="S";
     }
 
     public SimpleDataSet(String dataSetName, Object data) {
         this.data = data;
         this.dataSetName = dataSetName;
-        this.dataSetSize=getSize();
+        this.size=getSize();
+        this.dataSetType="S";
     }
     /**
      * 返回 DataSet 的名称
      */
     protected String dataSetName;
-    protected  int dataSetSize;
+    protected String dataSetType;
+    protected  int size;
     /**
      * 数据集中的数据
      * 是一个 对象（Map）列表；可以类比为JSONArray
@@ -164,7 +167,7 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
 
     public void setData(Object data) {
         this.data = data;
-        this.dataSetSize=getSize();
+        this.size=getSize();
     }
     /**
      * 数据集中的数据
