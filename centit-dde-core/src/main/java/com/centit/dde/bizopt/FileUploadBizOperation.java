@@ -1,13 +1,11 @@
 package com.centit.dde.bizopt;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.utils.GetJsonFieldValueUtils;
-import com.centit.fileserver.client.FileClient;
 import com.centit.fileserver.client.po.FileInfo;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
@@ -15,12 +13,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 文件上传节点
@@ -46,7 +41,7 @@ public class FileUploadBizOperation implements BizOperation {
         String fileId;
         FileInfo fileInfo = new FileInfo();
         fileInfo.setFileName(fileName);
-        if (data instanceof OutputStream){//如果是outputstream 就是从生成csv文件节点过来的
+        if (data instanceof OutputStream){//如果是outputstream 就是从生成csv excel文件节点过来的
             ByteArrayOutputStream byteArrayOutputStream =(ByteArrayOutputStream)data;
             ByteArrayInputStream input = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
             fileId = fileStore.saveFile(input, fileInfo, byteArrayOutputStream.size());

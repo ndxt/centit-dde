@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FileDownloadBizOperation implements BizOperation {
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         return null;
     }
 }

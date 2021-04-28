@@ -51,6 +51,16 @@ public class GenerateExcelBizeOperation implements BizOperation {
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
     }
 
+    //本地测试使用
+   /* private void crateExcel(ByteArrayOutputStream byteArrayOutputStream) throws IOException {
+        String fileName =System.currentTimeMillis()+".xlsx";
+        FileOutputStream inputStream = new FileOutputStream(new File("D:\\filetest\\"+fileName));
+        byteArrayOutputStream.writeTo(inputStream);
+        inputStream.flush();
+        inputStream.close();
+        byteArrayOutputStream.close();
+    }*/
+
     private ByteArrayOutputStream writeExcel(List<Map<String, Object>>  objectList){
         //获取数据源的 key, 用于获取列数及设置标题
         Map<String, Object> map = objectList.get(0);
