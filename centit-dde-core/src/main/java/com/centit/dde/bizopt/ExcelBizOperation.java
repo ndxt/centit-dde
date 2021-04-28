@@ -1,13 +1,18 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
+import com.centit.dde.utils.GetJsonFieldValueUtils;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.report.ExcelExportUtil;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 
@@ -15,23 +20,18 @@ import java.io.IOException;
  * @author zhf
  */
 public class ExcelBizOperation implements BizOperation {
-    private FileStore fileStore;
-    public ExcelBizOperation(FileStore fileStore) {
-        this.fileStore = fileStore;
-    }
+
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
-        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "nodeName", bizModel.getModelName());
-        String filePath = BuiltInOperation.getJsonFieldString(bizOptJson, "sql", "");
-        ExcelDataSet excelDataSet = new ExcelDataSet();
-        try {
-            excelDataSet.setFilePath(
-                fileStore.getFile(filePath).getPath());
-        } catch (IOException e) {
-            e.printStackTrace();
+        String id=bizOptJson.getString("id");
+        String source=bizOptJson.getString("source");
+        String excelexpression = bizOptJson.getString("excelexpression");
+        if (StringUtils.isNotBlank(excelexpression)){
+            JSONArray jsonFieldValue = GetJsonFieldValueUtils.getJsonFieldValue(excelexpression, bizModel.getDataSet(source));
+            bizModel.putDataSet(id,new SimpleDataSet(jsonFieldValue));
+        }else {
+            bizModel.putDataSet(id,new SimpleDataSet(bizModel.getDataSet(source).getData()));
         }
-        SimpleDataSet dataSet = excelDataSet.load(null);
-        bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
+        return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(source).getSize());
     }
 }

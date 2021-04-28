@@ -1,48 +1,35 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
-import com.centit.dde.dataset.CsvDataSet;
-import com.centit.fileserver.common.FileStore;
+import com.centit.dde.utils.CloneUtils;
+import com.centit.dde.utils.GetJsonFieldValueUtils;
 import com.centit.framework.common.ResponseData;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
+import org.apache.commons.lang3.StringUtils;
 
 
 /**
  * @author zhf
  */
 public class CsvBizOperation implements BizOperation {
-    private FileStore fileStore;
-
-    public CsvBizOperation(FileStore fileStore) {
-        this.fileStore = fileStore;
-    }
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
-        String filePath=null;
-        if(bizOptJson.getJSONArray("upjson").size()>0) {
-            filePath = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("fileId");
+        String source = bizOptJson.getString("source");
+        String csvExpressions = bizOptJson.getString("csvexpressions");
+        SimpleDataSet dataSet = (SimpleDataSet) bizModel.getDataSet(source);
+        SimpleDataSet simpleDataSet;
+        if (StringUtils.isNotBlank(csvExpressions)){
+            JSONArray jsonData = GetJsonFieldValueUtils.getJsonFieldValue(csvExpressions,dataSet);
+            simpleDataSet = new SimpleDataSet(jsonData);
+        }else {
+            simpleDataSet= CloneUtils.clone(dataSet);
         }
-        CsvDataSet csvDataSet = new CsvDataSet();
-        try {
-            if(filePath!=null) {
-                csvDataSet.setFilePath(
-                    fileStore.getFile(filePath).getPath());
-            }else {
-                csvDataSet.setInputStream(new ByteArrayInputStream(bizModel.getDataSet("requestFile").getData().toString().getBytes(Charset.forName("gbk"))));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        SimpleDataSet dataSet = csvDataSet.load(null);
-        bizModel.putDataSet(sourDsName, dataSet);
+        bizModel.putDataSet(sourDsName,simpleDataSet);
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
     }
 }

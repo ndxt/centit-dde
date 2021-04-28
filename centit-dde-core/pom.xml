@@ -72,6 +72,12 @@
             <artifactId>centit-dde-transaction</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>fileserver-client</artifactId>
+            <version>3.2-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

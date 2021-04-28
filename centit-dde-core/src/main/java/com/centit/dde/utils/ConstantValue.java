@@ -40,4 +40,10 @@ public class ConstantValue {
     public static final String CYCLE_JUMP_CONTINUE = "continue";
     public static final String CYCLE_FINISH = "finishCycle";
     public static final String ASSIGN = "assign";
+
+    public static final String GENERATEJSON = "Generatejson";
+    public static final String GENERATECSV = "Generatecsv";
+    public static final String FILEUPLOADS = "fileuploads";
+    public static final String GENERATEXCEL = "Generateexcel";
+    public static final String FILEDOWNLOAD = "filedownloads";
 }

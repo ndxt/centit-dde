@@ -1,6 +1,5 @@
 package com.centit.dde.core.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.*;
@@ -13,6 +12,7 @@ import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.CloneUtils;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.CycleVo;
 import com.centit.fileserver.common.FileStore;
@@ -25,8 +25,6 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
-import com.centit.support.json.JSONTransformer;
-import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -101,11 +99,11 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("persistence", databaseOperation);
         DbBizOperation dbBizOperation = new DbBizOperation(sourceInfoDao);
         allOperations.put("database", dbBizOperation);
-        ExcelBizOperation excelBizOperation = new ExcelBizOperation(fileStore);
+        ExcelBizOperation excelBizOperation = new ExcelBizOperation();
         allOperations.put("excel", excelBizOperation);
-        CsvBizOperation csvBizOperation = new CsvBizOperation(fileStore);
+        CsvBizOperation csvBizOperation = new CsvBizOperation();
         allOperations.put("csv", csvBizOperation);
-        JsonBizOperation jsonBizOperation = new JsonBizOperation(fileStore);
+        JsonBizOperation jsonBizOperation = new JsonBizOperation();
         allOperations.put("json", jsonBizOperation);
         RunSqlsBizOperation runsqlsbizoperation = new RunSqlsBizOperation(sourceInfoDao);
         allOperations.put("sqlS", runsqlsbizoperation);
@@ -151,10 +149,10 @@ public class BizOptFlowImpl implements BizOptFlow {
             case "3":
                 path = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
                 return bizModel.fetchDataSetByName(path);
-            case "4":
+            /*case "4":
                 path = BuiltInOperation.getJsonFieldString(stepJson, "textarea", "D");
                 return JSONTransformer.transformer(
-                    JSON.parse(path), new BizModelJSONTransform(bizModel));
+                    JSON.parse(path), new BizModelJSONTransform(bizModel));*/
             case "5":
                 path = BuiltInOperation.getJsonFieldString(stepJson, "kname", "D");
                 return bizModel.fetchDataSetByName(path);
@@ -216,7 +214,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 Object value = ((Iterator<Object>) iter).next();
                 if("1".equals(cycleVo.getAssignType())){
                     //clone 复制对象数据
-                    bizModel.putDataSet(cycleVo.getId(),SerializationUtils.clone(new SimpleDataSet(value)));
+                    bizModel.putDataSet(cycleVo.getId(), CloneUtils.clone(new SimpleDataSet(value)));
                 } else{
                     //引用对象数据
                     bizModel.putDataSet(cycleVo.getId(), new SimpleDataSet(value));
