@@ -6,6 +6,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
+import com.centit.dde.utils.CloneUtils;
 import com.centit.dde.utils.GetJsonFieldValueUtils;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
@@ -30,7 +31,7 @@ public class ExcelBizOperation implements BizOperation {
             JSONArray jsonFieldValue = GetJsonFieldValueUtils.getJsonFieldValue(excelexpression, bizModel.getDataSet(source));
             bizModel.putDataSet(id,new SimpleDataSet(jsonFieldValue));
         }else {
-            bizModel.putDataSet(id,new SimpleDataSet(bizModel.getDataSet(source).getData()));
+            bizModel.putDataSet(id, CloneUtils.clone(new SimpleDataSet(bizModel.getDataSet(source).getData())));
         }
         return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(source).getSize());
     }

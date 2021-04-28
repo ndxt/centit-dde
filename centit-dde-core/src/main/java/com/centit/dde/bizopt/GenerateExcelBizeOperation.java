@@ -1,6 +1,5 @@
 package com.centit.dde.bizopt;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -16,8 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,16 +49,6 @@ public class GenerateExcelBizeOperation implements BizOperation {
         bizModel.putDataSet(id,new SimpleDataSet(byteArrayOutputStream));
         //crateExcel(byteArrayOutputStream);
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
-    }
-
-    //本地测试使用
-    private void crateExcel(ByteArrayOutputStream byteArrayOutputStream) throws IOException {
-        String fileName =System.currentTimeMillis()+".xlsx";
-        FileOutputStream inputStream = new FileOutputStream(new File("D:\\filetest\\"+fileName));
-        byteArrayOutputStream.writeTo(inputStream);
-        inputStream.flush();
-        inputStream.close();
-        byteArrayOutputStream.close();
     }
 
     private ByteArrayOutputStream writeExcel(List<Map<String, Object>>  objectList){
