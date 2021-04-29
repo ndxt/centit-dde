@@ -23,6 +23,7 @@ public class CsvDataSet extends FileDataSet {
      * @return dataSet 数据集
      */
     private Map<String, Object> params;
+
     private InputStream inputStream;
     @Override
     public void setFilePath(String filePath) throws FileNotFoundException {
@@ -31,6 +32,11 @@ public class CsvDataSet extends FileDataSet {
             inputStream = new FileInputStream(filePath);
         }
     }
+
+    public  void  setInputStream(InputStream inputStream){
+        this.inputStream = inputStream;
+    }
+
     @Override
     public SimpleDataSet load(Map<String, Object> params) {
         try {
@@ -128,5 +134,46 @@ public class CsvDataSet extends FileDataSet {
         }
         csvWriter.close();
         IOUtils.closeQuietly(outputStream);
+    }
+
+
+    public static InputStream createCsvStream(DataSet dataSet) throws IOException {
+        try(
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(byteArrayOutputStream, Charset.forName("gbk")));
+        ) {
+            CsvWriter csvWriter = new CsvWriter(writer, ',');
+            csvWriter.setTextQualifier('"');
+            csvWriter.setUseTextQualifier(true);
+            csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR.charAt(0));
+            List<Map<String, Object>> list=dataSet.getDataAsList();
+            Collections.sort(list, (o1, o2) -> Integer.compare(o2.size(), o1.size()));
+            int iHead = 0;
+            for (Map<String, Object> row : list) {
+                if (iHead == 0) {
+                    try {
+                        csvWriter.writeRecord(row.keySet().toArray(new String[0]));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                iHead++;
+                try {
+                    List<String> splitedRows = new ArrayList<String>();
+                    for (String key : list.get(0).keySet()) {
+                        Object column = row.get(key);
+                        if (null != column) {
+                            splitedRows.add(column.toString());
+                        } else {
+                            splitedRows.add("");
+                        }
+                    }
+                    csvWriter.writeRecord(splitedRows.toArray(new String[0]));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        }
     }
 }

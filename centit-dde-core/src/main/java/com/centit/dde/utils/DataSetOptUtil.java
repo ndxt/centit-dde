@@ -15,7 +15,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.StatUtils;
+import org.checkerframework.checker.units.qual.A;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.*;
 
 /**
@@ -698,5 +702,27 @@ public abstract class DataSetOptUtil {
 
     private static void sortByFields(List<Map<String, Object>> data, List<String> fields) {
         data.sort((o1, o2) -> compareTwoRow(o1, o2, fields));
+    }
+
+    public static  List<InputStream> getInputStreamByFieldName(String fieldName, DataSet dataSet) {
+        List<InputStream> inputStreams= new ArrayList<>();
+        Map<String, String> mapInfo = new HashMap<>();
+        mapInfo.put(fieldName, fieldName);
+        if (dataSet != null) {
+            DataSet destDs = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
+            List<Map<String, Object>> dataAsList = destDs.getDataAsList();
+            for (Map<String, Object> objectMap : dataAsList) {
+                InputStream inputStream;
+                Object object = objectMap.get(fieldName);
+                if (object instanceof byte[]) {
+                    inputStream = new ByteArrayInputStream((byte[]) object);
+                    inputStreams.add(inputStream);
+                }else if (object instanceof InputStream) {
+                    inputStream = (InputStream) object;
+                    inputStreams.add(inputStream);
+                }
+            }
+        }
+        return inputStreams;
     }
 }

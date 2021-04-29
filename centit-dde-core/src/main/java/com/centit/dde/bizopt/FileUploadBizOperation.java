@@ -5,17 +5,19 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
-import com.centit.dde.utils.GetJsonFieldValueUtils;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.client.po.FileInfo;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 文件上传节点
@@ -29,28 +31,37 @@ public class FileUploadBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
-        String id =bizOptJson.getString("id");
-        String source = bizOptJson.getString("source");
-        String fileName = bizOptJson.getString("flieName");
-        String fileupexpression = bizOptJson.getString("fileupexpression");
-        DataSet dataSet = bizModel.getDataSet(source);
-        Object data = dataSet.getData();
-        if (StringUtils.isNotBlank(fileupexpression)){
-            data = GetJsonFieldValueUtils.getJsonFieldValue(fileupexpression,dataSet);
+        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
+        String fileNames=BuiltInOperation.getJsonFieldString(bizOptJson,"fileName",null);
+        String fileupexpression=BuiltInOperation.getJsonFieldString(bizOptJson,"fileupexpression",null);
+
+        DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+
+        Map<String, String> mapInfo = new HashMap<>();
+        mapInfo.put(fileNames, fileNames);
+        mapInfo.put(fileupexpression, fileupexpression);
+
+        DataSet destDs = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
+        List<String> fileIds = new ArrayList<>();
+        for (Map<String, Object> objectMap : destDs.getDataAsList()) {
+            String fileId="";
+            FileInfo fileInfo = new FileInfo();
+            String fileName = String.valueOf(objectMap.get(fileNames));
+            fileInfo.setFileName(fileName);
+            Object object = objectMap.get(fileupexpression);
+            InputStream inputStream;
+            if (object instanceof byte[]){
+                inputStream = new ByteArrayInputStream((byte[])object);
+            }else if (object instanceof InputStream){
+                inputStream=(InputStream)object;
+            }else {
+                return  BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：上传文件失败，不支持的流类型转换！");
+            }
+            fileId = fileStore.saveFile(inputStream, fileInfo, 0);
+            fileIds.add(fileId);
         }
-        String fileId;
-        FileInfo fileInfo = new FileInfo();
-        fileInfo.setFileName(fileName);
-        if (data instanceof OutputStream){//如果是outputstream 就是从生成csv excel文件节点过来的
-            ByteArrayOutputStream byteArrayOutputStream =(ByteArrayOutputStream)data;
-            ByteArrayInputStream input = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            fileId = fileStore.saveFile(input, fileInfo, byteArrayOutputStream.size());
-        }else {//直接将数据生成流，把流直接上传到文件服务器
-            String dataStr = JSONObject.toJSONString(data);
-            ByteArrayInputStream input = new ByteArrayInputStream(dataStr.getBytes());
-            fileId = fileStore.saveFile(input, fileInfo, dataStr.getBytes().length);
-        }
-        bizModel.putDataSet(id,new SimpleDataSet(fileId));
+        bizModel.putDataSet(targetDsName,new SimpleDataSet(fileIds));
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
     }
 }

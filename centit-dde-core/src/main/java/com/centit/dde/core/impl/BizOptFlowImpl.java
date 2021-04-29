@@ -26,6 +26,8 @@ import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,8 @@ import java.util.*;
  */
 @Service
 public class BizOptFlowImpl implements BizOptFlow {
+    private static  final Logger logger = LoggerFactory.getLogger(BizOptFlowImpl.class);
+
     @Value("${os.file.base.dir:./file_home/export}")
     private String path;
 
@@ -357,6 +361,7 @@ public class BizOptFlowImpl implements BizOptFlow {
      */
     public ResponseData runOneStepOpt(DataOptDescJson dataOptDescJson,
                                       BizModel bizModel, JSONObject bizOptJson, String logId) {
+        long startTime = System.currentTimeMillis();
         String sOptType = bizOptJson.getString("type");
         BizOperation opt = allOperations.get(sOptType);
         if (opt == null) {
@@ -382,8 +387,12 @@ public class BizOptFlowImpl implements BizOptFlow {
                 detailLog.setRunEndTime(new Date());
                 taskDetailLogDao.updateObject(detailLog);
             }
+
+            long expendTime = System.currentTimeMillis()-startTime;
+            logger.info(String.format("节点：%s，运行耗时:%s ms",bizOptJson.getString("SetsName"),expendTime));
             return responseData;
         } catch (Exception e) {
+            logger.error(String.format("节点：%s，运行异常:%s",bizOptJson.getString("SetsName"),e.getMessage()));
             return ResponseData.makeErrorMessage(ResponseData.ERROR_OPERATION, e.getMessage());
         }
     }
