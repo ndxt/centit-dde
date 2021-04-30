@@ -725,4 +725,19 @@ public abstract class DataSetOptUtil {
         }
         return inputStreams;
     }
+
+    public static  List<InputStream> getInputStreamByFieldName(DataSet dataSet) {
+        List<InputStream> inputStreams = new ArrayList<>();
+        Object data = dataSet.getData();
+        if (data instanceof  List){
+            for (Object datum : (List) data) {//必须保证集合中全部都是byte[]或者InputStream流
+                if (datum instanceof InputStream){
+                    inputStreams.add((InputStream)datum);
+                }else if (datum instanceof byte[]){
+                    inputStreams.add(new ByteArrayInputStream((byte[])datum));
+                }
+            }
+        }
+        return inputStreams;
+    }
 }

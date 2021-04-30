@@ -13,7 +13,7 @@ import com.centit.framework.common.ResponseData;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,31 +35,21 @@ public class FileDownloadBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String flieIds=BuiltInOperation.getJsonFieldString(bizOptJson,"flieId",null);
+        String fileIds=BuiltInOperation.getJsonFieldString(bizOptJson,"flieId",null);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-
-        Map<String, String> mapInfo = new HashMap<>();
-        mapInfo.put(flieIds, flieIds);
-
         List<InputStream> inputStreams = new ArrayList<>();
         if (dataSet!=null){
+            Map<String, String> mapInfo = new HashMap<>();
+            mapInfo.put(fileIds, fileIds);
             DataSet destDs = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
             List<Map<String, Object>> dataAsList = destDs.getDataAsList();
             for (Map<String, Object> objectMap : dataAsList) {
-                String fileId = String.valueOf(objectMap.get(flieIds));
-                FileInfo fileInfo = fileClient.getFileInfo(fileId);
-                if (fileInfo==null){
-                    return BuiltInOperation.getResponseData(0, 0, "文件不存在！" );
-                }
+                String fileId = String.valueOf(objectMap.get(fileIds));
                 InputStream inputStream = fileStore.loadFileStream(fileId);
                 inputStreams.add(inputStream);
             }
         }else {
-            FileInfo fileInfo = fileClient.getFileInfo(flieIds);
-            if (fileInfo==null){
-                return BuiltInOperation.getResponseData(0, 0, "文件不存在！" );
-            }
-            InputStream inputStream = fileStore.loadFileStream(flieIds);
+            InputStream inputStream = fileStore.loadFileStream(fileIds);
             inputStreams.add(inputStream);
         }
         bizModel.putDataSet(targetDsName,new SimpleDataSet(inputStreams));

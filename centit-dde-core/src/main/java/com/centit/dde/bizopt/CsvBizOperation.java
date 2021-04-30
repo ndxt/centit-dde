@@ -23,25 +23,33 @@ public class CsvBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
+
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
+
         String csvexpressions=BuiltInOperation.getJsonFieldString(bizOptJson,"csvexpressions",null);
+
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+        if(dataSet ==null){
+            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取CSV文件异常，请选择数据集！");
+        }
+        List<Object> objectList = new ArrayList<>();
+        List<InputStream> inputStreams;
         if (StringUtils.isNotBlank(csvexpressions)){
-            List<InputStream> inputStreams = DataSetOptUtil.getInputStreamByFieldName(csvexpressions,dataSet);
+            inputStreams = DataSetOptUtil.getInputStreamByFieldName(csvexpressions,dataSet);
             if (inputStreams.size()==0){
                 return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取CSV文件异常，不支持的流类型转换！");
             }
-            List<Object> objectList = new ArrayList<>();
-            for (InputStream inputStream : inputStreams) {
-                CsvDataSet csvDataSet = new CsvDataSet();
-                csvDataSet.setInputStream(inputStream);
-                SimpleDataSet  simpleDataSet= csvDataSet.load(null);
-                objectList.add(simpleDataSet.getData());
-            }
-            bizModel.putDataSet(targetDsName,new SimpleDataSet(objectList));
         }else {
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取CSV文件异常，未指定参数");
+            inputStreams = DataSetOptUtil.getInputStreamByFieldName(dataSet);
         }
-        return BuiltInOperation.getResponseSuccessData(1);
+        for (InputStream inputStream : inputStreams) {
+            CsvDataSet csvDataSet = new CsvDataSet();
+            csvDataSet.setInputStream(inputStream);
+            SimpleDataSet  simpleDataSet= csvDataSet.load(null);
+            objectList.add(simpleDataSet.getData());
+        }
+        SimpleDataSet simpleDataSet = new SimpleDataSet(objectList);
+        bizModel.putDataSet(targetDsName,simpleDataSet);
+        return BuiltInOperation.getResponseSuccessData(simpleDataSet.getSize());
     }
 }
