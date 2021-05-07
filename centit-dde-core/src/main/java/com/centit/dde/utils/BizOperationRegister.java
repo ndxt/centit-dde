@@ -16,8 +16,8 @@ public class BizOperationRegister {
     @Resource
     BizOptFlowImpl bizOptFlow;
 
-    @Resource
-    AssignmentBizOperation assignmentBizOperation;
+ /*   @Resource
+    AssignmentBizOperation assignmentBizOperation;*/
 
     @Resource
     GenerateCsvBizOperation generateCsvBizOperation;
@@ -37,7 +37,7 @@ public class BizOperationRegister {
     //注册节点对象
     @PostConstruct
     private void init(){
-        bizOptFlow.registerOperation(ConstantValue.ASSIGN,assignmentBizOperation);
+       /* bizOptFlow.registerOperation(ConstantValue.ASSIGN,assignmentBizOperation);*/
         bizOptFlow.registerOperation(ConstantValue.GENERATECSV,generateCsvBizOperation);
         bizOptFlow.registerOperation(ConstantValue.GENERATEJSON,generateJsonBizOperation);
         bizOptFlow.registerOperation(ConstantValue.FILEUPLOADS,fileUploadBizOperation);

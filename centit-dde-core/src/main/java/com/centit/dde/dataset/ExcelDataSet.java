@@ -34,9 +34,9 @@ public class ExcelDataSet extends FileDataSet {
             ExcelTypeEnum excelTypeEnum = ExcelTypeEnum.checkFileExcelType(inputStream);
             switch (excelTypeEnum){
                 case HSSF:
-                    dataSet.setData(excelStreamToArray("xls"));
+                    dataSet.setData(excelStreamToArray(ExcelTypeEnum.HSSF));
                 case XSSF:
-                    dataSet.setData(excelStreamToArray("xlsx"));
+                    dataSet.setData(excelStreamToArray(ExcelTypeEnum.XSSF));
                 case NOTEXCEL:
                     dataSet.setData(null);
             }
@@ -89,9 +89,9 @@ public class ExcelDataSet extends FileDataSet {
         }
     }
 
-    private   JSONArray excelStreamToArray(String fileType) throws Exception {
+    private   JSONArray excelStreamToArray(ExcelTypeEnum excelType) throws Exception {
         // 根据文件名来创建Excel工作薄
-        Workbook work = getWorkbook(inputStream, fileType);
+        Workbook work = getWorkbook(inputStream, excelType);
         if (null == work) {
             throw new Exception("创建Excel工作薄为空！");
         }
@@ -142,16 +142,8 @@ public class ExcelDataSet extends FileDataSet {
      * @return
      * @throws Exception
      */
-    public static Workbook getWorkbook(InputStream inStr, String fileType) throws Exception {
-        Workbook wb = null;
-        if ("xls".equals(fileType)) {
-            wb = new HSSFWorkbook(inStr); // 2003-
-        } else if ("xlsx".equals(fileType)) {
-            wb = new XSSFWorkbook(inStr); // 2007+
-        } else {
-            throw new Exception("解析的文件格式有误！");
-        }
-        return wb;
+    public static Workbook getWorkbook(InputStream inStr, ExcelTypeEnum excelType) throws Exception {
+        return excelType ==ExcelTypeEnum.HSSF ? new HSSFWorkbook(inStr) : new XSSFWorkbook(inStr);
     }
 
     /**
