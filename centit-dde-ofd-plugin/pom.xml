@@ -58,8 +58,7 @@
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>fileserver-client</artifactId>
-            <version>3.2-SNAPSHOT</version>
-            <scope>compile</scope>
+            <version>${centit.fileserver.version}</version>
         </dependency>
     </dependencies>
 
