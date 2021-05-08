@@ -23,14 +23,10 @@ public class CsvBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-
         String csvexpressions=BuiltInOperation.getJsonFieldString(bizOptJson,"csvexpressions",null);
-
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
-
         if(dataSet ==null && requestFileInfo==null){
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取CSV文件异常，请指定数据集或者指定对应的流信息！");
         }

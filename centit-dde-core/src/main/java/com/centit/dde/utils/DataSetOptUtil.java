@@ -191,8 +191,8 @@ public abstract class DataSetOptUtil {
     }
 
     public static DataSet statDataset(DataSet inData,
-                                       List<String> groupByFields,
-                                       Map<String, String> statDesc) {
+                                      List<String> groupByFields,
+                                      Map<String, String> statDesc) {
         List<Triple<String, String, String>> sd = new ArrayList<>(statDesc.size());
         for (Map.Entry<String, String> s : statDesc.entrySet()) {
             String[] optDesc = StringUtils.split(s.getValue(), ":");
@@ -705,6 +705,7 @@ public abstract class DataSetOptUtil {
         data.sort((o1, o2) -> compareTwoRow(o1, o2, fields));
     }
 
+    //从dataset 中获取流信息（页面上填写了“文件内容”参数时调用）
     public static  List<InputStream> getInputStreamByFieldName(String fieldName, DataSet dataSet) {
         List<InputStream> inputStreams= new ArrayList<>();
         Map<String, String> mapInfo = new HashMap<>();
@@ -726,7 +727,7 @@ public abstract class DataSetOptUtil {
         }
         return inputStreams;
     }
-
+    //从dataset 中获取流信息（页面上没填写“文件内容”参数时调用）
     public static  List<InputStream> getInputStreamByFieldName(DataSet dataSet) {
         List<InputStream> inputStreams = new ArrayList<>();
         Object data = dataSet.getData();
@@ -739,10 +740,15 @@ public abstract class DataSetOptUtil {
                 }
             }
         }
+        if (data instanceof InputStream){
+            inputStreams.add((InputStream)data);
+        }else if (data instanceof byte[]){
+            inputStreams.add(new ByteArrayInputStream((byte[])data));
+        }
         return inputStreams;
     }
 
-
+    //获取request请求中的文件（流）
     public static List<InputStream>  getRequestFileInfo(BizModel bizModel){
         List<InputStream> inputStreamList =null;
         Map<String, Object> modelTag = bizModel.getModelTag();

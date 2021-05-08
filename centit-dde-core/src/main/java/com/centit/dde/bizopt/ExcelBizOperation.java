@@ -23,11 +23,8 @@ public class ExcelBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-
         String excelexpression=BuiltInOperation.getJsonFieldString(bizOptJson,"excelexpression",null);
-
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
         if (dataSet==null && requestFileInfo==null){
@@ -35,7 +32,6 @@ public class ExcelBizOperation implements BizOperation {
                 bizOptJson.getString("SetsName")+"：读取EXCEL文件异常，请指定数据集或者指定对应的流信息！");
         }
         List<InputStream> inputStreams;
-        List<Object> objectList = new ArrayList<>();
         if (requestFileInfo !=null){
             inputStreams=requestFileInfo;
         }else if (StringUtils.isNotBlank(excelexpression)){
@@ -47,6 +43,7 @@ public class ExcelBizOperation implements BizOperation {
             return BuiltInOperation.getResponseData(0, 500,
                 bizOptJson.getString("SetsName")+"：读取EXCEL文件异常，不支持的流类型转换！");
         }
+        List<Object> objectList = new ArrayList<>();
         for (InputStream inputStream : inputStreams) {
             ExcelDataSet excelDataSet = new ExcelDataSet();
             excelDataSet.setInputStream(inputStream);

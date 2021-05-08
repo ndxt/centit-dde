@@ -11,7 +11,6 @@ import com.centit.framework.common.ResponseData;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +23,10 @@ public class JsonBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-
         String jsonexpression=BuiltInOperation.getJsonFieldString(bizOptJson,"jsonexpression",null);
-
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+
         List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
         if (dataSet==null&& requestFileInfo==null){
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取JSON文件异常,请指定数据集或者指定对应的流信息！");
@@ -54,18 +51,23 @@ public class JsonBizOperation implements BizOperation {
     }
 
     //将流转出json文件
-    private List<JSONObject> toJson( List<InputStream> inputStreams) throws IOException {
-        List<JSONObject> jsonDatas = new ArrayList<>();
+    private List<Object> toJson( List<InputStream> inputStreams) throws IOException {
+        List<Object> jsonDatas = new ArrayList<>();
         for (InputStream inputStream : inputStreams) {
             StringBuilder stringBuilder = new StringBuilder();
             try(BufferedInputStream  bis = new BufferedInputStream (inputStream);
-                BufferedReader  reader = new BufferedReader  (new InputStreamReader(bis,StandardCharsets.UTF_8));
+                BufferedReader  reader = new BufferedReader  (new InputStreamReader(bis));
             ) {
                 while (reader.ready()) {
                     stringBuilder.append((char)reader.read());
                 }
             }
-            jsonDatas.add(JSON.parseObject(stringBuilder.toString()));
+            if (StringUtils.isNotBlank(stringBuilder.toString())&& stringBuilder.toString().startsWith("[")){
+                jsonDatas.add(JSON.parseArray(stringBuilder.toString()));
+            }else {
+                jsonDatas.add(JSON.parseObject(stringBuilder.toString()));
+            }
+
         }
         return  jsonDatas;
     }

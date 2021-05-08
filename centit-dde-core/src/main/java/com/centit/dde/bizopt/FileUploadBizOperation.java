@@ -9,6 +9,7 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.client.po.FileInfo;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -36,32 +37,33 @@ public class FileUploadBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String fileNames=BuiltInOperation.getJsonFieldString(bizOptJson,"fileName",null);
-        String fileupexpression=BuiltInOperation.getJsonFieldString(bizOptJson,"fileupexpression",null);
-
+        String fileNameField=BuiltInOperation.getJsonFieldString(bizOptJson,"flieName",String.valueOf(System.currentTimeMillis()));
+        String fileDataField=BuiltInOperation.getJsonFieldString(bizOptJson,"fileupexpression",null);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-
-        Map<String, String> mapInfo = new HashMap<>();
-        mapInfo.put(fileNames, fileNames);
-        mapInfo.put(fileupexpression, fileupexpression);
-
-        DataSet destDs = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
+        if (dataSet==null){
+            return BuiltInOperation.getResponseData(0, 500,
+                bizOptJson.getString("SetsName")+"：文件上传失败，请选择数据集！");
+        }
+        if (dataSet!=null && StringUtils.isNotBlank(fileNameField)&&StringUtils.isNotBlank(fileDataField)){
+            Map<String, String> mapInfo = new HashMap<>();
+            mapInfo.put(fileDataField, fileDataField);
+            mapInfo.put(fileNameField, fileNameField);
+            dataSet = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
+        }
         List<String> fileIds = new ArrayList<>();
-        for (Map<String, Object> objectMap : destDs.getDataAsList()) {
-            String fileId="";
+        List<Map<String, Object>> dataSetDataAsList = dataSet.getDataAsList();
+        for (Map<String, Object> dataMap : dataSetDataAsList) {
             FileInfo fileInfo = new FileInfo();
-            String fileName = String.valueOf(objectMap.get(fileNames));
-            fileInfo.setFileName(fileName);
-            Object object = objectMap.get(fileupexpression);
-            InputStream inputStream;
+            fileInfo.setFileName(dataMap.get(fileNameField)==null?fileNameField:String.valueOf(dataMap.get(fileNameField)));
+            String fileId;
+            Object object = StringUtils.isNotBlank(fileDataField)?dataMap.get(fileDataField):dataSet.getData();
             if (object instanceof byte[]){
-                inputStream = new ByteArrayInputStream((byte[])object);
+                fileId = fileStore.saveFile(new ByteArrayInputStream((byte[])object), fileInfo, 0);
             }else if (object instanceof InputStream){
-                inputStream=(InputStream)object;
+                fileId = fileStore.saveFile((InputStream)object, fileInfo, 0);
             }else {
                 return  BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：上传文件失败，不支持的流类型转换！");
             }
-            fileId = fileStore.saveFile(inputStream, fileInfo, 0);
             fileIds.add(fileId);
         }
         bizModel.putDataSet(targetDsName,new SimpleDataSet(fileIds));
