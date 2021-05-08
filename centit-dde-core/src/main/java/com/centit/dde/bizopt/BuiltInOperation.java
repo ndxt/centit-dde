@@ -17,10 +17,7 @@ import com.centit.support.file.FileSystemOpt;
 import com.centit.support.report.ExcelExportUtil;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -112,8 +109,8 @@ public class BuiltInOperation {
     }
 
     public static ResponseData runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
-        String bodyString = (String) bizModel.getModelTag().get("requestFile");
-        DataSet destDs = BizOptUtils.castObjectToDataSet(bodyString);
+        InputStream inputStream = (InputStream)bizModel.getModelTag().get("requestFile");
+        DataSet destDs = BizOptUtils.castObjectToDataSet(inputStream);
         bizModel.putDataSet("requestFile", destDs);
         return getResponseSuccessData(destDs.getSize());
     }

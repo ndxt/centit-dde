@@ -29,20 +29,23 @@ public class ExcelBizOperation implements BizOperation {
         String excelexpression=BuiltInOperation.getJsonFieldString(bizOptJson,"excelexpression",null);
 
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-        if (dataSet==null){
+        List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
+        if (dataSet==null && requestFileInfo==null){
             return BuiltInOperation.getResponseData(0, 500,
-                bizOptJson.getString("SetsName")+"：读取EXCEL文件异常，请选择数据集！");
+                bizOptJson.getString("SetsName")+"：读取EXCEL文件异常，请指定数据集或者指定对应的流信息！");
         }
         List<InputStream> inputStreams;
         List<Object> objectList = new ArrayList<>();
-        if (StringUtils.isNotBlank(excelexpression)){
+        if (requestFileInfo !=null){
+            inputStreams=requestFileInfo;
+        }else if (StringUtils.isNotBlank(excelexpression)){
             inputStreams  = DataSetOptUtil.getInputStreamByFieldName(excelexpression,dataSet);
-            if (inputStreams.size()==0){
-                return BuiltInOperation.getResponseData(0, 500,
-                    bizOptJson.getString("SetsName")+"：读取EXCEL文件异常，不支持的流类型转换！");
-            }
         }else {
             inputStreams = DataSetOptUtil.getInputStreamByFieldName(dataSet);
+        }
+        if (inputStreams.size()==0){
+            return BuiltInOperation.getResponseData(0, 500,
+                bizOptJson.getString("SetsName")+"：读取EXCEL文件异常，不支持的流类型转换！");
         }
         for (InputStream inputStream : inputStreams) {
             ExcelDataSet excelDataSet = new ExcelDataSet();
@@ -51,6 +54,6 @@ public class ExcelBizOperation implements BizOperation {
             objectList.add(simpleDataSet.getData());
         }
         bizModel.putDataSet(targetDsName,new SimpleDataSet(objectList));
-        return BuiltInOperation.getResponseSuccessData(1);
+        return BuiltInOperation.getResponseSuccessData(objectList.size());
     }
 }

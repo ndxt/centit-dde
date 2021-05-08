@@ -9,14 +9,12 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 
 /**
  * 生成json文件节点信息
  */
-@Component
 public class GenerateJsonBizOperation implements BizOperation {
 
     @Override

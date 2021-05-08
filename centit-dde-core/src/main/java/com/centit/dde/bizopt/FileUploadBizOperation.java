@@ -9,8 +9,6 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.client.po.FileInfo;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -23,11 +21,16 @@ import java.util.Map;
  * 文件上传节点
  *
  */
-@Component
 public class FileUploadBizOperation implements BizOperation {
 
-    @Autowired(required = false)
     private FileStore fileStore;
+
+    public FileUploadBizOperation(FileStore fileStore) {
+        this.fileStore = fileStore;
+    }
+
+    public FileUploadBizOperation() {
+    }
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {

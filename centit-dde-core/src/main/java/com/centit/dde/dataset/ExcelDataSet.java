@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.file.FileIOOpt;
 import com.centit.support.report.ExcelExportUtil;
 import com.centit.support.report.ExcelImportUtil;
 import com.centit.support.report.ExcelTypeEnum;
@@ -12,8 +13,11 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
+import org.springframework.util.StreamUtils;
 
 import java.io.*;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,12 +35,16 @@ public class ExcelDataSet extends FileDataSet {
     public SimpleDataSet load(Map<String, Object> params) {
         try {
             SimpleDataSet dataSet = new SimpleDataSet();
-            ExcelTypeEnum excelTypeEnum = ExcelTypeEnum.checkFileExcelType(inputStream);
+            //直接执行ExcelTypeEnum.checkFileExcelType(inputStream) 会导致流损坏，创建Workbook时报错，目前只能通过复制流对象来解决
+            List<InputStream> inputStreamList  =cloneInputStream(inputStream) ;
+            ExcelTypeEnum excelTypeEnum = ExcelTypeEnum.checkFileExcelType(inputStreamList.get(0));
             switch (excelTypeEnum){
                 case HSSF:
-                    dataSet.setData(excelStreamToArray(ExcelTypeEnum.HSSF));
+                    dataSet.setData(excelStreamToArray(inputStreamList.get(1),ExcelTypeEnum.HSSF));
+                    break;
                 case XSSF:
-                    dataSet.setData(excelStreamToArray(ExcelTypeEnum.XSSF));
+                    dataSet.setData(excelStreamToArray(inputStreamList.get(1),ExcelTypeEnum.XSSF));
+                    break;
                 case NOTEXCEL:
                     dataSet.setData(null);
             }
@@ -89,15 +97,13 @@ public class ExcelDataSet extends FileDataSet {
         }
     }
 
-    private   JSONArray excelStreamToArray(ExcelTypeEnum excelType) throws Exception {
-        // 根据文件名来创建Excel工作薄
-        Workbook work = getWorkbook(inputStream, excelType);
+    private static JSONArray excelStreamToArray(InputStream inputStream, ExcelTypeEnum excelType) throws Exception {
+        Workbook work = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(inputStream) : new XSSFWorkbook(inputStream);
         if (null == work) {
             throw new Exception("创建Excel工作薄为空！");
         }
-        Sheet sheet = null;
-        Row row = null;
-        Cell cell = null;
+        Sheet sheet;
+        Row row;
         JSONArray jsonArray  = new JSONArray();
         // 遍历Excel中所有的sheet
         for (int i = 0; i < work.getNumberOfSheets(); i++) {
@@ -107,12 +113,12 @@ public class ExcelDataSet extends FileDataSet {
             }
             // 取第一行标题
             row = sheet.getRow(0);
-            String title[] = null;
+            Object title[];
             if (row != null) {
                 title = new String[row.getLastCellNum()];
                 for (int y = row.getFirstCellNum(); y < row.getLastCellNum(); y++) {
-                    cell = row.getCell(y);
-                    title[y] = String.valueOf(cell);
+                    Object cellValue = getCellValue(row.getCell(y));
+                    title[y] = cellValue;
                 }
             } else {
                 continue;
@@ -123,27 +129,15 @@ public class ExcelDataSet extends FileDataSet {
                 JSONObject jsonObject = new JSONObject();
                 // 遍历所有的列
                 for (int y = row.getFirstCellNum(); y < row.getLastCellNum(); y++) {
-                    cell = row.getCell(y);
-                    String key = title[y];
-                    jsonObject.put(key, cell);
+                    Object cellValue = getCellValue(row.getCell(y));
+                    Object key = title[y];
+                    jsonObject.put((String) key, cellValue);
                 }
                 jsonArray.add(jsonObject);
             }
         }
         work.close();
         return jsonArray;
-    }
-
-    /**
-     * 描述：根据文件后缀，自适应上传文件的版本
-     *
-     * @param inStr
-     *            ,fileName
-     * @return
-     * @throws Exception
-     */
-    public static Workbook getWorkbook(InputStream inStr, ExcelTypeEnum excelType) throws Exception {
-        return excelType ==ExcelTypeEnum.HSSF ? new HSSFWorkbook(inStr) : new XSSFWorkbook(inStr);
     }
 
     /**
@@ -210,4 +204,63 @@ public class ExcelDataSet extends FileDataSet {
             }
         }
     }
+
+    private static  List<InputStream> cloneInputStream(InputStream input) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = input.read(buffer)) > -1) {
+                baos.write(buffer, 0, len);
+            }
+            baos.flush();
+            List<InputStream> inputStreamList = new ArrayList<>();
+            ByteArrayInputStream byteArrayInputStreamOne = new ByteArrayInputStream(baos.toByteArray());
+            ByteArrayInputStream byteArrayInputStreamTwo = new ByteArrayInputStream(baos.toByteArray());
+            inputStreamList.add(byteArrayInputStreamOne);
+            inputStreamList.add(byteArrayInputStreamTwo);
+            return inputStreamList;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    /**
+     * 描述：对表格中数值进行格式化
+     *
+     * @param cell
+     * @return
+     */
+    public static Object getCellValue(Cell cell) {
+        Object value = null;
+        DecimalFormat df = new DecimalFormat("0"); // 格式化number String字符
+        SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd"); // 日期格式化
+        DecimalFormat df2 = new DecimalFormat("0"); // 格式化数字
+        switch (cell.getCellType()) {
+            case STRING:
+                value = cell.getRichStringCellValue().getString();
+                break;
+            case NUMERIC:
+                if ("General".equals(cell.getCellStyle().getDataFormatString())) {
+                    value = df.format(cell.getNumericCellValue());
+                } else if ("m/d/yy".equals(cell.getCellStyle().getDataFormatString())) {
+                    value = sdf.format(cell.getDateCellValue());
+                } else {
+                    value = df2.format(cell.getNumericCellValue());
+                }
+                break;
+            case BOOLEAN:
+                value = cell.getBooleanCellValue();
+                break;
+            case BLANK:
+                value = "";
+                break;
+            default:
+                break;
+        }
+        return value;
+    }
+
 }

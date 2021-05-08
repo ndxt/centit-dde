@@ -1,6 +1,7 @@
 package com.centit.dde.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.datarule.CheckRule;
@@ -739,5 +740,17 @@ public abstract class DataSetOptUtil {
             }
         }
         return inputStreams;
+    }
+
+
+    public static List<InputStream>  getRequestFileInfo(BizModel bizModel){
+        List<InputStream> inputStreamList =null;
+        Map<String, Object> modelTag = bizModel.getModelTag();
+        InputStream requestFile = (InputStream) modelTag.get("requestFile");
+        if (requestFile!=null){
+            inputStreamList =new ArrayList<>();
+            inputStreamList.add(requestFile);
+        }
+        return inputStreamList;
     }
 }

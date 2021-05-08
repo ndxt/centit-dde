@@ -29,18 +29,23 @@ public class CsvBizOperation implements BizOperation {
         String csvexpressions=BuiltInOperation.getJsonFieldString(bizOptJson,"csvexpressions",null);
 
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-        if(dataSet ==null){
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取CSV文件异常，请选择数据集！");
+        List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
+
+        if(dataSet ==null && requestFileInfo==null){
+            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取CSV文件异常，请指定数据集或者指定对应的流信息！");
         }
         List<Object> objectList = new ArrayList<>();
         List<InputStream> inputStreams;
         if (StringUtils.isNotBlank(csvexpressions)){
             inputStreams = DataSetOptUtil.getInputStreamByFieldName(csvexpressions,dataSet);
-            if (inputStreams.size()==0){
-                return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取CSV文件异常，不支持的流类型转换！");
-            }
-        }else {
+        }else  if (requestFileInfo!=null){
+            inputStreams=requestFileInfo;
+        }
+        else {
             inputStreams = DataSetOptUtil.getInputStreamByFieldName(dataSet);
+        }
+        if (inputStreams.size()==0){
+            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取CSV文件异常，不支持的流类型转换！");
         }
         for (InputStream inputStream : inputStreams) {
             CsvDataSet csvDataSet = new CsvDataSet();

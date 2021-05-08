@@ -30,25 +30,23 @@ public class JsonBizOperation implements BizOperation {
         String jsonexpression=BuiltInOperation.getJsonFieldString(bizOptJson,"jsonexpression",null);
 
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-        if (dataSet==null){
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：未选择数据集！");
+        List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
+        if (dataSet==null&& requestFileInfo==null){
+            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取JSON文件异常,请指定数据集或者指定对应的流信息！");
         }
         List<InputStream> inputStreams;
         if (StringUtils.isNotBlank(jsonexpression)){
             inputStreams = DataSetOptUtil.getInputStreamByFieldName(jsonexpression,dataSet);
-            if (inputStreams.size()==0){
-                return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取JSON文件异常，不支持的流类型转换！");
-            }
-        }else {
+        }else if(requestFileInfo!=null){
+            inputStreams=requestFileInfo;
+        }else  {
             inputStreams = DataSetOptUtil.getInputStreamByFieldName(dataSet);
         }
+        if (inputStreams.size()==0){
+            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取JSON文件异常，不支持的流类型转换！");
+        }
         try {
-            if (inputStreams.size()>0){
-                bizModel.putDataSet(targetDsName, new SimpleDataSet(toJson(inputStreams)));
-            } else {
-                return BuiltInOperation.getResponseData(0, 500,
-                    bizOptJson.getString("SetsName")+"：读取JSON文件异常，请填写正确的参数byte[]或者InputStream流！");
-            }
+            bizModel.putDataSet(targetDsName, new SimpleDataSet(toJson(inputStreams)));
         } catch (IOException e) {
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取JSON文件异常，异常信息："+e.getMessage());
         }

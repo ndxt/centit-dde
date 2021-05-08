@@ -76,7 +76,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @PostConstruct
     public void init() {
-        allOperations.put("start", BuiltInOperation::runStart);
+
         allOperations.put("sche", BuiltInOperation::runStart);
         allOperations.put("resBody", BuiltInOperation::runRequestBody);
         allOperations.put("resFile", BuiltInOperation::runRequestFile);
@@ -113,6 +113,12 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("sqlS", runsqlsbizoperation);
         ReportBizOperation reportBizOperation = new ReportBizOperation(fileStore);
         allOperations.put("SSD", reportBizOperation);
+
+        allOperations.put(ConstantValue.GENERATECSV,new GenerateCsvBizOperation());
+        allOperations.put(ConstantValue.GENERATEJSON,new GenerateJsonBizOperation());
+        allOperations.put(ConstantValue.FILEUPLOADS,new FileUploadBizOperation(fileStore));
+        allOperations.put(ConstantValue.GENERATEXCEL,new GenerateExcelBizeOperation());
+        allOperations.put(ConstantValue.FILEDOWNLOAD,new FileDownloadBizOperation(fileStore));
     }
 
     @Override

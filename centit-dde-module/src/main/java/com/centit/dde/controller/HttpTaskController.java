@@ -87,9 +87,9 @@ public class HttpTaskController extends BaseController {
                 params.put("requestBody", bodyString);
             }
         }else{
-            String bodyString = StreamUtils.copyToString(UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight(), Charset.forName("gbk"));
-            if (!StringBaseOpt.isNvl(bodyString)) {
-                params.put("requestFile", bodyString);
+            InputStream inputStream = UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight();
+            if (inputStream !=null) {
+                params.put("requestFile", inputStream);
             }
         }
         Object bizModel;

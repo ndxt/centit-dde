@@ -8,7 +8,6 @@ import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +16,6 @@ import java.util.Map;
 /**
  * 生成json文件节点信息
  */
-@Service
 public class GenerateCsvBizOperation implements BizOperation {
 
     @Override
