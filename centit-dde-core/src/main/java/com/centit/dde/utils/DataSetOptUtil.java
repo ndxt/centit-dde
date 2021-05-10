@@ -16,11 +16,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.StatUtils;
-import org.checkerframework.checker.units.qual.A;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.util.*;
 
 /**
@@ -749,11 +748,11 @@ public abstract class DataSetOptUtil {
     }
 
     //获取request请求中的文件（流）
-    public static List<InputStream>  getRequestFileInfo(BizModel bizModel){
+    public static List<InputStream>  getRequestFileInfo(BizModel bizModel) throws IOException {
         List<InputStream> inputStreamList =null;
         Map<String, Object> modelTag = bizModel.getModelTag();
         InputStream requestFile = (InputStream) modelTag.get("requestFile");
-        if (requestFile!=null){
+        if (requestFile!=null && requestFile.available()>0){
             inputStreamList =new ArrayList<>();
             inputStreamList.add(requestFile);
         }

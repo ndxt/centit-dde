@@ -21,7 +21,7 @@ import java.util.List;
 public class JsonBizOperation implements BizOperation {
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws IOException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         String jsonexpression=BuiltInOperation.getJsonFieldString(bizOptJson,"jsonexpression",null);

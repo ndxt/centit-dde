@@ -10,6 +10,7 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.List;
 public class CsvBizOperation implements BizOperation {
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws IOException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         String csvexpressions=BuiltInOperation.getJsonFieldString(bizOptJson,"csvexpressions",null);
