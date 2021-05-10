@@ -2,18 +2,24 @@ package com.centit.dde.dataset;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.bizopt.BuiltInOperation;
+import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
+import com.centit.fileserver.utils.SystemTempFileUtils;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.file.FileIOOpt;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.file.FileSystemOpt;
 import com.centit.support.report.ExcelExportUtil;
 import com.centit.support.report.ExcelImportUtil;
 import com.centit.support.report.ExcelTypeEnum;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.*;
-import org.springframework.util.StreamUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -21,7 +27,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ExcelDataSet extends FileDataSet {
 
@@ -140,69 +145,18 @@ public class ExcelDataSet extends FileDataSet {
         return jsonArray;
     }
 
-    /**
-     * 将集合生成Excel文件
-     * @param objectList 数据
-     * @return
-     * @throws IOException
-     */
-    public static InputStream writeExcel(List<Map<String, Object>> objectList) throws IOException {
-        //获取数据源的 key, 用于获取列数及设置标题
-        Map<String, Object> map = objectList.get(0);
-        Set<String> stringSet = map.keySet();
-        ArrayList<String> headList = new ArrayList<>(stringSet);
-        //定义一个新的工作簿
-        XSSFWorkbook wb = new XSSFWorkbook();
-        //创建一个Sheet页
-        XSSFSheet sheet = wb.createSheet(System.currentTimeMillis()+"");
-        //设置行高
-        sheet.setDefaultRowHeight((short) (2 * 256));
-        //为有数据的每列设置列宽
-        for (int i = 0; i < headList.size(); i++) {
-            sheet.setColumnWidth(i, 8000);
-        }
-        //设置单元格字体样式
-        XSSFFont font = wb.createFont();
-        font.setFontName("等线");
-        font.setFontHeightInPoints((short) 16);
-        //在sheet里创建第一行，并设置单元格内容为 title (标题)
-        XSSFRow titleRow = sheet.createRow(0);
-        XSSFCell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("Excel");
-        //合并单元格CellRangeAddress构造参数依次表示起始行，截至行，起始列， 截至列
-        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, headList.size()));
-        // 创建单元格文字居中样式并设置标题单元格居中
-        XSSFCellStyle cellStyle = wb.createCellStyle();
-        cellStyle.setAlignment(HorizontalAlignment.CENTER);
-        titleCell.setCellStyle(cellStyle);
-        //获得表格第二行
-        XSSFRow row = sheet.createRow(1);
-        //根据数据源信息给第二行每一列设置标题
-        for (int i = 0; i < headList.size(); i++) {
-            XSSFCell cell = row.createCell(i);
-            cell.setCellValue(headList.get(i));
-        }
-        XSSFRow rows;
-        XSSFCell cells;
-        //循环拿到的数据给所有行每一列设置对应的值
-        for (int i = 0; i < objectList.size(); i++) {
-            //在这个sheet页里创建一行
-            rows = sheet.createRow(i + 2);
-            //给该行数据赋值
-            for (int j = 0; j < headList.size(); j++) {
-                String value = objectList.get(i).get(headList.get(j))==null?"":objectList.get(i).get(headList.get(j)).toString();
-                cells = rows.createCell(j);
-                cells.setCellValue(value);
+    public static  InputStream writeExcel(BizModel bizModel,JSONObject bizOptJson) throws Exception{
+        String path = BuiltInOperation.getJsonFieldString(bizOptJson, "source", "");
+        File excel= new File(SystemTempFileUtils.getRandomTempFilePath());
+        for(Map.Entry<String,DataSet> set:bizModel.getBizData().entrySet()) {
+            if(set.getKey().equals(path) || StringBaseOpt.isNvl(path)) {
+                String[] head= CollectionsOpt.listToArray(set.getValue().getFirstRow().keySet());
+                ExcelExportUtil.appendDataToExcelSheet(excel.getPath(), set.getKey(), (List<Object>) set.getValue().getData(), head,head);
             }
         }
-        try( ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();) {
-            wb.write(byteArrayOutputStream);
-            return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-        } finally {
-            if (wb!=null){
-                wb.close();
-            }
-        }
+        FileInputStream  fileInputStream = new FileInputStream(excel);
+        FileSystemOpt.deleteFile(excel);
+        return  fileInputStream;
     }
 
     private static  List<InputStream> cloneInputStream(InputStream input) {
@@ -226,13 +180,6 @@ public class ExcelDataSet extends FileDataSet {
         }
     }
 
-
-    /**
-     * 描述：对表格中数值进行格式化
-     *
-     * @param cell
-     * @return
-     */
     public static Object getCellValue(Cell cell) {
         Object value = null;
         DecimalFormat df = new DecimalFormat("0"); // 格式化number String字符

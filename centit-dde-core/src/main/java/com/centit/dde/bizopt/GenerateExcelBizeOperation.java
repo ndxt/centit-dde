@@ -10,9 +10,7 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 
 public class GenerateExcelBizeOperation implements BizOperation {
@@ -35,11 +33,11 @@ public class GenerateExcelBizeOperation implements BizOperation {
         if (dataSet==null){
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：生成EXCEL文件异常，请指定数据集！");
         }
-        List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
+        bizModel.putDataSet(sourDsName,dataSet);
         try {
-            InputStream inputStream = ExcelDataSet.writeExcel(dataAsList);
+            InputStream inputStream = ExcelDataSet.writeExcel(bizModel,bizOptJson);
             bizModel.putDataSet(targetDsName,new SimpleDataSet(inputStream));
-        } catch (IOException e) {
+        } catch (Exception e) {
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：生成EXCEL文件异常，异常信息"+e.getMessage());
         }
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
