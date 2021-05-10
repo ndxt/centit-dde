@@ -1,5 +1,6 @@
 package com.centit.dde.core.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.*;
@@ -25,6 +26,7 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
+import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,10 +161,10 @@ public class BizOptFlowImpl implements BizOptFlow {
             case "3":
                 path = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
                 return bizModel.fetchDataSetByName(path);
-            /*case "4":
+            case "4":
                 path = BuiltInOperation.getJsonFieldString(stepJson, "textarea", "D");
                 return JSONTransformer.transformer(
-                    JSON.parse(path), new BizModelJSONTransform(bizModel));*/
+                    JSON.parse(path), new BizModelJSONTransform(bizModel));
             case "5":
                 path = BuiltInOperation.getJsonFieldString(stepJson, "kname", "D");
                 return bizModel.fetchDataSetByName(path);
@@ -317,7 +319,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     }
 
     private Object runModule(JSONObject bizOptJson, String logId, Map<String, Object> queryParams)
-          throws Exception {
+        throws Exception {
         SimpleBizModel bizModel = new SimpleBizModel(logId);
         bizModel.setModelTag(queryParams);
         DataOptDescJson dataOptDescJson = new DataOptDescJson(bizOptJson);
