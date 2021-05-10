@@ -85,7 +85,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
         allOperations.put("append", BuiltInOperation::runAppend);
-        allOperations.put("stat", BuiltInOperation::runStat);
+        allOperations.put("start", BuiltInOperation::runStat);
         allOperations.put("analyse", BuiltInOperation::runAnalyse);
         allOperations.put("cross", BuiltInOperation::runCross);
         allOperations.put("compare", BuiltInOperation::runCompare);
