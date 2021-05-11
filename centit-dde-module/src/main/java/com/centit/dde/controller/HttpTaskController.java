@@ -81,15 +81,17 @@ public class HttpTaskController extends BaseController {
     private void returnObject(String packetId,String runType,HttpServletRequest request,HttpServletResponse response) throws IOException {
         Map<String, Object> params = collectRequestParameters(request);
         params.put("runType",runType);
-        if(StringUtils.contains(request.getHeader("content-type"),"application")){
-            String bodyString = WebOptUtils.getRequestBody(request);
-            if (!StringBaseOpt.isNvl(bodyString)) {
-                params.put("requestBody", bodyString);
-            }
-        }else{
-            InputStream inputStream = UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight();
-            if (inputStream !=null) {
-                params.put("requestFile", inputStream);
+        if(!"GET".equals(request.getMethod())) {
+            if (StringUtils.contains(request.getHeader("content-type"), "application")) {
+                String bodyString = WebOptUtils.getRequestBody(request);
+                if (!StringBaseOpt.isNvl(bodyString)) {
+                    params.put("requestBody", bodyString);
+                }
+            } else {
+                InputStream inputStream = UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight();
+                if (inputStream != null) {
+                    params.put("requestFile", inputStream);
+                }
             }
         }
         Object bizModel;

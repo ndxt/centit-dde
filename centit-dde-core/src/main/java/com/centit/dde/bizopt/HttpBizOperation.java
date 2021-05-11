@@ -73,6 +73,8 @@ public class HttpBizOperation implements BizOperation {
                 dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
                 break;
             case "get":
+                mapObject.remove("requestBody");
+                mapObject.remove("requestFile");
                 receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGet(httpExecutorContext, httpUrl, mapObject));
                 if (receiveJson.getCode() != ResponseData.RESULT_OK) {
                     return BuiltInOperation.getResponseData(0, receiveJson.getCode(), receiveJson.getMessage());
