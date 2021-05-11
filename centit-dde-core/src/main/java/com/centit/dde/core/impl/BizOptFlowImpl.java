@@ -118,6 +118,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
         allOperations.put(ConstantValue.GENERATECSV,new GenerateCsvBizOperation());
         allOperations.put(ConstantValue.GENERATEJSON,new GenerateJsonBizOperation());
+        allOperations.put(ConstantValue.RETURN_JSON, GenerateJsonBizOperation::returnJson);
         allOperations.put(ConstantValue.FILEUPLOADS,new FileUploadBizOperation(fileStore));
         allOperations.put(ConstantValue.GENERATEXCEL,new GenerateExcelBizeOperation());
         allOperations.put(ConstantValue.FILEDOWNLOAD,new FileDownloadBizOperation(fileStore));

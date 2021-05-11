@@ -2,6 +2,7 @@ package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.service.ExchangeService;
@@ -9,6 +10,7 @@ import com.centit.dde.services.DataPacketCopyService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.utils.FileType;
 import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.WebOptUtils;
@@ -23,13 +25,12 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,14 +54,14 @@ public class HttpTaskController extends BaseController {
     @GetMapping(value = "/runTest/{packetId}")
     @ApiOperation(value = "测试：立即执行任务")
     public void runTestTaskExchange(@PathVariable String packetId, HttpServletRequest request,
-                                HttpServletResponse response) throws IOException {
+                                    HttpServletResponse response) throws IOException {
         returnObject(packetId,ConstantValue.RUN_TYPE_COPY, request,response);
     }
 
     @GetMapping(value = "/debugRunTest/{packetId}")
     @ApiOperation(value = "测试：DEBUG执行任务")
     public void debugRunTestTaskExchange(@PathVariable String packetId, HttpServletRequest request,
-                                     HttpServletResponse response) throws IOException {
+                                         HttpServletResponse response) throws IOException {
         returnObject(packetId,ConstantValue.RUN_TYPE_COPY,request,response);
     }
 
@@ -110,21 +111,35 @@ public class HttpTaskController extends BaseController {
                 dataPacketCopyService.setDataPacketBuf(bizModel, dataPacketCopy, params);
             }
         }
-        if(bizModel instanceof DataSet && ((DataSet) bizModel).getFirstRow().containsKey(ConstantValue.FILE_CONTENT)
-            && ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_CONTENT) instanceof OutputStream){
-            ByteArrayOutputStream outputStream= (ByteArrayOutputStream) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_CONTENT);
-            InputStream in =new ByteArrayInputStream(outputStream.toByteArray());
-            String fileName=(String) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_NAME);
-            UploadDownloadUtils.downFileRange(request, response,in,
-                in.available(), fileName, request.getParameter("downloadType"),null);
-            return;
+        if(bizModel instanceof DataSet){
+            InputStream in;
+            String fileName;
+            if (((DataSet) bizModel).getFirstRow().containsKey(ConstantValue.FILE_CONTENT)
+                && ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_CONTENT) instanceof OutputStream){
+                ByteArrayOutputStream outputStream= (ByteArrayOutputStream) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_CONTENT);
+                in =new ByteArrayInputStream(outputStream.toByteArray());
+                fileName=(String) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_NAME);
+                UploadDownloadUtils.downFileRange(request, response,in,
+                    in.available(), fileName, request.getParameter("downloadType"),null);
+                return;
+            }
+            if (((DataSet)bizModel).getData() instanceof InputStream){
+                in=(InputStream)((DataSet) bizModel).getData();
+                List<InputStream> inputStreamList  = ExcelDataSet.cloneInputStream(in) ;
+                String fileType = FileType.checkFileExcelType(inputStreamList.get(0));
+                fileType = StringUtils.isNotBlank(fileType)?fileType:".temp";
+                fileName=System.currentTimeMillis()+"."+fileType;
+                UploadDownloadUtils.downFileRange(request, response,inputStreamList.get(1),
+                    inputStreamList.get(1).available(), fileName, request.getParameter("downloadType"),null);
+                return;
+            }
         }
         JsonResultUtils.writeSingleDataJson(bizModel, response);
     }
     @PostMapping(value = "/runPostTest/{packetId}")
     @ApiOperation(value = "测试：立即执行任务Post")
     public void runTaskPostTest(@PathVariable String packetId, HttpServletRequest request,
-                            HttpServletResponse response) throws IOException {
+                                HttpServletResponse response) throws IOException {
         returnObject(packetId,ConstantValue.RUN_TYPE_COPY, request,response);
     }
     @PostMapping(value = "/runPost/{packetId}")

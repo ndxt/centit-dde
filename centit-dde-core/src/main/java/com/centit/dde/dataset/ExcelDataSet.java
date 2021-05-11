@@ -205,7 +205,7 @@ public class ExcelDataSet extends FileDataSet {
         }
     }
 
-    private static  List<InputStream> cloneInputStream(InputStream input) {
+    public static  List<InputStream> cloneInputStream(InputStream input) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];

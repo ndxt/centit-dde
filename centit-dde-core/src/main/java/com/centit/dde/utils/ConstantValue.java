@@ -28,7 +28,6 @@ public class ConstantValue {
     public static final String RUN_TYPE_NORMAL = "N";
     public static final String RUN_TYPE_COPY = "D";
 
-    public static final String CYCLE_TYPE_FOREACH = "foreach";
     public static final String CYCLE_TYPE_RANGE = "range";
 
 
@@ -37,13 +36,14 @@ public class ConstantValue {
     public static final String CYCLE_JUMP_OUT = "jumpCycle";
 
     public static final String CYCLE_JUMP_BREAK = "break";
-    public static final String CYCLE_JUMP_CONTINUE = "continue";
     public static final String CYCLE_FINISH = "finishCycle";
-    public static final String ASSIGN = "assign";
 
     public static final String GENERATEJSON = "Generatejson";
     public static final String GENERATECSV = "Generatecsv";
     public static final String FILEUPLOADS = "fileuploads";
     public static final String GENERATEXCEL = "Generateexcel";
     public static final String FILEDOWNLOAD = "filedownloads";
+    public static final String RETURN_JSON = "returnjson";
+    public static final String CREATE_WORKFLOW = "createWorkFlow";
+    public static final String SUBMIT_WORKFLOW ="submitWorkFlow";
 }
