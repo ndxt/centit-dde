@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 
 
 @Component
-public class RegisterOperation {
+public class WorkFlowRegisterOperation {
     @Resource
     BizOptFlow bizOptFlow;
 

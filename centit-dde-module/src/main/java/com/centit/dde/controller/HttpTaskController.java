@@ -19,6 +19,7 @@ import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
+import com.centit.support.file.FileIOOpt;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -84,7 +86,7 @@ public class HttpTaskController extends BaseController {
         params.put("runType",runType);
         if(!"GET".equals(request.getMethod())) {
             if (StringUtils.contains(request.getHeader("content-type"), "application")) {
-                String bodyString = WebOptUtils.getRequestBody(request);
+                String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
                 if (!StringBaseOpt.isNvl(bodyString)) {
                     params.put("requestBody", bodyString);
                 }
