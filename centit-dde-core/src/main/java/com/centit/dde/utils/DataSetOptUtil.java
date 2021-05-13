@@ -30,17 +30,36 @@ public abstract class DataSetOptUtil {
     private static final String RIGHT = "rightjoin";
     private static final String ALL = "alljoin";
 
-    public static VariableFormula createFormula(){
+    public static VariableFormula createFormula() {
         VariableFormula formula = new VariableFormula();
         formula.addExtendFunc("toJson", (a) -> JSON.parse(
             StringBaseOpt.castObjectToString(a[0])));
         formula.addExtendFunc("uuid", (a) -> UuidOpt.getUuidAsString32());
-        formula.addExtendFunc("dict", (a) -> a!=null && a.length>1 ?
-            CodeRepositoryUtil.getValue(
-                StringBaseOpt.castObjectToString(a[0]),
-                StringBaseOpt.castObjectToString(a[1])) : null);
+        formula.addExtendFunc("dict", (a) -> {
+            if (a != null && a.length > 1) {
+                String regex =",";
+                if (a.length>2) {
+                    regex = StringBaseOpt.objectToString(a[2]);
+                }
+                String[] strings=StringBaseOpt.objectToString(a[1]).split(regex);
+                StringBuilder stringBuilder = new StringBuilder();
+                for (String string : strings) {
+                    if (stringBuilder.length() > 0) {
+                        stringBuilder.append(regex);
+                    }
+                    stringBuilder.append(CodeRepositoryUtil.getValue(
+                        StringBaseOpt.castObjectToString(a[0]),
+                        StringBaseOpt.castObjectToString(string)));
+                }
+                return stringBuilder.toString();
+            }
+            else {
+                return null;
+            }
+        });
         return formula;
     }
+
     /**
      * 数据集 映射
      *
@@ -276,7 +295,7 @@ public abstract class DataSetOptUtil {
         return inData;
     }*/
 
-    private static void analyseDatasetGroup(List<Map<String, Object>> newData,List<Map<String, Object>> data,
+    private static void analyseDatasetGroup(List<Map<String, Object>> newData, List<Map<String, Object>> data,
                                             int offset, int endPos,
                                             DatasetVariableTranslate dvt,
                                             Collection<Map.Entry<String, String>> refDesc) {
@@ -319,13 +338,13 @@ public abstract class DataSetOptUtil {
             Map<String, Object> row = data.get(i);
             if (compareTwoRow(preRow, row, groupByFields) == 0) {
                 if (preRow != null) {
-                    analyseDatasetGroup(newData,data, prePos, i, dvt, refDesc);
+                    analyseDatasetGroup(newData, data, prePos, i, dvt, refDesc);
                 }
                 prePos = i;
             }
             preRow = row;
         }
-        analyseDatasetGroup(newData,data, prePos, n, dvt, refDesc);
+        analyseDatasetGroup(newData, data, prePos, n, dvt, refDesc);
         return new SimpleDataSet(newData);
     }
 
@@ -593,7 +612,7 @@ public abstract class DataSetOptUtil {
                         break;
                     }
                 }
-                if (canAdd){
+                if (canAdd) {
                     newRow.putAll(mainData.get(i));
                 }
                 i++;
@@ -603,7 +622,7 @@ public abstract class DataSetOptUtil {
             } else {
                 j++;
             }
-            if(newRow.size()!=0) {
+            if (newRow.size() != 0) {
                 newData.add(newRow);
             }
         }
@@ -705,8 +724,8 @@ public abstract class DataSetOptUtil {
     }
 
     //从dataset 中获取流信息（页面上填写了“文件内容”参数时调用）
-    public static  List<InputStream> getInputStreamByFieldName(String fieldName, DataSet dataSet) {
-        List<InputStream> inputStreams= new ArrayList<>();
+    public static List<InputStream> getInputStreamByFieldName(String fieldName, DataSet dataSet) {
+        List<InputStream> inputStreams = new ArrayList<>();
         Map<String, String> mapInfo = new HashMap<>();
         mapInfo.put(fieldName, fieldName);
         if (dataSet != null) {
@@ -718,7 +737,7 @@ public abstract class DataSetOptUtil {
                 if (object instanceof byte[]) {
                     inputStream = new ByteArrayInputStream((byte[]) object);
                     inputStreams.add(inputStream);
-                }else if (object instanceof InputStream) {
+                } else if (object instanceof InputStream) {
                     inputStream = (InputStream) object;
                     inputStreams.add(inputStream);
                 }
@@ -726,34 +745,35 @@ public abstract class DataSetOptUtil {
         }
         return inputStreams;
     }
+
     //从dataset 中获取流信息（页面上没填写“文件内容”参数时调用）
-    public static  List<InputStream> getInputStreamByFieldName(DataSet dataSet) {
+    public static List<InputStream> getInputStreamByFieldName(DataSet dataSet) {
         List<InputStream> inputStreams = new ArrayList<>();
         Object data = dataSet.getData();
-        if (data instanceof  List){
+        if (data instanceof List) {
             for (Object datum : (List) data) {//必须保证集合中全部都是byte[]或者InputStream流
-                if (datum instanceof InputStream){
-                    inputStreams.add((InputStream)datum);
-                }else if (datum instanceof byte[]){
-                    inputStreams.add(new ByteArrayInputStream((byte[])datum));
+                if (datum instanceof InputStream) {
+                    inputStreams.add((InputStream) datum);
+                } else if (datum instanceof byte[]) {
+                    inputStreams.add(new ByteArrayInputStream((byte[]) datum));
                 }
             }
         }
-        if (data instanceof InputStream){
-            inputStreams.add((InputStream)data);
-        }else if (data instanceof byte[]){
-            inputStreams.add(new ByteArrayInputStream((byte[])data));
+        if (data instanceof InputStream) {
+            inputStreams.add((InputStream) data);
+        } else if (data instanceof byte[]) {
+            inputStreams.add(new ByteArrayInputStream((byte[]) data));
         }
         return inputStreams;
     }
 
     //获取request请求中的文件（流）
-    public static List<InputStream>  getRequestFileInfo(BizModel bizModel) throws IOException {
-        List<InputStream> inputStreamList =null;
+    public static List<InputStream> getRequestFileInfo(BizModel bizModel) throws IOException {
+        List<InputStream> inputStreamList = null;
         Map<String, Object> modelTag = bizModel.getModelTag();
         InputStream requestFile = (InputStream) modelTag.get("requestFile");
-        if (requestFile!=null && requestFile.available()>0){
-            inputStreamList =new ArrayList<>();
+        if (requestFile != null && requestFile.available() > 0) {
+            inputStreamList = new ArrayList<>();
             inputStreamList.add(requestFile);
         }
         return inputStreamList;
