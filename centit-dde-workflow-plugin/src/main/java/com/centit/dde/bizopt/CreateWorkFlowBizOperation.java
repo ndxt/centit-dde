@@ -28,7 +28,7 @@ public class CreateWorkFlowBizOperation implements BizOperation {
     }
 
     public CreateWorkFlowBizOperation() {}
-    
+
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String id = bizOptJson.getString("id");

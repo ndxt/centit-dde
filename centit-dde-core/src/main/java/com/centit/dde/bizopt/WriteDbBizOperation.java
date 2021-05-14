@@ -28,7 +28,7 @@ public class WriteDbBizOperation  implements BizOperation {
         String tableId = bizOptJson.getString("tableLabelName");
         DataSet dataSet = bizModel.getDataSet(source);
         if (dataSet==null){
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：未指定数据集！");
+            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：未指定数据集,或指定的数据集为NULL！");
         }
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
         int count=0;
