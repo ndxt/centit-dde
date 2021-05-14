@@ -103,13 +103,13 @@ public class BizModelJSONTransform
         DataSet currentDateSet = this.data.fetchDataSetByName(dataSetName);
         if(currentDateSet!=null){
             if(StringUtils.isBlank(valuePath)){
-                return currentDateSet.getDataAsList();
+                return currentDateSet.getData();
             }
             if(ConstantValue.DATASET_SIZE.equals(valuePath)){
                 return currentDateSet.getSize();
             }
             return ReflectionOpt.attainExpressionValue(
-                currentDateSet.getDataAsList(),
+                currentDateSet.getData(),
                 valuePath);
         }
 
