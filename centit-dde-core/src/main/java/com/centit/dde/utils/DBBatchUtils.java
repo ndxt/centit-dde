@@ -1,10 +1,16 @@
 package com.centit.dde.utils;
 
+import com.centit.product.metadata.po.MetaColumn;
+import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
+import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DatabaseAccess;
+import com.centit.support.database.utils.FieldType;
 import com.centit.support.database.utils.QueryLogUtils;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +58,7 @@ public abstract class DBBatchUtils {
             for (Map<String, Object> object : objects) {
                 if (fieldsMap != null) {
                     object = DataSetOptUtil.mapDataRow(object, fieldsMap.entrySet());
+                    prepareObjectForSave(tableInfo,object);
                 }
                 DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object);
                 n += stmt.executeUpdate();
@@ -121,6 +128,7 @@ public abstract class DBBatchUtils {
             for (Map<String, Object> object : objects) {
                 if (fieldsMap != null) {
                     object = DataSetOptUtil.mapDataRow(object, fieldsMap.entrySet());
+                    prepareObjectForSave(tableInfo,object);
                 }
                 DatabaseAccess.setQueryStmtParameters(checkStmt, checkSqlPair.getRight(), object);
                 ResultSet rs = checkStmt.executeQuery();
@@ -151,5 +159,46 @@ public abstract class DBBatchUtils {
             }
         }
         return n;
+    }
+
+
+    private static void prepareObjectForSave(TableInfo tableInfo, Map<String, Object> object){
+        for (TableField col : tableInfo.getColumns()) {
+            Object fieldValue = object.get(col.getPropertyName());
+            if (fieldValue != null) {
+                switch (col.getFieldType()) {
+                    case FieldType.DATE:
+                        /*object.put(col.getPropertyName(), DatetimeOpt.castObjectToSqlDate(fieldValue));
+                        break;*/
+                    case FieldType.DATETIME:
+                    case FieldType.TIMESTAMP:
+                        object.put(col.getPropertyName(), DatetimeOpt.castObjectToSqlTimestamp(fieldValue));
+                        break;
+                    case FieldType.INTEGER:
+                    case FieldType.LONG:
+                        object.put(col.getPropertyName(), NumberBaseOpt.castObjectToLong(fieldValue));
+                        break;
+                    case FieldType.MONEY:
+                        object.put(col.getPropertyName(), NumberBaseOpt.castObjectToBigDecimal(fieldValue));
+                        break;
+                    case FieldType.FLOAT:
+                    case FieldType.DOUBLE:
+                        object.put(col.getPropertyName(), NumberBaseOpt.castObjectToDouble(fieldValue));
+                        break;
+                    case FieldType.STRING:
+                    case FieldType.TEXT:
+                        object.put(col.getPropertyName(), StringBaseOpt.castObjectToString(fieldValue));
+                        break;
+                    case FieldType.BOOLEAN:
+                        object.put(col.getPropertyName(),
+                            BooleanBaseOpt.castObjectToBoolean(fieldValue, false) ?
+                                BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE);
+                        break;
+                    default:
+                        break;
+
+                }
+            }
+        }
     }
 }
