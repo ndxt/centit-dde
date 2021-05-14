@@ -57,6 +57,15 @@ public abstract class DataSetOptUtil {
                 return null;
             }
         });
+        formula.addExtendFunc("replace", (a) -> {
+            if (a != null && a.length > 2) {
+                return StringUtils.replace(StringBaseOpt.castObjectToString(a[0]),
+                    StringBaseOpt.castObjectToString(a[1]),StringBaseOpt.castObjectToString(a[2]));
+            }
+            else {
+                return null;
+            }
+        });
         return formula;
     }
 
@@ -77,6 +86,7 @@ public abstract class DataSetOptUtil {
         Map<String, Object> newRow = new HashMap<>(formulaMap.size());
         for (Map.Entry<String, String> ent : formulaMap) {
             formula.setFormula(ent.getValue());
+
             newRow.put(ent.getKey(), formula.calcFormula());
         }
         return newRow;
