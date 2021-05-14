@@ -80,7 +80,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     public void init() {
 
         allOperations.put("sche", BuiltInOperation::runStart);
-        allOperations.put("resBody", BuiltInOperation::runRequestBody);
+        allOperations.put("Getpostdata", BuiltInOperation::runRequestBody);
         allOperations.put("resFile", BuiltInOperation::runRequestFile);
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
@@ -122,6 +122,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.FILEUPLOADS,new FileUploadBizOperation(fileStore));
         allOperations.put(ConstantValue.GENERATEXCEL,new GenerateExcelBizeOperation());
         allOperations.put(ConstantValue.FILEDOWNLOAD,new FileDownloadBizOperation(fileStore));
+        allOperations.put(ConstantValue.WRITE_DB,new WriteDbBizOperation(metaObjectService));
+        allOperations.put(ConstantValue.ASSIGNMENT,new AssignmentBizOperation());
     }
 
     @Override

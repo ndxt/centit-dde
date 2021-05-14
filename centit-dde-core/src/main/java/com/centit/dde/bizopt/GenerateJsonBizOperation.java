@@ -37,7 +37,7 @@ public class GenerateJsonBizOperation implements BizOperation {
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
     }
 
-
+    
     //返回json
     public static ResponseData returnJson(BizModel bizModel, JSONObject bizOptJson){
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());

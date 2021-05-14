@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -14,6 +15,7 @@ import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
+import com.centit.support.json.JSONTransformer;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.network.UrlOptUtils;
@@ -48,8 +50,9 @@ public class HttpBizOperation implements BizOperation {
         String httpMethod = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post");
         String httpUrl = BuiltInOperation.getJsonFieldString(bizOptJson, "httpUrl", "");
         String loginUrl = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
-        Object requestBody = VariableFormula.calculate(BuiltInOperation.getJsonFieldString(bizOptJson, "requestText", ""),
-            new BizModelJSONTransform(bizModel));
+       /* Object requestBody = VariableFormula.calculate(BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", ""),
+            new BizModelJSONTransform(bizModel));*/
+        Object requestBody = JSONTransformer.transformer(JSON.parse(BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "")), new BizModelJSONTransform(bizModel));
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlvalue");
         Map<String, Object> mapObject = new HashMap<>();
         if (params != null) {
@@ -60,6 +63,8 @@ public class HttpBizOperation implements BizOperation {
             }
         }
         mapObject.putAll(bizModel.getModelTag());
+        mapObject.remove("requestBody");
+        mapObject.remove("requestFile");
         HttpExecutorContext httpExecutorContext = getHttpClientContext(loginUrl, mapObject);
         DataSet dataSet = new SimpleDataSet();
         HttpReceiveJSON receiveJson;

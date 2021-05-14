@@ -72,6 +72,10 @@
             <artifactId>centit-dde-transaction</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.centit.support</groupId>
+            <artifactId>centit-database-datasource</artifactId>
+        </dependency>
 
     </dependencies>
 

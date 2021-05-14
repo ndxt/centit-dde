@@ -10,16 +10,15 @@ import com.centit.dde.services.DataPacketCopyService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
-import com.centit.dde.utils.FileType;
 import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
-import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.file.FileIOOpt;
+import com.centit.support.file.FileType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -128,7 +127,7 @@ public class HttpTaskController extends BaseController {
             if (((DataSet)bizModel).getData() instanceof InputStream){
                 in=(InputStream)((DataSet) bizModel).getData();
                 List<InputStream> inputStreamList  = ExcelDataSet.cloneInputStream(in) ;
-                String fileType = FileType.checkFileExcelType(inputStreamList.get(0));
+                String fileType = FileType.getFileType(inputStreamList.get(0));
                 fileType = StringUtils.isNotBlank(fileType)?fileType:".temp";
                 fileName=System.currentTimeMillis()+"."+fileType;
                 UploadDownloadUtils.downFileRange(request, response,inputStreamList.get(1),

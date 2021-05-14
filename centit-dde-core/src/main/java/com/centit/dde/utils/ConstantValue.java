@@ -46,4 +46,6 @@ public class ConstantValue {
     public static final String RETURN_JSON = "returnjson";
     public static final String CREATE_WORKFLOW = "createWorkFlow";
     public static final String SUBMIT_WORKFLOW ="submitWorkFlow";
+    public static final String WRITE_DB ="metadata";
+    public static final String ASSIGNMENT ="assignment";
 }

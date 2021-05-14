@@ -105,7 +105,11 @@
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-workflow-client</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
     </dependencies>
 
     <!--  end -->

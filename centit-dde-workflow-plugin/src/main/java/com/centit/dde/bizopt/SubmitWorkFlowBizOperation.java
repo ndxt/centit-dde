@@ -4,11 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.workflow.commons.SubmitOptOptions;
 import com.centit.workflow.service.FlowEngine;
-import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -28,29 +29,29 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String id = bizOptJson.getString("id");
-        Map<String, Object> modelTag = bizModel.getModelTag();
-        String requestBody= (String) modelTag.get("requestBody");
-        SubmitOptOptions submitOptOptions;
-        if (StringUtils.isNotBlank(requestBody)){
-            submitOptOptions = JSONObject.parseObject(requestBody, SubmitOptOptions.class);
-        }else if (modelTag.size()>1){
-            submitOptOptions = JSONObject.parseObject(JSON.toJSONString(modelTag), SubmitOptOptions.class);
-        }else {
-            //获取表达式信息
-            Map<String, String> mapInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
-            submitOptOptions = mapToEntity(mapInfo,SubmitOptOptions.class);
+        String source = bizOptJson.getString("source");
+        DataSet dataSet = bizModel.getDataSet(source);
+        if (dataSet==null){
+            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：未指定数据集！");
         }
+        //获取表达式信息
+        Map<String, String> mapInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
+        if (mapInfo!=null && mapInfo.size()>0){
+            dataSet = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
+        }
+        Map<String, Object> objectMap = dataSet.getDataAsList().get(0);
+        SubmitOptOptions submitOptOptions = mapToEntity(objectMap, SubmitOptOptions.class);
         List<String> list = flowEngine.submitOpt(submitOptOptions);
-         if (list.size()>0){
-             bizModel.putDataSet(id,new SimpleDataSet(list));
-         }
+        if (list.size()>0){
+            bizModel.putDataSet(id,new SimpleDataSet(list));
+        }
         return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(id).getSize());
     }
 
     /**
      * Map转实体类(只能转SubmitOptOptions使用)
      */
-    public static SubmitOptOptions mapToEntity(Map<String, String> dataMap, Class<SubmitOptOptions> clzz) {
+    public static SubmitOptOptions mapToEntity(Map<String, Object> dataMap, Class<SubmitOptOptions> clzz) {
         SubmitOptOptions submitOptOptions=null;
         try {
             submitOptOptions = SubmitOptOptions.create();
@@ -58,13 +59,13 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                 if (dataMap.containsKey(field.getName())) {
                     boolean flag = field.isAccessible();
                     field.setAccessible(true);
-                    String object = dataMap.get(field.getName());
+                    Object object = dataMap.get(field.getName());
                     if (object!= null) {
                         if (field.getType()==Map.class){
-                            Map map = JSON.parseObject(object, Map.class);
+                            Map map = JSON.parseObject(JSON.toJSONString(object), Map.class);
                             field.set(submitOptOptions, map);
                         }else if (field.getType()== List.class){
-                            List list = JSON.parseObject(object, List.class);
+                            List list = JSON.parseObject(JSON.toJSONString(object), List.class);
                             field.set(submitOptOptions, list);
                         }else {
                             field.set(submitOptOptions, object);
