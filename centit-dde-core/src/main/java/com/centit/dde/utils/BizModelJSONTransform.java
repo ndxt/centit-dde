@@ -3,6 +3,7 @@ package com.centit.dde.utils;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.compiler.VariableTranslate;
 import com.centit.support.json.JSONTransformDataSupport;
@@ -28,7 +29,10 @@ public class BizModelJSONTransform
 
     @Override
     public Object attainExpressionValue(String expression){
-        return VariableFormula.calculate(expression, this);
+        VariableFormula variableFormula = DataSetOptUtil.createFormula();
+        variableFormula.setTrans(this);
+        variableFormula.setFormula(expression);
+        return variableFormula.calcFormula();
     }
 
     private Object peekStackValue(){
