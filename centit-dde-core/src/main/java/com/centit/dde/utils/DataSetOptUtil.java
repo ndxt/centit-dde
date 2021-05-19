@@ -62,7 +62,9 @@ public abstract class DataSetOptUtil {
                 return StringUtils.replace(StringBaseOpt.castObjectToString(a[0]),
                     StringBaseOpt.castObjectToString(a[1]),StringBaseOpt.castObjectToString(a[2]));
             }
-            else {
+            else if (a != null && a.length>0){
+                return a[0];
+            } else{
                 return null;
             }
         });
