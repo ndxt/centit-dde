@@ -1,58 +1,44 @@
 package com.centit.dde.entity;
 
+import com.alibaba.fastjson.JSONObject;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 //查询参数封装
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ApiModel(value = "ES查询条件公共信息")
 public class QueryParameter {
-    @ApiModelProperty(value = "查询权重，提升文档搜索评分的重要因素,精确查询和匹配查询可用")
-    private Float boots;
-    @ApiModelProperty(value = "查询字段")
-    private String field;
-    @ApiModelProperty(value = "查询字段值")
-    private String value;
-    @ApiModelProperty(value = "指定查询分词器（匹配查询时才有效,默认入库时的分词器）")
-    private String analyzer;
+    @ApiModelProperty(value = "索引名称")
+    private String indexName;
+
+    @ApiModelProperty(value = "查询条数")
+    private Integer pageSize=10;
+
+    @ApiModelProperty(value = "页码")
+    private Integer pageNo=0;
+
     //查询最小匹配度   可以是百分比   也可以是整型  这里设置的是百分比 直观
     @ApiModelProperty(value = "查询最小匹配度（百分比）")
-    private String queryMinimumProportion;
+    private Object minimumShouldMatch;
 
-    public String getQueryMinimumProportion() {
-        return queryMinimumProportion;
-    }
+    @ApiModelProperty(value = "排序字段(fieldName(排序字段)，sortValue（排序字段值，DESC或者ASC）) ")
+    private List<JSONObject> sortField;
 
-    public void setQueryMinimumProportion(String queryMinimumProportion) {
-        this.queryMinimumProportion = queryMinimumProportion;
-    }
+    @ApiModelProperty(value = "查询结果返回字段")
+    private String[] returnField;
 
-    public Float getBoots() {
-        return boots;
-    }
+    @ApiModelProperty(value = "查询结果不返回的字段")
+    private String[] notReturnField;
 
-    public void setBoots(Float boots) {
-        this.boots = boots;
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public void setField(String field) {
-        this.field = field;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getAnalyzer() {
-        return analyzer;
-    }
-
-    public void setAnalyzer(String analyzer) {
-        this.analyzer = analyzer;
-    }
+    @ApiModelProperty(value = "查询超时时间,单位：秒")
+    private Integer timeOut;
+    @ApiModelProperty(value = "是否返回分页信息")
+    private Boolean isReturnPageInfo;
 }

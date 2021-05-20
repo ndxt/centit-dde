@@ -23,18 +23,27 @@ public class AssignmentBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         AssignmentVo assignmentVo =bizOptJson.toJavaObject(AssignmentVo.class);
         DataSet dataSet = bizModel.getDataSet(assignmentVo.getSource());
-        if (dataSet==null){
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：未指定数据集，或指定数据集值为NULL！");
+        String assignType = assignmentVo.getAssignType();
+        DataSet newDataSet;
+        switch (assignType){
+            case "1"://复制数据集
+                if (dataSet==null){
+                    return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：未指定数据集，或指定数据集值为NULL！");
+                }
+                newDataSet=SerializationUtils.clone(new SimpleDataSet(dataSet.getData()));
+                break;
+            case "2"://手动赋值
+                Object data = assignmentVo.getData();
+                if (data==null){
+                    return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：请输入赋值数据！");
+                }
+                newDataSet = new SimpleDataSet(data);
+                break;
+            default://引用数据集
+                newDataSet = dataSet;
+                break;
         }
-        DataSet newDataSet;//默认引用数据集
-        if ("1".equals(assignmentVo.getAssignType())){//复制
-            newDataSet=SerializationUtils.clone(new SimpleDataSet(dataSet.getData()));
-        } else if ("3".equals(assignmentVo.getAssignType())) {//手动赋值
-            newDataSet = new SimpleDataSet(assignmentVo.getData());
-        } else {
-            newDataSet = dataSet;
-        }
-        if (StringUtils.isNotBlank(assignmentVo.getExpression())){
+        if (StringUtils.isNotBlank(assignmentVo.getExpression())){//根据表达式生成新的数据集
             Object data = JSONTransformer.transformer(assignmentVo.getExpression(), new BizModelJSONTransform(bizModel));
             newDataSet= new SimpleDataSet(data);
         }

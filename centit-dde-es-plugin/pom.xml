@@ -13,6 +13,13 @@
     <dependencies>
 
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-core</artifactId>
             <version>${project.version}</version>
@@ -48,7 +55,6 @@
             <artifactId>hutool-all</artifactId>
             <version>5.6.1</version>
         </dependency>
-
     </dependencies>
 
 </project>
