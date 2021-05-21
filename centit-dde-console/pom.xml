@@ -92,13 +92,13 @@
         </dependency>
 
         <!-- server runtime library -->
-        <dependency>
+        <!--<dependency>
             <groupId>com.sun</groupId>
             <artifactId>tools</artifactId>
-            <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
+            <systemPath>${java.home}/../lib/tools.jar</systemPath>
             <version>${jdk.version}</version>
             <scope>system</scope>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -108,7 +108,7 @@
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-workflow-client</artifactId>
-            <version>${parent.version}</version>
+            <version>${centit.workflow.version}</version>
         </dependency>
     </dependencies>
 

@@ -10,14 +10,17 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>centit-dde-transaction</artifactId>
     <dependencies>
+
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
             <version>1.1.18</version>
         </dependency>
         <dependency>
-            <groupId>com.centit.support</groupId>
-            <artifactId>centit-database</artifactId>
+            <groupId>com.centit.product</groupId>
+            <artifactId>database-metadata</artifactId>
+           <version>${metadata.version}</version>
         </dependency>
+
     </dependencies>
 </project>
