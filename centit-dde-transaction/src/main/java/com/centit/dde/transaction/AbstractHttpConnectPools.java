@@ -1,9 +1,9 @@
 package com.centit.dde.transaction;
 
-import com.centit.product.metadata.vo.ISourceInfo;
+
+import com.centit.dde.transaction.vo.ISourceInfo;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
-import com.centit.support.network.UrlOptUtils;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -33,7 +33,7 @@ abstract class AbstractHttpConnectPools {
         HttpClientContext context = HttpClientContext.create();
         BasicCookieStore cookieStore = new BasicCookieStore();
         CloseableHttpClient httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
-        if(dsDesc.getDatabaseUrl()!=null) {
+        if (dsDesc.getDatabaseUrl() != null) {
             HttpExecutor.formPost(HttpExecutorContext.create(httpClient).context(context),
                 dsDesc.getDatabaseUrl(),
                 dsDesc.getExtProps(), false);
@@ -42,7 +42,7 @@ abstract class AbstractHttpConnectPools {
         return HttpExecutorContext.create(httpClient).context(context);
     }
 
-    static synchronized HttpExecutorContext getHttpConnect(ISourceInfo dsDesc) throws  IOException {
+    static synchronized HttpExecutorContext getHttpConnect(ISourceInfo dsDesc) throws IOException {
         HttpExecutorContext ds = HTTP_DATA_SOURCE_POOLS.get(dsDesc);
         if (ds == null) {
             ds = mapHttpSource(dsDesc);
@@ -50,7 +50,8 @@ abstract class AbstractHttpConnectPools {
         }
         return ds;
     }
-    static void releaseHttp(ISourceInfo dsDesc){
+
+    static void releaseHttp(ISourceInfo dsDesc) {
         HTTP_DATA_SOURCE_POOLS.remove(dsDesc);
     }
 }

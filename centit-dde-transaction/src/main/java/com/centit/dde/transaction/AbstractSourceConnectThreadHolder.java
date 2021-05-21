@@ -1,6 +1,7 @@
 package com.centit.dde.transaction;
 
-import com.centit.product.metadata.vo.ISourceInfo;
+
+import com.centit.dde.transaction.vo.ISourceInfo;
 
 /**
  * @author zhf
