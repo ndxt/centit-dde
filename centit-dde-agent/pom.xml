@@ -82,7 +82,11 @@
             <artifactId>mssql-jdbc</artifactId>
             <version>7.4.1.jre8</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.shentong</groupId>
+            <artifactId>shentongjdbc</artifactId>
+            <version>4.0</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
