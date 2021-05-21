@@ -5,11 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSetReader;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.transaction.AbstractSourceConnectThreadHolder;
+import com.centit.dde.transaction.vo.ISourceInfo;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
-import com.centit.product.metadata.vo.ISourceInfo;
+
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.QueryAndNamedParams;

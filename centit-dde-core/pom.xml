@@ -76,7 +76,11 @@
             <groupId>com.centit.support</groupId>
             <artifactId>centit-database-datasource</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>database-metadata</artifactId>
+            <version>${metadata.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
