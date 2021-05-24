@@ -16,6 +16,7 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.mail.MultiPartEmail;
+import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.support.CronSequenceGenerator;
@@ -140,16 +141,16 @@ public class TaskRun {
                 if (two.equals(dataPacketCopy.getTaskType())
                     && dataPacketCopy.getIsValid()
                     && !StringBaseOpt.isNvl(dataPacketCopy.getTaskCron())) {
-                    CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacketCopy.getTaskCron());
-                    dataPacketCopy.setNextRunTime(cronSequenceGenerator.next(dataPacketCopy.getLastRunTime()));
+                    CronExpression cronExpression = new CronExpression(dataPacketCopy.getTaskCron());
+                    dataPacketCopy.setNextRunTime(cronExpression.getNextValidTimeAfter(dataPacketCopy.getLastRunTime()));
                 }
             }else {
                 dataPacket.setNextRunTime(new Date());
                 if (two.equals(dataPacket.getTaskType())
                     && dataPacket.getIsValid()
                     && !StringBaseOpt.isNvl(dataPacket.getTaskCron())) {
-                    CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(dataPacket.getTaskCron());
-                    dataPacket.setNextRunTime(cronSequenceGenerator.next(dataPacket.getLastRunTime()));
+                    CronExpression cronExpression = new CronExpression(dataPacket.getTaskCron());
+                    dataPacket.setNextRunTime(cronExpression.getNextValidTimeAfter(dataPacket.getLastRunTime()));
                 }
             }
 
