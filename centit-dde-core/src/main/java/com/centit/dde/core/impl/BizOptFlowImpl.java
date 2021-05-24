@@ -11,7 +11,7 @@ import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketCopy;
 import com.centit.dde.po.TaskDetailLog;
-import com.centit.dde.transaction.AbstractSourceConnectThreadHolder;
+import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.CloneUtils;
 import com.centit.dde.utils.ConstantValue;

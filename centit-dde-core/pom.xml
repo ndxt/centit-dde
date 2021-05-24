@@ -67,11 +67,7 @@
             <artifactId>message-sender-utils</artifactId>
             <version>${centit.oa.modules.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-transaction</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-database-datasource</artifactId>
