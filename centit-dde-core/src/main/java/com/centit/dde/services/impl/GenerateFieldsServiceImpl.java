@@ -12,6 +12,7 @@ import com.centit.dde.vo.ColumnSchema;
 import com.centit.fileserver.common.FileStore;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.*;
 import org.slf4j.Logger;
@@ -48,11 +49,11 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(QueryUtils.translateQuery(sql, params));
         try {
-            return TransactionHandler.executeQueryInTransaction(DataSourceDescription.valueOf(sourceInfo),
-                (conn) -> DatabaseAccess.findObjectsAsJSON(conn,
+            Connection conn=AbstractSourceConnectThreadHolder.fetchConnect(sourceInfo);
+            return  DatabaseAccess.findObjectsAsJSON(conn,
                     QueryUtils.buildLimitQuerySQL(qap.getQuery(), 0, 20, false,
                         DBType.mapDBType(sourceInfo.getDatabaseUrl())),
-                    qap.getParams()));
+                    qap.getParams());
         } catch (SQLException | IOException e) {
             logger.error("执行查询出错，SQL：{},Param:{}", qap.getQuery(), qap.getParams());
             throw new ObjectException("执行查询出错!");
@@ -152,7 +153,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
             QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(QueryUtils.translateQuery(sql, params));
             String sSql = QueryUtils.buildLimitQuerySQL(qap.getQuery(), 0, 2, false,
                 DBType.mapDBType(databaseInfo.getDatabaseUrl()));
-            try (Connection conn = DbcpConnectPools.getDbcpConnect(databaseInfo);
+            try (Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(databaseInfo);
                  PreparedStatement stmt = conn.prepareStatement(sSql)) {
                 DatabaseAccess.setQueryStmtParameters(stmt, qap.getParams());
                 try (ResultSet rs = stmt.executeQuery()) {

@@ -41,10 +41,6 @@
             <artifactId>commons-math3</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>centit-persistence-extend</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-report-utils</artifactId>
         </dependency>
@@ -68,10 +64,6 @@
             <version>${centit.oa.modules.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.centit.support</groupId>
-            <artifactId>centit-database-datasource</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>database-metadata</artifactId>
