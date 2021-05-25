@@ -60,7 +60,7 @@ public class SqlDataSetWriter implements DataSetWriter {
 
     private void fetchConnect() {
         try {
-            connection = (Connection) AbstractSourceConnectThreadHolder.fetchConnect(dataSource);
+            connection = AbstractSourceConnectThreadHolder.fetchConnect(dataSource);
         } catch (Exception e) {
             throw new ObjectException(PersistenceException.DATABASE_OPERATE_EXCEPTION, e);
         }

@@ -48,7 +48,7 @@ public class SqlDataSetReader implements DataSetReader {
      */
     @Override
     public SimpleDataSet load(final Map<String, Object> params) throws Exception {
-        Connection conn = (Connection) AbstractSourceConnectThreadHolder.fetchConnect(databaseInfo);
+        Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(databaseInfo);
         QueryAndNamedParams qap;
         if (params != null && params.get(ConstantValue.CURRENT_USER) != null) {
             DataScopePowerManager queryDataScopeFilter = new DataScopePowerManagerImpl();
