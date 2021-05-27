@@ -43,10 +43,10 @@ public class AssignmentBizOperation implements BizOperation {
                 newDataSet = dataSet;
                 break;
         }
-        if (StringUtils.isNotBlank(assignmentVo.getExpression())){//根据表达式生成新的数据集
+       /* if (StringUtils.isNotBlank(assignmentVo.getExpression())){//根据表达式生成新的数据集
             Object data = JSONTransformer.transformer(assignmentVo.getExpression(), new BizModelJSONTransform(bizModel));
             newDataSet= new SimpleDataSet(data);
-        }
+        }*/
         bizModel.putDataSet(assignmentVo.getId(),newDataSet);
         return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(assignmentVo.getId()).getSize());
     }

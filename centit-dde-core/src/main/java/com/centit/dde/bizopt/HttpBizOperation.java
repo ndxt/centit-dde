@@ -19,6 +19,7 @@ import com.centit.support.json.JSONTransformer;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.network.UrlOptUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,9 +34,8 @@ public class HttpBizOperation implements BizOperation {
         this.sourceInfoDao = sourceInfoDao;
     }
 
-    private HttpExecutorContext getHttpClientContext(String loginUrl, Map<String, Object> map) throws Exception {
-        if (loginUrl != null) {
-            SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(loginUrl);
+    private HttpExecutorContext getHttpClientContext(SourceInfo databaseInfo) throws Exception {
+        if (databaseInfo != null) {
             HttpExecutorContext executorContext = (HttpExecutorContext) AbstractSourceConnectThreadHolder.fetchConnect(databaseInfo);
             if (executorContext != null) {
                 return executorContext;
@@ -65,7 +65,14 @@ public class HttpBizOperation implements BizOperation {
         mapObject.putAll(bizModel.getModelTag());
         mapObject.remove("requestBody");
         mapObject.remove("requestFile");
-        HttpExecutorContext httpExecutorContext = getHttpClientContext(loginUrl, mapObject);
+        SourceInfo databaseInfo=null;
+        if (StringUtils.isNotBlank(loginUrl)){
+            databaseInfo = sourceInfoDao.getDatabaseInfoById(loginUrl);
+        }
+        HttpExecutorContext httpExecutorContext = getHttpClientContext(databaseInfo);
+        if (httpUrl != null && databaseInfo !=null && !(httpUrl.startsWith("http:") || httpUrl.startsWith("https:"))){
+            httpUrl=databaseInfo.getDatabaseUrl()+httpUrl;
+        }
         DataSet dataSet = new SimpleDataSet();
         HttpReceiveJSON receiveJson;
         switch (httpMethod.toLowerCase()) {
