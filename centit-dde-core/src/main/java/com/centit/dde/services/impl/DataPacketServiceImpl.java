@@ -44,7 +44,7 @@ public class DataPacketServiceImpl implements DataPacketService {
 
     @Override
     public void updateDataPacket(DataPacket dataPacket) {
-        dataPacketDao.updateObject(dataPacket);
+        dataPacketDao.mergeObject(dataPacket);
         dataPacketDao.saveObjectReferences(dataPacket);
     }
 
