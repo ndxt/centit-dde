@@ -44,7 +44,13 @@ public class CreateWorkFlowBizOperation implements BizOperation {
         }
         Map<String, Object> objectMap = dataSet.getDataAsList().get(0);
         CreateFlowOptions createFlowOptions = mapToEntity(objectMap, CreateFlowOptions.class);
-        FlowInstance instance = flowEngine.createInstance(createFlowOptions);
+        FlowInstance instance;
+        try {
+            instance = flowEngine.createInstance(createFlowOptions);
+        } catch (Exception e) {
+            bizModel.putDataSet(id,new SimpleDataSet(e.getMessage()));
+            return BuiltInOperation.getResponseData(0, 500, e.getMessage());
+        }
         if (instance!=null){
             bizModel.putDataSet(id,new SimpleDataSet(instance));
         }

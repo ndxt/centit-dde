@@ -41,7 +41,13 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
         }
         Map<String, Object> objectMap = dataSet.getDataAsList().get(0);
         SubmitOptOptions submitOptOptions = mapToEntity(objectMap, SubmitOptOptions.class);
-        List<String> list = flowEngine.submitOpt(submitOptOptions);
+        List<String> list;
+        try {
+            list = flowEngine.submitOpt(submitOptOptions);
+        } catch (Exception e) {
+            bizModel.putDataSet(id,new SimpleDataSet(e.getMessage()));
+            return BuiltInOperation.getResponseData(0, 500, e.getMessage());
+        }
         if (list.size()>0){
             bizModel.putDataSet(id,new SimpleDataSet(list));
         }

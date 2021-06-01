@@ -1,10 +1,13 @@
 package com.centit.dde.entity;
 
+import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * 条件字段属性信息
@@ -40,5 +43,11 @@ public class FieldAttributeInfo {
 
     @ApiModelProperty(value = "match_phrase_prefix查询：模糊匹配值偏移个数")
     private Integer maxExpansions;
+
+    @ApiModelProperty(value = "是否作为排序字段")
+    private Boolean isSortField=false;
+
+    @ApiModelProperty(value = "排序值，只有isSortField字段为true时使用")
+    private String sortValue;
 
 }

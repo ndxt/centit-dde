@@ -25,6 +25,11 @@
         </dependency>
         <dependency>
             <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-redis-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-workflow-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -97,13 +102,13 @@
         </dependency>
 
         <!-- server runtime library -->
-        <!--<dependency>
+        <dependency>
             <groupId>com.sun</groupId>
             <artifactId>tools</artifactId>
-            <systemPath>${java.home}/../lib/tools.jar</systemPath>
+            <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
             <version>${jdk.version}</version>
             <scope>system</scope>
-        </dependency>-->
+        </dependency>
 
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -113,7 +118,7 @@
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-workflow-client</artifactId>
-            <version>${centit.workflow.version}</version>
+            <version>${parent.version}</version>
         </dependency>
     </dependencies>
 

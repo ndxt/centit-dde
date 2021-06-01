@@ -8,6 +8,8 @@ import com.centit.dde.core.SimpleDataSet;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.service.MetaObjectService;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +35,7 @@ public class WriteDbBizOperation  implements BizOperation {
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
         int count=0;
         for (Map<String, Object> objectMap : dataAsList) {
-            count += metaObjectService.mergeObjectWithChildren(tableId, objectMap);
+            count += metaObjectService.mergeObjectWithChildren(tableId,objectMap);
         }
         bizModel.putDataSet(id,new SimpleDataSet(count));
         return BuiltInOperation.getResponseSuccessData(count);

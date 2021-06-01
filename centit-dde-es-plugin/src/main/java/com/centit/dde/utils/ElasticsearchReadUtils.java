@@ -55,6 +55,13 @@ public class ElasticsearchReadUtils {
         List<FieldAttributeInfo> fieldAttributeInfos = searchVo.getFieldAttributeInfos();
         for (FieldAttributeInfo fieldAttributeInfo : fieldAttributeInfos) {
             String combinationType = fieldAttributeInfo.getCombinationType();
+            Boolean isSortField = fieldAttributeInfo.getIsSortField();
+            if (isSortField){//添加排序字段
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("fieldName",fieldAttributeInfo.getFieldName());
+                jsonObject.put("sortValue",fieldAttributeInfo.getSortValue());
+                queryParameter.getSortField().add(jsonObject);
+            }
             QueryBuilder queryBuilder = queryBuilder(fieldAttributeInfo);
             //must should  查询会计算相关文档得分情况       mustNot   filter  查询不会计算相关文档得分 并且会将查询结果换成
             switch (combinationType){
@@ -70,6 +77,8 @@ public class ElasticsearchReadUtils {
                 case "filter":
                     boolQueryBuilder.filter(queryBuilder);
                     break;
+                default:
+                    boolQueryBuilder.must(queryBuilder);
             }
         }
         Object minimumShouldMatch = queryParameter.getMinimumShouldMatch();
