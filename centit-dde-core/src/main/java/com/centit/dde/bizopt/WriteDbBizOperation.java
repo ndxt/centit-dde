@@ -24,10 +24,11 @@ public class WriteDbBizOperation  implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
         String id = bizOptJson.getString("id");
         String source = bizOptJson.getString("source");
         String tableId = bizOptJson.getString("tableLabelName");
+        Integer withChildrenDeep=bizOptJson.getInteger("withChildrenDeep");
         DataSet dataSet = bizModel.getDataSet(source);
         if (dataSet==null){
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：未指定数据集,或指定的数据集为NULL！");
@@ -35,7 +36,7 @@ public class WriteDbBizOperation  implements BizOperation {
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
         int count=0;
         for (Map<String, Object> objectMap : dataAsList) {
-            count += metaObjectService.mergeObjectWithChildren(tableId,objectMap);
+            count += metaObjectService.mergeObjectWithChildren(tableId,objectMap,withChildrenDeep==null?1:withChildrenDeep);
         }
         bizModel.putDataSet(id,new SimpleDataSet(count));
         return BuiltInOperation.getResponseSuccessData(count);
