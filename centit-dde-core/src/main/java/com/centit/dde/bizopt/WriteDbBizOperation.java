@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class WriteDbBizOperation  implements BizOperation {
+public class WriteDbBizOperation implements BizOperation {
     MetaObjectService metaObjectService;
 
     public WriteDbBizOperation(MetaObjectService metaObjectService) {
@@ -24,21 +24,26 @@ public class WriteDbBizOperation  implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String id = bizOptJson.getString("id");
         String source = bizOptJson.getString("source");
         String tableId = bizOptJson.getString("tableLabelName");
-        Integer withChildrenDeep=bizOptJson.getInteger("withChildrenDeep");
+        Integer withChildrenDeep = bizOptJson.getInteger("withChildrenDeep");
         DataSet dataSet = bizModel.getDataSet(source);
-        if (dataSet==null){
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：未指定数据集,或指定的数据集为NULL！");
+        if (dataSet == null) {
+            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName") + "：未指定数据集,或指定的数据集为NULL！");
         }
-        List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
-        int count=0;
-        for (Map<String, Object> objectMap : dataAsList) {
-            count += metaObjectService.mergeObjectWithChildren(tableId,objectMap,withChildrenDeep==null?1:withChildrenDeep);
+        try {
+            List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
+            int count = 0;
+            for (Map<String, Object> objectMap : dataAsList) {
+                count += metaObjectService.mergeObjectWithChildren(tableId, objectMap, withChildrenDeep == null ? 1 : withChildrenDeep);
+            }
+            bizModel.putDataSet(id, new SimpleDataSet(count));
+            return BuiltInOperation.getResponseSuccessData(count);
+        } catch (Exception e) {
+            bizModel.putDataSet(id,new SimpleDataSet(e.getMessage()));
+            return BuiltInOperation.getResponseData(0, 0, e.getMessage());
         }
-        bizModel.putDataSet(id,new SimpleDataSet(count));
-        return BuiltInOperation.getResponseSuccessData(count);
     }
 }
