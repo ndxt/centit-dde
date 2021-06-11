@@ -39,6 +39,7 @@ public class QueryParameter {
 
     @ApiModelProperty(value = "查询超时时间,单位：秒")
     private Integer timeOut;
+
     @ApiModelProperty(value = "是否返回分页信息")
     private Boolean isReturnPageInfo;
 }

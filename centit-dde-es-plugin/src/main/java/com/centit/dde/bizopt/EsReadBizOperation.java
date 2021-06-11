@@ -39,22 +39,24 @@ public class EsReadBizOperation implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
         return queryEs(bizModel, bizOptJson);
     }
 
     //ES查询操作
-    private ResponseData queryEs(BizModel bizModel, JSONObject bizOptJson) throws Exception {
+    private ResponseData queryEs(BizModel bizModel, JSONObject bizOptJson){
         EsReadVo esReadVo = JSONObject.parseObject(bizOptJson.toJSONString(), EsReadVo.class);
         TimeInterval timer = DateUtil.timer();
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(esReadVo.getDataSourceId());
         log.debug("获取元数据信息耗时："+timer.intervalRestart()+"ms,获取元数据信息："+sourceInfo.toString());
-        GenericObjectPool<RestHighLevelClient> restHighLevelClientGenericObjectPool = PooledRestClientFactory.obtainclientPool(new ElasticSearchConfig(), sourceInfo);
+        GenericObjectPool<RestHighLevelClient> restHighLevelClientGenericObjectPool =
+            PooledRestClientFactory.obtainclientPool(new ElasticSearchConfig(), sourceInfo);
         RestHighLevelClient restHighLevelClient = null;
         try {
             restHighLevelClient = restHighLevelClientGenericObjectPool.borrowObject();
             if (!EsIndexNameExistsUtils.indexNameExists(restHighLevelClient,esReadVo.getQueryParameter().getIndexName())){
-                return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+":"+esReadVo.getQueryParameter().getIndexName()+"索引不存在！");
+                return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+":"
+                    +esReadVo.getQueryParameter().getIndexName()+"索引不存在！");
             }
             log.debug("获restHighLevelClient耗时："+timer.intervalRestart()+"ms");
             JSONArray result = ElasticsearchReadUtils.combinationQuery(restHighLevelClient, esReadVo);

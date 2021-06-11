@@ -1,7 +1,6 @@
 package com.centit.dde;
 
-import com.centit.dde.bizopt.EsReadBizOperation;
-import com.centit.dde.bizopt.EsWriteBizOperation;
+import com.centit.dde.bizopt.RedisBizOperation;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 @Component
-public class RegisterOperation {
+public class RedisRegisterOperation {
     @Resource
     BizOptFlow bizOptFlow;
 
@@ -20,9 +19,7 @@ public class RegisterOperation {
 
     @PostConstruct
     void registerOperation(){
-        //注册查询操作类
-        bizOptFlow.registerOperation("readEs",new EsReadBizOperation(sourceInfoDao));
-        //注册插入操作类
-        bizOptFlow.registerOperation("writeEs",new EsWriteBizOperation(sourceInfoDao));
+        //注册redis操作类
+        bizOptFlow.registerOperation("redisOpt",new RedisBizOperation(sourceInfoDao));
     }
 }

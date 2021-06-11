@@ -28,6 +28,4 @@ public class   EsQueryType {
     public  final  static String MULTI_MATCH="multiMatch";
     //查询 field 中包含有 value1 和 value 的所有数据
     public  final  static String QUERYSTRING="queryString";
-
-
 }
