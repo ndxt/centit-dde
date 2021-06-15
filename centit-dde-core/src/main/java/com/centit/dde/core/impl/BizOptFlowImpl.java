@@ -318,6 +318,11 @@ public class BizOptFlowImpl implements BizOptFlow {
             dataOptDescJson.setCurrentStep(
                 dataOptDescJson.getNextStep(stepJson.getString("id")));
         }
+        // 添加异常处理
+        /** TODO : 张宏峰
+         * 1， API 中设定单独的异常处理，匹配异常，执行对应的操作； 匹配到了异常后，就不执行默认的异常处理操作了
+         * 2， API 设置 异常的处理方式： 终止运行并抛出异常、忽略异常（忽略异常可以在 业务节点后添加 分支来处理异常）
+         */
         return preResult;
     }
 
@@ -404,7 +409,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             return responseData;
         } catch (Exception e) {
             logger.error(String.format("节点：%s，运行异常:%s",bizOptJson.getString("SetsName"),e.getMessage()));
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_OPERATION, e.getMessage());
+            return ResponseData.makeErrorMessageWithData(e, ResponseData.ERROR_OPERATION, e.getMessage());
         }
     }
 
