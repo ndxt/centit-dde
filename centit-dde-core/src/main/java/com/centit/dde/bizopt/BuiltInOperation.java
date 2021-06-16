@@ -50,8 +50,10 @@ public class BuiltInOperation {
         JSONObject map = new JSONObject();
         map.put("info", info);
         map.put("success", success);
-        map.put("error", error);
-        return ResponseSingleData.makeResponseData(map);
+        map.put("error", 1);
+        ResponseSingleData result=ResponseSingleData.makeResponseData(map);
+        result.setCode(ResponseData.ERROR_OPERATION);
+        return result;
     }
 
     public static Map<String, String> jsonArrayToMap(JSONArray json, String key, String... value) {

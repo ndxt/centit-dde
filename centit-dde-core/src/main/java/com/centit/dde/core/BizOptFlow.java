@@ -1,6 +1,7 @@
 package com.centit.dde.core;
 
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.po.DataPacket;
 
 import java.util.Map;
 
@@ -10,6 +11,6 @@ import java.util.Map;
  */
 public interface BizOptFlow {
     void registerOperation(String key, BizOperation opt);
-    Object run(JSONObject bizOptJson,String logId,Map<String, Object> queryParams) throws Exception;
+    Object run(Object dataPacket,String logId,Map<String, Object> queryParams) throws Exception;
     BizModel debug(JSONObject bizOptJson);
 }

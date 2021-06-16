@@ -74,7 +74,7 @@ public class TaskRun {
         if(queryParams!=null) {
             mapObject.putAll(queryParams);
         }
-        return bizOptFlow.run(bizOptJson, logId, mapObject);
+        return bizOptFlow.run(dataPacket, logId, mapObject);
     }
 
     private Object runStepCopy(DataPacketCopy dataPacketCopy, String logId, Map<String, Object> queryParams) throws Exception {
@@ -87,7 +87,7 @@ public class TaskRun {
         if(queryParams!=null) {
             mapObject.putAll(queryParams);
         }
-        return bizOptFlow.run(bizOptJson, logId, mapObject);
+        return bizOptFlow.run(dataPacketCopy, logId, mapObject);
     }
 
 

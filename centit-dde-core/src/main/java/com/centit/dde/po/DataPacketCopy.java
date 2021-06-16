@@ -108,6 +108,10 @@ public class DataPacketCopy implements Serializable {
     @ApiModelProperty(value = "所属分组")
     private String ownGroup;
 
+    @Column(name = "NEED_ROLLBACK")
+    @ApiModelProperty(value = "是否回滚并结束")
+    private String needRollback;
+
     @Column(name = "publish_date")
     @ApiModelProperty(value = "发布时间")
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")

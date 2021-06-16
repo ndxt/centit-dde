@@ -43,7 +43,7 @@ public class WriteDbBizOperation implements BizOperation {
             return BuiltInOperation.getResponseSuccessData(count);
         } catch (Exception e) {
             bizModel.putDataSet(id,new SimpleDataSet(e.getMessage()));
-            return BuiltInOperation.getResponseData(0, 0, e.getMessage());
+            return BuiltInOperation.getResponseData(0, 1, e.getMessage());
         }
     }
 }

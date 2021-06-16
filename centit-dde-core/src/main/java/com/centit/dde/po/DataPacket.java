@@ -107,6 +107,11 @@ public class DataPacket implements Serializable {
     @Column(name = "OWN_GROUP")
     @ApiModelProperty(value = "所属分组")
     private String ownGroup;
+
+    @Column(name = "NEED_ROLLBACK")
+    @ApiModelProperty(value = "是否回滚并结束")
+    private String needRollback;
+
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "RETURN_RESULT")
     @ApiModelProperty(value = "桩数据", required = true)
