@@ -25,8 +25,10 @@ import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
+import javafx.beans.binding.ObjectExpression;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,6 +138,7 @@ public class BizOptFlowImpl implements BizOptFlow {
      */
     private JSONObject getBatchStep(BizModel bizModel, DataOptDescJson dataOptDescJson, String stepId, Object preResult) {
         List<JSONObject> linksJson = dataOptDescJson.getNextLinks(stepId);
+        bizModel.putDataSet("lastResult", new SimpleDataSet(preResult));
         for (JSONObject jsonObject : linksJson) {
             if(!ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
                 if (BooleanBaseOpt.castObjectToBoolean(
@@ -408,8 +411,9 @@ public class BizOptFlowImpl implements BizOptFlow {
             logger.info(String.format("节点：%s，运行耗时:%s ms",bizOptJson.getString("SetsName"),expendTime));
             return responseData;
         } catch (Exception e) {
-            logger.error(String.format("节点：%s，运行异常:%s",bizOptJson.getString("SetsName"),e.getMessage()));
-            return ResponseData.makeErrorMessageWithData(e, ResponseData.ERROR_OPERATION, e.getMessage());
+            logger.error(String.format("节点：%s，运行异常:%s",bizOptJson.getString("SetsName"), e.getMessage()));
+            return ResponseData.makeErrorMessageWithData(e, ResponseData.ERROR_OPERATION,
+                ObjectException.extortExceptionMessage(e, 8));
         }
     }
 
