@@ -50,7 +50,7 @@ public class ReportBizOperation implements BizOperation {
             bizModel.putDataSet(sourDsName, dataSet);
             return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
         } catch (Exception e) {
-            return BuiltInOperation.getResponseData(0, 0, e.getMessage());
+            return BuiltInOperation.getResponseData(0, 1, e.getMessage());
         }
     }
 

@@ -16,6 +16,7 @@ public class ConstantValue {
     static final String DOUBLE_SPOT = "..";
     public static final String ELSE = "else";
     public static final String FALSE = "F";
+    public static final String TRUE = "T";
     public static final String CONFIG = "config";
     public static final String FILE_CONTENT = "fileContent";
     public static final String FILE_NAME = "fileName";
