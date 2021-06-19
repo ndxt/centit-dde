@@ -112,7 +112,7 @@ public class HttpTaskController extends BaseController {
                 dataPacketCopyService.setDataPacketBuf(bizModel, dataPacketCopy, params);
             }
         }
-        if(bizModel instanceof DataSet){
+        if(bizModel instanceof DataSet && ((DataSet) bizModel).getFirstRow()!=null){
             InputStream in;
             String fileName;
             if (((DataSet) bizModel).getFirstRow().containsKey(ConstantValue.FILE_CONTENT)
