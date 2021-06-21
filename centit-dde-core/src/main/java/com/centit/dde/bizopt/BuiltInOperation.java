@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.datarule.CheckRule;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.DataSetOptUtil;
@@ -275,8 +276,10 @@ public class BuiltInOperation {
         String join = getJsonFieldString(bizOptJson, "operation", "join");
         Map<String, String> map = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("configfield"), "primaryKey1", "primaryKey2");
         if (map != null) {
-            DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
-            DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
+            DataSet dataSet = getArray(bizModel.fetchDataSetByName(sour1DsName));
+            DataSet dataSet2 =getArray(bizModel.fetchDataSetByName(sour2DsName));
+           /* DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
+            DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);*/
             DataSet destDs = DataSetOptUtil.joinTwoDataSet(dataSet, dataSet2, new ArrayList<>(map.entrySet()), join);
             if (destDs != null) {
                 bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
@@ -338,4 +341,17 @@ public class BuiltInOperation {
         return getResponseSuccessData(count);
     }
 
+    private static DataSet getArray(DataSet dataSet){
+        if (dataSet.getData() instanceof  List){
+            return  dataSet;
+        }
+        for (Map<String, Object> map : dataSet.getDataAsList()) {
+            for (String key : map.keySet()) {
+                if (map.get(key) instanceof List){
+                    return new SimpleDataSet(map.get(key));
+                }
+            }
+        }
+        return null;
+    }
 }
