@@ -5,10 +5,12 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.SqlDataSetReader;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.compiler.VariableFormula;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +36,7 @@ public class DbBizOperation implements BizOperation {
         if (mapString != null) {
             for (Map.Entry<String, String> map : mapString.entrySet()) {
                 if (!StringBaseOpt.isNvl(map.getValue())) {
-                    mapObject.put(map.getKey(), map.getValue());
+                    mapObject.put(map.getKey(),  VariableFormula.calculate(map.getValue(),new BizModelJSONTransform(bizModel)));
                 }
             }
         }

@@ -69,6 +69,7 @@ public class HttpBizOperation implements BizOperation {
         mapObject.putAll(bizModel.getModelTag());
         mapObject.remove("requestBody");
         mapObject.remove("requestFile");
+        mapObject.remove("runType");
         SourceInfo databaseInfo=null;
         if (StringUtils.isNotBlank(loginUrl)){
             databaseInfo = sourceInfoDao.getDatabaseInfoById(loginUrl);
