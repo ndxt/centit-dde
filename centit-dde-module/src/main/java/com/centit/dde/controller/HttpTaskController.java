@@ -115,8 +115,9 @@ public class HttpTaskController extends BaseController {
         if(bizModel instanceof DataSet){
             InputStream in;
             String fileName;
-            if (((DataSet) bizModel).getFirstRow().containsKey(ConstantValue.FILE_CONTENT)
-                && ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_CONTENT) instanceof OutputStream){
+            Map<String,Object> mapFirstRow=((DataSet) bizModel).getFirstRow();
+            if (mapFirstRow!=null && mapFirstRow.containsKey(ConstantValue.FILE_CONTENT)
+                && mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream){
                 ByteArrayOutputStream outputStream= (ByteArrayOutputStream) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_CONTENT);
                 in =new ByteArrayInputStream(outputStream.toByteArray());
                 fileName=(String) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_NAME);
