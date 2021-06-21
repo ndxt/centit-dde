@@ -36,7 +36,7 @@ public class HttpBizOperation implements BizOperation {
 
     private HttpExecutorContext getHttpClientContext(SourceInfo databaseInfo) throws Exception {
         if (databaseInfo != null) {
-            HttpExecutorContext executorContext = (HttpExecutorContext) AbstractSourceConnectThreadHolder.fetchConnect(databaseInfo);
+            HttpExecutorContext executorContext = AbstractSourceConnectThreadHolder.fetchHttpContext(databaseInfo);
             if (executorContext != null) {
                 return executorContext;
             }
