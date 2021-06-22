@@ -6,15 +6,15 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
-import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.framework.appclient.HttpReceiveJSON;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.compiler.VariableFormula;
+import com.centit.support.compiler.Pretreatment;
 import com.centit.support.json.JSONTransformer;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
@@ -52,11 +52,11 @@ public class HttpBizOperation implements BizOperation {
         String loginUrl = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
        /* Object requestBody = VariableFormula.calculate(BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", ""),
             new BizModelJSONTransform(bizModel));*/
-       Object json=JSON.parse(BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", ""));
-       Object requestBody="";
-       if(json!=null) {
-           requestBody = JSONTransformer.transformer(json, new BizModelJSONTransform(bizModel));
-       }
+        Object json=JSON.parse(BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", ""));
+        Object requestBody="";
+        if(json!=null) {
+            requestBody = JSONTransformer.transformer(json, new BizModelJSONTransform(bizModel));
+        }
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlvalue");
         Map<String, Object> mapObject = new HashMap<>();
         if (params != null) {
@@ -78,6 +78,7 @@ public class HttpBizOperation implements BizOperation {
         if (httpUrl != null && databaseInfo !=null && !(httpUrl.startsWith("http:") || httpUrl.startsWith("https:"))){
             httpUrl=databaseInfo.getDatabaseUrl()+httpUrl;
         }
+        httpUrl = Pretreatment.mapTemplateString(httpUrl,new BizModelJSONTransform(bizModel));
         DataSet dataSet = new SimpleDataSet();
         HttpReceiveJSON receiveJson;
         switch (httpMethod.toLowerCase()) {
