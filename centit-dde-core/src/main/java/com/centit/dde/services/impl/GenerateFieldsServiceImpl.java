@@ -115,7 +115,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return getColumnSchemas(Arrays.asList(excelDataSet.getColumns()));
+        return getColumnSchemas(Arrays.asList(excelDataSet.getColumns()),false);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return getColumnSchemas(Arrays.asList(csvDataSet.getColumns()));
+        return getColumnSchemas(Arrays.asList(csvDataSet.getColumns()),false);
     }
 
     @Override
@@ -137,12 +137,12 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
         for (Field s : columns) {
             sColumns.add(s.getName());
         }
-        return getColumnSchemas(sColumns);
+        return getColumnSchemas(sColumns,false);
     }
 
     @Override
     public List<ColumnSchema> generatePostFields(String jsonString) {
-        return getColumnSchemas(new ArrayList<>(JSON.parseObject(jsonString).keySet()));
+        return getColumnSchemas(new ArrayList<>(JSON.parseObject(jsonString).keySet()),false);
     }
 
     @Override
@@ -168,17 +168,17 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
                 logger.error("执行查询出错，SQL：{},Param:{}", sSql, qap.getParams());
             }
         }
-        return getColumnSchemas(sColumn);
+        return getColumnSchemas(sColumn,true);
     }
 
-    private List<ColumnSchema> getColumnSchemas(List<String> columns) {
+    private List<ColumnSchema> getColumnSchemas(List<String> columns,Boolean needProp) {
         List<ColumnSchema> columnSchemas = new ArrayList<>(10);
         if (columns != null) {
             for (String s : columns) {
                 if (s != null && s.length() != 0) {
                     ColumnSchema col = new ColumnSchema();
                     col.setColumnCode(s);
-                    col.setPropertyName(FieldType.mapPropName(s));
+                    col.setPropertyName(needProp?FieldType.mapPropName(s):s);
                     col.setColumnName(col.getPropertyName());
                     col.setDataType(FieldType.STRING);
                     col.setIsStatData("F");
