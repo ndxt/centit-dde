@@ -117,22 +117,17 @@ public class HttpTaskController extends BaseController {
             String fileName;
             Map<String,Object> mapFirstRow=((DataSet) bizModel).getFirstRow();
             if (mapFirstRow!=null && mapFirstRow.containsKey(ConstantValue.FILE_CONTENT)
-                && mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream){
-                ByteArrayOutputStream outputStream= (ByteArrayOutputStream) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_CONTENT);
-                in =new ByteArrayInputStream(outputStream.toByteArray());
+                && (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream
+                || mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof InputStream)){
+                if (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream){
+                    ByteArrayOutputStream outputStream= (ByteArrayOutputStream) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_CONTENT);
+                    in =new ByteArrayInputStream(outputStream.toByteArray());
+                }else {
+                    in= (InputStream)mapFirstRow.get(ConstantValue.FILE_CONTENT);
+                }
                 fileName=(String) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_NAME);
                 UploadDownloadUtils.downFileRange(request, response,in,
                     in.available(), fileName, request.getParameter("downloadType"),null);
-                return;
-            }
-            if (((DataSet)bizModel).getData() instanceof InputStream){
-                in=(InputStream)((DataSet) bizModel).getData();
-                List<InputStream> inputStreamList  = ExcelDataSet.cloneInputStream(in) ;
-                String fileType = FileType.getFileType(inputStreamList.get(0));
-                fileType = StringUtils.isNotBlank(fileType)?fileType:".temp";
-                fileName=System.currentTimeMillis()+"."+fileType;
-                UploadDownloadUtils.downFileRange(request, response,inputStreamList.get(1),
-                    inputStreamList.get(1).available(), fileName, request.getParameter("downloadType"),null);
                 return;
             }
         }

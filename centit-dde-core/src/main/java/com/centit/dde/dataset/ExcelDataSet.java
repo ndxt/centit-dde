@@ -156,11 +156,11 @@ public class ExcelDataSet extends FileDataSet {
         //创建一个Sheet页
         XSSFSheet sheet = wb.createSheet(System.currentTimeMillis()+"");
         //设置行高
-        sheet.setDefaultRowHeight((short) (2 * 256));
+        //sheet.setDefaultRowHeight((short) (2 * 200));
         //为有数据的每列设置列宽
-        for (int i = 0; i < headList.size(); i++) {
-            sheet.setColumnWidth(i, 8000);
-        }
+        //for (int i = 0; i < headList.size(); i++) {
+           // sheet.setColumnWidth(i, 8000);
+        //}
         //设置单元格字体样式
         XSSFFont font = wb.createFont();
         font.setFontName("等线");

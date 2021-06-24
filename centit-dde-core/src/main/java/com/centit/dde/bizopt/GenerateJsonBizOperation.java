@@ -7,12 +7,16 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.CloneUtils;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * 生成json文件节点信息
@@ -20,7 +24,7 @@ import java.io.ByteArrayInputStream;
 public class GenerateJsonBizOperation implements BizOperation {
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws IOException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         String requestBody= (String)bizModel.getModelTag().get("requestBody");
@@ -31,10 +35,11 @@ public class GenerateJsonBizOperation implements BizOperation {
             data = bizModel.fetchDataSetByName(sourDsName).getData();
         }
         String object = JSON.toJSONString(data);
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(object.getBytes());
-        SimpleDataSet dataSet = new SimpleDataSet(byteArrayInputStream);
-        bizModel.putDataSet(targetDsName,dataSet);
-        return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
+        InputStream inputStream = new ByteArrayInputStream(object.getBytes());
+        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".json",
+            "fileSize", inputStream.available(), "fileContent",inputStream));
+        bizModel.putDataSet(targetDsName,objectToDataSet);
+        return BuiltInOperation.getResponseSuccessData(objectToDataSet.getSize());
     }
 
 

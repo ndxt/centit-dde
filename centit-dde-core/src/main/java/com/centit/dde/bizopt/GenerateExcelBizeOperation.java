@@ -6,12 +6,15 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
+import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.CollectionsOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +41,9 @@ public class GenerateExcelBizeOperation implements BizOperation {
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
         try {
             InputStream inputStream = ExcelDataSet.writeExcel(dataAsList);
-            bizModel.putDataSet(targetDsName,new SimpleDataSet(inputStream));
+            DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".xlsx",
+                "fileSize", inputStream.available(), "fileContent",inputStream));
+            bizModel.putDataSet(targetDsName,objectToDataSet);
         } catch (IOException e) {
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：生成EXCEL文件异常，异常信息"+e.getMessage());
         }

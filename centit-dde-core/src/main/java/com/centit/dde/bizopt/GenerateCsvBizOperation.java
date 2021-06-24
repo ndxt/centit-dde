@@ -6,8 +6,10 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.CsvDataSet;
+import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.CollectionsOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -39,7 +41,9 @@ public class GenerateCsvBizOperation implements BizOperation {
         }
         try {
             InputStream inputStream = CsvDataSet.createCsvStream(dataSet);
-            bizModel.putDataSet(targetDsName,new SimpleDataSet(inputStream));
+            DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".csv",
+                "fileSize", inputStream.available(), "fileContent",inputStream));
+            bizModel.putDataSet(targetDsName,objectToDataSet);
         } catch (IOException e) {
            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：生成CSV文件异常，异常信息"+e.getMessage());
         }

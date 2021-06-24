@@ -173,6 +173,10 @@ public class CsvDataSet extends FileDataSet {
                     e.printStackTrace();
                 }
             }
+            csvWriter.flush();
+            if (csvWriter!=null){
+                csvWriter.close();
+            }
             return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
         }
     }
