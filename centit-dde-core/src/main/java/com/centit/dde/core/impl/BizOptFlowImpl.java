@@ -393,16 +393,16 @@ public class BizOptFlowImpl implements BizOptFlow {
             return ResponseData.makeErrorMessage(ResponseData.ERROR_OPERATION,
                 "找不到对应的操作：" + sOptType);
         }
-        try {
-            TaskDetailLog detailLog = new TaskDetailLog();
-            if (logId != null) {
-                String processName = bizOptJson.getString("processName");
-                if (StringBaseOpt.isNvl(processName)) {
-                    processName = bizOptJson.getString("nodeName");
-                }
-                detailLog = writeLog(logId, sOptType + ":" + processName,
-                    dataOptDescJson.getStepNo(), "");
+        TaskDetailLog detailLog = new TaskDetailLog();
+        if (logId != null) {
+            String processName = bizOptJson.getString("processName");
+            if (StringBaseOpt.isNvl(processName)) {
+                processName = bizOptJson.getString("nodeName");
             }
+            detailLog = writeLog(logId, sOptType + ":" + processName,
+                dataOptDescJson.getStepNo(), "");
+        }
+        try {
             ResponseData responseData = opt.runOpt(bizModel, bizOptJson);
             JSONObject jsonObject = JSONObject.parseObject(responseData.getData().toString());
             if (logId != null) {
@@ -412,14 +412,16 @@ public class BizOptFlowImpl implements BizOptFlow {
                 detailLog.setRunEndTime(new Date());
                 taskDetailLogDao.updateObject(detailLog);
             }
-
-            long expendTime = System.currentTimeMillis() - startTime;
-            logger.info(String.format("节点：%s，运行耗时:%s ms", bizOptJson.getString("SetsName"), expendTime));
             return responseData;
         } catch (Exception e) {
-            logger.error(String.format("节点：%s，运行异常:%s", bizOptJson.getString("SetsName"), e.getMessage()));
-            return ResponseData.makeErrorMessageWithData(e, ResponseData.ERROR_OPERATION,
-                ObjectException.extortExceptionMessage(e, 8));
+            String errMsg=ObjectException.extortExceptionMessage(e, 8);
+            ResponseData responseData=ResponseData.makeErrorMessageWithData(e, ResponseData.ERROR_OPERATION,
+               errMsg);
+            bizModel.putDataSet(bizOptJson.getString("id"),new SimpleDataSet(responseData));
+            detailLog.setLogInfo(errMsg);
+            detailLog.setRunEndTime(new Date());
+            taskDetailLogDao.updateObject(detailLog);
+            return responseData;
         }
     }
 
