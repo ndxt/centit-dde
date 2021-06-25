@@ -64,10 +64,10 @@ public class SqlDataSetReader implements DataSetReader {
             paramsMap.putAll(params);
         }
         paramsMap.putAll(qap.getParams());
-        String orderBy = GeneralJsonObjectDao.fetchSelfOrderSql(qap.getQuery(), paramsMap);
-        final String querySql=StringUtils.replace(qap.getQuery(),":ORDER_BY",orderBy);
+//        String orderBy = GeneralJsonObjectDao.fetchSelfOrderSql(qap.getQuery(), paramsMap);
+//        final String querySql=StringUtils.replace(qap.getQuery(),":ORDER_BY",orderBy);
         JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(
-            conn,querySql, paramsMap);
+            conn,qap.getQuery(), paramsMap);
         SimpleDataSet dataSet = new SimpleDataSet();
         dataSet.setData(jsonArray);
         return dataSet;
