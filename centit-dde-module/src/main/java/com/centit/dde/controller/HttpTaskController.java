@@ -2,6 +2,7 @@ package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketCopy;
@@ -12,6 +13,7 @@ import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
+import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -56,34 +58,34 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "测试：立即执行任务")
     public void runTestTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                     HttpServletResponse response) throws IOException {
-        returnObject(packetId,ConstantValue.RUN_TYPE_COPY, request,response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, request, response);
     }
 
     @GetMapping(value = "/debugRunTest/{packetId}")
     @ApiOperation(value = "测试：DEBUG执行任务")
     public void debugRunTestTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                          HttpServletResponse response) throws IOException {
-        returnObject(packetId,ConstantValue.RUN_TYPE_COPY,request,response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, request, response);
     }
 
     @GetMapping(value = "/run/{packetId}")
     @ApiOperation(value = "正式：立即执行任务")
     public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
-        returnObject(packetId,ConstantValue.RUN_TYPE_NORMAL, request,response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, request, response);
     }
 
     @GetMapping(value = "/debugRun/{packetId}")
     @ApiOperation(value = "正式：DEBUG执行任务")
     public void debugRunTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                      HttpServletResponse response) throws IOException {
-        returnObject(packetId,ConstantValue.RUN_TYPE_NORMAL,request,response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, request, response);
     }
 
-    private void returnObject(String packetId,String runType,HttpServletRequest request,HttpServletResponse response) throws IOException {
+    private void returnObject(String packetId, String runType, HttpServletRequest request, HttpServletResponse response) throws IOException {
         Map<String, Object> params = collectRequestParameters(request);
-        params.put("runType",runType);
-        if(!"GET".equals(request.getMethod())) {
+        params.put("runType", runType);
+        if (!"GET".equals(request.getMethod())) {
             if (StringUtils.contains(request.getHeader("content-type"), "application")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
                 if (!StringBaseOpt.isNvl(bodyString)) {
@@ -97,14 +99,14 @@ public class HttpTaskController extends BaseController {
             }
         }
         Object bizModel;
-        if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)){
-            DataPacket  dataPacket = dataPacketService.getDataPacket(packetId);
+        if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
+            DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
             bizModel = dataPacketService.fetchDataPacketDataFromBuf(dataPacket, params);
             if (bizModel == null) {
                 bizModel = exchangeService.runTask(packetId, params);
                 dataPacketService.setDataPacketBuf(bizModel, dataPacket, params);
             }
-        }else {
+        } else {
             DataPacketCopy dataPacketCopy = dataPacketCopyService.getDataPacket(packetId);
             bizModel = dataPacketCopyService.fetchDataPacketDataFromBuf(dataPacketCopy, params);
             if (bizModel == null) {
@@ -112,38 +114,48 @@ public class HttpTaskController extends BaseController {
                 dataPacketCopyService.setDataPacketBuf(bizModel, dataPacketCopy, params);
             }
         }
-        if(bizModel instanceof DataSet){
+        if (bizModel instanceof DataSet) {
             InputStream in;
             String fileName;
-            Map<String,Object> mapFirstRow=((DataSet) bizModel).getFirstRow();
-            if (mapFirstRow!=null && mapFirstRow.containsKey(ConstantValue.FILE_CONTENT)
+            Map<String, Object> mapFirstRow = ((DataSet) bizModel).getFirstRow();
+            if (mapFirstRow != null && mapFirstRow.containsKey(ConstantValue.FILE_CONTENT)
                 && (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream
-                || mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof InputStream)){
-                if (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream){
-                    ByteArrayOutputStream outputStream= (ByteArrayOutputStream) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_CONTENT);
-                    in =new ByteArrayInputStream(outputStream.toByteArray());
-                }else {
-                    in= (InputStream)mapFirstRow.get(ConstantValue.FILE_CONTENT);
+                || mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof InputStream)) {
+                if (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream) {
+                    ByteArrayOutputStream outputStream = (ByteArrayOutputStream) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_CONTENT);
+                    in = new ByteArrayInputStream(outputStream.toByteArray());
+                } else {
+                    in = (InputStream) mapFirstRow.get(ConstantValue.FILE_CONTENT);
                 }
-                fileName=(String) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_NAME);
-                UploadDownloadUtils.downFileRange(request, response,in,
-                    in.available(), fileName, request.getParameter("downloadType"),null);
+                fileName = (String) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_NAME);
+                UploadDownloadUtils.downFileRange(request, response, in,
+                    in.available(), fileName, request.getParameter("downloadType"), null);
                 return;
             }
         }
+        if (bizModel instanceof DataSet && ((DataSet) bizModel).getData() instanceof ResponseData) {
+            JsonResultUtils.writeResponseDataAsJson((ResponseData) ((DataSet) bizModel).getData(), response);
+            return;
+        }
+        if(bizModel instanceof ResponseData){
+            JsonResultUtils.writeResponseDataAsJson((ResponseData) bizModel,response);
+            return;
+        }
         JsonResultUtils.writeSingleDataJson(bizModel, response);
     }
+
     @PostMapping(value = "/runPostTest/{packetId}")
     @ApiOperation(value = "测试：立即执行任务Post")
     public void runTaskPostTest(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
-        returnObject(packetId,ConstantValue.RUN_TYPE_COPY, request,response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, request, response);
     }
+
     @PostMapping(value = "/runPost/{packetId}")
     @ApiOperation(value = "正式：立即执行任务Post")
     public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
                             HttpServletResponse response) throws IOException {
-        returnObject(packetId,ConstantValue.RUN_TYPE_NORMAL, request,response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, request, response);
     }
 
     @GetMapping(value = "/testformula")
