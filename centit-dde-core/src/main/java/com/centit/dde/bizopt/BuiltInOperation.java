@@ -292,8 +292,8 @@ public class BuiltInOperation {
     public static ResponseData runUnion(BizModel bizModel, JSONObject bizOptJson) {
         String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
         String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
-        DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
-        DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
+        DataSet dataSet = getArray(bizModel.fetchDataSetByName(sour1DsName));
+        DataSet dataSet2 = getArray(bizModel.fetchDataSetByName(sour2DsName));
         DataSet destDs = DataSetOptUtil.unionTwoDataSet(dataSet, dataSet2);
         bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
         return getResponseSuccessData(destDs.getSize());
@@ -315,8 +315,8 @@ public class BuiltInOperation {
         String targetDsName = getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         List<String> formulas = jsonArrayToList(bizOptJson.getJSONArray("config"), "expression", "expression2", "");
         Map<String, String> pks = jsonArrayToMap(bizOptJson.getJSONArray("primaryKeyList"), "primaryKey1", "primaryKey2");
-        DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
-        DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
+        DataSet dataSet = getArray(bizModel.fetchDataSetByName(sour1DsName));
+        DataSet dataSet2 = getArray(bizModel.fetchDataSetByName(sour2DsName));
         int count = 0;
         if (dataSet != null && dataSet2 != null) {
             DataSet destDs = DataSetOptUtil.filterByOtherDataSet(dataSet, dataSet2, new ArrayList<>(pks.entrySet()), formulas);
