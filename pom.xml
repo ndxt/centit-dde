@@ -22,6 +22,7 @@
         <module>centit-dde-redis-plugin</module>
         <module>centit-dde-ofd-plugin</module>
         <module>centit-dde-workflow-plugin</module>
+        <module>centit-dde-webservices-plugin</module>
     </modules>
     <name>com.centit.product:centit-dde</name>
 	<packaging>pom</packaging>

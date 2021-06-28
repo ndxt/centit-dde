@@ -19,10 +19,7 @@ import com.centit.support.report.ExcelExportUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 数据持久化操作
@@ -59,7 +56,7 @@ public class BuiltInOperation {
 
     public static Map<String, String> jsonArrayToMap(JSONArray json, String key, String... value) {
         if (json != null) {
-            Map<String, String> map = new HashMap<>(json.size());
+            LinkedHashMap<String, String> map = new LinkedHashMap<>();
             for (Object o : json) {
                 JSONObject temp = (JSONObject) o;
                 if (!StringBaseOpt.isNvl(temp.getString(key))) {
