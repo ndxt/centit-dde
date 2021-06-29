@@ -2,7 +2,10 @@ package com.centit.dde.core;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.ResponseMapData;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,6 +20,8 @@ public interface BizModel {
      * @return 模型名称; 可以作为主DataSet的名称
      */
     String getModelName();
+    ResponseMapData getResponseMapData();
+    void addResponseMapData(String sKey, ResponseData objValue);
     /**
      * 模型的标识， 就是对应的主键
      * @return  或者对应关系数据库查询的参数（数据源参数）

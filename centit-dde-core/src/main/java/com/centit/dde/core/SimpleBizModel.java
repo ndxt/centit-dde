@@ -2,10 +2,15 @@ package com.centit.dde.core;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.ResponseMapData;
+import com.centit.support.algorithm.CollectionsOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,13 +32,22 @@ public class SimpleBizModel implements BizModel, Serializable {
      * 模型数据
      */
     private Map<String, DataSet> bizData;
-
-    public SimpleBizModel() {
-        modelName = BizModel.DEFAULT_MODEL_NAME;
-    }
+    private ResponseMapData responseMapData;
 
     public SimpleBizModel(String modelName) {
         this.modelName = modelName;
+        responseMapData=new ResponseMapData(ResponseData.RESULT_OK,"");
+    }
+    @Override
+    public ResponseMapData getResponseMapData(){
+        return responseMapData;
+    }
+
+    @Override
+    public void addResponseMapData(String sKey, ResponseData objValue) {
+        this.responseMapData.setCode(objValue.getCode());
+        this.responseMapData.setMessage(StringUtils.join(this.responseMapData.getMessage(),objValue.getMessage()));
+        this.responseMapData.addResponseData(sKey,objValue);
     }
 
     @Override

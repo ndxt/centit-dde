@@ -160,9 +160,12 @@ public class BizOptFlowImpl implements BizOptFlow {
         String path;
         bizModel.getModelTag().remove("requestFile");
         bizModel.getModelTag().remove("requestBody");
+        if(bizModel.getResponseMapData().getCode()!=ResponseData.RESULT_OK){
+            return bizModel.getResponseMapData();
+        }
         switch (type) {
             case "2":
-                return "ok";
+                return bizModel.getResponseMapData();
             case "3":
                 path = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
                 return bizModel.fetchDataSetByName(path);
@@ -404,6 +407,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
         try {
             ResponseData responseData = opt.runOpt(bizModel, bizOptJson);
+            if(responseData.getCode()==ResponseData.ERROR_OPERATION){
+                throw new Exception(responseData.getMessage());
+            }
             JSONObject jsonObject = JSONObject.parseObject(responseData.getData().toString());
             if (logId != null) {
                 detailLog.setSuccessPieces(jsonObject.getIntValue("success"));
@@ -417,7 +423,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             String errMsg=ObjectException.extortExceptionMessage(e, 8);
             ResponseData responseData=ResponseData.makeErrorMessageWithData(e, ResponseData.ERROR_OPERATION,
                errMsg);
-            bizModel.putDataSet(bizOptJson.getString("id"),new SimpleDataSet(responseData));
+            bizModel.addResponseMapData(bizOptJson.getString("id"),responseData);
             detailLog.setLogInfo(errMsg);
             detailLog.setRunEndTime(new Date());
             taskDetailLogDao.updateObject(detailLog);

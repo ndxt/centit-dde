@@ -14,6 +14,7 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -133,8 +134,8 @@ public class HttpTaskController extends BaseController {
                 return;
             }
         }
-        if (bizModel instanceof DataSet && ((DataSet) bizModel).getData() instanceof ResponseData) {
-            JsonResultUtils.writeResponseDataAsJson((ResponseData) ((DataSet) bizModel).getData(), response);
+        if (bizModel instanceof ResponseMapData) {
+            JsonResultUtils.writeSingleDataJson(((ResponseMapData) bizModel).getCode(),((ResponseMapData) bizModel).getMessage(),bizModel, response,null);
             return;
         }
         if(bizModel instanceof ResponseData){

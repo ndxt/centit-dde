@@ -54,6 +54,7 @@ public class BuiltInOperation {
         map.put("error", 1);
         ResponseSingleData result=ResponseSingleData.makeResponseData(map);
         result.setCode(ResponseData.ERROR_OPERATION);
+        result.setMessage(info);
         return result;
     }
 
