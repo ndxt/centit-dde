@@ -407,8 +407,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
         try {
             ResponseData responseData = opt.runOpt(bizModel, bizOptJson);
-            if(responseData.getCode()==ResponseData.ERROR_OPERATION){
-                throw new Exception(responseData.getMessage());
+            if(responseData.getCode()!=ResponseData.RESULT_OK){
+                throw new ObjectException(responseData,responseData.getCode(),responseData.getMessage());
             }
             JSONObject jsonObject = JSONObject.parseObject(responseData.getData().toString());
             if (logId != null) {
