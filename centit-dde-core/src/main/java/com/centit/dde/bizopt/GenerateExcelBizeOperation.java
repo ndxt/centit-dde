@@ -40,7 +40,7 @@ public class GenerateExcelBizeOperation implements BizOperation {
         }
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
         try {
-            InputStream inputStream = ExcelDataSet.writeExcel(dataAsList);
+            InputStream inputStream = ExcelDataSet.writeExcel(dataAsList,mapInfo);
             DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".xlsx",
                 "fileSize", inputStream.available(), "fileContent",inputStream));
             bizModel.putDataSet(targetDsName,objectToDataSet);

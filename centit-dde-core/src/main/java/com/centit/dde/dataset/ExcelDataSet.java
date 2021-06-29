@@ -146,10 +146,10 @@ public class ExcelDataSet extends FileDataSet {
      * @return
      * @throws IOException
      */
-    public static InputStream writeExcel(List<Map<String, Object>> objectList) throws IOException {
+    public static InputStream writeExcel(List<Map<String, Object>> objectList,Map<String, String> mapInfo) throws IOException {
         //获取数据源的 key, 用于获取列数及设置标题
-        Map<String, Object> map = objectList.get(0);
-        Set<String> stringSet = map.keySet();
+        //Map<String, Object> map = objectList.get(0);
+        Set<String> stringSet = mapInfo.keySet();
         ArrayList<String> headList = new ArrayList<>(stringSet);
         //定义一个新的工作簿
         XSSFWorkbook wb = new XSSFWorkbook();
