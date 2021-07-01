@@ -63,7 +63,7 @@ public abstract class DBBatchUtils {
                 DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object);
                 n++;
                 stmt.addBatch();
-                if (n % 2000 == 0) {
+                if (n % ConstantValue.INT_BATCH_NUM == 0) {
                     stmt.executeBatch();
                     stmt.clearBatch();
                 }
@@ -152,7 +152,7 @@ public abstract class DBBatchUtils {
                     if (StringUtils.isNotBlank(updateSqlPair.getLeft())) {
                         update++;
                         updateStmt.addBatch();
-                        if (update % 2000 == 0) {
+                        if (update % ConstantValue.INT_BATCH_NUM == 0) {
                             updateStmt.executeBatch();
                             updateStmt.clearBatch();
                         }
@@ -161,7 +161,7 @@ public abstract class DBBatchUtils {
                     DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), object);
                     insert++;
                     insertStmt.addBatch();
-                    if (insert % 2000 == 0) {
+                    if (insert % ConstantValue.INT_BATCH_NUM == 0) {
                         insertStmt.executeBatch();
                         insertStmt.clearBatch();
                     }

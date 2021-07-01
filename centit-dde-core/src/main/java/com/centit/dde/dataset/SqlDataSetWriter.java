@@ -88,7 +88,6 @@ public class SqlDataSetWriter implements DataSetWriter {
                     successNums++;
                 }
             } catch (SQLException e) {
-                logger.error(e.getLocalizedMessage());
                 successNums = 0;
                 errorNums = 0;
                 info = e.getMessage();
@@ -141,10 +140,8 @@ public class SqlDataSetWriter implements DataSetWriter {
         }
         if (this.saveAsWhole) {
             try {
-
                 DBBatchUtils.batchMergeObjects(connection,
                     tableInfo, dataSet.getDataAsList(), fieldsMap);
-
                 successNums = 0;
                 errorNums = 0;
                 info = "ok";
@@ -153,7 +150,6 @@ public class SqlDataSetWriter implements DataSetWriter {
                     successNums++;
                 }
             } catch (SQLException e) {
-                logger.error(e.getLocalizedMessage());
                 successNums = 0;
                 errorNums = 0;
                 info = e.getMessage();

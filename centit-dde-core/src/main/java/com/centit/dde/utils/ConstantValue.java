@@ -49,4 +49,5 @@ public class ConstantValue {
     public static final String SUBMIT_WORKFLOW ="submitWorkFlow";
     public static final String WRITE_DB ="metadata";
     public static final String ASSIGNMENT ="assignment";
+    public static final Integer INT_BATCH_NUM=1000;
 }
