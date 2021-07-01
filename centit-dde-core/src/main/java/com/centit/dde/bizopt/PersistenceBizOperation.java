@@ -112,6 +112,9 @@ public class PersistenceBizOperation implements BizOperation {
         if (dataSet.getSize() > 0) {
             info = dataSetWriter.getInfo();
         }
+        if(dataSetWriter.getErrorNums()==0){
+            return BuiltInOperation.getResponseSuccessData(dataSetWriter.getSuccessNums());
+        }
         return BuiltInOperation.getResponseData(dataSetWriter.getSuccessNums(), dataSetWriter.getErrorNums(), info);
     }
 
