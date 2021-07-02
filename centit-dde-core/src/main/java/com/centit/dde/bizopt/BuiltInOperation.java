@@ -48,7 +48,7 @@ public class BuiltInOperation {
         JSONObject map = new JSONObject();
         map.put("info", info);
         map.put("success", success);
-        map.put("error", 1);
+        map.put("error", error==0?1:error);
         ResponseSingleData result=ResponseSingleData.makeResponseData(map);
         result.setCode(ResponseData.ERROR_OPERATION);
         result.setMessage(info);

@@ -108,14 +108,10 @@ public class PersistenceBizOperation implements BizOperation {
                 dataSetWriter.save(dataSet);
                 break;
         }
-        String info = "ok";
-        if (dataSet.getSize() > 0) {
-            info = dataSetWriter.getInfo();
+        if (dataSetWriter.getErrorNums() > 0) {
+            return BuiltInOperation.getResponseData(dataSetWriter.getSuccessNums(), dataSetWriter.getErrorNums(), dataSetWriter.getInfo());
         }
-        if(dataSetWriter.getErrorNums()==0){
-            return BuiltInOperation.getResponseSuccessData(dataSetWriter.getSuccessNums());
-        }
-        return BuiltInOperation.getResponseData(dataSetWriter.getSuccessNums(), dataSetWriter.getErrorNums(), info);
+        return BuiltInOperation.getResponseSuccessData(dataSetWriter.getSuccessNums());
     }
 
     private void writeCsvFile(BizModel bizModel, JSONObject bizOptJson) throws FileNotFoundException {

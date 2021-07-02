@@ -48,9 +48,10 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
             bizModel.putDataSet(id,new SimpleDataSet(e.getMessage()));
             return BuiltInOperation.getResponseData(0, 500, e.getMessage());
         }
-        if (list.size()>0){
-            bizModel.putDataSet(id,new SimpleDataSet(list));
+        if (list.size()==0){
+            list.add(submitOptOptions.getNodeInstId());
         }
+        bizModel.putDataSet(id,new SimpleDataSet(list));
         return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(id).getSize());
     }
 

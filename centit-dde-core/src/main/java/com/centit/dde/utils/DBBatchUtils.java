@@ -58,10 +58,15 @@ public abstract class DBBatchUtils {
             for (Map<String, Object> object : objects) {
                 if (fieldsMap != null) {
                     object = DataSetOptUtil.mapDataRow(object, fieldsMap.entrySet());
-                    prepareObjectForSave(tableInfo,object);
+                    prepareObjectForSave(tableInfo, object);
                 }
                 DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object);
-                n += stmt.executeUpdate();
+                n++;
+                stmt.addBatch();
+                if (n % ConstantValue.INT_BATCH_NUM == 0) {
+                    stmt.executeBatch();
+                    stmt.clearBatch();
+                }
             }
         } catch (SQLException e) {
             throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
@@ -120,7 +125,7 @@ public abstract class DBBatchUtils {
         sql = "select count(*) as checkExists from " + tableInfo.getTableName()
             + " where " + GeneralJsonObjectDao.buildFilterSqlByPk(tableInfo, null);
         LeftRightPair<String, List<String>> checkSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
-        int n = 0;
+        int n = 0,insert=0,update=0;
         boolean exists = false;
         try (PreparedStatement checkStmt = conn.prepareStatement(checkSqlPair.getLeft());
              PreparedStatement insertStmt = conn.prepareStatement(insertSqlPair.getLeft());
@@ -128,7 +133,7 @@ public abstract class DBBatchUtils {
             for (Map<String, Object> object : objects) {
                 if (fieldsMap != null) {
                     object = DataSetOptUtil.mapDataRow(object, fieldsMap.entrySet());
-                    prepareObjectForSave(tableInfo,object);
+                    prepareObjectForSave(tableInfo, object);
                 }
                 DatabaseAccess.setQueryStmtParameters(checkStmt, checkSqlPair.getRight(), object);
                 ResultSet rs = checkStmt.executeQuery();
@@ -141,14 +146,25 @@ public abstract class DBBatchUtils {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                n++;
                 if (exists) {
                     DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), object);
                     if (StringUtils.isNotBlank(updateSqlPair.getLeft())) {
-                        n += updateStmt.executeUpdate();
+                        update++;
+                        updateStmt.addBatch();
+                        if (update % ConstantValue.INT_BATCH_NUM == 0) {
+                            updateStmt.executeBatch();
+                            updateStmt.clearBatch();
+                        }
                     }
                 } else {
                     DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), object);
-                    n += insertStmt.executeUpdate();
+                    insert++;
+                    insertStmt.addBatch();
+                    if (insert % ConstantValue.INT_BATCH_NUM == 0) {
+                        insertStmt.executeBatch();
+                        insertStmt.clearBatch();
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -162,7 +178,7 @@ public abstract class DBBatchUtils {
     }
 
 
-    private static void prepareObjectForSave(TableInfo tableInfo, Map<String, Object> object){
+    private static void prepareObjectForSave(TableInfo tableInfo, Map<String, Object> object) {
         for (TableField col : tableInfo.getColumns()) {
             Object fieldValue = object.get(col.getPropertyName());
             if (fieldValue != null) {
