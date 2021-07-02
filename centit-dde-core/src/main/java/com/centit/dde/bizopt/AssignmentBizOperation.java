@@ -16,6 +16,10 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 /**
  * 赋值标签
  */
@@ -27,9 +31,9 @@ public class AssignmentBizOperation implements BizOperation {
         AssignmentVo assignmentVo =bizOptJson.toJavaObject(AssignmentVo.class);
         DataSet dataSet = bizModel.getDataSet(assignmentVo.getSource());
         String assignType = assignmentVo.getAssignType();
-        Object dataSetData=null;
+        JSONObject dataSetData=null;
         if (!StringBaseOpt.isNvl(String.valueOf(assignmentVo.getData()))){//根据表达式生成新的数据集
-            dataSetData = JSONTransformer.transformer(JSON.parse(String.valueOf(assignmentVo.getData())), new BizModelJSONTransform(bizModel));
+            dataSetData = (JSONObject)JSONTransformer.transformer(JSON.parse(String.valueOf(assignmentVo.getData())), new BizModelJSONTransform(bizModel));
         }
         DataSet newDataSet;
         switch (assignType){
@@ -40,18 +44,30 @@ public class AssignmentBizOperation implements BizOperation {
                 newDataSet=SerializationUtils.clone(new SimpleDataSet(dataSet.getData()));
                 break;
             case "2"://手动赋值
-                Object data = assignmentVo.getData();
-                if (data==null){
-                    return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：请输入赋值数据！");
+                Object data =  JSONTransformer.transformer(JSON.parse(assignmentVo.getData()), new BizModelJSONTransform(bizModel));
+                Map<String, Object> modelTag = bizModel.getModelTag();
+                if (data instanceof  Map){
+                    modelTag.putAll((Map)data);
+                }else {
+                 modelTag.put(assignmentVo.getId(),data);
                 }
                 newDataSet = new SimpleDataSet(data);
                 break;
             default://引用数据集
-                if(bizModel.getDataSet(assignmentVo.getId())!=null) {
+                DataSet sourceDataSet = bizModel.getDataSet(assignmentVo.getSource());
+                List<Map<String, Object>> dataAsList = sourceDataSet.getDataAsList();
+                Map map = JSONObject.parseObject(JSON.toJSONString(dataSetData), Map.class);
+                for (Map<String, Object> objectMap : dataAsList) {
+                    map.forEach((key,value)->{
+                        objectMap.put((String) key,value);
+                    });
+                }
+               /* if(bizModel.getDataSet(assignmentVo.getId())!=null) {
                     newDataSet = DataSetOptUtil.unionTwoDataSet(bizModel.getDataSet(assignmentVo.getId()), new SimpleDataSet(dataSetData));
                 }else{
                     newDataSet = new SimpleDataSet(dataSetData);
-                }
+                }*/
+                newDataSet = new SimpleDataSet(sourceDataSet);
                 break;
         }
         bizModel.putDataSet(assignmentVo.getId(),newDataSet);

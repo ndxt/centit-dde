@@ -16,8 +16,8 @@ public class AssignmentVo {
     private String type;
     @ApiModelProperty(value = "赋值类型：复制或者引用  1:复制   2：引用，3：手动赋值")
     private String assignType="2";
-    @ApiModelProperty(value = "赋值的数据（简单数值或者json串）")
-    private Object data;
+    @ApiModelProperty(value = "给modelTag中设置值")
+    private String data;
     @ApiModelProperty(value = "数据节点id")
     private String source;
     @ApiModelProperty(value = "表达式")
