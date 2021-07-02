@@ -54,20 +54,14 @@ public class AssignmentBizOperation implements BizOperation {
                 newDataSet = new SimpleDataSet(data);
                 break;
             default://引用数据集
-                DataSet sourceDataSet = bizModel.getDataSet(assignmentVo.getSource());
-                List<Map<String, Object>> dataAsList = sourceDataSet.getDataAsList();
+                List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
                 Map map = JSONObject.parseObject(JSON.toJSONString(dataSetData), Map.class);
                 for (Map<String, Object> objectMap : dataAsList) {
                     map.forEach((key,value)->{
                         objectMap.put((String) key,value);
                     });
                 }
-               /* if(bizModel.getDataSet(assignmentVo.getId())!=null) {
-                    newDataSet = DataSetOptUtil.unionTwoDataSet(bizModel.getDataSet(assignmentVo.getId()), new SimpleDataSet(dataSetData));
-                }else{
-                    newDataSet = new SimpleDataSet(dataSetData);
-                }*/
-                newDataSet = new SimpleDataSet(sourceDataSet);
+                newDataSet = new SimpleDataSet(dataSet);
                 break;
         }
         bizModel.putDataSet(assignmentVo.getId(),newDataSet);
