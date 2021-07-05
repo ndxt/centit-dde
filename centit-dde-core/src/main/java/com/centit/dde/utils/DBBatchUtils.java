@@ -68,6 +68,8 @@ public abstract class DBBatchUtils {
                     stmt.clearBatch();
                 }
             }
+            stmt.executeBatch();
+            stmt.clearBatch();
         } catch (SQLException e) {
             throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
         }
@@ -167,6 +169,10 @@ public abstract class DBBatchUtils {
                     }
                 }
             }
+            updateStmt.executeBatch();
+            updateStmt.clearBatch();
+            insertStmt.executeBatch();
+            insertStmt.clearBatch();
         } catch (SQLException e) {
             if (exists) {
                 throw DatabaseAccess.createAccessException(updateSqlPair.getLeft(), e);
