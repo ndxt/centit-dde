@@ -32,7 +32,7 @@ import java.util.*;
  */
 public abstract class DBBatchUtils {
     protected static final Logger logger = LoggerFactory.getLogger(DBBatchUtils.class);
-
+    private static int INT_BATCH_NUM=1000;
     public static List<String> achieveAllFields(final List<Map<String, Object>> objects) {
         HashSet<String> fields = new HashSet<>();
         for (Map<String, Object> map : objects) {
@@ -63,7 +63,7 @@ public abstract class DBBatchUtils {
                 DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object);
                 n++;
                 stmt.addBatch();
-                if (n % ConstantValue.INT_BATCH_NUM == 0) {
+                if (n % INT_BATCH_NUM == 0) {
                     stmt.executeBatch();
                     stmt.clearBatch();
                 }
@@ -154,7 +154,7 @@ public abstract class DBBatchUtils {
                     if (StringUtils.isNotBlank(updateSqlPair.getLeft())) {
                         update++;
                         updateStmt.addBatch();
-                        if (update % ConstantValue.INT_BATCH_NUM == 0) {
+                        if (update % INT_BATCH_NUM == 0) {
                             updateStmt.executeBatch();
                             updateStmt.clearBatch();
                         }
@@ -163,7 +163,7 @@ public abstract class DBBatchUtils {
                     DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), object);
                     insert++;
                     insertStmt.addBatch();
-                    if (insert % ConstantValue.INT_BATCH_NUM == 0) {
+                    if (insert % INT_BATCH_NUM == 0) {
                         insertStmt.executeBatch();
                         insertStmt.clearBatch();
                     }
