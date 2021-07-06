@@ -420,9 +420,12 @@ public class BizOptFlowImpl implements BizOptFlow {
             }
             return responseData;
         } catch (Exception e) {
+            if (bizModel.getModelTag().containsKey(ConstantValue.WORKFLOW_ERROR)){
+                bizModel.getModelTag().put(ConstantValue.WORKFLOW_ERROR,true);
+            }
             String errMsg=ObjectException.extortExceptionMessage(e, 8);
             ResponseData responseData=ResponseData.makeErrorMessageWithData(e, ResponseData.ERROR_OPERATION,
-               errMsg);
+                errMsg);
             bizModel.addResponseMapData(bizOptJson.getString("id"),responseData);
             detailLog.setLogInfo(errMsg);
             detailLog.setRunEndTime(new Date());
@@ -444,7 +447,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     }
 
     @Override
-    public BizModel debug(JSONObject bizOptJson) {
+    public BizModel debug(JSONObject bizOptJson)  {
         BizModel bizModel = null;
         JSONArray optSteps = bizOptJson.getJSONArray("steps");
         if (optSteps != null) {

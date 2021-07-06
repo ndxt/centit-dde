@@ -45,8 +45,13 @@ public class ConstantValue {
     public static final String GENERATEXCEL = "Generateexcel";
     public static final String FILEDOWNLOAD = "filedownloads";
     public static final String RETURN_JSON = "returnjson";
-    public static final String CREATE_WORKFLOW = "createWorkFlow";
-    public static final String SUBMIT_WORKFLOW ="submitWorkFlow";
     public static final String WRITE_DB ="metadata";
     public static final String ASSIGNMENT ="assignment";
+    //用于判断是否需要回滚工作流节点（当提交工作流完成后后面的节点发生异常时需要回滚工作流）
+    public static final String WORKFLOW_ERROR ="workflow_error";
+
+    public static final String CREATE_WORKFLOW = "createworkflow";
+
+    public static final String SUBMIT_WORKFLOW ="submitworkflow";
+
 }
