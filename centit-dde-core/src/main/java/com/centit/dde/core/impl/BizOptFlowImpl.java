@@ -137,7 +137,6 @@ public class BizOptFlowImpl implements BizOptFlow {
      */
     private JSONObject getBatchStep(BizModel bizModel, DataOptDescJson dataOptDescJson, String stepId, Object preResult) {
         List<JSONObject> linksJson = dataOptDescJson.getNextLinks(stepId);
-        bizModel.putDataSet("lastResult", new SimpleDataSet(preResult));
         for (JSONObject jsonObject : linksJson) {
             if (!ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
                 if (BooleanBaseOpt.castObjectToBoolean(
@@ -313,9 +312,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 preResult = runModule(dataPacket.getDataOptDescJson(), logId, queryParams, needRollBack);
             }
             if (preResult instanceof  DataSet){
-                DataSet dataSet = (DataSet)preResult;
-                Object data = dataSet.getData();
-                bizModel.putDataSet(stepId,new SimpleDataSet(data));
+                bizModel.putDataSet(stepId,(DataSet)preResult);
             }
         } else if (ConstantValue.CYCLE.equals(stepType)) {
             //当节点为“结束循环”时，将对应的循环节点信息set到json中
