@@ -297,6 +297,12 @@ public class BizOptFlowImpl implements BizOptFlow {
             Map<String, Object> queryParams = CollectionsOpt.cloneHashMap(bizModel.getModelTag());
             queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"),
                 "paramName", "paramDefaultValue"));
+            for (String key : queryParams.keySet()) {
+                Object calculateValue = VariableFormula.calculate(String.valueOf(queryParams.get(key)), new BizModelJSONTransform(bizModel));
+                if (calculateValue!=null){
+                    queryParams.put(key,calculateValue);
+                }
+            }
             if (ConstantValue.RUN_TYPE_COPY.equals(dataOptDescJson.getRunType())) {
                 DataPacketCopy dataPacket = dataPacketCopyDao
                     .getObjectWithReferences(stepJson.getString("packetName"));
@@ -305,6 +311,11 @@ public class BizOptFlowImpl implements BizOptFlow {
                 DataPacket dataPacket = dataPacketDao
                     .getObjectWithReferences(stepJson.getString("packetName"));
                 preResult = runModule(dataPacket.getDataOptDescJson(), logId, queryParams, needRollBack);
+            }
+            if (preResult instanceof  DataSet){
+                DataSet dataSet = (DataSet)preResult;
+                Object data = dataSet.getData();
+                bizModel.putDataSet(stepId,new SimpleDataSet(data));
             }
         } else if (ConstantValue.CYCLE.equals(stepType)) {
             //当节点为“结束循环”时，将对应的循环节点信息set到json中
