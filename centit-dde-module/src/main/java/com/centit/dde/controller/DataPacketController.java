@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,6 +47,9 @@ public class DataPacketController extends BaseController {
     public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacket dataPacket) {
         dataPacket.setPacketId(packetId);
         dataPacket.setDataOptDescJson(dataPacket.getDataOptDescJson());
+        if(dataPacket.getRecordDate()==null){
+            dataPacket.setRecordDate(new Date());
+        }
         dataPacketService.updateDataPacket(dataPacket);
     }
 
