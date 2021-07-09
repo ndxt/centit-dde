@@ -1,6 +1,7 @@
 package com.centit.dde.config;
 
 
+import com.centit.dde.webservice.restful.RestFulPacketWebServicesImpl;
 import com.centit.fileserver.client.ClientAsFileStore;
 import com.centit.fileserver.client.FileClientImpl;
 import com.centit.framework.components.impl.NotificationCenterImpl;
@@ -11,12 +12,15 @@ import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import redis.clients.jedis.JedisPool;
+
+import javax.annotation.PostConstruct;
 
 
 /**
@@ -35,12 +39,18 @@ public class ServiceConfig {
 
     @Value("${app.home:./}")
     private String appHome;
+
     @Value("${fileserver.url}")
     private String fileserver;
+
     @Value("${redis.host}")
     private String redisHost;
+
     @Value("${redis.port}")
     private int redisPort;
+
+    @Value("${dde.webservice.server.url}")
+    private String webserviceUrl;
 
     /**
      * 这个bean必须要有
@@ -54,7 +64,7 @@ public class ServiceConfig {
 
     @Bean
     public JedisPool jedisPool() {
-        JedisPool jedisPool= new JedisPool(redisHost, redisPort);
+        JedisPool jedisPool= new JedisPool(redisHost,redisPort);
         return jedisPool;
     }
 
@@ -89,4 +99,15 @@ public class ServiceConfig {
         return fileStoreBean;
     }
 
+   @PostConstruct
+    public void jaxWsServerFactoryBean(){
+       //创建服务工厂对象
+       JAXRSServerFactoryBean factoryBean=new JAXRSServerFactoryBean();
+       //设置服务地址
+       factoryBean.setAddress(webserviceUrl);
+       //设置实现类（服务类）对象
+       factoryBean.setServiceBean(new RestFulPacketWebServicesImpl());
+       //发布服务
+       factoryBean.create();
+    }
 }
