@@ -68,7 +68,7 @@
             <groupId>com.centit.product</groupId>
             <artifactId>database-metadata</artifactId>
             <version>${metadata.version}</version>
-            <exclusions>
+         <!--   <exclusions>
                 <exclusion>
                     <artifactId>cxf-core</artifactId>
                     <groupId>org.apache.cxf</groupId>
@@ -89,7 +89,7 @@
                     <artifactId>cxf-rt-transports-http</artifactId>
                     <groupId>org.apache.cxf</groupId>
                 </exclusion>
-            </exclusions>
+            </exclusions>-->
         </dependency>
     </dependencies>
 
