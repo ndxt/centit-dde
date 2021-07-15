@@ -53,5 +53,5 @@ public class ConstantValue {
     public static final String CREATE_WORKFLOW = "createworkflow";
 
     public static final String SUBMIT_WORKFLOW ="submitworkflow";
-
+public static final  String RESPONSE_DATA_CODE="responseDataCode";
 }
