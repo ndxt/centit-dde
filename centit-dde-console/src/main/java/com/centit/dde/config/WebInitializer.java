@@ -2,13 +2,11 @@ package com.centit.dde.config;
 
 import com.centit.framework.config.SystemSpringMvcConfig;
 import com.centit.framework.config.WebConfig;
-import org.apache.cxf.transport.servlet.CXFServlet;
 import org.springframework.web.WebApplicationInitializer;
 
 import javax.annotation.Nonnull;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
 
 /**
  *
@@ -19,11 +17,6 @@ import javax.servlet.ServletRegistration;
 public class WebInitializer implements WebApplicationInitializer {
     @Override
     public void onStartup(@Nonnull ServletContext servletContext) throws ServletException {
-        //webservices  start
-        ServletRegistration.Dynamic cxfServlet = servletContext.addServlet("cxfServlet", CXFServlet.class);
-        cxfServlet.addMapping("/webservice/*");
-        cxfServlet.setLoadOnStartup(1);
-        //webservices  end
         WebConfig.registerSpringConfig(servletContext, ServiceConfig.class);
 
         String [] servletUrlPatterns = {"/system/*","/dde/*"};

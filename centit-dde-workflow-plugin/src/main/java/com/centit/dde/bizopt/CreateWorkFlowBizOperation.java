@@ -48,8 +48,6 @@ public class CreateWorkFlowBizOperation implements BizOperation {
         FlowInstance instance;
         try {
             instance = flowEngine.createInstance(createFlowOptions);
-            //用于判断工作流是否需要强制结束（如果后面节点有异常出现，那此时的创建工作流流程作废）
-            bizModel.getModelTag().put(ConstantValue.WORKFLOW_ERROR,false);
         } catch (Exception e) {
             bizModel.putDataSet(id,new SimpleDataSet(e.getMessage()));
             return BuiltInOperation.getResponseData(0, 500, e.getMessage());

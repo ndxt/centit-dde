@@ -68,28 +68,6 @@
             <groupId>com.centit.product</groupId>
             <artifactId>database-metadata</artifactId>
             <version>${metadata.version}</version>
-         <!--   <exclusions>
-                <exclusion>
-                    <artifactId>cxf-core</artifactId>
-                    <groupId>org.apache.cxf</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-                    <groupId>org.apache.cxf</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>cxf-rt-rs-client</artifactId>
-                    <groupId>org.apache.cxf</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>cxf-rt-security</artifactId>
-                    <groupId>org.apache.cxf</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>cxf-rt-transports-http</artifactId>
-                    <groupId>org.apache.cxf</groupId>
-                </exclusion>
-            </exclusions>-->
         </dependency>
     </dependencies>
 

@@ -18,6 +18,13 @@
             <artifactId>centit-dde-es-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-webservices-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.shentong</groupId>
             <artifactId>shentongjdbc</artifactId>

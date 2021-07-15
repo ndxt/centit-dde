@@ -24,7 +24,6 @@ import redis.clients.jedis.JedisPool;
  */
 @EnableAsync
 @EnableScheduling
-@ImportResource({"classpath:META-INF/cxf/cxf.xml","classpath:application-cxf.xml"})
 @Import({IPOrStaticAppSystemBeanConfig.class,
     SpringSecurityDaoConfig.class,
     JdbcConfig.class})

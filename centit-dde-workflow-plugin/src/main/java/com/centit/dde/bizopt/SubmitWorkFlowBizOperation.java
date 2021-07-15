@@ -45,8 +45,6 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
         List<String> list;
         try {
             list = flowEngine.submitOpt(submitOptOptions);
-            //用于判断工作流是否需要回滚到上个节点
-            bizModel.getModelTag().put(ConstantValue.WORKFLOW_ERROR,false);
         } catch (Exception e) {
             bizModel.putDataSet(id,new SimpleDataSet(e.getMessage()));
             return BuiltInOperation.getResponseData(0, 500, e.getMessage());

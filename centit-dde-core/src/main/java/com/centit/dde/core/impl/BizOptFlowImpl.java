@@ -397,7 +397,6 @@ public class BizOptFlowImpl implements BizOptFlow {
      */
     public ResponseData runOneStepOpt(DataOptDescJson dataOptDescJson,
                                       BizModel bizModel, JSONObject bizOptJson, String logId) {
-        long startTime = System.currentTimeMillis();
         String sOptType = bizOptJson.getString("type");
         BizOperation opt = allOperations.get(sOptType);
         if (opt == null) {
@@ -428,9 +427,6 @@ public class BizOptFlowImpl implements BizOptFlow {
             }
             return responseData;
         } catch (Exception e) {
-            if (bizModel.getModelTag().containsKey(ConstantValue.WORKFLOW_ERROR)){
-                bizModel.getModelTag().put(ConstantValue.WORKFLOW_ERROR,true);
-            }
             String errMsg=ObjectException.extortExceptionMessage(e, 8);
             ResponseData responseData=ResponseData.makeErrorMessageWithData(e, ResponseData.ERROR_OPERATION,
                 errMsg);
