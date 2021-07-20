@@ -112,7 +112,7 @@ public class BuiltInOperation {
     public static ResponseData runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
         InputStream inputStream = (InputStream)bizModel.getModelTag().get("requestFile");
         DataSet destDs = BizOptUtils.castObjectToDataSet(inputStream);
-        bizModel.putDataSet("requestFile", destDs);
+        bizModel.putDataSet(bizOptJson.getString("id"), destDs);
         return getResponseSuccessData(destDs.getSize());
     }
     public static Object returnExcel(BizModel bizModel, JSONObject bizOptJson) throws Exception{

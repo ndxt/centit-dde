@@ -82,7 +82,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
         allOperations.put("sche", BuiltInOperation::runStart);
         allOperations.put("Getpostdata", BuiltInOperation::runRequestBody);
-        allOperations.put("resFile", BuiltInOperation::runRequestFile);
+        allOperations.put("Getpostfile", BuiltInOperation::runRequestFile);
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
         allOperations.put("append", BuiltInOperation::runAppend);
@@ -397,6 +397,7 @@ public class BizOptFlowImpl implements BizOptFlow {
      */
     public ResponseData runOneStepOpt(DataOptDescJson dataOptDescJson,
                                       BizModel bizModel, JSONObject bizOptJson, String logId) {
+        long startTime = System.currentTimeMillis();
         String sOptType = bizOptJson.getString("type");
         BizOperation opt = allOperations.get(sOptType);
         if (opt == null) {
@@ -425,8 +426,11 @@ public class BizOptFlowImpl implements BizOptFlow {
                 detailLog.setRunEndTime(new Date());
                 taskDetailLogDao.updateObject(detailLog);
             }
+            long expendTime = System.currentTimeMillis() - startTime;
+            logger.info(String.format("节点：%s，运行耗时:%s ms", bizOptJson.getString("SetsName"), expendTime));
             return responseData;
         } catch (Exception e) {
+            logger.error(String.format("节点：%s，运行异常:%s", bizOptJson.getString("SetsName"), e.getMessage()));
             String errMsg=ObjectException.extortExceptionMessage(e, 8);
             ResponseData responseData=ResponseData.makeErrorMessageWithData(e, ResponseData.ERROR_OPERATION,
                 errMsg);

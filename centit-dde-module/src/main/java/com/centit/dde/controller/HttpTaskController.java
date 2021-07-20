@@ -83,7 +83,8 @@ public class HttpTaskController extends BaseController {
         Map<String, Object> params = collectRequestParameters(request);
         params.put("runType", runType);
         if (!"GET".equals(request.getMethod())) {
-            if (StringUtils.contains(request.getHeader("content-type"), "application")) {
+            if (StringUtils.contains(request.getHeader("content-type"), "application")
+            &&!StringUtils.contains(request.getHeader("content-type"), "application/octet-stream")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
                 if (!StringBaseOpt.isNvl(bodyString)) {
                     params.put("requestBody", bodyString);
