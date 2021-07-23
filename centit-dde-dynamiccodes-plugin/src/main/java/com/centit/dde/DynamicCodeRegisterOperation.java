@@ -2,6 +2,7 @@ package com.centit.dde;
 
 import com.centit.dde.bizopt.DynamicCodeBizOperation;
 import com.centit.dde.core.BizOptFlow;
+import com.centit.dde.utils.ConstantValue;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -14,6 +15,6 @@ public class DynamicCodeRegisterOperation {
 
     @PostConstruct
     void registerOperation(){
-        bizOptFlow.registerOperation("readEs",new DynamicCodeBizOperation());
+        bizOptFlow.registerOperation(ConstantValue.DYNAMIC_CODE,new DynamicCodeBizOperation());
     }
 }
