@@ -7,10 +7,12 @@ import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.datarule.CheckRule;
 import com.centit.dde.datarule.CheckRuleUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
+import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.support.algorithm.*;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
+import com.centit.support.image.CaptchaImageUtil;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutableTriple;
@@ -35,6 +37,8 @@ public abstract class DataSetOptUtil {
         formula.addExtendFunc("toJson", (a) -> JSON.parse(
             StringBaseOpt.castObjectToString(a[0])));
         formula.addExtendFunc("uuid", (a) -> UuidOpt.getUuidAsString32());
+        formula.addExtendFunc("random", (a) -> CaptchaImageUtil.getRandomString(NumberBaseOpt.castObjectToInteger(a[0])));
+        formula.addExtendFunc("encode", (a) -> new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
         formula.addExtendFunc("dict", (a) -> {
             if (a != null && a.length > 1) {
                 String regex =",";
