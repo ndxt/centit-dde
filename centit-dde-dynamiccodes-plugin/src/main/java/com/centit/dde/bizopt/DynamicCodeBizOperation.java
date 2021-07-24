@@ -1,6 +1,5 @@
 package com.centit.dde.bizopt;
 
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
@@ -16,6 +15,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,14 +46,14 @@ public class DynamicCodeBizOperation implements BizOperation {
     private Object assembleCode(DynamicCodeParam dynamicCodeParam) throws Exception {
         String javaCode;
         //加载第三方依赖包
-        if (StrUtil.isNotBlank(dynamicCodeParam.getMavenDeps())){
+        if (StringUtils.isNotBlank(dynamicCodeParam.getMavenDeps())){
             JarService.savePom(StaticValue.mavenDeps(dynamicCodeParam.getMavenDeps()));
         }
-        if (StrUtil.isNotBlank(dynamicCodeParam.getImportClass())){
+        if (StringUtils.isNotBlank(dynamicCodeParam.getImportClass())){
             StringBuilder builderCode = new StringBuilder();
             builderCode.append("package com.centit.dde;\r\n");
             builderCode.append("\r\n");
-            if (StrUtil.isNotBlank(dynamicCodeParam.getImportClass())){
+            if (StringUtils.isNotBlank(dynamicCodeParam.getImportClass())){
                 builderCode.append(dynamicCodeParam.getImportClass()+"\r\n");
                 builderCode.append("\r\n");
             }

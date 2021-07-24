@@ -1,7 +1,7 @@
 package com.centit.dde.java;
 
-import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Joiner;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -201,7 +201,7 @@ public class DynamicEngine {
 
 	public <T> T javaCodeToObject(String content) throws IllegalAccessException, InstantiationException, IOException, Exception {
 		String className = JavaSourceUtil.findFullName(content);
-		if (StrUtil.isBlank(className)) {
+		if (StringUtils.isBlank(className)) {
 			throw new ClassFormatError("can find class name ,please define it ! use javaCodeToObject(String fullClassName, String javaCode)");
 		}
 		return (T) this.javaCodeToObject(className, content);
@@ -209,7 +209,7 @@ public class DynamicEngine {
 
 	public Class<?> javaCodeToClass(String content) throws IOException, Exception {
 		String className = JavaSourceUtil.findFullName(content);
-		if (StrUtil.isBlank(className)) {
+		if (StringUtils.isBlank(className)) {
 			throw new ClassFormatError("can find class name ,please define it ! use javaCodeToObject(String fullClassName, String javaCode)");
 		}
 		return this.javaCodeToClass(className, content);

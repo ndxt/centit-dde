@@ -1,12 +1,12 @@
 package com.centit.dde.java;
 
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.domain.CodeInfo;
 import com.centit.dde.domain.Task;
 import com.centit.dde.exception.CodeRuntimeException;
 import com.centit.dde.util.MapCount;
 import com.sun.org.apache.bcel.internal.classfile.CodeException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,7 +148,7 @@ public class JavaRunner {
         Method[] declaredMethods = codeInfo.getClassz().getDeclaredMethods();
         Method method=null;
         if (declaredMethods.length>=2){//当类中有2个或者2个以上的方法时必须填写方法名
-            if (StrUtil.isBlank(methodName)){
+            if (StringUtils.isBlank(methodName)){
                 return "类中存在多个方法，请指定执行的方法名！";
             }
             for (Method declaredMethod : declaredMethods) {

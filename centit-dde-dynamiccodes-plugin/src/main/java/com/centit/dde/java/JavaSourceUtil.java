@@ -1,6 +1,6 @@
 package com.centit.dde.java;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class JavaSourceUtil {
 			br = new BufferedReader(new StringReader(sourceCode));
 			String temp = null;
 			while ((temp = br.readLine()) != null) {
-				if (StrUtil.isBlank(temp)) {
+				if (StringUtils.isBlank(temp)) {
 					continue;
 				}
 				if (temp.trim().startsWith("package ")) {
@@ -68,7 +68,7 @@ public class JavaSourceUtil {
 			String temp = null;
 
 			while ((temp = br.readLine()) != null) {
-				if (StrUtil.isBlank(temp)) {
+				if (StringUtils.isBlank(temp)) {
 					continue;
 				}
 				Matcher matcher = PAT.matcher(temp);

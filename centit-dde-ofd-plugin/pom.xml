@@ -33,21 +33,11 @@
             <artifactId>suwell-web-reader</artifactId>
             <version>3.45.191114</version>
         </dependency>
+
         <dependency>
             <groupId>fakepath</groupId>
             <artifactId>suwell-native-render</artifactId>
             <version>1.46.191106</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>5.6.1</version>
         </dependency>
 
         <dependency>

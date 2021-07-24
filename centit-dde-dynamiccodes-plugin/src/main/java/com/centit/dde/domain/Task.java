@@ -1,5 +1,6 @@
 package com.centit.dde.domain;
 
+
 public class Task {
 	private String id;
 	private String name;
@@ -14,6 +15,7 @@ public class Task {
 	private CodeInfo codeInfo = new CodeInfo();
 	// 2:cron
 	private Integer type=2;
+
 	public String getId() {
 		return id;
 	}

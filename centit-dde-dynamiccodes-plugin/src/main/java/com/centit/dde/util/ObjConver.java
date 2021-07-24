@@ -1,6 +1,6 @@
 package com.centit.dde.util;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,14 +15,14 @@ public class ObjConver {
 	}
 
 	public static Double getDoubleValue(String value) {
-		if (StrUtil.isBlank(value)) {
+		if (StringUtils.isBlank(value)) {
 			return 0D;
 		}
 		return castToDouble(value);
 	}
 
 	public static Float getFloat(String value) {
-		if (StrUtil.isBlank(value)) {
+		if (StringUtils.isBlank(value)) {
 			return null;
 		}
 		return castToFloat(value);
@@ -37,14 +37,14 @@ public class ObjConver {
 	}
 
 	public static int getIntValue(String value) {
-		if (StrUtil.isBlank(value)) {
+		if (StringUtils.isBlank(value)) {
 			return 0;
 		}
 		return castToInteger(value);
 	}
 
 	public static Date getDate(String value) {
-		if (StrUtil.isBlank(value)) {
+		if (StringUtils.isBlank(value)) {
 			return null;
 		}
 		return castToDate(value);
@@ -55,7 +55,7 @@ public class ObjConver {
 	}
 
 	public static long getLongValue(String value) {
-		if (StrUtil.isBlank(value)) {
+		if (StringUtils.isBlank(value)) {
 			return 0L;
 		}
 		return castToLong(value);
@@ -66,7 +66,7 @@ public class ObjConver {
 	}
 
 	public static boolean getBooleanValue(String value) {
-		if (StrUtil.isBlank(value)) {
+		if (StringUtils.isBlank(value)) {
 			return false;
 		}
 		return castToBoolean(value);

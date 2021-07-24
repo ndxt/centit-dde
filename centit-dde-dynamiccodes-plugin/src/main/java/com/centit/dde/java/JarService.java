@@ -1,10 +1,10 @@
 package com.centit.dde.java;
 
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.util.IOUtil;
 import com.centit.dde.util.MD5Util;
 import com.centit.dde.util.StaticValue;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public class JarService {
 		config = readConfig();
 
 		// 加载mavenpath
-		if (StrUtil.isBlank(config.getString(MAVEN_PATH))) {
+		if (StringUtils.isBlank(config.getString(MAVEN_PATH))) {
 			setMavenPath(getMavenPath());
 		}
 
@@ -105,16 +105,16 @@ public class JarService {
 			mavenPath = config.getString(MAVEN_PATH);
 		}
 
-		if (StrUtil.isBlank(mavenPath)) {
+		if (StringUtils.isBlank(mavenPath)) {
 			mavenPath = System.getProperty(StaticValue.PREFIX + "maven");
 		}
 
-		if (StrUtil.isBlank(mavenPath)) {
+		if (StringUtils.isBlank(mavenPath)) {
 			String home = getPathByVar("MAVEN_HOME");
-			if (StrUtil.isBlank(home)) {
+			if (StringUtils.isBlank(home)) {
 				home = getPathByVar("M2_HOME");
 			}
-			if (StrUtil.isBlank(home)) {
+			if (StringUtils.isBlank(home)) {
 				mavenPath = "mvn";
 			} else {
 				mavenPath = home + "/bin/mvn";
@@ -286,7 +286,7 @@ public class JarService {
 	private static String getPathByVar(String var) {
 		String home = System.getProperty(var);
 
-		if (StrUtil.isBlank(home)) {
+		if (StringUtils.isBlank(home)) {
 			home = System.getenv("MAVEN_HOME");
 		}
 		return home;
