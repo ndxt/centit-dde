@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.centit.support.common.TimeInterval;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -60,7 +61,7 @@ public class OFDPreviewBizOperation implements BizOperation {
         if (StringUtils.isNotBlank(urlParam)){
             urlParam=urlParam+"reader?&type=upload";
         }
-        TimeInterval timer = DateUtil.timer();
+        TimeInterval timer = new TimeInterval();
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost uploadFile = new HttpPost(urlParam);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();

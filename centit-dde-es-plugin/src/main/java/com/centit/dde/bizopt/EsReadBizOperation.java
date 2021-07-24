@@ -14,6 +14,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.support.common.TimeInterval;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -44,7 +45,7 @@ public class EsReadBizOperation implements BizOperation {
     //ES查询操作
     private ResponseData queryEs(BizModel bizModel, JSONObject bizOptJson){
         EsReadVo esReadVo = JSONObject.parseObject(bizOptJson.toJSONString(), EsReadVo.class);
-        TimeInterval timer = DateUtil.timer();
+        TimeInterval timer = new TimeInterval();
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(esReadVo.getDataSourceId());
         log.debug("获取元数据信息耗时："+timer.intervalRestart()+"ms,获取元数据信息："+sourceInfo.toString());
         GenericObjectPool<RestHighLevelClient> restHighLevelClientGenericObjectPool =
