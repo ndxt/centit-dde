@@ -17,6 +17,8 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,7 @@ public class DynamicCodeBizOperation implements BizOperation {
      */
     private Object assembleCode(DynamicCodeParam dynamicCodeParam) throws Exception {
         String javaCode;
+        String libUrl = init();
         //加载第三方依赖包
         if (StringUtils.isNotBlank(dynamicCodeParam.getMavenDeps())){
             JarService.savePom(StaticValue.mavenDeps(dynamicCodeParam.getMavenDeps()));
@@ -72,7 +75,18 @@ public class DynamicCodeBizOperation implements BizOperation {
         task.setName(dynamicCodeParam.getId());
         task.setStatus(1);
         task.setCode(javaCode);
-        return run(task,dynamicCodeParam.getMethodParams(),dynamicCodeParam.getMethodName());
+        Object result = run(task, dynamicCodeParam.getMethodParams(), dynamicCodeParam.getMethodName());
+        return result;
+    }
+    /**
+     * 环境初始化
+     */
+    private String init() throws IOException {
+        String home = StaticValue.HOME;
+        StaticValue.makeFiles(home);
+        // 初始化Jar环境
+        JarService.init();
+        return home;
     }
 
     /**
@@ -82,10 +96,6 @@ public class DynamicCodeBizOperation implements BizOperation {
      * @return
      */
     private Object run(Task task,JSONObject params,String methodName) throws Exception {
-        String home = StaticValue.HOME;
-        StaticValue.makeFiles(home);
-        // 初始化Jar环境
-        JarService.init();
         JavaRunner javaRunner = new JavaRunner(task);
         if(javaRunner.check()) {
             return javaRunner.compile().instance().execute(methodName, params);
@@ -116,7 +126,14 @@ public class DynamicCodeBizOperation implements BizOperation {
         dynamicCodeParam.setImportClass("import java.util.ArrayList;\n" +
             "import java.util.List;");
         dynamicCodeParam.setMethodParams(jsonObject);
-        //dynamicCodeParam.setMethodName("test1");
+        dynamicCodeParam.setMavenDeps(" <dependency>\n" +
+            "            <groupId>javax.servlet</groupId>\n" +
+            "            <artifactId>javax.servlet-api</artifactId>\n" +
+            "            <scope>provided</scope>\n" +
+            "        </dependency>");
+        dynamicCodeParam.setMethodName("test1");
         System.out.println(new DynamicCodeBizOperation().assembleCode(dynamicCodeParam));
+        boolean delete = new File(StaticValue.HOME).delete();
+        System.out.println("删除动态代码依赖文件:"+delete);
     }
 }

@@ -53,20 +53,16 @@ public class EsWriteBizOperation implements BizOperation {
             String jsonData = JSONObject.toJSONString(datum);
             addData.add(jsonData);
         }
-        TimeInterval timer = DateUtil.timer();
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(esSearchWriteEntity.getDataSourceId());
-        log.debug("获取元数据信息耗时："+timer.intervalRestart()+"ms,获取元数据信息："+sourceInfo.toString());
         GenericObjectPool<RestHighLevelClient> restHighLevelClientGenericObjectPool = PooledRestClientFactory.obtainclientPool(new ElasticSearchConfig(), sourceInfo);
         RestHighLevelClient restHighLevelClient=null;
         try {
             restHighLevelClient = restHighLevelClientGenericObjectPool.borrowObject();
-            log.debug("获restHighLevelClient耗时："+timer.intervalRestart()+"ms");
             String indexName = esSearchWriteEntity.getIndexName();
             if (!EsIndexNameExistsUtils.indexNameExists(restHighLevelClient,indexName)){
                 return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+":"+indexName+"索引不存在！");
             }
             Boolean indexResponse = ElasticsearchWriteUtils.batchSaveDocuments(restHighLevelClient,addData, esSearchWriteEntity);
-            log.info("插入ES数据耗时："+timer.intervalRestart()+"ms");
             bizModel.putDataSet(esSearchWriteEntity.getId(),new SimpleDataSet(indexResponse));
             return ResponseSingleData.makeResponseData(indexResponse);
         }finally {

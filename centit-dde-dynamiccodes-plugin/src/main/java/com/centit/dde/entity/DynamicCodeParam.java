@@ -14,7 +14,7 @@ public class DynamicCodeParam {
     private String javaCode;
     //方法依赖的类 （如果传入的是类，该参数不填）
     private String importClass;
-    //第三方依赖
+    //第三方依赖(maven 包)
     private  String mavenDeps;
     //表达式
     private  String expression;

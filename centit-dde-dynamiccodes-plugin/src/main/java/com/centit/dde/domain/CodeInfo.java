@@ -7,12 +7,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Method;
 import java.util.*;
 
-/**
- * the code init info
- *
- * @author ansj
- *
- */
 public class CodeInfo {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CodeInfo.class);

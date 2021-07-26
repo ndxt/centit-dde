@@ -9,37 +9,58 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class StaticValue {
-	private static final Logger LOG = LoggerFactory.getLogger(StaticValue.class);
-	public static final String PREFIX = "dynamic_";
-	public static final String HOME = getValueOrCreate("user.dir", new File(System.getProperty("user.dir"), "centit-dde-dynamiccodes-plugin"+File.separator+"temp").getAbsolutePath());
+    private static final Logger LOG = LoggerFactory.getLogger(StaticValue.class);
+    public static final String PREFIX = "dynamic_";
+    public static final String HOME = getValueOrCreate("user.dir", new File(System.getProperty("user.dir"), "centit-dde-dynamiccodes-plugin"+File.separator+"temp").getAbsolutePath())+ File.separator+System.currentTimeMillis()+File.separator;
 
 
-	public static String getValueOrCreate(String key, String def) {
-		String value = System.getProperty(PREFIX + key);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("get property " + key + ":" + value);
-		}
-		if (value == null) {
-			if (def != null) {
-				System.setProperty(PREFIX + key, def);
-			}
-			return def;
-		} else {
-			return value;
-		}
-	}
+    public static String getValueOrCreate(String key, String def) {
+        String value = System.getProperty(PREFIX + key);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("get property " + key + ":" + value);
+        }
+        if (value == null) {
+            if (def != null) {
+                System.setProperty(PREFIX + key, def);
+            }
+            return def;
+        } else {
+            return value;
+        }
+    }
 
     //pom.xml文件内容
     public static String mavenDeps(String content) {
-        return "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
-            + "	xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n"
-            + "	<modelVersion>4.0.0</modelVersion>\n" + "	<groupId>org.nlpcn</groupId>\n" + "	<artifactId>jcoder</artifactId>\n" + "	<version>0.1</version>\n"
-            + "	\n" + "	<dependencies>\n" + content + "	</dependencies>\n" + "\n" + "	<build>\n" + "		<sourceDirectory>src/main/java</sourceDirectory>\n"
-            + "		<testSourceDirectory>src/test/java</testSourceDirectory>\n" + "		\n" + "		<plugins>\n" + "			<plugin>\n"
-            + "				<artifactId>maven-compiler-plugin</artifactId>\n" + "				<version>3.3</version>\n" + "				<configuration>\n"
-            + "					<source>1.8</source>\n" + "					<target>1.8</target>\n" + "					<encoding>UTF-8</encoding>\n"
-            + "					<compilerArguments>\n" + "						<extdirs>lib</extdirs>\n" + "					</compilerArguments>\n"
-            + "				</configuration>\n" + "			</plugin>\n" + "		</plugins>\n" + "	</build>\n" + "</project>\n" + "";
+        return "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+            "\txsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n" +
+            "\t<modelVersion>4.0.0</modelVersion>\n" +
+            "\t<groupId>org.nlpcn</groupId>\n" +
+            "\t<artifactId>jcoder</artifactId>\n" +
+            "\t<version>0.1</version>\n" +
+            "\t\n" +
+            "\t<dependencies>\n" +
+            " \t\t" +
+            content+
+            "\n" +
+            "\t</dependencies>\n" +
+            "\n" +
+            "\t<build>\n" +
+            "\t\t<plugins>\n" +
+            "\t\t\t<plugin>\n" +
+            "\t\t\t\t<artifactId>maven-compiler-plugin</artifactId>\n" +
+            "\t\t\t\t<version>3.3</version>\n" +
+            "\t\t\t\t<configuration>\n" +
+            "\t\t\t\t\t<source>1.8</source>\n" +
+            "\t\t\t\t\t<target>1.8</target>\n" +
+            "\t\t\t\t\t<encoding>UTF-8</encoding>\n" +
+            "\t\t\t\t\t<compilerArguments>\n" +
+            "\t\t\t\t\t\t<extdirs>lib</extdirs>\n" +
+            "\t\t\t\t\t</compilerArguments>\n" +
+            "\t\t\t\t</configuration>\n" +
+            "\t\t\t</plugin>\n" +
+            "\t\t</plugins>\n" +
+            "\t</build>\n" +
+            "</project>";
     }
 
     /**

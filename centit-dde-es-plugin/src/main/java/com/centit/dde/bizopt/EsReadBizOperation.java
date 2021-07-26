@@ -44,9 +44,7 @@ public class EsReadBizOperation implements BizOperation {
     //ES查询操作
     private ResponseData queryEs(BizModel bizModel, JSONObject bizOptJson){
         EsReadVo esReadVo = JSONObject.parseObject(bizOptJson.toJSONString(), EsReadVo.class);
-        TimeInterval timer = DateUtil.timer();
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(esReadVo.getDataSourceId());
-        log.debug("获取元数据信息耗时："+timer.intervalRestart()+"ms,获取元数据信息："+sourceInfo.toString());
         GenericObjectPool<RestHighLevelClient> restHighLevelClientGenericObjectPool =
             PooledRestClientFactory.obtainclientPool(new ElasticSearchConfig(), sourceInfo);
         RestHighLevelClient restHighLevelClient = null;
@@ -56,9 +54,7 @@ public class EsReadBizOperation implements BizOperation {
                 return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+":"
                     +esReadVo.getQueryParameter().getIndexName()+"索引不存在！");
             }
-            log.debug("获restHighLevelClient耗时："+timer.intervalRestart()+"ms");
             JSONArray result = ElasticsearchReadUtils.combinationQuery(restHighLevelClient, esReadVo);
-            log.info("查询类型:"+esReadVo.getQueryParameter().getIndexName()+",查询ES耗时："+timer.intervalRestart()+"ms");
             bizModel.putDataSet(esReadVo.getId(),new SimpleDataSet(result));
         }catch (Exception e){
             return BuiltInOperation.getResponseData(0, 500,"查询es数据异常,异常信息："+e.getMessage());
