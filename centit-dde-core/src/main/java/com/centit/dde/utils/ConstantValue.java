@@ -38,7 +38,7 @@ public class ConstantValue {
 
     public static final String CYCLE_JUMP_BREAK = "break";
     public static final String CYCLE_FINISH = "finishCycle";
-
+    public static final String DATA_COPY ="1";
     public static final String GENERATEJSON = "Generatejson";
     public static final String GENERATECSV = "Generatecsv";
     public static final String FILEUPLOADS = "fileuploads";

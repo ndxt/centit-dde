@@ -3,23 +3,83 @@ package com.centit.dde.core;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.framework.common.ResponseData;
 
 import java.util.*;
 
 /**
  * @author zhf
  */
-
-public class DataOptDescJson {
-    private Map<String, JSONObject> nodeMap=new HashMap<>(50);
-    private Map<String, List<JSONObject>> linkMap=new HashMap<>(100);
+public class DataOptStepWithBizModel {
+    private Map<String, JSONObject> nodeMap = new HashMap<>(50);
+    private Map<String, List<JSONObject>> linkMap = new HashMap<>(100);
     private JSONObject currentStep;
     private int stepNo;
     private String runType;
 
-    public DataOptDescJson(JSONObject dataOptJson) {
+    public SimpleBizModel getBizModel() {
+        return bizModel;
+    }
+
+    public void setBizModel(SimpleBizModel bizModel) {
+        this.bizModel = bizModel;
+    }
+
+    private SimpleBizModel bizModel;
+
+    public Object getPreResult() {
+        return preResult;
+    }
+
+    public void setPreResult(Object preResult) {
+        this.preResult = preResult;
+    }
+
+    private Object preResult;
+
+    public Map<String, Object> getQueryParams() {
+        return queryParams;
+    }
+
+    public void setQueryParams(Map<String, Object> queryParams) {
+        this.queryParams = queryParams;
+    }
+
+    private Map<String, Object> queryParams;
+
+    public String getLogId() {
+        return logId;
+    }
+
+    public void setLogId(String logId) {
+        this.logId = logId;
+    }
+
+    private String logId;
+
+    public String getNeedRollback() {
+        return needRollback;
+    }
+
+    public void setNeedRollback(String needRollback) {
+        this.needRollback = needRollback;
+    }
+
+    private String needRollback;
+
+    public DataOptStepWithBizModel(JSONObject dataOptJson, String needRollback, SimpleBizModel bizModel) {
         stepNo = 0;
-        this.runType = ConstantValue.RUN_TYPE_NORMAL;
+        this.bizModel = bizModel;
+        this.logId = bizModel.getModelName();
+        this.needRollback = needRollback;
+        this.queryParams = bizModel.getModelTag();
+        String runType = (String) queryParams.get("runType");
+        if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
+            this.runType = ConstantValue.RUN_TYPE_COPY;
+        } else {
+            this.runType = ConstantValue.RUN_TYPE_NORMAL;
+        }
+        this.preResult = ResponseData.successResponse;
         mapData(dataOptJson);
     }
 
@@ -40,7 +100,7 @@ public class DataOptDescJson {
                 if (nextNodes != null) {
                     nextNodes.add(linkJson);
                 } else {
-                    List<JSONObject> jsonObjects= new ArrayList<>();
+                    List<JSONObject> jsonObjects = new ArrayList<>();
                     jsonObjects.add(linkJson);
                     linkMap.put(linkJson.getString("sourceId"),
                         jsonObjects);
@@ -64,7 +124,7 @@ public class DataOptDescJson {
 
     public JSONObject getNextStep(String id) {
         List<JSONObject> links = getNextLinks(id);
-        if (links == null||links.size()!=1) {
+        if (links == null || links.size() != 1) {
             return null;
             //throw new ObjectException("不是有且只有一个后续节点");
         }
@@ -80,31 +140,31 @@ public class DataOptDescJson {
         ArrayDeque<String> brachNode = new ArrayDeque<>();
         String curId = id;
         int cascade = 0;
-        while(true){
+        while (true) {
             List<JSONObject> nexts = linkMap.get(curId);
-            if(nexts != null && nexts.size() > 0){
-                for(JSONObject n : nexts){
+            if (nexts != null && nexts.size() > 0) {
+                for (JSONObject n : nexts) {
                     String nId = n.getString("targetId");
-                    if(hasAddedNode.contains(nId)){
+                    if (hasAddedNode.contains(nId)) {
                         continue;
                     }
                     hasAddedNode.add(nId);
                     JSONObject nextNode =
                         nodeMap.get(n.getString("targetId"));
                     String stepType = nextNode.getString("type");
-                    if(ConstantValue.CYCLE_FINISH.equals(stepType)) {
+                    if (ConstantValue.CYCLE_FINISH.equals(stepType)) {
                         if (cascade == 0) {
                             return nextNode;
                         } else {
-                            cascade -- ;
+                            cascade--;
                         }
-                    } else if(ConstantValue.CYCLE.equals(stepType)) {
-                        cascade ++;
+                    } else if (ConstantValue.CYCLE.equals(stepType)) {
+                        cascade++;
                     }
                     brachNode.push(nId);
                 }
             }
-            if(brachNode.isEmpty()){
+            if (brachNode.isEmpty()) {
                 break;
             }
             curId = brachNode.pop();
@@ -116,9 +176,16 @@ public class DataOptDescJson {
         return currentStep;
     }
 
+    public void setNextStep() {
+        if (currentStep != null) {
+            setCurrentStep(
+                getNextStep(currentStep.getString("id")));
+        }
+    }
+
     public void setCurrentStep(JSONObject currentStep) {
         this.currentStep = currentStep;
-        stepNo ++;
+        stepNo++;
     }
 
     public int getStepNo() {
