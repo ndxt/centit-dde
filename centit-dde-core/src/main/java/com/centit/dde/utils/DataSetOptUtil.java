@@ -72,6 +72,24 @@ public abstract class DataSetOptUtil {
                 return null;
             }
         });
+        formula.addExtendFunc("size",(a)->{
+            Object o = Arrays.stream(a).toArray()[0];
+            if (o instanceof Collection){
+                return ((Collection<?>) o).size();
+            }
+            if (o instanceof Map){
+                return ((Map<?, ?>) o).size();
+            }
+            return null;
+        });
+        formula.addExtendFunc("concats",(a)->{
+            StringBuilder builder = new StringBuilder();
+            Object[] objects = Arrays.stream(a).toArray();
+            for (Object object : objects) {
+                builder.append(object);
+            }
+            return builder.toString();
+        });
         return formula;
     }
 
