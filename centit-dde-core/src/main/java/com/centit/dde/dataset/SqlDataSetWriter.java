@@ -88,13 +88,7 @@ public class SqlDataSetWriter implements DataSetWriter {
                     successNums++;
                 }
             } catch (SQLException e) {
-                successNums = 0;
-                errorNums = 0;
-                info = e.getMessage();
-                for (Map<String, Object> row : dataSet.getDataAsList()) {
-                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
-                    errorNums++;
-                }
+                dealWholeException(dataSet, e);
             }
         } else {
             /* 这部分也可以 直接运行sql语句 而不是用 GeneralJsonObjectDao 方式来提高效率 */
@@ -150,13 +144,7 @@ public class SqlDataSetWriter implements DataSetWriter {
                     successNums++;
                 }
             } catch (SQLException e) {
-                successNums = 0;
-                errorNums = 0;
-                info = e.getMessage();
-                for (Map<String, Object> row : dataSet.getDataAsList()) {
-                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
-                    errorNums++;
-                }
+                dealWholeException(dataSet, e);
             }
         } else {
             successNums = 0;
@@ -191,7 +179,15 @@ public class SqlDataSetWriter implements DataSetWriter {
     private void dealResultMsg(Map<String, Object> row) {
         row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "ok");
     }
-
+    private void dealWholeException(DataSet dataSet, SQLException e) {
+        successNums = 0;
+        errorNums = 0;
+        info = e.getMessage();
+        for (Map<String, Object> row : dataSet.getDataAsList()) {
+            row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
+            errorNums++;
+        }
+    }
     public void setSaveAsWhole(boolean saveAsWhole) {
         this.saveAsWhole = saveAsWhole;
     }
