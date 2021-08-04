@@ -82,14 +82,6 @@ public abstract class DataSetOptUtil {
             }
             return null;
         });
-        formula.addExtendFunc("concats",(a)->{
-            StringBuilder builder = new StringBuilder();
-            Object[] objects = Arrays.stream(a).toArray();
-            for (Object object : objects) {
-                builder.append(object);
-            }
-            return builder.toString();
-        });
         return formula;
     }
 
