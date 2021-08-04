@@ -16,55 +16,10 @@ public class DataOptStepWithBizModel {
     private JSONObject currentStep;
     private int stepNo;
     private String runType;
-
-    public SimpleBizModel getBizModel() {
-        return bizModel;
-    }
-
-    public void setBizModel(SimpleBizModel bizModel) {
-        this.bizModel = bizModel;
-    }
-
     private SimpleBizModel bizModel;
-
-    public Object getPreResult() {
-        return preResult;
-    }
-
-    public void setPreResult(Object preResult) {
-        this.preResult = preResult;
-    }
-
     private Object preResult;
-
-    public Map<String, Object> getQueryParams() {
-        return queryParams;
-    }
-
-    public void setQueryParams(Map<String, Object> queryParams) {
-        this.queryParams = queryParams;
-    }
-
     private Map<String, Object> queryParams;
-
-    public String getLogId() {
-        return logId;
-    }
-
-    public void setLogId(String logId) {
-        this.logId = logId;
-    }
-
     private String logId;
-
-    public String getNeedRollback() {
-        return needRollback;
-    }
-
-    public void setNeedRollback(String needRollback) {
-        this.needRollback = needRollback;
-    }
-
     private String needRollback;
 
     public DataOptStepWithBizModel(JSONObject dataOptJson, String needRollback, SimpleBizModel bizModel) {
@@ -126,7 +81,6 @@ public class DataOptStepWithBizModel {
         List<JSONObject> links = getNextLinks(id);
         if (links == null || links.size() != 1) {
             return null;
-            //throw new ObjectException("不是有且只有一个后续节点");
         }
         return getOptStep(links.get(0).getString("targetId"));
     }
@@ -198,6 +152,46 @@ public class DataOptStepWithBizModel {
 
     public void setRunType(String runType) {
         this.runType = runType;
+    }
+
+    public SimpleBizModel getBizModel() {
+        return bizModel;
+    }
+
+    public void setBizModel(SimpleBizModel bizModel) {
+        this.bizModel = bizModel;
+    }
+
+    public Object getPreResult() {
+        return preResult;
+    }
+
+    public void setPreResult(Object preResult) {
+        this.preResult = preResult;
+    }
+
+    public Map<String, Object> getQueryParams() {
+        return queryParams;
+    }
+
+    public void setQueryParams(Map<String, Object> queryParams) {
+        this.queryParams = queryParams;
+    }
+
+    public String getLogId() {
+        return logId;
+    }
+
+    public void setLogId(String logId) {
+        this.logId = logId;
+    }
+
+    public String getNeedRollback() {
+        return needRollback;
+    }
+
+    public void setNeedRollback(String needRollback) {
+        this.needRollback = needRollback;
     }
 }
 
