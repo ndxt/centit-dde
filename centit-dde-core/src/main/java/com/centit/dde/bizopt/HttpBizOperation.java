@@ -83,17 +83,17 @@ public class HttpBizOperation implements BizOperation {
         HttpReceiveJSON receiveJson;
         switch (httpMethod.toLowerCase()) {
             case "post":
-                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
+                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPostWithClose(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody,false));
                 dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
                 break;
             case "put":
-                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
+                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPutWithClose(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
                 dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
                 break;
             case "get":
                 mapObject.remove("requestBody");
                 mapObject.remove("requestFile");
-                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGet(httpExecutorContext, httpUrl, mapObject));
+                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGetWithClose(httpExecutorContext, httpUrl, mapObject));
                 if (receiveJson.getCode() != ResponseData.RESULT_OK) {
                     return BuiltInOperation.getResponseData(0, receiveJson.getCode(), receiveJson.getMessage());
                 } else {
@@ -101,7 +101,7 @@ public class HttpBizOperation implements BizOperation {
                 }
                 break;
             case "delete":
-                dataSet = BizOptUtils.castObjectToDataSet(HttpExecutor.simpleDelete(httpExecutorContext, httpUrl, mapObject));
+                dataSet = BizOptUtils.castObjectToDataSet(HttpExecutor.simpleDeleteWithClose(httpExecutorContext, httpUrl, mapObject));
             default:
                 break;
         }

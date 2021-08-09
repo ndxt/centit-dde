@@ -61,6 +61,16 @@ public abstract class DataSetOptUtil {
                 return null;
             }
         });
+        formula.addExtendFunc("dictTrans", (a) -> {
+            if (a != null && a.length > 1) {
+                return CodeRepositoryUtil.transExpression(
+                        StringBaseOpt.castObjectToString(a[0]),
+                        StringBaseOpt.castObjectToString(a[1]));
+            }
+            else {
+                return null;
+            }
+        });
         formula.addExtendFunc("replace", (a) -> {
             if (a != null && a.length > 2) {
                 return StringUtils.replace(StringBaseOpt.castObjectToString(a[0]),
