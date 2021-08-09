@@ -19,6 +19,7 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.file.FileIOOpt;
+import com.centit.support.network.HttpExecutor;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -82,9 +83,8 @@ public class HttpTaskController extends BaseController {
     private void returnObject(String packetId, String runType, HttpServletRequest request, HttpServletResponse response) throws IOException {
         Map<String, Object> params = collectRequestParameters(request);
         params.put("runType", runType);
-        if (!"GET".equals(request.getMethod())) {
-            if (StringUtils.contains(request.getHeader("content-type"), "application")
-            &&!StringUtils.contains(request.getHeader("content-type"), "application/octet-stream")) {
+        if ("POST".equalsIgnoreCase(request.getMethod())) {
+            if (StringUtils.contains(request.getHeader("Content-Type"), "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
                 if (!StringBaseOpt.isNvl(bodyString)) {
                     params.put("requestBody", bodyString);
