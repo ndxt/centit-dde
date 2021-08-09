@@ -37,7 +37,10 @@ public class FileUploadBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String fileNameField=BuiltInOperation.getJsonFieldString(bizOptJson,"flieName",String.valueOf(System.currentTimeMillis()));
+        String fileNameField= (String) bizModel.getModelTag().get("fileName");
+        if(fileNameField==null) {
+            fileNameField = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", String.valueOf(System.currentTimeMillis()));
+        }
         String fileDataField=BuiltInOperation.getJsonFieldString(bizOptJson,"fileupexpression",null);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet==null){
@@ -56,7 +59,7 @@ public class FileUploadBizOperation implements BizOperation {
             FileInfo fileInfo = new FileInfo();
             fileInfo.setFileName(dataMap.get(fileNameField)==null?fileNameField:String.valueOf(dataMap.get(fileNameField)));
             String fileId;
-            Object object = StringUtils.isNotBlank(fileDataField)?dataMap.get(fileDataField):dataSet.getData();
+            Object object = StringUtils.isNotBlank(fileDataField)?dataMap.get(fileDataField):dataSet.getFirstRow().get("fileContent");
             if (object instanceof byte[]){
                 fileId = fileStore.saveFile(new ByteArrayInputStream((byte[])object), fileInfo, 0);
             }else if (object instanceof InputStream){

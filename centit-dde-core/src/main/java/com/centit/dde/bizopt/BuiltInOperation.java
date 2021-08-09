@@ -111,7 +111,8 @@ public class BuiltInOperation {
 
     public static ResponseData runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
         InputStream inputStream = (InputStream)bizModel.getModelTag().get("requestFile");
-        DataSet destDs = BizOptUtils.castObjectToDataSet(inputStream);
+        DataSet destDs = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", "",
+            "fileSize", inputStream.available(), "fileContent", inputStream));
         bizModel.putDataSet(bizOptJson.getString("id"), destDs);
         return getResponseSuccessData(destDs.getSize());
     }
