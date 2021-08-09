@@ -90,6 +90,10 @@ public class HttpTaskController extends BaseController {
                     params.put("requestBody", bodyString);
                 }
             } else {
+                String header=request.getHeader("fileName");
+                if(header!=null){
+                    params.put("fileName",header);
+                }
                 InputStream inputStream = UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight();
                 if (inputStream != null) {
                     params.put("requestFile", inputStream);
