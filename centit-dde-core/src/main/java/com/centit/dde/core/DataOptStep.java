@@ -3,38 +3,20 @@ package com.centit.dde.core;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.utils.ConstantValue;
-import com.centit.framework.common.ResponseData;
 
 import java.util.*;
 
 /**
  * @author zhf
  */
-public class DataOptStepWithBizModel {
+public class DataOptStep {
     private Map<String, JSONObject> nodeMap = new HashMap<>(50);
     private Map<String, List<JSONObject>> linkMap = new HashMap<>(100);
     private JSONObject currentStep;
     private int stepNo;
-    private String runType;
-    private SimpleBizModel bizModel;
-    private Object preResult;
-    private Map<String, Object> queryParams;
-    private String logId;
-    private String needRollback;
 
-    public DataOptStepWithBizModel(JSONObject dataOptJson, String needRollback, SimpleBizModel bizModel) {
+    public DataOptStep(JSONObject dataOptJson) {
         stepNo = 0;
-        this.bizModel = bizModel;
-        this.logId = bizModel.getModelName();
-        this.needRollback = needRollback;
-        this.queryParams = bizModel.getModelTag();
-        String runType = (String) queryParams.get("runType");
-        if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
-            this.runType = ConstantValue.RUN_TYPE_COPY;
-        } else {
-            this.runType = ConstantValue.RUN_TYPE_NORMAL;
-        }
-        this.preResult = ResponseData.successResponse;
         mapData(dataOptJson);
     }
 
@@ -144,54 +126,6 @@ public class DataOptStepWithBizModel {
 
     public int getStepNo() {
         return stepNo;
-    }
-
-    public String getRunType() {
-        return runType;
-    }
-
-    public void setRunType(String runType) {
-        this.runType = runType;
-    }
-
-    public SimpleBizModel getBizModel() {
-        return bizModel;
-    }
-
-    public void setBizModel(SimpleBizModel bizModel) {
-        this.bizModel = bizModel;
-    }
-
-    public Object getPreResult() {
-        return preResult;
-    }
-
-    public void setPreResult(Object preResult) {
-        this.preResult = preResult;
-    }
-
-    public Map<String, Object> getQueryParams() {
-        return queryParams;
-    }
-
-    public void setQueryParams(Map<String, Object> queryParams) {
-        this.queryParams = queryParams;
-    }
-
-    public String getLogId() {
-        return logId;
-    }
-
-    public void setLogId(String logId) {
-        this.logId = logId;
-    }
-
-    public String getNeedRollback() {
-        return needRollback;
-    }
-
-    public void setNeedRollback(String needRollback) {
-        this.needRollback = needRollback;
     }
 }
 
