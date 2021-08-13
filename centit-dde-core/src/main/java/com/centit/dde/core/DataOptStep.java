@@ -127,5 +127,13 @@ public class DataOptStep {
     public int getStepNo() {
         return stepNo;
     }
+
+    public boolean isEndStep(){
+        return currentStep == null;
+    }
+
+    public void setEndStep(){
+        currentStep = null;
+    }
 }
 

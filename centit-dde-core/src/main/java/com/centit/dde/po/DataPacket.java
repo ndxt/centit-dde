@@ -25,7 +25,7 @@ import java.util.*;
 @Data
 @Entity
 @Table(name = "Q_DATA_PACKET")
-public class DataPacket implements Serializable {
+public class DataPacket implements Serializable,DataPacketInterface {
     private static final long serialVersionUID = 1;
 
     @ApiModelProperty(value = "数据处理ID", hidden = true)
@@ -133,6 +133,7 @@ public class DataPacket implements Serializable {
         return packetParams;
     }
 
+    @Override
     @JSONField(serialize = false)
     public Map<String, Object> getPacketParamsValue() {
         Map<String, Object> params = new HashMap<>(10);

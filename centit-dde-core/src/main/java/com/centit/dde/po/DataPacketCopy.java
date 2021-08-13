@@ -25,7 +25,7 @@ import java.util.*;
 @Data
 @Entity
 @Table(name = "Q_DATA_PACKET_COPY")
-public class DataPacketCopy implements Serializable {
+public class DataPacketCopy implements Serializable,DataPacketInterface {
     private static final long serialVersionUID = 1;
 
     @ApiModelProperty(value = "数据处理ID", hidden = true)
@@ -128,6 +128,7 @@ public class DataPacketCopy implements Serializable {
         return packetParams;
     }
 
+    @Override
     @JSONField(serialize = false)
     public Map<String, Object> getPacketParamsValue() {
         Map<String, Object> params = new HashMap<>(10);

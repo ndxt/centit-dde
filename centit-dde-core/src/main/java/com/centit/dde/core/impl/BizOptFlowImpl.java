@@ -10,6 +10,7 @@ import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketCopy;
+import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.CloneUtils;
@@ -123,20 +124,11 @@ public class BizOptFlowImpl implements BizOptFlow {
     }
 
     @Override
-    public Object run(Object dataPacket, String logId, Map<String, Object> queryParams) throws Exception {
-        JSONObject jsonObject = null;
-        String needRollBack = ConstantValue.FALSE;
-        if (dataPacket instanceof DataPacket) {
-            jsonObject = ((DataPacket) dataPacket).getDataOptDescJson();
-            needRollBack = ((DataPacket) dataPacket).getNeedRollback();
-        } else if (dataPacket instanceof DataPacketCopy) {
-            jsonObject = ((DataPacketCopy) dataPacket).getDataOptDescJson();
-            needRollBack = ((DataPacketCopy) dataPacket).getNeedRollback();
-        }
+    public Object run(DataPacketInterface dataPacket, String logId, Map<String, Object> queryParams) throws Exception {
         SimpleBizModel bizModel = new SimpleBizModel(logId);
         bizModel.setModelTag(queryParams);
-        DataOptStep dataOptStep = new DataOptStep(jsonObject);
-        DataOptVo dataOptVo = new DataOptVo(needRollBack, bizModel);
+        DataOptStep dataOptStep = new DataOptStep(dataPacket.getDataOptDescJson());
+        DataOptVo dataOptVo = new DataOptVo(dataPacket.getNeedRollback(), bizModel);
         try {
             runModule(dataOptStep, dataOptVo);
             AbstractSourceConnectThreadHolder.commitAndRelease();
@@ -149,8 +141,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     private void runModule(DataOptStep dataOptStep, DataOptVo dataOptVo) throws Exception {
         dataOptStep.setCurrentStep(dataOptStep.getStartStep());
         while (true) {
-            JSONObject step = dataOptStep.getCurrentStep();
-            if (step == null) {
+            if (dataOptStep.isEndStep()) {
                 return;
             }
             runStep(dataOptStep, dataOptVo);
@@ -164,12 +155,11 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (ConstantValue.RESULTS.equals(stepType)) {
             Object returnResult = returnResult(dataOptStep, dataOptVo);
             dataOptVo.setPreResult(returnResult);
-            dataOptStep.setCurrentStep(null);
+            dataOptStep.setEndStep();
             return;
         }
         if (ConstantValue.BRANCH.equals(stepType)) {
-            stepJson = getBatchStep(dataOptStep, dataOptVo);
-            dataOptStep.setCurrentStep(stepJson);
+            setBatchStep(dataOptStep, dataOptVo);
             return;
         }
         // 模块调用
@@ -212,7 +202,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (ConstantValue.TRUE.equals(dataOptVo.getNeedRollback())) {
             if (dataOptVo.getPreResult() instanceof ResponseData) {
                 if (((ResponseData) dataOptVo.getPreResult()).getCode() == ResponseData.ERROR_OPERATION) {
-                    dataOptStep.setCurrentStep(null);
+                    dataOptStep.setEndStep();
                     AbstractSourceConnectThreadHolder.rollbackAndRelease();
                 }
             }
@@ -249,7 +239,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
     }
 
-    private JSONObject getBatchStep(DataOptStep dataOptStep, DataOptVo dataOptVo) {
+    private void setBatchStep(DataOptStep dataOptStep, DataOptVo dataOptVo) {
         JSONObject stepJson = dataOptStep.getCurrentStep();
         String stepId = stepJson.getString("id");
         List<JSONObject> linksJson = dataOptStep.getNextLinks(stepId);
@@ -258,16 +248,20 @@ public class BizOptFlowImpl implements BizOptFlow {
                 if (BooleanBaseOpt.castObjectToBoolean(
                     VariableFormula.calculate(jsonObject.getString("expression"),
                         new BizModelJSONTransform(dataOptVo.getBizModel())), false)) {
-                    return dataOptStep.getOptStep(jsonObject.getString("targetId"));
+                    stepJson = dataOptStep.getOptStep(jsonObject.getString("targetId"));
+                    dataOptStep.setCurrentStep(stepJson);
+                    return;
                 }
             }
         }
         for (JSONObject jsonObject : linksJson) {
             if (ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
-                return dataOptStep.getOptStep(jsonObject.getString("targetId"));
+                stepJson = dataOptStep.getOptStep(jsonObject.getString("targetId"));
+                dataOptStep.setCurrentStep(stepJson);
+                return;
             }
         }
-        return null;
+        dataOptStep.setEndStep();
     }
 
     private void runCycle(DataOptStep dataOptStep, DataOptVo dataOptVo) throws Exception {
@@ -323,10 +317,10 @@ public class BizOptFlowImpl implements BizOptFlow {
             boolean endCycle = false;
             while (true) {
                 //获取节点信息
-                JSONObject step = dataOptStep.getCurrentStep();
-                if (step == null) {
+                if (dataOptStep.isEndStep()) {
                     break;
                 }
+                JSONObject step = dataOptStep.getCurrentStep();
                 String stepType = step.getString("type");
                 if (ConstantValue.CYCLE_FINISH.equals(stepType)) {
                     endNode = step;
