@@ -139,7 +139,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     }
 
     private void runModule(DataOptStep dataOptStep, DataOptVo dataOptVo) throws Exception {
-        dataOptStep.setCurrentStep(dataOptStep.getStartStep());
+        dataOptStep.setStartStep();
         while (true) {
             if (dataOptStep.isEndStep()) {
                 return;
@@ -270,7 +270,6 @@ public class BizOptFlowImpl implements BizOptFlow {
         CycleVo cycleVo = stepJson.toJavaObject(CycleVo.class);
         //循环节点的下个节点信息
         JSONObject startNode = dataOptStep.getNextStep(cycleVo.getId());
-        JSONObject endNode = null;
         Object iter = null;
         //Iterator<Object> rangeObject;
         //提取出需要操作的数据
@@ -323,7 +322,6 @@ public class BizOptFlowImpl implements BizOptFlow {
                 JSONObject step = dataOptStep.getCurrentStep();
                 String stepType = step.getString("type");
                 if (ConstantValue.CYCLE_FINISH.equals(stepType)) {
-                    endNode = step;
                     break;
                 }
                 if (ConstantValue.CYCLE_JUMP_OUT.equals(stepType)) {
@@ -341,14 +339,10 @@ public class BizOptFlowImpl implements BizOptFlow {
                 iter = (Integer) iter + cycleVo.getRangeStep();
             }
         }
-        if (endNode == null) {
-            endNode = dataOptStep.seekToCycleEnd(cycleVo.getId());
-        }
-        dataOptStep.setCurrentStep(endNode);
+        dataOptStep.seekToCycleEnd(cycleVo.getId());
     }
 
     private void runOneStepOpt(DataOptStep dataOptStep, DataOptVo dataOptVo) {
-        long startTime = System.currentTimeMillis();
         TaskDetailLog detailLog = writeLog(dataOptStep, dataOptVo);
         SimpleBizModel bizModel = dataOptVo.getBizModel();
         JSONObject bizOptJson = dataOptStep.getCurrentStep();
@@ -367,10 +361,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 detailLog.setRunEndTime(new Date());
                 taskDetailLogDao.updateObject(detailLog);
             }
-            long expendTime = System.currentTimeMillis() - startTime;
-            logger.info(String.format("节点：%s，运行耗时:%s ms", bizOptJson.getString("SetsName"), expendTime));
         } catch (Exception e) {
-            logger.error(String.format("节点：%s，运行异常:%s", bizOptJson.getString("SetsName"), e.getMessage()));
             String errMsg = ObjectException.extortExceptionMessage(e, 8);
             ResponseData responseData = ResponseData.makeErrorMessageWithData(e, ResponseData.ERROR_OPERATION,
                 errMsg);

@@ -24,7 +24,7 @@ public interface GenerateFieldsService {
     List<ColumnSchema> generatePostFields(String jsonString);
     JSONArray queryViewSqlData(String databaseCode, String sql, Map<String, Object> params);
     JSONArray queryViewCsvData(String fileId);
-    JSONArray queryViewJsonData(String fileId);
+    JSONArray queryViewJsonData(String fileId) throws Exception;
     Set<String> generateSqlParams(String sql);
 
 }

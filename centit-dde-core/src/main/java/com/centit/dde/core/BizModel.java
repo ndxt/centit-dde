@@ -62,7 +62,7 @@ public interface BizModel {
     default DataSet fetchDataSetByName(String relationPath){
         Map<String, DataSet> dss = getBizData();
         if(dss == null) {
-            return null;
+            return new SimpleDataSet();
         }
         if (dss.containsKey(relationPath)) {
             return dss.get(relationPath);

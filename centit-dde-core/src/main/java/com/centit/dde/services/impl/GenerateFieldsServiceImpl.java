@@ -82,7 +82,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     }
 
     @Override
-    public JSONArray queryViewJsonData(String fileId) {
+    public JSONArray queryViewJsonData(String fileId) throws Exception{
         JSONDataSet jsonDataSet = new JSONDataSet();
         try {
             jsonDataSet.setFilePath(

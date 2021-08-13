@@ -5,10 +5,7 @@ import com.centit.support.algorithm.CollectionsOpt;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 数据集 虚拟类
@@ -38,8 +35,8 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
     /**
      * 返回 DataSet 的名称
      */
-    protected String dataSetName;
-    protected String dataSetType;
+    private String dataSetName;
+    private String dataSetType;
     protected  int size;
     /**
      * 数据集中的数据
@@ -88,7 +85,7 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
     @JSONField(serialize = false)
     public List<Map<String, Object>> getDataAsList() {
         if(this.data ==null){
-            return null;
+            return Collections.emptyList();
         }
         if(this.data instanceof List){
             List<?> objects = (List<?>) this.data;
@@ -152,12 +149,12 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
     @JSONField(serialize = false)
     public Map<String, Object> getFirstRow() {
         if(this.data ==null){
-            return null;
+            return Collections.emptyMap();
         }
         if(this.data instanceof Collection) {
             Collection<?> objects = (Collection<?>) this.data;
             if(objects.size()==0){
-                return null;
+                return Collections.emptyMap();
             }
             return CollectionsOpt.objectToMap(objects.iterator().next());
         }

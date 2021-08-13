@@ -46,32 +46,30 @@ public class DataOptStep {
         }
     }
 
-    public JSONObject getStartStep() {
+    public void setStartStep() {
         for (Map.Entry<String, JSONObject> m : nodeMap.entrySet()) {
             if ("start".equals(m.getValue().getString("type"))) {
-                return getOptStep(m.getKey());
+                currentStep = getOptStep(m.getKey());
+                return;
             }
         }
-        return null;
+        setEndStep();
     }
 
     public JSONObject getOptStep(String id) {
         return nodeMap.get(id);
     }
 
-    public JSONObject getNextStep(String id) {
-        List<JSONObject> links = getNextLinks(id);
-        if (links == null || links.size() != 1) {
-            return null;
-        }
-        return getOptStep(links.get(0).getString("targetId"));
+    public void setEndStep() {
+        this.currentStep = getEmptyObject();
+        stepNo++;
     }
 
     public List<JSONObject> getNextLinks(String id) {
         return linkMap.get(id);
     }
 
-    public JSONObject seekToCycleEnd(String id) {
+    public void seekToCycleEnd(String id) {
         HashSet<String> hasAddedNode = new HashSet<>();
         ArrayDeque<String> brachNode = new ArrayDeque<>();
         String curId = id;
@@ -90,7 +88,8 @@ public class DataOptStep {
                     String stepType = nextNode.getString("type");
                     if (ConstantValue.CYCLE_FINISH.equals(stepType)) {
                         if (cascade == 0) {
-                            return nextNode;
+                            setCurrentStep(nextNode);
+                            return;
                         } else {
                             cascade--;
                         }
@@ -105,7 +104,7 @@ public class DataOptStep {
             }
             curId = brachNode.pop();
         }
-        return null;
+        setEndStep();
     }
 
     public JSONObject getCurrentStep() {
@@ -113,10 +112,23 @@ public class DataOptStep {
     }
 
     public void setNextStep() {
-        if (currentStep != null) {
+        if (!isEndStep()) {
             setCurrentStep(
                 getNextStep(currentStep.getString("id")));
         }
+    }
+    public JSONObject getNextStep(String id) {
+        List<JSONObject> links = getNextLinks(id);
+        if (links == null || links.size() != 1) {
+            return getEmptyObject();
+        }
+        return getOptStep(links.get(0).getString("targetId"));
+    }
+    private JSONObject getEmptyObject(){
+        return  new JSONObject();
+    }
+    public boolean isEndStep() {
+        return currentStep.isEmpty();
     }
 
     public void setCurrentStep(JSONObject currentStep) {
@@ -126,14 +138,6 @@ public class DataOptStep {
 
     public int getStepNo() {
         return stepNo;
-    }
-
-    public boolean isEndStep(){
-        return currentStep == null;
-    }
-
-    public void setEndStep(){
-        currentStep = null;
     }
 }
 

@@ -58,7 +58,7 @@ public abstract class DataSetOptUtil {
                 return stringBuilder.toString();
             }
             else {
-                return null;
+                return a;
             }
         });
         formula.addExtendFunc("dictTrans", (a) -> {
@@ -68,7 +68,7 @@ public abstract class DataSetOptUtil {
                         StringBaseOpt.castObjectToString(a[1]));
             }
             else {
-                return null;
+                return a;
             }
         });
         formula.addExtendFunc("replace", (a) -> {
@@ -79,7 +79,7 @@ public abstract class DataSetOptUtil {
             else if (a != null && a.length>0){
                 return a[0];
             } else{
-                return null;
+                return a;
             }
         });
         formula.addExtendFunc("size",(a)->{
@@ -90,7 +90,7 @@ public abstract class DataSetOptUtil {
             if (o instanceof Map){
                 return ((Map<?, ?>) o).size();
             }
-            return null;
+            return "";
         });
         return formula;
     }
@@ -268,10 +268,7 @@ public abstract class DataSetOptUtil {
     private static DataSet statDataset(DataSet inData,
                                        List<String> groupByFields,
                                        List<Triple<String, String, String>> statDesc) {
-        if (inData == null) {
-            return null;
-        }
-        if (groupByFields == null) {
+        if (inData == null || groupByFields == null) {
             return inData;
         }
         List<Map<String, Object>> data = inData.getDataAsList();
@@ -393,7 +390,7 @@ public abstract class DataSetOptUtil {
      */
     public static DataSet crossTabulation(DataSet inData, List<String> rowHeaderFields, List<String> colHeaderFields) {
         if (inData == null) {
-            return null;
+            return inData;
         }
         List<Map<String, Object>> data = inData.getDataAsList();
         if (data == null || data.size() == 0) {
