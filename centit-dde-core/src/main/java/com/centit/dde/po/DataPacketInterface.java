@@ -47,5 +47,5 @@ public interface DataPacketInterface {
 
     String getNeedRollback();
 
-    String getBufferFreshPeriod();
+    Integer getBufferFreshPeriod();
 }

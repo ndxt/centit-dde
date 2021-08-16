@@ -22,10 +22,10 @@ import java.util.List;
 public class ExcelBizOperation implements BizOperation {
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws IOException {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String excelexpression=BuiltInOperation.getJsonFieldString(bizOptJson,"excelexpression",null);
+        String excelExpression=BuiltInOperation.getJsonFieldString(bizOptJson,"excelexpression",null);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
         if (dataSet==null && requestFileInfo==null){
@@ -35,8 +35,8 @@ public class ExcelBizOperation implements BizOperation {
         List<InputStream> inputStreams;
         if (requestFileInfo !=null){
             inputStreams=requestFileInfo;
-        }else if (StringUtils.isNotBlank(excelexpression)){
-            inputStreams  = DataSetOptUtil.getInputStreamByFieldName(excelexpression,dataSet);
+        }else if (StringUtils.isNotBlank(excelExpression)){
+            inputStreams  = DataSetOptUtil.getInputStreamByFieldName(excelExpression,dataSet);
         }else {
             inputStreams = DataSetOptUtil.getInputStreamByFieldName(dataSet);
         }

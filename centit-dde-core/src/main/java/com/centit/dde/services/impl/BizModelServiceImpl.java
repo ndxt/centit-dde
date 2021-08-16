@@ -93,7 +93,7 @@ public class BizModelServiceImpl implements BizModelService {
             byte[] byt = bos.toByteArray();
             jedis.set(key.getBytes(), byt);
             int seconds;
-            int iPeriod = NumberBaseOpt.castObjectToInteger(dataPacket.getBufferFreshPeriod());
+            int iPeriod = dataPacket.getBufferFreshPeriod();
             if (iPeriod == ConstantValue.ONE) {
                 //一日
                 seconds = 24 * 3600;
