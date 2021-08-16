@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;
+import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
@@ -75,97 +76,12 @@ public class DataPacketServiceImpl implements DataPacketService {
     }
 
 
-    private String makeDataPacketBufId(DataPacket dataPacket, Map<String, Object> paramsMap) {
-        String dateString = DatetimeOpt.convertTimestampToString(dataPacket.getRecordDate());
-        String params = JSON.toJSONString(paramsMap, SerializerFeature.MapSortField);
-        StringBuffer temp;
-        temp = new StringBuffer("packet:");
-        temp.append(dataPacket.getPacketId())
-            .append(":")
-            .append(params)
-            .append(dateString);
-        return Md5Encoder.encode(temp.toString());
-    }
-
-    @Override
-    public Object fetchDataPacketDataFromBuf(DataPacket dataPacket, Map<String, Object> paramsMap) {
-        if (jedisPool == null || dataPacket.getBufferFreshPeriod()==null) {
-            return null;
-        }
-        String key = makeDataPacketBufId(dataPacket, paramsMap);
-        Object object = null;
-        if (NumberBaseOpt.castObjectToInteger(dataPacket.getBufferFreshPeriod()) >= 0) {
-            Jedis jedis = jedisPool.getResource();
-            if ((jedis.get(key.getBytes()) != null) && (jedis.get(key.getBytes()).length > 0)) {
-                try {
-                    byte[] byt = jedis.get(key.getBytes());
-                    ByteArrayInputStream bis = new ByteArrayInputStream(byt);
-                    ObjectInputStream ois = new ObjectInputStream(bis);
-                    object = ois.readObject();
-                    bis.close();
-                    ois.close();
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-                jedis.close();
-                return object;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void setDataPacketBuf(Object bizModel, DataPacket dataPacket, Map<String, Object> paramsMap) {
-        if (jedisPool == null || dataPacket.getBufferFreshPeriod() == null) {
-            return;
-        }
-        String key = makeDataPacketBufId(dataPacket, paramsMap);
-        Jedis jedis = jedisPool.getResource();
-        if (jedis.get(key.getBytes()) == null || (jedis.get(key.getBytes()).length == 0)) {
-            try {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ObjectOutputStream oos = new ObjectOutputStream(bos);
-                oos.writeObject(bizModel);
-
-                byte[] byt = bos.toByteArray();
-                jedis.set(key.getBytes(), byt);
-                int seconds;
-                int iPeriod=NumberBaseOpt.castObjectToInteger(dataPacket.getBufferFreshPeriod());
-                if ( iPeriod== ConstantValue.ONE) {
-                    //一日
-                    seconds = 24 * 3600;
-                    jedis.expire(key.getBytes(), seconds);
-                } else if (iPeriod == ConstantValue.TWO) {
-                    //按周
-                    seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfWeek(new Date())) * 24 * 3600;
-                    jedis.expire(key.getBytes(), seconds);
-                } else if (iPeriod == ConstantValue.THREE) {
-                    //按月
-                    seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfMonth(new Date())) * 24 * 3600;
-                    jedis.expire(key.getBytes(), seconds);
-                } else if (iPeriod == ConstantValue.FOUR) {
-                    //按年
-                    seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfYear(new Date())) * 24 * 3600;
-                    jedis.expire(key.getBytes(), seconds);
-                } else if (iPeriod >= ConstantValue.SIXTY) {
-                    //按秒
-                    jedis.expire(key.getBytes(), iPeriod);
-                }
-                bos.close();
-                oos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        jedis.close();
-    }
 
     @Override
     public void publishDataPacket(DataPacket dataPacket) {
         dataPacketDao.mergeObject(dataPacket);
         dataPacketDao.saveObjectReferences(dataPacket);
     }
-
 
 
 }

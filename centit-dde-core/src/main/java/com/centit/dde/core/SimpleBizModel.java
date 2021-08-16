@@ -68,7 +68,7 @@ public class SimpleBizModel implements BizModel, Serializable {
         if(bizData!=null){
             return bizData.get(relationPath);
         }
-        return null;
+        return new SimpleDataSet();
     }
 
     @Override
@@ -163,7 +163,7 @@ public class SimpleBizModel implements BizModel, Serializable {
         this.bizData = bizData;
     }
 
-    public static SimpleBizModel createSingleDataSetModel(String modelName, DataSet dataSet) {
+    private static SimpleBizModel createSingleDataSetModel(String modelName, DataSet dataSet) {
         SimpleBizModel model = new SimpleBizModel(modelName);
         model.bizData = new HashMap<>(1);
         model.putDataSet(modelName, dataSet);

@@ -23,10 +23,6 @@ public interface DataPacketCopyService {
 
     DataPacketCopy getDataPacket(String packetId);
 
-    void setDataPacketBuf(Object bizModel, DataPacketCopy dataPacketCopy, Map<String, Object>  paramsMap);
-
-    Object fetchDataPacketDataFromBuf(DataPacketCopy dataPacketCopy, Map<String, Object>  paramsMap);
-
     void publishDataPacket(DataPacketCopy dataPacketCopy);
 
 }

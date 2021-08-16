@@ -1,6 +1,7 @@
 package com.centit.dde.services;
 
 import com.centit.dde.po.DataPacket;
+import com.centit.dde.po.DataPacketInterface;
 import com.centit.support.database.utils.PageDesc;
 
 import java.util.List;
@@ -22,10 +23,6 @@ public interface DataPacketService {
     List<DataPacket> listDataPacket(Map<String, Object> params, PageDesc pageDesc);
 
     DataPacket getDataPacket(String packetId);
-
-    void setDataPacketBuf(Object bizModel, DataPacket dataPacket, Map<String, Object>  paramsMap);
-
-    Object fetchDataPacketDataFromBuf(DataPacket dataPacket, Map<String, Object>  paramsMap);
 
     void publishDataPacket(DataPacket dataPacket);
 

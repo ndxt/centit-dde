@@ -17,9 +17,6 @@ public abstract class BizOptUtils {
 
     @SuppressWarnings("unchecked")
     public static BizModel castObjectToBizModel(Object obj) {
-        if(obj==null){
-            return null;
-        }
         if(obj instanceof BizModel){
             return (BizModel)obj;
         }
@@ -37,7 +34,7 @@ public abstract class BizOptUtils {
     @SuppressWarnings("unchecked")
     public static DataSet castObjectToDataSet(Object obj) {
         if(obj==null){
-            return null;
+            return new SimpleDataSet();
         }
         if(obj instanceof DataSet){
             return (DataSet)obj;

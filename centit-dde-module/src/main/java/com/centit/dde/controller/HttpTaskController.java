@@ -2,9 +2,9 @@ package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.po.DataPacket;
-import com.centit.dde.po.DataPacketCopy;
+import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.service.ExchangeService;
+import com.centit.dde.services.DataPacketBufService;
 import com.centit.dde.services.DataPacketCopyService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.ConstantValue;
@@ -19,7 +19,6 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.file.FileIOOpt;
-import com.centit.support.network.HttpExecutor;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -45,11 +44,15 @@ public class HttpTaskController extends BaseController {
     private final DataPacketService dataPacketService;
     private final DataPacketCopyService dataPacketCopyService;
     private final ExchangeService exchangeService;
+    private final DataPacketBufService dataPacketBufService;
 
-    public HttpTaskController(DataPacketService dataPacketService, DataPacketCopyService dataPacketCopyService, ExchangeService exchangeService) {
+    public HttpTaskController(DataPacketService dataPacketService,
+                              DataPacketCopyService dataPacketCopyService,
+                              ExchangeService exchangeService, DataPacketBufService dataPacketBufService) {
         this.dataPacketService = dataPacketService;
         this.dataPacketCopyService = dataPacketCopyService;
         this.exchangeService = exchangeService;
+        this.dataPacketBufService = dataPacketBufService;
     }
 
     @GetMapping(value = "/runTest/{packetId}")
@@ -90,9 +93,9 @@ public class HttpTaskController extends BaseController {
                     params.put("requestBody", bodyString);
                 }
             } else {
-                String header=request.getHeader("fileName");
-                if(header!=null){
-                    params.put("fileName",header);
+                String header = request.getHeader("fileName");
+                if (header != null) {
+                    params.put("fileName", header);
                 }
                 InputStream inputStream = UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight();
                 if (inputStream != null) {
@@ -101,21 +104,17 @@ public class HttpTaskController extends BaseController {
             }
         }
         Object bizModel;
+        DataPacketInterface dataPacketInterface;
         if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
-            DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
-            bizModel = dataPacketService.fetchDataPacketDataFromBuf(dataPacket, params);
-            if (bizModel == null) {
-                bizModel = exchangeService.runTask(packetId, params);
-                dataPacketService.setDataPacketBuf(bizModel, dataPacket, params);
-            }
+            dataPacketInterface = dataPacketService.getDataPacket(packetId);
         } else {
-            DataPacketCopy dataPacketCopy = dataPacketCopyService.getDataPacket(packetId);
-            bizModel = dataPacketCopyService.fetchDataPacketDataFromBuf(dataPacketCopy, params);
-            if (bizModel == null) {
-                bizModel = exchangeService.runTask(packetId, params);
-                dataPacketCopyService.setDataPacketBuf(bizModel, dataPacketCopy, params);
-            }
+            dataPacketInterface = dataPacketCopyService.getDataPacket(packetId);
         }
+        bizModel = dataPacketBufService.fetchDataPacketDataFromBuf(dataPacketInterface, params);
+        if (bizModel == null) {
+            bizModel = exchangeService.runTask(packetId, params);
+        }
+        dataPacketBufService.setDataPacketBuf(bizModel, dataPacketInterface, params);
         if (bizModel instanceof DataSet) {
             InputStream in;
             String fileName;
@@ -136,11 +135,11 @@ public class HttpTaskController extends BaseController {
             }
         }
         if (bizModel instanceof ResponseMapData) {
-            JsonResultUtils.writeSingleDataJson(((ResponseMapData) bizModel).getCode(),((ResponseMapData) bizModel).getMessage(),bizModel, response,null);
+            JsonResultUtils.writeSingleDataJson(((ResponseMapData) bizModel).getCode(), ((ResponseMapData) bizModel).getMessage(), bizModel, response, null);
             return;
         }
-        if(bizModel instanceof ResponseData){
-            JsonResultUtils.writeResponseDataAsJson((ResponseData) bizModel,response);
+        if (bizModel instanceof ResponseData) {
+            JsonResultUtils.writeResponseDataAsJson((ResponseData) bizModel, response);
             return;
         }
         JsonResultUtils.writeSingleDataJson(bizModel, response);

@@ -22,6 +22,8 @@ public interface DataPacketInterface {
 
     Date getNextRunTime();
 
+    Date getRecordDate();
+
     /**
      * 获取applicationId
      *
@@ -44,4 +46,6 @@ public interface DataPacketInterface {
     Map<String, Object> getPacketParamsValue();
 
     String getNeedRollback();
+
+    String getBufferFreshPeriod();
 }

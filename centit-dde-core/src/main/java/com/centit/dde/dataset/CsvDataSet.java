@@ -10,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
+
 /**
  * @author zhf
  */
@@ -25,30 +26,26 @@ public class CsvDataSet extends FileDataSet {
     private Map<String, Object> params;
 
     private InputStream inputStream;
+
     @Override
     public void setFilePath(String filePath) throws FileNotFoundException {
-        super.filePath=filePath;
-        if(new File(filePath).exists()) {
+        super.filePath = filePath;
+        if (new File(filePath).exists()) {
             inputStream = new FileInputStream(filePath);
         }
     }
 
-    public  void  setInputStream(InputStream inputStream){
+    public void setInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
     }
 
     @Override
-    public SimpleDataSet load(Map<String, Object> params) {
-        try {
-            List<Map<String, Object>> list = new ArrayList<>();
-            readCsvFile(list);
-            SimpleDataSet dataSet = new SimpleDataSet();
-            dataSet.setData(list);
-            return dataSet;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    public SimpleDataSet load(Map<String, Object> params) throws Exception {
+        List<Map<String, Object>> list = new ArrayList<>();
+        readCsvFile(list);
+        SimpleDataSet dataSet = new SimpleDataSet();
+        dataSet.setData(list);
+        return dataSet;
     }
 
     private void readCsvFile(List<Map<String, Object>> list) throws IOException {
@@ -58,12 +55,12 @@ public class CsvDataSet extends FileDataSet {
         csvReader.setDelimiter(',');
         csvReader.setSafetySwitch(false);
         if (csvReader.readRecord()) {
-            String[] splitedHead = csvReader.getValues();
+            String[] splitHead = csvReader.getValues();
             while (csvReader.readRecord()) {
                 Map<String, Object> map = new HashMap<>();
-                String[] splitedResult = csvReader.getValues();
-                for (int i = 0; i < splitedHead.length; i++) {
-                    map.put(splitedHead[i], splitedResult[i]);
+                String[] splitResult = csvReader.getValues();
+                for (int i = 0; i < splitHead.length; i++) {
+                    map.put(splitHead[i], splitResult[i]);
                 }
                 list.add(map);
             }
@@ -79,9 +76,8 @@ public class CsvDataSet extends FileDataSet {
         if (csvReader.readRecord()) {
             return csvReader.getValues();
         }
-        return null;
+        return new String[0];
     }
-
 
 
     /**
@@ -97,13 +93,13 @@ public class CsvDataSet extends FileDataSet {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        BufferedWriter writer=new BufferedWriter(new OutputStreamWriter(
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
             outputStream, Charset.forName("gbk")));
         CsvWriter csvWriter = new CsvWriter(writer, ',');
         csvWriter.setTextQualifier('"');
         csvWriter.setUseTextQualifier(true);
         csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR.charAt(0));
-        List<Map<String, Object>> list=dataSet.getDataAsList();
+        List<Map<String, Object>> list = dataSet.getDataAsList();
         Collections.sort(list, (o1, o2) -> Integer.compare(o2.size(), o1.size()));
         int iHead = 0;
         for (Map<String, Object> row : list) {
@@ -138,7 +134,7 @@ public class CsvDataSet extends FileDataSet {
 
 
     public static InputStream createCsvStream(DataSet dataSet) throws IOException {
-        try(
+        try (
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(byteArrayOutputStream, Charset.forName("gbk")));
         ) {
@@ -146,7 +142,7 @@ public class CsvDataSet extends FileDataSet {
             csvWriter.setTextQualifier('"');
             csvWriter.setUseTextQualifier(true);
             csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR.charAt(0));
-            List<Map<String, Object>> list=dataSet.getDataAsList();
+            List<Map<String, Object>> list = dataSet.getDataAsList();
             Collections.sort(list, (o1, o2) -> Integer.compare(o2.size(), o1.size()));
             int iHead = 0;
             for (Map<String, Object> row : list) {
@@ -174,7 +170,7 @@ public class CsvDataSet extends FileDataSet {
                 }
             }
             csvWriter.flush();
-            if (csvWriter!=null){
+            if (csvWriter != null) {
                 csvWriter.close();
             }
             return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());

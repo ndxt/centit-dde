@@ -61,7 +61,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     }
 
     @Override
-    public JSONArray queryViewCsvData(String fileId) {
+    public JSONArray queryViewCsvData(String fileId) throws Exception{
         CsvDataSet csvDataSet = new CsvDataSet();
         try {
             csvDataSet.setFilePath(

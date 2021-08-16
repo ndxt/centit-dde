@@ -14,30 +14,32 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public SimpleDataSet(){
+    public SimpleDataSet() {
         dataSetName = DataSet.SINGLE_DATA_SET_DEFAULT_NAME;
+        this.data = Collections.emptyList();
         //sorted = false;
     }
 
-    public SimpleDataSet(Object data){
+    public SimpleDataSet(Object data) {
         this.dataSetName = DataSet.SINGLE_DATA_SET_DEFAULT_NAME;
         this.data = data;
-        this.size=getSize();
-        this.dataSetType="S";
+        this.size = getSize();
+        this.dataSetType = "S";
     }
 
     public SimpleDataSet(String dataSetName, Object data) {
         this.data = data;
         this.dataSetName = dataSetName;
-        this.size=getSize();
-        this.dataSetType="S";
+        this.size = getSize();
+        this.dataSetType = "S";
     }
+
     /**
      * 返回 DataSet 的名称
      */
     private String dataSetName;
     private String dataSetType;
-    protected  int size;
+    protected int size;
     /**
      * 数据集中的数据
      * 是一个 对象（Map）列表；可以类比为JSONArray
@@ -58,18 +60,19 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
      * 返回 DataSet 的类型
      * 二维表 T(table)、单个数据记录 R(row)、
      * 标量数据 S(scalar)、 E 空的(empty)
-     * @return  DataSet 的类型
+     *
+     * @return DataSet 的类型
      */
     @Override
     public String getDataSetType() {
-        if(this.data ==null){
+        if (this.data == null) {
             return "E"; //empty
         }
-        if(this.data instanceof Collection){
+        if (this.data instanceof Collection) {
             //Collection<?> objects = ((Collection<?>)this.data);
             return "T"; //二维表 T(table)
         }
-        if(this.data instanceof Map){
+        if (this.data instanceof Map) {
             return "R"; // 单个数据记录 R(row)
         }
 
@@ -84,17 +87,17 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
     @Override
     @JSONField(serialize = false)
     public List<Map<String, Object>> getDataAsList() {
-        if(this.data ==null){
+        if (this.data == null) {
             return Collections.emptyList();
         }
-        if(this.data instanceof List){
+        if (this.data instanceof List) {
             List<?> objects = (List<?>) this.data;
-            if(objects.size()<1){
+            if (objects.size() < 1) {
                 return (List<Map<String, Object>>) objects;
             }
             //只检查第一个，应该检查多个
             Object firstRow = objects.get(0);
-            if(firstRow instanceof Map){
+            if (firstRow instanceof Map) {
                 return (List<Map<String, Object>>) objects;
             } /*else {
                 List<Map<String, Object>> objList = new ArrayList<>(objects.size());
@@ -105,10 +108,10 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
             }*/
         }
 
-        if(this.data instanceof Collection) {
+        if (this.data instanceof Collection) {
             Collection<?> objects = (Collection<?>) this.data;
             List<Map<String, Object>> objList = new ArrayList<>(objects.size());
-            for(Object obj : objects) {
+            for (Object obj : objects) {
                 objList.add(CollectionsOpt.objectToMap(obj));
             }
             return objList;
@@ -116,11 +119,11 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
 
         Class<?> clazz = this.data.getClass();
         if (clazz.isArray() && !(this.data instanceof byte[])
-                && !(this.data instanceof char[])) {
+            && !(this.data instanceof char[])) {
             int len = Array.getLength(this.data);
-            if(len>0) {
+            if (len > 0) {
                 List<Map<String, Object>> objList = new ArrayList<>(len);
-                for(int i=0;i<len;i++) {
+                for (int i = 0; i < len; i++) {
                     objList.add(CollectionsOpt.objectToMap(Array.get(this.data, i)));
                 }
             }
@@ -130,17 +133,16 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
     }
 
 
-
     /**
      * @return 数据集大小
      */
     @Override
     public int getSize() {
-        if(this.data ==null){
+        if (this.data == null) {
             return 0;
         }
-        if(this.data instanceof Collection){
-            return ((Collection<?>)this.data).size();
+        if (this.data instanceof Collection) {
+            return ((Collection<?>) this.data).size();
         }
         return 1;
     }
@@ -148,12 +150,12 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
     @Override
     @JSONField(serialize = false)
     public Map<String, Object> getFirstRow() {
-        if(this.data ==null){
+        if (this.data == null) {
             return Collections.emptyMap();
         }
-        if(this.data instanceof Collection) {
+        if (this.data instanceof Collection) {
             Collection<?> objects = (Collection<?>) this.data;
-            if(objects.size()==0){
+            if (objects.size() == 0) {
                 return Collections.emptyMap();
             }
             return CollectionsOpt.objectToMap(objects.iterator().next());
@@ -164,8 +166,9 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
 
     public void setData(Object data) {
         this.data = data;
-        this.size=getSize();
+        this.size = getSize();
     }
+
     /**
      * 数据集中的数据
      *
@@ -178,6 +181,7 @@ public class SimpleDataSet implements DataSet, DataSetReader, Serializable {
 
     /**
      * 读取 dataSet 数据集
+     *
      * @param params 模块的自定义参数
      * @return dataSet 数据集
      */

@@ -248,9 +248,7 @@ public class BuiltInOperation {
         String sour1DsName = getJsonFieldString(bizOptJson, "source", null);
         List<String> orderByFields = jsonArrayToList(bizOptJson.getJSONArray("config"), "columnName", "orderBy", "desc");
         DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
-        if (orderByFields != null) {
-            DataSetOptUtil.sortDataSetByFields(dataSet, orderByFields);
-        }
+        DataSetOptUtil.sortDataSetByFields(dataSet, orderByFields);
         return getResponseSuccessData(dataSet.getSize());
     }
 

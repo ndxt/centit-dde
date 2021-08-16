@@ -470,7 +470,7 @@ public abstract class DataSetOptUtil {
                                             List<Map.Entry<String, String>> primaryFields,
                                             Collection<Map.Entry<String, String>> formulaMap) {
         if (currDataSet == null || lastDataSet == null) {
-            return null;
+            return new SimpleDataSet();
         }
         List<Map<String, Object>> currData = currDataSet.getDataAsList();
         List<Map<String, Object>> lastData = lastDataSet.getDataAsList();
@@ -618,7 +618,7 @@ public abstract class DataSetOptUtil {
     public static DataSet filterByOtherDataSet(DataSet mainDataSet, DataSet slaveDataSet,
                                                List<Map.Entry<String, String>> primaryFields, List<String> formulas) {
         if (mainDataSet == null || slaveDataSet == null) {
-            return null;
+            return new SimpleDataSet();
         }
         List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
         List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();

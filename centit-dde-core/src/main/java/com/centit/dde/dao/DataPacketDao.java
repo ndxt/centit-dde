@@ -12,8 +12,4 @@ import java.util.Map;
 @Repository
 public class DataPacketDao extends BaseDaoImpl<DataPacket, String> {
 
-    @Override
-    public Map<String, String> getFilterField() {
-        return null;
-    }
 }

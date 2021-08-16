@@ -16,9 +16,6 @@ public class DatasetVariableTranslate implements VariableTranslate {
     private int length;
     private int currentPos;
 
-    public DatasetVariableTranslate(){
-        dataSet = null;
-    }
     public DatasetVariableTranslate(List<Map<String, Object>> dataSet) {
         this.dataSet = dataSet;
     }
@@ -34,7 +31,7 @@ public class DatasetVariableTranslate implements VariableTranslate {
     @Override
     public Object getVarValue(String varName) {
         if(dataSet ==null) {
-            return null;
+            return "";
         }
         int n = varName.lastIndexOf('.');
 
@@ -47,14 +44,14 @@ public class DatasetVariableTranslate implements VariableTranslate {
                     if(currentPos + pos < offset + length){
                         return dataSet.get(currentPos + pos).get(fieldName);
                     }else{
-                        return null;
+                        return "";
                     }
                 }else{
                     int pos = NumberBaseOpt.castObjectToInteger(indexStr,0);
                     if(currentPos - pos >= offset){
                         return dataSet.get(currentPos - pos).get(fieldName);
                     }else{
-                        return null;
+                        return "";
                     }
                 }
             }
