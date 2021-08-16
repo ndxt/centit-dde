@@ -18,10 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author zhf
@@ -85,7 +82,7 @@ public class GenerateFieldsController extends BaseController {
             case "P":
                 return generateFieldsService.generatePostFields(sql);
             default:
-                return null;
+                return Collections.emptyList();
         }
     }
 

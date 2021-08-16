@@ -3,8 +3,7 @@ package com.centit.dde.controller;
 import com.alibaba.fastjson.JSON;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.po.DataPacketInterface;
-import com.centit.dde.service.ExchangeService;
-import com.centit.dde.services.DataPacketBufService;
+import com.centit.dde.services.BizModelService;
 import com.centit.dde.services.DataPacketCopyService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.ConstantValue;
@@ -43,16 +42,14 @@ public class HttpTaskController extends BaseController {
 
     private final DataPacketService dataPacketService;
     private final DataPacketCopyService dataPacketCopyService;
-    private final ExchangeService exchangeService;
-    private final DataPacketBufService dataPacketBufService;
+    private final BizModelService bizmodelService;
 
     public HttpTaskController(DataPacketService dataPacketService,
                               DataPacketCopyService dataPacketCopyService,
-                              ExchangeService exchangeService, DataPacketBufService dataPacketBufService) {
+                              BizModelService bizmodelService) {
         this.dataPacketService = dataPacketService;
         this.dataPacketCopyService = dataPacketCopyService;
-        this.exchangeService = exchangeService;
-        this.dataPacketBufService = dataPacketBufService;
+        this.bizmodelService = bizmodelService;
     }
 
     @GetMapping(value = "/runTest/{packetId}")
@@ -110,11 +107,8 @@ public class HttpTaskController extends BaseController {
         } else {
             dataPacketInterface = dataPacketCopyService.getDataPacket(packetId);
         }
-        bizModel = dataPacketBufService.fetchDataPacketDataFromBuf(dataPacketInterface, params);
-        if (bizModel == null) {
-            bizModel = exchangeService.runTask(packetId, params);
-        }
-        dataPacketBufService.setDataPacketBuf(bizModel, dataPacketInterface, params);
+        bizModel = bizmodelService.fetchBizModel(dataPacketInterface, params);
+        bizmodelService.setBizModelBuf(bizModel, dataPacketInterface, params);
         if (bizModel instanceof DataSet) {
             InputStream in;
             String fileName;

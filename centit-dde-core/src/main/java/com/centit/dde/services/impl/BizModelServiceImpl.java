@@ -3,7 +3,7 @@ package com.centit.dde.services.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.centit.dde.po.DataPacketInterface;
-import com.centit.dde.services.DataPacketBufService;
+import com.centit.dde.services.BizModelService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -23,11 +23,47 @@ import java.util.Map;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class DataPacketBufServiceImpl implements DataPacketBufService {
+public class BizModelServiceImpl implements BizModelService {
     @Autowired(required = false)
     private JedisPool jedisPool;
+    @Autowired
+    private TaskRun taskRun;
     private String key;
     private Jedis jedis;
+
+
+    @Override
+    public Object fetchBizModel(DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
+        if (notNeedBuf(dataPacket)) {
+            return taskRun.runTask(dataPacket.getPacketId(), paramsMap);
+        }
+        return fetchBizModelFromBuf(dataPacket, paramsMap);
+    }
+
+    private boolean notNeedBuf(DataPacketInterface dataPacket) {
+        return jedisPool == null || dataPacket.getBufferFreshPeriod() == null
+            || NumberBaseOpt.castObjectToInteger(dataPacket.getBufferFreshPeriod()) <= 0;
+    }
+
+    private Object fetchBizModelFromBuf(DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
+        makeDataPacketBufId(dataPacket, paramsMap);
+        setJedisPool();
+        Object object = null;
+        if (keyNotExpired()) {
+            try {
+                byte[] byt = jedis.get(key.getBytes());
+                ByteArrayInputStream bis = new ByteArrayInputStream(byt);
+                ObjectInputStream ois = new ObjectInputStream(bis);
+                object = ois.readObject();
+                bis.close();
+                ois.close();
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            jedis.close();
+        }
+        return object;
+    }
 
     private void makeDataPacketBufId(DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
         String dateString = DatetimeOpt.convertTimestampToString(dataPacket.getRecordDate());
@@ -40,59 +76,20 @@ public class DataPacketBufServiceImpl implements DataPacketBufService {
             .append(dateString);
         key = Md5Encoder.encode(temp.toString());
     }
-    private void setJedisPool(){
+
+    private void setJedisPool() {
         jedis = jedisPool.getResource();
     }
 
-    private boolean haveDataBuf(DataPacketInterface dataPacket) {
-        return jedisPool != null && dataPacket.getBufferFreshPeriod() != null;
-    }
-
     @Override
-    public Object fetchDataPacketDataFromBuf(DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
-        if(!haveDataBuf(dataPacket)){
-            return null;
-        }
-        makeDataPacketBufId(dataPacket, paramsMap);
-        Object object = null;
-        if (NumberBaseOpt.castObjectToInteger(dataPacket.getBufferFreshPeriod()) >= 0) {
-            setJedisPool();
-            if ((jedis.get(key.getBytes()) != null) && (jedis.get(key.getBytes()).length > 0)) {
-                try {
-                    byte[] byt = jedis.get(key.getBytes());
-                    ByteArrayInputStream bis = new ByteArrayInputStream(byt);
-                    ObjectInputStream ois = new ObjectInputStream(bis);
-                    object = ois.readObject();
-                    bis.close();
-                    ois.close();
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-                jedis.close();
-                return object;
-            }
-        }
-        return null;
-    }
-
-
-    private boolean needDataBuf(DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
-        if (haveDataBuf(dataPacket)) {
-            return jedis.get(key.getBytes()) == null || (jedis.get(key.getBytes()).length == 0);
-        }
-        return false;
-    }
-
-    @Override
-    public void setDataPacketBuf(Object bizModel, DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
-        if(!needDataBuf(dataPacket,paramsMap)){
+    public void setBizModelBuf(Object bizModel, DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
+        if (notNeedBuf(dataPacket) || keyNotExpired()) {
             return;
         }
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(bizModel);
-
             byte[] byt = bos.toByteArray();
             jedis.set(key.getBytes(), byt);
             int seconds;
@@ -123,6 +120,10 @@ public class DataPacketBufServiceImpl implements DataPacketBufService {
             e.printStackTrace();
         }
         jedis.close();
+    }
+
+    private boolean keyNotExpired() {
+        return jedis.get(key.getBytes()) != null && (jedis.get(key.getBytes()).length > 0);
     }
 
 }
