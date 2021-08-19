@@ -135,7 +135,7 @@ public class BizModelJSONTransform
         if(ConstantValue.RESPONSE_DATA_CODE.equals(dataSetName)){
             return this.data.getResponseMapData().getCode();
         }
-        return this.data;
+        return "";
     }
 
 }
