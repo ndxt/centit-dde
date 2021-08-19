@@ -1,10 +1,6 @@
 package com.centit.dde.utils;
 
-import com.centit.product.metadata.po.MetaColumn;
-import com.centit.support.algorithm.BooleanBaseOpt;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.*;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.metadata.TableField;
@@ -32,7 +28,8 @@ import java.util.*;
  */
 public abstract class DBBatchUtils {
     protected static final Logger logger = LoggerFactory.getLogger(DBBatchUtils.class);
-    private static int INT_BATCH_NUM=1000;
+    private static int INT_BATCH_NUM = 1000;
+
     public static List<String> achieveAllFields(final List<Map<String, Object>> objects) {
         HashSet<String> fields = new HashSet<>();
         for (Map<String, Object> map : objects) {
@@ -127,7 +124,7 @@ public abstract class DBBatchUtils {
         sql = "select count(*) as checkExists from " + tableInfo.getTableName()
             + " where " + GeneralJsonObjectDao.buildFilterSqlByPk(tableInfo, null);
         LeftRightPair<String, List<String>> checkSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
-        int n = 0,insert=0,update=0;
+        int n = 0, insert = 0, update = 0;
         boolean exists = false;
         try (PreparedStatement checkStmt = conn.prepareStatement(checkSqlPair.getLeft());
              PreparedStatement insertStmt = conn.prepareStatement(insertSqlPair.getLeft());
@@ -216,6 +213,9 @@ public abstract class DBBatchUtils {
                             BooleanBaseOpt.castObjectToBoolean(fieldValue, false) ?
                                 BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE);
                         break;
+                    case FieldType.BYTE_ARRAY:
+                    case FieldType.FILE:
+                        object.put(col.getPropertyName(), ByteBaseOpt.castObjectToBytes(fieldValue));
                     default:
                         break;
 

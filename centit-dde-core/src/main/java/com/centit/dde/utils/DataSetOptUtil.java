@@ -14,6 +14,7 @@ import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.image.CaptchaImageUtil;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
@@ -36,6 +37,14 @@ public abstract class DataSetOptUtil {
         VariableFormula formula = new VariableFormula();
         formula.addExtendFunc("toJson", (a) -> JSON.parse(
             StringBaseOpt.castObjectToString(a[0])));
+        formula.addExtendFunc("toByteArray", (a) -> {
+            try {
+                return IOUtils.toByteArray((InputStream) a[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return a;
+        });
         formula.addExtendFunc("uuid", (a) -> UuidOpt.getUuidAsString32());
         formula.addExtendFunc("random", (a) -> CaptchaImageUtil.getRandomString(NumberBaseOpt.castObjectToInteger(a[0])));
         formula.addExtendFunc("encode", (a) -> new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
