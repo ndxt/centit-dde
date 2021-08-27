@@ -22,7 +22,6 @@ import java.util.Map;
  * @author zhf
  */
 @Service
-@Transactional(rollbackFor = Exception.class)
 public class BizModelServiceImpl implements BizModelService {
     @Autowired(required = false)
     private JedisPool jedisPool;
