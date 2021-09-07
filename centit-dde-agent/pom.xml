@@ -11,12 +11,11 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.product</groupId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
     <artifactId>centit-dde-agent</artifactId>
 
     <properties>
-        <metadata.commons.version>5.1-SNAPSHOT</metadata.commons.version>
-        <centit.dde.version>5.1-SNAPSHOT</centit.dde.version>
+        <centit.dde.version>5.2-SNAPSHOT</centit.dde.version>
         <centit.ip.version>5.1-SNAPSHOT</centit.ip.version>
         <common.module.version>5.1-SNAPSHOT</common.module.version>
     </properties>

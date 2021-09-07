@@ -11,7 +11,7 @@
 
 	<groupId>com.centit.product</groupId>
 	<artifactId>centit-dde3</artifactId>
-	<version>5.1-SNAPSHOT</version>
+	<version>5.2-SNAPSHOT</version>
     <modules>
         <module>centit-dde-datamoving</module>
         <module>centit-dde-agent</module>
@@ -29,11 +29,11 @@
 
     <properties>
         <cxf.version>2.7.3</cxf.version>
-        <metadata.version>5.1-SNAPSHOT</metadata.version>
+        <metadata.version>5.2-SNAPSHOT</metadata.version>
         <common.module.version>5.1-SNAPSHOT</common.module.version>
-        <centit.dde.version>5.1-SNAPSHOT</centit.dde.version>
+        <centit.dde.version>5.2-SNAPSHOT</centit.dde.version>
         <centit.fileserver.version>5.1-SNAPSHOT</centit.fileserver.version>
-        <centit.workflow.version>5.1-SNAPSHOT</centit.workflow.version>
+        <centit.workflow.version>5.2-SNAPSHOT</centit.workflow.version>
     </properties>
 
 
