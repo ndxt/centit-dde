@@ -24,10 +24,6 @@ public class QueryParameter {
     @ApiModelProperty(value = "页码")
     private Integer pageNo=0;
 
-    //查询最小匹配度   可以是百分比   也可以是整型  这里设置的是百分比 直观
-    @ApiModelProperty(value = "查询最小匹配度（百分比）")
-    private Object minimumShouldMatch;
-
     @ApiModelProperty(value = "排序字段(fieldName(排序字段)，sortValue（排序字段值，DESC或者ASC）) ")
     private List<JSONObject> sortField;
 
@@ -41,5 +37,5 @@ public class QueryParameter {
     private Integer timeOut;
 
     @ApiModelProperty(value = "是否返回分页信息")
-    private Boolean isReturnPageInfo;
+    private Boolean isReturnPageInfo=false;
 }

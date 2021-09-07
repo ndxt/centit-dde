@@ -8,7 +8,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.entity.EsWriteVo;
 import com.centit.dde.factory.PooledRestClientFactory;
-import com.centit.dde.utils.ElasticsearchWriteUtils;
+import com.centit.dde.write.ElasticsearchWriteUtils;
 import com.centit.dde.utils.EsIndexNameExistsUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
@@ -62,9 +62,9 @@ public class EsWriteBizOperation implements BizOperation {
             if (!EsIndexNameExistsUtils.indexNameExists(restHighLevelClient,indexName)){
                 return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+":"+indexName+"索引不存在！");
             }
-            Boolean indexResponse = ElasticsearchWriteUtils.batchSaveDocuments(restHighLevelClient,addData, esSearchWriteEntity);
-            bizModel.putDataSet(esSearchWriteEntity.getId(),new SimpleDataSet(indexResponse));
-            return ResponseSingleData.makeResponseData(indexResponse);
+            JSONObject jsonObject = ElasticsearchWriteUtils.batchSaveDocuments(restHighLevelClient,addData, esSearchWriteEntity);
+            bizModel.putDataSet(esSearchWriteEntity.getId(),new SimpleDataSet(jsonObject));
+            return ResponseSingleData.makeResponseData(jsonObject);
         }finally {
             restHighLevelClientGenericObjectPool.returnObject(restHighLevelClient);
             log.debug("restHighLevelClient放回连接池中");

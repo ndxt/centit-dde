@@ -1,4 +1,4 @@
-package com.centit.dde.utils;
+package com.centit.dde.query.utils;
 
 /**
  * dde支持的es查询方式
@@ -10,6 +10,8 @@ public class   EsQueryType {
     public  final  static String TERMS="terms";
     //全文检索（查询时查询条件会被分词）
     public  final  static String MATCH="match";
+    //全文检索（查询时查询条件会被分词）
+    public  final  static String IDS="ids";
     //全部查询
     public  final  static String MATCH_ALL="matchAll";
     //区间查询

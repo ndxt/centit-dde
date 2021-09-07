@@ -1,6 +1,6 @@
 package com.centit.dde.entity;
 
-import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.query.utils.EsQueryTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * es查询参数封装
@@ -32,4 +31,7 @@ public class EsReadVo {
 
     @ApiModelProperty(value = "查询条件字段集合")
     List<FieldAttributeInfo> fieldAttributeInfos;
+
+    @ApiModelProperty(value = "查询类型")
+    private EsQueryTypeEnum queryType;
 }
