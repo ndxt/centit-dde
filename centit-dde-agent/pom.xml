@@ -53,12 +53,12 @@
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-core</artifactId>
             <version>${centit.dde.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.centit.support</groupId>
-                    <artifactId>centit-es-client</artifactId>
-                </exclusion>
-            </exclusions>
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.centit.support</groupId>-->
+<!--                    <artifactId>centit-es-client</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
         </dependency>
 
         <dependency>
