@@ -8,7 +8,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.entity.EsReadVo;
 import com.centit.dde.factory.PooledRestClientFactory;
-import com.centit.dde.utils.ElasticsearchReadUtils;
+import com.centit.dde.query.utils.ElasticsearchReadUtils;
 import com.centit.dde.utils.EsIndexNameExistsUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
@@ -21,20 +21,15 @@ import org.elasticsearch.client.RestHighLevelClient;
 
 public class EsReadBizOperation implements BizOperation {
     public static final Log log = LogFactory.getLog(EsReadBizOperation.class);
-
-
     private SourceInfoDao sourceInfoDao;
 
     public EsReadBizOperation( ) {
     }
 
-    public  SourceInfoDao getsourceInfoDao(){
-        return this.sourceInfoDao;
+    public EsReadBizOperation(SourceInfoDao sourceInfoDao) {
+        this.sourceInfoDao=sourceInfoDao;
     }
 
-    public EsReadBizOperation(SourceInfoDao sourceInfoDao) {
-        this.sourceInfoDao = sourceInfoDao;
-    }
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){

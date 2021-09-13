@@ -9,19 +9,23 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>centit-dde-webservices-plugin</artifactId>
+    <artifactId>centit-dde-kafka-plugin</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- 添加CXF dependency  -->
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>3.2.7</version>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>2.1.4.RELEASE</version>
         </dependency>
-    </dependencies>
 
+    </dependencies>
 </project>

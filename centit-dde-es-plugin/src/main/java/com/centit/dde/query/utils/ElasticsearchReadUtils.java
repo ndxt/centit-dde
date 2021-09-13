@@ -1,4 +1,4 @@
-package com.centit.dde.utils;
+package com.centit.dde.query.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -50,7 +50,6 @@ public class ElasticsearchReadUtils {
     public static JSONArray combinationQuery(RestHighLevelClient restHighLevelClient, EsReadVo searchVo) throws IOException {
         QueryParameter queryParameter = searchVo.getQueryParameter();
         SearchRequest searchRequest = new SearchRequest(queryParameter.getIndexName());
-        CountRequest countRequest = new CountRequest(queryParameter.getIndexName());
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         List<FieldAttributeInfo> fieldAttributeInfos = searchVo.getFieldAttributeInfos();
         for (FieldAttributeInfo fieldAttributeInfo : fieldAttributeInfos) {
@@ -81,17 +80,6 @@ public class ElasticsearchReadUtils {
                     boolQueryBuilder.must(queryBuilder);
             }
         }
-        Object minimumShouldMatch = queryParameter.getMinimumShouldMatch();
-        if (minimumShouldMatch!=null){
-            //百分比
-           if (minimumShouldMatch instanceof  String && StringUtils.isNotBlank((String)minimumShouldMatch)){
-               boolQueryBuilder.minimumShouldMatch((String) minimumShouldMatch);
-           }
-           //整形
-           if (minimumShouldMatch instanceof  Integer && (Integer)minimumShouldMatch>0){
-               boolQueryBuilder.minimumShouldMatch((Integer) minimumShouldMatch);
-           }
-        }
         SearchSourceBuilder searchSourceBuilder = publicSearchSourceBuilde(queryParameter);
         queryHighlightBuilder(fieldAttributeInfos,searchSourceBuilder);
         searchSourceBuilder.query(boolQueryBuilder);
@@ -105,18 +93,7 @@ public class ElasticsearchReadUtils {
         }
         //分页设置
         if (queryParameter.getIsReturnPageInfo()){
-            SearchSourceBuilder countSearchSourceBuilder = new SearchSourceBuilder();
-            countSearchSourceBuilder.query(boolQueryBuilder);
-            countRequest.source(countSearchSourceBuilder);
-            CountResponse countResponse = restHighLevelClient.count(countRequest, RequestOptions.DEFAULT);
-            int totalCount =  (int)countResponse.getCount();
-            int pagesTotal= totalCount== 0 ? 0: (totalCount%queryParameter.getPageSize() == 0 ? totalCount / queryParameter.getPageSize() : (totalCount / queryParameter.getPageSize()) + 1);
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("pageNo",queryParameter.getPageNo());
-            jsonObject.put("pageSize",queryParameter.getPageSize());
-            jsonObject.put("totalCount",totalCount);
-            jsonObject.put("pagesTotal",pagesTotal);
-            jsonArray.add(jsonObject);
+            pageInfo(queryParameter,boolQueryBuilder,restHighLevelClient);
         }
         return jsonArray;
     }
@@ -140,7 +117,7 @@ public class ElasticsearchReadUtils {
                 return queryBuilder;
             case EsQueryType.TERMS:
                 if (StringUtils.isNotBlank(fieldName) && value !=null){
-                    String fieldValues = JSON.toJSONString(value);
+                    String fieldValues = (String) value;
                     if (fieldValues.contains(",")){
                         String[] fieldValue = fieldValues.split(",");
                         queryBuilder = QueryBuilders.termsQuery(fieldName, fieldValue);
@@ -159,10 +136,32 @@ public class ElasticsearchReadUtils {
                     if(StringUtils.isNotBlank(analyzer)){
                         matchQueryBuilder.analyzer(analyzer);
                     }
+                    if (StringUtils.isNotBlank(fieldAttributeInfo.getOperator())){
+                        switch (fieldAttributeInfo.getOperator().toUpperCase()){
+                            case "AND":
+                                matchQueryBuilder.operator(Operator.AND);
+                                break;
+                            case "OR":
+                                matchQueryBuilder.operator(Operator.OR);
+                                break;
+                        }
+                    }
+                    if (StringUtils.isNotBlank(fieldAttributeInfo.getMinimumShouldMatch())){
+                        matchQueryBuilder.minimumShouldMatch(fieldAttributeInfo.getMinimumShouldMatch());
+                    }
                     return  matchQueryBuilder;
                 }
             case EsQueryType.MATCH_ALL:
                 return QueryBuilders.matchAllQuery();
+            case EsQueryType.IDS:
+                String idsStr = (String)value;
+                String[] ids = idsStr.split(",");
+                IdsQueryBuilder idsQueryBuilder = QueryBuilders.idsQuery();
+                idsQueryBuilder.addIds(ids);
+                if (boots!=null && boots>0){
+                    idsQueryBuilder.boost(boots);
+                }
+                return idsQueryBuilder;
             case EsQueryType.RANGE:
                 String fieldValue = (String)value;
                 String[] split = fieldValue.split(",");
@@ -222,7 +221,7 @@ public class ElasticsearchReadUtils {
      * @param searchResponse
      * @return
      */
-    private static JSONArray resultPart(SearchResponse searchResponse){
+    public static JSONArray resultPart(SearchResponse searchResponse){
         JSONArray resultArrays= new JSONArray();
         // 根据状态和数据条数验证是否返回了数据
         if (RestStatus.OK.equals(searchResponse.status()) && searchResponse.getHits().getTotalHits().value > 0) {
@@ -244,7 +243,7 @@ public class ElasticsearchReadUtils {
      * @param fieldAttributeInfos
      * @return
      */
-    private static  JSONArray returnHighlightResult(SearchResponse searchResponse, List<FieldAttributeInfo> fieldAttributeInfos){
+    public static  JSONArray returnHighlightResult(SearchResponse searchResponse, List<FieldAttributeInfo> fieldAttributeInfos){
         List<String> fieldNames = new ArrayList<>();
         for (FieldAttributeInfo fieldAttributeInfo : fieldAttributeInfos) {
             if (fieldAttributeInfo.getIsHighligh()){
@@ -279,7 +278,7 @@ public class ElasticsearchReadUtils {
      * @param searchSourceBuilder
      * @return
      */
-    private static void queryHighlightBuilder(List<FieldAttributeInfo> fieldAttributeInfos,SearchSourceBuilder searchSourceBuilder){
+    public static void queryHighlightBuilder(List<FieldAttributeInfo> fieldAttributeInfos,SearchSourceBuilder searchSourceBuilder){
         //高亮
         HighlightBuilder highlightBuilder = new HighlightBuilder();
         if (fieldAttributeInfos.size()>0){
@@ -306,7 +305,7 @@ public class ElasticsearchReadUtils {
      * @param queryParameter
      * @return
      */
-    private static SearchSourceBuilder publicSearchSourceBuilde(QueryParameter queryParameter){
+    public static SearchSourceBuilder publicSearchSourceBuilde(QueryParameter queryParameter){
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         //设置查询返回字段和不返回的字段
         searchSourceBuilder.fetchSource(queryParameter.getReturnField(),queryParameter.getNotReturnField());
@@ -328,6 +327,50 @@ public class ElasticsearchReadUtils {
         searchSourceBuilder.size(queryParameter.getPageSize());
         searchSourceBuilder.explain(true);
         return searchSourceBuilder;
+    }
+
+
+    public static JSONObject pageInfo(QueryParameter queryParameter,QueryBuilder queryBuilder,RestHighLevelClient restHighLevelClient) throws IOException {
+        CountRequest countRequest = new CountRequest(queryParameter.getIndexName());
+        SearchSourceBuilder countSearchSourceBuilder = new SearchSourceBuilder();
+        countSearchSourceBuilder.query(queryBuilder);
+        countRequest.source(countSearchSourceBuilder);
+        CountResponse countResponse = restHighLevelClient.count(countRequest, RequestOptions.DEFAULT);
+        int totalCount =  (int)countResponse.getCount();
+        int pagesTotal= totalCount== 0 ? 0: (totalCount%queryParameter.getPageSize() == 0 ? totalCount / queryParameter.getPageSize() : (totalCount / queryParameter.getPageSize()) + 1);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pageNo",queryParameter.getPageNo());
+        jsonObject.put("pageSize",queryParameter.getPageSize());
+        jsonObject.put("totalCount",totalCount);
+        jsonObject.put("pageTotal",pagesTotal);
+        return jsonObject;
+    }
+
+    /**
+     * 返回结果结果封装
+     * @return
+     */
+    public  static  JSONArray returnBuilde(EsReadVo esReadVo,QueryBuilder queryBuilder,RestHighLevelClient restHighLevelClient) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(esReadVo.getQueryParameter().getIndexName());
+        QueryParameter queryParameter = esReadVo.getQueryParameter();
+        //封装分页  排序信息
+        SearchSourceBuilder searchSourceBuilder = publicSearchSourceBuilde(queryParameter);
+        //设置高亮显示字段
+        queryHighlightBuilder(esReadVo.getFieldAttributeInfos(),searchSourceBuilder);
+        searchSourceBuilder.query(queryBuilder);
+        searchRequest.source(searchSourceBuilder);
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        JSONArray jsonArray;
+        if (searchSourceBuilder.highlighter()!=null && searchSourceBuilder.highlighter().fields().size()>0){
+            jsonArray = returnHighlightResult(searchResponse, esReadVo.getFieldAttributeInfos());
+        }else {
+            jsonArray =resultPart(searchResponse);
+        }
+        //分页设置
+        if (queryParameter.getIsReturnPageInfo()){
+            jsonArray.add(ElasticsearchReadUtils.pageInfo(queryParameter,queryBuilder,restHighLevelClient));
+        }
+        return jsonArray;
     }
 
 }

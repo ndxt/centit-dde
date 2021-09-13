@@ -70,7 +70,7 @@ public class ElasticSearchConfig {
         return new RestHighLevelClient(restClientBuilder);
     }
 
-    private RestClientBuilder restClientBuilder(String ipAddress) {
+    public RestClientBuilder restClientBuilder(String ipAddress) {
         String[] split = ipAddress.split(",");
         HttpHost[] hosts = Arrays.stream(split)
             .map(this::makeHttpHost)
