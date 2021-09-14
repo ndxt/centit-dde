@@ -10,9 +10,13 @@ import org.elasticsearch.index.query.QueryBuilder;
 import java.io.IOException;
 
 /**
- * 精确查询  查询条件不分词
+ * 短语查询
+ *  match_phrase属于短语匹配，能保证分词间的邻近关系，相当于对文档的关键词进行重组以匹配查询内容，对于匹配了短语"森 小 林"的文档，下面的条件必须为true：
+ *       森 、小、 林必须全部出现在某个字段中
+ *      小的位置必须比森的位置大1
+ *      林的位置必须比森的位置大2
  */
-public class EsTermQueryImpl implements EsQuery {
+public class EsMatchPhraseQueryImpl implements EsQuery {
     @Override
     public JSONObject query(RestHighLevelClient restHighLevelClient, EsReadVo esReadVo) throws IOException {
         QueryBuilder queryBuilder = ElasticsearchReadUtils.queryBuilder(esReadVo.getFieldAttributeInfos().get(0),esReadVo.getQueryType());

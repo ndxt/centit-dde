@@ -81,8 +81,12 @@ public class DataPacket implements Serializable,DataPacketInterface {
     private Date updateDate;
 
     @ApiModelProperty(value = "业务模块代码")
-    @Column(name = "APPLICATION_ID")
-    private String applicationId;
+    @Column(name = "os_id")
+    private String osId;
+
+    @ApiModelProperty(value = "所属模块")
+    @Column(name = "OPT_ID")
+    private String optId;
 
     @Column(name = "TASK_TYPE")
     @ApiModelProperty(value = "任务类型,1表示普通任务，2表示定时任务", required = true)
@@ -135,6 +139,16 @@ public class DataPacket implements Serializable,DataPacketInterface {
     }
 
     @Override
+
+
+
+
+
+
+
+
+
+
     @JSONField(serialize = false)
     public Map<String, Object> getPacketParamsValue() {
         Map<String, Object> params = new HashMap<>(10);

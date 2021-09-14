@@ -40,65 +40,10 @@ import java.util.concurrent.TimeUnit;
 public class ElasticsearchReadUtils {
     private static  final Logger logger = LoggerFactory.getLogger(ElasticsearchReadUtils.class);
 
-    /**
-     * 组合查询
-     * @param restHighLevelClient
-     * @param searchVo
-     * @return
-     * @throws IOException
-     */
-    public static JSONArray combinationQuery(RestHighLevelClient restHighLevelClient, EsReadVo searchVo) throws IOException {
-        QueryParameter queryParameter = searchVo.getQueryParameter();
-        SearchRequest searchRequest = new SearchRequest(queryParameter.getIndexName());
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        List<FieldAttributeInfo> fieldAttributeInfos = searchVo.getFieldAttributeInfos();
-        for (FieldAttributeInfo fieldAttributeInfo : fieldAttributeInfos) {
-            String combinationType = fieldAttributeInfo.getCombinationType();
-            Boolean isSortField = fieldAttributeInfo.getIsSortField();
-            if (isSortField){//添加排序字段
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("fieldName",fieldAttributeInfo.getFieldName());
-                jsonObject.put("sortValue",fieldAttributeInfo.getSortValue());
-                queryParameter.getSortField().add(jsonObject);
-            }
-            QueryBuilder queryBuilder = queryBuilder(fieldAttributeInfo);
-            //must should  查询会计算相关文档得分情况       mustNot   filter  查询不会计算相关文档得分 并且会将查询结果换成
-            switch (combinationType){
-                case "must":
-                    boolQueryBuilder.must(queryBuilder);
-                    break;
-                case "should":
-                    boolQueryBuilder.should(queryBuilder);
-                    break;
-                case "mustNot":
-                    boolQueryBuilder.mustNot(queryBuilder);
-                    break;
-                case "filter":
-                    boolQueryBuilder.filter(queryBuilder);
-                    break;
-                default:
-                    boolQueryBuilder.must(queryBuilder);
-            }
+    public static QueryBuilder queryBuilder(FieldAttributeInfo fieldAttributeInfo,String queryType){
+        if (StringUtils.isNotBlank(fieldAttributeInfo.getCombQueryType())&& StringUtils.isNotBlank(fieldAttributeInfo.getCombinationType())){
+            queryType=fieldAttributeInfo.getCombQueryType();
         }
-        SearchSourceBuilder searchSourceBuilder = publicSearchSourceBuilde(queryParameter);
-        queryHighlightBuilder(fieldAttributeInfos,searchSourceBuilder);
-        searchSourceBuilder.query(boolQueryBuilder);
-        searchRequest.source(searchSourceBuilder);
-        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-        JSONArray jsonArray;
-        if (searchSourceBuilder.highlighter()!=null && searchSourceBuilder.highlighter().fields().size()>0){
-            jsonArray = returnHighlightResult(searchResponse, fieldAttributeInfos);
-        }else {
-            jsonArray =resultPart(searchResponse);
-        }
-        //分页设置
-        if (queryParameter.getIsReturnPageInfo()){
-            pageInfo(queryParameter,boolQueryBuilder,restHighLevelClient);
-        }
-        return jsonArray;
-    }
-
-    private static QueryBuilder queryBuilder(FieldAttributeInfo fieldAttributeInfo){
         QueryBuilder queryBuilder=null;
         String fieldName = fieldAttributeInfo.getFieldName();
         Object value = fieldAttributeInfo.getValue();
@@ -106,7 +51,7 @@ public class ElasticsearchReadUtils {
         String analyzer = fieldAttributeInfo.getAnalyzer();
         Integer slop = fieldAttributeInfo.getSlop();
         Integer maxExpansions = fieldAttributeInfo.getMaxExpansions();
-        switch (fieldAttributeInfo.getQueryType()){
+        switch (queryType){
             case EsQueryType.TERM:
                 if (StringUtils.isNotBlank(fieldName) && value !=null){
                     queryBuilder = QueryBuilders.termQuery(fieldName, value);
@@ -221,7 +166,7 @@ public class ElasticsearchReadUtils {
      * @param searchResponse
      * @return
      */
-    public static JSONArray resultPart(SearchResponse searchResponse){
+    public static JSONArray resultPart(SearchResponse searchResponse,Boolean explain){
         JSONArray resultArrays= new JSONArray();
         // 根据状态和数据条数验证是否返回了数据
         if (RestStatus.OK.equals(searchResponse.status()) && searchResponse.getHits().getTotalHits().value > 0) {
@@ -229,6 +174,9 @@ public class ElasticsearchReadUtils {
                 // 打分
                 //float score = hit.getScore();
                 JSONObject jsonObject = JSONObject.parseObject(hit.getSourceAsString());
+                if (explain){
+                    jsonObject.put("explain_info",hit.getExplanation());
+                }
                 // 输出查询信息
                 logger.debug("获取es数据:"+jsonObject.toJSONString());
                 resultArrays.add(jsonObject);
@@ -243,7 +191,7 @@ public class ElasticsearchReadUtils {
      * @param fieldAttributeInfos
      * @return
      */
-    public static  JSONArray returnHighlightResult(SearchResponse searchResponse, List<FieldAttributeInfo> fieldAttributeInfos){
+    public static  JSONArray returnHighlightResult(SearchResponse searchResponse, List<FieldAttributeInfo> fieldAttributeInfos,Boolean explain){
         List<String> fieldNames = new ArrayList<>();
         for (FieldAttributeInfo fieldAttributeInfo : fieldAttributeInfos) {
             if (fieldAttributeInfo.getIsHighligh()){
@@ -253,6 +201,9 @@ public class ElasticsearchReadUtils {
         JSONArray jsonArray = new JSONArray();
         for (SearchHit hit : searchResponse.getHits()) {
             JSONObject jsonObject = JSON.parseObject(hit.getSourceAsString());
+            if (explain){
+                jsonObject.put("explain_info",hit.getExplanation());
+            }
             //解析高亮字段
             Map<String, HighlightField> highlightFields = hit.getHighlightFields();
             for (String fieldName : fieldNames) {
@@ -325,7 +276,8 @@ public class ElasticsearchReadUtils {
         searchSourceBuilder.timeout(new TimeValue(queryParameter.getTimeOut(), TimeUnit.SECONDS));
         searchSourceBuilder.from(queryParameter.getPageNo()>0?(queryParameter.getPageNo()-1)*queryParameter.getPageSize():0);
         searchSourceBuilder.size(queryParameter.getPageSize());
-        searchSourceBuilder.explain(true);
+        //explain 返回文档的评分解释
+        searchSourceBuilder.explain(queryParameter.getExplain());
         return searchSourceBuilder;
     }
 
@@ -350,7 +302,7 @@ public class ElasticsearchReadUtils {
      * 返回结果结果封装
      * @return
      */
-    public  static  JSONArray returnBuilde(EsReadVo esReadVo,QueryBuilder queryBuilder,RestHighLevelClient restHighLevelClient) throws IOException {
+    public  static  JSONObject returnBuilde(EsReadVo esReadVo,QueryBuilder queryBuilder,RestHighLevelClient restHighLevelClient) throws IOException {
         SearchRequest searchRequest = new SearchRequest(esReadVo.getQueryParameter().getIndexName());
         QueryParameter queryParameter = esReadVo.getQueryParameter();
         //封装分页  排序信息
@@ -360,17 +312,17 @@ public class ElasticsearchReadUtils {
         searchSourceBuilder.query(queryBuilder);
         searchRequest.source(searchSourceBuilder);
         SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-        JSONArray jsonArray;
+        JSONObject returnData =new JSONObject();
         if (searchSourceBuilder.highlighter()!=null && searchSourceBuilder.highlighter().fields().size()>0){
-            jsonArray = returnHighlightResult(searchResponse, esReadVo.getFieldAttributeInfos());
+            returnData.put("data",returnHighlightResult(searchResponse, esReadVo.getFieldAttributeInfos(),queryParameter.getExplain()));
         }else {
-            jsonArray =resultPart(searchResponse);
+            returnData.put("data",resultPart(searchResponse,queryParameter.getExplain()));
         }
         //分页设置
         if (queryParameter.getIsReturnPageInfo()){
-            jsonArray.add(ElasticsearchReadUtils.pageInfo(queryParameter,queryBuilder,restHighLevelClient));
+            returnData.put("pageInfo",ElasticsearchReadUtils.pageInfo(queryParameter,queryBuilder,restHighLevelClient));
         }
-        return jsonArray;
+        return returnData;
     }
 
 }

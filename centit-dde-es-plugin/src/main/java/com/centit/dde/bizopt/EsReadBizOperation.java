@@ -49,7 +49,7 @@ public class EsReadBizOperation implements BizOperation {
                 return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+":"
                     +esReadVo.getQueryParameter().getIndexName()+"索引不存在！");
             }
-            JSONArray result = ElasticsearchReadUtils.combinationQuery(restHighLevelClient, esReadVo);
+            JSONArray result = null;//ElasticsearchReadUtils.combinationQuery(restHighLevelClient, esReadVo);
             bizModel.putDataSet(esReadVo.getId(),new SimpleDataSet(result));
         }catch (Exception e){
             return BuiltInOperation.getResponseData(0, 500,"查询es数据异常,异常信息："+e.getMessage());

@@ -1,6 +1,5 @@
 package com.centit.dde.entity;
 
-import com.centit.dde.query.utils.EsQueryTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -33,5 +32,5 @@ public class EsReadVo {
     List<FieldAttributeInfo> fieldAttributeInfos;
 
     @ApiModelProperty(value = "查询类型")
-    private EsQueryTypeEnum queryType;
+    private String queryType;
 }

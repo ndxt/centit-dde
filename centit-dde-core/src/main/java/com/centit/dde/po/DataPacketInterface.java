@@ -29,7 +29,9 @@ public interface DataPacketInterface {
      *
      * @return applicationId
      */
-    String getApplicationId();
+    String getOsId();
+
+    String getOptId();
 
     String getPacketId();
 

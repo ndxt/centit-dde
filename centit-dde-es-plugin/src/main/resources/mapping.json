@@ -1,0 +1,116 @@
+{
+  "properties": {
+    "packetId": {
+      "type": "keyword"
+    },
+    "applicationId": {
+      "type": "keyword"
+    },
+    "ownerType": {
+      "type": "keyword"
+    },
+    "ownerCode": {
+      "type": "keyword"
+    },
+    "packetName": {
+      //text和keyword的区别   text：存储数据时候，会自动分词，并生成索引，keyword：存储数据时候，不会分词建立索引
+      "type": "text",
+      //入库时ik细粒度分词
+      "analyzer": "ikSearchAnalyzer",
+      //查询时粗粒度分词
+      "search_analyzer": "ikSmartSearchAnalyzer",
+      "fields": {
+        "pinyin": {
+          "type": "text",
+          "analyzer": "pinyinComplexAnalyzer",
+          "search_analyzer": "pinyinComplexAnalyzer",
+          //分词时是否存储原始字段值    存储的原始字段只可以获取不可分词
+          "store": false,
+          "term_vector": "with_offsets",
+          "boost": 10
+        }
+      }
+    },
+    "packetType": {
+      "type": "text"
+    },
+    "packetDesc": {
+      "type": "text"
+    },
+    "Recorder": {
+      "type": "text"
+    },
+    "hasDataOpt": {
+      "type": "text"
+    },
+    "dataOptDescJson": {
+      //text和keyword的区别   text：存储数据时候，会自动分词，并生成索引，keyword：存储数据时候，不会分词建立索引
+      "type": "text",
+      //入库时ik细粒度分词
+      "analyzer": "ikSearchAnalyzer",
+      //查询时粗粒度分词
+      "search_analyzer": "ikSmartSearchAnalyzer",
+      "fields": {
+        "pinyin": {
+          "type": "text",
+          "analyzer": "pinyinComplexAnalyzer",
+          "search_analyzer": "pinyinComplexAnalyzer",
+          //分词时是否存储原始字段值    存储的原始字段只可以获取不可分词
+          "store": false,
+          "term_vector": "with_offsets",
+          "boost": 10
+        }
+      }
+    },
+    "bufferFreshPeriod": {
+      "type": "text"
+    },
+    "taskType": {
+      "type": "text"
+    },
+    "taskCron": {
+      "type": "text"
+    },
+    "lastRunTime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "nextRunTime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "isValid": {
+      "type": "keyword"
+    },
+    "interfaceName": {
+      "type": "text"
+    },
+    "isWhile": {
+      "type": "text"
+    },
+    "returnType": {
+      "type": "text"
+    },
+    "returnResult": {
+      "type": "text"
+    },
+    "ownGroup": {
+      "type": "text"
+    },
+    "recordDate": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "publishDate": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "updateDate": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "needRollback": {
+      "type": "text"
+    }
+  }
+}

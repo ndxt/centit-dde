@@ -1,23 +1,21 @@
 package com.centit.dde.query.impl;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.entity.EsReadVo;
 import com.centit.dde.query.EsQuery;
 import com.centit.dde.query.utils.ElasticsearchReadUtils;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 
 import java.io.IOException;
 
+/**
+ * 全文查询   分词查询   将输入的条件进行分词后再检索
+ */
 public class EsMatchQueryImpl implements EsQuery {
     @Override
-    public JSONArray query(RestHighLevelClient restHighLevelClient, EsReadVo esReadVo) throws IOException {
-        String fieldName = esReadVo.getFieldAttributeInfos().get(0).getFieldName();
-        Object value = esReadVo.getFieldAttributeInfos().get(0).getValue();
-        Float boots = esReadVo.getFieldAttributeInfos().get(0).getBoots();
-        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery(fieldName, value);
-        if (boots>0)termQueryBuilder.boost(boots);
-        return ElasticsearchReadUtils.returnBuilde(esReadVo,termQueryBuilder,restHighLevelClient);
+    public JSONObject query(RestHighLevelClient restHighLevelClient, EsReadVo esReadVo) throws IOException {
+        QueryBuilder queryBuilder = ElasticsearchReadUtils.queryBuilder(esReadVo.getFieldAttributeInfos().get(0),esReadVo.getQueryType());
+        return ElasticsearchReadUtils.returnBuilde(esReadVo,queryBuilder,restHighLevelClient);
     }
 }

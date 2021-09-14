@@ -10,9 +10,10 @@ import org.elasticsearch.index.query.QueryBuilder;
 import java.io.IOException;
 
 /**
- * 精确查询  查询条件不分词
+ * 一词多字段查询
+ * muti_match标识了只要有一个字段里有匹配短语的词就返回
  */
-public class EsTermQueryImpl implements EsQuery {
+public class EsMutiMatchQueryImpl implements EsQuery {
     @Override
     public JSONObject query(RestHighLevelClient restHighLevelClient, EsReadVo esReadVo) throws IOException {
         QueryBuilder queryBuilder = ElasticsearchReadUtils.queryBuilder(esReadVo.getFieldAttributeInfos().get(0),esReadVo.getQueryType());

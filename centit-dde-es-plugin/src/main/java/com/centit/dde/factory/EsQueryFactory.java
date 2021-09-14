@@ -1,20 +1,24 @@
 package com.centit.dde.factory;
 
 import com.centit.dde.query.EsQuery;
-import com.centit.dde.query.impl.EsMatchQueryImpl;
-import com.centit.dde.query.impl.EsTermQueryImpl;
-import com.centit.dde.query.impl.EsTermsQueryImpl;
-import com.centit.dde.query.utils.EsQueryTypeEnum;
+import com.centit.dde.query.impl.*;
+import com.centit.dde.query.utils.EsQueryType;
 
 public class EsQueryFactory {
-    public static EsQuery getEsQueryType(EsQueryTypeEnum queryTypeEnum){
-        switch (queryTypeEnum){
-            case TERM:
+    public static EsQuery getEsQueryType(String queryType){
+        switch (queryType){
+            case EsQueryType.TERM:
               return  new EsTermQueryImpl();
-            case TERMS:
+            case EsQueryType.TERMS:
                 return  new EsTermsQueryImpl();
-            case MATCH:
+            case EsQueryType.MATCH:
                 return  new EsMatchQueryImpl();
+            case EsQueryType.MATCH_ALL:
+                return  new EsMatchAllQueryImpl();
+            case EsQueryType.MATCH_PHRASE:
+                return  new EsMatchPhraseQueryImpl();
+            case EsQueryType.BOOLEAN:
+                return  new EsBooleanQueryImpl();
         }
         return null;
     }

@@ -59,14 +59,14 @@ public class TaskRun {
             dataPacketCopy.setLastRunTime(new Date());
             dataPacketInterface = dataPacketCopy;
             taskLog.setRunner("T");
-            taskLog.setApplicationId(dataPacketCopy.getApplicationId());
+            taskLog.setApplicationId(dataPacketCopy.getOsId());
             taskLog.setRunType(dataPacketCopy.getPacketName());
         } else {
             DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
             dataPacket.setLastRunTime(new Date());
             dataPacketInterface = dataPacket;
             taskLog.setRunner("A");
-            taskLog.setApplicationId(dataPacket.getApplicationId());
+            taskLog.setApplicationId(dataPacket.getOsId());
             taskLog.setRunType(dataPacket.getPacketName());
         }
         try {

@@ -24,7 +24,7 @@ public class QueryParameter {
     @ApiModelProperty(value = "页码")
     private Integer pageNo=0;
 
-    @ApiModelProperty(value = "排序字段(fieldName(排序字段)，sortValue（排序字段值，DESC或者ASC）) ")
+    @ApiModelProperty(value = "排序字段(fieldName(排序字段)，sortValue（排序字段值，DESC或者ASC)")
     private List<JSONObject> sortField;
 
     @ApiModelProperty(value = "查询结果返回字段")
@@ -38,4 +38,7 @@ public class QueryParameter {
 
     @ApiModelProperty(value = "是否返回分页信息")
     private Boolean isReturnPageInfo=false;
+
+    @ApiModelProperty(value = "是否返回文档的评分解释 默认false")
+    private Boolean explain=false;
 }
