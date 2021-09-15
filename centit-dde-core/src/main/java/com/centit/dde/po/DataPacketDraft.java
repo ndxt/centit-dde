@@ -24,8 +24,8 @@ import java.util.*;
 @ApiModel
 @Data
 @Entity
-@Table(name = "Q_DATA_PACKET_COPY")
-public class DataPacketCopy implements Serializable,DataPacketInterface {
+@Table(name = "Q_DATA_PACKET_DRAFT")
+public class DataPacketDraft implements Serializable,DataPacketInterface {
     private static final long serialVersionUID = 1;
 
     @ApiModelProperty(value = "数据处理ID", hidden = true)
@@ -122,11 +122,11 @@ public class DataPacketCopy implements Serializable,DataPacketInterface {
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private String publishDate;
 
-    @OneToMany(targetEntity = DataPacketParamCopy.class)
+    @OneToMany(targetEntity = DataPacketParamDraft.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
-    private List<DataPacketParamCopy> packetParams;
+    private List<DataPacketParamDraft> packetParams;
 
-    public List<DataPacketParamCopy> getPacketParams() {
+    public List<DataPacketParamDraft> getPacketParams() {
         if (packetParams == null) {
             packetParams = new ArrayList<>(2);
         }
@@ -140,7 +140,7 @@ public class DataPacketCopy implements Serializable,DataPacketInterface {
         if (packetParams == null) {
             return params;
         }
-        for (DataPacketParamCopy packetParam : packetParams) {
+        for (DataPacketParamDraft packetParam : packetParams) {
             if (packetParam.getParamType() != null) {
                 switch (packetParam.getParamType()) {
                     case "N":

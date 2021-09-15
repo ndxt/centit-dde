@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.services.BizModelService;
-import com.centit.dde.services.DataPacketCopyService;
+import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
@@ -41,11 +41,11 @@ import java.util.Map;
 public class HttpTaskController extends BaseController {
 
     private final DataPacketService dataPacketService;
-    private final DataPacketCopyService dataPacketCopyService;
+    private final DataPacketDraftService dataPacketCopyService;
     private final BizModelService bizmodelService;
 
     public HttpTaskController(DataPacketService dataPacketService,
-                              DataPacketCopyService dataPacketCopyService,
+                              DataPacketDraftService dataPacketCopyService,
                               BizModelService bizmodelService) {
         this.dataPacketService = dataPacketService;
         this.dataPacketCopyService = dataPacketCopyService;

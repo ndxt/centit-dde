@@ -18,9 +18,9 @@ import java.io.Serializable;
 
 @Data
 @Entity
-@Table(name = "Q_DATA_PACKET_PARAM_COPY")
+@Table(name = "Q_DATA_PACKET_PARAM_DRAFT")
 @ApiModel(value = "数据包参数")
-public class DataPacketParamCopy implements Serializable {
+public class DataPacketParamDraft implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

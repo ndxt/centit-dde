@@ -2,7 +2,7 @@ package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizOptFlow;
-import com.centit.dde.dao.DataPacketCopyDao;
+import com.centit.dde.dao.DataPacketDraftDao;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.dao.TaskLogDao;
@@ -29,7 +29,7 @@ import java.util.Map;
 public class TaskRun {
     private final TaskLogDao taskLogDao;
     private final TaskDetailLogDao taskDetailLogDao;
-    private final DataPacketCopyDao dataPacketCopyDao;
+    private final DataPacketDraftDao dataPacketCopyDao;
     private final DataPacketDao dataPacketDao;
     private final BizOptFlow bizOptFlow;
     @Autowired(required = false)
@@ -37,7 +37,7 @@ public class TaskRun {
 
     @Autowired
     public TaskRun(TaskLogDao taskLogDao, TaskDetailLogDao taskDetailLogDao,
-                   DataPacketCopyDao dataPacketCopyDao, DataPacketDao dataPacketDao,
+                   DataPacketDraftDao dataPacketCopyDao, DataPacketDao dataPacketDao,
                    BizOptFlow bizOptFlow) {
         this.taskLogDao = taskLogDao;
         this.taskDetailLogDao = taskDetailLogDao;
@@ -55,7 +55,7 @@ public class TaskRun {
         Date beginTime = new Date();
         DataPacketInterface dataPacketInterface;
         if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
-            DataPacketCopy dataPacketCopy = dataPacketCopyDao.getObjectWithReferences(packetId);
+            DataPacketDraft dataPacketCopy = dataPacketCopyDao.getObjectWithReferences(packetId);
             dataPacketCopy.setLastRunTime(new Date());
             dataPacketInterface = dataPacketCopy;
             taskLog.setRunner("T");

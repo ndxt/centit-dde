@@ -84,7 +84,7 @@ public class DataPacket implements Serializable,DataPacketInterface {
     @Column(name = "os_id")
     private String osId;
 
-    @ApiModelProperty(value = "所属模块")
+    @ApiModelProperty(value = "所属业务")
     @Column(name = "OPT_ID")
     private String optId;
 

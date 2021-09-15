@@ -1,7 +1,7 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.po.DataPacketCopy;
-import com.centit.dde.services.DataPacketCopyService;
+import com.centit.dde.po.DataPacketDraft;
+import com.centit.dde.services.DataPacketDraftService;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
@@ -17,73 +17,73 @@ import java.util.List;
 /**
  * @author zhf
  */
-@Api(value = "COPY数据包", tags = "COPY数据包")
+@Api(value = "未发布API网关接口管理", tags = "未发布API网关接口管理")
 @RestController
-@RequestMapping(value = "packetCopy")
-public class DataPacketCopyController extends BaseController {
+@RequestMapping(value = "packetDraft")
+public class DataPacketDraftController extends BaseController {
 
 
-    private final DataPacketCopyService dataPacketCopyService;
+    private final DataPacketDraftService dataPacketCopyService;
 
 
-    public DataPacketCopyController(DataPacketCopyService dataPacketCopyService) {
+    public DataPacketDraftController(DataPacketDraftService dataPacketCopyService) {
         this.dataPacketCopyService = dataPacketCopyService;
     }
 
-    @ApiOperation(value = "新增数据包")
+    @ApiOperation(value = "新增API网关")
     @PostMapping
     @WrapUpResponseBody
-    public DataPacketCopy createDataPacket(@RequestBody DataPacketCopy dataPacketCopy, HttpServletRequest request) {
+    public DataPacketDraft createDataPacket(@RequestBody DataPacketDraft dataPacketCopy, HttpServletRequest request) {
         dataPacketCopy.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacketCopy.setDataOptDescJson(dataPacketCopy.getDataOptDescJson());
         dataPacketCopyService.createDataPacket(dataPacketCopy);
         return dataPacketCopy;
     }
 
-    @ApiOperation(value = "编辑数据包")
+    @ApiOperation(value = "编辑API网关")
     @PutMapping(value = "/{packetId}")
     @WrapUpResponseBody
-    public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketCopy dataPacket) {
+    public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketDraft dataPacket) {
         dataPacket.setPacketId(packetId);
         dataPacket.setDataOptDescJson(dataPacket.getDataOptDescJson());
         dataPacketCopyService.updateDataPacket(dataPacket);
     }
 
-    @ApiOperation(value = "数据包发布")
+    @ApiOperation(value = "API网关发布")
     @PutMapping(value = "publish/{packetId}")
     @WrapUpResponseBody
     public void publishDataPacket(@PathVariable String packetId) {
-        DataPacketCopy dataPacketCopy = dataPacketCopyService.getDataPacket(packetId);
+        DataPacketDraft dataPacketCopy = dataPacketCopyService.getDataPacket(packetId);
         dataPacketCopyService.updateDataPacket(dataPacketCopy);
         dataPacketCopyService.publishDataPacket(dataPacketCopy);
     }
 
-    @ApiOperation(value = "编辑数据包数据处理描述信息")
+    @ApiOperation(value = "编辑API网关数据处理描述信息")
     @PutMapping(value = "/opt/{packetId}")
     @WrapUpResponseBody
     public void updateDataPacketOpt(@PathVariable String packetId, @RequestBody String dataOptDescJson) {
         dataPacketCopyService.updateDataPacketOptJson(packetId, dataOptDescJson);
     }
 
-    @ApiOperation(value = "删除数据包")
+    @ApiOperation(value = "删除API网关")
     @DeleteMapping(value = "/{packetId}")
     @WrapUpResponseBody
     public void deleteDataPacket(@PathVariable String packetId) {
         dataPacketCopyService.deleteDataPacket(packetId);
     }
 
-    @ApiOperation(value = "查询数据包")
+    @ApiOperation(value = "查询API网关")
     @GetMapping
     @WrapUpResponseBody
-    public PageQueryResult<DataPacketCopy> listDataPacket(HttpServletRequest request, PageDesc pageDesc) {
-        List<DataPacketCopy> list = dataPacketCopyService.listDataPacket(BaseController.collectRequestParameters(request), pageDesc);
+    public PageQueryResult<DataPacketDraft> listDataPacket(HttpServletRequest request, PageDesc pageDesc) {
+        List<DataPacketDraft> list = dataPacketCopyService.listDataPacket(BaseController.collectRequestParameters(request), pageDesc);
         return PageQueryResult.createResult(list, pageDesc);
     }
 
-    @ApiOperation(value = "查询单个数据包")
+    @ApiOperation(value = "查询单个API网关")
     @GetMapping(value = "/{packetId}")
     @WrapUpResponseBody
-    public DataPacketCopy getDataPacket(@PathVariable String packetId) {
+    public DataPacketDraft getDataPacket(@PathVariable String packetId) {
         return dataPacketCopyService.getDataPacket(packetId);
     }
 

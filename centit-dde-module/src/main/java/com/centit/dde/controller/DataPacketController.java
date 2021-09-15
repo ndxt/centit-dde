@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * @author zhf
  */
-@Api(value = "数据包", tags = "数据包")
+@Api(value = "已发布API网关接口管理", tags = "已发布API网关接口管理")
 @RestController
 @RequestMapping(value = "packet")
 public class DataPacketController extends BaseController {
@@ -31,7 +31,7 @@ public class DataPacketController extends BaseController {
         this.dataPacketService = dataPacketService;
     }
 
-    @ApiOperation(value = "新增数据包")
+    @ApiOperation(value = "新增API网关")
     @PostMapping
     @WrapUpResponseBody
     public DataPacket createDataPacket(@RequestBody DataPacket dataPacket, HttpServletRequest request) {
@@ -41,7 +41,7 @@ public class DataPacketController extends BaseController {
         return dataPacket;
     }
 
-    @ApiOperation(value = "编辑数据包")
+    @ApiOperation(value = "编辑API网关")
     @PutMapping(value = "/{packetId}")
     @WrapUpResponseBody
     public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacket dataPacket) {
@@ -53,21 +53,21 @@ public class DataPacketController extends BaseController {
         dataPacketService.updateDataPacket(dataPacket);
     }
 
-    @ApiOperation(value = "编辑数据包数据处理描述信息")
+    @ApiOperation(value = "编辑API网关数据处理描述信息")
     @PutMapping(value = "/opt/{packetId}")
     @WrapUpResponseBody
     public void updateDataPacketOpt(@PathVariable String packetId, @RequestBody String dataOptDescJson) {
         dataPacketService.updateDataPacketOptJson(packetId, dataOptDescJson);
     }
 
-    @ApiOperation(value = "删除数据包")
+    @ApiOperation(value = "删除API网关")
     @DeleteMapping(value = "/{packetId}")
     @WrapUpResponseBody
     public void deleteDataPacket(@PathVariable String packetId) {
         dataPacketService.deleteDataPacket(packetId);
     }
 
-    @ApiOperation(value = "查询数据包")
+    @ApiOperation(value = "查询API网关")
     @GetMapping
     @WrapUpResponseBody
     public PageQueryResult<DataPacket> listDataPacket(HttpServletRequest request, PageDesc pageDesc) {
@@ -75,7 +75,7 @@ public class DataPacketController extends BaseController {
         return PageQueryResult.createResult(list, pageDesc);
     }
 
-    @ApiOperation(value = "查询单个数据包")
+    @ApiOperation(value = "查询单个API网关")
     @GetMapping(value = "/{packetId}")
     @WrapUpResponseBody
     public DataPacket getDataPacket(@PathVariable String packetId) {

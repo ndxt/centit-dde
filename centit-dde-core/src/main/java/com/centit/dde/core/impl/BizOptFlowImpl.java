@@ -5,11 +5,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.*;
 import com.centit.dde.core.*;
-import com.centit.dde.dao.DataPacketCopyDao;
+import com.centit.dde.dao.DataPacketDraftDao;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.po.DataPacket;
-import com.centit.dde.po.DataPacketCopy;
+import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.utils.BizModelJSONTransform;
@@ -57,7 +57,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     @Autowired
     private TaskDetailLogDao taskDetailLogDao;
     @Autowired
-    private DataPacketCopyDao dataPacketCopyDao;
+    private DataPacketDraftDao dataPacketCopyDao;
     @Autowired
     private DataPacketDao dataPacketDao;
     @Autowired(required = false)
@@ -176,7 +176,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             }
             JSONObject dataOptJson;
             if (ConstantValue.RUN_TYPE_COPY.equals(dataOptVo.getRunType())) {
-                DataPacketCopy dataPacket = dataPacketCopyDao
+                DataPacketDraft dataPacket = dataPacketCopyDao
                     .getObjectWithReferences(stepJson.getString("packetName"));
                 dataOptJson = dataPacket.getDataOptDescJson();
             } else {
