@@ -37,6 +37,7 @@ public class ProducerBizOperation implements BizOperation {
         try {
             ProducerRecord<String, String> record = new ProducerRecord<>(producerEntity.getTopic(), producerEntity.getPartition(), producerEntity.getId(),JSON.toJSONString(dataSet.getData()));
             producer = DDEProducerConfig.getKafkaProducer(producerEntity.getJsonObject(), sourceInfo);
+            //producer.send(record);  //同步发送
             //异步发送添加回调函数,展示信息
            producer.send(record, (metadata, exception) -> {
                 if(metadata!=null) {
