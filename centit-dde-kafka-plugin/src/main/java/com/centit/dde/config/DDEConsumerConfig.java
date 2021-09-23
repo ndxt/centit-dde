@@ -27,6 +27,8 @@ public class DDEConsumerConfig {
         }
         //Kafka broker 列表  放最后，避免页面填写参数时填写该参数   直接覆盖页面填写的broker列表
         proper.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, sourceInfo.getDatabaseUrl());
+        //开启自动提交  默认5s刷新一次
+        proper.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
         KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(proper);
         return consumer;
     }

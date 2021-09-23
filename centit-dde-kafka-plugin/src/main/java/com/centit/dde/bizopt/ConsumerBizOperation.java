@@ -10,6 +10,7 @@ import com.centit.dde.entity.ConsumerEntity;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -17,6 +18,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ConsumerBizOperation implements BizOperation {
     private SourceInfoDao sourceInfoDao;
@@ -28,17 +30,30 @@ public class ConsumerBizOperation implements BizOperation {
         this.sourceInfoDao=sourceInfoDao;
     }
 
+    /**
+     * kafka 该方法只支持自动提交，无法支持手动提交
+     * 这样就可能造成数据取出来消费掉了，但是后续的处理异常了，这个没法控制
+     * @param bizModel
+     * @param bizOptJson
+     * @return
+     */
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
         ConsumerEntity consumerEntity = JSON.parseObject(JSON.toJSONString(bizOptJson), ConsumerEntity.class);
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(consumerEntity.getDataSourceID());
         KafkaConsumer consumer = DDEConsumerConfig.getKafkaConsumer(consumerEntity.getJsonObject(),sourceInfo);
-        List<String> result = new ArrayList<>();
+        String topics = consumerEntity.getTopic();
+        ConsumerRecords<String, String> records=null;
         try {
-            consumer.subscribe(Arrays.asList(consumerEntity.getTopic()));//设置主题，可多个
-            ConsumerRecords<String, String> records = consumer.poll(1000);
-            for (ConsumerRecord<String, String> record : records) {
-                result.add(record.value());
+            if (StringUtils.isNotBlank(topics)){
+                String[] topicArray = topics.split(",");
+                //通过正则表达式订阅主题
+                if (topicArray.length==1 && topicArray[0].contains(".*")){
+                    consumer.subscribe(Pattern.compile(topicArray[0]));
+                }else {
+                    consumer.subscribe(Arrays.asList(topicArray));//设置主题，可多个
+                }
+                records = consumer.poll(1000);
             }
         }catch (Exception e){
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"异常信息："+e.getMessage());
@@ -47,7 +62,7 @@ public class ConsumerBizOperation implements BizOperation {
                 consumer.close();
             }
         }
-        bizModel.putDataSet(consumerEntity.getId(),new SimpleDataSet(result));
-        return BuiltInOperation.getResponseSuccessData(result.size());
+        bizModel.putDataSet(consumerEntity.getId(),new SimpleDataSet(records));
+        return BuiltInOperation.getResponseSuccessData(records==null?0:records.count());
     }
 }

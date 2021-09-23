@@ -9,9 +9,11 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
-public class EsRegisterOperation {
+public class KafkaRegisterOperation {
     @Resource
     BizOptFlow bizOptFlow;
 

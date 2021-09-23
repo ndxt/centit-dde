@@ -15,11 +15,22 @@ public class ProducerEntity {
     //topic
     private String topic;
 
+    //是否异步发送
+    private Boolean isAsyn=true;
+
     //指定分区
     private Integer partition;
 
     //创建操作对象时的配置信息
     private JSONObject jsonObject;
+
+    public Boolean getAsyn() {
+        return isAsyn;
+    }
+
+    public void setAsyn(Boolean asyn) {
+        isAsyn = asyn;
+    }
 
     public Integer getPartition() {
         return partition;

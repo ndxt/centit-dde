@@ -14,6 +14,7 @@ import com.centit.product.metadata.po.SourceInfo;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProducerBizOperation implements BizOperation {
@@ -37,15 +38,22 @@ public class ProducerBizOperation implements BizOperation {
         try {
             ProducerRecord<String, String> record = new ProducerRecord<>(producerEntity.getTopic(), producerEntity.getPartition(), producerEntity.getId(),JSON.toJSONString(dataSet.getData()));
             producer = DDEProducerConfig.getKafkaProducer(producerEntity.getJsonObject(), sourceInfo);
-            //producer.send(record);  //同步发送
-            //异步发送添加回调函数,展示信息
-           producer.send(record, (metadata, exception) -> {
-                if(metadata!=null) {
+            if (!producerEntity.getAsyn()){
+                //同步发送   会阻塞
+                Future future = producer.send(record);
+                if (future.get()!=null){
                     result.set(true);
-                } else  if(exception!=null) {
-                    exception.printStackTrace();
                 }
-            });
+            }else {
+                //异步发送添加回调函数,展示信息 不会阻塞
+                producer.send(record, (metadata, exception) -> {
+                    if (metadata != null) {
+                        result.set(true);
+                    } else if (exception != null) {
+                        exception.printStackTrace();
+                    }
+                });
+            }
             SimpleDataSet simpleDataSet = new SimpleDataSet(result);
             bizModel.putDataSet(producerEntity.getId(),simpleDataSet);
             return  BuiltInOperation.getResponseSuccessData(simpleDataSet.getSize());
