@@ -3,6 +3,7 @@ package com.centit.dde.po;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.core.dao.DictionaryMap;
+import com.centit.framework.model.basedata.IOptMethod;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.database.orm.GeneratorCondition;
@@ -11,7 +12,10 @@ import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -25,7 +29,7 @@ import java.util.*;
 @Data
 @Entity
 @Table(name = "Q_DATA_PACKET_DRAFT")
-public class DataPacketDraft implements Serializable,DataPacketInterface {
+public class DataPacketDraft implements Serializable, DataPacketInterface {
     private static final long serialVersionUID = 1;
 
     @ApiModelProperty(value = "数据处理ID", hidden = true)
@@ -79,12 +83,14 @@ public class DataPacketDraft implements Serializable,DataPacketInterface {
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date updateDate;
 
-    @ApiModelProperty(value = "业务模块代码")
+    @ApiModelProperty(value = "业务模块代码", required = true)
     @Column(name = "os_id")
+    @NotBlank(message = "osId字段不能为空")
     private String osId;
 
-    @ApiModelProperty(value = "所属模块")
+    @ApiModelProperty(value = "所属模块", required = true)
     @Column(name = "OPT_ID")
+    @NotBlank(message = "optId字段不能为空")
     private String optId;
 
 
@@ -125,6 +131,9 @@ public class DataPacketDraft implements Serializable,DataPacketInterface {
     @OneToMany(targetEntity = DataPacketParamDraft.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
     private List<DataPacketParamDraft> packetParams;
+
+    @ApiModelProperty(hidden = true)
+    private Object optMethod;
 
     public List<DataPacketParamDraft> getPacketParams() {
         if (packetParams == null) {

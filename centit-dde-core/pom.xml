@@ -33,7 +33,7 @@
         </dependency>
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>fileserver-client</artifactId>
+            <artifactId>fileserver-adapter</artifactId>
             <version>${centit.fileserver.version}</version>
         </dependency>
         <dependency>

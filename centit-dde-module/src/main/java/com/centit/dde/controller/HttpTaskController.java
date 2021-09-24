@@ -37,7 +37,7 @@ import java.util.Map;
  */
 @Api(value = "Http触发任务响应", tags = "Http触发任务响应")
 @RestController
-@RequestMapping(value = "httpTask")
+@RequestMapping(value = "run")
 public class HttpTaskController extends BaseController {
 
     private final DataPacketService dataPacketService;
@@ -52,31 +52,31 @@ public class HttpTaskController extends BaseController {
         this.bizmodelService = bizmodelService;
     }
 
-    @GetMapping(value = "/runTest/{packetId}")
-    @ApiOperation(value = "测试：立即执行任务")
+    @GetMapping(value = "/draft/{packetId}")
+    @ApiOperation(value = "草稿：立即执行任务")
     public void runTestTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                     HttpServletResponse response) throws IOException {
         returnObject(packetId, ConstantValue.RUN_TYPE_COPY, request, response);
     }
 
-    @GetMapping(value = "/debugRunTest/{packetId}")
-    @ApiOperation(value = "测试：DEBUG执行任务")
-    public void debugRunTestTaskExchange(@PathVariable String packetId, HttpServletRequest request,
-                                         HttpServletResponse response) throws IOException {
+    @PostMapping(value = "/draft/{packetId}")
+    @ApiOperation(value = "草稿：立即执行任务Post")
+    public void runTaskPostTest(@PathVariable String packetId, HttpServletRequest request,
+                                HttpServletResponse response) throws IOException {
         returnObject(packetId, ConstantValue.RUN_TYPE_COPY, request, response);
     }
 
-    @GetMapping(value = "/run/{packetId}")
-    @ApiOperation(value = "正式：立即执行任务")
+    @GetMapping(value = "/{packetId}")
+    @ApiOperation(value = "发布：立即执行任务")
     public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
         returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, request, response);
     }
 
-    @GetMapping(value = "/debugRun/{packetId}")
-    @ApiOperation(value = "正式：DEBUG执行任务")
-    public void debugRunTaskExchange(@PathVariable String packetId, HttpServletRequest request,
-                                     HttpServletResponse response) throws IOException {
+    @PostMapping(value = "/{packetId}")
+    @ApiOperation(value = "发布：立即执行任务Post")
+    public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
+                            HttpServletResponse response) throws IOException {
         returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, request, response);
     }
 
@@ -137,20 +137,6 @@ public class HttpTaskController extends BaseController {
             return;
         }
         JsonResultUtils.writeSingleDataJson(bizModel, response);
-    }
-
-    @PostMapping(value = "/runPostTest/{packetId}")
-    @ApiOperation(value = "测试：立即执行任务Post")
-    public void runTaskPostTest(@PathVariable String packetId, HttpServletRequest request,
-                                HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, request, response);
-    }
-
-    @PostMapping(value = "/runPost/{packetId}")
-    @ApiOperation(value = "正式：立即执行任务Post")
-    public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
-                            HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, request, response);
     }
 
     @GetMapping(value = "/testformula")

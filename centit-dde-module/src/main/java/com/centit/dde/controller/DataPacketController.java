@@ -22,49 +22,10 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "packet")
 public class DataPacketController extends BaseController {
-
-
     private final DataPacketService dataPacketService;
-
 
     public DataPacketController(DataPacketService dataPacketService) {
         this.dataPacketService = dataPacketService;
-    }
-
-    @ApiOperation(value = "新增API网关")
-    @PostMapping
-    @WrapUpResponseBody
-    public DataPacket createDataPacket(@RequestBody DataPacket dataPacket, HttpServletRequest request) {
-        dataPacket.setRecorder(WebOptUtils.getCurrentUserCode(request));
-        dataPacket.setDataOptDescJson(dataPacket.getDataOptDescJson());
-        dataPacketService.createDataPacket(dataPacket);
-        return dataPacket;
-    }
-
-    @ApiOperation(value = "编辑API网关")
-    @PutMapping(value = "/{packetId}")
-    @WrapUpResponseBody
-    public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacket dataPacket) {
-        dataPacket.setPacketId(packetId);
-        dataPacket.setDataOptDescJson(dataPacket.getDataOptDescJson());
-        if(dataPacket.getRecordDate()==null){
-            dataPacket.setRecordDate(new Date());
-        }
-        dataPacketService.updateDataPacket(dataPacket);
-    }
-
-    @ApiOperation(value = "编辑API网关数据处理描述信息")
-    @PutMapping(value = "/opt/{packetId}")
-    @WrapUpResponseBody
-    public void updateDataPacketOpt(@PathVariable String packetId, @RequestBody String dataOptDescJson) {
-        dataPacketService.updateDataPacketOptJson(packetId, dataOptDescJson);
-    }
-
-    @ApiOperation(value = "删除API网关")
-    @DeleteMapping(value = "/{packetId}")
-    @WrapUpResponseBody
-    public void deleteDataPacket(@PathVariable String packetId) {
-        dataPacketService.deleteDataPacket(packetId);
     }
 
     @ApiOperation(value = "查询API网关")

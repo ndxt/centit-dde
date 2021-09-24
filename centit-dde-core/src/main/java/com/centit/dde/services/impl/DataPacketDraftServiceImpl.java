@@ -1,21 +1,21 @@
 package com.centit.dde.services.impl;
 
-import com.centit.dde.core.BizOptFlow;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.dao.DataPacketDraftDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.po.DataPacketParam;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
-import com.centit.fileserver.common.FileStore;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
+import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.model.basedata.IOptMethod;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import redis.clients.jedis.JedisPool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,20 +27,14 @@ import java.util.Map;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class DataPacketDraftServiceImpl implements DataPacketDraftService {
-    @Autowired(required = false)
-    private JedisPool jedisPool;
-
-    @Autowired(required = false)
-    private FileStore fileStore;
-
+    private final static String OPTMETHOD_OPTTYPE_API = "A";
     @Autowired
     private DataPacketDraftDao dataPacketCopyDao;
 
     @Autowired
     private DataPacketService dataPacketService;
-
-    @Autowired
-    private BizOptFlow bizOptFlow;
+    @Autowired(required = false)
+    private PlatformEnvironment platformEnvironment;
 
     public DataPacketDraftServiceImpl() {
 
@@ -50,7 +44,30 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
     public void createDataPacket(DataPacketDraft dataPacketCopy) {
         dataPacketCopyDao.saveNewObject(dataPacketCopy);
         dataPacketCopyDao.saveObjectReferences(dataPacketCopy);
+        dataPacketCopy.setOptMethod(creatApiOptMethod(dataPacketCopy));
     }
+
+    private IOptMethod creatApiOptMethod(DataPacketDraft dataPacket) {
+        if (platformEnvironment != null) {
+            JSONObject result = assemblyOptMethodGet(dataPacket);
+            return platformEnvironment.addOptMethod(result);
+        }
+        return null;
+    }
+
+    private JSONObject assemblyOptMethodGet(DataPacketDraft dataPacket) {
+        JSONObject result = new JSONObject();
+        result.put("optId", dataPacket.getOptId());
+        result.put("optName", dataPacket.getPacketName());
+        result.put("apiId", dataPacket.getPacketId());
+        result.put("optMethod", "api");
+        result.put("optUrl", "/dde/run/" + dataPacket.getPacketId());
+        result.put("optReq", "CR");
+        result.put("optDesc", "请求api网关接口");
+        result.put("optType", OPTMETHOD_OPTTYPE_API);
+        return result;
+    }
+
 
     @Override
     public void updateDataPacket(DataPacketDraft dataPacketCopy) {
@@ -62,9 +79,9 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
     @Override
     public void publishDataPacket(DataPacketDraft dataPacketCopy) {
         DataPacket dataPacket = new DataPacket();
-        BeanUtils.copyProperties(dataPacketCopy,dataPacket);
+        BeanUtils.copyProperties(dataPacketCopy, dataPacket);
         List<DataPacketParam> dataPacketParamList = new ArrayList<>();
-        BeanUtils.copyProperties(dataPacketCopy.getPacketParams(),dataPacketParamList);
+        BeanUtils.copyProperties(dataPacketCopy.getPacketParams(), dataPacketParamList);
         dataPacket.setPacketParams(dataPacketParamList);
         dataPacketService.publishDataPacket(dataPacket);
     }

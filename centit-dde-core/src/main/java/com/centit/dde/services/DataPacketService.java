@@ -2,6 +2,7 @@ package com.centit.dde.services;
 
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketInterface;
+import com.centit.framework.model.basedata.IOptMethod;
 import com.centit.support.database.utils.PageDesc;
 
 import java.util.List;
