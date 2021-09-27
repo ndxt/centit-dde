@@ -72,7 +72,7 @@ public class ElasticsearchReadUtils {
         return ElasticsearchReadUtils.returnBuilde(esReadVo,boolQueryBuilder==null?queryBuilder:boolQueryBuilder,restHighLevelClient);
     }
 
-    public static QueryBuilder queryBuilder(FieldAttributeInfo fieldAttributeInfo){
+    private static QueryBuilder queryBuilder(FieldAttributeInfo fieldAttributeInfo){
         //简单的查询类型
         String simpleQueryType = fieldAttributeInfo.getSimpleQueryType();
         String fieldName = fieldAttributeInfo.getFieldName();
@@ -167,7 +167,7 @@ public class ElasticsearchReadUtils {
      * @param searchResponse
      * @return
      */
-    public static JSONArray resultPart(SearchResponse searchResponse,Boolean explain){
+    private static JSONArray resultPart(SearchResponse searchResponse,Boolean explain){
         JSONArray resultArrays= new JSONArray();
         // 根据状态和数据条数验证是否返回了数据
         if (RestStatus.OK.equals(searchResponse.status()) && searchResponse.getHits().getTotalHits().value > 0) {
@@ -192,7 +192,7 @@ public class ElasticsearchReadUtils {
      * @param fieldAttributeInfos
      * @return
      */
-    public static  JSONArray returnHighlightResult(SearchResponse searchResponse, List<FieldAttributeInfo> fieldAttributeInfos,Boolean explain){
+    private static  JSONArray returnHighlightResult(SearchResponse searchResponse, List<FieldAttributeInfo> fieldAttributeInfos,Boolean explain){
         List<String> fieldNames = new ArrayList<>();
         for (FieldAttributeInfo fieldAttributeInfo : fieldAttributeInfos) {
             if (fieldAttributeInfo.getIsHighligh()){
@@ -230,7 +230,7 @@ public class ElasticsearchReadUtils {
      * @param searchSourceBuilder
      * @return
      */
-    public static void queryHighlightBuilder(List<FieldAttributeInfo> fieldAttributeInfos,SearchSourceBuilder searchSourceBuilder){
+    private static void queryHighlightBuilder(List<FieldAttributeInfo> fieldAttributeInfos,SearchSourceBuilder searchSourceBuilder){
         //高亮
         HighlightBuilder highlightBuilder = new HighlightBuilder();
         if (fieldAttributeInfos.size()>0){
@@ -274,7 +274,7 @@ public class ElasticsearchReadUtils {
      * @param queryParameter
      * @return
      */
-    public static SearchSourceBuilder publicSearchSourceBuilde(QueryParameter queryParameter){
+    private static SearchSourceBuilder publicSearchSourceBuilde(QueryParameter queryParameter){
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         //设置查询返回字段和不返回的字段
         searchSourceBuilder.fetchSource(queryParameter.getReturnField(),queryParameter.getNotReturnField());
@@ -303,7 +303,7 @@ public class ElasticsearchReadUtils {
     }
 
 
-    public static JSONObject pageInfo(QueryParameter queryParameter,QueryBuilder queryBuilder,RestHighLevelClient restHighLevelClient) throws IOException {
+    private static JSONObject pageInfo(QueryParameter queryParameter,QueryBuilder queryBuilder,RestHighLevelClient restHighLevelClient) throws IOException {
         CountRequest countRequest = new CountRequest(queryParameter.getIndexName());
         SearchSourceBuilder countSearchSourceBuilder = new SearchSourceBuilder();
         countSearchSourceBuilder.query(queryBuilder);
@@ -323,7 +323,7 @@ public class ElasticsearchReadUtils {
      * 返回结果结果封装
      * @return
      */
-    public  static  JSONObject returnBuilde(EsReadVo esReadVo,QueryBuilder queryBuilder,RestHighLevelClient restHighLevelClient) throws IOException {
+    private  static  JSONObject returnBuilde(EsReadVo esReadVo,QueryBuilder queryBuilder,RestHighLevelClient restHighLevelClient) throws IOException {
         SearchRequest searchRequest = new SearchRequest(esReadVo.getQueryParameter().getIndexName());
         QueryParameter queryParameter = esReadVo.getQueryParameter();
         //封装分页  排序信息
