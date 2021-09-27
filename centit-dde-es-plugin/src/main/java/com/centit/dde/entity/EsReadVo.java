@@ -30,7 +30,4 @@ public class EsReadVo {
 
     @ApiModelProperty(value = "查询条件字段集合")
     List<FieldAttributeInfo> fieldAttributeInfos;
-
-    @ApiModelProperty(value = "查询类型")
-    private String queryType;
 }

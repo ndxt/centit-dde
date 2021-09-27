@@ -6,10 +6,9 @@ import com.centit.dde.config.ElasticSearchConfig;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.entity.EsReadVo;
 import com.centit.dde.entity.EsWriteVo;
-import com.centit.dde.factory.EsQueryFactory;
 import com.centit.dde.factory.PooledRestClientFactory;
 import com.centit.dde.po.DataPacket;
-import com.centit.dde.query.EsQuery;
+import com.centit.dde.query.ElasticsearchReadUtils;
 import com.centit.dde.test.QDataPacket;
 import com.centit.dde.write.ElasticsearchWriteUtils;
 import com.centit.product.metadata.dao.SourceInfoDao;
@@ -45,9 +44,7 @@ public class TestController {
         RestHighLevelClient restHighLevelClient=null;
         try {
             restHighLevelClient = restHighLevelClientGenericObjectPool.borrowObject();
-            String queryType = esReadVo.getQueryType();
-            EsQuery esQueryType = EsQueryFactory.getEsQueryType(queryType);
-            JSONObject query = esQueryType.query(restHighLevelClient, esReadVo);
+            JSONObject query = ElasticsearchReadUtils.query(restHighLevelClient, esReadVo);
             return query;
         } catch (Exception e) {
             e.printStackTrace();

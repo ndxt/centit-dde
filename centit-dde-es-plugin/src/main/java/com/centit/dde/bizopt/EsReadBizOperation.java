@@ -8,7 +8,6 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.entity.EsReadVo;
 import com.centit.dde.factory.PooledRestClientFactory;
-import com.centit.dde.query.utils.ElasticsearchReadUtils;
 import com.centit.dde.utils.EsIndexNameExistsUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;

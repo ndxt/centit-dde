@@ -18,13 +18,10 @@ public class FieldAttributeInfo {
     private String fieldName;
 
     @ApiModelProperty(value = "查询字段值")
-    private Object value;
+    private String value;
 
-    @ApiModelProperty(value = "组合类型 must   should    must_not filter ")
-    private String combinationType;
-
-    @ApiModelProperty(value = "组合查询类型，term  terms  match  matchall等")
-    private String combQueryType;
+    @ApiModelProperty(value = "简单查询类型，term  terms  match  matchall...")
+    private String simpleQueryType;
 
     @ApiModelProperty(value = "查询权重，提升文档搜索评分的重要因素,精确查询和匹配查询可用")
     private Float boots;
