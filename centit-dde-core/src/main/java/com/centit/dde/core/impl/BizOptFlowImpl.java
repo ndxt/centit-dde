@@ -5,8 +5,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.*;
 import com.centit.dde.core.*;
-import com.centit.dde.dao.DataPacketDraftDao;
 import com.centit.dde.dao.DataPacketDao;
+import com.centit.dde.dao.DataPacketDraftDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketDraft;
@@ -17,7 +17,7 @@ import com.centit.dde.utils.CloneUtils;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.CycleVo;
 import com.centit.dde.vo.DataOptVo;
-import com.centit.fileserver.common.FileStore;
+import com.centit.fileserver.common.FileStoreContext;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.service.MetaDataService;
@@ -62,8 +62,12 @@ public class BizOptFlowImpl implements BizOptFlow {
     private DataPacketDao dataPacketDao;
     @Autowired(required = false)
     private MetaObjectService metaObjectService;
+
+
     @Autowired(required = false)
-    private FileStore fileStore;
+    private FileStoreContext fileStoreContext;
+
+
     private Map<String, BizOperation> allOperations;
 
     public BizOptFlowImpl() {
@@ -106,14 +110,14 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("json", jsonBizOperation);
         RunSqlsBizOperation runsqlsbizoperation = new RunSqlsBizOperation(sourceInfoDao);
         allOperations.put("sqlS", runsqlsbizoperation);
-        ReportBizOperation reportBizOperation = new ReportBizOperation(fileStore);
+        ReportBizOperation reportBizOperation = new ReportBizOperation(fileStoreContext);
         allOperations.put("SSD", reportBizOperation);
         allOperations.put(ConstantValue.GENERATECSV, new GenerateCsvBizOperation());
         allOperations.put(ConstantValue.GENERATEJSON, new GenerateJsonBizOperation());
         allOperations.put(ConstantValue.RETURN_JSON, GenerateJsonBizOperation::returnJson);
-        allOperations.put(ConstantValue.FILEUPLOADS, new FileUploadBizOperation(fileStore));
+        allOperations.put(ConstantValue.FILEUPLOADS, new FileUploadBizOperation(fileStoreContext));
         allOperations.put(ConstantValue.GENERATEXCEL, new GenerateExcelBizeOperation());
-        allOperations.put(ConstantValue.FILEDOWNLOAD, new FileDownloadBizOperation(fileStore));
+        allOperations.put(ConstantValue.FILEDOWNLOAD, new FileDownloadBizOperation(fileStoreContext));
         allOperations.put(ConstantValue.WRITE_DB, new WriteDbBizOperation(metaObjectService));
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentBizOperation());
     }

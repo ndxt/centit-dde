@@ -32,11 +32,6 @@
             <artifactId>jedis</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>fileserver-client</artifactId>
-            <version>${centit.fileserver.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
         </dependency>
@@ -68,6 +63,12 @@
             <groupId>com.centit.product</groupId>
             <artifactId>database-metadata</artifactId>
             <version>${metadata.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>fileserver-dubbo-client-config</artifactId>
+            <version>${centit.fileserver.version}</version>
         </dependency>
     </dependencies>
 

@@ -1,8 +1,8 @@
 package com.centit.dde.config;
 
 
-import com.centit.fileserver.client.ClientAsFileStore;
-import com.centit.fileserver.client.FileClientImpl;
+import com.centit.fileserver.common.FileStore;
+import com.centit.fileserver.common.FileStoreContext;
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.config.SpringSecurityDaoConfig;
@@ -11,12 +11,13 @@ import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import redis.clients.jedis.JedisPool;
+
+import javax.annotation.Resource;
 
 
 /**
@@ -79,18 +80,18 @@ public class ServiceConfig {
         return operationLog;
     }
 
-    @Bean
+  /*  @Bean
     public FileClientImpl fileClient() {
         FileClientImpl fileClient = new FileClientImpl();
         fileClient.init(fileserver, fileserver, "u0000000", "000000", fileserver);
         return fileClient;
-    }
+    }*/
+
+    @Resource
+    FileStore fileStore;
 
     @Bean
-    public ClientAsFileStore fileStore(@Autowired FileClientImpl fileClient) {
-        ClientAsFileStore fileStoreBean = new ClientAsFileStore();
-        fileStoreBean.setFileClient(fileClient);
-        return fileStoreBean;
+    public FileStoreContext fileStoreContext(){
+        return new  FileStoreContext(fileStore);
     }
-
 }

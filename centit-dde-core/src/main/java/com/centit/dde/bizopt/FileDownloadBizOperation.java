@@ -5,7 +5,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizOptUtils;
-import com.centit.fileserver.common.FileStore;
+import com.centit.fileserver.common.FileStoreContext;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import org.apache.commons.lang3.StringUtils;
@@ -20,10 +20,10 @@ import java.util.Map;
  */
 public class FileDownloadBizOperation implements BizOperation {
 
-    FileStore fileStore;
+    FileStoreContext fileStoreContext;
 
-    public FileDownloadBizOperation(FileStore fileStore) {
-        this.fileStore = fileStore;
+    public FileDownloadBizOperation(FileStoreContext fileStoreContext) {
+        this.fileStoreContext = fileStoreContext;
     }
 
     public FileDownloadBizOperation() {
@@ -39,7 +39,7 @@ public class FileDownloadBizOperation implements BizOperation {
         if (StringUtils.isNotBlank(fileIds)){//直接填写文件id的请求，直接下载文件
             String[] split = fileIds.split(",");
             for (String fileId : split) {
-                InputStream inputStream = fileStore.loadFileStream(fileId);
+                InputStream inputStream = fileStoreContext.loadFileStream(fileId);
                 inputStreams.add(inputStream);
             }
         }else {
@@ -52,7 +52,7 @@ public class FileDownloadBizOperation implements BizOperation {
             List<Map<String, Object>> dataSetDataAsList = dataSet.getDataAsList();
             for (Map<String, Object> objectMap : dataSetDataAsList) {
                 for (Object fileId : objectMap.values()) {
-                    InputStream inputStream = fileStore.loadFileStream(String.valueOf(fileId));
+                    InputStream inputStream = fileStoreContext.loadFileStream(String.valueOf(fileId));
                     inputStreams.add(inputStream);
                 }
             }

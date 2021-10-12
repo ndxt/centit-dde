@@ -53,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>fileserver-client</artifactId>
+            <artifactId>fileserver-dubbo-client-config</artifactId>
             <version>${centit.fileserver.version}</version>
         </dependency>
 

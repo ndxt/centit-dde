@@ -45,11 +45,6 @@
             <artifactId>centit-dde-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>fileserver-client</artifactId>
-            <version>${centit.fileserver.version}</version>
-        </dependency>
     </dependencies>
 
 </project>
