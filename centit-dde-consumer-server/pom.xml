@@ -29,11 +29,19 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
         </dependency>
 
-        <dependency>
+     <!--   <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-quartz-extend</artifactId>
             <version>${common.module.version}</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>2.7.2</version>
         </dependency>
+
+
 
         <dependency>
             <groupId>com.centit.product</groupId>
