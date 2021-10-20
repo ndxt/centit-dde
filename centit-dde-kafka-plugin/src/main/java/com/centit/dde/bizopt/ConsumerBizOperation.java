@@ -41,7 +41,9 @@ public class ConsumerBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
         ConsumerEntity consumerEntity = JSON.parseObject(JSON.toJSONString(bizOptJson), ConsumerEntity.class);
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(consumerEntity.getDataSourceID());
-        KafkaConsumer consumer = DDEConsumerConfig.getKafkaConsumer(consumerEntity.getJsonObject(),sourceInfo);
+        JSONObject extProps = sourceInfo.getExtProps();
+        extProps.put("group.id",consumerEntity.getGroupId());
+        KafkaConsumer consumer = DDEConsumerConfig.getKafkaConsumer(extProps,sourceInfo);
         String topics = consumerEntity.getTopic();
         ConsumerRecords<String, String> records=null;
         try {
@@ -62,7 +64,12 @@ public class ConsumerBizOperation implements BizOperation {
                 consumer.close();
             }
         }
-        bizModel.putDataSet(consumerEntity.getId(),new SimpleDataSet(records));
-        return BuiltInOperation.getResponseSuccessData(records==null?0:records.count());
+        List<String> values = new ArrayList<>();
+        for (ConsumerRecord<String, String> record : records) {
+            values.add(record.value());
+        }
+        SimpleDataSet simpleDataSet = new SimpleDataSet(values);
+        bizModel.putDataSet(consumerEntity.getId(),simpleDataSet);
+        return BuiltInOperation.getResponseSuccessData(simpleDataSet.getSize());
     }
 }

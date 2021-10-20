@@ -1,7 +1,5 @@
 package com.centit.dde.entity;
 
-import com.alibaba.fastjson.JSONObject;
-
 /**
  * 生产者标签参数
  */
@@ -14,15 +12,20 @@ public class ProducerEntity {
     private String dataSourceID;
     //topic
     private String topic;
-
+    //指定发送分区
+    private Integer partition;
+    //指定发送key
+    private String key;
     //是否异步发送
     private Boolean isAsyn=true;
 
-    //指定分区
-    private Integer partition;
+    public String getKey() {
+        return key;
+    }
 
-    //创建操作对象时的配置信息
-    private JSONObject jsonObject;
+    public void setKey(String key) {
+        this.key = key;
+    }
 
     public Boolean getAsyn() {
         return isAsyn;
@@ -70,13 +73,5 @@ public class ProducerEntity {
 
     public void setTopic(String topic) {
         this.topic = topic;
-    }
-
-    public JSONObject getJsonObject() {
-        return jsonObject;
-    }
-
-    public void setJsonObject(JSONObject jsonObject) {
-        this.jsonObject = jsonObject;
     }
 }

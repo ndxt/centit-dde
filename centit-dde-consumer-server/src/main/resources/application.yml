@@ -23,16 +23,6 @@ centit:
   dataMovingPath: D:\centit-dde-datamoving-3.1-SNAPSHOT.jar
   logs: D:/Projects/RunData/dde/log
   ownGroups: ''
-  #消息触发任务执行频率 多久执行一次  cronb表达式   默认：0/5 * * * * ? *   每隔5秒一次
-  frequency: 0/5 * * * * ? *
-logging.path: D:/Projects/RunData/dde/log
-email:
-  hostName: mail.centit.com
-  smtpPort: 25
-  userName: alertmail@centit.com
-  userPassword: 131511.cn
-  serverEmail: no-reply@centit.com
-  emailTo: zhf@centit.com
 
 
 

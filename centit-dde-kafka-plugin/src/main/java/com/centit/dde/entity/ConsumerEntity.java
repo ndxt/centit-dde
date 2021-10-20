@@ -12,9 +12,19 @@ public class ConsumerEntity {
     //topic
     private String topic;
 
-    //创建操作对象时的配置信息
-    private JSONObject jsonObject;
+    private String groupId;
 
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    /*  //创建操作对象时的配置信息
+        private JSONObject jsonObject;
+    */
     public String getId() {
         return id;
     }
@@ -47,11 +57,11 @@ public class ConsumerEntity {
         this.topic = topic;
     }
 
-    public JSONObject getJsonObject() {
+   /* public JSONObject getJsonObject() {
         return jsonObject;
     }
 
     public void setJsonObject(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
-    }
+    }*/
 }

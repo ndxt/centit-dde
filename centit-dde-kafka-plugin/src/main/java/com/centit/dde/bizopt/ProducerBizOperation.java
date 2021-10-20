@@ -11,13 +11,20 @@ import com.centit.dde.entity.ProducerEntity;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.KafkaAdminClient;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ProducerBizOperation implements BizOperation {
+    private final  static Logger logger = LoggerFactory.getLogger(ProducerBizOperation.class);
     private SourceInfoDao sourceInfoDao;
 
     public ProducerBizOperation( ) {
@@ -34,31 +41,40 @@ public class ProducerBizOperation implements BizOperation {
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(producerEntity.getDataSourceID());
         DataSet dataSet = bizModel.getDataSet(producerEntity.getSourceID());
         KafkaProducer producer=null;
-        AtomicBoolean result=new AtomicBoolean(false);
         try {
             ProducerRecord<String, String> record = new ProducerRecord<>(producerEntity.getTopic(), producerEntity.getPartition(), producerEntity.getId(),JSON.toJSONString(dataSet.getData()));
-            producer = DDEProducerConfig.getKafkaProducer(producerEntity.getJsonObject(), sourceInfo);
+            //判断topic是否存在，不存在不发送，防止填错topic
+            Properties properties= new Properties();
+            properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, sourceInfo.getDatabaseUrl());
+            AdminClient adminClient = KafkaAdminClient.create(properties);//创建Topic
+            Set<String> topicNames = adminClient.listTopics().names().get();
+            if (!topicNames.contains(producerEntity.getTopic())){
+                return BuiltInOperation.getResponseData(0, 500,
+                    bizOptJson.getString("SetsName")+"异常信息:topic_"+producerEntity.getTopic()+"不存在！");
+            }
+            producer = DDEProducerConfig.getKafkaProducer(sourceInfo);
+            AtomicReference<String> resut= new AtomicReference<>("");
             if (!producerEntity.getAsyn()){
                 //同步发送   会阻塞
-                Future future = producer.send(record);
-                if (future.get()!=null){
-                    result.set(true);
+                Object res = producer.send(record).get();
+                if (res!=null){
+                    resut.set("发送成功！");
                 }
             }else {
                 //异步发送添加回调函数,展示信息 不会阻塞
                 producer.send(record, (metadata, exception) -> {
                     if (metadata != null) {
-                        result.set(true);
+                        resut.set("消息发送成功，topic："+ metadata.topic()+"，分区："+metadata.partition());
                     } else if (exception != null) {
-                        exception.printStackTrace();
+                        resut.set("消息发送失败，异常信息："+exception.getMessage());
                     }
                 });
             }
-            SimpleDataSet simpleDataSet = new SimpleDataSet(result);
+            SimpleDataSet simpleDataSet = new SimpleDataSet(resut);
             bizModel.putDataSet(producerEntity.getId(),simpleDataSet);
             return  BuiltInOperation.getResponseSuccessData(simpleDataSet.getSize());
         } catch (Exception e) {
-           return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"异常信息："+e.getMessage());
+            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"异常信息："+e.getMessage());
         } finally {
             if (producer!=null){
                 producer.close();
