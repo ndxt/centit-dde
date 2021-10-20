@@ -80,7 +80,10 @@
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-config</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-core-web</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-persistence-jdbc-config</artifactId>
