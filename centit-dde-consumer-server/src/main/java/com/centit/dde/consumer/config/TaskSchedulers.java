@@ -98,15 +98,15 @@ public class TaskSchedulers {
         for (DataPacket dataPacket : list) {
             if (!packetMD5.containsKey(dataPacket.getPacketId())){//不存在，第一次加载
                 packetMD5.put(dataPacket.getPacketId(),dataPacketMD5(dataPacket));
-                logger.info("添加任务MAD5信息，任务名:"+dataPacket.getPacketName());
+                logger.debug("添加任务MAD5信息，任务名:"+dataPacket.getPacketName());
                 run(dataPacket,sourceInfoMap);
             }else if (packetMD5.get(dataPacket.getPacketId())!=null
                 && packetMD5.get(dataPacket.getPacketId()).equals(dataPacketMD5(dataPacket))){//数据没做任何修改
-                logger.info("任务数据没变化，不需停止任务，任务名："+dataPacket.getPacketName());
+                logger.debug("任务数据没变化，不需停止任务，任务名："+dataPacket.getPacketName());
                 continue;
             }else if (packetMD5.containsKey(dataPacket.getPacketId())
                 && !packetMD5.get(dataPacket.getPacketId()).equals(dataPacketMD5(dataPacket))){
-                logger.info("任务数据有变动，重新执行任务,任务名："+dataPacket.getPacketName());
+                logger.debug("任务数据有变动，重新执行任务,任务名："+dataPacket.getPacketName());
                 //替换新的MD5值
                 packetMD5.put(dataPacket.getPacketId(),dataPacketMD5(dataPacket));
                 run(dataPacket,sourceInfoMap);
@@ -124,7 +124,7 @@ public class TaskSchedulers {
 
     private static void run(DataPacket dataPacket, Map<String, SourceInfo> sourceInfoMap){
         new Thread(()->{
-            logger.info("创建消息触发任务,任务名:"+dataPacket.getPacketName());
+            logger.debug("创建消息触发任务,任务名:"+dataPacket.getPacketName());
             JSONObject extProps = dataPacket.getExtProps();
             SourceInfo sourceInfo = sourceInfoMap.get(extProps.getString("databaseId"));
             if (sourceInfo==null){
@@ -164,7 +164,7 @@ public class TaskSchedulers {
                 ConsumerRecords<String, String> msgList = consumer.poll(1000);
                 for (ConsumerRecord<String, String> record : msgList) {
                     try{
-                        logger.info("任务名：" + dataPacket.getPacketName()+",topic:" + record.topic() + ",key:" + record.key() + ",value:" + record.value() + ",offset:" + record.offset() + "，分区：" + record.partition());
+                        logger.debug("任务名：" + dataPacket.getPacketName()+",topic:" + record.topic() + ",key:" + record.key() + ",value:" + record.value() + ",offset:" + record.offset() + "，分区：" + record.partition());
                         String value = record.value();
                         Map<String, Object> kafkaData = new HashMap<>();
                         kafkaData.put(dataPacket.getPacketId(),value);
@@ -173,22 +173,22 @@ public class TaskSchedulers {
                         try {
                             consumer.commitAsync();//异步提交
                         }catch (Exception e) {
-                            logger.info("异步提交offset异常,任务名：" + dataPacket.getPacketName() + "异常信息：" + e.getMessage());
+                            logger.error("异步提交offset异常,任务名：" + dataPacket.getPacketName() + "异常信息：" + e.getMessage());
                         }finally {
                             try {
                                 consumer.commitSync();//同步提交
                             }catch (Exception e){
-                                logger.info("同步提交offset异常,任务名："+dataPacket.getPacketName()+"异常信息："+e.getMessage());
+                                logger.error("同步提交offset异常,任务名："+dataPacket.getPacketName()+"异常信息："+e.getMessage());
                             }
                         }
                     }catch (Exception e){
-                        logger.info("消费异常,任务名："+dataPacket.getPacketName()+"异常信息："+e.getMessage());
+                        logger.error("消费异常,任务名："+dataPacket.getPacketName()+"异常信息："+e.getMessage());
                     }
                 }
             }
             //数据更改或者删除后
             if (!packetMD5.containsKey(dataPacket.getPacketId()) || !packetMD5.get(dataPacket.getPacketId()).equals(dataPacketMD5(dataPacket))) {
-                logger.info("停止消息触发任务,任务名："+dataPacket.getPacketName());
+                logger.debug("停止消息触发任务,任务名："+dataPacket.getPacketName());
                 consumer.close();
                 return;
             }
