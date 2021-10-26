@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author zc
@@ -76,10 +77,10 @@ public class TaskSchedulers {
             packetMD5.clear();
             return;
         }
-        List<String> packetIds = new ArrayList<>();
-        for (DataPacket dataPacket : list) {
-            packetIds.add(dataPacket.getPacketId());
-        }
+        List<String> packetIds = list.stream()
+            .map(DataPacket::getPacketId)
+            .collect(Collectors.toList());
+
         //移除map中过期的数据，保持最新的数据
         for (Map.Entry<String, String> entry : packetMD5.entrySet()) {
             String key = entry.getKey();

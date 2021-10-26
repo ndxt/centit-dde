@@ -5,7 +5,6 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
 
-import java.util.List;
 import java.util.Map;
 
 /**

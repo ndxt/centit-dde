@@ -16,24 +16,18 @@ import org.apache.kafka.clients.admin.KafkaAdminClient;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ProducerBizOperation implements BizOperation {
-    private final  static Logger logger = LoggerFactory.getLogger(ProducerBizOperation.class);
     private SourceInfoDao sourceInfoDao;
-
     public ProducerBizOperation( ) {
     }
-
     public ProducerBizOperation(SourceInfoDao sourceInfoDao) {
         this.sourceInfoDao=sourceInfoDao;
     }
-
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
@@ -46,7 +40,8 @@ public class ProducerBizOperation implements BizOperation {
             //判断topic是否存在，不存在不发送，防止填错topic
             Properties properties= new Properties();
             properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, sourceInfo.getDatabaseUrl());
-            AdminClient adminClient = KafkaAdminClient.create(properties);//创建Topic
+            //创建Topic
+            AdminClient adminClient = KafkaAdminClient.create(properties);
             Set<String> topicNames = adminClient.listTopics().names().get();
             if (!topicNames.contains(producerEntity.getTopic())){
                 return BuiltInOperation.getResponseData(0, 500,
