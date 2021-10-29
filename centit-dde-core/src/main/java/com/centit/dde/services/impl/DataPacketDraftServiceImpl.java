@@ -10,6 +10,7 @@ import com.centit.dde.services.DataPacketService;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOptMethod;
+import com.centit.framework.system.po.OptMethod;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.springframework.beans.BeanUtils;
@@ -49,22 +50,22 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
     private IOptMethod creatApiOptMethod(DataPacketDraft dataPacket) {
         if (platformEnvironment != null) {
-            JSONObject result = assemblyOptMethodGet(dataPacket);
+            OptMethod result = assemblyOptMethodGet(dataPacket);
             return platformEnvironment.addOptMethod(result);
         }
         return null;
     }
 
-    private JSONObject assemblyOptMethodGet(DataPacketDraft dataPacket) {
-        JSONObject result = new JSONObject();
-        result.put("optId", dataPacket.getOptId());
-        result.put("optName", dataPacket.getPacketName());
-        result.put("apiId", dataPacket.getPacketId());
-        result.put("optMethod", "api");
-        result.put("optUrl", "/dde/run/" + dataPacket.getPacketId());
-        result.put("optReq", "CR");
-        result.put("optDesc", "请求api网关接口");
-        result.put("optType", OPTMETHOD_OPTTYPE_API);
+    private OptMethod assemblyOptMethodGet(DataPacketDraft dataPacket) {
+        OptMethod result = new OptMethod();
+        result.setOptId(dataPacket.getOptId());
+        result.setOptName(dataPacket.getPacketName());
+        result.setApiId(dataPacket.getPacketId());
+        result.setOptMethod("api");
+        result.setOptUrl("/dde/run/" + dataPacket.getPacketId());
+        result.setOptReq("CR");
+        result.setOptDesc("请求api网关接口");
+        result.setOptType(OPTMETHOD_OPTTYPE_API);
         return result;
     }
 
