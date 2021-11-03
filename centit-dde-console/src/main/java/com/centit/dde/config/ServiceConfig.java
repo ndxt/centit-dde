@@ -6,7 +6,6 @@ import com.centit.fileserver.common.FileStoreContext;
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.config.SpringSecurityDaoConfig;
-import com.centit.framework.ip.app.config.IPOrStaticAppSystemBeanConfig;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
@@ -25,7 +24,7 @@ import javax.annotation.Resource;
  */
 @EnableAsync
 @EnableScheduling
-@Import({IPOrStaticAppSystemBeanConfig.class,
+@Import({//IPOrStaticAppSystemBeanConfig.class,
     SpringSecurityDaoConfig.class,
     JdbcConfig.class})
 @ComponentScan(basePackages = "com.centit",

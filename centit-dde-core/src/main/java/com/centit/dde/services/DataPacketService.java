@@ -1,8 +1,8 @@
 package com.centit.dde.services;
 
+import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.po.DataPacket;
-import com.centit.dde.po.DataPacketInterface;
-import com.centit.framework.model.basedata.IOptMethod;
+import com.centit.framework.system.po.OptMethod;
 import com.centit.support.database.utils.PageDesc;
 
 import java.util.List;
@@ -26,5 +26,7 @@ public interface DataPacketService {
     DataPacket getDataPacket(String packetId);
 
     void publishDataPacket(DataPacket dataPacket);
+
+    int[] batchUpdateOptIdByApiId(String optId, List<String> apiIds);
 
 }

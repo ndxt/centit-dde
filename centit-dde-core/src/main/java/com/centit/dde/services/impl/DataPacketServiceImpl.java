@@ -4,20 +4,21 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
-import com.centit.framework.appclient.HttpReceiveJSON;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.model.basedata.IOptMethod;
+import com.centit.framework.system.po.OptMethod;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import redis.clients.jedis.JedisPool;
 
-import java.util.ArrayList;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author zc
@@ -27,7 +28,6 @@ import java.util.Map;
 public class DataPacketServiceImpl implements DataPacketService {
     @Autowired
     private DataPacketDao dataPacketDao;
-
 
     @Override
     public void createDataPacket(DataPacket dataPacket) {
@@ -72,6 +72,24 @@ public class DataPacketServiceImpl implements DataPacketService {
     public void publishDataPacket(DataPacket dataPacket) {
         dataPacketDao.mergeObject(dataPacket);
         dataPacketDao.saveObjectReferences(dataPacket);
+    }
+
+    @Override
+    public int[] batchUpdateOptIdByApiId(String optId, List<String> apiIds) {
+        String sql="UPDATE q_data_packet SET OPT_ID=? WHERE PACKET_ID IN (?)";
+        int[] dataPacket = dataPacketDao.getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setString(1, optId);
+                ps.setString(2, apiIds.get(i));
+            }
+
+            @Override
+            public int getBatchSize() {
+                return apiIds.size();
+            }
+        });
+        return dataPacket;
     }
 
 

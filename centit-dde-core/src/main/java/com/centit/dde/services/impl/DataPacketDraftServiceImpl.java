@@ -15,12 +15,16 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author zhf
@@ -34,6 +38,7 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
     @Autowired
     private DataPacketService dataPacketService;
+
     @Autowired(required = false)
     private PlatformEnvironment platformEnvironment;
 
@@ -87,6 +92,23 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         dataPacketService.publishDataPacket(dataPacket);
     }
 
+    @Override
+    public int[] batchUpdateOptIdByApiId(String optId,List<String> apiIds) {
+        String sql="UPDATE q_data_packet_draft SET OPT_ID=? WHERE PACKET_ID IN (?)";
+        int[] dataPacket = dataPacketCopyDao.getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setString(1, optId);
+                ps.setString(2, apiIds.get(i));
+            }
+
+            @Override
+            public int getBatchSize() {
+                return apiIds.size();
+            }
+        });
+        return dataPacket;
+    }
 
     @Override
     public void updateDataPacketOptJson(String packetId, String dataPacketOptJson) {

@@ -109,10 +109,6 @@ public class DataPacket implements Serializable,DataPacketInterface {
     @ApiModelProperty(value = "是否启用", required = true)
     private Boolean isValid;
 
-    @Column(name = "OWN_GROUP")
-    @ApiModelProperty(value = "所属分组")
-    private String ownGroup;
-
     @Column(name = "NEED_ROLLBACK")
     @ApiModelProperty(value = "是否回滚并结束")
     private String needRollback;

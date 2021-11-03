@@ -47,8 +47,8 @@ public class TaskSchedulers {
         this.sourceInfoDao=sourceInfoDao;
         queryParams.put("taskType", "4");
         queryParams.put("isValid", "T");
-        if (pathConfig.getOwnGroups() != null && pathConfig.getOwnGroups().length > 0) {
-            queryParams.put("ownGroup_in", pathConfig.getOwnGroups());
+        if (pathConfig.getOptId() != null && pathConfig.getOptId().length > 0) {
+            queryParams.put("optId_in", pathConfig.getOptId());
         }
     }
 

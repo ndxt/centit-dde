@@ -89,11 +89,22 @@
             <artifactId>centit-persistence-jdbc-config</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>centit-ip-dubbo-client-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>centit-ip-app-base-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
+<!--
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-ip-app-config</artifactId>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>

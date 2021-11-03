@@ -1,6 +1,7 @@
 package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.services.BizModelService;
@@ -14,6 +15,8 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
+import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.system.po.OptMethod;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
@@ -24,13 +27,16 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author zhf
@@ -40,15 +46,19 @@ import java.util.Map;
 @RequestMapping(value = "run")
 public class HttpTaskController extends BaseController {
 
+    @Autowired
+    private PlatformEnvironment platformEnvironment;
+
     private final DataPacketService dataPacketService;
-    private final DataPacketDraftService dataPacketCopyService;
+    private final DataPacketDraftService dataPacketDraftService;
     private final BizModelService bizmodelService;
 
+
     public HttpTaskController(DataPacketService dataPacketService,
-                              DataPacketDraftService dataPacketCopyService,
+                              DataPacketDraftService dataPacketDraftService,
                               BizModelService bizmodelService) {
         this.dataPacketService = dataPacketService;
-        this.dataPacketCopyService = dataPacketCopyService;
+        this.dataPacketDraftService = dataPacketDraftService;
         this.bizmodelService = bizmodelService;
     }
 
@@ -105,7 +115,7 @@ public class HttpTaskController extends BaseController {
         if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
             dataPacketInterface = dataPacketService.getDataPacket(packetId);
         } else {
-            dataPacketInterface = dataPacketCopyService.getDataPacket(packetId);
+            dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
         }
         bizModel = bizmodelService.fetchBizModel(dataPacketInterface, params);
         bizmodelService.setBizModelBuf(bizModel, dataPacketInterface, params);
@@ -225,6 +235,21 @@ public class HttpTaskController extends BaseController {
         variableFormula.setTrans(new ObjectTranslate(object));
         variableFormula.setFormula(StringEscapeUtils.unescapeHtml4(formula));
         return variableFormula.calcFormula();
+    }
+
+    @ApiOperation(value = "修改数据所属业务模块")
+    @PutMapping(value = "/updateOptId")
+    public JSONObject updateOptIdByOptCodes(String optId , @RequestBody List<OptMethod> optMethods) {
+        List<String> optCodes = optMethods.stream().map(optMethod -> optMethod.getOptCode()).collect(Collectors.toList());
+        List<String> apiIds = optMethods.stream().map(optMethod -> optMethod.getApiId()).collect(Collectors.toList());
+        int[] optdefCount = platformEnvironment.updateOptIdByOptCodes(optId, optCodes);
+        int[] dataPacketDraftCount = apiIds.size()>0?dataPacketDraftService.batchUpdateOptIdByApiId(optId, apiIds):null;
+        int[] dataPacketCount = apiIds.size()>0?dataPacketService.batchUpdateOptIdByApiId(optId, apiIds):null;
+        JSONObject result = new JSONObject();
+        result.put("optdefCount",optdefCount);
+        result.put("dataPacketDraftCount",dataPacketDraftCount);
+        result.put("dataPacketCount",dataPacketCount);
+        return result;
     }
 
 }
