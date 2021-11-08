@@ -94,7 +94,7 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
     @Override
     public int[] batchUpdateOptIdByApiId(String optId,List<String> apiIds) {
-        String sql="UPDATE q_data_packet_draft SET OPT_ID=? WHERE PACKET_ID IN (?)";
+        String sql="UPDATE q_data_packet_draft SET OPT_ID=? WHERE PACKET_ID = ? ";
         int[] dataPacket = dataPacketCopyDao.getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
