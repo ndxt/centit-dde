@@ -118,7 +118,7 @@ public abstract class DataSetOptUtil {
         }
         VariableFormula formula = createFormula();
         formula.setTrans(new ObjectTranslate(inRow));
-        Map<String, Object> newRow = new HashMap<>(formulaMap.size());
+        Map<String, Object> newRow = new LinkedHashMap<>(formulaMap.size());
         for (Map.Entry<String, String> ent : formulaMap) {
             formula.setFormula(ent.getValue());
 
