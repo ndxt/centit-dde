@@ -1,7 +1,5 @@
 package com.centit.dde.entity;
 
-import com.alibaba.fastjson.JSONObject;
-
 public class ConsumerEntity {
     //标签唯一id
     private String id;
@@ -56,12 +54,4 @@ public class ConsumerEntity {
     public void setTopic(String topic) {
         this.topic = topic;
     }
-
-   /* public JSONObject getJsonObject() {
-        return jsonObject;
-    }
-
-    public void setJsonObject(JSONObject jsonObject) {
-        this.jsonObject = jsonObject;
-    }*/
 }

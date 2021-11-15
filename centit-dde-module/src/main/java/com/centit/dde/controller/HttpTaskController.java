@@ -28,6 +28,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -239,6 +240,7 @@ public class HttpTaskController extends BaseController {
 
     @ApiOperation(value = "修改数据所属业务模块")
     @PutMapping(value = "/updateOptId")
+    @Transactional
     public JSONObject updateOptIdByOptCodes(String optId , @RequestBody List<OptMethod> optMethods) {
         List<String> optCodes = optMethods.stream().map(optMethod -> optMethod.getOptCode()).collect(Collectors.toList());
         List<String> apiIds = optMethods.stream().map(optMethod -> optMethod.getApiId()).collect(Collectors.toList());
