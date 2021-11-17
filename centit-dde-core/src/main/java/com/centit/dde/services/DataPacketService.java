@@ -22,6 +22,7 @@ public interface DataPacketService {
     void deleteDataPacket(String packetId);
 
     List<DataPacket> listDataPacket(Map<String, Object> params, PageDesc pageDesc);
+    List<Map<String,String>> listDataPacket(String optId);
 
     DataPacket getDataPacket(String packetId);
 

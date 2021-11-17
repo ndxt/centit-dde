@@ -1,5 +1,6 @@
 package com.centit.dde.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
 import com.centit.framework.common.WebOptUtils;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhf
@@ -35,6 +37,14 @@ public class DataPacketController extends BaseController {
         List<DataPacket> list = dataPacketService.listDataPacket(BaseController.collectRequestParameters(request), pageDesc);
         return PageQueryResult.createResult(list, pageDesc);
     }
+
+    @ApiOperation(value = "工作流查询API网关")
+    @GetMapping(value = "/workflow/{optId}")
+    @WrapUpResponseBody
+    public List<Map<String,String>> listDataPacket(@PathVariable String optId) {
+        return dataPacketService.listDataPacket(optId);
+    }
+
 
     @ApiOperation(value = "查询单个API网关")
     @GetMapping(value = "/{packetId}")

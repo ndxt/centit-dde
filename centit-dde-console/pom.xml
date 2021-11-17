@@ -11,7 +11,9 @@
 
     <artifactId>centit-dde-console</artifactId>
     <packaging>war</packaging>
-
+    <properties>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.centit.product</groupId>
