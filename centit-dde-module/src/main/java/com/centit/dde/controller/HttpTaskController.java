@@ -238,7 +238,8 @@ public class HttpTaskController extends BaseController {
         return variableFormula.calcFormula();
     }
 
-    @ApiOperation(value = "修改数据所属业务模块")
+    @ApiOperation(value = "修改数据所属业务模块(删除菜单迁移数据(接口页面" +
+        "))")
     @PutMapping(value = "/updateOptId")
     @Transactional
     public JSONObject updateOptIdByOptCodes(String optId , @RequestBody List<OptMethod> optMethods) {
