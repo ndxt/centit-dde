@@ -10,18 +10,22 @@ import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.AlternativeJdkIdGenerator;
+import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Objects;
 
 @Slf4j
 public class CreateIndex {
-    public static void main(String[] args) throws IOException {
-       // System.out.println(new CreateIndex().createIndexJson("q_data_packet"));
-        RestClientBuilder restClientBuilder = new CreateIndex().restClientBuilder("127.0.0.1:9201,127.0.0.1:9202,127.0.0.1:9203");
-        RestHighLevelClient restHighLevelClient = new RestHighLevelClient(restClientBuilder);
+    public static void main(String[] args) throws Exception {
+      // System.out.println(new CreateIndex().createIndexJson("q_data_packet"));
+       /* RestClientBuilder restClientBuilder = new CreateIndex().restClientBuilder("127.0.0.1:9201,127.0.0.1:9202,127.0.0.1:9203");
+        RestHighLevelClient restHighLevelClient = new RestHighLevelClient(restClientBuilder);*/
         /**
          * 多索引查询
          *//*
@@ -48,6 +52,9 @@ public class CreateIndex {
             System.out.println(hit.getSourceAsString());
         }
         restHighLevelClient.close();*/
+        String str=null;
+        Assert.notNull(str,"参数不能为null");
+        System.out.println(1111111111);
     }
 
     public   boolean createIndexJson(String index) throws IOException {

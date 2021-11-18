@@ -40,6 +40,16 @@ import java.util.concurrent.TimeUnit;
 public class ElasticsearchReadUtils {
     private static  final Logger logger = LoggerFactory.getLogger(ElasticsearchReadUtils.class);
 
+    /**
+     * 查询分类：
+     *  1.简单查询：
+     *      term   terms   match  ids   match_all   range   constant_score   match_phrase  match_phrase_prefix
+     *      multi_match  query_string  simple_query_string  wildcard 等。
+     *  2.组合查询：
+     *      must  should  mustNot  filter
+     *
+     */
+
     //查询入口
     public static JSONObject query(RestHighLevelClient restHighLevelClient, EsReadVo esReadVo) throws IOException {
         //bool查询类型
