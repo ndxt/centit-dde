@@ -7,7 +7,9 @@ import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
+import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.product.adapter.api.WorkGroupManager;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
@@ -41,7 +43,11 @@ public class DataPacketDraftController extends BaseController {
     @PostMapping
     @WrapUpResponseBody
     public DataPacketDraft createDataPacket(@RequestBody DataPacketDraft dataPacketDraft, HttpServletRequest request) {
-        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacketDraft.getOsId())){
+        String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+        if (StringBaseOpt.isNvl(loginUser)) {
+            loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
+        }
+        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacketDraft.getOsId(),loginUser)){
             throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您未登录或没有权限！");
         }
         dataPacketDraft.setRecorder(WebOptUtils.getCurrentUserCode(request));
@@ -54,7 +60,11 @@ public class DataPacketDraftController extends BaseController {
     @PutMapping(value = "/{packetId}")
     @WrapUpResponseBody
     public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketDraft dataPacket) {
-        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacket.getOsId())){
+        String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+        if (StringBaseOpt.isNvl(loginUser)) {
+            loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
+        }
+        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacket.getOsId(),loginUser)){
             throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您未登录或没有权限！");
         }
         dataPacket.setPacketId(packetId);
@@ -66,8 +76,12 @@ public class DataPacketDraftController extends BaseController {
     @PutMapping(value = "publish/{packetId}")
     @WrapUpResponseBody
     public void publishDataPacket(@PathVariable String packetId) {
+        String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+        if (StringBaseOpt.isNvl(loginUser)) {
+            loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
+        }
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacketDraft.getOsId())){
+        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacketDraft.getOsId(),loginUser)){
             throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您未登录或没有权限！");
         }
         dataPacketDraftService.updateDataPacket(dataPacketDraft);
@@ -78,8 +92,12 @@ public class DataPacketDraftController extends BaseController {
     @PutMapping(value = "/opt/{packetId}")
     @WrapUpResponseBody
     public void updateDataPacketOpt(@PathVariable String packetId, @RequestBody String dataOptDescJson) {
+        String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+        if (StringBaseOpt.isNvl(loginUser)) {
+            loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
+        }
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacketDraft.getOsId())){
+        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacketDraft.getOsId(),loginUser)){
             throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您未登录或没有权限！");
         }
         dataPacketDraftService.updateDataPacketOptJson(packetId, dataOptDescJson);
@@ -89,8 +107,12 @@ public class DataPacketDraftController extends BaseController {
     @DeleteMapping(value = "/{packetId}")
     @WrapUpResponseBody
     public void deleteDataPacket(@PathVariable String packetId) {
+        String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+        if (StringBaseOpt.isNvl(loginUser)) {
+            loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
+        }
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacketDraft.getOsId())){
+        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacketDraft.getOsId(),loginUser)){
             throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您未登录或没有权限！");
         }
         dataPacketDraftService.deleteDataPacket(packetId);
