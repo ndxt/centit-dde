@@ -36,6 +36,12 @@
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-redis-plugin</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.data</groupId>
+                    <artifactId>spring-data-redis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.centit.product</groupId>
@@ -101,7 +107,10 @@
             <artifactId>centit-ip-app-base-config</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-session-redis</artifactId>
+        </dependency>
 <!--
         <dependency>
             <groupId>com.centit.framework</groupId>
