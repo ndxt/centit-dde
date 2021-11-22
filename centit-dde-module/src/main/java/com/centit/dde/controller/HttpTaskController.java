@@ -13,11 +13,15 @@ import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
+import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.system.po.OptMethod;
+import com.centit.product.adapter.api.WorkGroupManager;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.file.FileIOOpt;
@@ -49,7 +53,8 @@ public class HttpTaskController extends BaseController {
 
     @Autowired
     private PlatformEnvironment platformEnvironment;
-
+    @Autowired
+    WorkGroupManager workGroupManager;
     private final DataPacketService dataPacketService;
     private final DataPacketDraftService dataPacketDraftService;
     private final BizModelService bizmodelService;
@@ -67,6 +72,7 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "草稿：立即执行任务")
     public void runTestTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                     HttpServletResponse response) throws IOException {
+        judgePower(packetId);
         returnObject(packetId, ConstantValue.RUN_TYPE_COPY, request, response);
     }
 
@@ -74,7 +80,22 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "草稿：立即执行任务Post")
     public void runTaskPostTest(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
+        judgePower(packetId);
         returnObject(packetId, ConstantValue.RUN_TYPE_COPY, request, response);
+    }
+
+    private void judgePower(@PathVariable String packetId) {
+        String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+        if (StringBaseOpt.isNvl(loginUser)) {
+            loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
+        }
+        if (StringBaseOpt.isNvl(loginUser)) {
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "您未登录！");
+        }
+        DataPacketInterface dataPacket=dataPacketDraftService.getDataPacket(packetId);
+        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacket.getOsId(),loginUser)){
+            throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您没有权限！");
+        }
     }
 
     @GetMapping(value = "/{packetId}")
