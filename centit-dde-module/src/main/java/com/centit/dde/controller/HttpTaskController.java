@@ -3,13 +3,13 @@ package com.centit.dde.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.services.BizModelService;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.vo.UpdateOptIdParamVo;
 import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseData;
@@ -19,7 +19,6 @@ import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.system.po.OptMethod;
 import com.centit.product.adapter.api.WorkGroupManager;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
@@ -41,9 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author zhf
@@ -263,10 +260,11 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "修改数据所属业务模块(删除菜单迁移数据(接口页面))")
     @PutMapping(value = "/updateOptId")
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject updateOptIdByOptCodes(@RequestBody  String optId , @RequestBody String[] optCodes ,@RequestBody String[] apiIds) {
-        int[] optdefCount = platformEnvironment.updateOptIdByOptCodes(optId, Arrays.asList(optCodes));
-        int[] dataPacketDraftCount = apiIds!=null&&apiIds.length>0?dataPacketDraftService.batchUpdateOptIdByApiId(optId, Arrays.asList(apiIds)):null;
-        int[] dataPacketCount = apiIds!=null&&apiIds.length>0?dataPacketService.batchUpdateOptIdByApiId(optId, Arrays.asList(apiIds)):null;
+    public JSONObject updateOptIdByOptCodes(@RequestBody UpdateOptIdParamVo updateOptIdParamVo) {
+        int[] optdefCount = platformEnvironment.updateOptIdByOptCodes(updateOptIdParamVo.getOptId(), Arrays.asList(updateOptIdParamVo.getOptCodes()));
+        String[] apiIds = updateOptIdParamVo.getApiIds();
+        int[] dataPacketDraftCount = apiIds!=null&&apiIds.length>0?dataPacketDraftService.batchUpdateOptIdByApiId(updateOptIdParamVo.getOptId(), Arrays.asList(apiIds)):null;
+        int[] dataPacketCount = apiIds!=null&&apiIds.length>0?dataPacketService.batchUpdateOptIdByApiId(updateOptIdParamVo.getOptId(), Arrays.asList(apiIds)):null;
         JSONObject result = new JSONObject();
         result.put("optdefCount",optdefCount);
         result.put("dataPacketDraftCount",dataPacketDraftCount);
