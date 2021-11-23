@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -262,10 +263,10 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "修改数据所属业务模块(删除菜单迁移数据(接口页面))")
     @PutMapping(value = "/updateOptId")
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject updateOptIdByOptCodes(@RequestBody  String optId , @RequestBody List<String> optCodes ,@RequestBody List<String> apiIds) {
-        int[] optdefCount = platformEnvironment.updateOptIdByOptCodes(optId, optCodes);
-        int[] dataPacketDraftCount = apiIds.size()>0?dataPacketDraftService.batchUpdateOptIdByApiId(optId, apiIds):null;
-        int[] dataPacketCount = apiIds.size()>0?dataPacketService.batchUpdateOptIdByApiId(optId, apiIds):null;
+    public JSONObject updateOptIdByOptCodes(@RequestBody  String optId , @RequestBody String[] optCodes ,@RequestBody String[] apiIds) {
+        int[] optdefCount = platformEnvironment.updateOptIdByOptCodes(optId, Arrays.asList(optCodes));
+        int[] dataPacketDraftCount = apiIds!=null&&apiIds.length>0?dataPacketDraftService.batchUpdateOptIdByApiId(optId, Arrays.asList(apiIds)):null;
+        int[] dataPacketCount = apiIds!=null&&apiIds.length>0?dataPacketService.batchUpdateOptIdByApiId(optId, Arrays.asList(apiIds)):null;
         JSONObject result = new JSONObject();
         result.put("optdefCount",optdefCount);
         result.put("dataPacketDraftCount",dataPacketDraftCount);
