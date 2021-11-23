@@ -121,7 +121,6 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
 
     @Column(name = "publish_date")
     @ApiModelProperty(value = "发布时间")
-    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private String publishDate;
 
 

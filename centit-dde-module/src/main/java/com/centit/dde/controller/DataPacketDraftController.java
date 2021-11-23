@@ -3,14 +3,17 @@ package com.centit.dde.controller;
 import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.utils.LoginUserPermissionCheck;
+import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.product.adapter.api.WorkGroupManager;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -84,6 +87,9 @@ public class DataPacketDraftController extends BaseController {
     public void deleteDataPacket(@PathVariable String packetId) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
         LoginUserPermissionCheck.loginUserPermissionCheck(workGroupManager,dataPacketDraft);
+        if (StringUtils.isNotBlank(dataPacketDraft.getPublishDate())){
+            throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "该API已经发布过，不能删除！");
+        }
         dataPacketDraftService.deleteDataPacket(packetId);
     }
 

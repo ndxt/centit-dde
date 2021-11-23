@@ -20,7 +20,7 @@ public class LoginUserPermissionCheck {
             throw new ObjectException(ResponseData.HTTP_MOVE_TEMPORARILY, "您未登录，请先登录！");
         }
         if (!workGroupManager.loginUserIsExistWorkGroup(dataPacketDraft.getOsId(),loginUser)){
-            throw new ObjectException(ResponseData.HTTP_UNAUTHORIZED, "您没有权限，请联系管理员！");
+            throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您没有权限，请联系管理员！");
         }
     }
 }
