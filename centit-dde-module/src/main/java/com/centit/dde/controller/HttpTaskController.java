@@ -99,14 +99,14 @@ public class HttpTaskController extends BaseController {
     }
 
     @GetMapping(value = "/{packetId}")
-    @ApiOperation(value = "发布：立即执行任务")
+    @ApiOperation(value = "正式：立即执行任务")
     public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
         returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, request, response);
     }
 
     @PostMapping(value = "/{packetId}")
-    @ApiOperation(value = "发布：立即执行任务Post")
+    @ApiOperation(value = "正式：立即执行任务Post")
     public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
                             HttpServletResponse response) throws IOException {
         returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, request, response);
@@ -140,7 +140,6 @@ public class HttpTaskController extends BaseController {
             dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
         }
         bizModel = bizmodelService.fetchBizModel(dataPacketInterface, params);
-        bizmodelService.setBizModelBuf(bizModel, dataPacketInterface, params);
         if (bizModel instanceof DataSet) {
             InputStream in;
             String fileName;
@@ -259,10 +258,9 @@ public class HttpTaskController extends BaseController {
         return variableFormula.calcFormula();
     }
 
-    @ApiOperation(value = "修改数据所属业务模块(删除菜单迁移数据(接口页面" +
-        "))")
+    @ApiOperation(value = "修改数据所属业务模块(删除菜单迁移数据(接口页面))")
     @PutMapping(value = "/updateOptId")
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public JSONObject updateOptIdByOptCodes(String optId , @RequestBody List<OptMethod> optMethods) {
         List<String> optCodes = optMethods.stream().map(optMethod -> optMethod.getOptCode()).collect(Collectors.toList());
         List<String> apiIds = optMethods.stream().map(optMethod -> optMethod.getApiId()).collect(Collectors.toList());

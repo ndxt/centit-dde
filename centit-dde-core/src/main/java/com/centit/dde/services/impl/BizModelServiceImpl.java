@@ -25,6 +25,10 @@ import java.util.Map;
 public class BizModelServiceImpl implements BizModelService {
     @Autowired(required = false)
     private JedisPool jedisPool;
+
+    @Autowired
+    private  BizModelService bizmodelService;
+
     @Autowired
     private TaskRun taskRun;
     private String key;
@@ -36,7 +40,12 @@ public class BizModelServiceImpl implements BizModelService {
         if (notNeedBuf(dataPacket)) {
             return taskRun.runTask(dataPacket.getPacketId(), paramsMap);
         }
-        return fetchBizModelFromBuf(dataPacket, paramsMap);
+        Object bizModel = fetchBizModelFromBuf(dataPacket, paramsMap);
+        if (bizModel==null){//第一次执行或者换成失效的时候执行
+            bizModel = taskRun.runTask(dataPacket.getPacketId(), paramsMap);
+            bizmodelService.setBizModelBuf(bizModel, dataPacket, paramsMap);
+        }
+        return bizModel;
     }
 
     private boolean notNeedBuf(DataPacketInterface dataPacket) {
