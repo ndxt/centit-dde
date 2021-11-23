@@ -3,6 +3,7 @@ package com.centit.dde.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.services.BizModelService;
 import com.centit.dde.services.DataPacketDraftService;
@@ -261,9 +262,9 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "修改数据所属业务模块(删除菜单迁移数据(接口页面))")
     @PutMapping(value = "/updateOptId")
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject updateOptIdByOptCodes(String optId , @RequestBody List<OptMethod> optMethods) {
-        List<String> optCodes = optMethods.stream().map(optMethod -> optMethod.getOptCode()).collect(Collectors.toList());
-        List<String> apiIds = optMethods.stream().map(optMethod -> optMethod.getApiId()).collect(Collectors.toList());
+    public JSONObject updateOptIdByOptCodes(String optId , @RequestBody List<DataPacketDraft> dataPacketDraftList) {
+        List<String> optCodes = dataPacketDraftList.stream().map(dataPacketDraft -> dataPacketDraft.getOptCode()).collect(Collectors.toList());
+        List<String> apiIds = dataPacketDraftList.stream().map(dataPacketDraft -> dataPacketDraft.getPacketId()).collect(Collectors.toList());
         int[] optdefCount = platformEnvironment.updateOptIdByOptCodes(optId, optCodes);
         int[] dataPacketDraftCount = apiIds.size()>0?dataPacketDraftService.batchUpdateOptIdByApiId(optId, apiIds):null;
         int[] dataPacketCount = apiIds.size()>0?dataPacketService.batchUpdateOptIdByApiId(optId, apiIds):null;
