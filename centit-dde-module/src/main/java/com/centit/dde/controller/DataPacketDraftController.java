@@ -9,6 +9,7 @@ import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.product.adapter.api.WorkGroupManager;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
@@ -19,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -68,6 +71,7 @@ public class DataPacketDraftController extends BaseController {
     public void publishDataPacket(@PathVariable String packetId) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
         LoginUserPermissionCheck.loginUserPermissionCheck(workGroupManager,dataPacketDraft);
+        dataPacketDraft.setPublishDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         dataPacketDraftService.updateDataPacket(dataPacketDraft);
         dataPacketDraftService.publishDataPacket(dataPacketDraft);
     }
