@@ -127,6 +127,11 @@ public class DataPacket implements Serializable,DataPacketInterface {
     @ApiModelProperty(value = "队列配置扩展信息，独有配置，公共的配置在资源管理页面添加")
     private JSONObject extProps;
 
+    @Column(name = "opt_code")
+    @ApiModelProperty(value = "f_optdef表主键")
+    private String optCode;
+
+
     @OneToMany(targetEntity = DataPacketParam.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
     private List<DataPacketParam> packetParams;

@@ -12,6 +12,7 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOptMethod;
 import com.centit.framework.system.po.OptMethod;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,15 +49,17 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
     @Override
     public void createDataPacket(DataPacketDraft dataPacketCopy) {
+        dataPacketCopy.setPacketId(UuidOpt.getUuidAsString32());
+        dataPacketCopy.setOptCode(creatApiOptMethod(dataPacketCopy));
         dataPacketCopyDao.saveNewObject(dataPacketCopy);
         dataPacketCopyDao.saveObjectReferences(dataPacketCopy);
-        dataPacketCopy.setOptMethod(creatApiOptMethod(dataPacketCopy));
     }
 
-    private IOptMethod creatApiOptMethod(DataPacketDraft dataPacket) {
+    private String creatApiOptMethod(DataPacketDraft dataPacket) {
         if (platformEnvironment != null) {
             OptMethod result = assemblyOptMethodGet(dataPacket);
-            return platformEnvironment.addOptMethod(result);
+            IOptMethod iOptMethod = platformEnvironment.addOptMethod(result);
+            return iOptMethod==null?null:iOptMethod.getOptCode();
         }
         return null;
     }

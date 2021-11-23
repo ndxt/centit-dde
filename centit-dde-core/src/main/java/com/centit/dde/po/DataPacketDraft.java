@@ -130,6 +130,10 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     private JSONObject extProps;
 
 
+    @Column(name = "opt_code")
+    @ApiModelProperty(value = "f_optdef表主键")
+    private String optCode;
+
     @OneToMany(targetEntity = DataPacketParamDraft.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
     private List<DataPacketParamDraft> packetParams;
