@@ -144,7 +144,7 @@ public class BuiltInOperation {
     }
 
     public static ResponseData runAppend(BizModel bizModel, JSONObject bizOptJson) {
-        String sourDsName = getJsonFieldString((JSONObject) bizOptJson.get("source"), "value", bizModel.getModelName());
+        String sourDsName = bizOptJson.getString("source");
         Map<String, String> mapInfo = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
         int count = 0;
         if (mapInfo != null) {
