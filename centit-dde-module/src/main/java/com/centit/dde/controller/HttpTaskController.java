@@ -260,7 +260,7 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "修改数据所属业务模块(删除菜单迁移数据(接口页面))")
     @PutMapping(value = "/updateOptId")
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject updateOptIdByOptCodes(@RequestBody UpdateOptIdParamVo updateOptIdParamVo) {
+    public ResponseData updateOptIdByOptCodes(@RequestBody UpdateOptIdParamVo updateOptIdParamVo) {
         int[] optdefCount = platformEnvironment.updateOptIdByOptCodes(updateOptIdParamVo.getOptId(), Arrays.asList(updateOptIdParamVo.getOptCodes()));
         String[] apiIds = updateOptIdParamVo.getApiIds();
         int[] dataPacketDraftCount = apiIds!=null&&apiIds.length>0?dataPacketDraftService.batchUpdateOptIdByApiId(updateOptIdParamVo.getOptId(), Arrays.asList(apiIds)):null;
@@ -269,7 +269,7 @@ public class HttpTaskController extends BaseController {
         result.put("optdefCount",optdefCount);
         result.put("dataPacketDraftCount",dataPacketDraftCount);
         result.put("dataPacketCount",dataPacketCount);
-        return result;
+        return ResponseData.makeSuccessResponse(result.toJSONString());
     }
 
 }
