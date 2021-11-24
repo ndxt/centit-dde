@@ -8,6 +8,7 @@ import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
+import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.product.adapter.api.WorkGroupManager;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.common.ObjectException;
@@ -38,6 +39,9 @@ public class DataPacketDraftController extends BaseController {
     @Autowired
     WorkGroupManager workGroupManager;
 
+
+    @Autowired
+    private PlatformEnvironment platformEnvironment;
 
     public DataPacketDraftController(DataPacketDraftService dataPacketDraftService) {
         this.dataPacketDraftService = dataPacketDraftService;
@@ -94,6 +98,7 @@ public class DataPacketDraftController extends BaseController {
         if (StringUtils.isNotBlank(dataPacketDraft.getPublishDate())){
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "该API已经发布过，不能删除！");
         }
+        platformEnvironment.deleteOptDefAndRolepowerByOptCode(dataPacketDraft.getOptCode());
         dataPacketDraftService.deleteDataPacket(packetId);
     }
 
