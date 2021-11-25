@@ -32,7 +32,7 @@ public class DataPacketTemplate  implements Serializable {
     private String id;
 
     @Column(name = "template_type")
-    @ApiModelProperty(value = "1:api网关，2：元数据，3：第三方接口调用")
+    @ApiModelProperty(value = "模板(操作)类型 1：新建 2：修改 3：删除 4：查询 5：查看 6：创建流程 7：提交流程 8：http调用")
     private Integer templateType;
 
     @Column(name = "os_id")

@@ -64,17 +64,17 @@
             <artifactId>database-metadata</artifactId>
             <version>${metadata.version}</version>
         </dependency>
-
-      <!--  <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>fileserver-dubbo-client-config</artifactId>
-            <version>${centit.fileserver.version}</version>
-        </dependency>-->
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>fileserver-adapter</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-dubbo-adapter</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
