@@ -66,5 +66,20 @@ public class DataPacketTemplate  implements Serializable {
     @ApiModelProperty(value = "是否可用")
     private Integer isValid;
 
+    @Column(name = "top_unit")
+    @ApiModelProperty(value = "租户code")
+    private String topUnit;
 
+
+    @Column(name = "template_name")
+    @ApiModelProperty(value = "模板名称")
+    private String templateName;
+
+    @Column(name = "packet_template_name")
+    @ApiModelProperty(value = "API网关名称")
+    private String packetTemplateName;
+
+    @Column(name = "opt_method_template_name")
+    @ApiModelProperty(value = "OPT_NAME（f_optdef表字段）")
+    private String optMethodTemplateName;
 }

@@ -1,5 +1,6 @@
 package com.centit.dde.services;
 
+import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.po.DataPacketTemplate;
 import com.centit.support.database.utils.PageDesc;
 
@@ -13,6 +14,10 @@ public interface DataPacketTemplateService {
     void updateDataPacketTemplate(DataPacketTemplate dataPacketTemplate);
 
     void updateDataPacketTemplateContent(String id, String content);
+
+    DataPacketTemplate getDataPacketTemplateById(String id);
+
+    JSONObject getDataPacketTemplateByType(Integer type);
 
     void deleteDataPacketTemplate(String id);
 

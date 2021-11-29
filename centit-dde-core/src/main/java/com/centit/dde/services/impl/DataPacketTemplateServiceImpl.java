@@ -1,7 +1,7 @@
 package com.centit.dde.services.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.dao.DataPacketTemplateDao;
-import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketTemplate;
 import com.centit.dde.services.DataPacketTemplateService;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
@@ -36,6 +36,17 @@ public class DataPacketTemplateServiceImpl implements DataPacketTemplateService 
             CollectionsOpt.createHashMap("content", content),
             CollectionsOpt.createHashMap("id", id)
         );
+    }
+
+    @Override
+    public DataPacketTemplate getDataPacketTemplateById(String id) {
+        return dataPacketTemplateDao.getObjectById(id);
+    }
+
+    @Override
+    public JSONObject getDataPacketTemplateByType(Integer type) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM q_data_packet_template WHERE is_valid = 0  and template_type = ? ");
+        return DatabaseOptUtils.getObjectBySqlAsJson(dataPacketTemplateDao, sql.toString(),new Object[]{type});
     }
 
     @Override

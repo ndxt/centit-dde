@@ -2,8 +2,11 @@ package com.centit.dde.controller;
 
 import com.centit.dde.po.DataPacketTemplate;
 import com.centit.dde.services.DataPacketTemplateService;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
+import com.centit.framework.filter.RequestThreadLocal;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,6 +27,11 @@ public class DataPacketTemplateController extends BaseController {
     @PutMapping
     @WrapUpResponseBody
     public DataPacketTemplate createDataPacketTemplate(@RequestBody DataPacketTemplate dataPacketTemplate){
+        String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+        if (StringBaseOpt.isNvl(loginUser)) {
+            loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
+        }
+        dataPacketTemplate.setCreateUser(loginUser);
         dataPacketTemplateService.createDataPacketTemplate(dataPacketTemplate);
         return dataPacketTemplate;
     }

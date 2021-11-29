@@ -121,7 +121,7 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
 
     @Column(name = "publish_date")
     @ApiModelProperty(value = "发布时间")
-    private String publishDate;
+    private Date publishDate;
 
 
     @Column(name = "EXT_PROPS")
