@@ -65,10 +65,13 @@ public class WriteDbBizOperation implements BizOperation {
                     return BuiltInOperation.getResponseSuccessData(deleteCount);
                 case 4://查询
                     JSONArray jsonArray =new JSONArray();
+                    PageDesc pageDesc=null;
                     for (Map<String, Object> objectMap : dataAsList) {
-                        PageDesc pageDesc = new PageDesc();
-                        pageDesc.setPageNo(Integer.valueOf(String.valueOf(objectMap.get("pageNo"))));
-                        pageDesc.setPageSize(Integer.valueOf(String.valueOf(objectMap.get("pageSize"))));
+                        if (objectMap.get("pageNo")!=null && objectMap.get("pageSize")!=null){
+                            pageDesc = new PageDesc();
+                            pageDesc.setPageNo(Integer.valueOf(String.valueOf(objectMap.get("pageNo"))));
+                            pageDesc.setPageSize(Integer.valueOf(String.valueOf(objectMap.get("pageSize"))));
+                        }
                         jsonArray = metaObjectService.pageQueryObjects(tableId, objectMap,pageDesc);
                     }
                     bizModel.putDataSet(id, new SimpleDataSet(jsonArray));

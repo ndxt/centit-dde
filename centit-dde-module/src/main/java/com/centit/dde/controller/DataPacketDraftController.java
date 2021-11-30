@@ -93,7 +93,7 @@ public class DataPacketDraftController extends BaseController {
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setBufferFreshPeriod(-1);
         dataPacketDraft.setIsValid(true);
-        dataPacketDraft.setTaskType("1");
+        dataPacketDraft.setTaskType(type==1||type==2?"3":"1");
         dataPacketDraft.setOptId(metaDataOrHttpParams.getOptId());
         dataPacketDraft.setOsId(metaDataOrHttpParams.getOsId());
         JSONObject dataPacketTemplate = dataPacketTemplateService.getDataPacketTemplateByType(type);
@@ -105,6 +105,8 @@ public class DataPacketDraftController extends BaseController {
         JSONArray nodeList = content.getJSONArray("nodeList");
         for (Object node : nodeList) {
             JSONObject nodeData = (JSONObject) node;
+            nodeData.put("tableLabelName",tableId);
+            nodeData.put("databaseName",dataBaseCode);
             if ("metadata".equals(nodeData.getString("type"))){
                 JSONObject properties = nodeData.getJSONObject("properties");
                 properties.put("tableLabelName",tableId);
