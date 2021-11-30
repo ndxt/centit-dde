@@ -59,7 +59,7 @@ public class ServiceConfig {
 
     @Bean
     public JedisPool jedisPool() {
-        JedisPool jedisPool= new JedisPool(redisHost, redisPort);
+        JedisPool jedisPool= new JedisPool(redisHost, 6379);
         return jedisPool;
     }
 
