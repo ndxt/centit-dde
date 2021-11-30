@@ -10,6 +10,7 @@ import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
+import com.centit.support.algorithm.NumberBaseOpt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -43,7 +44,7 @@ public class ServiceConfig {
     private String redisHost;
 
     @Value("${redis.port}")
-    private int redisPort;
+    private String redisPort;
 
 
     /**
@@ -58,7 +59,7 @@ public class ServiceConfig {
 
     @Bean
     public JedisPool jedisPool() {
-        JedisPool jedisPool= new JedisPool(redisHost,redisPort);
+        JedisPool jedisPool= new JedisPool(redisHost, NumberBaseOpt.castObjectToInteger(redisPort));
         return jedisPool;
     }
 
