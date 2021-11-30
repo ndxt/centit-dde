@@ -44,7 +44,7 @@ public class ServiceConfig {
     private String redisHost;
 
     @Value("${redis.port}")
-    private String redisPort;
+    private int redisPort;
 
 
     /**
@@ -59,7 +59,7 @@ public class ServiceConfig {
 
     @Bean
     public JedisPool jedisPool() {
-        JedisPool jedisPool= new JedisPool(redisHost, NumberBaseOpt.castObjectToInteger(redisPort));
+        JedisPool jedisPool= new JedisPool(redisHost, redisPort);
         return jedisPool;
     }
 
