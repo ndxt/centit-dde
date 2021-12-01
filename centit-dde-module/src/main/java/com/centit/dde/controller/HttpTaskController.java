@@ -3,6 +3,7 @@ package com.centit.dde.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.core.impl.BizOptFlowImpl;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.services.BizModelService;
 import com.centit.dde.services.DataPacketDraftService;
@@ -91,8 +92,8 @@ public class HttpTaskController extends BaseController {
         if (StringBaseOpt.isNvl(loginUser)) {
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "您未登录！");
         }
-        DataPacketInterface dataPacket=dataPacketDraftService.getDataPacket(packetId);
-        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacket.getOsId(),loginUser)){
+        DataPacketInterface dataPacket = dataPacketDraftService.getDataPacket(packetId);
+        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacket.getOsId(), loginUser)) {
             throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您没有权限！");
         }
     }
@@ -139,34 +140,24 @@ public class HttpTaskController extends BaseController {
             dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
         }
         bizModel = bizmodelService.fetchBizModel(dataPacketInterface, params);
-        if (bizModel instanceof DataSet) {
+        boolean isFileDown = bizModel instanceof ResponseData
+            && BizOptFlowImpl.FILE_DOWNLOAD.equals(((ResponseData) bizModel).getMessage());
+        if (isFileDown) {
             InputStream in;
-            String fileName;
-            Map<String, Object> mapFirstRow = ((DataSet) bizModel).getFirstRow();
-            if (mapFirstRow != null && mapFirstRow.containsKey(ConstantValue.FILE_CONTENT)
-                && (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream
-                || mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof InputStream)) {
-                if (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream) {
-                    ByteArrayOutputStream outputStream = (ByteArrayOutputStream) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_CONTENT);
-                    in = new ByteArrayInputStream(outputStream.toByteArray());
-                } else {
-                    in = (InputStream) mapFirstRow.get(ConstantValue.FILE_CONTENT);
-                }
-                fileName = (String) ((DataSet) bizModel).getFirstRow().get(ConstantValue.FILE_NAME);
-                UploadDownloadUtils.downFileRange(request, response, in,
-                    in.available(), fileName, request.getParameter("downloadType"), null);
-                return;
+            DataSet dataSet= (DataSet) ((ResponseData) bizModel).getData();
+            Map<String, Object> mapFirstRow = dataSet.getFirstRow();
+            if (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream) {
+                ByteArrayOutputStream outputStream = (ByteArrayOutputStream)mapFirstRow.get(ConstantValue.FILE_CONTENT);
+                in = new ByteArrayInputStream(outputStream.toByteArray());
+            } else {
+                in = (InputStream) mapFirstRow.get(ConstantValue.FILE_CONTENT);
             }
-        }
-        if (bizModel instanceof ResponseMapData) {
-            JsonResultUtils.writeSingleDataJson(((ResponseMapData) bizModel).getCode(), ((ResponseMapData) bizModel).getMessage(), bizModel, response, null);
+            String fileName = (String) mapFirstRow.get(ConstantValue.FILE_NAME);
+            UploadDownloadUtils.downFileRange(request, response, in,
+                in.available(), fileName, request.getParameter("downloadType"), null);
             return;
         }
-        if (bizModel instanceof ResponseData) {
-            JsonResultUtils.writeResponseDataAsJson((ResponseData) bizModel, response);
-            return;
-        }
-        JsonResultUtils.writeSingleDataJson(bizModel, response);
+        JsonResultUtils.writeOriginalObject(bizModel, response);
     }
 
     @GetMapping(value = "/testformula")
@@ -263,12 +254,12 @@ public class HttpTaskController extends BaseController {
     public ResponseData updateOptIdByOptCodes(@RequestBody UpdateOptIdParamVo updateOptIdParamVo) {
         int[] optdefCount = platformEnvironment.updateOptIdByOptCodes(updateOptIdParamVo.getOptId(), Arrays.asList(updateOptIdParamVo.getOptCodes()));
         String[] apiIds = updateOptIdParamVo.getApiIds();
-        int[] dataPacketDraftCount = apiIds!=null&&apiIds.length>0?dataPacketDraftService.batchUpdateOptIdByApiId(updateOptIdParamVo.getOptId(), Arrays.asList(apiIds)):null;
-        int[] dataPacketCount = apiIds!=null&&apiIds.length>0?dataPacketService.batchUpdateOptIdByApiId(updateOptIdParamVo.getOptId(), Arrays.asList(apiIds)):null;
+        int[] dataPacketDraftCount = apiIds != null && apiIds.length > 0 ? dataPacketDraftService.batchUpdateOptIdByApiId(updateOptIdParamVo.getOptId(), Arrays.asList(apiIds)) : null;
+        int[] dataPacketCount = apiIds != null && apiIds.length > 0 ? dataPacketService.batchUpdateOptIdByApiId(updateOptIdParamVo.getOptId(), Arrays.asList(apiIds)) : null;
         JSONObject result = new JSONObject();
-        result.put("optdefCount",optdefCount);
-        result.put("dataPacketDraftCount",dataPacketDraftCount);
-        result.put("dataPacketCount",dataPacketCount);
+        result.put("optdefCount", optdefCount);
+        result.put("dataPacketDraftCount", dataPacketDraftCount);
+        result.put("dataPacketCount", dataPacketCount);
         return ResponseData.makeSuccessResponse(result.toJSONString());
     }
 

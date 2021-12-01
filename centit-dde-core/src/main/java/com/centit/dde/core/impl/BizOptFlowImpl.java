@@ -19,6 +19,8 @@ import com.centit.dde.vo.CycleVo;
 import com.centit.dde.vo.DataOptVo;
 import com.centit.fileserver.common.FileStoreContext;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.ResponseMapData;
+import com.centit.framework.common.ResponseSingleData;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
@@ -36,8 +38,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import thredds.catalog2.Dataset;
 
 import javax.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.*;
 
 /**
@@ -48,6 +55,10 @@ import java.util.*;
 @Service
 public class BizOptFlowImpl implements BizOptFlow {
     private static final Logger logger = LoggerFactory.getLogger(BizOptFlowImpl.class);
+    public static final String RETURN_RESULT_STATE = "2";
+    public static final String RETURN_RESULT_DATASET = "3";
+    public static final String RETURN_RESULT_ORIGIN = "4";
+    public static final String FILE_DOWNLOAD = "fileDownload";
     @Value("${os.file.base.dir:./file_home/export}")
     private String path;
     @Autowired
@@ -220,27 +231,34 @@ public class BizOptFlowImpl implements BizOptFlow {
         String path;
         bizModel.getModelTag().remove("requestFile");
         bizModel.getModelTag().remove("requestBody");
-        if (bizModel.getResponseMapData().getCode() != ResponseData.RESULT_OK) {
-            return bizModel.getResponseMapData();
+        if (bizModel.getResponseMapData().getCode() != ResponseData.RESULT_OK || RETURN_RESULT_STATE.equals(type)) {
+            ResponseMapData responseMapData=bizModel.getResponseMapData();
+            ResponseSingleData responseSingleData= new ResponseSingleData(responseMapData.getCode(),responseMapData.getMessage());
+            responseSingleData.setData(responseMapData);
+            return responseSingleData;
         }
-        switch (type) {
-            case "2":
-                return bizModel.getResponseMapData();
-            case "3":
-                path = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
-                return bizModel.fetchDataSetByName(path);
-            case "4":
-                path = BuiltInOperation.getJsonFieldString(stepJson, "textarea", "D");
-                return JSONTransformer.transformer(
-                    JSON.parse(path), new BizModelJSONTransform(bizModel));
-            case "5":
-                path = BuiltInOperation.getJsonFieldString(stepJson, "kname", "D");
-                return bizModel.fetchDataSetByName(path);
-            case "6":
-                return BuiltInOperation.returnExcel(bizModel, stepJson);
-            default:
-                return bizModel;
+        if(RETURN_RESULT_DATASET.equals(type) || RETURN_RESULT_ORIGIN.equals(type)){
+            path = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
+            DataSet dataSet=bizModel.fetchDataSetByName(path);
+            if(RETURN_RESULT_DATASET.equals(type)){
+                Map<String, Object> mapFirstRow = dataSet.getFirstRow();
+                ResponseSingleData responseSingleData= new ResponseSingleData();
+                boolean isFile = mapFirstRow != null && mapFirstRow.containsKey(ConstantValue.FILE_CONTENT)
+                    && (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream
+                    || mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof InputStream);
+                if (isFile) {
+                    responseSingleData= new ResponseSingleData(FILE_DOWNLOAD);
+                    responseSingleData.setData(dataSet);
+                    return responseSingleData;
+                }
+                responseSingleData.setMessage("OK");
+                responseSingleData.setData(dataSet.getData());
+                return responseSingleData;
+            }else{
+                return dataSet;
+            }
         }
+        return ResponseData.makeResponseData(bizModel);
     }
 
     private void setBatchStep(DataOptStep dataOptStep, DataOptVo dataOptVo) {
