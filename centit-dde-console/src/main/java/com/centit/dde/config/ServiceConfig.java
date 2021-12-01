@@ -11,6 +11,8 @@ import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.support.algorithm.NumberBaseOpt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -33,6 +35,8 @@ import javax.annotation.Resource;
         value = org.springframework.stereotype.Controller.class))
 @Configuration
 public class ServiceConfig {
+    Class clazz;
+    Logger logger = LoggerFactory.getLogger(ServiceConfig.class);
 
     @Value("${app.home:./}")
     private String appHome;
@@ -43,7 +47,7 @@ public class ServiceConfig {
     @Value("${redis.host}")
     private String redisHost;
 
-    //@Value("${redis.port}")
+    @Value("${redis.port}")
     private int redisPort;
 
 
@@ -59,6 +63,7 @@ public class ServiceConfig {
 
     @Bean
     public JedisPool jedisPool() {
+        logger.info("------------------------redisPort-----------------------:"+redisPort);
         JedisPool jedisPool= new JedisPool(redisHost, 6379);
         return jedisPool;
     }

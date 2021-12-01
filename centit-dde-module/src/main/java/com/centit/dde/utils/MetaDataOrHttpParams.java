@@ -5,8 +5,11 @@ package com.centit.dde.utils;
  */
 public class MetaDataOrHttpParams {
     //库id
-    private String dataBaseCode;
-
+    private String databaseCode;
+    //表名
+    private String tableName;
+    //资源名 http调用使用
+    private String databaseName;
     //表id
     private String tableId;
     //创建类型  新建   删除  查询  查看   等
@@ -17,13 +20,30 @@ public class MetaDataOrHttpParams {
     private String optId;
 
 
-    public String getDataBaseCode() {
-        return dataBaseCode;
+    public String getDatabaseCode() {
+        return databaseCode;
     }
 
-    public void setDataBaseCode(String dataBaseCode) {
-        this.dataBaseCode = dataBaseCode;
+    public void setDatabaseCode(String databaseCode) {
+        this.databaseCode = databaseCode;
     }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
 
     public String getTableId() {
         return tableId;

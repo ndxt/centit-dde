@@ -7,6 +7,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.database.utils.PageDesc;
 
@@ -65,16 +66,19 @@ public class WriteDbBizOperation implements BizOperation {
                     return BuiltInOperation.getResponseSuccessData(deleteCount);
                 case 4://查询
                     JSONArray jsonArray =new JSONArray();
-                    PageDesc pageDesc=null;
+                    PageDesc pageDesc = new PageDesc();
+                    PageQueryResult<Object> result =null;
                     for (Map<String, Object> objectMap : dataAsList) {
                         if (objectMap.get("pageNo")!=null && objectMap.get("pageSize")!=null){
-                            pageDesc = new PageDesc();
                             pageDesc.setPageNo(Integer.valueOf(String.valueOf(objectMap.get("pageNo"))));
                             pageDesc.setPageSize(Integer.valueOf(String.valueOf(objectMap.get("pageSize"))));
+                            objectMap.remove("pageNo");
+                            objectMap.remove("pageSize");
                         }
                         jsonArray = metaObjectService.pageQueryObjects(tableId, objectMap,pageDesc);
+                        result = PageQueryResult.createResult(jsonArray, pageDesc);
                     }
-                    bizModel.putDataSet(id, new SimpleDataSet(jsonArray));
+                    bizModel.putDataSet(id, new SimpleDataSet(result));
                     return BuiltInOperation.getResponseSuccessData(jsonArray.size());
                 case 5://查看
                     Map<String, Object> objectById = new HashMap<>();

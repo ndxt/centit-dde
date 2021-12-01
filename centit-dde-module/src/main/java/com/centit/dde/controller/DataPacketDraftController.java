@@ -20,6 +20,7 @@ import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -97,9 +98,18 @@ public class DataPacketDraftController extends BaseController {
         dataPacketDraft.setOptId(metaDataOrHttpParams.getOptId());
         dataPacketDraft.setOsId(metaDataOrHttpParams.getOsId());
         JSONObject dataPacketTemplate = dataPacketTemplateService.getDataPacketTemplateByType(type);
-        dataPacketDraft.setPacketDesc(dataPacketTemplate.getString("packetTemplateName"));
-        dataPacketDraft.setPacketName(dataPacketTemplate.getString("packetTemplateName"));
-        String dataBaseCode = metaDataOrHttpParams.getDataBaseCode();
+        String tableName=metaDataOrHttpParams.getTableName();
+        String packetTemplateName = dataPacketTemplate.getString("packetTemplateName");
+        if (StringUtils.isNotBlank(tableName)){
+            String replace = packetTemplateName.replace("{name}", tableName);
+            dataPacketDraft.setPacketName(replace);
+            dataPacketDraft.setPacketDesc(replace);
+        }else if (StringUtils.isNotBlank(metaDataOrHttpParams.getDatabaseName())){
+            String replace = packetTemplateName.replace("{name}", metaDataOrHttpParams.getDatabaseName());
+            dataPacketDraft.setPacketName(replace);
+            dataPacketDraft.setPacketDesc(replace);
+        }
+        String dataBaseCode = metaDataOrHttpParams.getDatabaseCode();
         String tableId = metaDataOrHttpParams.getTableId();
         JSONObject content = dataPacketTemplate.getJSONObject("content");
         JSONArray nodeList = content.getJSONArray("nodeList");
@@ -183,5 +193,4 @@ public class DataPacketDraftController extends BaseController {
     public DataPacketDraft getDataPacket(@PathVariable String packetId) {
         return dataPacketDraftService.getDataPacket(packetId);
     }
-
 }
