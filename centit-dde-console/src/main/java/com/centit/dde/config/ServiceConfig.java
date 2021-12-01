@@ -48,7 +48,7 @@ public class ServiceConfig {
     private String redisHost;
 
     @Value("${redis.port}")
-    private int redisPort;
+    private String redisPort;
 
 
     /**
