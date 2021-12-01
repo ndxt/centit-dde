@@ -44,11 +44,11 @@ public class ServiceConfig {
     @Value("${fileserver.url}")
     private String fileserver;
 
-    @Value("${redis.host}")
+    @Value("${redis.default.host}")
     private String redisHost;
 
-    @Value("${redis.port}")
-    private String redisPort;
+    @Value("${redis.default.port}")
+    private int redisPort;
 
 
     /**
@@ -64,7 +64,7 @@ public class ServiceConfig {
     @Bean
     public JedisPool jedisPool() {
         logger.info("------------------------redisPort-----------------------:"+redisPort);
-        JedisPool jedisPool= new JedisPool(redisHost, 6379);
+        JedisPool jedisPool= new JedisPool(redisHost,redisPort);
         return jedisPool;
     }
 
