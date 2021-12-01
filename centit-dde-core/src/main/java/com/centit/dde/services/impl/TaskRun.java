@@ -87,8 +87,8 @@ public class TaskRun {
             DatabaseOptUtils.doExecuteSql(dataPacketDao, "update q_data_packet set next_run_time=? where packet_id=?",
                 new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
             TaskDetailLog taskDetailLog = taskDetailLogDao.getObjectByProperties(
-                CollectionsOpt.createHashMap("logId", taskLog.getLogId(), "logInfo_ne", "ok"));
-            taskLog.setOtherMessage(taskDetailLog == null ? "ok" : "error");
+                CollectionsOpt.createHashMap("logId", taskLog.getLogId()));
+            taskLog.setOtherMessage("ok".equals(taskDetailLog.getLogInfo())? "ok" : "error");
             taskLogDao.updateObject(taskLog);
             return runResult;
         } catch (Exception e) {
