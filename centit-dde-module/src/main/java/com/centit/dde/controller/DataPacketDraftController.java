@@ -5,8 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketTemplateService;
+import com.centit.dde.utils.HttpParames;
 import com.centit.dde.utils.LoginUserPermissionCheck;
-import com.centit.dde.utils.MetaDataOrHttpParams;
+import com.centit.dde.utils.MetaDataParames;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
@@ -67,11 +68,67 @@ public class DataPacketDraftController extends BaseController {
         return dataPacketDraft;
     }
 
-    @ApiOperation(value = "新增元数据或HTTP调用类型API")
+    @ApiOperation(value = "新增HTTP调用类型API")
+    @PostMapping("/http-type")
+    @WrapUpResponseBody
+    @Transactional(rollbackFor = Exception.class)
+    public DataPacketDraft createHttpTypeApi(@RequestBody HttpParames httpParames) {
+        DataPacketDraft dataPacketDraft = new DataPacketDraft();
+        dataPacketDraft.setOsId(httpParames.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(workGroupManager,dataPacketDraft);
+        String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+        if (StringBaseOpt.isNvl(loginUser)) {
+            loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
+        }
+        dataPacketDraft.setRecorder(loginUser);
+        JSONObject dataPacketTemplate = dataPacketTemplateService.getDataPacketTemplateByType(8);
+        JSONObject content = dataPacketTemplate.getJSONObject("content");
+        JSONArray nodeList = content.getJSONArray("nodeList");
+        for (Object node : nodeList) {
+            JSONObject nodeData = (JSONObject) node;
+            if ("htts".equals(nodeData.getString("type"))){
+                nodeData.put("httpUrl",httpParames.getMethodName());
+                nodeData.put("loginService",httpParames.getLoginUrlCode());
+                nodeData.put("requestMode",httpParames.getMethodType());
+                nodeData.put("databaseId",httpParames.getHttpUrlCode());
+                if (StringUtils.isNotBlank(httpParames.getRequestBody())){
+                    nodeData.put("querySQL",httpParames.getRequestBody());
+                }
+                if (httpParames.getParamesList()!=null&&httpParames.getParamesList().length>0){
+                    nodeData.put("parameterList",httpParames.getParamesList());
+                }
+                JSONObject properties = nodeData.getJSONObject("properties");
+                if (StringUtils.isNotBlank(httpParames.getRequestBody())){
+                    properties.put("querySQL",httpParames.getRequestBody());
+                }
+                if (httpParames.getParamesList()!=null&&httpParames.getParamesList().length>0){
+                    properties.put("parameterList",httpParames.getParamesList());
+                }
+                properties.put("httpUrl",httpParames.getMethodName());
+                properties.put("loginService",httpParames.getLoginUrlCode());
+                properties.put("requestMode",httpParames.getMethodType());
+                properties.put("databaseId",httpParames.getHttpUrlCode());
+            }
+        }
+        dataPacketDraft.setBufferFreshPeriod(-1);
+        dataPacketDraft.setIsValid(true);
+        String methodType = httpParames.getMethodType();
+        dataPacketDraft.setTaskType("GET".equals(methodType)?"1":"POST".equals(methodType)?"3":"1");
+        dataPacketDraft.setOptId(httpParames.getOptId());
+        dataPacketDraft.setOsId(httpParames.getOsId());
+        dataPacketDraft.setPacketName(httpParames.getPacketName());
+        dataPacketDraft.setPacketDesc(httpParames.getPacketName());
+        dataPacketDraft.setDataOptDescJson(content);
+        dataPacketDraftService.createDataPacket(dataPacketDraft);
+        return dataPacketDraft;
+    }
+
+
+    @ApiOperation(value = "新增元数据类型API")
     @PostMapping("/metadata/api")
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
-    public List<DataPacketDraft> createMetaDataApi(@RequestBody MetaDataOrHttpParams metaDataOrHttpParams, HttpServletRequest request) {
+    public List<DataPacketDraft> createMetaDataApi(@RequestBody MetaDataParames metaDataOrHttpParams) {
         DataPacketDraft dataPacket = new DataPacketDraft();
         dataPacket.setOsId(metaDataOrHttpParams.getOsId());
         LoginUserPermissionCheck.loginUserPermissionCheck(workGroupManager,dataPacket);
@@ -90,7 +147,7 @@ public class DataPacketDraftController extends BaseController {
         return dataPacketDraftList;
     }
 
-    private DataPacketDraft createDataPacket(MetaDataOrHttpParams metaDataOrHttpParams,Integer type){
+    private DataPacketDraft createDataPacket(MetaDataParames metaDataOrHttpParams, Integer type){
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setBufferFreshPeriod(-1);
         dataPacketDraft.setIsValid(true);
@@ -100,15 +157,9 @@ public class DataPacketDraftController extends BaseController {
         JSONObject dataPacketTemplate = dataPacketTemplateService.getDataPacketTemplateByType(type);
         String tableName=metaDataOrHttpParams.getTableName();
         String packetTemplateName = dataPacketTemplate.getString("packetTemplateName");
-        if (StringUtils.isNotBlank(tableName)){
-            String replace = packetTemplateName.replace("{name}", tableName);
-            dataPacketDraft.setPacketName(replace);
-            dataPacketDraft.setPacketDesc(replace);
-        }else if (StringUtils.isNotBlank(metaDataOrHttpParams.getDatabaseName())){
-            String replace = packetTemplateName.replace("{name}", metaDataOrHttpParams.getDatabaseName());
-            dataPacketDraft.setPacketName(replace);
-            dataPacketDraft.setPacketDesc(replace);
-        }
+        String replace = packetTemplateName.replace("{name}", tableName);
+        dataPacketDraft.setPacketName(replace);
+        dataPacketDraft.setPacketDesc(replace);
         String dataBaseCode = metaDataOrHttpParams.getDatabaseCode();
         String tableId = metaDataOrHttpParams.getTableId();
         JSONObject content = dataPacketTemplate.getJSONObject("content");
@@ -122,10 +173,6 @@ public class DataPacketDraftController extends BaseController {
                 properties.put("tableLabelName",tableId);
                 properties.put("templateType",type);
                 properties.put("databaseName",dataBaseCode);
-            }else if ("htts".equals(nodeData.getString("type"))){
-                //http调用
-                JSONObject properties = nodeData.getJSONObject("properties");
-                properties.put("databaseId",tableId);
             }
         }
         dataPacketDraft.setDataOptDescJson(content);

@@ -3,7 +3,7 @@ package com.centit.dde.utils;
 /**
  * 用于创建元数据或者http调用类型的API使用
  */
-public class MetaDataOrHttpParams {
+public class MetaDataParames {
     //库id
     private String databaseCode;
     //表名
