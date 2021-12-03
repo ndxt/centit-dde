@@ -34,9 +34,13 @@ public class CreateWorkFlowBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String id = bizOptJson.getString("id");
         String source = bizOptJson.getString("source");
+        Map<String, Object> modelTag = bizModel.getModelTag();
+        modelTag.remove("runType");
         DataSet dataSet = bizModel.getDataSet(source);
         if (dataSet==null){
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：未指定数据集！");
+            SimpleDataSet simpleDataSet = new SimpleDataSet();
+            simpleDataSet.setData(modelTag);
+            dataSet = simpleDataSet;
         }
         //获取表达式信息
         Map<String, String> mapInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");

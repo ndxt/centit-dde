@@ -72,7 +72,6 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "草稿：立即执行任务")
     public void runTestTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                     HttpServletResponse response) throws IOException {
-        judgePower(packetId);
         returnObject(packetId, ConstantValue.RUN_TYPE_COPY, request, response);
     }
 
@@ -80,7 +79,6 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "草稿：立即执行任务Post")
     public void runTaskPostTest(@PathVariable String packetId, HttpServletRequest request,
                                 HttpServletResponse response) throws IOException {
-        judgePower(packetId);
         returnObject(packetId, ConstantValue.RUN_TYPE_COPY, request, response);
     }
 
@@ -113,6 +111,7 @@ public class HttpTaskController extends BaseController {
     }
 
     private void returnObject(String packetId, String runType, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //judgePower(packetId);
         Map<String, Object> params = collectRequestParameters(request);
         params.put("runType", runType);
         if ("POST".equalsIgnoreCase(request.getMethod())) {

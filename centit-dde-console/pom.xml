@@ -159,6 +159,12 @@
             <artifactId>work-group-dubbo-client-config</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-workflow-dubbo-client-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <!--  end -->
