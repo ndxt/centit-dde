@@ -151,7 +151,7 @@ public class DataPacketDraftController extends BaseController {
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setBufferFreshPeriod(-1);
         dataPacketDraft.setIsValid(true);
-        dataPacketDraft.setTaskType(type==1||type==2?"3":"1");
+        dataPacketDraft.setTaskType(type==3 || type==4 || type==5 ? "1" : "3");
         dataPacketDraft.setOptId(metaDataOrHttpParams.getOptId());
         dataPacketDraft.setOsId(metaDataOrHttpParams.getOsId());
         JSONObject dataPacketTemplate = dataPacketTemplateService.getDataPacketTemplateByType(type);
