@@ -171,7 +171,7 @@ public class DataPacketDraftController extends BaseController {
             if ("metadata".equals(nodeData.getString("type"))){
                 JSONObject properties = nodeData.getJSONObject("properties");
                 properties.put("tableLabelName",tableId);
-                properties.put("templateType",type);
+                properties.put("templateType",type==6||type==7?1:type);
                 properties.put("databaseName",dataBaseCode);
             }
         }
