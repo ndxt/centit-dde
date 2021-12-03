@@ -111,7 +111,7 @@ public class HttpTaskController extends BaseController {
     }
 
     private void returnObject(String packetId, String runType, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        //judgePower(packetId);
+        judgePower(packetId);
         Map<String, Object> params = collectRequestParameters(request);
         params.put("runType", runType);
         if ("POST".equalsIgnoreCase(request.getMethod())) {
