@@ -133,6 +133,10 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     @ApiModelProperty(value = "f_optdef表主键")
     private String optCode;
 
+    @Column(name = "buffer_fresh_period_secs")
+    @ApiModelProperty(value = "缓存周期（秒）")
+    private String bufferFreshPeriodSecs;
+
     @OneToMany(targetEntity = DataPacketParamDraft.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
     private List<DataPacketParamDraft> packetParams;

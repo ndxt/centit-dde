@@ -99,6 +99,7 @@ public class TaskRun {
 
     private Object runStep(DataPacketInterface dataPacketInterface, String logId, Map<String, Object> queryParams) throws Exception {
         JSONObject bizOptJson = dataPacketInterface.getDataOptDescJson();
+        bizOptJson = bizOptJson.getJSONObject("properties");
         if (bizOptJson.isEmpty()) {
             throw new ObjectException("运行步骤为空");
         }

@@ -52,7 +52,6 @@ public class DataPacketTemplate  implements Serializable {
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date createTime;
 
-
     @Column(name = "update_time")
     @ApiModelProperty(value = "更新时间", hidden = true)
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
@@ -70,7 +69,6 @@ public class DataPacketTemplate  implements Serializable {
     @ApiModelProperty(value = "租户code")
     private String topUnit;
 
-
     @Column(name = "template_name")
     @ApiModelProperty(value = "模板名称")
     private String templateName;
@@ -82,4 +80,9 @@ public class DataPacketTemplate  implements Serializable {
     @Column(name = "opt_method_template_name")
     @ApiModelProperty(value = "OPT_NAME（f_optdef表字段）")
     private String optMethodTemplateName;
+
+    @Column(name = "task_type")
+    @ApiModelProperty(value = "任务类型：1：GET请求，2：表示定时任务,3：POST请求,4：表示消息触发，5：PUT请求,6：DELETE请求")
+    private String taskType;
+
 }

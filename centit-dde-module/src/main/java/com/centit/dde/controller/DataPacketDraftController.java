@@ -83,21 +83,12 @@ public class DataPacketDraftController extends BaseController {
         dataPacketDraft.setRecorder(loginUser);
         JSONObject dataPacketTemplate = dataPacketTemplateService.getDataPacketTemplateByType(8);
         JSONObject content = dataPacketTemplate.getJSONObject("content");
-        JSONArray nodeList = content.getJSONArray("nodeList");
-        for (Object node : nodeList) {
+        String taskType = content.getString("taskType");
+        JSONArray nodes = content.getJSONArray("nodes");
+        for (Object node : nodes) {
             JSONObject nodeData = (JSONObject) node;
-            if ("htts".equals(nodeData.getString("type"))){
-                nodeData.put("httpUrl",httpParames.getMethodName());
-                nodeData.put("loginService",httpParames.getLoginUrlCode());
-                nodeData.put("requestMode",httpParames.getMethodType());
-                nodeData.put("databaseId",httpParames.getHttpUrlCode());
-                if (StringUtils.isNotBlank(httpParames.getRequestBody())){
-                    nodeData.put("querySQL",httpParames.getRequestBody());
-                }
-                if (httpParames.getParamesList()!=null&&httpParames.getParamesList().length>0){
-                    nodeData.put("parameterList",httpParames.getParamesList());
-                }
-                JSONObject properties = nodeData.getJSONObject("properties");
+            JSONObject properties = nodeData.getJSONObject("properties");
+            if ("htts".equals(properties.getString("type"))){
                 if (StringUtils.isNotBlank(httpParames.getRequestBody())){
                     properties.put("querySQL",httpParames.getRequestBody());
                 }
@@ -112,8 +103,11 @@ public class DataPacketDraftController extends BaseController {
         }
         dataPacketDraft.setBufferFreshPeriod(-1);
         dataPacketDraft.setIsValid(true);
+        //GET   POST   PUT   DELETE  由于当前版本数据库API中taskType值只有 get  post 请求类型 所以在此写死，
+        // 不使用模板中的taskType字段，按理应取模板中的taskType值
         String methodType = httpParames.getMethodType();
-        dataPacketDraft.setTaskType("GET".equals(methodType)?"1":"POST".equals(methodType)?"3":"1");
+        methodType = "GET".equals(methodType) || "DELETE".equals(methodType)?"1":"POST".equals(methodType)||"PUT".equals(methodType)?"3":"1";
+        dataPacketDraft.setTaskType(methodType);
         dataPacketDraft.setOptId(httpParames.getOptId());
         dataPacketDraft.setOsId(httpParames.getOsId());
         dataPacketDraft.setPacketName(httpParames.getPacketName());
@@ -151,25 +145,23 @@ public class DataPacketDraftController extends BaseController {
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setBufferFreshPeriod(-1);
         dataPacketDraft.setIsValid(true);
-        dataPacketDraft.setTaskType(type==3 || type==4 || type==5 ? "1" : "3");
         dataPacketDraft.setOptId(metaDataOrHttpParams.getOptId());
         dataPacketDraft.setOsId(metaDataOrHttpParams.getOsId());
         JSONObject dataPacketTemplate = dataPacketTemplateService.getDataPacketTemplateByType(type);
         String tableName=metaDataOrHttpParams.getTableName();
         String packetTemplateName = dataPacketTemplate.getString("packetTemplateName");
         String replace = packetTemplateName.replace("{name}", tableName);
+        dataPacketDraft.setTaskType(dataPacketTemplate.getString("taskType"));
         dataPacketDraft.setPacketName(replace);
         dataPacketDraft.setPacketDesc(replace);
         String dataBaseCode = metaDataOrHttpParams.getDatabaseCode();
         String tableId = metaDataOrHttpParams.getTableId();
         JSONObject content = dataPacketTemplate.getJSONObject("content");
-        JSONArray nodeList = content.getJSONArray("nodeList");
-        for (Object node : nodeList) {
+        JSONArray nodes = content.getJSONArray("nodes");
+        for (Object node : nodes) {
             JSONObject nodeData = (JSONObject) node;
-            nodeData.put("tableLabelName",tableId);
-            nodeData.put("databaseName",dataBaseCode);
-            if ("metadata".equals(nodeData.getString("type"))){
-                JSONObject properties = nodeData.getJSONObject("properties");
+            JSONObject properties = nodeData.getJSONObject("properties");
+            if ("metadata".equals(properties.getString("type"))){
                 properties.put("tableLabelName",tableId);
                 properties.put("templateType",type==6||type==7?1:type);
                 properties.put("databaseName",dataBaseCode);
@@ -240,4 +232,6 @@ public class DataPacketDraftController extends BaseController {
     public DataPacketDraft getDataPacket(@PathVariable String packetId) {
         return dataPacketDraftService.getDataPacket(packetId);
     }
+
+
 }
