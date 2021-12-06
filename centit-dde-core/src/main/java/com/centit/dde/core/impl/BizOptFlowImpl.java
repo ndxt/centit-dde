@@ -165,6 +165,9 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     private void runStep(DataOptStep dataOptStep, DataOptVo dataOptVo) throws Exception {
         JSONObject stepJson = dataOptStep.getCurrentStep();
+        String id = stepJson.getString("id");
+        stepJson=stepJson.getJSONObject("properties");
+        stepJson.put("id",id);
         String stepType = stepJson.getString("type");
         SimpleBizModel bizModel = dataOptVo.getBizModel();
         if (ConstantValue.RESULTS.equals(stepType)) {
@@ -368,6 +371,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         TaskDetailLog detailLog = writeLog(dataOptStep, dataOptVo);
         SimpleBizModel bizModel = dataOptVo.getBizModel();
         JSONObject bizOptJson = dataOptStep.getCurrentStep();
+        bizOptJson = bizOptJson.getJSONObject("properties");
         try {
             BizOperation opt = allOperations.get(bizOptJson.getString("type"));
             ResponseData responseData = opt.runOpt(bizModel, bizOptJson);

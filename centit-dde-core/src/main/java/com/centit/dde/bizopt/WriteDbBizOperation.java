@@ -37,8 +37,7 @@ public class WriteDbBizOperation implements BizOperation {
             simpleDataSet.setData(modelTag);
             dataSet = simpleDataSet;
         }
-        JSONObject properties = bizOptJson.getJSONObject("properties");
-        Integer templateType = properties.getInteger("templateType");
+        Integer templateType = bizOptJson.getInteger("templateType");
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
         try {
             switch (templateType){

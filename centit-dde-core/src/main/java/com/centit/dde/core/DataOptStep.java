@@ -21,17 +21,18 @@ public class DataOptStep {
     }
 
     private void mapData(JSONObject dataOptJson) {
-        JSONArray nodes = dataOptJson.getJSONArray("nodeList");
+        JSONArray nodes = dataOptJson.getJSONArray("nodes");
         for (Object obj : nodes) {
             if (obj instanceof JSONObject) {
                 JSONObject nodeJson = (JSONObject) obj;
                 nodeMap.put(nodeJson.getString("id"), nodeJson);
             }
         }
-        JSONArray links = dataOptJson.getJSONArray("linkList");
+        JSONArray links = dataOptJson.getJSONArray("edges");
         for (Object obj : links) {
             if (obj instanceof JSONObject) {
                 JSONObject linkJson = (JSONObject) obj;
+                linkJson = linkJson.getJSONObject("properties");
                 String sourceId = linkJson.getString("sourceId");
                 List<JSONObject> nextNodes = linkMap.get(sourceId);
                 if (nextNodes != null) {
