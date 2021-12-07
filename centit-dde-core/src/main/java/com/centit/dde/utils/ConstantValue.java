@@ -54,4 +54,9 @@ public class ConstantValue {
     public static final  String RESPONSE_DATA_CODE="responseDataCode";
     //动态代码节点
     public static final String DYNAMIC_CODE = "createworkflow";
+
+    public static final String TASK_TYPE_GET="1";
+    public static final String TASK_TYPE_POST="3";
+    public static final String TASK_TYPE_PUT="5";
+    public static final String TASK_TYPE_DELETE="6";
 }

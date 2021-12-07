@@ -103,11 +103,7 @@ public class DataPacketDraftController extends BaseController {
         }
         dataPacketDraft.setBufferFreshPeriod(-1);
         dataPacketDraft.setIsValid(true);
-        //GET   POST   PUT   DELETE  由于当前版本数据库API中taskType值只有 get  post 请求类型 所以在此写死，
-        // 不使用模板中的taskType字段，按理应取模板中的taskType值
-        String methodType = httpParames.getMethodType();
-        methodType = "GET".equals(methodType) || "DELETE".equals(methodType)?"1":"POST".equals(methodType)||"PUT".equals(methodType)?"3":"1";
-        dataPacketDraft.setTaskType(methodType);
+        dataPacketDraft.setTaskType(taskType);
         dataPacketDraft.setOptId(httpParames.getOptId());
         dataPacketDraft.setOsId(httpParames.getOsId());
         dataPacketDraft.setPacketName(httpParames.getPacketName());

@@ -18,6 +18,8 @@ import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +48,7 @@ public class TaskRun {
         this.bizOptFlow = bizOptFlow;
     }
 
-    public Object runTask(String packetId, Map<String, Object> queryParams) {
+    public Object runTask(String packetId, Map<String, Object> queryParams){
         String runType = ConstantValue.RUN_TYPE_NORMAL;
         if (queryParams != null && queryParams.containsKey("runType")) {
             runType = (String) queryParams.get("runType");
@@ -73,19 +75,30 @@ public class TaskRun {
             taskLog.setTaskId(packetId);
             taskLog.setRunBeginTime(beginTime);
             taskLogDao.saveNewObject(taskLog);
-            Object runResult;
-            runResult = runStep(dataPacketInterface, taskLog.getLogId(), queryParams);
+            Object runResult = runStep(dataPacketInterface, taskLog.getLogId(), queryParams);
             String two = "2";
             taskLog.setRunEndTime(new Date());
-            dataPacketInterface.setNextRunTime(new Date());
             if (two.equals(dataPacketInterface.getTaskType())
                 && dataPacketInterface.getIsValid()
                 && !StringBaseOpt.isNvl(dataPacketInterface.getTaskCron())) {
                 CronExpression cronExpression = new CronExpression(dataPacketInterface.getTaskCron());
                 dataPacketInterface.setNextRunTime(cronExpression.getNextValidTimeAfter(dataPacketInterface.getLastRunTime()));
             }
-            DatabaseOptUtils.doExecuteSql(dataPacketDao, "update q_data_packet set next_run_time=? where packet_id=?",
-                new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
+            if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
+                if (two.equals(dataPacketInterface.getTaskType())){//定时任务才更新
+                    dataPacketInterface.setNextRunTime(new Date());
+                    DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set next_run_time=? where packet_id=?",
+                        new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
+                }
+                dataPacketCopyDao.mergeObject((DataPacketDraft)dataPacketInterface);
+            } else {
+                if (two.equals(dataPacketInterface.getTaskType())) {//定时任务才更新
+                    dataPacketInterface.setNextRunTime(new Date());
+                    DatabaseOptUtils.doExecuteSql(dataPacketDao, "update q_data_packet set next_run_time=? where packet_id=?",
+                        new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
+                }
+                dataPacketDao.mergeObject((DataPacket)dataPacketInterface);
+            }
             TaskDetailLog taskDetailLog = taskDetailLogDao.getObjectByProperties(
                 CollectionsOpt.createHashMap("logId", taskLog.getLogId()));
             taskLog.setOtherMessage("ok".equals(taskDetailLog.getLogInfo())? "ok" : "error");

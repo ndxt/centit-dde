@@ -14,7 +14,6 @@ import com.centit.dde.vo.UpdateOptIdParamVo;
 import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
@@ -60,26 +59,76 @@ public class HttpTaskController extends BaseController {
     private final BizModelService bizmodelService;
 
 
-    public HttpTaskController(DataPacketService dataPacketService,
-                              DataPacketDraftService dataPacketDraftService,
+    public HttpTaskController(DataPacketService dataPacketService, DataPacketDraftService dataPacketDraftService,
                               BizModelService bizmodelService) {
         this.dataPacketService = dataPacketService;
         this.dataPacketDraftService = dataPacketDraftService;
         this.bizmodelService = bizmodelService;
     }
 
+    /**
+     * 草稿-----------请求方法
+     */
+
     @GetMapping(value = "/draft/{packetId}")
-    @ApiOperation(value = "草稿：立即执行任务")
-    public void runTestTaskExchange(@PathVariable String packetId, HttpServletRequest request,
-                                    HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, request, response);
+    @ApiOperation(value = "草稿：立即执行任务GET")
+    public void runGetDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
+                                        HttpServletResponse response) throws IOException {
+        returnObject(packetId, ConstantValue.RUN_TYPE_COPY,ConstantValue.TASK_TYPE_GET, request, response);
     }
 
     @PostMapping(value = "/draft/{packetId}")
-    @ApiOperation(value = "草稿：立即执行任务Post")
-    public void runTaskPostTest(@PathVariable String packetId, HttpServletRequest request,
-                                HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, request, response);
+    @ApiOperation(value = "草稿：立即执行任务POST")
+    public void runPostDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
+                                         HttpServletResponse response) throws IOException {
+        returnObject(packetId, ConstantValue.RUN_TYPE_COPY,ConstantValue.TASK_TYPE_POST, request, response);
+    }
+
+    @PutMapping(value = "/draft/{packetId}")
+    @ApiOperation(value = "草稿：立即执行任务PUT")
+    public void runPutDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
+                                        HttpServletResponse response) throws IOException {
+        returnObject(packetId, ConstantValue.RUN_TYPE_COPY,ConstantValue.TASK_TYPE_PUT, request, response);
+    }
+
+    @DeleteMapping(value = "/draft/{packetId}")
+    @ApiOperation(value = "草稿：立即执行任务DELETE")
+    public void runDelDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
+                                        HttpServletResponse response) throws IOException {
+        returnObject(packetId, ConstantValue.RUN_TYPE_COPY,ConstantValue.TASK_TYPE_DELETE, request, response);
+    }
+
+
+    /**
+     * 发布-------请求方法
+     */
+
+    @GetMapping(value = "/{packetId}")
+    @ApiOperation(value = "发布：立即执行任务GET")
+    public void runGetTaskExchange(@PathVariable String packetId, HttpServletRequest request,
+                                   HttpServletResponse response) throws IOException {
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL,ConstantValue.TASK_TYPE_GET, request, response);
+    }
+
+    @PostMapping(value = "/{packetId}")
+    @ApiOperation(value = "发布：立即执行任务POST")
+    public void runPostTaskExchange(@PathVariable String packetId, HttpServletRequest request,
+                                    HttpServletResponse response) throws IOException {
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL,ConstantValue.TASK_TYPE_POST, request, response);
+    }
+
+    @PutMapping(value = "/{packetId}")
+    @ApiOperation(value = "发布：立即执行任务PUT")
+    public void runPutTaskExchange(@PathVariable String packetId, HttpServletRequest request,
+                                   HttpServletResponse response) throws IOException {
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL,ConstantValue.TASK_TYPE_PUT, request, response);
+    }
+
+    @DeleteMapping(value = "/{packetId}")
+    @ApiOperation(value = "发布：立即执行任务DELETE")
+    public void runDelTaskExchange(@PathVariable String packetId, HttpServletRequest request,
+                                   HttpServletResponse response) throws IOException {
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL,ConstantValue.TASK_TYPE_DELETE, request, response);
     }
 
     private void judgePower(@PathVariable String packetId) {
@@ -96,22 +145,24 @@ public class HttpTaskController extends BaseController {
         }
     }
 
-    @GetMapping(value = "/{packetId}")
-    @ApiOperation(value = "正式：立即执行任务")
-    public void runTaskExchange(@PathVariable String packetId, HttpServletRequest request,
-                                HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, request, response);
-    }
-
-    @PostMapping(value = "/{packetId}")
-    @ApiOperation(value = "正式：立即执行任务Post")
-    public void runTaskPost(@PathVariable String packetId, HttpServletRequest request,
-                            HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, request, response);
-    }
-
-    private void returnObject(String packetId, String runType, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        judgePower(packetId);
+    private void returnObject(String packetId, String runType,String taskType, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //judgePower(packetId);
+        Object bizModel;
+        DataPacketInterface dataPacketInterface;
+        if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
+            dataPacketInterface = dataPacketService.getDataPacket(packetId);
+        } else {
+            dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
+        }
+        if (dataPacketInterface==null){
+            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, packetId+"不存在！");
+        }
+        if ("2".equals(dataPacketInterface.getTaskType()) || "4".equals(dataPacketInterface.getTaskType())){
+            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "定时任务或消息触发不支持请求，该类型任务会自动触发！");
+        }
+        if (!taskType.equals(dataPacketInterface.getTaskType())){
+            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "任务类型和请求方式不匹配，请保持一致！");
+        }
         Map<String, Object> params = collectRequestParameters(request);
         params.put("runType", runType);
         if ("POST".equalsIgnoreCase(request.getMethod())) {
@@ -130,13 +181,6 @@ public class HttpTaskController extends BaseController {
                     params.put("requestFile", inputStream);
                 }
             }
-        }
-        Object bizModel;
-        DataPacketInterface dataPacketInterface;
-        if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
-            dataPacketInterface = dataPacketService.getDataPacket(packetId);
-        } else {
-            dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
         }
         bizModel = bizmodelService.fetchBizModel(dataPacketInterface, params);
         boolean isFileDown = bizModel instanceof ResponseData

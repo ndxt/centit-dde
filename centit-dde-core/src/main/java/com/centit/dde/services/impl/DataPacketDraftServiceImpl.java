@@ -71,7 +71,7 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         result.setApiId(dataPacket.getPacketId());
         result.setOptMethod("api");
         result.setOptUrl("/dde/run/" + dataPacket.getPacketId());
-        result.setOptReq("CR");
+        result.setOptReq("CRUD");
         result.setOptDesc("请求api网关接口");
         result.setOptType(OPTMETHOD_OPTTYPE_API);
         return result;
