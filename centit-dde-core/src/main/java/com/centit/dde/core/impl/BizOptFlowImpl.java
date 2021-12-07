@@ -165,9 +165,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     private void runStep(DataOptStep dataOptStep, DataOptVo dataOptVo) throws Exception {
         JSONObject stepJson = dataOptStep.getCurrentStep();
-        String id = stepJson.getString("id");
         stepJson=stepJson.getJSONObject("properties");
-        stepJson.put("id",id);
         String stepType = stepJson.getString("type");
         SimpleBizModel bizModel = dataOptVo.getBizModel();
         if (ConstantValue.RESULTS.equals(stepType)) {
@@ -230,6 +228,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     private Object returnResult(DataOptStep dataOptStep, DataOptVo dataOptVo) throws Exception {
         JSONObject stepJson = dataOptStep.getCurrentStep();
         SimpleBizModel bizModel = dataOptVo.getBizModel();
+        stepJson=stepJson.getJSONObject("properties");
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
         String path;
         bizModel.getModelTag().remove("requestFile");
@@ -266,6 +265,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     private void setBatchStep(DataOptStep dataOptStep, DataOptVo dataOptVo) {
         JSONObject stepJson = dataOptStep.getCurrentStep();
+        stepJson=stepJson.getJSONObject("properties");
         String stepId = stepJson.getString("id");
         List<JSONObject> linksJson = dataOptStep.getNextLinks(stepId);
         for (JSONObject jsonObject : linksJson) {
@@ -291,6 +291,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     private void runCycle(DataOptStep dataOptStep, DataOptVo dataOptVo) throws Exception {
         JSONObject stepJson = dataOptStep.getCurrentStep();
+        stepJson=stepJson.getJSONObject("properties");
         SimpleBizModel bizModel = dataOptVo.getBizModel();
         CycleVo cycleVo = stepJson.toJavaObject(CycleVo.class);
         //循环节点的下个节点信息
@@ -405,6 +406,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             return detailLog;
         }
         JSONObject bizOptJson = dataOptStep.getCurrentStep();
+        bizOptJson=bizOptJson.getJSONObject("properties");
         String sOptType = bizOptJson.getString("type");
         String processName = bizOptJson.getString("processName");
         if (StringBaseOpt.isNvl(processName)) {
