@@ -146,7 +146,7 @@ public class HttpTaskController extends BaseController {
     }
 
     private void returnObject(String packetId, String runType,String taskType, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        //judgePower(packetId);
+        judgePower(packetId);
         Object bizModel;
         DataPacketInterface dataPacketInterface;
         if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
@@ -165,7 +165,7 @@ public class HttpTaskController extends BaseController {
         }
         Map<String, Object> params = collectRequestParameters(request);
         params.put("runType", runType);
-        if ("POST".equalsIgnoreCase(request.getMethod())) {
+        if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod()) ) {
             if (StringUtils.contains(request.getHeader("Content-Type"), "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
                 if (!StringBaseOpt.isNvl(bodyString)) {

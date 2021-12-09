@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
@@ -42,36 +43,28 @@ public class WriteDbBizOperation implements BizOperation {
         try {
             switch (templateType){
                 case 1://新建
-                    int saveCount = 0;
-                    for (Map<String, Object> objectMap : dataAsList) {
-                        saveCount += metaObjectService.saveObjectWithChildren(tableId, objectMap, withChildrenDeep == null ? 1 : withChildrenDeep);
-                    }
-                    bizModel.putDataSet(id, new SimpleDataSet(saveCount));
-                    return BuiltInOperation.getResponseSuccessData(saveCount);
+                    metaObjectService.saveObjectWithChildren(tableId, dataAsList.get(0), withChildrenDeep == null ? 1 : withChildrenDeep);
+                    bizModel.putDataSet(id, new SimpleDataSet(dataAsList.get(0)));
+                    return BuiltInOperation.getResponseSuccessData(dataAsList.size());
                 case 2://修改
-                    int updateCount = 0;
-                    for (Map<String, Object> objectMap : dataAsList) {
-                        updateCount += metaObjectService.updateObjectWithChildren(tableId, objectMap, withChildrenDeep == null ? 1 : withChildrenDeep);
-                    }
-                    bizModel.putDataSet(id, new SimpleDataSet(updateCount));
-                    return BuiltInOperation.getResponseSuccessData(updateCount);
+                    metaObjectService.updateObjectWithChildren(tableId, dataAsList.get(0), withChildrenDeep == null ? 1 : withChildrenDeep);
+                    bizModel.putDataSet(id, new SimpleDataSet(dataAsList.get(0)));
+                    return BuiltInOperation.getResponseSuccessData(dataAsList.size());
                 case 3://删除
-                    int deleteCount = 0;
-                    for (Map<String, Object> objectMap : dataAsList) {
-                        metaObjectService.deleteObjectWithChildren(tableId, objectMap, withChildrenDeep == null ? 1 : withChildrenDeep);
-                        deleteCount++;
-                    }
-                    bizModel.putDataSet(id, new SimpleDataSet(deleteCount));
-                    return BuiltInOperation.getResponseSuccessData(deleteCount);
+                    metaObjectService.deleteObjectWithChildren(tableId, dataAsList.get(0), withChildrenDeep == null ? 1 : withChildrenDeep);
+                    bizModel.putDataSet(id, new SimpleDataSet(dataAsList.size()));
+                    return BuiltInOperation.getResponseSuccessData(dataAsList.size());
                 case 4://查询
                     JSONArray jsonArray =new JSONArray();
                     PageDesc pageDesc = new PageDesc();
                     PageQueryResult<Object> result =null;
                     for (Map<String, Object> objectMap : dataAsList) {
-                        if (objectMap.get("pageNo")!=null && objectMap.get("pageSize")!=null){
+                        if (objectMap.get("pageNo")!=null){
                             pageDesc.setPageNo(Integer.valueOf(String.valueOf(objectMap.get("pageNo"))));
-                            pageDesc.setPageSize(Integer.valueOf(String.valueOf(objectMap.get("pageSize"))));
                             objectMap.remove("pageNo");
+                        }
+                        if ( objectMap.get("pageSize")!=null){
+                            pageDesc.setPageSize(Integer.valueOf(String.valueOf(objectMap.get("pageSize"))));
                             objectMap.remove("pageSize");
                         }
                         jsonArray = metaObjectService.pageQueryObjects(tableId, objectMap,pageDesc);
@@ -80,12 +73,21 @@ public class WriteDbBizOperation implements BizOperation {
                     bizModel.putDataSet(id, new SimpleDataSet(result));
                     return BuiltInOperation.getResponseSuccessData(jsonArray.size());
                 case 5://查看
-                    Map<String, Object> objectById = new HashMap<>();
-                    for (Map<String, Object> objectMap : dataAsList) {
-                        objectById= metaObjectService.getObjectById(tableId, objectMap);
+                    Map<String, Object> data = metaObjectService.getObjectWithChildren(tableId, dataAsList.get(0), withChildrenDeep == null ? 1 : withChildrenDeep);
+                    bizModel.putDataSet(id, new SimpleDataSet(data));
+                    return BuiltInOperation.getResponseSuccessData(data.size());
+                case 9://批量删除
+                    List<Map> parames = JSON.parseArray((String)dataAsList.get(0).get("requestBody"), Map.class);
+                    for (Map parame : parames) {
+                        metaObjectService.deleteObjectWithChildren(tableId,parame,withChildrenDeep == null ? 1 : withChildrenDeep);
                     }
-                    bizModel.putDataSet(id, new SimpleDataSet(objectById));
-                    return BuiltInOperation.getResponseSuccessData(objectById.size());
+                    bizModel.putDataSet(id, new SimpleDataSet(parames));
+                    return BuiltInOperation.getResponseSuccessData(dataAsList.size());
+                case 10://根据条件更新字段值
+                    JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(dataAsList.get(0)), JSONObject.class);
+                    int count  = metaObjectService.updateObjectsByProperties(tableId, jsonObject, bizModel.getModelTag());
+                    bizModel.putDataSet(id, new SimpleDataSet(count));
+                    return BuiltInOperation.getResponseSuccessData(count);
             }
         } catch (Exception e) {
             bizModel.putDataSet(id,new SimpleDataSet(e.getMessage()));

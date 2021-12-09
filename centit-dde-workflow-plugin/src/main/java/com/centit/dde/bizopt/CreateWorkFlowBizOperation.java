@@ -1,19 +1,24 @@
 package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.commons.CreateFlowOptions;
 import com.centit.workflow.po.FlowInstance;
 import com.centit.workflow.service.FlowEngine;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,22 +38,48 @@ public class CreateWorkFlowBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String id = bizOptJson.getString("id");
-        String source = bizOptJson.getString("source");
-        Map<String, Object> modelTag = bizModel.getModelTag();
-        modelTag.remove("runType");
-        DataSet dataSet = bizModel.getDataSet(source);
-        if (dataSet==null){
-            SimpleDataSet simpleDataSet = new SimpleDataSet();
-            simpleDataSet.setData(modelTag);
-            dataSet = simpleDataSet;
+        String unitCode = (String) JSONTransformer.transformer(bizOptJson.getString("unitCode"), new BizModelJSONTransform(bizModel));
+        String userCode = (String) JSONTransformer.transformer(bizOptJson.getString("userCode"), new BizModelJSONTransform(bizModel));
+        //根据表达式获取流程变量信息
+        Map<String, String> variablesInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("flowVariables"), "variableName", "expression");
+        Map<String, Object> variables = new HashMap<>();
+        //流程全局变量
+        Map<String, Object> globalVariables = new HashMap<>();
+        if (variablesInfo!=null && variablesInfo.size()>0){
+            JSONObject transformer = (JSONObject) JSONTransformer.transformer(variablesInfo, new BizModelJSONTransform(bizModel));
+            JSONArray flowVariables = bizOptJson.getJSONArray("flowVariables");
+            for (Object flowVariable : flowVariables) {
+                JSONObject data =  (JSONObject)flowVariable;
+                if (data.getBoolean("isGlobal")!=null&& data.getBoolean("isGlobal")==true){//全局流程变量
+                    globalVariables.put(data.getString("variableName"),transformer.get(data.getString("variableName")));
+                }else {
+                    variables.put(data.getString("variableName"),transformer.get(data.getString("variableName")));
+                }
+            }
         }
-        //获取表达式信息
-        Map<String, String> mapInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
-        if (mapInfo!=null && mapInfo.size()>0){
-            dataSet = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
+        //根据表达式获取办件角色信息
+        Map<String, List<String>> flowRoleUsers = new HashMap<>();
+        Map<String, String> flowRoleUsersInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("role"), "roleCode", "expression");
+        if (flowRoleUsersInfo!=null && flowRoleUsersInfo.size()>0){
+            JSONObject transformer = (JSONObject) JSONTransformer.transformer(flowRoleUsersInfo, new BizModelJSONTransform(bizModel));
+            JSONArray roleInfo = bizOptJson.getJSONArray("role");
+            for (Object role : roleInfo) {
+                JSONObject roleData =  (JSONObject)role;
+                Object roleCode = transformer.get(roleData.getString("roleCode"));
+                if (roleCode instanceof List){
+                    flowRoleUsers.put(roleData.getString("roleCode"),JSON.parseArray(JSON.toJSONString(roleCode),String.class));
+                }else {
+                   return ResponseData.makeErrorMessage(500,"办件角色参数必须传集合！");
+                }
+            }
         }
-        Map<String, Object> objectMap = dataSet.getDataAsList().get(0);
-        CreateFlowOptions createFlowOptions = mapToEntity(objectMap, CreateFlowOptions.class);
+        CreateFlowOptions createFlowOptions = CreateFlowOptions.create();
+        createFlowOptions.setFlowCode(bizOptJson.getString("flowCode"));
+        createFlowOptions.setUnitCode(unitCode);
+        createFlowOptions.setUserCode(userCode);
+        createFlowOptions.setVariables(variables);
+        createFlowOptions.setGlobalVariables(globalVariables);
+        createFlowOptions.setFlowRoleUsers(flowRoleUsers);
         FlowInstance instance;
         try {
             instance = flowEngine.createInstance(createFlowOptions);
@@ -60,38 +91,5 @@ public class CreateWorkFlowBizOperation implements BizOperation {
             bizModel.putDataSet(id,new SimpleDataSet(instance));
         }
         return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(id).getSize());
-    }
-
-    /**
-     * Map转实体类(只能转CreateFlowOptions使用)
-     */
-    public static CreateFlowOptions mapToEntity(Map<String, Object> dataMap, Class<CreateFlowOptions> clzz) {
-        CreateFlowOptions createFlowOptions=null;
-        try {
-            createFlowOptions = CreateFlowOptions.create();
-            for(Field field : clzz.getDeclaredFields()) {
-                if (dataMap.containsKey(field.getName())) {
-                    boolean flag = field.isAccessible();
-                    field.setAccessible(true);
-                    Object object = dataMap.get(field.getName());
-                    if (object!= null) {
-                        if (field.getType()==Map.class){
-                            Map map = JSON.parseObject(JSON.toJSONString(object), Map.class);
-                            field.set(createFlowOptions, map);
-                        }else if (field.getType()== List.class){
-                            List list = JSON.parseObject(JSON.toJSONString(object), List.class);
-                            field.set(createFlowOptions, list);
-                        }else {
-                            field.set(createFlowOptions, object);
-                        }
-                    }
-                    field.setAccessible(flag);
-                }
-            }
-            return  createFlowOptions;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return createFlowOptions;
     }
 }
