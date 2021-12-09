@@ -38,15 +38,13 @@ public class ReportBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
-        String filePath = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("fileId");
+        String filePath = bizOptJson.getString("fileId");
         String fileName = Pretreatment.mapTemplateString(BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()), bizModel)
             + ".pdf";
-        String size = bizOptJson.getJSONArray("upjson").getJSONObject(0).getString("size");
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName");
         try {
             ByteArrayInputStream in = generateWord(bizModel, filePath, params);
-            DataSet dataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName,
-                "fileSize", size, "fileContent", word2Pdf(in)));
+            DataSet dataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName, "fileContent", word2Pdf(in)));
             bizModel.putDataSet(sourDsName, dataSet);
             return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
         } catch (Exception e) {
