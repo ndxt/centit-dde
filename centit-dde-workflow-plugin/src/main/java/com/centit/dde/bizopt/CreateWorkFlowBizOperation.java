@@ -5,18 +5,15 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
-import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
-import com.centit.dde.utils.ConstantValue;
-import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.commons.CreateFlowOptions;
 import com.centit.workflow.po.FlowInstance;
 import com.centit.workflow.service.FlowEngine;
+import org.apache.commons.lang3.StringUtils;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,8 +35,20 @@ public class CreateWorkFlowBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String id = bizOptJson.getString("id");
-        String unitCode = (String) JSONTransformer.transformer(bizOptJson.getString("unitCode"), new BizModelJSONTransform(bizModel));
-        String userCode = (String) JSONTransformer.transformer(bizOptJson.getString("userCode"), new BizModelJSONTransform(bizModel));
+        CreateFlowOptions createFlowOptions = CreateFlowOptions.create();
+        if (StringUtils.isBlank(bizOptJson.getString("flowCode"))){
+            return  ResponseData.makeErrorMessage(500,"flowCode不能为空！");
+        }
+        if (StringUtils.isBlank(bizOptJson.getString("unitCode"))){
+            return  ResponseData.makeErrorMessage(500,"unitCode不能为空！");
+        }
+        if (StringUtils.isBlank(bizOptJson.getString("userCode"))){
+            return  ResponseData.makeErrorMessage(500,"userCode不能为空！");
+        }
+        Object unitCode =JSONTransformer.transformer(bizOptJson.getString("unitCode"), new BizModelJSONTransform(bizModel));
+        createFlowOptions.setUnitCode((String)unitCode);
+        Object userCode =JSONTransformer.transformer(bizOptJson.getString("userCode"), new BizModelJSONTransform(bizModel));
+        createFlowOptions.setUserCode((String)userCode);
         //根据表达式获取流程变量信息
         Map<String, String> variablesInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("flowVariables"), "variableName", "expression");
         Map<String, Object> variables = new HashMap<>();
@@ -50,10 +59,12 @@ public class CreateWorkFlowBizOperation implements BizOperation {
             JSONArray flowVariables = bizOptJson.getJSONArray("flowVariables");
             for (Object flowVariable : flowVariables) {
                 JSONObject data =  (JSONObject)flowVariable;
-                if (data.getBoolean("isGlobal")!=null&& data.getBoolean("isGlobal")==true){//全局流程变量
-                    globalVariables.put(data.getString("variableName"),transformer.get(data.getString("variableName")));
-                }else {
-                    variables.put(data.getString("variableName"),transformer.get(data.getString("variableName")));
+                if (transformer !=null && transformer.get(data.getString("variableName")) !=null){
+                    if (data.getBoolean("isGlobal") !=null && data.getBoolean("isGlobal")==true){//全局流程变量
+                        globalVariables.put(data.getString("variableName"),transformer.get(data.getString("variableName")));
+                    }else {
+                        variables.put(data.getString("variableName"),transformer.get(data.getString("variableName")));
+                    }
                 }
             }
         }
@@ -66,17 +77,19 @@ public class CreateWorkFlowBizOperation implements BizOperation {
             for (Object role : roleInfo) {
                 JSONObject roleData =  (JSONObject)role;
                 Object roleCode = transformer.get(roleData.getString("roleCode"));
+                if (roleCode==null){
+                    continue;
+                }
                 if (roleCode instanceof List){
                     flowRoleUsers.put(roleData.getString("roleCode"),JSON.parseArray(JSON.toJSONString(roleCode),String.class));
-                }else {
-                   return ResponseData.makeErrorMessage(500,"办件角色参数必须传集合！");
+                }else if (roleCode instanceof String){
+                    List<String> list = new ArrayList<>();
+                    list.add((String)roleCode);
+                    flowRoleUsers.put(roleData.getString("roleCode"),list);
                 }
             }
         }
-        CreateFlowOptions createFlowOptions = CreateFlowOptions.create();
         createFlowOptions.setFlowCode(bizOptJson.getString("flowCode"));
-        createFlowOptions.setUnitCode(unitCode);
-        createFlowOptions.setUserCode(userCode);
         createFlowOptions.setVariables(variables);
         createFlowOptions.setGlobalVariables(globalVariables);
         createFlowOptions.setFlowRoleUsers(flowRoleUsers);

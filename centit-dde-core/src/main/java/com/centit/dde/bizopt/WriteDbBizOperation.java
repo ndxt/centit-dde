@@ -83,7 +83,7 @@ public class WriteDbBizOperation implements BizOperation {
                     }
                     bizModel.putDataSet(id, new SimpleDataSet(parames));
                     return BuiltInOperation.getResponseSuccessData(dataAsList.size());
-                case 10://根据条件更新字段值
+                case 10://根据条件修改字段值
                     JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(dataAsList.get(0)), JSONObject.class);
                     int count  = metaObjectService.updateObjectsByProperties(tableId, jsonObject, bizModel.getModelTag());
                     bizModel.putDataSet(id, new SimpleDataSet(count));
