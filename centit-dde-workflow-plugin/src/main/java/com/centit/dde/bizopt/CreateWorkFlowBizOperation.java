@@ -12,12 +12,10 @@ import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.commons.CreateFlowOptions;
 import com.centit.workflow.po.FlowInstance;
 import com.centit.workflow.service.FlowEngine;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 创建工作流节点
@@ -45,11 +43,21 @@ public class CreateWorkFlowBizOperation implements BizOperation {
         if (StringUtils.isBlank(bizOptJson.getString("userCode"))){
             return  ResponseData.makeErrorMessage(500,"userCode不能为空！");
         }
+        if (StringUtils.isBlank(bizOptJson.getString("flowOptName"))){
+            return  ResponseData.makeErrorMessage(500,"flowOptName不能为空！");
+        }
+        if (StringUtils.isBlank(bizOptJson.getString("flowOptTag"))){
+            return  ResponseData.makeErrorMessage(500,"flowOptTag不能为空！");
+        }
         Object unitCode =JSONTransformer.transformer(bizOptJson.getString("unitCode"), new BizModelJSONTransform(bizModel));
         createFlowOptions.setUnitCode((String)unitCode);
         Object userCode =JSONTransformer.transformer(bizOptJson.getString("userCode"), new BizModelJSONTransform(bizModel));
         createFlowOptions.setUserCode((String)userCode);
-        //根据表达式获取流程变量信息
+        Object flowOptName =JSONTransformer.transformer(bizOptJson.getString("flowOptName"), new BizModelJSONTransform(bizModel));
+        createFlowOptions.setFlowOptName((String)flowOptName);
+        Object flowOptTag =JSONTransformer.transformer(bizOptJson.getString("flowOptTag"), new BizModelJSONTransform(bizModel));
+        createFlowOptions.setFlowOptTag((String)flowOptTag);
+        //根据表达式获取流程变量信息(非必填参数)
         Map<String, String> variablesInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("flowVariables"), "variableName", "expression");
         Map<String, Object> variables = new HashMap<>();
         //流程全局变量
@@ -68,7 +76,7 @@ public class CreateWorkFlowBizOperation implements BizOperation {
                 }
             }
         }
-        //根据表达式获取办件角色信息
+        //根据表达式获取办件角色信息(非必填参数)
         Map<String, List<String>> flowRoleUsers = new HashMap<>();
         Map<String, String> flowRoleUsersInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("role"), "roleCode", "expression");
         if (flowRoleUsersInfo!=null && flowRoleUsersInfo.size()>0){
@@ -93,6 +101,48 @@ public class CreateWorkFlowBizOperation implements BizOperation {
         createFlowOptions.setVariables(variables);
         createFlowOptions.setGlobalVariables(globalVariables);
         createFlowOptions.setFlowRoleUsers(flowRoleUsers);
+        //字段信息
+        JSONArray fieldInfos = bizOptJson.getJSONArray("config");
+        for (Object fieldInfo : fieldInfos) {
+            JSONObject fieldData= (JSONObject)fieldInfo;
+            String columnName = fieldData.getString("columnName");
+            String expression = fieldData.getString("expression");
+            Object value =JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
+            if(StringUtils.isBlank(expression) || value==null){
+                continue;
+            }
+            switch (columnName){
+                case "modelId":
+                    createFlowOptions.setModelId((String)value);
+                case "flowVersion":
+                    createFlowOptions.setFlowVersion(Long.valueOf(String.valueOf(value)));
+                case "parentNodeInstId":
+                    createFlowOptions.setParentNodeInstId((String)value);
+                case "parentFlowInstId":
+                    createFlowOptions.setParentFlowInstId((String)value);
+                case "flowGroupId":
+                    createFlowOptions.setFlowGroupId((String)value);
+                case "timeLimitStr":
+                    createFlowOptions.setTimeLimitStr((String)value);
+                case "skipFirstNode":
+                    createFlowOptions.setSkipFirstNode(Boolean.valueOf(String.valueOf(value)));
+                case "lockOptUser":
+                    createFlowOptions.setLockOptUser(Boolean.valueOf(String.valueOf(value)));
+                case "workUserCode":
+                    createFlowOptions.setWorkUserCode((String)value);
+                case "flowOrganizes":
+                    Map<String, List<String>> flowOrganizes = JSON.parseObject((String) value, Map.class);;
+                    createFlowOptions.setFlowOrganizes(flowOrganizes);
+                case "nodeUnits":
+                    Map<String, String> nodeUnits = JSON.parseObject((String) value, Map.class);;
+                    createFlowOptions.setNodeUnits(nodeUnits);
+                case "nodeOptUsers":
+                    Map<String, Set<String>>  nodeOptUsers = JSON.parseObject((String) value, Map.class);;
+                    createFlowOptions.setNodeOptUsers(nodeOptUsers);
+                default:
+            }
+        }
+
         FlowInstance instance;
         try {
             instance = flowEngine.createInstance(createFlowOptions);

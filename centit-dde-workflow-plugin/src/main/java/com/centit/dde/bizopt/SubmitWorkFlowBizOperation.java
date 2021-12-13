@@ -13,10 +13,7 @@ import com.centit.workflow.commons.SubmitOptOptions;
 import com.centit.workflow.service.FlowEngine;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SubmitWorkFlowBizOperation implements BizOperation {
 
@@ -92,6 +89,36 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
         submitOptOptions.setVariables(variables);
         submitOptOptions.setGlobalVariables(globalVariables);
         submitOptOptions.setFlowRoleUsers(flowRoleUsers);
+
+        JSONArray fieldInfos = bizOptJson.getJSONArray("config");
+        for (Object fieldInfo : fieldInfos) {
+            JSONObject fieldData= (JSONObject)fieldInfo;
+            String columnName = fieldData.getString("columnName");
+            String expression = fieldData.getString("expression");
+            Object value =JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
+            if(StringUtils.isBlank(expression) || value==null){
+                continue;
+            }
+            switch (columnName){
+                case "grantorCode":
+                    submitOptOptions.setGrantorCode((String)value);
+                case "lockOptUser":
+                    submitOptOptions.setLockOptUser(Boolean.valueOf(String.valueOf(value)));
+                case "workUserCode":
+                    submitOptOptions.setWorkUserCode((String)value);
+                case "flowOrganizes":
+                    Map<String, List<String>> flowOrganizes = JSON.parseObject((String) value, Map.class);
+                    submitOptOptions.setFlowOrganizes(flowOrganizes);
+                case "nodeUnits":
+                    Map<String, String> nodeUnits = JSON.parseObject((String) value, Map.class);
+                    submitOptOptions.setNodeUnits(nodeUnits);
+                case "nodeOptUsers":
+                    Map<String, Set<String>> nodeOptUsers = JSON.parseObject((String) value, Map.class);
+                    submitOptOptions.setNodeOptUsers(nodeOptUsers);
+                default:
+            }
+        }
+
         List<String> list;
         try {
             list = flowEngine.submitOpt(submitOptOptions);

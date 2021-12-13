@@ -104,7 +104,7 @@ public class BuiltInOperation {
 
     public static ResponseData runRequestBody(BizModel bizModel, JSONObject bizOptJson) {
         String bodyString = (String) bizModel.getModelTag().get("requestBody");
-        DataSet destDs = BizOptUtils.castObjectToDataSet(JSONObject.parseObject(bodyString));
+        DataSet destDs = BizOptUtils.castObjectToDataSet(bodyString.contains("[")?JSONObject.parseObject(bodyString,JSONArray.class):JSONObject.parseObject(bodyString));
         bizModel.putDataSet(bizOptJson.getString("id"), destDs);
         return getResponseSuccessData(destDs.getSize());
     }

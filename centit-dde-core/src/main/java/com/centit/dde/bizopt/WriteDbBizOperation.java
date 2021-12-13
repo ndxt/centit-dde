@@ -77,12 +77,14 @@ public class WriteDbBizOperation implements BizOperation {
                     bizModel.putDataSet(id, new SimpleDataSet(data));
                     return BuiltInOperation.getResponseSuccessData(data.size());
                 case 9://批量删除
-                    List<Map> parames = JSON.parseArray((String)dataAsList.get(0).get("requestBody"), Map.class);
+                    List<Map> parames = JSON.parseArray(JSON.toJSONString(dataAsList),Map.class);
+                    int delCount =0;
                     for (Map parame : parames) {
                         metaObjectService.deleteObjectWithChildren(tableId,parame,withChildrenDeep == null ? 1 : withChildrenDeep);
+                        delCount++;
                     }
-                    bizModel.putDataSet(id, new SimpleDataSet(parames));
-                    return BuiltInOperation.getResponseSuccessData(dataAsList.size());
+                    bizModel.putDataSet(id, new SimpleDataSet(delCount));
+                    return BuiltInOperation.getResponseSuccessData(delCount);
                 case 10://根据条件修改字段值
                     JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(dataAsList.get(0)), JSONObject.class);
                     int count  = metaObjectService.updateObjectsByProperties(tableId, jsonObject, bizModel.getModelTag());
