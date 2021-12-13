@@ -47,9 +47,9 @@ public class WriteDbBizOperation implements BizOperation {
                     bizModel.putDataSet(id, new SimpleDataSet(dataAsList.get(0)));
                     return BuiltInOperation.getResponseSuccessData(dataAsList.size());
                 case 2://修改
-                    metaObjectService.updateObjectWithChildren(tableId, dataAsList.get(0), withChildrenDeep == null ? 1 : withChildrenDeep);
-                    bizModel.putDataSet(id, new SimpleDataSet(dataAsList.get(0)));
-                    return BuiltInOperation.getResponseSuccessData(dataAsList.size());
+                    int upcount= metaObjectService.updateObjectWithChildren(tableId, dataAsList.get(0), withChildrenDeep == null ? 1 : withChildrenDeep);
+                    bizModel.putDataSet(id, new SimpleDataSet(upcount));
+                    return BuiltInOperation.getResponseSuccessData(upcount);
                 case 3://删除
                     metaObjectService.deleteObjectWithChildren(tableId, dataAsList.get(0), withChildrenDeep == null ? 1 : withChildrenDeep);
                     bizModel.putDataSet(id, new SimpleDataSet(dataAsList.size()));

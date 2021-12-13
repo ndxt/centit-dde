@@ -35,7 +35,6 @@ import javax.annotation.Resource;
         value = org.springframework.stereotype.Controller.class))
 @Configuration
 public class ServiceConfig {
-    Class clazz;
     Logger logger = LoggerFactory.getLogger(ServiceConfig.class);
 
     @Value("${app.home:./}")
