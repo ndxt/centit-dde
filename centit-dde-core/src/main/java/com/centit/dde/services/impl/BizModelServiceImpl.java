@@ -37,6 +37,8 @@ public class BizModelServiceImpl implements BizModelService {
 
     @Override
     public Object fetchBizModel(DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
+        //元数据标签做数据范围查询的时候需要该值，只能从这儿set进去
+        paramsMap.put("metadata_optId",dataPacket.getOptId());
         if (notNeedBuf(dataPacket)) {
             return taskRun.runTask(dataPacket.getPacketId(), paramsMap);
         }

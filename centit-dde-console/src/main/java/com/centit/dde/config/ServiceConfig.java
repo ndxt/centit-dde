@@ -6,11 +6,12 @@ import com.centit.fileserver.common.FileStoreContext;
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.config.SpringSecurityDaoConfig;
+import com.centit.framework.core.service.DataScopePowerManager;
+import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
-import com.centit.support.algorithm.NumberBaseOpt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,6 +75,12 @@ public class ServiceConfig {
         ///notificationCenter.registerMessageSender("innerMsg",innerMessageManager);
         return notificationCenter;
     }
+
+    @Bean
+    public DataScopePowerManager queryDataScopeFilter(){
+        return new DataScopePowerManagerImpl();
+    }
+
 
     @Bean
     @Lazy(value = false)

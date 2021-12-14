@@ -8,17 +8,33 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.dao.PageQueryResult;
+import com.centit.framework.core.service.DataScopePowerManager;
+import com.centit.framework.filter.RequestThreadLocal;
+import com.centit.product.metadata.po.MetaTable;
+import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.database.utils.PageDesc;
+import com.centit.support.database.utils.QueryAndNamedParams;
 
-import java.util.*;
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WriteDbBizOperation implements BizOperation {
-    MetaObjectService metaObjectService;
+    private  MetaObjectService metaObjectService;
 
-    public WriteDbBizOperation(MetaObjectService metaObjectService) {
+    private DataScopePowerManager queryDataScopeFilter;
+
+    private MetaDataCache metaDataCache;
+
+    public WriteDbBizOperation(MetaObjectService metaObjectService,DataScopePowerManager queryDataScopeFilter,MetaDataCache metaDataCache) {
         this.metaObjectService = metaObjectService;
+        this.queryDataScopeFilter=queryDataScopeFilter;
+        this.metaDataCache=metaDataCache;
     }
 
     public WriteDbBizOperation() {
@@ -30,6 +46,7 @@ public class WriteDbBizOperation implements BizOperation {
         String source = bizOptJson.getString("source");
         String tableId = bizOptJson.getString("tableLabelName");
         Integer withChildrenDeep = bizOptJson.getInteger("withChildrenDeep");
+        String optId=(String) bizModel.getModelTag().get("metadata_optId");
         Map<String, Object> modelTag = bizModel.getModelTag();
         modelTag.remove("runType");
         DataSet dataSet = bizModel.getDataSet(source);
@@ -55,6 +72,10 @@ public class WriteDbBizOperation implements BizOperation {
                     bizModel.putDataSet(id, new SimpleDataSet(dataAsList.size()));
                     return BuiltInOperation.getResponseSuccessData(dataAsList.size());
                 case 4://查询
+                    HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
+                    String topUnit = WebOptUtils.getCurrentTopUnit(request);
+                    List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, WebOptUtils.getCurrentUserCode(request), optId, "list");
+                    String extFilter = null;
                     JSONArray jsonArray =new JSONArray();
                     PageDesc pageDesc = new PageDesc();
                     PageQueryResult<Object> result =null;
@@ -67,7 +88,20 @@ public class WriteDbBizOperation implements BizOperation {
                             pageDesc.setPageSize(Integer.valueOf(String.valueOf(objectMap.get("pageSize"))));
                             objectMap.remove("pageSize");
                         }
-                        jsonArray = metaObjectService.pageQueryObjects(tableId, objectMap,pageDesc);
+                        if (filters != null) {
+                            MetaTable table = metaDataCache.getTableInfo(tableId);
+                            DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
+                                WebOptUtils.getCurrentUserInfo(request), topUnit, WebOptUtils.getCurrentUnitCode(request));
+                            dataPowerFilter.addSourceData(objectMap);
+                            Map<String, String> tableAlias = new HashMap<>(3);
+                            tableAlias.put(table.getTableName(), "");
+                            QueryAndNamedParams qap = dataPowerFilter.translateQueryFilter(
+                                tableAlias, filters);
+                            objectMap.putAll(qap.getParams());
+                            extFilter = qap.getQuery();
+                        }
+                        objectMap.remove("metadata_optId");
+                        jsonArray =metaObjectService.pageQueryObjects(tableId, extFilter, objectMap,null, pageDesc);;
                         result = PageQueryResult.createResult(jsonArray, pageDesc);
                     }
                     bizModel.putDataSet(id, new SimpleDataSet(result));

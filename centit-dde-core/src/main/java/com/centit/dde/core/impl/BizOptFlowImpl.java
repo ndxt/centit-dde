@@ -1,6 +1,5 @@
 package com.centit.dde.core.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.*;
@@ -21,7 +20,9 @@ import com.centit.fileserver.common.FileStoreContext;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.common.ResponseSingleData;
+import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
@@ -31,18 +32,14 @@ import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
-import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import thredds.catalog2.Dataset;
 
 import javax.annotation.PostConstruct;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
@@ -59,20 +56,33 @@ public class BizOptFlowImpl implements BizOptFlow {
     public static final String RETURN_RESULT_DATASET = "3";
     public static final String RETURN_RESULT_ORIGIN = "4";
     public static final String FILE_DOWNLOAD = "fileDownload";
+
     @Value("${os.file.base.dir:./file_home/export}")
     private String path;
+
     @Autowired
     private SourceInfoDao sourceInfoDao;
+
     @Autowired
     private MetaDataService metaDataService;
+
     @Autowired
     private TaskDetailLogDao taskDetailLogDao;
+
     @Autowired
     private DataPacketDraftDao dataPacketCopyDao;
+
     @Autowired
     private DataPacketDao dataPacketDao;
+
     @Autowired(required = false)
     private MetaObjectService metaObjectService;
+
+    @Autowired
+    private DataScopePowerManager queryDataScopeFilter;
+
+    @Autowired
+    private MetaDataCache metaDataCache;
 
 
     @Autowired(required = false)
@@ -129,7 +139,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.FILEUPLOADS, new FileUploadBizOperation(fileStoreContext));
         allOperations.put(ConstantValue.GENERATEXCEL, new GenerateExcelBizeOperation());
         allOperations.put(ConstantValue.FILEDOWNLOAD, new FileDownloadBizOperation(fileStoreContext));
-        allOperations.put(ConstantValue.WRITE_DB, new WriteDbBizOperation(metaObjectService));
+        allOperations.put(ConstantValue.WRITE_DB, new WriteDbBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentBizOperation());
     }
 
@@ -150,6 +160,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         } catch (Exception e) {
             AbstractSourceConnectThreadHolder.rollbackAndRelease();
         }
+        //移除内部逻辑需要添加的参数
+        dataOptVo.getBizModel().getModelTag().remove("metadata_optId");
+        dataOptVo.getBizModel().getModelTag().remove("runType");
         return dataOptVo.getPreResult();
     }
 
