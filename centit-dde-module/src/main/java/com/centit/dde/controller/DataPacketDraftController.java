@@ -4,11 +4,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.services.DataPacketDraftService;
+import com.centit.dde.services.DataPacketService;
 import com.centit.dde.services.DataPacketTemplateService;
 import com.centit.dde.utils.HttpParames;
 import com.centit.dde.utils.LoginUserPermissionCheck;
 import com.centit.dde.utils.MetaDataParames;
-import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
@@ -17,7 +17,6 @@ import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.product.adapter.api.WorkGroupManager;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -45,10 +44,13 @@ public class DataPacketDraftController extends BaseController {
     private final DataPacketDraftService dataPacketDraftService;
 
     @Autowired
-    WorkGroupManager workGroupManager;
+    private WorkGroupManager workGroupManager;
 
     @Autowired
-    DataPacketTemplateService dataPacketTemplateService;
+    private DataPacketTemplateService dataPacketTemplateService;
+
+    @Autowired
+    private DataPacketService dataPacketService;
 
     @Autowired
     private PlatformEnvironment platformEnvironment;
@@ -204,13 +206,12 @@ public class DataPacketDraftController extends BaseController {
     @ApiOperation(value = "删除API网关")
     @DeleteMapping(value = "/{packetId}")
     @WrapUpResponseBody
+    @Transactional(rollbackFor = Exception.class)
     public void deleteDataPacket(@PathVariable String packetId) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
         LoginUserPermissionCheck.loginUserPermissionCheck(workGroupManager,dataPacketDraft);
-        if (dataPacketDraft.getPublishDate()!=null){
-            throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "该API已经发布过，不能删除！");
-        }
         platformEnvironment.deleteOptDefAndRolepowerByOptCode(dataPacketDraft.getOptCode());
+        dataPacketService.deleteDataPacket(packetId);
         dataPacketDraftService.deleteDataPacket(packetId);
     }
 
