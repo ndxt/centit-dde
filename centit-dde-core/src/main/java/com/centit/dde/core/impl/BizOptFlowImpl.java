@@ -16,7 +16,7 @@ import com.centit.dde.utils.CloneUtils;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.CycleVo;
 import com.centit.dde.vo.DataOptVo;
-import com.centit.fileserver.common.FileStoreContext;
+import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.common.ResponseSingleData;
@@ -86,7 +86,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
 
     @Autowired(required = false)
-    private FileStoreContext fileStoreContext;
+    private FileStore fileStore;
 
 
     private Map<String, BizOperation> allOperations;
@@ -131,14 +131,14 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("json", jsonBizOperation);
         RunSqlsBizOperation runsqlsbizoperation = new RunSqlsBizOperation(sourceInfoDao);
         allOperations.put("sqlS", runsqlsbizoperation);
-        ReportBizOperation reportBizOperation = new ReportBizOperation(fileStoreContext);
+        ReportBizOperation reportBizOperation = new ReportBizOperation(fileStore);
         allOperations.put("SSD", reportBizOperation);
         allOperations.put(ConstantValue.GENERATECSV, new GenerateCsvBizOperation());
         allOperations.put(ConstantValue.GENERATEJSON, new GenerateJsonBizOperation());
         allOperations.put(ConstantValue.RETURN_JSON, GenerateJsonBizOperation::returnJson);
-        allOperations.put(ConstantValue.FILEUPLOADS, new FileUploadBizOperation(fileStoreContext));
+        allOperations.put(ConstantValue.FILEUPLOADS, new FileUploadBizOperation(fileStore));
         allOperations.put(ConstantValue.GENERATEXCEL, new GenerateExcelBizeOperation());
-        allOperations.put(ConstantValue.FILEDOWNLOAD, new FileDownloadBizOperation(fileStoreContext));
+        allOperations.put(ConstantValue.FILEDOWNLOAD, new FileDownloadBizOperation(fileStore));
         allOperations.put(ConstantValue.WRITE_DB, new WriteDbBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentBizOperation());
     }

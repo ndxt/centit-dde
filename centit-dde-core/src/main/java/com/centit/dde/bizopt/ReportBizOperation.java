@@ -5,7 +5,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizOptUtils;
-import com.centit.fileserver.common.FileStoreContext;
+import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.ReflectionOpt;
@@ -29,10 +29,10 @@ import java.util.Map;
  * @author zhf
  */
 public class ReportBizOperation implements BizOperation {
-    FileStoreContext fileStoreContext;
+    FileStore fileStore;
 
-    public ReportBizOperation(FileStoreContext fileStoreContext) {
-        this.fileStoreContext = fileStoreContext;
+    public ReportBizOperation(FileStore fileStore) {
+        this.fileStore = fileStore;
     }
 
     @Override
@@ -97,7 +97,7 @@ public class ReportBizOperation implements BizOperation {
         } else if (fieldValue instanceof String) {
             String fileId = StringBaseOpt.castObjectToString(fieldValue);
             try {
-                docData.put(placeholder, new ByteArrayImageProvider(FileIOOpt.readBytesFromFile(fileStoreContext.getFile(fileId))));
+                docData.put(placeholder, new ByteArrayImageProvider(FileIOOpt.readBytesFromFile(fileStore.getFile(fileId))));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -108,7 +108,7 @@ public class ReportBizOperation implements BizOperation {
         JSONObject docData = dataModel.toJsonObject(false);
         // 准备图片元数据
         FieldsMetadata metadata = getFieldsMetadata(params, docData);
-        try (InputStream in = new FileInputStream(fileStoreContext.getFile(filePath))) {
+        try (InputStream in = new FileInputStream(fileStore.getFile(filePath))) {
             // 1) Load ODT file and set Velocity template engine and cache it to the registry
             IXDocReport report = XDocReportRegistry.getRegistry().loadReport(in, TemplateEngineKind.Freemarker, false);
             // 2) Create Java model context

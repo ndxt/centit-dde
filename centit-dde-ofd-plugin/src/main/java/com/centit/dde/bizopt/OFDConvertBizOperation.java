@@ -6,7 +6,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.vo.OFDConvertVo;
 import com.centit.fileserver.common.FileInfo;
-import com.centit.fileserver.common.FileStoreContext;
+import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
 import com.suwell.ofd.custom.agent.HTTPAgent;
 import org.apache.commons.lang3.StringUtils;
@@ -22,10 +22,10 @@ import java.util.Map;
  */
 public class OFDConvertBizOperation implements BizOperation {
 
-    private FileStoreContext fileStoreContext;
+    private FileStore fileStore;
 
-    public OFDConvertBizOperation(FileStoreContext fileStoreContext) {
-        this.fileStoreContext = fileStoreContext;
+    public OFDConvertBizOperation(FileStore fileStore) {
+        this.fileStore = fileStore;
     }
     public OFDConvertBizOperation() {
     }
@@ -44,7 +44,7 @@ public class OFDConvertBizOperation implements BizOperation {
         List<File> fileList = new ArrayList<>();
         for (String fileId : fileidArr) {
             //获取上传文件（文件服务器获取）
-            File file = fileStoreContext.getFile(fileId);
+            File file = fileStore.getFile(fileId);
             if(file.length()==0) {
                 continue;
             }
@@ -53,7 +53,7 @@ public class OFDConvertBizOperation implements BizOperation {
             if (pos >= 0) {
                 fileType = fileId.substring(pos + 1);
             } else {
-                FileInfo fileInfo = fileStoreContext.getFileInfo(fileId);
+                FileInfo fileInfo = fileStore.getFileInfo(fileId);
                 fileType = fileInfo.getFileType();
             }
             String fileName = System.currentTimeMillis() + "." + fileType;

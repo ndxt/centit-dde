@@ -7,7 +7,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileInfo;
-import com.centit.fileserver.common.FileStoreContext;
+import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
 import org.apache.commons.lang3.StringUtils;
 
@@ -24,10 +24,10 @@ import java.util.Map;
  */
 public class FileUploadBizOperation implements BizOperation {
 
-    FileStoreContext fileStoreContext;
+    FileStore fileStore;
 
-    public FileUploadBizOperation( FileStoreContext fileStoreContext) {
-        this.fileStoreContext = fileStoreContext;
+    public FileUploadBizOperation( FileStore fileStore) {
+        this.fileStore = fileStore;
     }
 
     public FileUploadBizOperation() {
@@ -61,9 +61,9 @@ public class FileUploadBizOperation implements BizOperation {
             String fileId;
             Object object = StringUtils.isNotBlank(fileDataField)?dataMap.get(fileDataField):dataSet.getFirstRow().get("fileContent");
             if (object instanceof byte[]){
-                fileId = fileStoreContext.saveFile(fileInfo, 0,new ByteArrayInputStream((byte[])object));
+                fileId = fileStore.saveFile(fileInfo, 0,new ByteArrayInputStream((byte[])object));
             }else if (object instanceof InputStream){
-                fileId = fileStoreContext.saveFile(fileInfo, 0,(InputStream) object);
+                fileId = fileStore.saveFile(fileInfo, 0,(InputStream) object);
             }else {
                 return  BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：上传文件失败，不支持的流类型转换！");
             }
