@@ -2,8 +2,8 @@ package com.centit.dde.dataset;
 
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetWriter;
+import com.centit.product.adapter.api.ISourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
-import com.centit.product.metadata.transaction.ISourceInfo;
 import com.centit.dde.utils.DBBatchUtils;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;

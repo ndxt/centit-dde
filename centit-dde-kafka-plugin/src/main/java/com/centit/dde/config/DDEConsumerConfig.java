@@ -1,7 +1,7 @@
 package com.centit.dde.config;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.adapter.po.SourceInfo;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.util.Assert;

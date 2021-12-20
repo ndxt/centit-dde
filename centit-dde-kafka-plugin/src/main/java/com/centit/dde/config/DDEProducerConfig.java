@@ -1,7 +1,7 @@
 package com.centit.dde.config;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.adapter.po.SourceInfo;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;

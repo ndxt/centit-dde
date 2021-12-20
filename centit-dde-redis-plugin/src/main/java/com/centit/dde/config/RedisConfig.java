@@ -1,7 +1,7 @@
 package com.centit.dde.config;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.adapter.po.SourceInfo;
 import com.centit.support.security.AESSecurityUtils;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -65,7 +65,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         return  config;
     }
 
-    private LettuceConnectionFactory lettuceConnectionFactory(SourceInfo sourceInfo,RedisTypeEnum nodeType){
+    private LettuceConnectionFactory lettuceConnectionFactory(SourceInfo sourceInfo, RedisTypeEnum nodeType){
         String databaseUrl = sourceInfo.getDatabaseUrl();
         if (StringUtils.isBlank(databaseUrl)){
             return null;
