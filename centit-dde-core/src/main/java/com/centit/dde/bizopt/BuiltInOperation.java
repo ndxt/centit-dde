@@ -213,7 +213,7 @@ public class BuiltInOperation {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
         List<String> rows = jsonArrayToList(bizOptJson.getJSONArray("RowField"), "primaryKey1", "unique", "");
-        List<String> cols = jsonArrayToList(bizOptJson.getJSONArray("ColumnsField"), "primaryKey1", "unique", "");
+        List<String> cols = jsonArrayToList(bizOptJson.getJSONArray("ColumnsField"), "primaryKey2", "unique", "");
         int count = 0;
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet != null) {
