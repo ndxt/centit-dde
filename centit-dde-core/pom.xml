@@ -64,11 +64,11 @@
             <artifactId>database-metadata</artifactId>
             <version>${metadata.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>fileserver-adapter</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
+            <artifactId>fileserver-client</artifactId>
+            <version>${centit.fileserver.version}</version>
         </dependency>
 
         <dependency>
