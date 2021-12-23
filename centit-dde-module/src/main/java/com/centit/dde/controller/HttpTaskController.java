@@ -131,7 +131,7 @@ public class HttpTaskController extends BaseController {
         returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL,ConstantValue.TASK_TYPE_DELETE, request, response);
     }
 
-    private void judgePower(@PathVariable String packetId) {
+    private void judgePower(@PathVariable String packetId,String runType) {
         String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringBaseOpt.isNvl(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
@@ -139,14 +139,16 @@ public class HttpTaskController extends BaseController {
         if (StringBaseOpt.isNvl(loginUser)) {
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "您未登录！");
         }
-        DataPacketInterface dataPacket = dataPacketDraftService.getDataPacket(packetId);
-        if (!workGroupManager.loginUserIsExistWorkGroup(dataPacket.getOsId(), loginUser)) {
-            throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您没有权限！");
+        if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
+            DataPacketInterface dataPacket = dataPacketDraftService.getDataPacket(packetId);
+            if (!workGroupManager.loginUserIsExistWorkGroup(dataPacket.getOsId(), loginUser)) {
+                throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您没有权限！");
+            }
         }
     }
 
     private void returnObject(String packetId, String runType,String taskType, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        judgePower(packetId);
+        judgePower(packetId,runType);
         Object bizModel;
         DataPacketInterface dataPacketInterface;
         if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
@@ -155,7 +157,7 @@ public class HttpTaskController extends BaseController {
             dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
         }
         if (dataPacketInterface==null){
-            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, packetId+"不存在！");
+            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "网关数据："+packetId+"不存在！");
         }
         if ("2".equals(dataPacketInterface.getTaskType()) || "4".equals(dataPacketInterface.getTaskType())){
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "定时任务或消息触发不支持请求，该类型任务会自动触发！");
