@@ -7,6 +7,7 @@ import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.po.DataPacketParam;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
+import com.centit.dde.utils.DBBatchUtils;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOptMethod;
@@ -87,6 +88,8 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
     @Override
     public void publishDataPacket(DataPacketDraft dataPacketCopy) {
+        String sql = "update q_data_packet_draft SET publish_date=? WHERE  PACKET_ID=? ";
+        dataPacketCopyDao.getJdbcTemplate().update(sql, new Object[]{dataPacketCopy.getPublishDate(), dataPacketCopy.getPacketId()});
         DataPacket dataPacket = new DataPacket();
         BeanUtils.copyProperties(dataPacketCopy, dataPacket);
         List<DataPacketParam> dataPacketParamList = new ArrayList<>();

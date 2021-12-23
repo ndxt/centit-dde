@@ -101,7 +101,7 @@ public class WriteDbBizOperation implements BizOperation {
                             extFilter = qap.getQuery();
                         }
                         objectMap.remove("metadata_optId");
-                        jsonArray =metaObjectService.pageQueryObjects(tableId, extFilter, objectMap,null, pageDesc);;
+                        jsonArray =metaObjectService.pageQueryObjects(tableId, extFilter, objectMap,null, pageDesc);
                         result = PageQueryResult.createResult(jsonArray, pageDesc);
                     }
                     bizModel.putDataSet(id, new SimpleDataSet(result));

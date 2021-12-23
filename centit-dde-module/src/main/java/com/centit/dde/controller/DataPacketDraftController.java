@@ -190,7 +190,6 @@ public class DataPacketDraftController extends BaseController {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateStr = simpleDateFormat.format(new Date());
         dataPacketDraft.setPublishDate(simpleDateFormat.parse(dateStr));
-        dataPacketDraftService.updateDataPacket(dataPacketDraft);
         dataPacketDraftService.publishDataPacket(dataPacketDraft);
     }
 
