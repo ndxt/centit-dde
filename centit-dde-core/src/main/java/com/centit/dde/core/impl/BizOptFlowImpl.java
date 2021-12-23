@@ -78,7 +78,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     @Autowired(required = false)
     private MetaObjectService metaObjectService;
 
-    @Autowired
+    @Autowired(required = false)
     private DataScopePowerManager queryDataScopeFilter;
 
     @Autowired
