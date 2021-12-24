@@ -12,9 +12,9 @@ class ConsumerServerApplicationTests {
     @Resource
     DataPacketDao dataPacketDao;
 
-    @Test
-    void contextLoads() {
-        DataPacket objectById = dataPacketDao.getObjectById("159cbd136539491a83b320e232340688");
-    }
+//    @Test
+//    void contextLoads() {
+//        DataPacket objectById = dataPacketDao.getObjectById("159cbd136539491a83b320e232340688");
+//    }
 
 }
