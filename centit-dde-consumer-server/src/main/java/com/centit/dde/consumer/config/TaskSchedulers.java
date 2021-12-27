@@ -169,7 +169,7 @@ public class TaskSchedulers {
                         Map<String, Object> kafkaData = new HashMap<>();
                         kafkaData.put(dataPacket.getPacketId(),value);
                         TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
-                        taskRun.runTask(dataPacket.getPacketId(), kafkaData);
+                        taskRun.runTask(dataPacket.getPacketId(), kafkaData,new HashMap<>());
                         try {
                             consumer.commitAsync();//异步提交
                         }catch (Exception e) {

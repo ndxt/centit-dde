@@ -10,7 +10,7 @@ import java.util.Map;
 public interface BizModelService {
     void setBizModelBuf(Object bizModel, DataPacketInterface dataPacket, Map<String, Object> paramsMap);
 
-    Object fetchBizModel(DataPacketInterface dataPacket, Map<String, Object> paramsMap);
+    Object fetchBizModel(DataPacketInterface dataPacket, Map<String, Object> paramsMap,Map<String, Object> interimVariable);
 
 
 }

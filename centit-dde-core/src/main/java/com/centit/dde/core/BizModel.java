@@ -26,6 +26,12 @@ public interface BizModel {
      * @return  或者对应关系数据库查询的参数（数据源参数）
      */
     Map<String, Object> getModelTag();
+
+    /**
+     * 存放内部逻辑使用的临时变量
+     * @return
+     */
+    Map<String, Object> getInterimVariable();
     /**
      * @return  模型数据 key为关联关系链， value为dataSet
      */

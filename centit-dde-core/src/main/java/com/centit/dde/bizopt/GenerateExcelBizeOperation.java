@@ -25,7 +25,7 @@ public class GenerateExcelBizeOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-        String requestBody= (String)bizModel.getModelTag().get("requestBody");
+        String requestBody= (String)bizModel.getInterimVariable().get("requestBody");
         //获取表达式信息
         Map<String, String> mapInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
         if (mapInfo != null && mapInfo.size() > 0) {

@@ -36,15 +36,15 @@ public class BizModelServiceImpl implements BizModelService {
 
 
     @Override
-    public Object fetchBizModel(DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
+    public Object fetchBizModel(DataPacketInterface dataPacket, Map<String, Object> paramsMap,Map<String, Object> interimVariable) {
         //元数据标签做数据范围查询的时候需要该值，只能从这儿set进去
-        paramsMap.put("metadata_optId",dataPacket.getOptId());
+        interimVariable.put("metadata_optId",dataPacket.getOptId());
         if (notNeedBuf(dataPacket)) {
-            return taskRun.runTask(dataPacket.getPacketId(), paramsMap);
+            return taskRun.runTask(dataPacket.getPacketId(), paramsMap,interimVariable);
         }
         Object bizModel = fetchBizModelFromBuf(dataPacket, paramsMap);
         if (bizModel==null){//第一次执行或者换成失效的时候执行
-            bizModel = taskRun.runTask(dataPacket.getPacketId(), paramsMap);
+            bizModel = taskRun.runTask(dataPacket.getPacketId(), paramsMap,interimVariable);
             bizmodelService.setBizModelBuf(bizModel, dataPacket, paramsMap);
         }
         return bizModel;

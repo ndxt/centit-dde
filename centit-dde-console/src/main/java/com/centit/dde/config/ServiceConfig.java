@@ -1,17 +1,12 @@
 package com.centit.dde.config;
 
 
-import com.alibaba.nacos.api.NacosFactory;
-import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.annotation.NacosProperties;
-import com.alibaba.nacos.api.config.ConfigService;
-import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.spring.context.annotation.config.EnableNacosConfig;
 import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySource;
 import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySources;
 import com.centit.fileserver.client.ClientAsFileStore;
 import com.centit.fileserver.client.FileClientImpl;
-import com.centit.fileserver.common.FileStore;
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.config.SpringSecurityDaoConfig;
@@ -26,13 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
-import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import redis.clients.jedis.JedisPool;
-
-import javax.annotation.Resource;
-import java.util.Properties;
 
 
 /**

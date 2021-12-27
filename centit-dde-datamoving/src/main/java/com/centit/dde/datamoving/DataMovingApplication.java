@@ -36,7 +36,7 @@ public class DataMovingApplication {
         }
         ConfigurableApplicationContext context = SpringApplication.run(DataMovingApplication.class, args);
         TaskRun taskRun = context.getBean(TaskRun.class);
-        taskRun.runTask(args[0], null);
+        taskRun.runTask(args[0], null,null);
         int exitCode = SpringApplication.exit(context, () -> 0);
         System.exit(exitCode);
     }

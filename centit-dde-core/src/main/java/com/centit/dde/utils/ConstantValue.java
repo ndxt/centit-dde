@@ -58,6 +58,8 @@ public class ConstantValue {
     //动态代码节点
     public static final String DYNAMIC_CODE = "createworkflow";
 
+    public static final String FINAL_TWO="2";
+
     public static final String TASK_TYPE_GET="1";
     public static final String TASK_TYPE_POST="3";
     public static final String TASK_TYPE_PUT="5";

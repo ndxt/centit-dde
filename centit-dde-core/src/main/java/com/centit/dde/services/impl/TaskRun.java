@@ -48,10 +48,10 @@ public class TaskRun {
         this.bizOptFlow = bizOptFlow;
     }
 
-    public Object runTask(String packetId, Map<String, Object> queryParams){
+    public Object runTask(String packetId, Map<String, Object> queryParams, Map<String, Object> interimVariable){
         String runType = ConstantValue.RUN_TYPE_NORMAL;
-        if (queryParams != null && queryParams.containsKey("runType")) {
-            runType = (String) queryParams.get("runType");
+        if (interimVariable != null && interimVariable.containsKey("runType")) {
+            runType = (String) interimVariable.get("runType");
         }
         TaskLog taskLog = new TaskLog();
         Date beginTime = new Date();
@@ -75,32 +75,30 @@ public class TaskRun {
             taskLog.setTaskId(packetId);
             taskLog.setRunBeginTime(beginTime);
             taskLogDao.saveNewObject(taskLog);
-            Object runResult = runStep(dataPacketInterface, taskLog.getLogId(), queryParams);
-            String two = "2";
+            Object runResult = runStep(dataPacketInterface, taskLog.getLogId(), queryParams,interimVariable);
             taskLog.setRunEndTime(new Date());
-            if (two.equals(dataPacketInterface.getTaskType())
+            if (ConstantValue.FINAL_TWO.equals(dataPacketInterface.getTaskType())
                 && dataPacketInterface.getIsValid()
                 && !StringBaseOpt.isNvl(dataPacketInterface.getTaskCron())) {
                 CronExpression cronExpression = new CronExpression(dataPacketInterface.getTaskCron());
                 dataPacketInterface.setNextRunTime(cronExpression.getNextValidTimeAfter(dataPacketInterface.getLastRunTime()));
             }
             if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
-                if (two.equals(dataPacketInterface.getTaskType())){//定时任务才更新
+                if (ConstantValue.FINAL_TWO.equals(dataPacketInterface.getTaskType())){//定时任务才更新
                     dataPacketInterface.setNextRunTime(new Date());
                     DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set next_run_time=? where packet_id=?",
                         new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
                 }
                 dataPacketCopyDao.mergeObject((DataPacketDraft)dataPacketInterface);
             } else {
-                if (two.equals(dataPacketInterface.getTaskType())) {//定时任务才更新
+                if (ConstantValue.FINAL_TWO.equals(dataPacketInterface.getTaskType())) {//定时任务才更新
                     dataPacketInterface.setNextRunTime(new Date());
                     DatabaseOptUtils.doExecuteSql(dataPacketDao, "update q_data_packet set next_run_time=? where packet_id=?",
                         new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
                 }
                 dataPacketDao.mergeObject((DataPacket)dataPacketInterface);
             }
-            TaskDetailLog taskDetailLog = taskDetailLogDao.getObjectByProperties(
-                CollectionsOpt.createHashMap("logId", taskLog.getLogId()));
+            TaskDetailLog taskDetailLog = taskDetailLogDao.getObjectByProperties(CollectionsOpt.createHashMap("logId", taskLog.getLogId()));
             taskLog.setOtherMessage("ok".equals(taskDetailLog.getLogInfo())? "ok" : "error");
             taskLogDao.updateObject(taskLog);
             return runResult;
@@ -110,7 +108,8 @@ public class TaskRun {
         return new Object();
     }
 
-    private Object runStep(DataPacketInterface dataPacketInterface, String logId, Map<String, Object> queryParams) throws Exception {
+    private Object runStep(DataPacketInterface dataPacketInterface, String logId, Map<String, Object> queryParams,
+                           Map<String, Object> interimVariable) throws Exception {
         JSONObject bizOptJson = dataPacketInterface.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
             throw new ObjectException("运行步骤为空");
@@ -119,7 +118,7 @@ public class TaskRun {
         if (queryParams != null) {
             mapObject.putAll(queryParams);
         }
-        return bizOptFlow.run(dataPacketInterface, logId, mapObject);
+        return bizOptFlow.run(dataPacketInterface, logId, mapObject,interimVariable);
     }
 
     private void dealException(TaskLog taskLog, DataPacketInterface dataPacketInterface, Exception e) {

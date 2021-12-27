@@ -13,6 +13,7 @@ public class DataOptVo {
     private SimpleBizModel bizModel;
     private Object preResult;
     private Map<String, Object> queryParams;
+    private Map<String, Object> interimVariable;
     private String logId;
     private String needRollback;
 
@@ -21,7 +22,8 @@ public class DataOptVo {
         this.logId = bizModel.getModelName();
         this.needRollback = needRollback;
         this.queryParams= bizModel.getModelTag();
-        String runType = (String) queryParams.get("runType");
+        this.interimVariable= bizModel.getInterimVariable();
+        String runType = (String) interimVariable.get("runType");
         if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
             runType = ConstantValue.RUN_TYPE_COPY;
         } else {

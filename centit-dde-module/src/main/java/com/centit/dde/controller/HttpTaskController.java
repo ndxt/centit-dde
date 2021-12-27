@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -166,25 +167,27 @@ public class HttpTaskController extends BaseController {
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "任务类型和请求方式不匹配，请保持一致！");
         }
         Map<String, Object> params = collectRequestParameters(request);
-        params.put("runType", runType);
+        //保存内部逻辑变量，有些时候需要将某些值传递到其它标签节点，这时候需要用到它
+        Map<String, Object> interimVariable = new HashMap<>();
+        interimVariable.put("runType", runType);
         if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod()) ) {
             if (StringUtils.contains(request.getHeader("Content-Type"), "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
                 if (!StringBaseOpt.isNvl(bodyString)) {
-                    params.put("requestBody", bodyString);
+                    interimVariable.put("requestBody", bodyString);
                 }
             } else {
                 String header = request.getHeader("fileName");
                 if (header != null) {
-                    params.put("fileName", header);
+                    interimVariable.put("fileName", header);
                 }
                 InputStream inputStream = UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight();
                 if (inputStream != null) {
-                    params.put("requestFile", inputStream);
+                    interimVariable.put("requestFile", inputStream);
                 }
             }
         }
-        bizModel = bizmodelService.fetchBizModel(dataPacketInterface, params);
+        bizModel = bizmodelService.fetchBizModel(dataPacketInterface, params,interimVariable);
         boolean isFileDown = bizModel instanceof ResponseData
             && BizOptFlowImpl.FILE_DOWNLOAD.equals(((ResponseData) bizModel).getMessage());
         if (isFileDown) {

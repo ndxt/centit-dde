@@ -149,9 +149,10 @@ public class BizOptFlowImpl implements BizOptFlow {
     }
 
     @Override
-    public Object run(DataPacketInterface dataPacket, String logId, Map<String, Object> queryParams) throws Exception {
+    public Object run(DataPacketInterface dataPacket, String logId, Map<String, Object> queryParams,Map<String, Object> interimVariable) throws Exception {
         SimpleBizModel bizModel = new SimpleBizModel(logId);
         bizModel.setModelTag(queryParams);
+        bizModel.setInterimVariable(interimVariable==null?new HashMap<>():interimVariable);
         DataOptStep dataOptStep = new DataOptStep(dataPacket.getDataOptDescJson());
         DataOptVo dataOptVo = new DataOptVo(dataPacket.getNeedRollback(), bizModel);
         try {
@@ -160,9 +161,6 @@ public class BizOptFlowImpl implements BizOptFlow {
         } catch (Exception e) {
             AbstractSourceConnectThreadHolder.rollbackAndRelease();
         }
-        //移除内部逻辑需要添加的参数
-        dataOptVo.getBizModel().getModelTag().remove("metadata_optId");
-        dataOptVo.getBizModel().getModelTag().remove("runType");
         return dataOptVo.getPreResult();
     }
 
@@ -204,16 +202,13 @@ public class BizOptFlowImpl implements BizOptFlow {
             }
             JSONObject dataOptJson;
             if (ConstantValue.RUN_TYPE_COPY.equals(dataOptVo.getRunType())) {
-                DataPacketDraft dataPacket = dataPacketCopyDao
-                    .getObjectWithReferences(stepJson.getString("packetName"));
+                DataPacketDraft dataPacket = dataPacketCopyDao.getObjectWithReferences(stepJson.getString("packetName"));
                 dataOptJson = dataPacket.getDataOptDescJson();
             } else {
-                DataPacket dataPacket = dataPacketDao
-                    .getObjectWithReferences(stepJson.getString("packetName"));
+                DataPacket dataPacket = dataPacketDao.getObjectWithReferences(stepJson.getString("packetName"));
                 dataOptJson = dataPacket.getDataOptDescJson();
             }
-            DataOptStep subModuleDataOptStep =
-                new DataOptStep(dataOptJson);
+            DataOptStep subModuleDataOptStep = new DataOptStep(dataOptJson);
             DataOptVo subDataOptVo = new DataOptVo(dataOptVo.getNeedRollback(), bizModel);
             runModule(subModuleDataOptStep, subDataOptVo);
             dataOptVo.setPreResult(subDataOptVo.getPreResult());
@@ -226,6 +221,13 @@ public class BizOptFlowImpl implements BizOptFlow {
         } else {
             runOneStepOpt(dataOptStep, dataOptVo);
         }
+      /*  String debugId = (String)dataOptVo.getQueryParams().get("debugId");
+        if (StringUtils.isNotBlank(debugId) && debugId.equals(stepJson.getString("id"))){
+            Object returnResult = returnResult(dataOptStep, dataOptVo);
+            dataOptVo.setPreResult(returnResult);
+            dataOptStep.setEndStep();
+            return;
+        }*/
         dataOptStep.setNextStep();
         if (ConstantValue.TRUE.equals(dataOptVo.getNeedRollback())) {
             if (dataOptVo.getPreResult() instanceof ResponseData) {
@@ -243,8 +245,6 @@ public class BizOptFlowImpl implements BizOptFlow {
         stepJson=stepJson.getJSONObject("properties");
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
         String path;
-        bizModel.getModelTag().remove("requestFile");
-        bizModel.getModelTag().remove("requestBody");
         if (bizModel.getResponseMapData().getCode() != ResponseData.RESULT_OK || RETURN_RESULT_STATE.equals(type)) {
             ResponseMapData responseMapData=bizModel.getResponseMapData();
             ResponseSingleData responseSingleData= new ResponseSingleData(responseMapData.getCode(),responseMapData.getMessage());

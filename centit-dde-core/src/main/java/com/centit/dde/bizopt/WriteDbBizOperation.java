@@ -48,7 +48,6 @@ public class WriteDbBizOperation implements BizOperation {
         Integer withChildrenDeep = bizOptJson.getInteger("withChildrenDeep");
         String optId=(String) bizModel.getModelTag().get("metadata_optId");
         Map<String, Object> modelTag = bizModel.getModelTag();
-        modelTag.remove("runType");
         DataSet dataSet = bizModel.getDataSet(source);
         if (dataSet==null){
             SimpleDataSet simpleDataSet = new SimpleDataSet();

@@ -27,7 +27,7 @@ public class GenerateJsonBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws IOException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String requestBody= (String)bizModel.getModelTag().get("requestBody");
+        String requestBody= (String)bizModel.getInterimVariable().get("requestBody");
         Object data;
         if (StringUtils.isNotBlank(requestBody)){
             data=requestBody;

@@ -83,9 +83,6 @@ public class HttpBizOperation implements BizOperation {
         DataSet dataSet = new SimpleDataSet();
         HttpReceiveJSON receiveJson;
         mapObject.putAll(bizModel.getModelTag());
-        mapObject.remove("requestBody");
-        mapObject.remove("requestFile");
-        mapObject.remove("runType");
         switch (httpMethod.toLowerCase()) {
             case "post":
                 receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody,false));
