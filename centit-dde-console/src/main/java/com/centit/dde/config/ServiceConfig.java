@@ -97,13 +97,6 @@ public class ServiceConfig {
         return operationLog;
     }
 
-  /*  @Bean
-    public FileClientImpl fileClient() {
-        FileClientImpl fileClient = new FileClientImpl();
-        fileClient.init(fileserver, fileserver, "u0000000", "000000", fileserver);
-        return fileClient;
-    }*/
-
     @Bean
     public FileClientImpl fileClient() {
         FileClientImpl fileClient = new FileClientImpl();

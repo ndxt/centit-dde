@@ -77,8 +77,7 @@ public class HttpBizOperation implements BizOperation {
         if (httpUrlCodeInfo == null && !(httpUrl.startsWith("http://") || httpUrl.startsWith("https://"))){
             return ResponseData.makeErrorMessage(ResponseData.ERROR_PRECONDITION_FAILED,"无效请求地址！");
         }
-        httpUrl=httpUrlCodeInfo == null && (httpUrl.startsWith("http://") || httpUrl.startsWith("https://"))
-            ?httpUrl:httpUrlCodeInfo.getDatabaseUrl()+httpUrl;
+        httpUrl=httpUrlCodeInfo == null && (httpUrl.startsWith("http://") || httpUrl.startsWith("https://"))?httpUrl:httpUrlCodeInfo.getDatabaseUrl()+httpUrl;
         httpUrl = Pretreatment.mapTemplateString(httpUrl,new BizModelJSONTransform(bizModel));
         DataSet dataSet = new SimpleDataSet();
         HttpReceiveJSON receiveJson;
