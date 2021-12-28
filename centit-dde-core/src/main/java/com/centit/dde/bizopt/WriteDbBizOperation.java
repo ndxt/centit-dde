@@ -46,7 +46,7 @@ public class WriteDbBizOperation implements BizOperation {
         String source = bizOptJson.getString("source");
         String tableId = bizOptJson.getString("tableLabelName");
         Integer withChildrenDeep = bizOptJson.getInteger("withChildrenDeep");
-        String optId=(String) bizModel.getModelTag().get("metadata_optId");
+        String optId=(String) bizModel.getInterimVariable().get("metadata_optId");
         Map<String, Object> modelTag = bizModel.getModelTag();
         DataSet dataSet = bizModel.getDataSet(source);
         if (dataSet==null){
@@ -99,7 +99,6 @@ public class WriteDbBizOperation implements BizOperation {
                             objectMap.putAll(qap.getParams());
                             extFilter = qap.getQuery();
                         }
-                        objectMap.remove("metadata_optId");
                         jsonArray =metaObjectService.pageQueryObjects(tableId, extFilter, objectMap,null, pageDesc);
                         result = PageQueryResult.createResult(jsonArray, pageDesc);
                     }
