@@ -134,7 +134,9 @@ public class DataPacket implements Serializable,DataPacketInterface {
     @Column(name = "buffer_fresh_period_secs")
     @ApiModelProperty(value = "缓存周期（秒）")
     private String bufferFreshPeriodSecs;
-
+    @Column(name = "SOURCE_ID")
+    @ApiModelProperty(value = "模板来源")
+    private String sourceId;
 
 
     @OneToMany(targetEntity = DataPacketParam.class)
