@@ -1,12 +1,18 @@
 package com.centit.dde.config;
 
+import com.alibaba.druid.support.http.StatViewServlet;
+import com.alibaba.druid.support.http.WebStatFilter;
 import com.centit.framework.config.SystemSpringMvcConfig;
 import com.centit.framework.config.WebConfig;
 import org.springframework.web.WebApplicationInitializer;
 
 import javax.annotation.Nonnull;
+import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -26,6 +32,19 @@ public class WebInitializer implements WebApplicationInitializer {
         WebConfig.registerServletConfig(servletContext, "dde",
             "/dde/*",
             DdeSpringMvcConfig.class,SwaggerConfig.class);
+
+        //druid 监控配置信息
+        ServletRegistration.Dynamic druidStatView = servletContext.addServlet("druidStatView", StatViewServlet.class);
+        Map<String, String> initParameters = new HashMap<>();
+        initParameters.put("loginUsername","admin");
+        initParameters.put("loginPassword","hqHge0A2192X92F");
+        druidStatView.setInitParameters(initParameters);
+        druidStatView.addMapping("/druid/*");
+
+        FilterRegistration.Dynamic druidWebStatFilter = servletContext.addFilter("druidWebStatFilter", WebStatFilter.class);
+        druidWebStatFilter.addMappingForUrlPatterns(null, true,"/*");
+        druidWebStatFilter.setInitParameter("exclusions","*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*");
+
 
         WebConfig.registerRequestContextListener(servletContext);
         WebConfig.registerSingleSignOutHttpSessionListener(servletContext);
