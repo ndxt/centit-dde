@@ -136,6 +136,7 @@ public class DataPacket implements Serializable,DataPacketInterface {
     private String bufferFreshPeriodSecs;
     @Column(name = "SOURCE_ID")
     @ApiModelProperty(value = "模板来源")
+    @JSONField(serialize = false)
     private String sourceId;
 
 
