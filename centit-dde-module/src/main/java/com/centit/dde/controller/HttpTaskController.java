@@ -149,7 +149,9 @@ public class HttpTaskController extends BaseController {
     }
 
     private void returnObject(String packetId, String runType,String taskType, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        judgePower(packetId,runType);
+        if (!ConstantValue.RUN_TYPE_COPY.equals(runType)){
+            judgePower(packetId,runType);
+        }
         Object bizModel;
         DataPacketInterface dataPacketInterface;
         if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
