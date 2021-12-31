@@ -102,7 +102,11 @@ public class WriteDbBizOperation implements BizOperation {
                         jsonArray =metaObjectService.pageQueryObjects(tableId, extFilter, objectMap,null, pageDesc);
                         result = PageQueryResult.createResult(jsonArray, pageDesc);
                     }
-                    bizModel.putDataSet(id, new SimpleDataSet(result));
+                    if (modelTag.get("closePage")!=null){//返回接口元数数据，不含分页信息
+                        bizModel.putDataSet(id, new SimpleDataSet(jsonArray));
+                    }else {
+                        bizModel.putDataSet(id, new SimpleDataSet(result));//返回带分页的数据
+                    }
                     return BuiltInOperation.getResponseSuccessData(jsonArray.size());
                 case 5://查看
                     Map<String, Object> data = metaObjectService.getObjectWithChildren(tableId, dataAsList.get(0), withChildrenDeep == null ? 1 : withChildrenDeep);
