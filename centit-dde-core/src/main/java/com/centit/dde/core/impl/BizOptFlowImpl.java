@@ -137,7 +137,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.GENERATEJSON, new GenerateJsonBizOperation());
         allOperations.put(ConstantValue.RETURN_JSON, GenerateJsonBizOperation::returnJson);
         allOperations.put(ConstantValue.FILEUPLOADS, new FileUploadBizOperation(fileStore));
-        allOperations.put(ConstantValue.GENERATEXCEL, new GenerateExcelBizeOperation());
+        allOperations.put(ConstantValue.GENERATEXCEL, new GenerateExcelBizeOperation(fileStore));
         allOperations.put(ConstantValue.FILEDOWNLOAD, new FileDownloadBizOperation(fileStore));
         allOperations.put(ConstantValue.WRITE_DB, new WriteDbBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentBizOperation());

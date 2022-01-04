@@ -188,7 +188,7 @@ public class ExcelDataSet extends FileDataSet {
                 cells.setCellValue(value);
             }
         }
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
             wb.write(byteArrayOutputStream);
             return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
         } finally {
