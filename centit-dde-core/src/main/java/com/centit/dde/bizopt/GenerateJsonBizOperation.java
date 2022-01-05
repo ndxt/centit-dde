@@ -8,7 +8,6 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
-import com.centit.dde.utils.CloneUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.json.JSONTransformer;
@@ -45,17 +44,16 @@ public class GenerateJsonBizOperation implements BizOperation {
 
     //返回json
     public static ResponseData returnJson(BizModel bizModel, JSONObject bizOptJson){
-        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName =bizOptJson.getString("id");
         String jsonValue=BuiltInOperation.getJsonFieldString(bizOptJson,"jsonValue",null);
-        if (StringUtils.isNotBlank(jsonValue)){
+        if (StringUtils.isNotEmpty(jsonValue)&& jsonValue.startsWith("{")){
+            //json格式表达式获取值
             Object data = JSONTransformer.transformer(JSON.parse(jsonValue), new BizModelJSONTransform(bizModel));
             bizModel.putDataSet(targetDsName,new SimpleDataSet(data));
         }else {
-            DataSet dataSet = bizModel.getDataSet(sourDsName);
-            if (dataSet != null) {
-                bizModel.putDataSet(targetDsName, CloneUtils.clone((SimpleDataSet) dataSet));
-            }
+            //非json格式表达式获取值
+            Object data = JSONTransformer.transformer(jsonValue, new BizModelJSONTransform(bizModel));
+            bizModel.putDataSet(targetDsName, new SimpleDataSet(data));
         }
         return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(targetDsName).getSize());
     }
