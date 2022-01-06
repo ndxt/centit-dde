@@ -55,8 +55,6 @@ public class ConstantValue {
     public static final String DELETE_WORKFLOW ="deleteworkflow";
 
     public static final  String RESPONSE_DATA_CODE="responseDataCode";
-    //动态代码节点
-    public static final String DYNAMIC_CODE = "createworkflow";
 
     public static final String FINAL_TWO="2";
 

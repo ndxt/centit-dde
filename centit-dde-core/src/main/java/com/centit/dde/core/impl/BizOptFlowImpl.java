@@ -98,12 +98,13 @@ public class BizOptFlowImpl implements BizOptFlow {
     @PostConstruct
     public void init() {
         allOperations.put("sche", BuiltInOperation::runStart);
+        allOperations.put("start", BuiltInOperation::runStart);
         allOperations.put("Getpostdata", BuiltInOperation::runRequestBody);
         allOperations.put("Getpostfile", BuiltInOperation::runRequestFile);
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
         allOperations.put("append", BuiltInOperation::runAppend);
-        allOperations.put("start", BuiltInOperation::runStat);
+        allOperations.put("stat", BuiltInOperation::runStat);
         allOperations.put("analyse", BuiltInOperation::runAnalyse);
         allOperations.put("cross", BuiltInOperation::runCross);
         allOperations.put("compare", BuiltInOperation::runCompare);
@@ -141,6 +142,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.FILEDOWNLOAD, new FileDownloadBizOperation(fileStore));
         allOperations.put(ConstantValue.WRITE_DB, new WriteDbBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentBizOperation());
+        allOperations.put("compareSource", new ObjectCompareBizOperation());
     }
 
     @Override

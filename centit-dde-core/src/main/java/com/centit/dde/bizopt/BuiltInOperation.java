@@ -8,17 +8,14 @@ import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.datarule.CheckRule;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.DataSetOptUtil;
-import com.centit.fileserver.utils.SystemTempFileUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.file.FileIOOpt;
-import com.centit.support.file.FileSystemOpt;
-import com.centit.support.report.ExcelExportUtil;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -117,7 +114,7 @@ public class BuiltInOperation {
         return getResponseSuccessData(destDs.getSize());
     }
 
-    public static Object returnExcel(BizModel bizModel, JSONObject bizOptJson) throws Exception {
+/*    public static Object returnExcel(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String path = BuiltInOperation.getJsonFieldString(bizOptJson, "source2", "");
         File excel = new File(SystemTempFileUtils.getRandomTempFilePath());
         for (Map.Entry<String, DataSet> set : bizModel.getBizData().entrySet()) {
@@ -131,7 +128,7 @@ public class BuiltInOperation {
         FileSystemOpt.deleteFile(excel);
         return BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", bizModel.getModelName() + ".xlsx",
             "fileContent", outStream));
-    }
+    }*/
 
     public static ResponseData runMap(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());

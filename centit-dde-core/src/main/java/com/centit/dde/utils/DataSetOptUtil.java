@@ -206,44 +206,65 @@ public abstract class DataSetOptUtil {
     private static Map<String, Object> makeNewStatRow(List<String> groupByFields,
                                                       List<Triple<String, String, String>> statDesc,
                                                       Map<String, Object> preRow,
-                                                      Map<String, List<Double>> tempData) {
+                                                      Map<String, List<Object>> tempData) {
         Map<String, Object> newRow = new HashMap<>(groupByFields.size());
         if (groupByFields.size() > 0) {
             for (String field : groupByFields) {
                 newRow.put(field, preRow.get(field));
             }
         }
+        Map<String, List<Double>> tempDataDouble = new HashMap<>(statDesc.size());
         for (Triple<String, String, String> tr : statDesc) {
-            double db;
+          if (!"concat".equals(tr.getRight())){
+              tempData.forEach((key, value) -> {
+                  List<Double> doubleList = new ArrayList<>();
+                  List<Object> list = value;
+                  for (Object o : list) {
+                      doubleList.add(NumberBaseOpt.castObjectToDouble(o));
+                  }
+                  tempDataDouble.put(key, doubleList);
+              });
+          }
+        }
+        for (Triple<String, String, String> tr : statDesc) {
+            Object db;
             switch (tr.getRight()) {
                 case "min":
-                    db = StatUtils.min(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.min(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "max":
-                    db = StatUtils.max(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.max(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "mean":
-                    db = StatUtils.mean(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.mean(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "sum":
-                    db = StatUtils.sum(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.sum(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "sumSq":
-                    db = StatUtils.sumSq(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.sumSq(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "prod":
-                    db = StatUtils.product(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.product(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "sumLog":
-                    db = StatUtils.sumLog(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.sumLog(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "geometricMean":
-                    db = StatUtils.geometricMean(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.geometricMean(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "variance":
-                    db = StatUtils.variance(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.variance(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 /* percentile 这个没有实现*/
+                case "concat":
+                    List<Object> objects = tempData.get(tr.getLeft());
+                    StringBuilder builder = new StringBuilder();
+                    for (Object object : objects) {
+                        builder.append(object);
+                    }
+                    db=builder.toString();
+                    break;
                 default:
                     db = tempData.get(tr.getLeft()).size();
                     break;
@@ -277,7 +298,7 @@ public abstract class DataSetOptUtil {
     private static DataSet statDataset(DataSet inData,
                                        List<String> groupByFields,
                                        List<Triple<String, String, String>> statDesc) {
-        if (inData == null || groupByFields == null) {
+        if (inData == null) {//|| groupByFields == null
             return inData;
         }
         List<Map<String, Object>> data = inData.getDataAsList();
@@ -285,14 +306,14 @@ public abstract class DataSetOptUtil {
             return inData;
         }
         //按group by字段排序
-        if (groupByFields.size() > 0) {
+        if (groupByFields != null && groupByFields.size() > 0) {
             sortByFields(data, groupByFields);
         }
 
         List<Map<String, Object>> newData = new ArrayList<>();
         Map<String, Object> preRow = null;
 
-        Map<String, List<Double>> tempData = new HashMap<>(statDesc.size());
+        Map<String, List<Object>> tempData = new HashMap<>(statDesc.size());
         for (Triple<String, String, String> tr : statDesc) {
             tempData.put(tr.getLeft(), new ArrayList<>());
         }
@@ -301,8 +322,7 @@ public abstract class DataSetOptUtil {
             if (0 != compareTwoRow(preRow, row, groupByFields)) {
                 if (preRow != null) {
                     //保存newRow
-                    Map<String, Object> newRow = makeNewStatRow(groupByFields,
-                        statDesc, preRow, tempData);
+                    Map<String, Object> newRow = makeNewStatRow(groupByFields, statDesc, preRow, tempData);
                     newData.add(newRow);
                 }
                 // 新建数据临时数据空间
@@ -311,16 +331,15 @@ public abstract class DataSetOptUtil {
                 }
             }
             for (Triple<String, String, String> tr : statDesc) {
-                tempData.get(tr.getLeft()).add(
-                    NumberBaseOpt.castObjectToDouble(row.get(tr.getMiddle())));
+                //tempData.get(tr.getLeft()).add(NumberBaseOpt.castObjectToDouble(row.get(tr.getMiddle())));
+                tempData.get(tr.getLeft()).add(row.get(tr.getMiddle()));
             }
             preRow = row;
         }
 
         if (preRow != null) {
             //保存newRow
-            Map<String, Object> newRow = makeNewStatRow(groupByFields,
-                statDesc, preRow, tempData);
+            Map<String, Object> newRow = makeNewStatRow(groupByFields, statDesc, preRow, tempData);
             newData.add(newRow);
         }
         return new SimpleDataSet(newData);
