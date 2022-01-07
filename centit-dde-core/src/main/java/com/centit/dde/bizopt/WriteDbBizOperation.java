@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
-import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
@@ -20,6 +19,7 @@ import com.centit.support.database.utils.PageDesc;
 import com.centit.support.database.utils.QueryAndNamedParams;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,14 +48,12 @@ public class WriteDbBizOperation implements BizOperation {
         Integer withChildrenDeep = bizOptJson.getInteger("withChildrenDeep");
         String optId=(String) bizModel.getInterimVariable().get("metadata_optId");
         Map<String, Object> modelTag = bizModel.getModelTag();
-        DataSet dataSet = bizModel.getDataSet(source);
-        if (dataSet==null){
-            SimpleDataSet simpleDataSet = new SimpleDataSet();
-            simpleDataSet.setData(modelTag);
-            dataSet = simpleDataSet;
-        }
+        SimpleDataSet dataSet = (SimpleDataSet)bizModel.getDataSet(source);
         Integer templateType = bizOptJson.getInteger("templateType");
-        List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
+        List<Map<String, Object>> dataAsList = new ArrayList<>();
+        if(dataSet!=null){
+            dataAsList = dataSet.getDataAsList();
+        }
         try {
             switch (templateType){
                 case 1://新建
@@ -67,7 +65,7 @@ public class WriteDbBizOperation implements BizOperation {
                     bizModel.putDataSet(id, new SimpleDataSet(upcount));
                     return BuiltInOperation.getResponseSuccessData(upcount);
                 case 3://删除
-                    metaObjectService.deleteObjectWithChildren(tableId, dataAsList.get(0), withChildrenDeep == null ? 1 : withChildrenDeep);
+                    metaObjectService.deleteObjectWithChildren(tableId, modelTag, withChildrenDeep == null ? 1 : withChildrenDeep);
                     bizModel.putDataSet(id, new SimpleDataSet(dataAsList.size()));
                     return BuiltInOperation.getResponseSuccessData(dataAsList.size());
                 case 4://查询
@@ -75,33 +73,29 @@ public class WriteDbBizOperation implements BizOperation {
                     String topUnit = WebOptUtils.getCurrentTopUnit(request);
                     List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, WebOptUtils.getCurrentUserCode(request), optId, "list");
                     String extFilter = null;
-                    JSONArray jsonArray =new JSONArray();
                     PageDesc pageDesc = new PageDesc();
-                    PageQueryResult<Object> result =null;
-                    for (Map<String, Object> objectMap : dataAsList) {
-                        if (objectMap.get("pageNo")!=null){
-                            pageDesc.setPageNo(Integer.valueOf(String.valueOf(objectMap.get("pageNo"))));
-                            objectMap.remove("pageNo");
-                        }
-                        if ( objectMap.get("pageSize")!=null){
-                            pageDesc.setPageSize(Integer.valueOf(String.valueOf(objectMap.get("pageSize"))));
-                            objectMap.remove("pageSize");
-                        }
-                        if (filters != null) {
-                            MetaTable table = metaDataCache.getTableInfo(tableId);
-                            DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
-                                WebOptUtils.getCurrentUserInfo(request), topUnit, WebOptUtils.getCurrentUnitCode(request));
-                            dataPowerFilter.addSourceData(objectMap);
-                            Map<String, String> tableAlias = new HashMap<>(3);
-                            tableAlias.put(table.getTableName(), "");
-                            QueryAndNamedParams qap = dataPowerFilter.translateQueryFilter(
-                                tableAlias, filters);
-                            objectMap.putAll(qap.getParams());
-                            extFilter = qap.getQuery();
-                        }
-                        jsonArray =metaObjectService.pageQueryObjects(tableId, extFilter, objectMap,null, pageDesc);
-                        result = PageQueryResult.createResult(jsonArray, pageDesc);
+                    if (modelTag.get("pageNo")!=null){
+                        pageDesc.setPageNo(Integer.valueOf(String.valueOf(modelTag.get("pageNo"))));
+                        modelTag.remove("pageNo");
                     }
+                    if ( modelTag.get("pageSize")!=null){
+                        pageDesc.setPageSize(Integer.valueOf(String.valueOf(modelTag.get("pageSize"))));
+                        modelTag.remove("pageSize");
+                    }
+                    if (filters != null) {
+                        MetaTable table = metaDataCache.getTableInfo(tableId);
+                        DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
+                            WebOptUtils.getCurrentUserInfo(request), topUnit, WebOptUtils.getCurrentUnitCode(request));
+                        dataPowerFilter.addSourceData(modelTag);
+                        Map<String, String> tableAlias = new HashMap<>(3);
+                        tableAlias.put(table.getTableName(), "");
+                        QueryAndNamedParams qap = dataPowerFilter.translateQueryFilter(
+                            tableAlias, filters);
+                        modelTag.putAll(qap.getParams());
+                        extFilter = qap.getQuery();
+                    }
+                    JSONArray  jsonArray =metaObjectService.pageQueryObjects(tableId, extFilter, modelTag,null, pageDesc);
+                    PageQueryResult<Object>  result = PageQueryResult.createResult(jsonArray, pageDesc);
                     if (modelTag.get("closePage")!=null){//返回接口元数数据，不含分页信息
                         bizModel.putDataSet(id, new SimpleDataSet(jsonArray));
                     }else {
@@ -109,7 +103,7 @@ public class WriteDbBizOperation implements BizOperation {
                     }
                     return BuiltInOperation.getResponseSuccessData(jsonArray.size());
                 case 5://查看
-                    Map<String, Object> data = metaObjectService.getObjectWithChildren(tableId, dataAsList.get(0), withChildrenDeep == null ? 1 : withChildrenDeep);
+                    Map<String, Object> data = metaObjectService.getObjectWithChildren(tableId, modelTag, withChildrenDeep == null ? 1 : withChildrenDeep);
                     bizModel.putDataSet(id, new SimpleDataSet(data));
                     return BuiltInOperation.getResponseSuccessData(data.size());
                 case 9://批量删除
