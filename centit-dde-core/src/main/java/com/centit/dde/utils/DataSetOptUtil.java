@@ -257,7 +257,7 @@ public abstract class DataSetOptUtil {
                     db = StatUtils.variance(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 /* percentile 这个没有实现*/
-                case "concat":
+                case "splitJ":
                     List<Object> objects = tempData.get(tr.getLeft());
                     StringBuilder builder = new StringBuilder();
                     for (Object object : objects) {

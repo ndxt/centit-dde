@@ -70,10 +70,18 @@ public class HttpBizOperation implements BizOperation {
             loginUrlInfo = sourceInfoDao.getDatabaseInfoById(loginUrlCode);
         }
         SourceInfo httpUrlCodeInfo=null;
+        Map<String, String> headers = new HashMap<>();
         if (StringUtils.isNotBlank(httpUrlCode)){
             httpUrlCodeInfo = sourceInfoDao.getDatabaseInfoById(httpUrlCode);
+            if (httpUrlCodeInfo!=null){
+                JSONObject extProps = httpUrlCodeInfo.getExtProps();
+                if (extProps !=null){
+                    headers = JSON.parseObject(extProps.toJSONString(), Map.class);
+                }
+            }
         }
         HttpExecutorContext httpExecutorContext = getHttpClientContext(loginUrlInfo);
+        httpExecutorContext.headers(headers);
         if (httpUrlCodeInfo == null && !(httpUrl.startsWith("http://") || httpUrl.startsWith("https://"))){
             return ResponseData.makeErrorMessage(ResponseData.ERROR_PRECONDITION_FAILED,"无效请求地址！");
         }
