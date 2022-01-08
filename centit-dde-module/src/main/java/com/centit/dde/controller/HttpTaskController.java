@@ -283,7 +283,8 @@ public class HttpTaskController extends BaseController {
             "表达式:addyears(),名称:加年数,示例:formula:addyears(name,1)  \n" +
             "表达式:truncdate(),名称:截断日期  第二个参数  Y ，M , D 分别返回一年、月的第一天 ，或者一日的零点,示例:formula:truncdate(name,'y')  \n" +
             "表达式:lastofmonth(),名称:求这个月最后一天,示例:formula:lastofmonth(name)  \n" +
-            "表达式:toDate(),名称:转换为日期,示例:formula:toDate(name)  \n")
+            "表达式:random(),名称:生成随机数random(5),random(1,5),random(string,20),random(string,uuid22/uuid32/uuid36)示例:formula:random()  \n" +
+            "表达式:hash(),名称:签名计算,hash(object),hash(object,md5/sha,base64),hash(object,hmac-sha1,secret-key),hash(object,hmac-sha1,secret-key,base64)示例:formula:hash(name)  \n" )
     @ApiImplicitParams({@ApiImplicitParam(
         name = "formula", value = "表达式"
     ), @ApiImplicitParam(

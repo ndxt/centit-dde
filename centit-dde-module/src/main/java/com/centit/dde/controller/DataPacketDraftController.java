@@ -173,9 +173,12 @@ public class DataPacketDraftController extends BaseController {
     @ApiOperation(value = "编辑API网关")
     @PutMapping(value = "/{packetId}")
     @WrapUpResponseBody
-    public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketDraft dataPacketDraft) {
+    public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketDraft dataPacketDraft) throws ParseException {
         LoginUserPermissionCheck.loginUserPermissionCheck(workGroupManager,dataPacketDraft);
         dataPacketDraft.setPacketId(packetId);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateStr = dateFormat.format(new Date());
+        dataPacketDraft.setUpdateDate(dateFormat.parse(dateStr));
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
         dataPacketDraftService.updateDataPacket(dataPacketDraft);
     }
