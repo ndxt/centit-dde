@@ -1,5 +1,6 @@
 package com.centit.dde.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
 import com.centit.framework.common.WebOptUtils;
@@ -14,60 +15,22 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhf
  */
-@Api(value = "数据包", tags = "数据包")
+@Api(value = "已发布API网关接口管理", tags = "已发布API网关接口管理")
 @RestController
 @RequestMapping(value = "packet")
 public class DataPacketController extends BaseController {
-
-
     private final DataPacketService dataPacketService;
-
 
     public DataPacketController(DataPacketService dataPacketService) {
         this.dataPacketService = dataPacketService;
     }
 
-    @ApiOperation(value = "新增数据包")
-    @PostMapping
-    @WrapUpResponseBody
-    public DataPacket createDataPacket(@RequestBody DataPacket dataPacket, HttpServletRequest request) {
-        dataPacket.setRecorder(WebOptUtils.getCurrentUserCode(request));
-        dataPacket.setDataOptDescJson(dataPacket.getDataOptDescJson());
-        dataPacketService.createDataPacket(dataPacket);
-        return dataPacket;
-    }
-
-    @ApiOperation(value = "编辑数据包")
-    @PutMapping(value = "/{packetId}")
-    @WrapUpResponseBody
-    public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacket dataPacket) {
-        dataPacket.setPacketId(packetId);
-        dataPacket.setDataOptDescJson(dataPacket.getDataOptDescJson());
-        if(dataPacket.getRecordDate()==null){
-            dataPacket.setRecordDate(new Date());
-        }
-        dataPacketService.updateDataPacket(dataPacket);
-    }
-
-    @ApiOperation(value = "编辑数据包数据处理描述信息")
-    @PutMapping(value = "/opt/{packetId}")
-    @WrapUpResponseBody
-    public void updateDataPacketOpt(@PathVariable String packetId, @RequestBody String dataOptDescJson) {
-        dataPacketService.updateDataPacketOptJson(packetId, dataOptDescJson);
-    }
-
-    @ApiOperation(value = "删除数据包")
-    @DeleteMapping(value = "/{packetId}")
-    @WrapUpResponseBody
-    public void deleteDataPacket(@PathVariable String packetId) {
-        dataPacketService.deleteDataPacket(packetId);
-    }
-
-    @ApiOperation(value = "查询数据包")
+    @ApiOperation(value = "查询API网关")
     @GetMapping
     @WrapUpResponseBody
     public PageQueryResult<DataPacket> listDataPacket(HttpServletRequest request, PageDesc pageDesc) {
@@ -75,7 +38,15 @@ public class DataPacketController extends BaseController {
         return PageQueryResult.createResult(list, pageDesc);
     }
 
-    @ApiOperation(value = "查询单个数据包")
+    @ApiOperation(value = "工作流查询API网关")
+    @GetMapping(value = "/workflow/{optId}")
+    @WrapUpResponseBody
+    public List<Map<String,String>> listDataPacket(@PathVariable String optId) {
+        return dataPacketService.listDataPacket(optId);
+    }
+
+
+    @ApiOperation(value = "查询单个API网关")
     @GetMapping(value = "/{packetId}")
     @WrapUpResponseBody
     public DataPacket getDataPacket(@PathVariable String packetId) {

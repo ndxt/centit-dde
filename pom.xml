@@ -6,12 +6,12 @@
     <parent>
         <groupId>com.centit.framework</groupId>
         <artifactId>framework-snapshot-dependencies</artifactId>
-        <version>5.1-SNAPSHOT</version>
+        <version>5.2-SNAPSHOT</version>
     </parent>
 
 	<groupId>com.centit.product</groupId>
 	<artifactId>centit-dde3</artifactId>
-	<version>5.1-SNAPSHOT</version>
+	<version>5.2-SNAPSHOT</version>
     <modules>
         <module>centit-dde-datamoving</module>
         <module>centit-dde-agent</module>
@@ -22,19 +22,21 @@
         <module>centit-dde-redis-plugin</module>
         <module>centit-dde-ofd-plugin</module>
         <module>centit-dde-workflow-plugin</module>
-        <module>centit-dde-webservices-plugin</module>
-        <module>centit-dde-dynamiccodes-plugin</module>
+        <module>centit-dde-kafka-plugin</module>
+        <module>centit-dde-consumer-server</module>
+        <module>centit-dde-dubbo-adapter</module>
+        <module>centit-dde-dubbo-server-config</module>
+        <module>centit-dde-dubbo-client-config</module>
     </modules>
     <name>com.centit.product:centit-dde</name>
 	<packaging>pom</packaging>
 
     <properties>
         <cxf.version>2.7.3</cxf.version>
-        <metadata.version>5.1-SNAPSHOT</metadata.version>
-        <common.module.version>5.1-SNAPSHOT</common.module.version>
-        <centit.dde.version>5.1-SNAPSHOT</centit.dde.version>
-        <centit.fileserver.version>5.1-SNAPSHOT</centit.fileserver.version>
-        <centit.workflow.version>5.1-SNAPSHOT</centit.workflow.version>
+        <metadata.version>5.2-SNAPSHOT</metadata.version>
+        <centit.dde.version>5.2-SNAPSHOT</centit.dde.version>
+        <centit.fileserver.version>5.2-SNAPSHOT</centit.fileserver.version>
+        <centit.workflow.version>5.2-SNAPSHOT</centit.workflow.version>
     </properties>
 
 

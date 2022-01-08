@@ -1,0 +1,86 @@
+{
+  "settings":{
+    "number_of_replicas":3,
+    "number_of_shards":3,
+    "index.max_ngram_diff":6,
+    "refresh_interval":"20s",
+    "index.search.slowlog.threshold.query.warn": "10s",
+    "index.search.slowlog.threshold.query.info": "5s",
+    "index.search.slowlog.threshold.query.debug": "2s",
+    "index.search.slowlog.threshold.query.trace": "500ms",
+    "analysis": {
+      "analyzer": {
+        "ikSearchAnalyzer": {
+          "type": "custom",
+          "tokenizer": "ik_max_word",
+          "char_filter": [
+            "tsconvert"
+          ]
+        },
+        "ikSmartSearchAnalyzer": {
+          "type": "custom",
+          "tokenizer": "ik_smart",
+          "char_filter": [
+            "tsconvert"
+          ]
+        },
+        "pinyinSimpleAnalyzer": {
+          "tokenizer": "my_pinyin"
+        },
+        "pinyinComplexAnalyzer": {
+          "tokenizer": "ik_max_word",
+          "filter": [
+            "lowercase",
+            "pinyin_simple_filter",
+            "edge_ngram_filter"
+          ],
+          "char_filter":[
+            "tsconvert"
+          ]
+        },
+        "lowercaseAnalyzer": {
+          "type": "custom",
+          "tokenizer": "keyword",
+          "filter": "lowercase"
+        }
+      },
+      "tokenizer" : {
+        "my_pinyin" : {
+          "type" : "pinyin",
+          "keep_separate_first_letter" : false,
+          "keep_full_pinyin" : true,
+          "keep_original" : true,
+          "limit_first_letter_length" : 16,
+          "lowercase" : true,
+          "remove_duplicated_term" : true
+        }
+      },
+      "filter": {
+        "edge_ngram_filter": {
+          "type": "edge_ngram",
+          "min_gram": 1,
+          "max_gram": 50
+        },
+        "ngram_filter": {
+          "type": "ngram",
+          "min_gram": 2,
+          "max_gram": 5
+        },
+        "pinyin_simple_filter": {
+          "type": "pinyin",
+          "keep_first_letter": true,
+          "first_letter": "prefix",
+          "padding_char": " ",
+          "keep_full_pinyin" : true,
+          "lowercase": true
+        }
+      },
+      "char_filter": {
+        "tsconvert": {
+          "type": "stconvert",
+          "convert_type": "t2s"
+        }
+      }
+    }
+  }
+}

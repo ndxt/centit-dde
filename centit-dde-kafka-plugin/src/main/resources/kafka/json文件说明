@@ -1,0 +1,4 @@
+consumerParameter.json
+producerParameter.json
+2个json文件为kafka消费者和生产者参数配置文件，提供给前端标签填写参数时使用，方便后期维护参数
+文件中包含了参数名，参数值，参数简述，详情等。

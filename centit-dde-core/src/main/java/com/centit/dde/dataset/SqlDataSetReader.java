@@ -4,18 +4,16 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSetReader;
 import com.centit.dde.core.SimpleDataSet;
+import com.centit.product.adapter.api.ISourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
-import com.centit.product.metadata.transaction.ISourceInfo;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
 
-import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

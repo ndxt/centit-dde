@@ -5,7 +5,7 @@
     <parent>
         <artifactId>centit-dde3</artifactId>
         <groupId>com.centit.product</groupId>
-        <version>5.1-SNAPSHOT</version>
+        <version>5.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -50,6 +50,11 @@
             <version>${centit.fileserver.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>work-group-adapter</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
     </dependencies>
 
 

@@ -10,8 +10,8 @@ import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.entity.RedisParamVo;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
+import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
-import com.centit.product.metadata.po.SourceInfo;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.lang.reflect.Method;

@@ -28,6 +28,12 @@ public class SimpleBizModel implements BizModel, Serializable {
      * 或者对应关系数据库查询的参数（数据源参数）
      */
     private Map<String, Object> modelTag;
+
+    /**
+     * 内部需要传递某些值到其它标签作为标识时使用
+     */
+    private Map<String, Object> interimVariable;
+
     /**
      * 模型数据
      */
@@ -68,7 +74,7 @@ public class SimpleBizModel implements BizModel, Serializable {
         if(bizData!=null){
             return bizData.get(relationPath);
         }
-        return null;
+        return new SimpleDataSet();
     }
 
     @Override
@@ -155,6 +161,15 @@ public class SimpleBizModel implements BizModel, Serializable {
     }
 
     @Override
+    public Map<String, Object> getInterimVariable() {
+        return interimVariable;
+    }
+
+    public void setInterimVariable(Map<String, Object> interimVariable) {
+        this.interimVariable = interimVariable;
+    }
+
+    @Override
     public Map<String, DataSet> getBizData() {
         return bizData;
     }
@@ -163,7 +178,7 @@ public class SimpleBizModel implements BizModel, Serializable {
         this.bizData = bizData;
     }
 
-    public static SimpleBizModel createSingleDataSetModel(String modelName, DataSet dataSet) {
+    private static SimpleBizModel createSingleDataSetModel(String modelName, DataSet dataSet) {
         SimpleBizModel model = new SimpleBizModel(modelName);
         model.bizData = new HashMap<>(1);
         model.putDataSet(modelName, dataSet);

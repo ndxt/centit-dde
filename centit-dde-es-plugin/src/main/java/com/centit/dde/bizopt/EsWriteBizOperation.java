@@ -8,13 +8,12 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.entity.EsWriteVo;
 import com.centit.dde.factory.PooledRestClientFactory;
-import com.centit.dde.utils.ElasticsearchWriteUtils;
+import com.centit.dde.write.ElasticsearchWriteUtils;
 import com.centit.dde.utils.EsIndexNameExistsUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
+import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
-import com.centit.product.metadata.po.SourceInfo;
-import com.centit.support.common.TimeInterval;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -54,22 +53,18 @@ public class EsWriteBizOperation implements BizOperation {
             String jsonData = JSONObject.toJSONString(datum);
             addData.add(jsonData);
         }
-        TimeInterval timer = new TimeInterval();
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(esSearchWriteEntity.getDataSourceId());
-        log.debug("获取元数据信息耗时："+timer.intervalRestart()+"ms,获取元数据信息："+sourceInfo.toString());
         GenericObjectPool<RestHighLevelClient> restHighLevelClientGenericObjectPool = PooledRestClientFactory.obtainclientPool(new ElasticSearchConfig(), sourceInfo);
         RestHighLevelClient restHighLevelClient=null;
         try {
             restHighLevelClient = restHighLevelClientGenericObjectPool.borrowObject();
-            log.debug("获restHighLevelClient耗时："+timer.intervalRestart()+"ms");
             String indexName = esSearchWriteEntity.getIndexName();
             if (!EsIndexNameExistsUtils.indexNameExists(restHighLevelClient,indexName)){
                 return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+":"+indexName+"索引不存在！");
             }
-            Boolean indexResponse = ElasticsearchWriteUtils.batchSaveDocuments(restHighLevelClient,addData, esSearchWriteEntity);
-            log.info("插入ES数据耗时："+timer.intervalRestart()+"ms");
-            bizModel.putDataSet(esSearchWriteEntity.getId(),new SimpleDataSet(indexResponse));
-            return ResponseSingleData.makeResponseData(indexResponse);
+            JSONObject jsonObject = ElasticsearchWriteUtils.batchSaveDocuments(restHighLevelClient,addData, esSearchWriteEntity);
+            bizModel.putDataSet(esSearchWriteEntity.getId(),new SimpleDataSet(jsonObject));
+            return ResponseSingleData.makeResponseData(jsonObject);
         }finally {
             restHighLevelClientGenericObjectPool.returnObject(restHighLevelClient);
             log.debug("restHighLevelClient放回连接池中");

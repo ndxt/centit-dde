@@ -14,6 +14,7 @@ import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.image.CaptchaImageUtil;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
@@ -36,6 +37,14 @@ public abstract class DataSetOptUtil {
         VariableFormula formula = new VariableFormula();
         formula.addExtendFunc("toJson", (a) -> JSON.parse(
             StringBaseOpt.castObjectToString(a[0])));
+        formula.addExtendFunc("toByteArray", (a) -> {
+            try {
+                return IOUtils.toByteArray((InputStream) a[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return a;
+        });
         formula.addExtendFunc("uuid", (a) -> UuidOpt.getUuidAsString32());
         formula.addExtendFunc("random", (a) -> CaptchaImageUtil.getRandomString(NumberBaseOpt.castObjectToInteger(a[0])));
         formula.addExtendFunc("encode", (a) -> new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
@@ -58,7 +67,17 @@ public abstract class DataSetOptUtil {
                 return stringBuilder.toString();
             }
             else {
-                return null;
+                return a;
+            }
+        });
+        formula.addExtendFunc("dictTrans", (a) -> {
+            if (a != null && a.length > 1) {
+                return CodeRepositoryUtil.transExpression(
+                        StringBaseOpt.castObjectToString(a[0]),
+                        StringBaseOpt.castObjectToString(a[1]));
+            }
+            else {
+                return a;
             }
         });
         formula.addExtendFunc("replace", (a) -> {
@@ -69,8 +88,18 @@ public abstract class DataSetOptUtil {
             else if (a != null && a.length>0){
                 return a[0];
             } else{
-                return null;
+                return a;
             }
+        });
+        formula.addExtendFunc("size",(a)->{
+            Object o = Arrays.stream(a).toArray()[0];
+            if (o instanceof Collection){
+                return ((Collection<?>) o).size();
+            }
+            if (o instanceof Map){
+                return ((Map<?, ?>) o).size();
+            }
+            return "";
         });
         return formula;
     }
@@ -89,7 +118,7 @@ public abstract class DataSetOptUtil {
         }
         VariableFormula formula = createFormula();
         formula.setTrans(new ObjectTranslate(inRow));
-        Map<String, Object> newRow = new HashMap<>(formulaMap.size());
+        Map<String, Object> newRow = new LinkedHashMap<>(formulaMap.size());
         for (Map.Entry<String, String> ent : formulaMap) {
             formula.setFormula(ent.getValue());
 
@@ -177,44 +206,65 @@ public abstract class DataSetOptUtil {
     private static Map<String, Object> makeNewStatRow(List<String> groupByFields,
                                                       List<Triple<String, String, String>> statDesc,
                                                       Map<String, Object> preRow,
-                                                      Map<String, List<Double>> tempData) {
+                                                      Map<String, List<Object>> tempData) {
         Map<String, Object> newRow = new HashMap<>(groupByFields.size());
         if (groupByFields.size() > 0) {
             for (String field : groupByFields) {
                 newRow.put(field, preRow.get(field));
             }
         }
+        Map<String, List<Double>> tempDataDouble = new HashMap<>(statDesc.size());
         for (Triple<String, String, String> tr : statDesc) {
-            double db;
+          if (!"concat".equals(tr.getRight())){
+              tempData.forEach((key, value) -> {
+                  List<Double> doubleList = new ArrayList<>();
+                  List<Object> list = value;
+                  for (Object o : list) {
+                      doubleList.add(NumberBaseOpt.castObjectToDouble(o));
+                  }
+                  tempDataDouble.put(key, doubleList);
+              });
+          }
+        }
+        for (Triple<String, String, String> tr : statDesc) {
+            Object db;
             switch (tr.getRight()) {
                 case "min":
-                    db = StatUtils.min(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.min(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "max":
-                    db = StatUtils.max(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.max(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "mean":
-                    db = StatUtils.mean(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.mean(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "sum":
-                    db = StatUtils.sum(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.sum(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "sumSq":
-                    db = StatUtils.sumSq(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.sumSq(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "prod":
-                    db = StatUtils.product(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.product(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "sumLog":
-                    db = StatUtils.sumLog(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.sumLog(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "geometricMean":
-                    db = StatUtils.geometricMean(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.geometricMean(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 case "variance":
-                    db = StatUtils.variance(listDoubleToArray(tempData.get(tr.getLeft())));
+                    db = StatUtils.variance(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
                 /* percentile 这个没有实现*/
+                case "splitJ":
+                    List<Object> objects = tempData.get(tr.getLeft());
+                    StringBuilder builder = new StringBuilder();
+                    for (Object object : objects) {
+                        builder.append(object);
+                    }
+                    db=builder.toString();
+                    break;
                 default:
                     db = tempData.get(tr.getLeft()).size();
                     break;
@@ -248,10 +298,7 @@ public abstract class DataSetOptUtil {
     private static DataSet statDataset(DataSet inData,
                                        List<String> groupByFields,
                                        List<Triple<String, String, String>> statDesc) {
-        if (inData == null) {
-            return null;
-        }
-        if (groupByFields == null) {
+        if (inData == null) {//|| groupByFields == null
             return inData;
         }
         List<Map<String, Object>> data = inData.getDataAsList();
@@ -259,14 +306,14 @@ public abstract class DataSetOptUtil {
             return inData;
         }
         //按group by字段排序
-        if (groupByFields.size() > 0) {
+        if (groupByFields != null && groupByFields.size() > 0) {
             sortByFields(data, groupByFields);
         }
 
         List<Map<String, Object>> newData = new ArrayList<>();
         Map<String, Object> preRow = null;
 
-        Map<String, List<Double>> tempData = new HashMap<>(statDesc.size());
+        Map<String, List<Object>> tempData = new HashMap<>(statDesc.size());
         for (Triple<String, String, String> tr : statDesc) {
             tempData.put(tr.getLeft(), new ArrayList<>());
         }
@@ -275,8 +322,7 @@ public abstract class DataSetOptUtil {
             if (0 != compareTwoRow(preRow, row, groupByFields)) {
                 if (preRow != null) {
                     //保存newRow
-                    Map<String, Object> newRow = makeNewStatRow(groupByFields,
-                        statDesc, preRow, tempData);
+                    Map<String, Object> newRow = makeNewStatRow(groupByFields, statDesc, preRow, tempData);
                     newData.add(newRow);
                 }
                 // 新建数据临时数据空间
@@ -285,16 +331,15 @@ public abstract class DataSetOptUtil {
                 }
             }
             for (Triple<String, String, String> tr : statDesc) {
-                tempData.get(tr.getLeft()).add(
-                    NumberBaseOpt.castObjectToDouble(row.get(tr.getMiddle())));
+                //tempData.get(tr.getLeft()).add(NumberBaseOpt.castObjectToDouble(row.get(tr.getMiddle())));
+                tempData.get(tr.getLeft()).add(row.get(tr.getMiddle()));
             }
             preRow = row;
         }
 
         if (preRow != null) {
             //保存newRow
-            Map<String, Object> newRow = makeNewStatRow(groupByFields,
-                statDesc, preRow, tempData);
+            Map<String, Object> newRow = makeNewStatRow(groupByFields, statDesc, preRow, tempData);
             newData.add(newRow);
         }
         return new SimpleDataSet(newData);
@@ -373,7 +418,7 @@ public abstract class DataSetOptUtil {
      */
     public static DataSet crossTabulation(DataSet inData, List<String> rowHeaderFields, List<String> colHeaderFields) {
         if (inData == null) {
-            return null;
+            return inData;
         }
         List<Map<String, Object>> data = inData.getDataAsList();
         if (data == null || data.size() == 0) {
@@ -453,7 +498,7 @@ public abstract class DataSetOptUtil {
                                             List<Map.Entry<String, String>> primaryFields,
                                             Collection<Map.Entry<String, String>> formulaMap) {
         if (currDataSet == null || lastDataSet == null) {
-            return null;
+            return new SimpleDataSet();
         }
         List<Map<String, Object>> currData = currDataSet.getDataAsList();
         List<Map<String, Object>> lastData = lastDataSet.getDataAsList();
@@ -601,7 +646,7 @@ public abstract class DataSetOptUtil {
     public static DataSet filterByOtherDataSet(DataSet mainDataSet, DataSet slaveDataSet,
                                                List<Map.Entry<String, String>> primaryFields, List<String> formulas) {
         if (mainDataSet == null || slaveDataSet == null) {
-            return null;
+            return new SimpleDataSet();
         }
         List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
         List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();

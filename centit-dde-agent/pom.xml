@@ -11,14 +11,12 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.product</groupId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
     <artifactId>centit-dde-agent</artifactId>
 
     <properties>
-        <metadata.commons.version>5.1-SNAPSHOT</metadata.commons.version>
-        <centit.dde.version>5.1-SNAPSHOT</centit.dde.version>
-        <centit.ip.version>5.1-SNAPSHOT</centit.ip.version>
-        <common.module.version>5.1-SNAPSHOT</common.module.version>
+        <centit.dde.version>5.2-SNAPSHOT</centit.dde.version>
+        <common.module.version>5.2-SNAPSHOT</common.module.version>
     </properties>
 
     <dependencies>
@@ -30,21 +28,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
         </dependency>
-        <!--<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-            <exclusions>&lt;!&ndash; 去掉默认配置 &ndash;&gt;
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>-->
-
-        <!--<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-quartz</artifactId>
-        </dependency>-->
         <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-quartz-extend</artifactId>
@@ -55,12 +38,6 @@
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-core</artifactId>
             <version>${centit.dde.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.centit.support</groupId>
-                    <artifactId>centit-es-client</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -112,13 +89,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
         </dependency>
-        <!--<dependency>
-            <groupId>com.sun</groupId>
-            <artifactId>tools</artifactId>
-            <systemPath>${java.home}/../lib/tools.jar</systemPath>
-            <version>${jdk.version}</version>
-            <scope>system</scope>
-        </dependency>-->
     </dependencies>
     <build>
         <plugins>

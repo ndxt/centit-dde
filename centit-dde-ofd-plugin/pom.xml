@@ -5,7 +5,7 @@
     <parent>
         <artifactId>centit-dde3</artifactId>
         <groupId>com.centit.product</groupId>
-        <version>5.1-SNAPSHOT</version>
+        <version>5.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -44,12 +44,6 @@
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-core</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>fileserver-client</artifactId>
-            <version>${centit.fileserver.version}</version>
         </dependency>
     </dependencies>
 

@@ -38,7 +38,7 @@ public class ConstantValue {
 
     public static final String CYCLE_JUMP_BREAK = "break";
     public static final String CYCLE_FINISH = "finishCycle";
-
+    public static final String DATA_COPY ="1";
     public static final String GENERATEJSON = "Generatejson";
     public static final String GENERATECSV = "Generatecsv";
     public static final String FILEUPLOADS = "fileuploads";
@@ -51,7 +51,15 @@ public class ConstantValue {
     public static final String CREATE_WORKFLOW = "createworkflow";
 
     public static final String SUBMIT_WORKFLOW ="submitworkflow";
+
+    public static final String DELETE_WORKFLOW ="deleteworkflow";
+
     public static final  String RESPONSE_DATA_CODE="responseDataCode";
-    //动态代码节点
-    public static final String DYNAMIC_CODE = "createworkflow";
+
+    public static final String FINAL_TWO="2";
+
+    public static final String TASK_TYPE_GET="1";
+    public static final String TASK_TYPE_POST="3";
+    public static final String TASK_TYPE_PUT="5";
+    public static final String TASK_TYPE_DELETE="6";
 }

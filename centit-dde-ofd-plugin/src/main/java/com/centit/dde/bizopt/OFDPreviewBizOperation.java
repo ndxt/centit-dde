@@ -1,6 +1,5 @@
 package com.centit.dde.bizopt;
 
-import com.centit.support.common.TimeInterval;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -61,7 +60,6 @@ public class OFDPreviewBizOperation implements BizOperation {
         if (StringUtils.isNotBlank(urlParam)){
             urlParam=urlParam+"reader?&type=upload";
         }
-        TimeInterval timer = new TimeInterval();
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost uploadFile = new HttpPost(urlParam);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
@@ -76,7 +74,6 @@ public class OFDPreviewBizOperation implements BizOperation {
             response = httpClient.execute(uploadFile);
             HttpEntity responseEntity = response.getEntity();
             String sResponse= EntityUtils.toString(responseEntity, "UTF-8");
-            log.info("请求OFD预览服务,请求地址："+urlParam+"，返回结果："+sResponse+"请求耗时："+timer.interval());
             return JSONObject.parseObject(sResponse);
         } catch (IOException e) {
             log.error("请求OFD预览服务异常，异常信息："+e.getMessage());

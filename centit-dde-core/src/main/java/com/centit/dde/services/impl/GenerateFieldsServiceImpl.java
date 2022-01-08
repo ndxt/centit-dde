@@ -10,8 +10,8 @@ import com.centit.dde.dataset.SqlDataSetWriter;
 import com.centit.dde.services.GenerateFieldsService;
 import com.centit.dde.vo.ColumnSchema;
 import com.centit.fileserver.common.FileStore;
+import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
-import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.*;
@@ -61,7 +61,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     }
 
     @Override
-    public JSONArray queryViewCsvData(String fileId) {
+    public JSONArray queryViewCsvData(String fileId) throws Exception{
         CsvDataSet csvDataSet = new CsvDataSet();
         try {
             csvDataSet.setFilePath(
@@ -82,7 +82,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     }
 
     @Override
-    public JSONArray queryViewJsonData(String fileId) {
+    public JSONArray queryViewJsonData(String fileId) throws Exception{
         JSONDataSet jsonDataSet = new JSONDataSet();
         try {
             jsonDataSet.setFilePath(

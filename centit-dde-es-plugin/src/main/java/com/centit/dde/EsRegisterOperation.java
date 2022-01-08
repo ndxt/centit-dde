@@ -23,8 +23,8 @@ public class EsRegisterOperation {
     @PostConstruct
     void registerOperation(){
         //注册查询操作类
-        bizOptFlow.registerOperation("readEs",new EsReadBizOperation(sourceInfoDao));
+        bizOptFlow.registerOperation("EsReadVo",new EsReadBizOperation(sourceInfoDao));
         //注册插入操作类
-        bizOptFlow.registerOperation("writeEs",new EsWriteBizOperation(sourceInfoDao));
+        bizOptFlow.registerOperation("EsWriteVo",new EsWriteBizOperation(sourceInfoDao));
     }
 }

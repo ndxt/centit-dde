@@ -12,27 +12,24 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Map;
 
-public class JSONDataSet extends FileDataSet{
+public class JSONDataSet extends FileDataSet {
 
     private static final Logger logger = LoggerFactory.getLogger(JSONDataSet.class);
+
     /**
      * 读取 dataSet 数据集
+     *
      * @param params 模块的自定义参数
      * @return dataSet 数据集
      */
     @Override
-    public SimpleDataSet load(Map<String, Object> params) {
-        try {
-            if(params !=null && BooleanBaseOpt.castObjectToBoolean(
-                params.get("isJSONArray"),false)) {
-                JSONArray json = JSON.parseArray(FileIOOpt.readStringFromFile(this.getFilePath()));
-                return new SimpleDataSet(json);
-            }else {
-                return JSON.parseObject(FileIOOpt.readStringFromFile(this.getFilePath()), SimpleDataSet.class);
-            }
-        } catch (IOException e) {
-            logger.error(e.getLocalizedMessage(),e);
-            return null;
+    public SimpleDataSet load(Map<String, Object> params) throws Exception{
+        if (params != null && BooleanBaseOpt.castObjectToBoolean(
+            params.get("isJSONArray"), false)) {
+            JSONArray json = JSON.parseArray(FileIOOpt.readStringFromFile(this.getFilePath()));
+            return new SimpleDataSet(json);
+        } else {
+            return JSON.parseObject(FileIOOpt.readStringFromFile(this.getFilePath()), SimpleDataSet.class);
         }
     }
 
@@ -46,7 +43,7 @@ public class JSONDataSet extends FileDataSet{
         try {
             FileIOOpt.writeStringToFile(JSON.toJSONString(dataSet), this.getFilePath());
         } catch (IOException e) {
-            logger.error(e.getLocalizedMessage(),e);
+            logger.error(e.getLocalizedMessage(), e);
         }
     }
 }

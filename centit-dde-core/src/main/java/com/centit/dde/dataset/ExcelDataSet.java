@@ -18,41 +18,33 @@ import org.apache.poi.xssf.usermodel.*;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ExcelDataSet extends FileDataSet {
 
     private InputStream inputStream;
 
-    public  void  setInputStream(InputStream inputStream){
-        this.inputStream=inputStream;
+    public void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
     }
 
     @Override
-    public SimpleDataSet load(Map<String, Object> params) {
-        try {
-            SimpleDataSet dataSet = new SimpleDataSet();
-            //直接执行ExcelTypeEnum.checkFileExcelType(inputStream) 会导致流损坏，创建Workbook时报错，目前只能通过复制流对象来解决
-            List<InputStream> inputStreamList  =cloneInputStream(inputStream) ;
-            ExcelTypeEnum excelTypeEnum = ExcelTypeEnum.checkFileExcelType(inputStreamList.get(0));
-            switch (excelTypeEnum){
-                case HSSF:
-                    dataSet.setData(excelStreamToArray(inputStreamList.get(1),ExcelTypeEnum.HSSF));
-                    break;
-                case XSSF:
-                    dataSet.setData(excelStreamToArray(inputStreamList.get(1),ExcelTypeEnum.XSSF));
-                    break;
-                case NOTEXCEL:
-                    dataSet.setData(null);
-            }
-            return dataSet;
-        } catch (Exception e) {
-            e.printStackTrace();
+    public SimpleDataSet load(Map<String, Object> params) throws Exception {
+        SimpleDataSet dataSet = new SimpleDataSet();
+        //直接执行ExcelTypeEnum.checkFileExcelType(inputStream) 会导致流损坏，创建Workbook时报错，目前只能通过复制流对象来解决
+        List<InputStream> inputStreamList = cloneInputStream(inputStream);
+        ExcelTypeEnum excelTypeEnum = ExcelTypeEnum.checkFileExcelType(inputStreamList.get(0));
+        switch (excelTypeEnum) {
+            case HSSF:
+                dataSet.setData(excelStreamToArray(inputStreamList.get(1), ExcelTypeEnum.HSSF));
+                break;
+            case XSSF:
+                dataSet.setData(excelStreamToArray(inputStreamList.get(1), ExcelTypeEnum.XSSF));
+                break;
+            default:
+                dataSet.setData(null);
         }
-        return null;
+        return dataSet;
     }
 
     /**
@@ -68,7 +60,7 @@ public class ExcelDataSet extends FileDataSet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return new String[0];
     }
 
     @Override
@@ -104,7 +96,7 @@ public class ExcelDataSet extends FileDataSet {
         }
         Sheet sheet;
         Row row;
-        JSONArray jsonArray  = new JSONArray();
+        JSONArray jsonArray = new JSONArray();
         // 遍历Excel中所有的sheet
         for (int i = 0; i < work.getNumberOfSheets(); i++) {
             sheet = work.getSheetAt(i);
@@ -128,7 +120,7 @@ public class ExcelDataSet extends FileDataSet {
                 row = sheet.getRow(j);
                 JSONObject jsonObject = new JSONObject();
                 // 遍历所有的列
-                for (int y = row.getFirstCellNum(); y < row.getLastCellNum()-1; y++) {
+                for (int y = row.getFirstCellNum(); y < row.getLastCellNum() - 1; y++) {
                     Object cellValue = getCellValue(row.getCell(y));
                     Object key = title[y];
                     jsonObject.put((String) key, cellValue);
@@ -142,11 +134,12 @@ public class ExcelDataSet extends FileDataSet {
 
     /**
      * 将集合生成Excel文件
+     *
      * @param objectList 数据
      * @return
      * @throws IOException
      */
-    public static InputStream writeExcel(List<Map<String, Object>> objectList,Map<String, String> mapInfo) throws IOException {
+    public static InputStream writeExcel(List<Map<String, Object>> objectList, Map<String, String> mapInfo) throws IOException {
         //获取数据源的 key, 用于获取列数及设置标题
         //Map<String, Object> map = objectList.get(0);
         Set<String> stringSet = mapInfo.keySet();
@@ -154,12 +147,12 @@ public class ExcelDataSet extends FileDataSet {
         //定义一个新的工作簿
         XSSFWorkbook wb = new XSSFWorkbook();
         //创建一个Sheet页
-        XSSFSheet sheet = wb.createSheet(System.currentTimeMillis()+"");
+        XSSFSheet sheet = wb.createSheet(System.currentTimeMillis() + "");
         //设置行高
         //sheet.setDefaultRowHeight((short) (2 * 200));
         //为有数据的每列设置列宽
         //for (int i = 0; i < headList.size(); i++) {
-           // sheet.setColumnWidth(i, 8000);
+        // sheet.setColumnWidth(i, 8000);
         //}
         //设置单元格字体样式
         XSSFFont font = wb.createFont();
@@ -190,22 +183,20 @@ public class ExcelDataSet extends FileDataSet {
             rows = sheet.createRow(i + 1);
             //给该行数据赋值
             for (int j = 0; j < headList.size(); j++) {
-                String value = objectList.get(i).get(headList.get(j))==null?"":objectList.get(i).get(headList.get(j)).toString();
+                String value = objectList.get(i).get(headList.get(j)) == null ? "" : objectList.get(i).get(headList.get(j)).toString();
                 cells = rows.createCell(j);
                 cells.setCellValue(value);
             }
         }
-        try( ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
             wb.write(byteArrayOutputStream);
             return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
         } finally {
-            if (wb!=null){
-                wb.close();
-            }
+            wb.close();
         }
     }
 
-    public static  List<InputStream> cloneInputStream(InputStream input) {
+    private static List<InputStream> cloneInputStream(InputStream input) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
@@ -222,8 +213,8 @@ public class ExcelDataSet extends FileDataSet {
             return inputStreamList;
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
+        return Collections.emptyList();
     }
 
 
@@ -235,9 +226,9 @@ public class ExcelDataSet extends FileDataSet {
      */
     public static Object getCellValue(Cell cell) {
         Object value = null;
-        DecimalFormat df = new DecimalFormat("0"); // 格式化number String字符
-        SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd"); // 日期格式化
-        DecimalFormat df2 = new DecimalFormat("0"); // 格式化数字
+        DecimalFormat df = new DecimalFormat("0");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
+        DecimalFormat df2 = new DecimalFormat("0");
         switch (cell.getCellType()) {
             case STRING:
                 value = cell.getRichStringCellValue().getString();

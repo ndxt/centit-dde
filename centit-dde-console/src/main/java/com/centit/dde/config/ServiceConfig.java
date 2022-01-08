@@ -1,16 +1,23 @@
 package com.centit.dde.config;
 
 
+import com.alibaba.nacos.api.annotation.NacosProperties;
+import com.alibaba.nacos.spring.context.annotation.config.EnableNacosConfig;
+import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySource;
+import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySources;
 import com.centit.fileserver.client.ClientAsFileStore;
 import com.centit.fileserver.client.FileClientImpl;
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.config.SpringSecurityDaoConfig;
-import com.centit.framework.ip.app.config.IPOrStaticAppSystemBeanConfig;
+import com.centit.framework.core.service.DataScopePowerManager;
+import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
@@ -24,14 +31,18 @@ import redis.clients.jedis.JedisPool;
  */
 @EnableAsync
 @EnableScheduling
-@Import({IPOrStaticAppSystemBeanConfig.class,
+@Import({//IPOrStaticAppSystemBeanConfig.class,
     SpringSecurityDaoConfig.class,
     JdbcConfig.class})
 @ComponentScan(basePackages = "com.centit",
     excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION,
         value = org.springframework.stereotype.Controller.class))
 @Configuration
+@EnableNacosConfig(globalProperties = @NacosProperties(serverAddr = "${nacos.server-addr}"))
+@NacosPropertySources({@NacosPropertySource(dataId = "${nacos.system-dataid}",groupId = "CENTIT", autoRefreshed = true)}
+)
 public class ServiceConfig {
+    Logger logger = LoggerFactory.getLogger(ServiceConfig.class);
 
     @Value("${app.home:./}")
     private String appHome;
@@ -39,10 +50,10 @@ public class ServiceConfig {
     @Value("${fileserver.url}")
     private String fileserver;
 
-    @Value("${redis.host}")
+    @Value("${redis.default.host}")
     private String redisHost;
 
-    @Value("${redis.port}")
+    @Value("${redis.default.port}")
     private int redisPort;
 
 
@@ -58,6 +69,7 @@ public class ServiceConfig {
 
     @Bean
     public JedisPool jedisPool() {
+        logger.info("------------------------redisPort-----------------------:"+redisPort);
         JedisPool jedisPool= new JedisPool(redisHost,redisPort);
         return jedisPool;
     }
@@ -69,6 +81,12 @@ public class ServiceConfig {
         ///notificationCenter.registerMessageSender("innerMsg",innerMessageManager);
         return notificationCenter;
     }
+
+    @Bean
+    public DataScopePowerManager queryDataScopeFilter(){
+        return new DataScopePowerManagerImpl();
+    }
+
 
     @Bean
     @Lazy(value = false)
@@ -92,5 +110,4 @@ public class ServiceConfig {
         fileStoreBean.setFileClient(fileClient);
         return fileStoreBean;
     }
-
 }

@@ -5,7 +5,6 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +26,12 @@ public interface BizModel {
      * @return  或者对应关系数据库查询的参数（数据源参数）
      */
     Map<String, Object> getModelTag();
+
+    /**
+     * 存放内部逻辑使用的临时变量
+     * @return
+     */
+    Map<String, Object> getInterimVariable();
     /**
      * @return  模型数据 key为关联关系链， value为dataSet
      */
@@ -62,7 +67,7 @@ public interface BizModel {
     default DataSet fetchDataSetByName(String relationPath){
         Map<String, DataSet> dss = getBizData();
         if(dss == null) {
-            return null;
+            return new SimpleDataSet();
         }
         if (dss.containsKey(relationPath)) {
             return dss.get(relationPath);

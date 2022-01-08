@@ -39,13 +39,13 @@ public class PathConfig {
 
     private String useDataMoving;
 
-    public String[] getOwnGroups() {
-        return ownGroups;
+    public String[] getOptId() {
+        return optId;
     }
 
-    public void setOwnGroups(String[] ownGroups) {
-        this.ownGroups = ownGroups;
+    public void setOptId(String[] ownGroups) {
+        this.optId = ownGroups;
     }
 
-    private String[] ownGroups;
+    private String[] optId;
 }

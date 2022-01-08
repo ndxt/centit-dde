@@ -1,6 +1,8 @@
 package com.centit.dde.services;
 
+import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.po.DataPacket;
+import com.centit.framework.system.po.OptMethod;
 import com.centit.support.database.utils.PageDesc;
 
 import java.util.List;
@@ -20,13 +22,12 @@ public interface DataPacketService {
     void deleteDataPacket(String packetId);
 
     List<DataPacket> listDataPacket(Map<String, Object> params, PageDesc pageDesc);
+    List<Map<String,String>> listDataPacket(String optId);
 
     DataPacket getDataPacket(String packetId);
 
-    void setDataPacketBuf(Object bizModel, DataPacket dataPacket, Map<String, Object>  paramsMap);
-
-    Object fetchDataPacketDataFromBuf(DataPacket dataPacket, Map<String, Object>  paramsMap);
-
     void publishDataPacket(DataPacket dataPacket);
+
+    int[] batchUpdateOptIdByApiId(String optId, List<String> apiIds);
 
 }

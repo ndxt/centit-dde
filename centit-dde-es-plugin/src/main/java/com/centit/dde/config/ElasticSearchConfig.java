@@ -1,7 +1,7 @@
 package com.centit.dde.config;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.adapter.po.SourceInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,7 +70,7 @@ public class ElasticSearchConfig {
         return new RestHighLevelClient(restClientBuilder);
     }
 
-    private RestClientBuilder restClientBuilder(String ipAddress) {
+    public RestClientBuilder restClientBuilder(String ipAddress) {
         String[] split = ipAddress.split(",");
         HttpHost[] hosts = Arrays.stream(split)
             .map(this::makeHttpHost)

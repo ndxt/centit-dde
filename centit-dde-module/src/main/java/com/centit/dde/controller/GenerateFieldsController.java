@@ -5,6 +5,7 @@ import com.centit.dde.services.GenerateFieldsService;
 import com.centit.dde.vo.ColumnSchema;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
+import com.centit.support.common.ObjectException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -17,10 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author zhf
@@ -46,13 +44,17 @@ public class GenerateFieldsController extends BaseController {
     @WrapUpResponseBody
     public JSONArray queryViewSqlData(String databaseCode, String sql, HttpServletRequest request) {
         Map<String, Object> params = collectRequestParameters(request);
-        switch (databaseCode) {
-            case "C":
-                return generateFieldsService.queryViewCsvData(sql);
-            case "J":
-                return generateFieldsService.queryViewJsonData(sql);
-            default:
-                return generateFieldsService.queryViewSqlData(databaseCode, StringEscapeUtils.unescapeHtml4(sql), params);
+        try {
+            switch (databaseCode) {
+                case "C":
+                    return generateFieldsService.queryViewCsvData(sql);
+                case "J":
+                    return generateFieldsService.queryViewJsonData(sql);
+                default:
+                    return generateFieldsService.queryViewSqlData(databaseCode, StringEscapeUtils.unescapeHtml4(sql), params);
+            }
+        } catch (Exception e) {
+            throw new ObjectException(e);
         }
     }
 
@@ -80,7 +82,7 @@ public class GenerateFieldsController extends BaseController {
             case "P":
                 return generateFieldsService.generatePostFields(sql);
             default:
-                return null;
+                return Collections.emptyList();
         }
     }
 

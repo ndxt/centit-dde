@@ -87,7 +87,7 @@ public class BizModelJSONTransform
 
     private Object fetchRootData(String labelName){
         if(StringUtils.isBlank(labelName)){
-            return null;
+            return this.data;
         }
 
         String dataSetName , valuePath;
@@ -135,7 +135,7 @@ public class BizModelJSONTransform
         if(ConstantValue.RESPONSE_DATA_CODE.equals(dataSetName)){
             return this.data.getResponseMapData().getCode();
         }
-        return null;
+        return "";
     }
 
 }

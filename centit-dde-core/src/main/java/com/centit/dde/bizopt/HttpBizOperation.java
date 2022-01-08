@@ -10,8 +10,8 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.framework.appclient.HttpReceiveJSON;
 import com.centit.framework.common.ResponseData;
+import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
-import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
@@ -48,11 +48,10 @@ public class HttpBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String httpMethod = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post");
-        String httpUrl = BuiltInOperation.getJsonFieldString(bizOptJson, "httpUrl", "");
-        String loginUrl = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
-       /* Object requestBody = VariableFormula.calculate(BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", ""),
-            new BizModelJSONTransform(bizModel));*/
+        String httpUrlCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseId", "");
+        String loginUrlCode = BuiltInOperation.getJsonFieldString(bizOptJson, "loginService", null);
         Object json=JSON.parse(BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", ""));
+        String httpUrl = BuiltInOperation.getJsonFieldString(bizOptJson, "httpUrl", null);
         Object requestBody="";
         if(json!=null) {
             requestBody = JSONTransformer.transformer(json, new BizModelJSONTransform(bizModel));
@@ -66,24 +65,34 @@ public class HttpBizOperation implements BizOperation {
                 }
             }
         }
-        mapObject.putAll(bizModel.getModelTag());
-        mapObject.remove("requestBody");
-        mapObject.remove("requestFile");
-        mapObject.remove("runType");
-        SourceInfo databaseInfo=null;
-        if (StringUtils.isNotBlank(loginUrl)){
-            databaseInfo = sourceInfoDao.getDatabaseInfoById(loginUrl);
+        SourceInfo loginUrlInfo=null;
+        if (StringUtils.isNotBlank(loginUrlCode)){
+            loginUrlInfo = sourceInfoDao.getDatabaseInfoById(loginUrlCode);
         }
-        HttpExecutorContext httpExecutorContext = getHttpClientContext(databaseInfo);
-        if (httpUrl != null && databaseInfo !=null && !(httpUrl.startsWith("http:") || httpUrl.startsWith("https:"))){
-            httpUrl=databaseInfo.getDatabaseUrl()+httpUrl;
+        SourceInfo httpUrlCodeInfo=null;
+        Map<String, String> headers = new HashMap<>();
+        if (StringUtils.isNotBlank(httpUrlCode)){
+            httpUrlCodeInfo = sourceInfoDao.getDatabaseInfoById(httpUrlCode);
+            if (httpUrlCodeInfo!=null){
+                JSONObject extProps = httpUrlCodeInfo.getExtProps();
+                if (extProps !=null){
+                    headers = JSON.parseObject(extProps.toJSONString(), Map.class);
+                }
+            }
         }
+        HttpExecutorContext httpExecutorContext = getHttpClientContext(loginUrlInfo);
+        httpExecutorContext.headers(headers);
+        if (httpUrlCodeInfo == null && !(httpUrl.startsWith("http://") || httpUrl.startsWith("https://"))){
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_PRECONDITION_FAILED,"无效请求地址！");
+        }
+        httpUrl=httpUrlCodeInfo == null && (httpUrl.startsWith("http://") || httpUrl.startsWith("https://"))?httpUrl:httpUrlCodeInfo.getDatabaseUrl()+httpUrl;
         httpUrl = Pretreatment.mapTemplateString(httpUrl,new BizModelJSONTransform(bizModel));
         DataSet dataSet = new SimpleDataSet();
         HttpReceiveJSON receiveJson;
+        mapObject.putAll(bizModel.getModelTag());
         switch (httpMethod.toLowerCase()) {
             case "post":
-                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
+                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody,false));
                 dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
                 break;
             case "put":
@@ -91,8 +100,6 @@ public class HttpBizOperation implements BizOperation {
                 dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
                 break;
             case "get":
-                mapObject.remove("requestBody");
-                mapObject.remove("requestFile");
                 receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGet(httpExecutorContext, httpUrl, mapObject));
                 if (receiveJson.getCode() != ResponseData.RESULT_OK) {
                     return BuiltInOperation.getResponseData(0, receiveJson.getCode(), receiveJson.getMessage());

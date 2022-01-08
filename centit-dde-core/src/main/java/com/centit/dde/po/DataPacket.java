@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.*;
@@ -25,7 +26,7 @@ import java.util.*;
 @Data
 @Entity
 @Table(name = "Q_DATA_PACKET")
-public class DataPacket implements Serializable {
+public class DataPacket implements Serializable,DataPacketInterface {
     private static final long serialVersionUID = 1;
 
     @ApiModelProperty(value = "数据处理ID", hidden = true)
@@ -62,7 +63,7 @@ public class DataPacket implements Serializable {
 
     @Column(name = "BUFFER_FRESH_PERIOD")
     @ApiModelProperty(value = "数据缓存有效期，-1：不缓存（默认值） 0 永不失效 1 一日，2 按周（注意不是一周） 3 按月 4 按年， >=60 代表时间单位为秒", required = true)
-    private String bufferFreshPeriod;
+    private Integer bufferFreshPeriod;
 
     @Column(name = "RECORDER")
     @ApiModelProperty(value = "创建人", hidden = true)
@@ -80,8 +81,12 @@ public class DataPacket implements Serializable {
     private Date updateDate;
 
     @ApiModelProperty(value = "业务模块代码")
-    @Column(name = "APPLICATION_ID")
-    private String applicationId;
+    @Column(name = "os_id")
+    private String osId;
+
+    @ApiModelProperty(value = "所属业务")
+    @Column(name = "OPT_ID")
+    private String optId;
 
     @Column(name = "TASK_TYPE")
     @ApiModelProperty(value = "任务类型,1表示普通任务，2表示定时任务", required = true)
@@ -104,10 +109,6 @@ public class DataPacket implements Serializable {
     @ApiModelProperty(value = "是否启用", required = true)
     private Boolean isValid;
 
-    @Column(name = "OWN_GROUP")
-    @ApiModelProperty(value = "所属分组")
-    private String ownGroup;
-
     @Column(name = "NEED_ROLLBACK")
     @ApiModelProperty(value = "是否回滚并结束")
     private String needRollback;
@@ -122,6 +123,23 @@ public class DataPacket implements Serializable {
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private String publishDate;
 
+    @Column(name = "EXT_PROPS")
+    @ApiModelProperty(value = "队列配置扩展信息，独有配置，公共的配置在资源管理页面添加")
+    private JSONObject extProps;
+
+    @Column(name = "opt_code")
+    @ApiModelProperty(value = "f_optdef表主键")
+    private String optCode;
+
+    @Column(name = "buffer_fresh_period_secs")
+    @ApiModelProperty(value = "缓存周期（秒）")
+    private String bufferFreshPeriodSecs;
+    @Column(name = "SOURCE_ID")
+    @ApiModelProperty(value = "模板来源")
+    @JSONField(serialize = false)
+    private String sourceId;
+
+
     @OneToMany(targetEntity = DataPacketParam.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
     private List<DataPacketParam> packetParams;
@@ -132,6 +150,17 @@ public class DataPacket implements Serializable {
         }
         return packetParams;
     }
+
+    @Override
+
+
+
+
+
+
+
+
+
 
     @JSONField(serialize = false)
     public Map<String, Object> getPacketParamsValue() {

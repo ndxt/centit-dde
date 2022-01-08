@@ -45,8 +45,8 @@ public class TaskSchedulers {
         this.operationLogWriter = operationLogWriter;
         queryParams.put("taskType", "2");
         queryParams.put("isValid", "T");
-        if (pathConfig.getOwnGroups() != null && pathConfig.getOwnGroups().length > 0) {
-            queryParams.put("ownGroup_in", pathConfig.getOwnGroups());
+        if (pathConfig.getOptId() != null && pathConfig.getOptId().length > 0) {
+            queryParams.put("optId_in", pathConfig.getOptId());
         }
     }
 
@@ -93,7 +93,7 @@ public class TaskSchedulers {
                     i++;
                     CronTrigger quartzTrigger = (CronTrigger) scheduler.getTrigger(tKey);
                     if (!(quartzTrigger.getCronExpression().equals(ll.getTaskCron()))) {
-                        QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getPacketId(), ll.getOwnGroup(), "task", ll.getTaskCron(),
+                        QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getPacketId(), ll.getOptId(), "task", ll.getTaskCron(),
                             CollectionsOpt.createHashMap("taskExchange", ll));
                         break;
                     }
@@ -101,14 +101,14 @@ public class TaskSchedulers {
                 }
             }
             if (i == 0) {
-                QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getPacketId(), ll.getOwnGroup(), "task", ll.getTaskCron(),
+                QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getPacketId(), ll.getOptId(), "task", ll.getTaskCron(),
                     CollectionsOpt.createHashMap("taskExchange", ll));
             }
         }
         for (TriggerKey tKey : triggerKeys) {
             boolean found = false;
             for (DataPacket ll : list) {
-                TriggerKey triggerKey = TriggerKey.triggerKey(ll.getPacketId(), ll.getOwnGroup());
+                TriggerKey triggerKey = TriggerKey.triggerKey(ll.getPacketId(), ll.getOptId());
                 if (tKey.equals(triggerKey)) {
                     found = true;
                     break;

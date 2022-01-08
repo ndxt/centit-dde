@@ -1,27 +1,29 @@
 package com.centit.dde.services.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
-import com.centit.dde.utils.ConstantValue;
+import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.components.CodeRepositoryUtil;
+import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
+import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.model.basedata.IOptInfo;
+import com.centit.framework.system.po.OptInfo;
+import com.centit.framework.system.po.OptMethod;
 import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
-import com.centit.support.security.Md5Encoder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
-import java.io.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author zc
@@ -29,12 +31,9 @@ import java.util.Map;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class DataPacketServiceImpl implements DataPacketService {
-    @Autowired(required = false)
-    private JedisPool jedisPool;
-
+    private final static String OPTINFO_FORMCODE_COMMON = "C";
     @Autowired
     private DataPacketDao dataPacketDao;
-
 
     @Override
     public void createDataPacket(DataPacket dataPacket) {
@@ -70,95 +69,33 @@ public class DataPacketServiceImpl implements DataPacketService {
     }
 
     @Override
+    public List<Map<String, String>> listDataPacket(String optId) {
+        optId = getOptIdWithCommon(optId);
+        List<DataPacket> dataPacketList = dataPacketDao.listObjects(CollectionsOpt.createHashMap("optids", optId));
+        List<Map<String, String>> mapList = new ArrayList<>();
+        for (DataPacket dataPacket : dataPacketList) {
+            Map<String, String> map = new HashMap<>(1);
+            map.put(dataPacket.getPacketId(), dataPacket.getPacketName());
+            mapList.add(map);
+        }
+        return mapList;
+    }
+
+    private String getOptIdWithCommon(String optId) {
+        String topUnit = WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest());
+        IOptInfo commonOptInfo = CodeRepositoryUtil.getCommonOptId(topUnit, optId);
+        if (commonOptInfo != null) {
+            String commonOptId = commonOptInfo.getOptId();
+            return StringBaseOpt.concat(optId, ",", commonOptId);
+        }
+        return optId;
+    }
+
+    @Override
     public DataPacket getDataPacket(String packetId) {
         return dataPacketDao.getObjectWithReferences(packetId);
     }
 
-
-    private String makeDataPacketBufId(DataPacket dataPacket, Map<String, Object> paramsMap) {
-        String dateString = DatetimeOpt.convertTimestampToString(dataPacket.getRecordDate());
-        String params = JSON.toJSONString(paramsMap, SerializerFeature.MapSortField);
-        StringBuffer temp;
-        temp = new StringBuffer("packet:");
-        temp.append(dataPacket.getPacketId())
-            .append(":")
-            .append(params)
-            .append(dateString);
-        return Md5Encoder.encode(temp.toString());
-    }
-
-    @Override
-    public Object fetchDataPacketDataFromBuf(DataPacket dataPacket, Map<String, Object> paramsMap) {
-        if (jedisPool == null || dataPacket.getBufferFreshPeriod()==null) {
-            return null;
-        }
-        String key = makeDataPacketBufId(dataPacket, paramsMap);
-        Object object = null;
-        if (NumberBaseOpt.castObjectToInteger(dataPacket.getBufferFreshPeriod()) >= 0) {
-            Jedis jedis = jedisPool.getResource();
-            if ((jedis.get(key.getBytes()) != null) && (jedis.get(key.getBytes()).length > 0)) {
-                try {
-                    byte[] byt = jedis.get(key.getBytes());
-                    ByteArrayInputStream bis = new ByteArrayInputStream(byt);
-                    ObjectInputStream ois = new ObjectInputStream(bis);
-                    object = ois.readObject();
-                    bis.close();
-                    ois.close();
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-                jedis.close();
-                return object;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void setDataPacketBuf(Object bizModel, DataPacket dataPacket, Map<String, Object> paramsMap) {
-        if (jedisPool == null || dataPacket.getBufferFreshPeriod() == null) {
-            return;
-        }
-        String key = makeDataPacketBufId(dataPacket, paramsMap);
-        Jedis jedis = jedisPool.getResource();
-        if (jedis.get(key.getBytes()) == null || (jedis.get(key.getBytes()).length == 0)) {
-            try {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ObjectOutputStream oos = new ObjectOutputStream(bos);
-                oos.writeObject(bizModel);
-
-                byte[] byt = bos.toByteArray();
-                jedis.set(key.getBytes(), byt);
-                int seconds;
-                int iPeriod=NumberBaseOpt.castObjectToInteger(dataPacket.getBufferFreshPeriod());
-                if ( iPeriod== ConstantValue.ONE) {
-                    //一日
-                    seconds = 24 * 3600;
-                    jedis.expire(key.getBytes(), seconds);
-                } else if (iPeriod == ConstantValue.TWO) {
-                    //按周
-                    seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfWeek(new Date())) * 24 * 3600;
-                    jedis.expire(key.getBytes(), seconds);
-                } else if (iPeriod == ConstantValue.THREE) {
-                    //按月
-                    seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfMonth(new Date())) * 24 * 3600;
-                    jedis.expire(key.getBytes(), seconds);
-                } else if (iPeriod == ConstantValue.FOUR) {
-                    //按年
-                    seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfYear(new Date())) * 24 * 3600;
-                    jedis.expire(key.getBytes(), seconds);
-                } else if (iPeriod >= ConstantValue.SIXTY) {
-                    //按秒
-                    jedis.expire(key.getBytes(), iPeriod);
-                }
-                bos.close();
-                oos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        jedis.close();
-    }
 
     @Override
     public void publishDataPacket(DataPacket dataPacket) {
@@ -166,6 +103,23 @@ public class DataPacketServiceImpl implements DataPacketService {
         dataPacketDao.saveObjectReferences(dataPacket);
     }
 
+    @Override
+    public int[] batchUpdateOptIdByApiId(String optId, List<String> apiIds) {
+        String sql = "UPDATE q_data_packet SET OPT_ID=? WHERE PACKET_ID = ?";
+        int[] dataPacket = dataPacketDao.getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setString(1, optId);
+                ps.setString(2, apiIds.get(i));
+            }
+
+            @Override
+            public int getBatchSize() {
+                return apiIds.size();
+            }
+        });
+        return dataPacket;
+    }
 
 
 }
