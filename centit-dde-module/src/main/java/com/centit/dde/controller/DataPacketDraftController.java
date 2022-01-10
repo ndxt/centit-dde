@@ -143,6 +143,7 @@ public class DataPacketDraftController extends BaseController {
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setBufferFreshPeriod(-1);
         dataPacketDraft.setIsValid(true);
+        dataPacketDraft.setTemplateType(type);
         dataPacketDraft.setOptId(metaDataOrHttpParams.getOptId());
         dataPacketDraft.setOsId(metaDataOrHttpParams.getOsId());
         JSONObject dataPacketTemplate = dataPacketTemplateService.getDataPacketTemplateByType(type);
@@ -165,6 +166,7 @@ public class DataPacketDraftController extends BaseController {
                 properties.put("databaseName",dataBaseCode);
             }
         }
+        dataPacketDraft.setMetadataTableId(tableId);
         dataPacketDraft.setDataOptDescJson(content);
         return  dataPacketDraft;
     }

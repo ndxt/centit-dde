@@ -93,7 +93,6 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     @NotBlank(message = "optId字段不能为空")
     private String optId;
 
-
     @Column(name = "TASK_TYPE")
     @ApiModelProperty(value = "任务类型,1表示普通任务，2表示定时任务", required = true)
     @NotBlank
@@ -123,11 +122,9 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     @ApiModelProperty(value = "发布时间")
     private Date publishDate;
 
-
     @Column(name = "EXT_PROPS")
     @ApiModelProperty(value = "队列配置扩展信息，独有配置，公共的配置在资源管理页面添加")
     private JSONObject extProps;
-
 
     @Column(name = "opt_code")
     @ApiModelProperty(value = "f_optdef表主键")
@@ -136,6 +133,16 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     @Column(name = "buffer_fresh_period_secs")
     @ApiModelProperty(value = "缓存周期（秒）")
     private String bufferFreshPeriodSecs;
+
+    @Column(name = "template_type")
+    @ApiModelProperty(value = "模板(操作)类型：1：新建 2：修改 3：删除 4：查询 5：查看 6：创建流程 7：提交流程 8：http调用")
+    private Integer templateType;
+    /**
+     * template_type  metadata_table_id  这2个字段都是给前端做判断使用的，dde本身不需要这2个字段
+     */
+    @Column(name = "metadata_table_id")
+    @ApiModelProperty(value = "通过元数据模板生成接口时会选择一个表，这个存选择的表ID")
+    private String metadataTableId;
 
     @OneToMany(targetEntity = DataPacketParamDraft.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
