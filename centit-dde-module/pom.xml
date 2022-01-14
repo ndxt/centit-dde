@@ -49,12 +49,6 @@
             <artifactId>fileserver-utils</artifactId>
             <version>${centit.fileserver.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>work-group-adapter</artifactId>
-            <version>${parent.version}</version>
-        </dependency>
     </dependencies>
 
 

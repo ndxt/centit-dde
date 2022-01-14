@@ -19,7 +19,6 @@ import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.product.adapter.api.WorkGroupManager;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.ObjectTranslate;
@@ -53,8 +52,7 @@ public class HttpTaskController extends BaseController {
 
     @Autowired
     private PlatformEnvironment platformEnvironment;
-    @Autowired
-    WorkGroupManager workGroupManager;
+
     private final DataPacketService dataPacketService;
     private final DataPacketDraftService dataPacketDraftService;
     private final BizModelService bizmodelService;
@@ -142,7 +140,7 @@ public class HttpTaskController extends BaseController {
         }
         if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
             DataPacketInterface dataPacket = dataPacketDraftService.getDataPacket(packetId);
-            if (!workGroupManager.loginUserIsExistWorkGroup(dataPacket.getOsId(), loginUser)) {
+            if (!platformEnvironment.loginUserIsExistWorkGroup(dataPacket.getOsId(), loginUser)) {
                 throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您没有权限！");
             }
         }
