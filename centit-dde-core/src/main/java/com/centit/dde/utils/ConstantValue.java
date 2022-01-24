@@ -4,11 +4,12 @@ package com.centit.dde.utils;
  * @author zhf
  */
 public class ConstantValue {
+    //缓存单位  1:分 2:时 3:日  -1:不缓存
+    public static final int MINUS_ONE=-1;
     public static final int ONE = 1;
     public static final int TWO = 2;
     public static final int THREE = 3;
-    public static final int FOUR = 4;
-    public static final int SIXTY = 60;
+
     static final String MODEL_TAG = "modelTag";
     static final String MODEL_NAME = "modelName";
     static final String BACKSLASH = "/";

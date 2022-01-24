@@ -131,14 +131,14 @@ public class HttpTaskController extends BaseController {
     }
 
     private void judgePower(@PathVariable String packetId,String runType) {
-        String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
-        if (StringBaseOpt.isNvl(loginUser)) {
-            loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
-        }
-        if (StringBaseOpt.isNvl(loginUser)) {
-            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "您未登录！");
-        }
         if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
+            String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+            if (StringBaseOpt.isNvl(loginUser)) {
+                loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
+            }
+            if (StringBaseOpt.isNvl(loginUser)) {
+                throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "您未登录！");
+            }
             DataPacketInterface dataPacket = dataPacketDraftService.getDataPacket(packetId);
             if (!platformEnvironment.loginUserIsExistWorkGroup(dataPacket.getOsId(), loginUser)) {
                 throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您没有权限！");
@@ -147,9 +147,9 @@ public class HttpTaskController extends BaseController {
     }
 
     private void returnObject(String packetId, String runType,String taskType, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (!ConstantValue.RUN_TYPE_COPY.equals(runType)){
+     /*   if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
             judgePower(packetId,runType);
-        }
+        }*/
         Object bizModel;
         DataPacketInterface dataPacketInterface;
         if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
@@ -174,7 +174,7 @@ public class HttpTaskController extends BaseController {
             if (StringUtils.contains(request.getHeader("Content-Type"), "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
                 if (!StringBaseOpt.isNvl(bodyString)) {
-                    interimVariable.put("requestBody", bodyString);
+                    interimVariable.put("requestBody", JSON.parseObject(bodyString));
                 }
             } else {
                 String header = request.getHeader("fileName");

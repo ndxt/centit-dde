@@ -140,9 +140,10 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.FILEUPLOADS, new FileUploadBizOperation(fileStore));
         allOperations.put(ConstantValue.GENERATEXCEL, new GenerateExcelBizeOperation(fileStore));
         allOperations.put(ConstantValue.FILEDOWNLOAD, new FileDownloadBizOperation(fileStore));
-        allOperations.put(ConstantValue.WRITE_DB, new WriteDbBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
+        allOperations.put(ConstantValue.WRITE_DB, new MetadataBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentBizOperation());
         allOperations.put("compareSource", new ObjectCompareBizOperation());
+        allOperations.put("getSession", new GetSessionDataBizOperation());
     }
 
     @Override
@@ -155,6 +156,16 @@ public class BizOptFlowImpl implements BizOptFlow {
         SimpleBizModel bizModel = new SimpleBizModel(logId);
         bizModel.setModelTag(queryParams);
         bizModel.setInterimVariable(interimVariable==null?new HashMap<>():interimVariable);
+        //标签中默认的3个数据集  将数据set进去   需要在结束标签中移除这3个默认标签的数据  否则会显得返回结果数据很乱
+        if (queryParams!=null && queryParams.size()>0){
+            bizModel.putDataSet("getData",new SimpleDataSet(queryParams));
+        }
+        if (interimVariable.containsKey("requestBody")){
+            bizModel.putDataSet("postBodyData",new SimpleDataSet(interimVariable.get("requestBody")));
+        }
+        if (interimVariable.containsKey("requestFile")){
+            bizModel.putDataSet("postFileData",new SimpleDataSet(interimVariable.get("requestBody")));
+        }
         DataOptStep dataOptStep = new DataOptStep(dataPacket.getDataOptDescJson());
         DataOptVo dataOptVo = new DataOptVo(dataPacket.getNeedRollback(), bizModel);
         try {
@@ -247,6 +258,12 @@ public class BizOptFlowImpl implements BizOptFlow {
     private Object returnResult(DataOptStep dataOptStep, DataOptVo dataOptVo) throws Exception {
         JSONObject stepJson = dataOptStep.getCurrentStep();
         SimpleBizModel bizModel = dataOptVo.getBizModel();
+        //移除3个默认请求参数数据集数据  这个3个数据集保存的是请求的参数，这个不需要返回
+        if(bizModel!=null){
+            bizModel.removeDataSet("getData");
+            bizModel.removeDataSet("postBodyData");
+            bizModel.removeDataSet("postFileData");
+        }
         stepJson=stepJson.getJSONObject("properties");
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
         String path;

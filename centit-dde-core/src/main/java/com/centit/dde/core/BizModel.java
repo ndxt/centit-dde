@@ -44,6 +44,9 @@ public interface BizModel {
 
     DataSet getDataSet(String relationPath);
 
+    //移除DataSet
+    void removeDataSet(String relationPath);
+
     JSONObject toJsonObject();
     /**
      * @param singleRowAsObject 如果为true DataSet中只有一行记录的就作为JSONObject；

@@ -50,4 +50,6 @@ public interface DataPacketInterface {
     String getNeedRollback();
 
     Integer getBufferFreshPeriod();
+
+    Integer getBufferFreshPeriodType();
 }

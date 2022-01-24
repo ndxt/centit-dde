@@ -3,7 +3,6 @@ package com.centit.dde.po;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.core.dao.DictionaryMap;
-import com.centit.framework.model.basedata.IOptMethod;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.database.orm.GeneratorCondition;
@@ -12,10 +11,7 @@ import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -65,8 +61,12 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     private JSONObject dataOptDescJson;
 
     @Column(name = "BUFFER_FRESH_PERIOD")
-    @ApiModelProperty(value = "数据缓存有效期，-1：不缓存（默认值） 0 永不失效 1 一日，2 按周（注意不是一周） 3 按月 4 按年， >=60 代表时间单位为秒", required = true)
+    @ApiModelProperty(value = "缓存时间", required = true)
     private Integer bufferFreshPeriod;
+
+    @Column(name = "buffer_fresh_period_type")
+    @ApiModelProperty(value = "缓存单位, 1:分 2:时 3:日 -1:不缓存")
+    private Integer bufferFreshPeriodType;
 
     @Column(name = "RECORDER")
     @ApiModelProperty(value = "创建人", hidden = true)
@@ -129,10 +129,6 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     @Column(name = "opt_code")
     @ApiModelProperty(value = "f_optdef表主键")
     private String optCode;
-
-    @Column(name = "buffer_fresh_period_secs")
-    @ApiModelProperty(value = "缓存周期（秒）")
-    private String bufferFreshPeriodSecs;
 
     @Column(name = "template_type")
     @ApiModelProperty(value = "模板(操作)类型：1：新建 2：修改 3：删除 4：查询 5：查看 6：创建流程 7：提交流程 8：http调用")

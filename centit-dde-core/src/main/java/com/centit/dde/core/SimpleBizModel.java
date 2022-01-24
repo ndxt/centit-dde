@@ -4,13 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
-import com.centit.support.algorithm.CollectionsOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -75,6 +72,13 @@ public class SimpleBizModel implements BizModel, Serializable {
             return bizData.get(relationPath);
         }
         return new SimpleDataSet();
+    }
+
+    @Override
+    public void removeDataSet(String relationPath) {
+        if (bizData != null){
+            bizData.remove(relationPath);
+        }
     }
 
     @Override
