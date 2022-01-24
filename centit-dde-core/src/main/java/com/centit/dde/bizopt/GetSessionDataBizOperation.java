@@ -17,7 +17,7 @@ public class GetSessionDataBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String id = bizOptJson.getString("id");
-        JSONArray config = bizOptJson.getJSONArray("config");
+        JSONArray config = bizOptJson.getJSONArray("config")==null?new JSONArray():bizOptJson.getJSONArray("config");
         HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
         JSONObject result = new JSONObject();
         for (Object o : config) {
