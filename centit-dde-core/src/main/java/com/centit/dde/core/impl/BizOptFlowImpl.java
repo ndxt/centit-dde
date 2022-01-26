@@ -12,6 +12,7 @@ import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.CloneUtils;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.CycleVo;
@@ -99,8 +100,12 @@ public class BizOptFlowImpl implements BizOptFlow {
     public void init() {
         allOperations.put("sche", BuiltInOperation::runStart);
         allOperations.put("start", BuiltInOperation::runStart);
+        //适配老版本遗留下来的数据
         allOperations.put("Getpostdata", BuiltInOperation::runRequestBody);
         allOperations.put("Getpostfile", BuiltInOperation::runRequestFile);
+        //新版本
+        allOperations.put("getPostData", BuiltInOperation::runRequestBody);
+        allOperations.put("getPostFile", BuiltInOperation::runRequestFile);
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
         allOperations.put("append", BuiltInOperation::runAppend);
@@ -161,10 +166,12 @@ public class BizOptFlowImpl implements BizOptFlow {
             bizModel.putDataSet("getData",new SimpleDataSet(queryParams));
         }
         if (interimVariable.containsKey("requestBody")){
-            bizModel.putDataSet("postBodyData",new SimpleDataSet(interimVariable.get("requestBody")));
+            String requestBody = (String) interimVariable.get("requestBody");
+            DataSet destDs = BizOptUtils.castObjectToDataSet(requestBody.contains("[")?JSONObject.parseObject(requestBody,JSONArray.class):JSONObject.parseObject(requestBody));
+            bizModel.putDataSet("postBodyData",destDs);
         }
         if (interimVariable.containsKey("requestFile")){
-            bizModel.putDataSet("postFileData",new SimpleDataSet(interimVariable.get("requestBody")));
+            bizModel.putDataSet("postFileData",new SimpleDataSet(interimVariable.get("requestFile")));
         }
         DataOptStep dataOptStep = new DataOptStep(dataPacket.getDataOptDescJson());
         DataOptVo dataOptVo = new DataOptVo(dataPacket.getNeedRollback(), bizModel);

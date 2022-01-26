@@ -147,7 +147,8 @@ public class HttpTaskController extends BaseController {
     }
 
     private void returnObject(String packetId, String runType,String taskType, HttpServletRequest request, HttpServletResponse response) throws IOException {
-     /*   if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
+        //暂时先把登录验证关闭掉
+        /*   if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
             judgePower(packetId,runType);
         }*/
         Object bizModel;
@@ -174,7 +175,7 @@ public class HttpTaskController extends BaseController {
             if (StringUtils.contains(request.getHeader("Content-Type"), "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
                 if (!StringBaseOpt.isNvl(bodyString)) {
-                    interimVariable.put("requestBody", JSON.parseObject(bodyString));
+                    interimVariable.put("requestBody", bodyString);
                 }
             } else {
                 String header = request.getHeader("fileName");
