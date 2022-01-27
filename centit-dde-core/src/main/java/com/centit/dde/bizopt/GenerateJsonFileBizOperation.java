@@ -5,12 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.core.SimpleDataSet;
-import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -20,7 +17,7 @@ import java.io.InputStream;
 /**
  * 生成json文件节点信息
  */
-public class GenerateJsonBizOperation implements BizOperation {
+public class GenerateJsonFileBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws IOException {
@@ -39,22 +36,5 @@ public class GenerateJsonBizOperation implements BizOperation {
             "fileSize", inputStream.available(), "fileContent",inputStream));
         bizModel.putDataSet(targetDsName,objectToDataSet);
         return BuiltInOperation.getResponseSuccessData(objectToDataSet.getSize());
-    }
-
-
-    //返回json
-    public static ResponseData returnJson(BizModel bizModel, JSONObject bizOptJson){
-        String targetDsName =bizOptJson.getString("id");
-        String jsonValue=BuiltInOperation.getJsonFieldString(bizOptJson,"jsonValue",null);
-        if (StringUtils.isNotEmpty(jsonValue)&& jsonValue.startsWith("{")){
-            //json格式表达式获取值
-            Object data = JSONTransformer.transformer(JSON.parse(jsonValue), new BizModelJSONTransform(bizModel));
-            bizModel.putDataSet(targetDsName,new SimpleDataSet(data));
-        }else {
-            //非json格式表达式获取值
-            Object data = JSONTransformer.transformer(jsonValue, new BizModelJSONTransform(bizModel));
-            bizModel.putDataSet(targetDsName, new SimpleDataSet(data));
-        }
-        return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(targetDsName).getSize());
     }
 }

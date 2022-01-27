@@ -98,14 +98,14 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @PostConstruct
     public void init() {
-        allOperations.put("sche", BuiltInOperation::runStart);
+        allOperations.put("schedule", BuiltInOperation::runStart);
         allOperations.put("start", BuiltInOperation::runStart);
         //适配老版本遗留下来的数据
-        allOperations.put("Getpostdata", BuiltInOperation::runRequestBody);
-        allOperations.put("Getpostfile", BuiltInOperation::runRequestFile);
+    /*    allOperations.put("Getpostdata", BuiltInOperation::runRequestBody);
+        allOperations.put("Getpostfile", BuiltInOperation::runRequestFile);*/
         //新版本
-        allOperations.put("getPostData", BuiltInOperation::runRequestBody);
-        allOperations.put("getPostFile", BuiltInOperation::runRequestFile);
+        allOperations.put("postData", BuiltInOperation::runRequestBody);
+        allOperations.put("postFile", BuiltInOperation::runRequestFile);
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
         allOperations.put("append", BuiltInOperation::runAppend);
@@ -119,36 +119,26 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("filterExt", BuiltInOperation::runFilterExt);
         allOperations.put("check", BuiltInOperation::runCheckData);
         allOperations.put("static", BuiltInOperation::runStaticData);
-        HttpBizOperation httpBizOperation = new HttpBizOperation(sourceInfoDao);
-        allOperations.put("htts", httpBizOperation);
+        allOperations.put("htts", new HttpBizOperation(sourceInfoDao));
         allOperations.put("clear", BuiltInOperation::runClear);
-        JSBizOperation jsBizOperation = new JSBizOperation(metaObjectService);
-        allOperations.put("js", jsBizOperation);
-        PersistenceBizOperation databaseOperation = new PersistenceBizOperation(
-            path, sourceInfoDao, metaDataService);
-        allOperations.put("persistence", databaseOperation);
-        DbBizOperation dbBizOperation = new DbBizOperation(sourceInfoDao);
-        allOperations.put("database", dbBizOperation);
-        ExcelBizOperation excelBizOperation = new ExcelBizOperation();
-        allOperations.put("excel", excelBizOperation);
-        CsvBizOperation csvBizOperation = new CsvBizOperation();
-        allOperations.put("csv", csvBizOperation);
-        JsonBizOperation jsonBizOperation = new JsonBizOperation();
-        allOperations.put("json", jsonBizOperation);
-        RunSqlsBizOperation runsqlsbizoperation = new RunSqlsBizOperation(sourceInfoDao);
-        allOperations.put("sqlS", runsqlsbizoperation);
-        ReportBizOperation reportBizOperation = new ReportBizOperation(fileStore);
-        allOperations.put("SSD", reportBizOperation);
-        allOperations.put(ConstantValue.GENERATECSV, new GenerateCsvBizOperation());
-        allOperations.put(ConstantValue.GENERATEJSON, new GenerateJsonBizOperation());
-        allOperations.put(ConstantValue.RETURN_JSON, GenerateJsonBizOperation::returnJson);
-        allOperations.put(ConstantValue.FILEUPLOADS, new FileUploadBizOperation(fileStore));
-        allOperations.put(ConstantValue.GENERATEXCEL, new GenerateExcelBizeOperation(fileStore));
-        allOperations.put(ConstantValue.FILEDOWNLOAD, new FileDownloadBizOperation(fileStore));
-        allOperations.put(ConstantValue.WRITE_DB, new MetadataBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
+        allOperations.put("js", new JSBizOperation(metaObjectService));
+        allOperations.put("persistence", new PersistenceBizOperation(path, sourceInfoDao, metaDataService));
+        allOperations.put("database", new DbBizOperation(sourceInfoDao));
+        allOperations.put("excel", new ExcelBizOperation());
+        allOperations.put("csv", new CsvBizOperation());
+        allOperations.put("json", new JsonBizOperation());
+        allOperations.put("sqlS", new RunSqlsBizOperation(sourceInfoDao));
+        allOperations.put("SSD", new ReportBizOperation(fileStore));
+        allOperations.put(ConstantValue.GENERATE_CSV_FILE , new GenerateCsvFileBizOperation());
+        allOperations.put(ConstantValue.GENERATE_JSON_FILE, new GenerateJsonFileBizOperation());
+        allOperations.put(ConstantValue.GENERAT_EXCEL_FILE , new GenerateExcelFileBizeOperation(fileStore));
+        allOperations.put(ConstantValue.DEFINE_JSON_DATA, new DefineJsonDataBizOperation());
+        allOperations.put(ConstantValue.FILE_UPLOAD, new FileUploadBizOperation(fileStore));
+        allOperations.put(ConstantValue.FILE_DOWNLOAD, new FileDownloadBizOperation(fileStore));
+        allOperations.put(ConstantValue.METADATA_OPERATION, new MetadataBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentBizOperation());
-        allOperations.put("compareSource", new ObjectCompareBizOperation());
-        allOperations.put("getSession", new GetSessionDataBizOperation());
+        allOperations.put(ConstantValue.COMPARE_SOURCE, new ObjectCompareBizOperation());
+        allOperations.put(ConstantValue.SESSION_DATA, new GetSessionDataBizOperation());
     }
 
     @Override

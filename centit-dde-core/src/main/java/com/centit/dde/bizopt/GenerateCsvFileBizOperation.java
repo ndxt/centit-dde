@@ -17,9 +17,9 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- * 生成json文件节点信息
+ * 生成CSV文件节点信息
  */
-public class GenerateCsvBizOperation implements BizOperation {
+public class GenerateCsvFileBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){

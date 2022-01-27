@@ -28,11 +28,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GenerateExcelBizeOperation implements BizOperation {
+public class GenerateExcelFileBizeOperation implements BizOperation {
 
     FileStore fileStore;
 
-    public GenerateExcelBizeOperation(FileStore fileStore) {
+    public GenerateExcelFileBizeOperation(FileStore fileStore) {
         this.fileStore = fileStore;
     }
 
