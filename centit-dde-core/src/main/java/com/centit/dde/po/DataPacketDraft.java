@@ -24,7 +24,7 @@ import java.util.*;
 @ApiModel
 @Data
 @Entity
-@Table(name = "Q_DATA_PACKET_DRAFT")
+@Table(name = "q_data_packet_draft_copy1")
 public class DataPacketDraft implements Serializable, DataPacketInterface {
     private static final long serialVersionUID = 1;
 

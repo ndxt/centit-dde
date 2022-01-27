@@ -98,14 +98,10 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @PostConstruct
     public void init() {
-        allOperations.put("schedule", BuiltInOperation::runStart);
-        allOperations.put("start", BuiltInOperation::runStart);
-        //适配老版本遗留下来的数据
-    /*    allOperations.put("Getpostdata", BuiltInOperation::runRequestBody);
-        allOperations.put("Getpostfile", BuiltInOperation::runRequestFile);*/
-        //新版本
-        allOperations.put("postData", BuiltInOperation::runRequestBody);
-        allOperations.put("postFile", BuiltInOperation::runRequestFile);
+        allOperations.put("schedule", BuiltInOperation::runStart);//模块调度
+        allOperations.put("start", BuiltInOperation::runStart);//起始节点
+        allOperations.put("postData", BuiltInOperation::runRequestBody);//获取post数据
+        allOperations.put("postFile", BuiltInOperation::runRequestFile);//获取post文件
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
         allOperations.put("append", BuiltInOperation::runAppend);
@@ -127,7 +123,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("excel", new ExcelBizOperation());
         allOperations.put("csv", new CsvBizOperation());
         allOperations.put("json", new JsonBizOperation());
-        allOperations.put("sqlS", new RunSqlsBizOperation(sourceInfoDao));
+        allOperations.put("sqlS", new RunSqlsBizOperation(sourceInfoDao));//批量执行SQL
         allOperations.put("SSD", new ReportBizOperation(fileStore));
         allOperations.put(ConstantValue.GENERATE_CSV_FILE , new GenerateCsvFileBizOperation());
         allOperations.put(ConstantValue.GENERATE_JSON_FILE, new GenerateJsonFileBizOperation());
