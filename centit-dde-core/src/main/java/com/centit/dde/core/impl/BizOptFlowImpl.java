@@ -98,7 +98,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @PostConstruct
     public void init() {
-        allOperations.put("schedule", BuiltInOperation::runStart);//模块调度
+        allOperations.put(ConstantValue.SCHEDULER, BuiltInOperation::runStart);//模块调度
         allOperations.put("start", BuiltInOperation::runStart);//起始节点
         allOperations.put("postData", BuiltInOperation::runRequestBody);//获取post数据
         allOperations.put("postFile", BuiltInOperation::runRequestFile);//获取post文件
@@ -115,7 +115,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("filterExt", BuiltInOperation::runFilterExt);
         allOperations.put("check", BuiltInOperation::runCheckData);
         allOperations.put("static", BuiltInOperation::runStaticData);
-        allOperations.put("htts", new HttpBizOperation(sourceInfoDao));
+        allOperations.put("http", new HttpBizOperation(sourceInfoDao));
         allOperations.put("clear", BuiltInOperation::runClear);
         allOperations.put("js", new JSBizOperation(metaObjectService));
         allOperations.put("persistence", new PersistenceBizOperation(path, sourceInfoDao, metaDataService));

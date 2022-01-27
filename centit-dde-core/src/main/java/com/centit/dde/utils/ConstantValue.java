@@ -36,7 +36,7 @@ public class ConstantValue {
     public static final String CYCLE_JUMP_BREAK = "break";
     public static final String CYCLE_FINISH = "finishCycle";
     public static final String RESULTS = "results";
-    public static final String SCHEDULER = "sche";
+    public static final String SCHEDULER = "schedule";
     public static final String BRANCH = "branch";
     //生成json文件组件
     public static final String GENERATE_JSON_FILE = "generateJsonFile";
