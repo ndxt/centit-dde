@@ -153,7 +153,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
         if (interimVariable.containsKey("requestBody")){
             String requestBody = (String) interimVariable.get("requestBody");
-            DataSet destDs = BizOptUtils.castObjectToDataSet(requestBody.contains("[")?JSONObject.parseObject(requestBody,JSONArray.class):JSONObject.parseObject(requestBody));
+            DataSet destDs = BizOptUtils.castObjectToDataSet(requestBody.startsWith("[")?JSONObject.parseObject(requestBody,JSONArray.class):JSONObject.parseObject(requestBody));
             bizModel.putDataSet("postBodyData",destDs);
         }
         if (interimVariable.containsKey("requestFile")){
