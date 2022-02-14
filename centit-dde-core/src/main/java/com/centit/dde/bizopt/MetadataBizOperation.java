@@ -51,7 +51,7 @@ public class MetadataBizOperation implements BizOperation {
         if(source==null){
             dataSet = new SimpleDataSet(bizModel.getModelTag());
         }
-        Map<String, Object> parames = dataSet.getDataAsList().get(0);
+        Map<String, Object> parames = dataSet.getDataAsList().size()>0?dataSet.getDataAsList().get(0):new HashMap<>();
         try {
             switch (templateType){
                 case 1://新建
