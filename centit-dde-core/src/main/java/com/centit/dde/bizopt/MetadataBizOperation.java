@@ -69,7 +69,7 @@ public class MetadataBizOperation implements BizOperation {
                 case 4://查询
                     HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
                     String topUnit = WebOptUtils.getCurrentTopUnit(request);
-                    List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, WebOptUtils.getCurrentUserCode(request), optId, "search");
+                    List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, WebOptUtils.getCurrentUserCode(request), optId, "api");
                     String extFilter = null;
                     PageDesc pageDesc = new PageDesc();
                     if (parames.get("pageNo")!=null){
