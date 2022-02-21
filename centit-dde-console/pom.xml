@@ -184,6 +184,12 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
         </profile>
+        <profile>
+            <id>prev</id>
+            <properties>
+                <profiles.active>prev</profiles.active>
+            </properties>
+        </profile>
     </profiles>
 
 
@@ -206,6 +212,7 @@
                 <excludes>
                     <exclude>demo/*</exclude>
                     <exclude>system.properties</exclude>
+                    <exclude>prev/*</exclude>
                 </excludes>
             </resource>
             <resource>
