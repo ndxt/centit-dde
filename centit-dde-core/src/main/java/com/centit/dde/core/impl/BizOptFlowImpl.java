@@ -125,9 +125,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("json", new JsonBizOperation());
         allOperations.put("sqlS", new RunSqlsBizOperation(sourceInfoDao));//批量执行SQL
         allOperations.put("SSD", new ReportBizOperation(fileStore));
-        allOperations.put(ConstantValue.GENERATE_CSV_FILE , new GenerateCsvFileBizOperation());
-        allOperations.put(ConstantValue.GENERATE_JSON_FILE, new GenerateJsonFileBizOperation());
-        allOperations.put(ConstantValue.GENERAT_EXCEL_FILE , new GenerateExcelFileBizeOperation(fileStore));
+        allOperations.put(ConstantValue.GENERATE_CSV, new GenerateCsvFileBizOperation());
+        allOperations.put(ConstantValue.GENERATE_JSON, new GenerateJsonFileBizOperation());
+        allOperations.put(ConstantValue.GENERAT_EXCEL, new GenerateExcelFileBizeOperation(fileStore));
         allOperations.put(ConstantValue.DEFINE_JSON_DATA, new DefineJsonDataBizOperation());
         allOperations.put(ConstantValue.FILE_UPLOAD, new FileUploadBizOperation(fileStore));
         allOperations.put(ConstantValue.FILE_DOWNLOAD, new FileDownloadBizOperation(fileStore));
