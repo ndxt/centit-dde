@@ -231,8 +231,12 @@ public class BizOptFlowImpl implements BizOptFlow {
         String debugId = (String)dataOptVo.getQueryParams().get("debugId");
         if (StringUtils.isNotBlank(debugId) && debugId.equals(stepJson.getString("id"))){
             dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions","3");
+            String source = stepJson.getString("source");
+            //设置返回节点  内部方法会通过这个source 来判断返回具体的某个节点 这个只能重置为当前ID 下面再重置回去
             dataOptStep.getCurrentStep().getJSONObject("properties").put("source",stepJson.getString("id"));
             Object returnResult = returnResult(dataOptStep, dataOptVo);
+            //恢复原始JSON数据，否则后面更新的时候会将原本的数据替换为当前节点id
+            dataOptStep.getCurrentStep().getJSONObject("properties").put("source",source);
             dataOptVo.setPreResult(returnResult);
             dataOptStep.setEndStep();
             return;
