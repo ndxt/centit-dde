@@ -36,23 +36,19 @@ public class ReportBizOperation implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws  Exception{
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String filePath = bizOptJson.getString("fileId");
         String fileName = Pretreatment.mapTemplateString(BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()), bizModel)
             + ".pdf";
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName");
-        try {
-            ByteArrayInputStream in = generateWord(bizModel, filePath, params);
-            DataSet dataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName, "fileContent", word2Pdf(in)));
-            bizModel.putDataSet(sourDsName, dataSet);
-            return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
-        } catch (Exception e) {
-            return BuiltInOperation.getResponseData(0, 1, e.getMessage());
-        }
+        ByteArrayInputStream in = generateWord(bizModel, filePath, params);
+        DataSet dataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName, "fileContent", word2Pdf(in)));
+        bizModel.putDataSet(sourDsName, dataSet);
+        return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
     }
 
-    private FieldsMetadata getFieldsMetadata(Map<String, String> params, JSONObject docData) {
+    private FieldsMetadata getFieldsMetadata(Map<String, String> params, JSONObject docData) throws Exception {
         FieldsMetadata metadata = new FieldsMetadata();
         if (params != null) {
             int i = 0;
@@ -89,22 +85,18 @@ public class ReportBizOperation implements BizOperation {
     }
 
     private void addImageMeta(FieldsMetadata metadata, JSONObject docData, Object fieldValue,
-                              String imageName, String placeholder) {
+                              String imageName, String placeholder) throws Exception {
         metadata.addFieldAsImage(imageName, placeholder);
         //书签，数据集+img_+图片字段
         if (fieldValue instanceof byte[]) {
             docData.put(placeholder, new ByteArrayImageProvider((byte[]) fieldValue));
         } else if (fieldValue instanceof String) {
             String fileId = StringBaseOpt.castObjectToString(fieldValue);
-            try {
-                docData.put(placeholder, new ByteArrayImageProvider(FileIOOpt.readBytesFromFile(fileStore.getFile(fileId))));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            docData.put(placeholder, new ByteArrayImageProvider(FileIOOpt.readBytesFromFile(fileStore.getFile(fileId))));
         }
     }
 
-    private ByteArrayInputStream generateWord(BizModel dataModel, String filePath, Map<String, String> params) {
+    private ByteArrayInputStream generateWord(BizModel dataModel, String filePath, Map<String, String> params) throws Exception {
         JSONObject docData = dataModel.toJsonObject(false);
         // 准备图片元数据
         FieldsMetadata metadata = getFieldsMetadata(params, docData);

@@ -11,12 +11,7 @@ import java.util.Properties;
 public class KafkaConsumerConfig {
 
     public static KafkaConsumer getKafkaConsumer(JSONObject properties, SourceInfo sourceInfo){
-        if (sourceInfo==null){
-            Assert.isNull(new SourceInfo(),"连接信息不能为空，请配置kafka连接信息");
-        }
         Properties proper=new Properties();
-        //没填默认值
-        proper.put("group.id", "dde-consumer-group");
         //设置Key和Value的序列化类    配置默认值，页面填写了后直接覆盖
         proper.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         proper.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");

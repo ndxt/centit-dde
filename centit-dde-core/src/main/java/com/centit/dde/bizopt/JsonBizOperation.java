@@ -42,11 +42,7 @@ public class JsonBizOperation implements BizOperation {
         if (inputStreams.size()==0){
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取JSON文件异常，不支持的流类型转换！");
         }
-        try {
-            bizModel.putDataSet(targetDsName, new SimpleDataSet(toJson(inputStreams)));
-        } catch (IOException e) {
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取JSON文件异常，异常信息："+e.getMessage());
-        }
+        bizModel.putDataSet(targetDsName, new SimpleDataSet(toJson(inputStreams)));
         return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(targetDsName).getSize());
     }
 

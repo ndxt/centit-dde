@@ -60,16 +60,15 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
             XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
             Map<Integer, String> mapInfo = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
             ExcelExportUtil.saveObjectsToExcelSheet(sheet,jsonArray,mapInfo,beginRow,true);
-            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-                xssfWorkbook.write(byteArrayOutputStream);
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-                DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".xlsx",
-                    "fileSize", inputStream.available(), "fileContent",byteArrayInputStream));
-                bizModel.putDataSet(targetDsName,objectToDataSet);
-                return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
-            } finally {
-                xssfWorkbook.close();
-            }
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            xssfWorkbook.write(byteArrayOutputStream);
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+            DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".xlsx",
+                "fileSize", inputStream.available(), "fileContent",byteArrayInputStream));
+            bizModel.putDataSet(targetDsName,objectToDataSet);
+            byteArrayOutputStream.close();
+            xssfWorkbook.close();
+            return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
         }
         //获取表达式信息
         Map<String, String> mapInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
@@ -84,14 +83,10 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：生成EXCEL文件异常，请指定数据集！");
         }
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
-        try {
-            InputStream inputStream = ExcelDataSet.writeExcel(dataAsList,mapInfo);
-            DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".xlsx",
-                "fileSize", inputStream.available(), "fileContent",inputStream));
-            bizModel.putDataSet(targetDsName,objectToDataSet);
-        } catch (IOException e) {
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：生成EXCEL文件异常，异常信息"+e.getMessage());
-        }
+        InputStream inputStream = ExcelDataSet.writeExcel(dataAsList,mapInfo);
+        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".xlsx",
+            "fileSize", inputStream.available(), "fileContent",inputStream));
+        bizModel.putDataSet(targetDsName,objectToDataSet);
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
     }
 

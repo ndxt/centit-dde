@@ -46,23 +46,18 @@ public class ConsumerBizOperation implements BizOperation {
         KafkaConsumer consumer = KafkaConsumerConfig.getKafkaConsumer(extProps,sourceInfo);
         String topics = consumerEntity.getTopic();
         ConsumerRecords<String, String> records=null;
-        try {
-            if (StringUtils.isNotBlank(topics)){
-                String[] topicArray = topics.split(",");
-                //通过正则表达式订阅主题
-                if (topicArray.length==1 && topicArray[0].contains(".*")){
-                    consumer.subscribe(Pattern.compile(topicArray[0]));
-                }else {
-                    consumer.subscribe(Arrays.asList(topicArray));//设置主题，可多个
-                }
-                records = consumer.poll(1000);
+        if (StringUtils.isNotBlank(topics)){
+            String[] topicArray = topics.split(",");
+            //通过正则表达式订阅主题
+            if (topicArray.length==1 && topicArray[0].contains(".*")){
+                consumer.subscribe(Pattern.compile(topicArray[0]));
+            }else {
+                consumer.subscribe(Arrays.asList(topicArray));//设置主题，可多个
             }
-        }catch (Exception e){
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"异常信息："+e.getMessage());
-        }finally {
-            if (consumer!=null){
-                consumer.close();
-            }
+            records = consumer.poll(1000);
+        }
+        if (consumer!=null){
+            consumer.close();
         }
         List<String> values = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {

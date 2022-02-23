@@ -61,29 +61,18 @@ public class OFDConvertBizOperation implements BizOperation {
             file.renameTo(new File(path + File.separator + fileName));
             fileList.add(new File(path + File.separator + fileName));
         }
-        HTTPAgent httpAgent = null;
-        ByteArrayOutputStream stream = null;
-        try {
-            httpAgent = new HTTPAgent(ofdConvertVo.getHttpUrl());
-            stream = new ByteArrayOutputStream();
-            httpAgent.officesToOFD(fileList, stream);
-            bizModel.putDataSet(ofdConvertVo.getId(), new SimpleDataSet(stream));
-            for(File file:fileList){
-                file.delete();
-            }
-        } catch (Exception e) {
-            BuiltInOperation.getResponseData(0, 500, "请求转换文件服务异常，异常信息:" + e.getMessage());
-        } finally {
-            try {
-                if (httpAgent != null) {
-                    httpAgent.close();
-                }
-                if (stream != null) {
-                    stream.close();
-                }
-            } catch (Exception e) {
-                e.getMessage();
-            }
+        HTTPAgent httpAgent = new HTTPAgent(ofdConvertVo.getHttpUrl());
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        httpAgent.officesToOFD(fileList, stream);
+        bizModel.putDataSet(ofdConvertVo.getId(), new SimpleDataSet(stream));
+        for(File file:fileList){
+            file.delete();
+        }
+        if (httpAgent != null) {
+            httpAgent.close();
+        }
+        if (stream != null) {
+            stream.close();
         }
         return ResponseData.successResponse;
     }
