@@ -7,6 +7,7 @@ import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.SqlDataSetReader;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -22,8 +23,11 @@ import java.util.Map;
 public class DbBizOperation implements BizOperation {
     private SourceInfoDao sourceInfoDao;
 
-    public DbBizOperation(SourceInfoDao sourceInfoDao) {
+    private DataScopePowerManager queryDataScopeFilter;
+
+    public DbBizOperation(SourceInfoDao sourceInfoDao,DataScopePowerManager queryDataScopeFilter) {
         this.sourceInfoDao = sourceInfoDao;
+        this.queryDataScopeFilter = queryDataScopeFilter;
     }
 
     @Override
@@ -32,6 +36,7 @@ public class DbBizOperation implements BizOperation {
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", "");
         String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
         Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
+        String optId=(String) bizModel.getInterimVariable().get("metadata_optId");
         Map<String, Object> mapObject = new HashMap<>();
         if (mapString != null) {
             for (Map.Entry<String, String> map : mapString.entrySet()) {
@@ -48,6 +53,8 @@ public class DbBizOperation implements BizOperation {
         SqlDataSetReader sqlDsr = new SqlDataSetReader();
         sqlDsr.setDataSource(databaseInfo);
         sqlDsr.setSqlSen(sql);
+        sqlDsr.setQueryDataScopeFilter(queryDataScopeFilter);
+        sqlDsr.setOptId(optId);
         SimpleDataSet dataSet = sqlDsr.load(mapObject);
         bizModel.putDataSet(sourDsName, dataSet);
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());

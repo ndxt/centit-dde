@@ -1,4 +1,4 @@
-package com.centit.dde.config;
+package com.centit.dde.producer;
 
 import com.alibaba.fastjson.JSONObject;
 import com.centit.product.adapter.po.SourceInfo;
@@ -9,7 +9,7 @@ import org.springframework.util.Assert;
 
 import java.util.Properties;
 
-public class DDEProducerConfig {
+public class KafkaProducerConfig {
 
     public static KafkaProducer getKafkaProducer(SourceInfo sourceInfo){
         if (sourceInfo==null){

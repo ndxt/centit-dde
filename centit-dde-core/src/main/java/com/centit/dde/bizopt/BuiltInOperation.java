@@ -190,10 +190,10 @@ public class BuiltInOperation {
     public static ResponseData runAnalyse(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
-        List<String> orderFields = jsonArrayToList(bizOptJson.getJSONArray("sortconifg"), "sortName", "order", "desc");
+        List<String> orderFields = jsonArrayToList(bizOptJson.getJSONArray("sortconfig"), "sortName", "order", "desc");
         List<String> groupFields = jsonArrayToList(bizOptJson.getJSONArray("exconfig"), "groupName", "groupName", "");
         int count = 0;
-        Map<String, String> analyse = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
+        Map<String, String> analyse = jsonArrayToMap(bizOptJson.getJSONArray("configfield"), "columnName", "expression");
         if (analyse != null) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
             if (dataSet != null) {

@@ -2,12 +2,12 @@ package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.config.DDEProducerConfig;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
-import com.centit.dde.entity.ProducerEntity;
+import com.centit.dde.producer.KafkaProducerConfig;
+import com.centit.dde.producer.ProducerEntity;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
@@ -32,8 +32,8 @@ public class ProducerBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
         ProducerEntity producerEntity = JSON.parseObject(JSON.toJSONString(bizOptJson), ProducerEntity.class);
-        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(producerEntity.getDataSourceID());
-        DataSet dataSet = bizModel.getDataSet(producerEntity.getSourceID());
+        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(producerEntity.getDatabaseId());
+        DataSet dataSet = bizModel.getDataSet(producerEntity.getSource());
         KafkaProducer producer=null;
         try {
             ProducerRecord<String, String> record = new ProducerRecord<>(producerEntity.getTopic(), producerEntity.getPartition(), producerEntity.getId(),JSON.toJSONString(dataSet.getData()));
@@ -47,9 +47,9 @@ public class ProducerBizOperation implements BizOperation {
                 return BuiltInOperation.getResponseData(0, 500,
                     bizOptJson.getString("SetsName")+"异常信息:topic_"+producerEntity.getTopic()+"不存在！");
             }
-            producer = DDEProducerConfig.getKafkaProducer(sourceInfo);
+            producer = KafkaProducerConfig.getKafkaProducer(sourceInfo);
             AtomicReference<String> resut= new AtomicReference<>("");
-            if (!producerEntity.getAsyn()){
+            if (!producerEntity.getIsAsyn()){
                 //同步发送   会阻塞
                 Object res = producer.send(record).get();
                 if (res!=null){

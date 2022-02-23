@@ -2,11 +2,11 @@ package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.config.DDEConsumerConfig;
+import com.centit.dde.consumer.KafkaConsumerConfig;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
-import com.centit.dde.entity.ConsumerEntity;
+import com.centit.dde.consumer.ConsumerEntity;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
@@ -40,10 +40,10 @@ public class ConsumerBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
         ConsumerEntity consumerEntity = JSON.parseObject(JSON.toJSONString(bizOptJson), ConsumerEntity.class);
-        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(consumerEntity.getDataSourceID());
+        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(consumerEntity.getDatabaseId());
         JSONObject extProps = sourceInfo.getExtProps();
         extProps.put("group.id",consumerEntity.getGroupId());
-        KafkaConsumer consumer = DDEConsumerConfig.getKafkaConsumer(extProps,sourceInfo);
+        KafkaConsumer consumer = KafkaConsumerConfig.getKafkaConsumer(extProps,sourceInfo);
         String topics = consumerEntity.getTopic();
         ConsumerRecords<String, String> records=null;
         try {

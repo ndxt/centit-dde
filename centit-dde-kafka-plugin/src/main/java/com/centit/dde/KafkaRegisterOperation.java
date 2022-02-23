@@ -20,9 +20,9 @@ public class KafkaRegisterOperation implements InitializingBean {
 
     @Override
     public void afterPropertiesSet(){
-        //注册查询操作类
-        bizOptFlow.registerOperation("producer",new ProducerBizOperation(sourceInfoDao));
-        //注册插入操作类
+        //消息推送实例
+        bizOptFlow.registerOperation("kafkaSCZ",new ProducerBizOperation(sourceInfoDao));
+        //消息订阅实例
         bizOptFlow.registerOperation("consumer",new ConsumerBizOperation(sourceInfoDao));
     }
 }

@@ -119,7 +119,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("clear", BuiltInOperation::runClear);
         allOperations.put("js", new JSBizOperation(metaObjectService));
         allOperations.put("persistence", new PersistenceBizOperation(path, sourceInfoDao, metaDataService));
-        allOperations.put("database", new DbBizOperation(sourceInfoDao));
+        allOperations.put("database", new DbBizOperation(sourceInfoDao,queryDataScopeFilter));
         allOperations.put("excel", new ExcelBizOperation());
         allOperations.put("csv", new CsvBizOperation());
         allOperations.put("json", new JsonBizOperation());
@@ -230,7 +230,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         //断点调试，指定节点数据返回
         String debugId = (String)dataOptVo.getQueryParams().get("debugId");
         if (StringUtils.isNotBlank(debugId) && debugId.equals(stepJson.getString("id"))){
-            dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions","1");
+            dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions","3");
             dataOptStep.getCurrentStep().getJSONObject("properties").put("source",stepJson.getString("id"));
             Object returnResult = returnResult(dataOptStep, dataOptVo);
             dataOptVo.setPreResult(returnResult);

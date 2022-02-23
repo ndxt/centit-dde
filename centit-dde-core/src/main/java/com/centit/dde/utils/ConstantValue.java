@@ -39,11 +39,11 @@ public class ConstantValue {
     public static final String SCHEDULER = "schedule";
     public static final String BRANCH = "branch";
     //生成json文件组件
-    public static final String GENERATE_JSON_FILE = "generateJsonFile";
+    public static final String GENERATE_JSON_FILE = "generateJson";
     //生成CSV文件组件
-    public static final String GENERATE_CSV_FILE = "generateCsvFile";
+    public static final String GENERATE_CSV_FILE = "generateCsv";
     //生成EXCEL文件组件
-    public static final String GENERAT_EXCEL_FILE = "generateExcelFile";
+    public static final String GENERAT_EXCEL_FILE = "generateExcel";
     //文件上传组件
     public static final String FILE_UPLOAD = "fileUpload";
     //文件下载组件
@@ -64,10 +64,6 @@ public class ConstantValue {
     public static final String COMPARE_SOURCE="compareSource";
     //获取session数据
     public static final String SESSION_DATA="sessionData";
-
-
-
-
 
     public static final String FINAL_TWO="2";
 

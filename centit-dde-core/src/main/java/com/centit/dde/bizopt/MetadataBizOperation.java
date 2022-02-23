@@ -87,8 +87,7 @@ public class MetadataBizOperation implements BizOperation {
                         dataPowerFilter.addSourceData(parames);
                         Map<String, String> tableAlias = new HashMap<>(3);
                         tableAlias.put(table.getTableName(), "");
-                        QueryAndNamedParams qap = dataPowerFilter.translateQueryFilter(
-                            tableAlias, filters);
+                        QueryAndNamedParams qap = dataPowerFilter.translateQueryFilter(tableAlias, filters);
                         parames.putAll(qap.getParams());
                         extFilter = qap.getQuery();
                     }
