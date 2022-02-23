@@ -87,7 +87,19 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-config</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.alibaba.nacos</groupId>
+                    <artifactId>nacos-client</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
+    <!--    <dependency>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-client</artifactId>
+            <version>2.0.3</version>
+        </dependency>-->
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-core-web</artifactId>
@@ -164,6 +176,30 @@
               <artifactId>centit-workflow-client</artifactId>
               <version>${parent.version}</version>
           </dependency>-->
+
+
+        <!--knife4j-->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring</artifactId>
+            <!--在引用时请在maven中央仓库搜索最新版本号-->
+            <version>2.0.8</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-ui</artifactId>
+            <!--在引用时请在maven中央仓库搜索最新版本号-->
+            <version>2.0.8</version>
+        </dependency>
+
+        <!--引入Knife4j-->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-mvc</artifactId>
+            <!--在引用时请在maven中央仓库搜索最新版本号，如果不存在则代表尚未发布,作者正在努力开发中-->
+            <version>2.0.8</version>
+        </dependency>
+
     </dependencies>
 
     <!--  end -->
