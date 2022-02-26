@@ -1,5 +1,6 @@
 package com.centit.dde.core.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.*;
@@ -230,14 +231,31 @@ public class BizOptFlowImpl implements BizOptFlow {
         //断点调试，指定节点数据返回
         String debugId = (String)dataOptVo.getQueryParams().get("debugId");
         if (StringUtils.isNotBlank(debugId) && debugId.equals(stepJson.getString("id"))){
-            dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions","3");
+            dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions","1");
             String source = stepJson.getString("source");
             //设置返回节点  内部方法会通过这个source 来判断返回具体的某个节点 这个只能重置为当前ID 下面再重置回去
             dataOptStep.getCurrentStep().getJSONObject("properties").put("source",stepJson.getString("id"));
             Object returnResult = returnResult(dataOptStep, dataOptVo);
             //恢复原始JSON数据，否则后面更新的时候会将原本的数据替换为当前节点id
             dataOptStep.getCurrentStep().getJSONObject("properties").put("source",source);
-            dataOptVo.setPreResult(returnResult);
+            JSONObject newResultData = new JSONObject();
+            JSONObject bizData = new JSONObject();
+            if (returnResult!=null){
+                JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(returnResult));
+                JSONObject data = jsonObject.getJSONObject("data");
+                if (data!=null){
+                    JSONObject dump = new JSONObject();
+                    dump.put("allNodeData",data.getJSONObject("bizData"));
+                    dump.put("modelTag",data.getJSONObject("modelTag"));
+                    dump.put("responseMapData",data.getJSONObject("responseMapData"));
+                    bizData.put("currentNodeData",data.getJSONObject("bizData")==null?null:data.getJSONObject("bizData").get(debugId));
+                    bizData.put("dump",dump);
+                    newResultData.put("code",jsonObject.get("code"));
+                    newResultData.put("message",jsonObject.get("message"));
+                    newResultData.put("data",bizData);
+                }
+            }
+            dataOptVo.setPreResult(newResultData);
             dataOptStep.setEndStep();
             return;
         }

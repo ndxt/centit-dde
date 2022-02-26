@@ -25,16 +25,6 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!--<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-            <exclusions>&lt;!&ndash; 去掉默认配置 &ndash;&gt;
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>-->
         <dependency>
             <groupId>net.sf.ucanaccess</groupId>
             <artifactId>ucanaccess</artifactId>
@@ -43,23 +33,17 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-persistence-extend</artifactId>
-            <version>5.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-persistence-core</artifactId>
-            <version>5.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
-        <!--<dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-app-boot-config</artifactId>
-            <version>${centit.ip.version}</version>
-        </dependency>-->
-
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>fileserver-utils</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.oracle</groupId>

@@ -20,6 +20,12 @@
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-dubbo-client-config</artifactId>
             <version>${centit.framework.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.alibaba.spring</groupId>
+                    <artifactId>spring-context-support</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.centit.product</groupId>

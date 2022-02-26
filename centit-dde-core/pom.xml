@@ -44,6 +44,12 @@
         <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-office-utils</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.docx4j</groupId>
+                    <artifactId>docx4j-JAXB-Internal</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.javacsv</groupId>

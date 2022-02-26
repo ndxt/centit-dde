@@ -11,6 +11,7 @@ import com.centit.dde.core.SimpleDataSet;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -38,7 +39,7 @@ public class ConsumerBizOperation implements BizOperation {
         ConsumerEntity consumerEntity = JSON.parseObject(JSON.toJSONString(bizOptJson), ConsumerEntity.class);
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(consumerEntity.getDatabaseId());
         JSONObject extProps = sourceInfo.getExtProps();
-        extProps.put("group.id",consumerEntity.getGroupId());
+        extProps.put(ConsumerConfig.GROUP_ID_CONFIG,consumerEntity.getGroupId());
         KafkaConsumer consumer = KafkaConsumerConfig.getKafkaConsumer(extProps,sourceInfo);
         JSONArray topics = consumerEntity.getTopic();
         if (topics!=null || topics.size()==0){
@@ -52,9 +53,10 @@ public class ConsumerBizOperation implements BizOperation {
             consumer.subscribe(topics);
         }
         ConsumerRecords<String, String> records = consumer.poll(1000);
+        //同步提交offset
+        consumer.commitSync();
         if (consumer!=null){
             consumer.close();
-
         }
         List<String> values = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {
