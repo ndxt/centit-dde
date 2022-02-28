@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * @author zhf
@@ -33,6 +34,88 @@ public abstract class DataSetOptUtil {
     private static final String RIGHT = "rightjoin";
     private static final String ALL = "alljoin";
 
+    private static Map<String, Function<Object[], Object>> extendFuncs = null;
+    public static  Map<String, Function<Object[], Object>> makeExtendFuns(){
+        if(extendFuncs == null ){
+            extendFuncs = new HashMap<>();
+            extendFuncs.put("toJson", (a) -> JSON.parse(StringBaseOpt.castObjectToString(a[0])));
+            extendFuncs.put("toByteArray", (a) -> {
+                try {
+                    return IOUtils.toByteArray((InputStream) a[0]);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return a;
+            });
+            extendFuncs.put("uuid", (a) -> UuidOpt.getUuidAsString32());
+            extendFuncs.put("random", (a) -> CaptchaImageUtil.getRandomString(NumberBaseOpt.castObjectToInteger(a[0])));
+            extendFuncs.put("encode", (a) -> new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
+            extendFuncs.put("dict", (a) -> {
+                if (a != null && a.length > 1) {
+                    String regex =",";
+                    if (a.length>2) {
+                        regex = StringBaseOpt.objectToString(a[2]);
+                    }
+                    String[] strings=StringBaseOpt.objectToString(a[1]).split(regex);
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (String string : strings) {
+                        if (stringBuilder.length() > 0) {
+                            stringBuilder.append(regex);
+                        }
+                        stringBuilder.append(CodeRepositoryUtil.getValue(
+                            StringBaseOpt.castObjectToString(a[0]),
+                            StringBaseOpt.castObjectToString(string)));
+                    }
+                    return stringBuilder.toString();
+                }
+                else {
+                    return a;
+                }
+            });
+            extendFuncs.put("dictTrans", (a) -> {
+                if (a != null && a.length > 1) {
+                    return CodeRepositoryUtil.transExpression(
+                        StringBaseOpt.castObjectToString(a[0]),
+                        StringBaseOpt.castObjectToString(a[1]));
+                }
+                else {
+                    return a;
+                }
+            });
+            extendFuncs.put("replace", (a) -> {
+                if (a != null && a.length > 2) {
+                    return StringUtils.replace(StringBaseOpt.castObjectToString(a[0]),
+                        StringBaseOpt.castObjectToString(a[1]),StringBaseOpt.castObjectToString(a[2]));
+                }
+                else if (a != null && a.length>0){
+                    return a[0];
+                } else{
+                    return a;
+                }
+            });
+            extendFuncs.put("size",(a)->{
+                Object o = Arrays.stream(a).toArray()[0];
+                if (o instanceof Collection){
+                    return ((Collection<?>) o).size();
+                }
+                if (o instanceof Map){
+                    return ((Map<?, ?>) o).size();
+                }
+                return "";
+            });
+            extendFuncs.put("startsWith",(a)->{
+                Object[] objects = Arrays.stream(a).toArray();
+                if (objects.length==2){
+                    String regex= (String) objects[0];
+                    String value=  (String)objects[1];
+                    return value.startsWith(regex);
+                }
+                return false;
+            });
+        }
+        return extendFuncs;
+    }
+/*
     public static VariableFormula createFormula() {
         VariableFormula formula = new VariableFormula();
         formula.addExtendFunc("toJson", (a) -> JSON.parse(
@@ -73,8 +156,8 @@ public abstract class DataSetOptUtil {
         formula.addExtendFunc("dictTrans", (a) -> {
             if (a != null && a.length > 1) {
                 return CodeRepositoryUtil.transExpression(
-                        StringBaseOpt.castObjectToString(a[0]),
-                        StringBaseOpt.castObjectToString(a[1]));
+                    StringBaseOpt.castObjectToString(a[0]),
+                    StringBaseOpt.castObjectToString(a[1]));
             }
             else {
                 return a;
@@ -111,7 +194,7 @@ public abstract class DataSetOptUtil {
             return false;
         });
         return formula;
-    }
+    }*/
 
     /**
      * 数据集 映射
@@ -125,7 +208,8 @@ public abstract class DataSetOptUtil {
         if (formulaMap == null) {
             return inRow;
         }
-        VariableFormula formula = createFormula();
+        VariableFormula formula = new VariableFormula();
+        formula.setExtendFuncMap(makeExtendFuns());
         formula.setTrans(new ObjectTranslate(inRow));
         Map<String, Object> newRow = new LinkedHashMap<>(formulaMap.size());
         for (Map.Entry<String, String> ent : formulaMap) {

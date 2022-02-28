@@ -12,10 +12,7 @@ import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.po.TaskDetailLog;
-import com.centit.dde.utils.BizModelJSONTransform;
-import com.centit.dde.utils.BizOptUtils;
-import com.centit.dde.utils.CloneUtils;
-import com.centit.dde.utils.ConstantValue;
+import com.centit.dde.utils.*;
 import com.centit.dde.vo.CycleVo;
 import com.centit.dde.vo.DataOptVo;
 import com.centit.fileserver.common.FileStore;
@@ -319,17 +316,14 @@ public class BizOptFlowImpl implements BizOptFlow {
         List<JSONObject> linksJson = dataOptStep.getNextLinks(stepId);
         for (JSONObject jsonObject : linksJson) {
             if (!ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
-                if (BooleanBaseOpt.castObjectToBoolean(
-                    VariableFormula.calculate(jsonObject.getString("expression"),
-                        new BizModelJSONTransform(dataOptVo.getBizModel())), false)) {
+                String expression = jsonObject.getString("expression");
+                Object calculate = VariableFormula.calculate(expression, new BizModelJSONTransform(dataOptVo.getBizModel()), DataSetOptUtil.makeExtendFuns());
+                if (BooleanBaseOpt.castObjectToBoolean(calculate, false)) {
                     stepJson = dataOptStep.getOptStep(jsonObject.getString("targetId"));
                     dataOptStep.setCurrentStep(stepJson);
                     return;
                 }
-            }
-        }
-        for (JSONObject jsonObject : linksJson) {
-            if (ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
+            }else if (ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
                 stepJson = dataOptStep.getOptStep(jsonObject.getString("targetId"));
                 dataOptStep.setCurrentStep(stepJson);
                 return;
