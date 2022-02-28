@@ -232,6 +232,7 @@ public class HttpTaskController extends BaseController {
             "表达式:if(判断条件,真值,假值),名称:三目判断,示例:formula:if(name=='b','c','d');json:{name:'a'}  \n" +
             "表达式:case(string/true/digit,匹配值1,返回值1,[匹配值2,返回值2]),名称:swithcase判断,示例:formula:case(name,'b','c','d','e')  \n" +
             "表达式:match(regex,string),名称:匹配判断,*?为通配符,示例:formula:match('t??t',name)  \n" +
+            "表达式:startsWith(regex,string),名称:判断字符串中是以某个字符开头,示例:formula:startsWith('a',name)  \n" +
             "表达式:regexmatch(regex,string),名称:匹配判断,*?为通配符,示例:formula:regexmatch('t??t',name)  \n" +
             "表达式:regexmatchvalue(regex,string),名称:获取匹配值list,示例:formula:regexmatchvalue('t??t',name)  \n" +
             "表达式:count(listObject),名称:计数,示例:formula:count(1,\"2\",3,\"5\",1,1,4)  \n" +

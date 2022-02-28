@@ -101,6 +101,15 @@ public abstract class DataSetOptUtil {
             }
             return "";
         });
+        formula.addExtendFunc("startsWith",(a)->{
+            Object[] objects = Arrays.stream(a).toArray();
+            if (objects.length==2){
+                String regex= (String) objects[0];
+                String value=  (String)objects[1];
+                return value.startsWith(regex);
+            }
+            return false;
+        });
         return formula;
     }
 
