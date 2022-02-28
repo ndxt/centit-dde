@@ -7,6 +7,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -46,7 +47,7 @@ public class RunTaskJob extends AbstractQuartzJob {
             }
             try {
                 TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
-                taskRun.runTask(dataPacket.getPacketId(), null,null);
+                taskRun.runTask(dataPacket.getPacketId(), null,new HashMap<>());
             } finally {
                 runningTask.put(dataPacket.getPacketId(), false);
             }
