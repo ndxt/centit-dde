@@ -55,17 +55,24 @@ public class SqlDataSetReader implements DataSetReader {
     @Override
     public SimpleDataSet load(final Map<String, Object> params) throws Exception {
         Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(databaseInfo);
-        QueryAndNamedParams qap;
+        QueryAndNamedParams qap = null;
         HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
-        String topUnit = WebOptUtils.getCurrentTopUnit(request);
-        List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, WebOptUtils.getCurrentUserCode(request), optId, "search");
-        if (filters != null) {
-            DataScopePowerManager queryDataScopeFilter = new DataScopePowerManagerImpl();
-            DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
-                WebOptUtils.getCurrentUserInfo(request), topUnit, WebOptUtils.getCurrentUnitCode(request));
-            dataPowerFilter.addSourceData(params);
-            qap = dataPowerFilter.translateQuery(sqlSen, null);
-        } else {
+        if(request!=null) {
+            String topUnit = WebOptUtils.getCurrentTopUnit(request);
+            String userCode=WebOptUtils.getCurrentUserCode(request);
+            if(userCode!=null) {
+                List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,userCode , optId, "search");
+                if (filters != null) {
+                    DataScopePowerManager queryDataScopeFilter = new DataScopePowerManagerImpl();
+                    DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
+                        WebOptUtils.getCurrentUserInfo(request), topUnit, WebOptUtils.getCurrentUnitCode(request));
+                    dataPowerFilter.addSourceData(params);
+                    qap = dataPowerFilter.translateQuery(sqlSen, null);
+                }
+            }else{
+                qap = QueryUtils.translateQuery(sqlSen, params);
+            }
+        }else {
             qap = QueryUtils.translateQuery(sqlSen, params);
         }
         Map<String, Object> paramsMap = new HashMap<>(params == null ? 0 : params.size() + 6);
