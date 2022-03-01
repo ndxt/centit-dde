@@ -12,17 +12,16 @@ import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
 /**
- * 生成json文件节点信息
+ * 生成CSV文件节点信息
  */
-public class GenerateCsvBizOperation implements BizOperation {
+public class GenerateCsvFileBizOperation implements BizOperation {
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
@@ -39,14 +38,10 @@ public class GenerateCsvBizOperation implements BizOperation {
         if (dataSet==null){
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：生成CSV文件异常，请指定数据集！");
         }
-        try {
-            InputStream inputStream = CsvDataSet.createCsvStream(dataSet);
-            DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".csv",
-                "fileSize", inputStream.available(), "fileContent",inputStream));
-            bizModel.putDataSet(targetDsName,objectToDataSet);
-        } catch (IOException e) {
-           return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：生成CSV文件异常，异常信息"+e.getMessage());
-        }
+        InputStream inputStream = CsvDataSet.createCsvStream(dataSet);
+        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".csv",
+            "fileSize", inputStream.available(), "fileContent",inputStream));
+        bizModel.putDataSet(targetDsName,objectToDataSet);
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
     }
 }

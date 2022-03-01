@@ -26,7 +26,7 @@ public class JSBizOperation implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         JSRuntimeContext jsRuntimeContext = new JSRuntimeContext();
 
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", "js");
@@ -35,16 +35,11 @@ public class JSBizOperation implements BizOperation {
             jsRuntimeContext.compileScript(javaScript);
         }
         int count = 0;
-        try {
-            Object object = jsRuntimeContext.callJsFunc("runOpt",
-                this, bizModel,bizModel.toJsonObject());
-            bizModel.putDataSet(targetDsName,
-                BizOptUtils.castObjectToDataSet(object));
-            if (object != null) {
-                count = bizModel.fetchDataSetByName(targetDsName).getSize();
-            }
-        } catch (ScriptException | NoSuchMethodException e) {
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_PROCESS_FAILED,e.getMessage());
+        Object object = jsRuntimeContext.callJsFunc("runOpt", this, bizModel,bizModel.toJsonObject());
+        bizModel.putDataSet(targetDsName,
+            BizOptUtils.castObjectToDataSet(object));
+        if (object != null) {
+            count = bizModel.fetchDataSetByName(targetDsName).getSize();
         }
         return BuiltInOperation.getResponseSuccessData(count);
     }

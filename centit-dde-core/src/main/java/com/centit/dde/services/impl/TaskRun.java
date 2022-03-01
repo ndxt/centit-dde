@@ -2,8 +2,8 @@ package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizOptFlow;
-import com.centit.dde.dao.DataPacketDraftDao;
 import com.centit.dde.dao.DataPacketDao;
+import com.centit.dde.dao.DataPacketDraftDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.po.*;
@@ -15,11 +15,10 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import org.quartz.CronExpression;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -95,8 +94,15 @@ public class TaskRun {
                     dataPacketInterface.setNextRunTime(new Date());
                     DatabaseOptUtils.doExecuteSql(dataPacketDao, "update q_data_packet set next_run_time=? where packet_id=?",
                         new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
+                    DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set next_run_time=? where packet_id=?",
+                        new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
                 }
                 dataPacketDao.mergeObject((DataPacket)dataPacketInterface);
+                //将正式流程执行的时间同步到草稿表中
+                DataPacket dataPacket = (DataPacket)dataPacketInterface;
+                DataPacketDraft dataPacketDraft = new DataPacketDraft();
+                BeanUtils.copyProperties(dataPacket,dataPacketDraft);
+                dataPacketCopyDao.mergeObject(dataPacketDraft);
             }
             TaskDetailLog taskDetailLog = taskDetailLogDao.getObjectByProperties(CollectionsOpt.createHashMap("logId", taskLog.getLogId()));
             taskLog.setOtherMessage("ok".equals(taskDetailLog.getLogInfo())? "ok" : "error");

@@ -6,16 +6,13 @@ import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.services.BizModelService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.security.Md5Encoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import java.io.*;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -51,8 +48,11 @@ public class BizModelServiceImpl implements BizModelService {
     }
 
     private boolean notNeedBuf(DataPacketInterface dataPacket) {
-        return jedisPool == null || dataPacket.getBufferFreshPeriod() == null
-            || NumberBaseOpt.castObjectToInteger(dataPacket.getBufferFreshPeriod()) <= 0;
+        return jedisPool == null
+            || dataPacket.getBufferFreshPeriodType() == null
+            || dataPacket.getBufferFreshPeriodType() == ConstantValue.MINUS_ONE
+            || dataPacket.getBufferFreshPeriod() == null
+            || dataPacket.getBufferFreshPeriod()<=0;
     }
 
     private Object fetchBizModelFromBuf(DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
@@ -102,27 +102,15 @@ public class BizModelServiceImpl implements BizModelService {
             oos.writeObject(bizModel);
             byte[] byt = bos.toByteArray();
             jedis.set(key.getBytes(), byt);
-            int seconds;
-            int iPeriod = dataPacket.getBufferFreshPeriod();
-            if (iPeriod == ConstantValue.ONE) {
-                //一日
-                seconds = 24 * 3600;
-                jedis.expire(key.getBytes(), seconds);
-            } else if (iPeriod == ConstantValue.TWO) {
-                //按周
-                seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfWeek(new Date())) * 24 * 3600;
-                jedis.expire(key.getBytes(), seconds);
-            } else if (iPeriod == ConstantValue.THREE) {
-                //按月
-                seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfMonth(new Date())) * 24 * 3600;
-                jedis.expire(key.getBytes(), seconds);
-            } else if (iPeriod == ConstantValue.FOUR) {
-                //按年
-                seconds = DatetimeOpt.calcSpanDays(new Date(), DatetimeOpt.seekEndOfYear(new Date())) * 24 * 3600;
-                jedis.expire(key.getBytes(), seconds);
-            } else if (iPeriod >= ConstantValue.SIXTY) {
-                //按秒
-                jedis.expire(key.getBytes(), iPeriod);
+            int seconds = dataPacket.getBufferFreshPeriod();
+            int iPeriod = dataPacket.getBufferFreshPeriodType();
+            if (iPeriod == ConstantValue.ONE) {//按分
+                jedis.expire(key.getBytes(), seconds * 60);
+            } else if (iPeriod == ConstantValue.TWO) {//按时
+                jedis.expire(key.getBytes(),  seconds*3600);
+            } else if (iPeriod == ConstantValue.THREE) {//按天
+                int days = seconds * 24 * 3600;
+                jedis.expire(key.getBytes(), days);
             }
             bos.close();
             oos.close();
@@ -135,5 +123,4 @@ public class BizModelServiceImpl implements BizModelService {
     private boolean keyNotExpired() {
         return jedis.get(key.getBytes()) != null && (jedis.get(key.getBytes()).length > 0);
     }
-
 }

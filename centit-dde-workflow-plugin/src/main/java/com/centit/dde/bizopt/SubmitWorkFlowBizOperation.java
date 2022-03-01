@@ -118,13 +118,8 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                 default:
             }
         }
-        try {
-            Map<String, Object>   objectMap = flowEngine.submitFlowOpt(submitOptOptions);
-            bizModel.putDataSet(id,new SimpleDataSet(objectMap));
-        } catch (Exception e) {
-            bizModel.putDataSet(id,new SimpleDataSet(e.getMessage()));
-            return BuiltInOperation.getResponseData(0, 500, e.getMessage());
-        }
+        Map<String, Object>   objectMap = flowEngine.submitFlowOpt(submitOptOptions);
+        bizModel.putDataSet(id,new SimpleDataSet(objectMap));
         return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(id).getSize());
     }
 }

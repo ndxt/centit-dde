@@ -32,33 +32,33 @@ public class OFDPreviewBizOperation implements BizOperation {
     public static final Log log = LogFactory.getLog(OFDPreviewBizOperation.class);
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         OFDPreviewVo ofdPreviewVo = bizOptJson.toJavaObject(OFDPreviewVo.class);
         String httpUrl = ofdPreviewVo.getHttpUrl();
-        if ( StringUtils.isBlank(httpUrl)){
+        if (StringUtils.isBlank(httpUrl)) {
             return ResponseData.makeErrorMessage("服务地址为空，请填写服务地址！");
         }
         //获取数据集
         DataSet dataSet = bizModel.getDataSet(ofdPreviewVo.getSource());
         Object data = dataSet.getData();
-        if (data instanceof OutputStream){
-            ByteArrayOutputStream byteArrayOutputStream =  (ByteArrayOutputStream)data;
-            httpUrl=httpUrl.endsWith("/")?httpUrl:httpUrl+"/";
-            JSONObject jsonObject = httpPostRequest(httpUrl, byteArrayOutputStream, System.currentTimeMillis()+".ofd");
-            if (jsonObject==null){
+        if (data instanceof OutputStream) {
+            ByteArrayOutputStream byteArrayOutputStream = (ByteArrayOutputStream) data;
+            httpUrl = httpUrl.endsWith("/") ? httpUrl : httpUrl + "/";
+            JSONObject jsonObject = httpPostRequest(httpUrl, byteArrayOutputStream, System.currentTimeMillis() + ".ofd");
+            if (jsonObject == null) {
                 return ResponseData.makeErrorMessage("请求预览服务异常！");
             }
-            String previewUrl=httpUrl+"reader?file="+jsonObject.getString("name");
-            bizModel.putDataSet(ofdPreviewVo.getId(),new SimpleDataSet(previewUrl));
+            String previewUrl = httpUrl + "reader?file=" + jsonObject.getString("name");
+            bizModel.putDataSet(ofdPreviewVo.getId(), new SimpleDataSet(previewUrl));
             return ResponseData.makeSuccessResponse("ok");
         }
         return null;
     }
 
 
-    public static JSONObject httpPostRequest(String urlParam,ByteArrayOutputStream byteArrayOutputStream,String fileName){
-        if (StringUtils.isNotBlank(urlParam)){
-            urlParam=urlParam+"reader?&type=upload";
+    public static JSONObject httpPostRequest(String urlParam, ByteArrayOutputStream byteArrayOutputStream, String fileName) throws Exception {
+        if (StringUtils.isNotBlank(urlParam)) {
+            urlParam = urlParam + "reader?&type=upload";
         }
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost uploadFile = new HttpPost(urlParam);
@@ -66,29 +66,18 @@ public class OFDPreviewBizOperation implements BizOperation {
         // builder.addTextBody("field1", "yes", ContentType.TEXT_PLAIN);
         ByteArrayInputStream input = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
         // 把文件加到HTTP的post请求中
-        builder.addBinaryBody("file", input, ContentType.APPLICATION_OCTET_STREAM,fileName);
+        builder.addBinaryBody("file", input, ContentType.APPLICATION_OCTET_STREAM, fileName);
         HttpEntity multipart = builder.build();
         uploadFile.setEntity(multipart);
-        CloseableHttpResponse response = null;
-        try {
-            response = httpClient.execute(uploadFile);
-            HttpEntity responseEntity = response.getEntity();
-            String sResponse= EntityUtils.toString(responseEntity, "UTF-8");
-            return JSONObject.parseObject(sResponse);
-        } catch (IOException e) {
-            log.error("请求OFD预览服务异常，异常信息："+e.getMessage());
-        }finally {
-            try {
-                if (response!=null){
-                    response.close();
-                }
-                if (httpClient!=null){
-                    httpClient.close();
-                }
-            }catch (Exception e){
-                e.getMessage();
-            }
+        CloseableHttpResponse response = httpClient.execute(uploadFile);
+        HttpEntity responseEntity = response.getEntity();
+        String sResponse = EntityUtils.toString(responseEntity, "UTF-8");
+        if (response != null) {
+            response.close();
         }
-       return null;
+        if (httpClient != null) {
+            httpClient.close();
+        }
+        return JSONObject.parseObject(sResponse);
     }
 }

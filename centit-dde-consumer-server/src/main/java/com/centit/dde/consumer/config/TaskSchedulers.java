@@ -1,11 +1,13 @@
 package com.centit.dde.consumer.config;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import com.google.gson.JsonArray;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -151,13 +153,17 @@ public class TaskSchedulers {
             // 指定订阅的分区
           /*  TopicPartition topicPartition = new TopicPartition(topic, 0);
             consumer.assign(Arrays.asList(topicPartition));*/
-            String messageKey = extProps.getString("messageKey");
-            String[] topicArray = messageKey.split(",");
+            JSONArray messageKey = extProps.getJSONArray("topic");
+            List<String> topicNames=new ArrayList<>();
+            for (Object topic : messageKey) {
+                JSONObject topicInfo= (JSONObject)topic;
+                topicNames.add(topicInfo.getString("name"));
+            }
             //通过正则表达式订阅主题
-            if (topicArray.length==1 && topicArray[0].contains(".*")){
-                consumer.subscribe(Pattern.compile(topicArray[0]));
+            if (topicNames.size()==1 && topicNames.get(0).contains(".*")){
+                consumer.subscribe(Pattern.compile(topicNames.get(0)));
             }else {
-                consumer.subscribe(Arrays.asList(topicArray));//设置主题，可多个
+                consumer.subscribe(topicNames);//设置主题，可多个
             }
             //当数据修改或者删除后停止循环
             while (packetMD5.containsKey(dataPacket.getPacketId()) && packetMD5.get(dataPacket.getPacketId()).equals(dataPacketMD5(dataPacket))){

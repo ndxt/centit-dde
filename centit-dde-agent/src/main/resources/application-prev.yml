@@ -1,28 +1,37 @@
 server:
   port: 10089
   servlet:
-    contextPath: /dde
+   contextPath: /dde
 spring:
   application:
-    name: DDE-KAFKA-CONSUMER
+    name: DDE
   datasource:
     type: org.apache.commons.dbcp2.BasicDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.137.63:31426/locodedata?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: stat
-    password: stat
+    url: jdbc:mysql://192.168.134.250:31183/locodedata?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
     dbcp2:
       max-wait-millis: 10000
       max-idle: 15
       initial-size: 10
       validation-query: SELECT 1 from dual
       connection-properties: characterEncoding=utf8
-
 centit:
   useDataMoving: false
   dataMovingPath: D:\centit-dde-datamoving-3.1-SNAPSHOT.jar
   logs: D:/Projects/RunData/dde/log
   optId: ''
+logging.path: D:/Projects/RunData/dde/log
+email:
+ hostName: mail.centit.com
+ smtpPort: 25
+ userName: alertmail@centit.com
+ userPassword: 131511.cn
+ serverEmail: no-reply@centit.com
+ emailTo: zhf@centit.com
+
+
 
 
 

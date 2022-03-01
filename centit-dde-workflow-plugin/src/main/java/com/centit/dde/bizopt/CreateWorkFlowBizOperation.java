@@ -141,14 +141,7 @@ public class CreateWorkFlowBizOperation implements BizOperation {
                 default:
             }
         }
-
-        FlowInstance instance;
-        try {
-            instance = flowEngine.createInstance(createFlowOptions);
-        } catch (Exception e) {
-            bizModel.putDataSet(id,new SimpleDataSet(e.getMessage()));
-            return BuiltInOperation.getResponseData(0, 500, e.getMessage());
-        }
+        FlowInstance   instance = flowEngine.createInstance(createFlowOptions);
         if (instance!=null){
             bizModel.putDataSet(id,new SimpleDataSet(instance));
         }

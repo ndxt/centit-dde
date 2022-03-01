@@ -19,7 +19,6 @@ import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.product.adapter.api.WorkGroupManager;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.ObjectTranslate;
@@ -53,8 +52,7 @@ public class HttpTaskController extends BaseController {
 
     @Autowired
     private PlatformEnvironment platformEnvironment;
-    @Autowired
-    WorkGroupManager workGroupManager;
+
     private final DataPacketService dataPacketService;
     private final DataPacketDraftService dataPacketDraftService;
     private final BizModelService bizmodelService;
@@ -133,25 +131,26 @@ public class HttpTaskController extends BaseController {
     }
 
     private void judgePower(@PathVariable String packetId,String runType) {
-        String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
-        if (StringBaseOpt.isNvl(loginUser)) {
-            loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
-        }
-        if (StringBaseOpt.isNvl(loginUser)) {
-            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "您未登录！");
-        }
         if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
+            String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+            if (StringBaseOpt.isNvl(loginUser)) {
+                loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
+            }
+            if (StringBaseOpt.isNvl(loginUser)) {
+                throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "您未登录！");
+            }
             DataPacketInterface dataPacket = dataPacketDraftService.getDataPacket(packetId);
-            if (!workGroupManager.loginUserIsExistWorkGroup(dataPacket.getOsId(), loginUser)) {
+            if (!platformEnvironment.loginUserIsExistWorkGroup(dataPacket.getOsId(), loginUser)) {
                 throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您没有权限！");
             }
         }
     }
 
     private void returnObject(String packetId, String runType,String taskType, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (!ConstantValue.RUN_TYPE_COPY.equals(runType)){
+        //暂时先把登录验证关闭掉
+        /*   if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
             judgePower(packetId,runType);
-        }
+        }*/
         Object bizModel;
         DataPacketInterface dataPacketInterface;
         if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
@@ -233,6 +232,7 @@ public class HttpTaskController extends BaseController {
             "表达式:if(判断条件,真值,假值),名称:三目判断,示例:formula:if(name=='b','c','d');json:{name:'a'}  \n" +
             "表达式:case(string/true/digit,匹配值1,返回值1,[匹配值2,返回值2]),名称:swithcase判断,示例:formula:case(name,'b','c','d','e')  \n" +
             "表达式:match(regex,string),名称:匹配判断,*?为通配符,示例:formula:match('t??t',name)  \n" +
+            "表达式:startsWith(regex,string),名称:判断字符串中是以某个字符开头,示例:formula:startsWith('a',name)  \n" +
             "表达式:regexmatch(regex,string),名称:匹配判断,*?为通配符,示例:formula:regexmatch('t??t',name)  \n" +
             "表达式:regexmatchvalue(regex,string),名称:获取匹配值list,示例:formula:regexmatchvalue('t??t',name)  \n" +
             "表达式:count(listObject),名称:计数,示例:formula:count(1,\"2\",3,\"5\",1,1,4)  \n" +
@@ -283,7 +283,8 @@ public class HttpTaskController extends BaseController {
             "表达式:addyears(),名称:加年数,示例:formula:addyears(name,1)  \n" +
             "表达式:truncdate(),名称:截断日期  第二个参数  Y ，M , D 分别返回一年、月的第一天 ，或者一日的零点,示例:formula:truncdate(name,'y')  \n" +
             "表达式:lastofmonth(),名称:求这个月最后一天,示例:formula:lastofmonth(name)  \n" +
-            "表达式:toDate(),名称:转换为日期,示例:formula:toDate(name)  \n")
+            "表达式:random(),名称:生成随机数random(5),random(1,5),random(string,20),random(string,uuid22/uuid32/uuid36)示例:formula:random()  \n" +
+            "表达式:hash(),名称:签名计算,hash(object),hash(object,md5/sha,base64),hash(object,hmac-sha1,secret-key),hash(object,hmac-sha1,secret-key,base64)示例:formula:hash(name)  \n" )
     @ApiImplicitParams({@ApiImplicitParam(
         name = "formula", value = "表达式"
     ), @ApiImplicitParam(
@@ -292,7 +293,8 @@ public class HttpTaskController extends BaseController {
     @WrapUpResponseBody
     public Object testFormula(String formula, String jsonString) {
         Map object = (Map) JSON.parse(StringEscapeUtils.unescapeHtml4(jsonString));
-        VariableFormula variableFormula = DataSetOptUtil.createFormula();
+        VariableFormula variableFormula = new VariableFormula();
+        variableFormula.setExtendFuncMap(DataSetOptUtil.makeExtendFuns());
         variableFormula.setTrans(new ObjectTranslate(object));
         variableFormula.setFormula(StringEscapeUtils.unescapeHtml4(formula));
         return variableFormula.calcFormula();

@@ -15,7 +15,6 @@ import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.product.adapter.api.WorkGroupManager;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
@@ -44,9 +43,6 @@ public class DataPacketDraftController extends BaseController {
     private final DataPacketDraftService dataPacketDraftService;
 
     @Autowired
-    private WorkGroupManager workGroupManager;
-
-    @Autowired
     private DataPacketTemplateService dataPacketTemplateService;
 
     @Autowired
@@ -63,7 +59,7 @@ public class DataPacketDraftController extends BaseController {
     @PostMapping
     @WrapUpResponseBody
     public DataPacketDraft createDataPacket(@RequestBody DataPacketDraft dataPacketDraft, HttpServletRequest request) {
-        LoginUserPermissionCheck.loginUserPermissionCheck(workGroupManager,dataPacketDraft);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
         dataPacketDraft.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
         dataPacketDraftService.createDataPacket(dataPacketDraft);
@@ -77,7 +73,7 @@ public class DataPacketDraftController extends BaseController {
     public DataPacketDraft createHttpTypeApi(@RequestBody HttpParames httpParames) {
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setOsId(httpParames.getOsId());
-        LoginUserPermissionCheck.loginUserPermissionCheck(workGroupManager,dataPacketDraft);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
         String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringBaseOpt.isNvl(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
@@ -123,7 +119,7 @@ public class DataPacketDraftController extends BaseController {
     public List<DataPacketDraft> createMetaDataApi(@RequestBody MetaDataParames metaDataOrHttpParams) {
         DataPacketDraft dataPacket = new DataPacketDraft();
         dataPacket.setOsId(metaDataOrHttpParams.getOsId());
-        LoginUserPermissionCheck.loginUserPermissionCheck(workGroupManager,dataPacket);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacket);
         String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringBaseOpt.isNvl(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
@@ -143,6 +139,7 @@ public class DataPacketDraftController extends BaseController {
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setBufferFreshPeriod(-1);
         dataPacketDraft.setIsValid(true);
+        dataPacketDraft.setTemplateType(type);
         dataPacketDraft.setOptId(metaDataOrHttpParams.getOptId());
         dataPacketDraft.setOsId(metaDataOrHttpParams.getOsId());
         JSONObject dataPacketTemplate = dataPacketTemplateService.getDataPacketTemplateByType(type);
@@ -165,6 +162,7 @@ public class DataPacketDraftController extends BaseController {
                 properties.put("databaseName",dataBaseCode);
             }
         }
+        dataPacketDraft.setMetadataTableId(tableId);
         dataPacketDraft.setDataOptDescJson(content);
         return  dataPacketDraft;
     }
@@ -173,9 +171,12 @@ public class DataPacketDraftController extends BaseController {
     @ApiOperation(value = "编辑API网关")
     @PutMapping(value = "/{packetId}")
     @WrapUpResponseBody
-    public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketDraft dataPacketDraft) {
-        LoginUserPermissionCheck.loginUserPermissionCheck(workGroupManager,dataPacketDraft);
+    public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketDraft dataPacketDraft) throws ParseException  {
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
         dataPacketDraft.setPacketId(packetId);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateStr = dateFormat.format(new Date());
+        dataPacketDraft.setUpdateDate(dateFormat.parse(dateStr));
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
         dataPacketDraftService.updateDataPacket(dataPacketDraft);
     }
@@ -186,7 +187,7 @@ public class DataPacketDraftController extends BaseController {
     @Transactional(rollbackFor = Exception.class)
     public void publishDataPacket(@PathVariable String packetId) throws ParseException {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        LoginUserPermissionCheck.loginUserPermissionCheck(workGroupManager,dataPacketDraft);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateStr = simpleDateFormat.format(new Date());
         dataPacketDraft.setPublishDate(simpleDateFormat.parse(dateStr));
@@ -198,7 +199,7 @@ public class DataPacketDraftController extends BaseController {
     @WrapUpResponseBody
     public void updateDataPacketOpt(@PathVariable String packetId, @RequestBody String dataOptDescJson) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        LoginUserPermissionCheck.loginUserPermissionCheck(workGroupManager,dataPacketDraft);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
         dataPacketDraftService.updateDataPacketOptJson(packetId, dataOptDescJson);
     }
 
@@ -208,7 +209,7 @@ public class DataPacketDraftController extends BaseController {
     @Transactional(rollbackFor = Exception.class)
     public void deleteDataPacket(@PathVariable String packetId) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        LoginUserPermissionCheck.loginUserPermissionCheck(workGroupManager,dataPacketDraft);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
         platformEnvironment.deleteOptDefAndRolepowerByOptCode(dataPacketDraft.getOptCode());
         dataPacketService.deleteDataPacket(packetId);
         dataPacketDraftService.deleteDataPacket(packetId);

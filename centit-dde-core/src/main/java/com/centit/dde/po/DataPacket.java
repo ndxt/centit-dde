@@ -14,7 +14,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.*;
@@ -62,8 +61,12 @@ public class DataPacket implements Serializable,DataPacketInterface {
     private JSONObject dataOptDescJson;
 
     @Column(name = "BUFFER_FRESH_PERIOD")
-    @ApiModelProperty(value = "数据缓存有效期，-1：不缓存（默认值） 0 永不失效 1 一日，2 按周（注意不是一周） 3 按月 4 按年， >=60 代表时间单位为秒", required = true)
+    @ApiModelProperty(value = "缓存时间", required = true)
     private Integer bufferFreshPeriod;
+
+    @Column(name = "buffer_fresh_period_type")
+    @ApiModelProperty(value = "缓存单位, 1:分 2:时 3:日  -1:不缓存")
+    private Integer bufferFreshPeriodType;
 
     @Column(name = "RECORDER")
     @ApiModelProperty(value = "创建人", hidden = true)
@@ -131,9 +134,6 @@ public class DataPacket implements Serializable,DataPacketInterface {
     @ApiModelProperty(value = "f_optdef表主键")
     private String optCode;
 
-    @Column(name = "buffer_fresh_period_secs")
-    @ApiModelProperty(value = "缓存周期（秒）")
-    private String bufferFreshPeriodSecs;
     @Column(name = "SOURCE_ID")
     @ApiModelProperty(value = "模板来源")
     @JSONField(serialize = false)

@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * @author zhf
  */
-@Repository
+@Repository(value = "ddeTaskLogDao")
 public class TaskLogDao extends BaseDaoImpl<TaskLog, Long> {
 
     @Override

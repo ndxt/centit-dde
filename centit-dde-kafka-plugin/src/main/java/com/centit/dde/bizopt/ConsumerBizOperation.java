@@ -1,30 +1,27 @@
 package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.config.DDEConsumerConfig;
+import com.centit.dde.consumer.ConsumerEntity;
+import com.centit.dde.consumer.KafkaConsumerConfig;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
-import com.centit.dde.entity.ConsumerEntity;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class ConsumerBizOperation implements BizOperation {
     private SourceInfoDao sourceInfoDao;
-
-    public ConsumerBizOperation( ) {
-    }
 
     public ConsumerBizOperation(SourceInfoDao sourceInfoDao) {
         this.sourceInfoDao=sourceInfoDao;
@@ -40,29 +37,26 @@ public class ConsumerBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
         ConsumerEntity consumerEntity = JSON.parseObject(JSON.toJSONString(bizOptJson), ConsumerEntity.class);
-        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(consumerEntity.getDataSourceID());
+        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(consumerEntity.getDatabaseId());
         JSONObject extProps = sourceInfo.getExtProps();
-        extProps.put("group.id",consumerEntity.getGroupId());
-        KafkaConsumer consumer = DDEConsumerConfig.getKafkaConsumer(extProps,sourceInfo);
-        String topics = consumerEntity.getTopic();
-        ConsumerRecords<String, String> records=null;
-        try {
-            if (StringUtils.isNotBlank(topics)){
-                String[] topicArray = topics.split(",");
-                //通过正则表达式订阅主题
-                if (topicArray.length==1 && topicArray[0].contains(".*")){
-                    consumer.subscribe(Pattern.compile(topicArray[0]));
-                }else {
-                    consumer.subscribe(Arrays.asList(topicArray));//设置主题，可多个
-                }
-                records = consumer.poll(1000);
-            }
-        }catch (Exception e){
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"异常信息："+e.getMessage());
-        }finally {
-            if (consumer!=null){
-                consumer.close();
-            }
+        extProps.put(ConsumerConfig.GROUP_ID_CONFIG,consumerEntity.getGroupId());
+        KafkaConsumer consumer = KafkaConsumerConfig.getKafkaConsumer(extProps,sourceInfo);
+        JSONArray topics = consumerEntity.getTopic();
+        if (topics!=null || topics.size()==0){
+           throw  new RuntimeException("topic不能为空！");
+        }
+        //正则表达式方式订阅消息
+        if (topics.size()==1 && topics.getString(0).contains(".*")){
+            consumer.subscribe(Pattern.compile(topics.getString(0)));
+        }else {
+            //设置主题，可多个
+            consumer.subscribe(topics);
+        }
+        ConsumerRecords<String, String> records = consumer.poll(1000);
+        //同步提交offset
+        consumer.commitSync();
+        if (consumer!=null){
+            consumer.close();
         }
         List<String> values = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {

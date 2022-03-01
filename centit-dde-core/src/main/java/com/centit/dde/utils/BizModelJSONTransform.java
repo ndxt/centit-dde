@@ -29,7 +29,8 @@ public class BizModelJSONTransform
 
     @Override
     public Object attainExpressionValue(String expression){
-        VariableFormula variableFormula = DataSetOptUtil.createFormula();
+        VariableFormula variableFormula = new VariableFormula();
+        variableFormula.setExtendFuncMap(DataSetOptUtil.makeExtendFuns());
         variableFormula.setTrans(this);
         variableFormula.setFormula(expression);
         return variableFormula.calcFormula();

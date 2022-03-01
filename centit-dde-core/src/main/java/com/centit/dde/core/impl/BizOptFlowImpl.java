@@ -1,5 +1,6 @@
 package com.centit.dde.core.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.*;
@@ -11,9 +12,7 @@ import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.po.TaskDetailLog;
-import com.centit.dde.utils.BizModelJSONTransform;
-import com.centit.dde.utils.CloneUtils;
-import com.centit.dde.utils.ConstantValue;
+import com.centit.dde.utils.*;
 import com.centit.dde.vo.CycleVo;
 import com.centit.dde.vo.DataOptVo;
 import com.centit.fileserver.common.FileStore;
@@ -97,10 +96,10 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @PostConstruct
     public void init() {
-        allOperations.put("sche", BuiltInOperation::runStart);
-        allOperations.put("start", BuiltInOperation::runStart);
-        allOperations.put("Getpostdata", BuiltInOperation::runRequestBody);
-        allOperations.put("Getpostfile", BuiltInOperation::runRequestFile);
+        allOperations.put(ConstantValue.SCHEDULER, BuiltInOperation::runStart);//模块调度
+        allOperations.put("start", BuiltInOperation::runStart);//起始节点
+        allOperations.put("postData", BuiltInOperation::runRequestBody);//获取post数据
+        allOperations.put("postFile", BuiltInOperation::runRequestFile);//获取post文件
         allOperations.put("map", BuiltInOperation::runMap);
         allOperations.put("filter", BuiltInOperation::runFilter);
         allOperations.put("append", BuiltInOperation::runAppend);
@@ -114,35 +113,26 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("filterExt", BuiltInOperation::runFilterExt);
         allOperations.put("check", BuiltInOperation::runCheckData);
         allOperations.put("static", BuiltInOperation::runStaticData);
-        HttpBizOperation httpBizOperation = new HttpBizOperation(sourceInfoDao);
-        allOperations.put("htts", httpBizOperation);
+        allOperations.put("http", new HttpBizOperation(sourceInfoDao));
         allOperations.put("clear", BuiltInOperation::runClear);
-        JSBizOperation jsBizOperation = new JSBizOperation(metaObjectService);
-        allOperations.put("js", jsBizOperation);
-        PersistenceBizOperation databaseOperation = new PersistenceBizOperation(
-            path, sourceInfoDao, metaDataService);
-        allOperations.put("persistence", databaseOperation);
-        DbBizOperation dbBizOperation = new DbBizOperation(sourceInfoDao);
-        allOperations.put("database", dbBizOperation);
-        ExcelBizOperation excelBizOperation = new ExcelBizOperation();
-        allOperations.put("excel", excelBizOperation);
-        CsvBizOperation csvBizOperation = new CsvBizOperation();
-        allOperations.put("csv", csvBizOperation);
-        JsonBizOperation jsonBizOperation = new JsonBizOperation();
-        allOperations.put("json", jsonBizOperation);
-        RunSqlsBizOperation runsqlsbizoperation = new RunSqlsBizOperation(sourceInfoDao);
-        allOperations.put("sqlS", runsqlsbizoperation);
-        ReportBizOperation reportBizOperation = new ReportBizOperation(fileStore);
-        allOperations.put("SSD", reportBizOperation);
-        allOperations.put(ConstantValue.GENERATECSV, new GenerateCsvBizOperation());
-        allOperations.put(ConstantValue.GENERATEJSON, new GenerateJsonBizOperation());
-        allOperations.put(ConstantValue.RETURN_JSON, GenerateJsonBizOperation::returnJson);
-        allOperations.put(ConstantValue.FILEUPLOADS, new FileUploadBizOperation(fileStore));
-        allOperations.put(ConstantValue.GENERATEXCEL, new GenerateExcelBizeOperation(fileStore));
-        allOperations.put(ConstantValue.FILEDOWNLOAD, new FileDownloadBizOperation(fileStore));
-        allOperations.put(ConstantValue.WRITE_DB, new WriteDbBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
+        allOperations.put("js", new JSBizOperation(metaObjectService));
+        allOperations.put("persistence", new PersistenceBizOperation(path, sourceInfoDao, metaDataService));
+        allOperations.put("database", new DbBizOperation(sourceInfoDao,queryDataScopeFilter));
+        allOperations.put("excel", new ExcelBizOperation());
+        allOperations.put("csv", new CsvBizOperation());
+        allOperations.put("json", new JsonBizOperation());
+        allOperations.put("sqlS", new RunSqlsBizOperation(sourceInfoDao));//批量执行SQL
+        allOperations.put("SSD", new ReportBizOperation(fileStore));
+        allOperations.put(ConstantValue.GENERATE_CSV, new GenerateCsvFileBizOperation());
+        allOperations.put(ConstantValue.GENERATE_JSON, new GenerateJsonFileBizOperation());
+        allOperations.put(ConstantValue.GENERAT_EXCEL, new GenerateExcelFileBizeOperation(fileStore));
+        allOperations.put(ConstantValue.DEFINE_JSON_DATA, new DefineJsonDataBizOperation());
+        allOperations.put(ConstantValue.FILE_UPLOAD, new FileUploadBizOperation(fileStore));
+        allOperations.put(ConstantValue.FILE_DOWNLOAD, new FileDownloadBizOperation(fileStore));
+        allOperations.put(ConstantValue.METADATA_OPERATION, new MetadataBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentBizOperation());
-        allOperations.put("compareSource", new ObjectCompareBizOperation());
+        allOperations.put(ConstantValue.COMPARE_SOURCE, new ObjectCompareBizOperation());
+        allOperations.put(ConstantValue.SESSION_DATA, new GetSessionDataBizOperation());
     }
 
     @Override
@@ -155,6 +145,18 @@ public class BizOptFlowImpl implements BizOptFlow {
         SimpleBizModel bizModel = new SimpleBizModel(logId);
         bizModel.setModelTag(queryParams);
         bizModel.setInterimVariable(interimVariable==null?new HashMap<>():interimVariable);
+        //标签中默认的3个数据集  将数据set进去   需要在结束标签中移除这3个默认标签的数据  否则会显得返回结果数据很乱
+        if (queryParams!=null && queryParams.size()>0){
+            bizModel.putDataSet("getData",new SimpleDataSet(queryParams));
+        }
+        if (interimVariable.containsKey("requestBody")){
+            String requestBody = (String) interimVariable.get("requestBody");
+            DataSet destDs = BizOptUtils.castObjectToDataSet(requestBody.startsWith("[")?JSONObject.parseObject(requestBody,JSONArray.class):JSONObject.parseObject(requestBody));
+            bizModel.putDataSet("postBodyData",destDs);
+        }
+        if (interimVariable.containsKey("requestFile")){
+            bizModel.putDataSet("postFileData",new SimpleDataSet(interimVariable.get("requestFile")));
+        }
         DataOptStep dataOptStep = new DataOptStep(dataPacket.getDataOptDescJson());
         DataOptVo dataOptVo = new DataOptVo(dataPacket.getNeedRollback(), bizModel);
         try {
@@ -226,10 +228,31 @@ public class BizOptFlowImpl implements BizOptFlow {
         //断点调试，指定节点数据返回
         String debugId = (String)dataOptVo.getQueryParams().get("debugId");
         if (StringUtils.isNotBlank(debugId) && debugId.equals(stepJson.getString("id"))){
-            dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions","3");
+            dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions","1");
+            String source = stepJson.getString("source");
+            //设置返回节点  内部方法会通过这个source 来判断返回具体的某个节点 这个只能重置为当前ID 下面再重置回去
             dataOptStep.getCurrentStep().getJSONObject("properties").put("source",stepJson.getString("id"));
             Object returnResult = returnResult(dataOptStep, dataOptVo);
-            dataOptVo.setPreResult(returnResult);
+            //恢复原始JSON数据，否则后面更新的时候会将原本的数据替换为当前节点id
+            dataOptStep.getCurrentStep().getJSONObject("properties").put("source",source);
+            JSONObject newResultData = new JSONObject();
+            JSONObject bizData = new JSONObject();
+            if (returnResult!=null){
+                JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(returnResult));
+                JSONObject data = jsonObject.getJSONObject("data");
+                if (data!=null){
+                    JSONObject dump = new JSONObject();
+                    dump.put("allNodeData",data.getJSONObject("bizData"));
+                    dump.put("modelTag",data.getJSONObject("modelTag"));
+                    dump.put("responseMapData",data.getJSONObject("responseMapData"));
+                    bizData.put("currentNodeData",data.getJSONObject("bizData")==null?null:data.getJSONObject("bizData").get(debugId));
+                    bizData.put("dump",dump);
+                    newResultData.put("code",jsonObject.get("code"));
+                    newResultData.put("message",jsonObject.get("message"));
+                    newResultData.put("data",bizData);
+                }
+            }
+            dataOptVo.setPreResult(newResultData);
             dataOptStep.setEndStep();
             return;
         }
@@ -247,6 +270,12 @@ public class BizOptFlowImpl implements BizOptFlow {
     private Object returnResult(DataOptStep dataOptStep, DataOptVo dataOptVo) throws Exception {
         JSONObject stepJson = dataOptStep.getCurrentStep();
         SimpleBizModel bizModel = dataOptVo.getBizModel();
+        //移除3个默认请求参数数据集数据  这个3个数据集保存的是请求的参数，这个不需要返回
+        if(bizModel!=null){
+            bizModel.removeDataSet("getData");
+            bizModel.removeDataSet("postBodyData");
+            bizModel.removeDataSet("postFileData");
+        }
         stepJson=stepJson.getJSONObject("properties");
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
         String path;
@@ -287,17 +316,14 @@ public class BizOptFlowImpl implements BizOptFlow {
         List<JSONObject> linksJson = dataOptStep.getNextLinks(stepId);
         for (JSONObject jsonObject : linksJson) {
             if (!ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
-                if (BooleanBaseOpt.castObjectToBoolean(
-                    VariableFormula.calculate(jsonObject.getString("expression"),
-                        new BizModelJSONTransform(dataOptVo.getBizModel())), false)) {
+                String expression = jsonObject.getString("expression");
+                Object calculate = VariableFormula.calculate(expression, new BizModelJSONTransform(dataOptVo.getBizModel()), DataSetOptUtil.makeExtendFuns());
+                if (BooleanBaseOpt.castObjectToBoolean(calculate, false)) {
                     stepJson = dataOptStep.getOptStep(jsonObject.getString("targetId"));
                     dataOptStep.setCurrentStep(stepJson);
                     return;
                 }
-            }
-        }
-        for (JSONObject jsonObject : linksJson) {
-            if (ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
+            }else if (ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
                 stepJson = dataOptStep.getOptStep(jsonObject.getString("targetId"));
                 dataOptStep.setCurrentStep(stepJson);
                 return;
