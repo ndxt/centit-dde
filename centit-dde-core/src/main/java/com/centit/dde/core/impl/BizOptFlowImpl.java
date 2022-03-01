@@ -235,24 +235,21 @@ public class BizOptFlowImpl implements BizOptFlow {
             Object returnResult = returnResult(dataOptStep, dataOptVo);
             //恢复原始JSON数据，否则后面更新的时候会将原本的数据替换为当前节点id
             dataOptStep.getCurrentStep().getJSONObject("properties").put("source",source);
-            JSONObject newResultData = new JSONObject();
             JSONObject bizData = new JSONObject();
             if (returnResult!=null){
                 JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(returnResult));
                 JSONObject data = jsonObject.getJSONObject("data");
                 if (data!=null){
                     JSONObject dump = new JSONObject();
-                    dump.put("allNodeData",data.getJSONObject("bizData"));
-                    dump.put("modelTag",data.getJSONObject("modelTag"));
-                    dump.put("responseMapData",data.getJSONObject("responseMapData"));
-                    bizData.put("currentNodeData",data.getJSONObject("bizData")==null?null:data.getJSONObject("bizData").get(debugId));
+                    dump.put("allNodeData",dataOptVo.getBizModel().getBizData());
+                    dump.put("modelTag",dataOptVo.getBizModel().getModelTag());
+                    dump.put("responseMapData",dataOptVo.getBizModel().getResponseMapData());
+                    JSONObject currentNodeData = data.getJSONObject(debugId);
+                    bizData.put("currentNodeData",currentNodeData==null?null:currentNodeData.getJSONObject("data"));
                     bizData.put("dump",dump);
-                    newResultData.put("code",jsonObject.get("code"));
-                    newResultData.put("message",jsonObject.get("message"));
-                    newResultData.put("data",bizData);
                 }
             }
-            dataOptVo.setPreResult(newResultData);
+            dataOptVo.setPreResult(bizData);
             dataOptStep.setEndStep();
             return;
         }
@@ -277,11 +274,15 @@ public class BizOptFlowImpl implements BizOptFlow {
             bizModel.removeDataSet("postFileData");
         }
         stepJson=stepJson.getJSONObject("properties");
+        String code = stepJson.getString("code");
+        String message =stepJson.getString("message");
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
         String path;
         if (bizModel.getResponseMapData().getCode() != ResponseData.RESULT_OK || RETURN_RESULT_STATE.equals(type)) {
             ResponseMapData responseMapData=bizModel.getResponseMapData();
             ResponseSingleData responseSingleData= new ResponseSingleData(responseMapData.getCode(),responseMapData.getMessage());
+            responseSingleData.setCode(Integer.valueOf(code));
+            responseSingleData.setMessage(message);
             responseSingleData.setData(responseMapData);
             return responseSingleData;
         }
@@ -299,14 +300,19 @@ public class BizOptFlowImpl implements BizOptFlow {
                     responseSingleData.setData(dataSet);
                     return responseSingleData;
                 }
-                responseSingleData.setMessage("OK");
+                responseSingleData.setCode(Integer.valueOf(code));
+                responseSingleData.setMessage(message==null?"":message);
                 responseSingleData.setData(dataSet.getData());
                 return responseSingleData;
             }else{
-                return dataSet;
+                return dataSet==null?null:dataSet.getData();
             }
         }
-        return ResponseData.makeResponseData(bizModel);
+        ResponseSingleData response = new ResponseSingleData();
+        response.setCode(code==null?0:Integer.valueOf(code));
+        response.setMessage(message==null?"":message);
+        response.setData(bizModel.getBizData());
+        return response;
     }
 
     private void setBatchStep(DataOptStep dataOptStep, DataOptVo dataOptVo) {
