@@ -244,8 +244,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                     dump.put("allNodeData",dataOptVo.getBizModel().getBizData());
                     dump.put("modelTag",dataOptVo.getBizModel().getModelTag());
                     dump.put("responseMapData",dataOptVo.getBizModel().getResponseMapData());
-                    JSONObject currentNodeData = data.getJSONObject(debugId);
-                    bizData.put("currentNodeData",currentNodeData==null?null:currentNodeData.getJSONObject("data"));
+                    bizData.put("currentNodeData",data.getJSONObject(debugId));
                     bizData.put("dump",dump);
                 }
             }
@@ -311,7 +310,12 @@ public class BizOptFlowImpl implements BizOptFlow {
         ResponseSingleData response = new ResponseSingleData();
         response.setCode(code==null?0:Integer.valueOf(code));
         response.setMessage(message==null?"":message);
-        response.setData(bizModel.getBizData());
+        Map<String, Object> returnData = new HashMap<>();
+        Map<String, DataSet> bizData = bizModel.getBizData();
+        for (String key : bizData.keySet()) {
+            returnData.put(key,bizData.get(key)==null?null:bizData.get(key).getData());
+        }
+        response.setData(returnData);
         return response;
     }
 
