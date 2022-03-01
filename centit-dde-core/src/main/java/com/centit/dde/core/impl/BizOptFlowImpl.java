@@ -280,7 +280,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (bizModel.getResponseMapData().getCode() != ResponseData.RESULT_OK || RETURN_RESULT_STATE.equals(type)) {
             ResponseMapData responseMapData=bizModel.getResponseMapData();
             ResponseSingleData responseSingleData= new ResponseSingleData(responseMapData.getCode(),responseMapData.getMessage());
-            responseSingleData.setCode(Integer.valueOf(code));
+            responseSingleData.setCode(code==null?0:Integer.valueOf(code));//==null  兼容老版本数据
             responseSingleData.setMessage(message);
             responseSingleData.setData(responseMapData);
             return responseSingleData;
@@ -299,7 +299,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                     responseSingleData.setData(dataSet);
                     return responseSingleData;
                 }
-                responseSingleData.setCode(Integer.valueOf(code));
+                responseSingleData.setCode(code==null?0:Integer.valueOf(code));
                 responseSingleData.setMessage(message==null?"":message);
                 responseSingleData.setData(dataSet.getData());
                 return responseSingleData;
