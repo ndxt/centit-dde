@@ -54,6 +54,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     public static final String RETURN_RESULT_STATE = "2";
     public static final String RETURN_RESULT_DATASET = "3";
     public static final String RETURN_RESULT_ORIGIN = "4";
+    public static final String RETURN_RESULT_ERROR = "5";
     public static final String FILE_DOWNLOAD = "fileDownload";
 
     @Value("${os.file.base.dir:./file_home/export}")
@@ -273,16 +274,12 @@ public class BizOptFlowImpl implements BizOptFlow {
             bizModel.removeDataSet("postFileData");
         }
         stepJson=stepJson.getJSONObject("properties");
-        String code = stepJson.getString("code");
-        String message =stepJson.getString("message");
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
         String path;
         if (bizModel.getResponseMapData().getCode() != ResponseData.RESULT_OK || RETURN_RESULT_STATE.equals(type)) {
             ResponseMapData responseMapData=bizModel.getResponseMapData();
             ResponseSingleData responseSingleData= new ResponseSingleData(responseMapData.getCode(),responseMapData.getMessage());
-            responseSingleData.setCode(code==null?0:Integer.valueOf(code));//==null  兼容老版本数据
-            responseSingleData.setMessage(message);
-            responseSingleData.setData(responseMapData);
+            responseSingleData.setData(responseMapData.getData());
             return responseSingleData;
         }
         if(RETURN_RESULT_DATASET.equals(type) || RETURN_RESULT_ORIGIN.equals(type)){
@@ -299,17 +296,28 @@ public class BizOptFlowImpl implements BizOptFlow {
                     responseSingleData.setData(dataSet);
                     return responseSingleData;
                 }
-                responseSingleData.setCode(code==null?0:Integer.valueOf(code));
-                responseSingleData.setMessage(message==null?"":message);
+                responseSingleData.setMessage("OK");
                 responseSingleData.setData(dataSet.getData());
                 return responseSingleData;
             }else{
                 return dataSet==null?null:dataSet.getData();
             }
         }
+        //返回异常信息
+        if(RETURN_RESULT_ERROR.equals(type)){
+            String code = stepJson.getString("code");
+            String message =stepJson.getString("message");
+            path = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
+            DataSet dataSet=bizModel.fetchDataSetByName(path);
+            ResponseSingleData response = new ResponseSingleData();
+            response.setCode(code==null?0:Integer.valueOf(code));
+            response.setMessage(message);
+            if(dataSet!=null){
+                response.setData(dataSet.getData());
+            }
+            return response;
+        }
         ResponseSingleData response = new ResponseSingleData();
-        response.setCode(code==null?0:Integer.valueOf(code));
-        response.setMessage(message==null?"":message);
         Map<String, Object> returnData = new HashMap<>();
         Map<String, DataSet> bizData = bizModel.getBizData();
         for (String key : bizData.keySet()) {
