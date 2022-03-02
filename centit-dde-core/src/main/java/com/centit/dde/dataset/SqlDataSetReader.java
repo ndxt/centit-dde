@@ -16,6 +16,7 @@ import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,12 +56,12 @@ public class SqlDataSetReader implements DataSetReader {
     @Override
     public SimpleDataSet load(final Map<String, Object> params) throws Exception {
         Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(databaseInfo);
-        QueryAndNamedParams qap = null;
         HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
+        QueryAndNamedParams qap = QueryUtils.translateQuery(sqlSen, params);
         if(request!=null) {
             String topUnit = WebOptUtils.getCurrentTopUnit(request);
             String userCode=WebOptUtils.getCurrentUserCode(request);
-            if(userCode!=null) {
+            if(StringUtils.isNotBlank(userCode)) {
                 List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,userCode , optId, "search");
                 if (filters != null) {
                     DataScopePowerManager queryDataScopeFilter = new DataScopePowerManagerImpl();
@@ -69,19 +70,13 @@ public class SqlDataSetReader implements DataSetReader {
                     dataPowerFilter.addSourceData(params);
                     qap = dataPowerFilter.translateQuery(sqlSen, null);
                 }
-            }else{
-                qap = QueryUtils.translateQuery(sqlSen, params);
             }
-        }else {
-            qap = QueryUtils.translateQuery(sqlSen, params);
         }
         Map<String, Object> paramsMap = new HashMap<>(params == null ? 0 : params.size() + 6);
         if (params != null) {
             paramsMap.putAll(params);
         }
         paramsMap.putAll(qap.getParams());
-//        String orderBy = GeneralJsonObjectDao.fetchSelfOrderSql(qap.getQuery(), paramsMap);
-//        final String querySql=StringUtils.replace(qap.getQuery(),":ORDER_BY",orderBy);
         JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn,qap.getQuery(), paramsMap);
         SimpleDataSet dataSet = new SimpleDataSet();
         dataSet.setData(jsonArray);
