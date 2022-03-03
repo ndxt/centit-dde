@@ -13,6 +13,7 @@ import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.image.CaptchaImageUtil;
+import net.sourceforge.pinyin4j.PinyinHelper;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -832,20 +833,55 @@ public abstract class DataSetOptUtil {
         for (String field : fields) {
             if (field.endsWith(" desc")) {
                 String dataField = field.substring(0, field.length() - 5).trim();
-                int cr = GeneralAlgorithm.compareTwoObject(
-                    data1.get(dataField), data2.get(dataField));
+                int cr;
+                if (isChinese((String)data1.get(dataField))&&isChinese((String) data2.get(dataField))){
+                    char c1 = ((String) data1.get(dataField)).charAt(0);
+                    char c2 = ((String) data2.get(dataField)).charAt(0);
+                    cr =concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c1)).compareTo(concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c2)));
+                }else {
+                    cr = GeneralAlgorithm.compareTwoObject(data1.get(dataField), data2.get(dataField));
+                }
                 if (cr != 0) {
                     return 0 - cr;
                 }
             } else {
-                int cr = GeneralAlgorithm.compareTwoObject(
-                    data1.get(field), data2.get(field));
+                int cr;
+                if (isChinese((String)data1.get(field))&&isChinese((String) data2.get(field))){
+                    char c1 = ((String) data1.get(field)).charAt(0);
+                    char c2 = ((String) data2.get(field)).charAt(0);
+                    cr =concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c1)).compareTo(concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c2)));
+                }else {
+                    cr = GeneralAlgorithm.compareTwoObject(data1.get(field), data2.get(field));
+                }
                 if (cr != 0) {
                     return cr;
                 }
             }
         }
         return 0;
+    }
+    //判断字符串是否为纯中文 包括中文标点符号
+    private static boolean isChinese(String str){
+        if (str == null) {
+            return false;
+        }
+        char[] ch = str.toCharArray();
+        for (char c : ch) {
+            if (c < 0x4E00 || c > 0x9FBF) {
+                return false;
+            }
+        }
+        return true;
+    }
+    //自定义中文排序方法
+    private static String concatPinyinStringArray(String[] pinyinArray) {
+        StringBuffer pinyinSbf = new StringBuffer();
+        if ((pinyinArray != null) && (pinyinArray.length > 0)) {
+            for (int i = 0; i < pinyinArray.length; i++) {
+                pinyinSbf.append(pinyinArray[i]);
+            }
+        }
+        return pinyinSbf.toString();
     }
 
     private static int compareTwoRowWithMap(Map<String, Object> data1, Map<String, Object> data2, List<Map.Entry<String, String>> fields) {

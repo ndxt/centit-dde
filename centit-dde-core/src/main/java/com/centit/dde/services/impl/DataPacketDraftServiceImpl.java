@@ -93,7 +93,13 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         DataPacket dataPacket = new DataPacket();
         BeanUtils.copyProperties(dataPacketCopy, dataPacket);
         List<DataPacketParam> dataPacketParamList = new ArrayList<>();
-        BeanUtils.copyProperties(dataPacketCopy.getPacketParams(), dataPacketParamList);
+        if (dataPacketCopy.getPacketParams()!=null){
+           dataPacketCopy.getPacketParams().forEach(dataPacketParamDraft -> {
+               DataPacketParam  dataPacketParam = new DataPacketParam();
+               BeanUtils.copyProperties(dataPacketParamDraft, dataPacketParam);
+               dataPacketParamList.add(dataPacketParam);
+           });
+        }
         dataPacket.setPacketParams(dataPacketParamList);
         dataPacketService.publishDataPacket(dataPacket);
     }

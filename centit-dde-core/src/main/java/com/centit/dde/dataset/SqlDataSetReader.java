@@ -36,7 +36,6 @@ import java.util.Map;
  */
 public class SqlDataSetReader implements DataSetReader {
 
-    private static final Logger logger = LoggerFactory.getLogger(SqlDataSetReader.class);
     private ISourceInfo databaseInfo;
     /**
      * 参数驱动sql

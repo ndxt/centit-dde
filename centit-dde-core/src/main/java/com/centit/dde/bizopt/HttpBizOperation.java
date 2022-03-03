@@ -10,6 +10,7 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.framework.appclient.HttpReceiveJSON;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
@@ -21,6 +22,7 @@ import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.network.UrlOptUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,6 +81,10 @@ public class HttpBizOperation implements BizOperation {
                     headers = JSON.parseObject(extProps.toJSONString(), Map.class);
                 }
             }
+        }
+        if (RequestThreadLocal.getLocalThreadWrapperRequest()!=null){
+            HttpSession session = RequestThreadLocal.getLocalThreadWrapperRequest().getSession();
+            headers.put("x-auth-token", session==null?null:session.getId());
         }
         HttpExecutorContext httpExecutorContext = getHttpClientContext(loginUrlInfo);
         httpExecutorContext.headers(headers);
