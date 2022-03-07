@@ -1,4 +1,4 @@
-package com.centit.dde.consumer.config;
+package com.centit.dde.consumer.task;
 
 import org.springframework.context.ApplicationContext;
 
@@ -8,18 +8,11 @@ import org.springframework.context.ApplicationContext;
 public class ContextUtils {
     private static ApplicationContext context;
 
-    private ContextUtils() {
-    }
-
     public static void setApplicationContext(ApplicationContext applicationContext) {
         context = applicationContext;
     }
 
-    public static Object getBean(String beanName) {
-        return context.getBean(beanName);
-    }
-
-    static <T> T getBean(Class<T> t) {
+    public static <T> T getBean(Class<T> t) {
         return context.getBean(t);
     }
 }
