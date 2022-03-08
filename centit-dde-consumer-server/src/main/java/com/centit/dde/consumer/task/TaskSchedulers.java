@@ -1,5 +1,6 @@
 package com.centit.dde.consumer.task;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.dao.DataPacketDao;
@@ -29,16 +30,37 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
  * @author zc
  * 消息触发任务类   自动执行api网关类型为消息触发任务的流程    给kafkaconsumer 处理消息使用
+ *
+ * 问题记录：
+ * 默认每个topic只创建一个消费者  一个消费者消费topic的所有分区   如果相同的topic要创建多个消费者来进行消费的话就需要创建多个API 使其分组id相同
+ *理论应该提供创建消费者个数的配置，但是怕创建的线程过多，导致服务器挂掉，所以默认只创建一个（比如一个topic有50个分区，按照理想状态创建的话那么就得创建50个线程）
+ * 弊端：默认每个分区只创建一个消费者，这样带来的后果就是消费能力较差，容易造成消息积压 可以创建多个API 使其分组id相同，就是麻烦了点，这样一来也会出现上面说的问题，
+ * API越多也就意味着创建的线程越多，只是一开始不用创建那边多线程罢了 ，不管哪种方式都会有这个问题
  */
 @Service
 public class TaskSchedulers {
+
+    @Autowired
+    ConsumerPoolConfig consumerPoolConfig;
+
     private final static  Logger logger = LoggerFactory.getLogger(TaskSchedulers.class);
+    private   ExecutorService threadPool = Executors.newCachedThreadPool();
+       /* new ThreadPoolExecutor(
+            consumerPoolConfig.getCorePoolSize(),
+            consumerPoolConfig.getMaximumPoolSize(),
+            consumerPoolConfig.getKeepAliveTime(),
+            TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue<>(consumerPoolConfig.getQueueSize()),
+            Executors.defaultThreadFactory(),
+            new ThreadPoolExecutor.AbortPolicy());*/
     private final DataPacketDao dataPacketDao;
     private final SourceInfoDao sourceInfoDao;
     private static ConcurrentHashMap<String, Object> queryParams = new ConcurrentHashMap<>(2);
@@ -57,11 +79,17 @@ public class TaskSchedulers {
      */
     @Scheduled(fixedDelay = 1000 * 50)
     private void runTask(){
-        List<DataPacket> list =  new CopyOnWriteArrayList<>(dataPacketDao.listObjectsByProperties(queryParams));
+        List<DataPacket> list = new  CopyOnWriteArrayList(dataPacketDao.listObjectsByProperties(queryParams));
         if(list.size()==0 && packetMD5.size()>0){
             packetMD5.clear();
             return;
         }
+        //置空这几个时间再计算MD5值
+        list.stream().forEach(dataPacket -> {
+            dataPacket.setUpdateDate(null);
+            dataPacket.setLastRunTime(null);
+            dataPacket.setNextRunTime(null);
+        });
         List<String> packetIds = list.stream().map(DataPacket::getPacketId).collect(Collectors.toList());
         //移除map中过期的数据，保持最新的数据
         for (String packetId : packetMD5.keySet()) {
@@ -84,7 +112,7 @@ public class TaskSchedulers {
                 continue;
             }else if (packetMD5.containsKey(dataPacket.getPacketId())
                 && !packetMD5.get(dataPacket.getPacketId()).equals(dataPacketMD5(dataPacket))){
-                logger.debug(String.format("%s:任务数据有变化，重新执行!",dataPacket.getPacketName()));
+                logger.info(String.format("%s:任务数据有变化，重新执行!",dataPacket.getPacketName()));
                 //替换新的MD5值
                 packetMD5.put(dataPacket.getPacketId(),dataPacketMD5(dataPacket));
                 run(dataPacket,sourceInfoMap);
@@ -92,8 +120,8 @@ public class TaskSchedulers {
         }
     }
 
-    private static void run(DataPacket dataPacket, Map<String, SourceInfo> sourceInfoMap){
-        new Thread(()->{
+    private  void run(DataPacket dataPacket, Map<String, SourceInfo> sourceInfoMap){
+        threadPool.execute(()->{
             JSONObject extProps = dataPacket.getExtProps();
             SourceInfo sourceInfo = sourceInfoMap.get(extProps.getString("databaseId"));
             Assert.notNull(sourceInfo,"连接信息不能为空，请配置kafka连接信息");
@@ -133,20 +161,18 @@ public class TaskSchedulers {
                 ConsumerRecords<String, String> msgList = consumer.poll(Duration.ofMillis(1000));
                 for (ConsumerRecord<String, String> record : msgList) {
                     try{
-                      /*  logger.info(String.format("任务名：%s,topic:%s,key:%s,value:%s,offset:%s，分区：%s",
+                        logger.debug(String.format("任务名：%s,topic:%s,key:%s,value:%s,offset:%s，分区：%s",
                             dataPacket.getPacketName(),
                             record.topic(),
                             record.key(),
                             record.value(),
                             record.offset(),
                             record.partition()
-                        ));*/
+                        ));
                         String value = record.value();
                         //开始处理任务逻辑
-                        Map<String, Object> kafkaData = new HashMap<>();
-                        kafkaData.put(dataPacket.getPacketId(),value);
                         TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
-                        taskRun.runTask(dataPacket.getPacketId(), kafkaData,new HashMap<>());
+                        taskRun.runTask(dataPacket.getPacketId(), JSON.parseObject(value),new HashMap<>());
                         try {
                             consumer.commitAsync();//异步提交
                         }catch (Exception e) {
@@ -167,9 +193,8 @@ public class TaskSchedulers {
             if (!packetMD5.containsKey(dataPacket.getPacketId()) || !packetMD5.get(dataPacket.getPacketId()).equals(dataPacketMD5(dataPacket))) {
                 consumer.close();
                 logger.info(String.format("移除过期消息触发任务，任务ID：%s，任务名称：%s",dataPacket.getPacketId(),dataPacket.getPacketName()));
-                return;
             }
-        }).start();
+        });
     }
 
 
@@ -192,4 +217,6 @@ public class TaskSchedulers {
         }
         return taskMd5;
     }
+
+
 }

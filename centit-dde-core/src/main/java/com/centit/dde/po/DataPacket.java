@@ -123,8 +123,7 @@ public class DataPacket implements Serializable,DataPacketInterface {
 
     @Column(name = "publish_date")
     @ApiModelProperty(value = "发布时间")
-    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
-    private String publishDate;
+    private Date publishDate;
 
     @Column(name = "EXT_PROPS")
     @ApiModelProperty(value = "队列配置扩展信息，独有配置，公共的配置在资源管理页面添加")
