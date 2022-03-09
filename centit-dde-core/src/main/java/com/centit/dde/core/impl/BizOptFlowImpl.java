@@ -148,7 +148,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         bizModel.setInterimVariable(interimVariable==null?new HashMap<>():interimVariable);
         //标签中默认的3个数据集  将数据set进去   需要在结束标签中移除这3个默认标签的数据  否则会显得返回结果数据很乱
         if (queryParams!=null && queryParams.size()>0){
-            bizModel.putDataSet("getData",new SimpleDataSet(queryParams));
+            bizModel.putDataSet("pathData",new SimpleDataSet(queryParams));
         }
         if (interimVariable.containsKey("requestBody")){
             String requestBody = (String) interimVariable.get("requestBody");
