@@ -7,6 +7,7 @@ import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.quartz.QuartzJobUtils;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronTrigger;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -50,32 +51,6 @@ public class TaskSchedulers {
         }
     }
 
-    private boolean isEqualMd5(List<DataPacket> list) {
-        boolean result = false;
-        StringBuffer stringBuffer = new StringBuffer(100);
-        for (DataPacket i : list) {
-            stringBuffer.append(i.getTaskCron());
-        }
-        String taskMd5 = "";
-        try {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            byte[] buffer = new byte[8192];
-            int length;
-            InputStream is = new ByteArrayInputStream(stringBuffer.toString().getBytes());
-            while ((length = is.read(buffer)) != -1) {
-                md5.update(buffer, 0, length);
-            }
-            taskMd5 = new String(Hex.encodeHex(md5.digest()));
-        } catch (NoSuchAlgorithmException | IOException e) {
-            e.printStackTrace();
-        }
-        if (taskMd5.equals(staticTaskMd5)) {
-            result = true;
-        } else {
-            staticTaskMd5 = taskMd5;
-        }
-        return result;
-    }
 
     private void refreshTask() throws SchedulerException {
         List<DataPacket> list =  new CopyOnWriteArrayList<>(dataPacketDao.listObjectsByProperties(queryParams));
@@ -83,26 +58,26 @@ public class TaskSchedulers {
             return;
         }
         Set<TriggerKey> triggerKeys =  new CopyOnWriteArraySet<>(scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup()));
-        for (DataPacket ll : list) {
-            if ("".equals(ll.getTaskCron()) || ll.getTaskCron() == null) {
+        for (DataPacket dataPacket : list) {
+            if (StringUtils.isBlank(dataPacket.getTaskCron())) {
                 continue;
             }
             int i = 0;
             for (TriggerKey tKey : triggerKeys) {
-                if (tKey.getName().equals(ll.getPacketId())) {
+                if (tKey.getName().equals(dataPacket.getPacketId())) {
                     i++;
                     CronTrigger quartzTrigger = (CronTrigger) scheduler.getTrigger(tKey);
-                    if (!(quartzTrigger.getCronExpression().equals(ll.getTaskCron()))) {
-                        QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getPacketId(), ll.getOptId(), "task", ll.getTaskCron(),
-                            CollectionsOpt.createHashMap("taskExchange", ll));
+                    if (!(quartzTrigger.getCronExpression().equals(dataPacket.getTaskCron()))) {
+                        QuartzJobUtils.createOrReplaceCronJob(scheduler, dataPacket.getPacketId(), dataPacket.getOptId(), "task", dataPacket.getTaskCron(),
+                            CollectionsOpt.createHashMap("taskExchange", dataPacket));
                         break;
                     }
                     break;
                 }
             }
             if (i == 0) {
-                QuartzJobUtils.createOrReplaceCronJob(scheduler, ll.getPacketId(), ll.getOptId(), "task", ll.getTaskCron(),
-                    CollectionsOpt.createHashMap("taskExchange", ll));
+                QuartzJobUtils.createOrReplaceCronJob(scheduler, dataPacket.getPacketId(), dataPacket.getOptId(), "task", dataPacket.getTaskCron(),
+                    CollectionsOpt.createHashMap("taskExchange", dataPacket));
             }
         }
         for (TriggerKey tKey : triggerKeys) {
@@ -134,4 +109,32 @@ public class TaskSchedulers {
     public void work() throws SchedulerException {
         refreshTask();
     }
+
+    private boolean isEqualMd5(List<DataPacket> list) {
+        boolean result = false;
+        StringBuffer stringBuffer = new StringBuffer(100);
+        for (DataPacket i : list) {
+            stringBuffer.append(i.getTaskCron());
+        }
+        String taskMd5 = "";
+        try {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            byte[] buffer = new byte[8192];
+            int length;
+            InputStream is = new ByteArrayInputStream(stringBuffer.toString().getBytes());
+            while ((length = is.read(buffer)) != -1) {
+                md5.update(buffer, 0, length);
+            }
+            taskMd5 = new String(Hex.encodeHex(md5.digest()));
+        } catch (NoSuchAlgorithmException | IOException e) {
+            e.printStackTrace();
+        }
+        if (taskMd5.equals(staticTaskMd5)) {
+            result = true;
+        } else {
+            staticTaskMd5 = taskMd5;
+        }
+        return result;
+    }
+
 }

@@ -47,6 +47,7 @@ public class RunTaskJob extends AbstractQuartzJob {
             }
             try {
                 TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
+                logger.info(String.format("开始执行定时任务:%s,任务ID：%s,cron表达式：%s",dataPacket.getPacketName(),dataPacket.getPacketId(),dataPacket.getTaskCron()));
                 taskRun.runTask(dataPacket.getPacketId(), null,new HashMap<>());
             } finally {
                 runningTask.put(dataPacket.getPacketId(), false);
