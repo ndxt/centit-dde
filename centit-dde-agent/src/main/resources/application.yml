@@ -1,4 +1,4 @@
 spring:
   profiles:
-    #active: demo
-    active: prev
+    active: demo
+    #active: prev
