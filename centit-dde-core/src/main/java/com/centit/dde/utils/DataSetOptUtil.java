@@ -31,11 +31,9 @@ import java.util.function.Function;
  * @author zhf
  */
 public abstract class DataSetOptUtil {
-    private static final String LEFT = "leftjoin";
-    private static final String RIGHT = "rightjoin";
-    private static final String ALL = "alljoin";
 
     private static Map<String, Function<Object[], Object>> extendFuncs = null;
+    //扩展函数表达式
     public static  Map<String, Function<Object[], Object>> makeExtendFuns(){
         if(extendFuncs == null ){
             extendFuncs = new HashMap<>();
@@ -116,86 +114,6 @@ public abstract class DataSetOptUtil {
         }
         return extendFuncs;
     }
-/*
-    public static VariableFormula createFormula() {
-        VariableFormula formula = new VariableFormula();
-        formula.addExtendFunc("toJson", (a) -> JSON.parse(
-            StringBaseOpt.castObjectToString(a[0])));
-        formula.addExtendFunc("toByteArray", (a) -> {
-            try {
-                return IOUtils.toByteArray((InputStream) a[0]);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return a;
-        });
-        formula.addExtendFunc("uuid", (a) -> UuidOpt.getUuidAsString32());
-        formula.addExtendFunc("random", (a) -> CaptchaImageUtil.getRandomString(NumberBaseOpt.castObjectToInteger(a[0])));
-        formula.addExtendFunc("encode", (a) -> new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
-        formula.addExtendFunc("dict", (a) -> {
-            if (a != null && a.length > 1) {
-                String regex =",";
-                if (a.length>2) {
-                    regex = StringBaseOpt.objectToString(a[2]);
-                }
-                String[] strings=StringBaseOpt.objectToString(a[1]).split(regex);
-                StringBuilder stringBuilder = new StringBuilder();
-                for (String string : strings) {
-                    if (stringBuilder.length() > 0) {
-                        stringBuilder.append(regex);
-                    }
-                    stringBuilder.append(CodeRepositoryUtil.getValue(
-                        StringBaseOpt.castObjectToString(a[0]),
-                        StringBaseOpt.castObjectToString(string)));
-                }
-                return stringBuilder.toString();
-            }
-            else {
-                return a;
-            }
-        });
-        formula.addExtendFunc("dictTrans", (a) -> {
-            if (a != null && a.length > 1) {
-                return CodeRepositoryUtil.transExpression(
-                    StringBaseOpt.castObjectToString(a[0]),
-                    StringBaseOpt.castObjectToString(a[1]));
-            }
-            else {
-                return a;
-            }
-        });
-        formula.addExtendFunc("replace", (a) -> {
-            if (a != null && a.length > 2) {
-                return StringUtils.replace(StringBaseOpt.castObjectToString(a[0]),
-                    StringBaseOpt.castObjectToString(a[1]),StringBaseOpt.castObjectToString(a[2]));
-            }
-            else if (a != null && a.length>0){
-                return a[0];
-            } else{
-                return a;
-            }
-        });
-        formula.addExtendFunc("size",(a)->{
-            Object o = Arrays.stream(a).toArray()[0];
-            if (o instanceof Collection){
-                return ((Collection<?>) o).size();
-            }
-            if (o instanceof Map){
-                return ((Map<?, ?>) o).size();
-            }
-            return "";
-        });
-        formula.addExtendFunc("startsWith",(a)->{
-            Object[] objects = Arrays.stream(a).toArray();
-            if (objects.length==2){
-                String regex= (String) objects[0];
-                String value=  (String)objects[1];
-                return value.startsWith(regex);
-            }
-            return false;
-        });
-        return formula;
-    }*/
 
     /**
      * 数据集 映射
@@ -701,7 +619,7 @@ public abstract class DataSetOptUtil {
                 }
             } else if (nc < 0) {
                 if (nInsertMain < i) {
-                    if (LEFT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
+                    if (ConstantValue.LEFT.equalsIgnoreCase(join) || ConstantValue.ALL.equalsIgnoreCase(join)) {
                         newRow.putAll(mainData.get(i));
                     }
                     nInsertMain = i;
@@ -709,7 +627,7 @@ public abstract class DataSetOptUtil {
                 i++;
             } else {
                 if (nInsertSlave < j) {
-                    if (RIGHT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
+                    if (ConstantValue.RIGHT.equalsIgnoreCase(join) || ConstantValue.ALL.equalsIgnoreCase(join)) {
                         newRow.putAll(slaveData.get(j));
                     }
                     nInsertSlave = j;
@@ -720,14 +638,14 @@ public abstract class DataSetOptUtil {
                 newData.add(newRow);
             }
         }
-        if (LEFT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
+        if (ConstantValue.LEFT.equalsIgnoreCase(join) || ConstantValue.ALL.equalsIgnoreCase(join)) {
             while (i < mainData.size()) {
                 Map<String, Object> newRow = new LinkedHashMap<>(mainData.get(i));
                 newData.add(newRow);
                 i++;
             }
         }
-        if (RIGHT.equalsIgnoreCase(join) || ALL.equalsIgnoreCase(join)) {
+        if (ConstantValue.RIGHT.equalsIgnoreCase(join) || ConstantValue.ALL.equalsIgnoreCase(join)) {
             while (j < slaveData.size()) {
                 Map<String, Object> newRow = new LinkedHashMap<>(slaveData.get(j));
                 newData.add(newRow);

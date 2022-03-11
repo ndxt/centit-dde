@@ -71,4 +71,10 @@ public class ConstantValue {
     public static final String TASK_TYPE_POST="3";
     public static final String TASK_TYPE_PUT="5";
     public static final String TASK_TYPE_DELETE="6";
+
+
+    public static final String LEFT = "leftjoin";
+    public static final String RIGHT = "rightjoin";
+    public static final String ALL = "alljoin";
+
 }
