@@ -61,13 +61,12 @@ public class SqlDataSetReader implements DataSetReader {
             String topUnit = WebOptUtils.getCurrentTopUnit(request);
             String userCode=WebOptUtils.getCurrentUserCode(request);
             if(StringUtils.isNotBlank(userCode)) {
-                List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,userCode , optId, "search");
+                List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,userCode , optId, "api");
                 if (filters != null) {
-                    DataScopePowerManager queryDataScopeFilter = new DataScopePowerManagerImpl();
                     DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
                         WebOptUtils.getCurrentUserInfo(request), topUnit, WebOptUtils.getCurrentUnitCode(request));
                     dataPowerFilter.addSourceData(params);
-                    qap = dataPowerFilter.translateQuery(sqlSen, null);
+                    qap = dataPowerFilter.translateQuery(sqlSen, filters);
                 }
             }
         }
