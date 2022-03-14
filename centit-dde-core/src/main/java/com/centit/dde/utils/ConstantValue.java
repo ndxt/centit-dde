@@ -65,6 +65,10 @@ public class ConstantValue {
     //获取session数据
     public static final String SESSION_DATA="sessionData";
 
+    public static final String ELASTICSEARCH_QUERY = "esRead";
+    public static final String ELASTICSEARCH_WRITE = "esWrite";
+
+
     public static final String FINAL_TWO="2";
 
     public static final String TASK_TYPE_GET="1";
@@ -76,5 +80,6 @@ public class ConstantValue {
     public static final String LEFT = "leftjoin";
     public static final String RIGHT = "rightjoin";
     public static final String ALL = "alljoin";
+
 
 }

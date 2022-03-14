@@ -34,7 +34,8 @@ public class RunSqlsBizOperation implements BizOperation {
                 JSONObject jsonObject = (JSONObject) object;
                 QueryAndNamedParams qap = QueryUtils.translateQuery(jsonObject.getString("sql"), new BizModelJSONTransform(bizModel));
                 QueryAndParams q = QueryAndParams.createFromQueryAndNamedParams(qap);
-                Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfoDao.getDatabaseInfoById((jsonObject.getString("databaseName"))));
+                String databaseCode = jsonObject.getJSONObject("databaseName").getString("value");
+                Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfoDao.getDatabaseInfoById((databaseCode)));
                 count += DatabaseAccess.doExecuteSql(conn, q.getQuery(), q.getParams());
             }
             return BuiltInOperation.getResponseSuccessData(count);
