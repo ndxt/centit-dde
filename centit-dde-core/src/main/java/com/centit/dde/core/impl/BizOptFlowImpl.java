@@ -269,7 +269,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         SimpleBizModel bizModel = dataOptVo.getBizModel();
         //移除3个默认请求参数数据集数据  这个3个数据集保存的是请求的参数，这个不需要返回
         if(bizModel!=null){
-            bizModel.removeDataSet("getData");
+            bizModel.removeDataSet("pathData");
             bizModel.removeDataSet("postBodyData");
             bizModel.removeDataSet("postFileData");
         }

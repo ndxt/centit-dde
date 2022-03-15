@@ -65,7 +65,7 @@ public class ConstantValue {
     //获取session数据
     public static final String SESSION_DATA="sessionData";
 
-    public static final String ELASTICSEARCH_QUERY = "esRead";
+    public static final String ELASTICSEARCH_QUERY = "esQuery";
     public static final String ELASTICSEARCH_WRITE = "esWrite";
 
 
