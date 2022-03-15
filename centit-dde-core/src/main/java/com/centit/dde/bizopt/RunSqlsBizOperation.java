@@ -12,6 +12,7 @@ import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryAndParams;
 import com.centit.support.database.utils.QueryUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 
@@ -34,7 +35,12 @@ public class RunSqlsBizOperation implements BizOperation {
                 JSONObject jsonObject = (JSONObject) object;
                 QueryAndNamedParams qap = QueryUtils.translateQuery(jsonObject.getString("sql"), new BizModelJSONTransform(bizModel));
                 QueryAndParams q = QueryAndParams.createFromQueryAndNamedParams(qap);
-                String databaseCode = jsonObject.getJSONObject("databaseName").getString("value");
+                String databaseCode="";
+                if (jsonObject.get("databaseName") instanceof String){
+                    databaseCode=jsonObject.getString("databaseName");
+                }else {
+                    databaseCode = jsonObject.getJSONObject("databaseName").getString("value");
+                }
                 Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfoDao.getDatabaseInfoById((databaseCode)));
                 count += DatabaseAccess.doExecuteSql(conn, q.getQuery(), q.getParams());
             }
