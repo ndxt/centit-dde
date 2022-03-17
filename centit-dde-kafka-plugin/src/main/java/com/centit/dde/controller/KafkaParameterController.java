@@ -85,7 +85,7 @@ public class KafkaParameterController {
         }finally {
             adminClient.close();
         }
-        PageQueryResult<Object> result = PageQueryResult.createResult(topicArr, new PageDesc());
+        PageQueryResult<Object> result = PageQueryResult.createResult(topicArr, null);
         return ResponseSingleData.makeResponseData(result);
     }
 }

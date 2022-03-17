@@ -91,11 +91,10 @@ public class PersistenceBizOperation implements BizOperation {
             return BuiltInOperation.getResponseData(0, 0,
                 "没有配置交换字段");
         }
-        SqlDataSetWriter dataSetWriter = new SqlDataSetWriter(
-            databaseInfo, tableInfo);
+        SqlDataSetWriter dataSetWriter = new SqlDataSetWriter(databaseInfo, tableInfo);
         dataSetWriter.setFieldsMap(BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "propertyName", "primaryKey1"));
-        String saveAsWhole = BuiltInOperation.getJsonFieldString(bizOptJson, "saveAsWhole", "T");
-        dataSetWriter.setSaveAsWhole("T".equalsIgnoreCase(saveAsWhole));
+        String saveAsWhole = BuiltInOperation.getJsonFieldString(bizOptJson, "saveAsWhole", "false");
+        dataSetWriter.setSaveAsWhole("true".equalsIgnoreCase(saveAsWhole));
         switch (writerType) {
             case WRITER_INDICATE_APPEND:
                 dataSetWriter.append(dataSet);
