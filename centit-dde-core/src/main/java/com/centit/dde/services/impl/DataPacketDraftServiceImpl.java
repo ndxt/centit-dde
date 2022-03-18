@@ -67,6 +67,7 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
     private OptMethod assemblyOptMethodGet(DataPacketDraft dataPacket) {
         OptMethod result = new OptMethod();
+        result.setOptCode(dataPacket.getPacketId());
         result.setOptId(dataPacket.getOptId());
         result.setOptName(dataPacket.getPacketName());
         result.setApiId(dataPacket.getPacketId());
