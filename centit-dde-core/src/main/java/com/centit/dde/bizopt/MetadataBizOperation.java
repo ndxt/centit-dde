@@ -40,7 +40,7 @@ public class MetadataBizOperation implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String id = bizOptJson.getString("id");
         String source = bizOptJson.getString("source");//数据集
         String tableId = bizOptJson.getString("tableLabelName");
