@@ -100,9 +100,8 @@ public class TaskRun {
                 dataPacketDao.mergeObject((DataPacket)dataPacketInterface);
                 //将正式流程执行的时间同步到草稿表中
                 DataPacket dataPacket = (DataPacket)dataPacketInterface;
-                DataPacketDraft dataPacketDraft = new DataPacketDraft();
-                BeanUtils.copyProperties(dataPacket,dataPacketDraft);
-                dataPacketCopyDao.mergeObject(dataPacketDraft);
+                DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set LAST_RUN_TIME=? where packet_id=?",
+                    new Object[]{dataPacket.getLastRunTime(), dataPacket.getPacketId()});
             }
             TaskDetailLog taskDetailLog = taskDetailLogDao.getObjectByProperties(CollectionsOpt.createHashMap("logId", taskLog.getLogId()));
             taskLog.setOtherMessage("ok".equals(taskDetailLog.getLogInfo())? "ok" : "error");
