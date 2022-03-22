@@ -134,6 +134,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentBizOperation());
         allOperations.put(ConstantValue.COMPARE_SOURCE, new ObjectCompareBizOperation());
         allOperations.put(ConstantValue.SESSION_DATA, new GetSessionDataBizOperation());
+        allOperations.put(ConstantValue.COMMIT_TRANSACTION, new TransactionCommitOperation(sourceInfoDao));
     }
 
     @Override

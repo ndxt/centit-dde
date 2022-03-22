@@ -68,6 +68,8 @@ public class ConstantValue {
     public static final String ELASTICSEARCH_QUERY = "esQuery";
     public static final String ELASTICSEARCH_WRITE = "esWrite";
 
+    //dde手动提交事物
+    public static final String  COMMIT_TRANSACTION="commitTransaction";
 
     public static final String FINAL_TWO="2";
 
