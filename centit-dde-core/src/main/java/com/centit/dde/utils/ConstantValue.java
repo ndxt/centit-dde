@@ -65,10 +65,23 @@ public class ConstantValue {
     //获取session数据
     public static final String SESSION_DATA="sessionData";
 
+    public static final String ELASTICSEARCH_QUERY = "esQuery";
+    public static final String ELASTICSEARCH_WRITE = "esWrite";
+
+    //dde手动提交事物
+    public static final String  COMMIT_TRANSACTION="commitTransaction";
+
     public static final String FINAL_TWO="2";
 
     public static final String TASK_TYPE_GET="1";
     public static final String TASK_TYPE_POST="3";
     public static final String TASK_TYPE_PUT="5";
     public static final String TASK_TYPE_DELETE="6";
+
+
+    public static final String LEFT = "leftjoin";
+    public static final String RIGHT = "rightjoin";
+    public static final String ALL = "alljoin";
+
+
 }

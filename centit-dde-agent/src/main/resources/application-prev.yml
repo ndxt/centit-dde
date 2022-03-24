@@ -1,14 +1,14 @@
 server:
   port: 10089
   servlet:
-   contextPath: /dde
+    contextPath: /dde
 spring:
   application:
     name: DDE
   datasource:
     type: org.apache.commons.dbcp2.BasicDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.134.250:31183/locodedata?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://192.168.134.250:31343/locodedata?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
     password: root
     dbcp2:
@@ -24,12 +24,12 @@ centit:
   optId: ''
 logging.path: D:/Projects/RunData/dde/log
 email:
- hostName: mail.centit.com
- smtpPort: 25
- userName: alertmail@centit.com
- userPassword: 131511.cn
- serverEmail: no-reply@centit.com
- emailTo: zhf@centit.com
+  hostName: mail.centit.com
+  smtpPort: 25
+  userName: alertmail@centit.com
+  userPassword: 131511.cn
+  serverEmail: no-reply@centit.com
+  emailTo: zhf@centit.com
 
 
 

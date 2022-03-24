@@ -3,8 +3,12 @@ package com.centit.dde.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.ResponseSingleData;
+import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.support.database.utils.PageDesc;
 import com.centit.support.security.AESSecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -56,7 +60,7 @@ public class KafkaParameterController {
 
     @ApiOperation(value = "获取topic列表")
     @GetMapping("/topics/{databaseCode}")
-    public JSONArray topics(@PathVariable String databaseCode) throws Exception {
+    public ResponseData topics(@PathVariable String databaseCode) throws Exception {
         SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         JSONArray topicArr = new JSONArray();
         Properties props = new Properties();
@@ -72,9 +76,8 @@ public class KafkaParameterController {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, databaseInfo.getDatabaseUrl());
         AdminClient adminClient = KafkaAdminClient.create(props);
         try{
-            ListTopicsResult result = adminClient.listTopics();
-            KafkaFuture<Set<String>> set = result.names();
-            for (String topicName : set.get()) {
+            KafkaFuture<Set<String>> topicSet = adminClient.listTopics().names();
+            for (String topicName : topicSet.get()) {
                 JSONObject topicInfo = new JSONObject();
                 topicInfo.put("name", topicName);
                 topicArr.add(topicInfo);
@@ -82,6 +85,7 @@ public class KafkaParameterController {
         }finally {
             adminClient.close();
         }
-        return topicArr;
+        PageQueryResult<Object> result = PageQueryResult.createResult(topicArr, null);
+        return ResponseSingleData.makeResponseData(result);
     }
 }

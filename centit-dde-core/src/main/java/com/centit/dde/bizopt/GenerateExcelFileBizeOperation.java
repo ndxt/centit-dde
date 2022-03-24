@@ -38,18 +38,18 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
-        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
+        String id = bizOptJson.getString("id");
+        String source = bizOptJson.getString("source");
+        String fileName=bizOptJson.getString("fileName");
         //模板文件id
-        String templateFileId = BuiltInOperation.getJsonFieldString(bizOptJson, "templateFileId", sourDsName);
-        //从第几行开始插入
-        Integer beginRow = Integer.valueOf(BuiltInOperation.getJsonFieldString(bizOptJson, "beginRow", sourDsName))==null?0:
-            Integer.valueOf(BuiltInOperation.getJsonFieldString(bizOptJson, "beginRow", sourDsName));
-        //指定写入第几个sheet中
-        String sheetName = BuiltInOperation.getJsonFieldString(bizOptJson, "sheetName", sourDsName);
-        DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+        String templateFileId =bizOptJson.getString("templateFileId");
+        DataSet dataSet = bizModel.fetchDataSetByName(source);
         String requestBody= (String)bizModel.getInterimVariable().get("requestBody");
         if (StringUtils.isNotBlank(templateFileId)){//根据模板生成
+            //从第几行开始插入
+            Integer beginRow =bizOptJson.getInteger("beginRow")==null?0:bizOptJson.getInteger("beginRow");
+            //指定写入第几个sheet中
+            String sheetName = bizOptJson.getString("sheetName");
             InputStream inputStream = fileStore.loadFileStream(templateFileId);
             if (inputStream==null){
                 return  BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：Excel模板不存在，请先上传模板！");
@@ -63,9 +63,9 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             xssfWorkbook.write(byteArrayOutputStream);
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".xlsx",
+            DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName",fileName.endsWith(".xlsx")?fileName:fileName+".xlsx",
                 "fileSize", inputStream.available(), "fileContent",byteArrayInputStream));
-            bizModel.putDataSet(targetDsName,objectToDataSet);
+            bizModel.putDataSet(id,objectToDataSet);
             byteArrayOutputStream.close();
             xssfWorkbook.close();
             return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
@@ -83,10 +83,10 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：生成EXCEL文件异常，请指定数据集！");
         }
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
-        InputStream inputStream = ExcelDataSet.writeExcel(dataAsList,mapInfo);
-        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".xlsx",
+        InputStream inputStream = ExcelDataSet.writeExcel(dataAsList,mapInfo,fileName);
+        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName",fileName.endsWith(".xlsx")?fileName:fileName+".xlsx",
             "fileSize", inputStream.available(), "fileContent",inputStream));
-        bizModel.putDataSet(targetDsName,objectToDataSet);
+        bizModel.putDataSet(id,objectToDataSet);
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
     }
 

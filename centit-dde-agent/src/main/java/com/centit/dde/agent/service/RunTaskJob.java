@@ -5,9 +5,17 @@ import com.centit.dde.services.impl.TaskRun;
 import com.centit.support.quartz.AbstractQuartzJob;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
+import org.quartz.TriggerUtils;
+import org.quartz.impl.triggers.CronTriggerImpl;
+import org.springframework.scheduling.support.CronSequenceGenerator;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -47,6 +55,8 @@ public class RunTaskJob extends AbstractQuartzJob {
             }
             try {
                 TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
+                logger.info(String.format("execute scheduled tasks,taskName:%s,taskID：%s,cron expression：%s,execute time:%s",
+                    dataPacket.getPacketName(),dataPacket.getPacketId(),dataPacket.getTaskCron(),getDate(dataPacket.getTaskCron())));
                 taskRun.runTask(dataPacket.getPacketId(), null,new HashMap<>());
             } finally {
                 runningTask.put(dataPacket.getPacketId(), false);
@@ -65,5 +75,18 @@ public class RunTaskJob extends AbstractQuartzJob {
 //          System.out.println(line);
 //      }
         return true;
+    }
+
+    private static String getDate(String cron){
+        try {
+            CronTriggerImpl cronTrigger = new CronTriggerImpl();
+            cronTrigger.setCronExpression(cron);
+            List<Date> dates = TriggerUtils.computeFireTimes(cronTrigger, null, 1);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return sdf.format(dates.get(0));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

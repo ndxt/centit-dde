@@ -25,6 +25,7 @@ public class GenerateCsvFileBizOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+        String fileName=bizOptJson.getString("fileName");
         String requestBody= (String)bizModel.getInterimVariable().get("requestBody");
         //获取表达式信息
         Map<String, String> mapInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
@@ -39,7 +40,7 @@ public class GenerateCsvFileBizOperation implements BizOperation {
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：生成CSV文件异常，请指定数据集！");
         }
         InputStream inputStream = CsvDataSet.createCsvStream(dataSet);
-        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".csv",
+        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName.endsWith(".csv")?fileName:fileName+".csv",
             "fileSize", inputStream.available(), "fileContent",inputStream));
         bizModel.putDataSet(targetDsName,objectToDataSet);
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());

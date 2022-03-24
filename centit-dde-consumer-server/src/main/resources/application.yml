@@ -18,11 +18,17 @@ spring:
       validation-query: SELECT 1 from dual
       connection-properties: characterEncoding=utf8
 
-centit:
-  useDataMoving: false
-  dataMovingPath: D:\centit-dde-datamoving-3.1-SNAPSHOT.jar
-  logs: D:/Projects/RunData/dde/log
-  optId: ''
+consumer:
+  #指定了线程池中的线程数量，它的数量决定了添加的任务是开辟新的线程去执行，还是放到workQueue任务队列中去
+  corePoolSize: 5
+  #指定了线程池中的最大线程数量，这个参数会根据你使用的workQueue任务队列的类型，决定线程池会开辟的最大线程数量；
+  maximumPoolSize: 30
+  #当线程池中空闲线程数量超过corePoolSize时，多余的线程会在多长时间内被销毁 单位：毫秒
+  keepAliveTime: 5000
+  #初始化等待队列大小
+  queueSize: 10
+
+
 
 
 

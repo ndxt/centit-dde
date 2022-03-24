@@ -54,6 +54,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     public static final String RETURN_RESULT_STATE = "2";
     public static final String RETURN_RESULT_DATASET = "3";
     public static final String RETURN_RESULT_ORIGIN = "4";
+    public static final String RETURN_RESULT_ERROR = "5";
     public static final String FILE_DOWNLOAD = "fileDownload";
 
     @Value("${os.file.base.dir:./file_home/export}")
@@ -133,6 +134,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentBizOperation());
         allOperations.put(ConstantValue.COMPARE_SOURCE, new ObjectCompareBizOperation());
         allOperations.put(ConstantValue.SESSION_DATA, new GetSessionDataBizOperation());
+        allOperations.put(ConstantValue.COMMIT_TRANSACTION, new TransactionCommitOperation(sourceInfoDao));
     }
 
     @Override
@@ -147,7 +149,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         bizModel.setInterimVariable(interimVariable==null?new HashMap<>():interimVariable);
         //标签中默认的3个数据集  将数据set进去   需要在结束标签中移除这3个默认标签的数据  否则会显得返回结果数据很乱
         if (queryParams!=null && queryParams.size()>0){
-            bizModel.putDataSet("getData",new SimpleDataSet(queryParams));
+            bizModel.putDataSet("pathData",new SimpleDataSet(queryParams));
         }
         if (interimVariable.containsKey("requestBody")){
             String requestBody = (String) interimVariable.get("requestBody");
@@ -235,24 +237,20 @@ public class BizOptFlowImpl implements BizOptFlow {
             Object returnResult = returnResult(dataOptStep, dataOptVo);
             //恢复原始JSON数据，否则后面更新的时候会将原本的数据替换为当前节点id
             dataOptStep.getCurrentStep().getJSONObject("properties").put("source",source);
-            JSONObject newResultData = new JSONObject();
             JSONObject bizData = new JSONObject();
             if (returnResult!=null){
                 JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(returnResult));
                 JSONObject data = jsonObject.getJSONObject("data");
                 if (data!=null){
                     JSONObject dump = new JSONObject();
-                    dump.put("allNodeData",data.getJSONObject("bizData"));
-                    dump.put("modelTag",data.getJSONObject("modelTag"));
-                    dump.put("responseMapData",data.getJSONObject("responseMapData"));
-                    bizData.put("currentNodeData",data.getJSONObject("bizData")==null?null:data.getJSONObject("bizData").get(debugId));
+                    dump.put("allNodeData",dataOptVo.getBizModel().getBizData());
+                    dump.put("modelTag",dataOptVo.getBizModel().getModelTag());
+                    dump.put("responseMapData",dataOptVo.getBizModel().getResponseMapData());
+                    bizData.put("currentNodeData",data.getJSONObject(debugId));
                     bizData.put("dump",dump);
-                    newResultData.put("code",jsonObject.get("code"));
-                    newResultData.put("message",jsonObject.get("message"));
-                    newResultData.put("data",bizData);
                 }
             }
-            dataOptVo.setPreResult(newResultData);
+            dataOptVo.setPreResult(bizData);
             dataOptStep.setEndStep();
             return;
         }
@@ -272,7 +270,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         SimpleBizModel bizModel = dataOptVo.getBizModel();
         //移除3个默认请求参数数据集数据  这个3个数据集保存的是请求的参数，这个不需要返回
         if(bizModel!=null){
-            bizModel.removeDataSet("getData");
+            bizModel.removeDataSet("pathData");
             bizModel.removeDataSet("postBodyData");
             bizModel.removeDataSet("postFileData");
         }
@@ -282,7 +280,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (bizModel.getResponseMapData().getCode() != ResponseData.RESULT_OK || RETURN_RESULT_STATE.equals(type)) {
             ResponseMapData responseMapData=bizModel.getResponseMapData();
             ResponseSingleData responseSingleData= new ResponseSingleData(responseMapData.getCode(),responseMapData.getMessage());
-            responseSingleData.setData(responseMapData);
+            responseSingleData.setData(responseMapData.getData());
             return responseSingleData;
         }
         if(RETURN_RESULT_DATASET.equals(type) || RETURN_RESULT_ORIGIN.equals(type)){
@@ -303,10 +301,31 @@ public class BizOptFlowImpl implements BizOptFlow {
                 responseSingleData.setData(dataSet.getData());
                 return responseSingleData;
             }else{
-                return dataSet;
+                return dataSet==null?null:dataSet.getData();
             }
         }
-        return ResponseData.makeResponseData(bizModel);
+        //返回异常信息
+        if(RETURN_RESULT_ERROR.equals(type)){
+            String code = stepJson.getString("code");
+            String message =stepJson.getString("message");
+            path = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
+            DataSet dataSet=bizModel.fetchDataSetByName(path);
+            ResponseSingleData response = new ResponseSingleData();
+            response.setCode(code==null?0:Integer.valueOf(code));
+            response.setMessage(message);
+            if(dataSet!=null){
+                response.setData(dataSet.getData());
+            }
+            return response;
+        }
+        ResponseSingleData response = new ResponseSingleData();
+        Map<String, Object> returnData = new HashMap<>();
+        Map<String, DataSet> bizData = bizModel.getBizData();
+        for (String key : bizData.keySet()) {
+            returnData.put(key,bizData.get(key)==null?null:bizData.get(key).getData());
+        }
+        response.setData(returnData);
+        return response;
     }
 
     private void setBatchStep(DataOptStep dataOptStep, DataOptVo dataOptVo) {

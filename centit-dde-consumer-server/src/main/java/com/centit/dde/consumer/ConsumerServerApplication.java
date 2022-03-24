@@ -1,6 +1,6 @@
 package com.centit.dde.consumer;
 
-import com.centit.dde.consumer.config.ContextUtils;
+import com.centit.dde.consumer.task.ContextUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;

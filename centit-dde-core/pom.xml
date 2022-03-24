@@ -84,6 +84,13 @@
             <artifactId>centit-dde-dubbo-adapter</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>net.sourceforge.pinyin4j</groupId>
+            <artifactId>pinyin4j</artifactId>
+            <version>5.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

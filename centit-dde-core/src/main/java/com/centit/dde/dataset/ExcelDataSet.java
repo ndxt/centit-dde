@@ -8,11 +8,9 @@ import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.report.ExcelExportUtil;
 import com.centit.support.report.ExcelImportUtil;
 import com.centit.support.report.ExcelTypeEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 
 import java.io.*;
@@ -139,7 +137,7 @@ public class ExcelDataSet extends FileDataSet {
      * @return
      * @throws IOException
      */
-    public static InputStream writeExcel(List<Map<String, Object>> objectList, Map<String, String> mapInfo) throws IOException {
+    public static InputStream writeExcel(List<Map<String, Object>> objectList, Map<String, String> mapInfo,String fileName) throws IOException {
         //获取数据源的 key, 用于获取列数及设置标题
         //Map<String, Object> map = objectList.get(0);
         Set<String> stringSet = mapInfo.keySet();
@@ -147,7 +145,7 @@ public class ExcelDataSet extends FileDataSet {
         //定义一个新的工作簿
         XSSFWorkbook wb = new XSSFWorkbook();
         //创建一个Sheet页
-        XSSFSheet sheet = wb.createSheet(System.currentTimeMillis() + "");
+        XSSFSheet sheet = wb.createSheet(StringUtils.isNotBlank(fileName)?fileName:System.currentTimeMillis() + "");
         //设置行高
         //sheet.setDefaultRowHeight((short) (2 * 200));
         //为有数据的每列设置列宽
@@ -155,9 +153,19 @@ public class ExcelDataSet extends FileDataSet {
         // sheet.setColumnWidth(i, 8000);
         //}
         //设置单元格字体样式
-        XSSFFont font = wb.createFont();
-        font.setFontName("等线");
-        font.setFontHeightInPoints((short) 16);
+        CellStyle cellStyle = wb.createCellStyle();
+        // 指定单元格居中对齐
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        // 指定单元格垂直居中对齐
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+//        cellStyle.setWrapText(true);// 指定单元格自动换行
+        // 设置单元格字体
+        Font font = wb.createFont();
+//        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+        font.setFontName("宋体");
+//        font.setFontHeight((short) 300);
+        cellStyle.setFont(font);
+
         //在sheet里创建第一行，并设置单元格内容为 title (标题)
         /*XSSFRow titleRow = sheet.createRow(0);
         XSSFCell titleCell = titleRow.createCell(0);
@@ -174,6 +182,7 @@ public class ExcelDataSet extends FileDataSet {
         for (int i = 0; i < headList.size(); i++) {
             XSSFCell cell = row.createCell(i);
             cell.setCellValue(headList.get(i));
+            cell.setCellStyle(cellStyle);
         }
         XSSFRow rows;
         XSSFCell cells;
@@ -186,6 +195,7 @@ public class ExcelDataSet extends FileDataSet {
                 String value = objectList.get(i).get(headList.get(j)) == null ? "" : objectList.get(i).get(headList.get(j)).toString();
                 cells = rows.createCell(j);
                 cells.setCellValue(value);
+                cells.setCellStyle(cellStyle);
             }
         }
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {

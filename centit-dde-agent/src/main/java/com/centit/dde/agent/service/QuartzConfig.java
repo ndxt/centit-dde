@@ -14,6 +14,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 @Configuration
 public class QuartzConfig {
     private final PathConfig pathConfig;
+
     @Autowired
     public QuartzConfig(PathConfig pathConfig) {
         this.pathConfig = pathConfig;
