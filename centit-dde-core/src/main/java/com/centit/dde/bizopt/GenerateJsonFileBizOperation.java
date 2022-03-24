@@ -24,6 +24,7 @@ public class GenerateJsonFileBizOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         String requestBody= (String)bizModel.getInterimVariable().get("requestBody");
+        String fileName=bizOptJson.getString("fileName");
         Object data;
         if (StringUtils.isNotBlank(requestBody)){
             data=requestBody;
@@ -32,7 +33,7 @@ public class GenerateJsonFileBizOperation implements BizOperation {
         }
         String object = JSON.toJSONString(data);
         InputStream inputStream = new ByteArrayInputStream(object.getBytes());
-        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".json",
+        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName.endsWith(".json")?fileName:fileName+".json",
             "fileSize", inputStream.available(), "fileContent",inputStream));
         bizModel.putDataSet(targetDsName,objectToDataSet);
         return BuiltInOperation.getResponseSuccessData(objectToDataSet.getSize());

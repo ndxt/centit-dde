@@ -40,6 +40,7 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String id = bizOptJson.getString("id");
         String source = bizOptJson.getString("source");
+        String fileName=bizOptJson.getString("fileName");
         //模板文件id
         String templateFileId =bizOptJson.getString("templateFileId");
         DataSet dataSet = bizModel.fetchDataSetByName(source);
@@ -62,7 +63,7 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             xssfWorkbook.write(byteArrayOutputStream);
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".xlsx",
+            DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName",fileName.endsWith(".xlsx")?fileName:fileName+".xlsx",
                 "fileSize", inputStream.available(), "fileContent",byteArrayInputStream));
             bizModel.putDataSet(id,objectToDataSet);
             byteArrayOutputStream.close();
@@ -82,8 +83,8 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：生成EXCEL文件异常，请指定数据集！");
         }
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
-        InputStream inputStream = ExcelDataSet.writeExcel(dataAsList,mapInfo);
-        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", System.currentTimeMillis()+".xlsx",
+        InputStream inputStream = ExcelDataSet.writeExcel(dataAsList,mapInfo,fileName);
+        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName",fileName.endsWith(".xlsx")?fileName:fileName+".xlsx",
             "fileSize", inputStream.available(), "fileContent",inputStream));
         bizModel.putDataSet(id,objectToDataSet);
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());

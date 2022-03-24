@@ -111,6 +111,26 @@ public abstract class DataSetOptUtil {
                 }
                 return false;
             });
+            extendFuncs.put("remove",(a)->{
+                Object[] objects = Arrays.stream(a).toArray();
+                if (objects.length==2){
+                    Object removeKey= objects[0];
+                    Object value=  objects[1];
+                    if (value instanceof List){
+                        int index = Integer.valueOf(removeKey+"");
+                        List list = (List)value;
+                        list.remove(index);
+                        return list;
+                    }
+                    if (value instanceof Map){
+                        String key = (String)removeKey;
+                        Map map = (Map)value;
+                        map.remove(key);
+                        return map;
+                    }
+                }
+                return false;
+            });
         }
         return extendFuncs;
     }
