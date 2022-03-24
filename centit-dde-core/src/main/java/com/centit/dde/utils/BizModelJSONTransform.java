@@ -3,7 +3,6 @@ package com.centit.dde.utils;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.support.algorithm.ReflectionOpt;
-import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.compiler.VariableTranslate;
 import com.centit.support.json.JSONTransformDataSupport;
