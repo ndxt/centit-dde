@@ -118,9 +118,12 @@ public class ExcelDataSet extends FileDataSet {
                 row = sheet.getRow(j);
                 JSONObject jsonObject = new JSONObject();
                 // 遍历所有的列
-                for (int y = row.getFirstCellNum(); y < row.getLastCellNum() - 1; y++) {
+                for (int y = row.getFirstCellNum(); y < row.getLastCellNum(); y++) {
                     Object cellValue = getCellValue(row.getCell(y));
                     Object key = title[y];
+                    if("".equals(cellValue) && "".equals(key)){
+                        continue;
+                    };
                     jsonObject.put((String) key, cellValue);
                 }
                 jsonArray.add(jsonObject);
@@ -235,6 +238,9 @@ public class ExcelDataSet extends FileDataSet {
      * @return
      */
     public static Object getCellValue(Cell cell) {
+        if (cell ==null){
+            return "";
+        }
         Object value = null;
         DecimalFormat df = new DecimalFormat("0");
         SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
