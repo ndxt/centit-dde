@@ -153,8 +153,10 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
         if (interimVariable.containsKey("requestBody")){
             String requestBody = (String) interimVariable.get("requestBody");
-            DataSet destDs = BizOptUtils.castObjectToDataSet(requestBody.startsWith("[")?JSONObject.parseObject(requestBody,JSONArray.class):JSONObject.parseObject(requestBody));
-            bizModel.putDataSet("postBodyData",destDs);
+            if (StringUtils.isNotBlank(requestBody)){
+                DataSet destDs = BizOptUtils.castObjectToDataSet(requestBody.startsWith("[")?JSONObject.parseObject(requestBody,JSONArray.class):JSONObject.parseObject(requestBody));
+                bizModel.putDataSet("postBodyData",destDs);
+            }
         }
         if (interimVariable.containsKey("requestFile")){
             bizModel.putDataSet("postFileData",new SimpleDataSet(interimVariable.get("requestFile")));
@@ -270,8 +272,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         SimpleBizModel bizModel = dataOptVo.getBizModel();
         //移除3个默认请求参数数据集数据  这个3个数据集保存的是请求的参数，这个不需要返回
         if(bizModel!=null){
-            bizModel.removeDataSet("pathData");
-            bizModel.removeDataSet("postBodyData");
+           /* bizModel.removeDataSet("pathData");
+            bizModel.removeDataSet("postBodyData");*/
             bizModel.removeDataSet("postFileData");
         }
         stepJson=stepJson.getJSONObject("properties");

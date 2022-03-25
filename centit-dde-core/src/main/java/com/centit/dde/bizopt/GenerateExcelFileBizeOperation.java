@@ -40,7 +40,7 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String id = bizOptJson.getString("id");
         String source = bizOptJson.getString("source");
-        String fileName=bizOptJson.getString("fileName");
+        String fileName=StringUtils.isNotBlank(bizOptJson.getString("fileName"))?bizOptJson.getString("fileName"):System.currentTimeMillis()+"";
         //模板文件id
         String templateFileId =bizOptJson.getString("templateFileId");
         DataSet dataSet = bizModel.fetchDataSetByName(source);

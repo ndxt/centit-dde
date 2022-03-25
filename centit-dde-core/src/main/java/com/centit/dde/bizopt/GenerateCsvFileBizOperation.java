@@ -25,7 +25,7 @@ public class GenerateCsvFileBizOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-        String fileName=bizOptJson.getString("fileName");
+        String fileName=StringUtils.isNotBlank(bizOptJson.getString("fileName"))?bizOptJson.getString("fileName"):System.currentTimeMillis()+"";
         String requestBody= (String)bizModel.getInterimVariable().get("requestBody");
         //获取表达式信息
         Map<String, String> mapInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");

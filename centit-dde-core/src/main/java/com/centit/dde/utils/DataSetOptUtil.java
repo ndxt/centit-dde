@@ -61,9 +61,10 @@ public abstract class DataSetOptUtil {
                         if (stringBuilder.length() > 0) {
                             stringBuilder.append(regex);
                         }
-                        stringBuilder.append(CodeRepositoryUtil.getValue(
-                            StringBaseOpt.castObjectToString(a[0]),
-                            StringBaseOpt.castObjectToString(string)));
+                        String value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), StringBaseOpt.castObjectToString(string));
+                        value = !value.equals(string)?value:
+                            CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]),StringBaseOpt.castObjectToString(string));
+                        stringBuilder.append(value);
                     }
                     return stringBuilder.toString();
                 }
@@ -114,19 +115,13 @@ public abstract class DataSetOptUtil {
             extendFuncs.put("remove",(a)->{
                 Object[] objects = Arrays.stream(a).toArray();
                 if (objects.length==2){
-                    Object removeKey= objects[0];
+                    Object index= objects[0];
                     Object value=  objects[1];
+                    //lsit<String>  list<Map>
                     if (value instanceof List){
-                        int index = Integer.valueOf(removeKey+"");
                         List list = (List)value;
                         list.remove(index);
                         return list;
-                    }
-                    if (value instanceof Map){
-                        String key = (String)removeKey;
-                        Map map = (Map)value;
-                        map.remove(key);
-                        return map;
                     }
                 }
                 return false;
@@ -134,6 +129,7 @@ public abstract class DataSetOptUtil {
         }
         return extendFuncs;
     }
+
 
     /**
      * 数据集 映射
@@ -898,7 +894,7 @@ public abstract class DataSetOptUtil {
     //获取request请求中的文件（流）
     public static List<InputStream> getRequestFileInfo(BizModel bizModel) throws IOException {
         List<InputStream> inputStreamList = null;
-        Map<String, Object> modelTag = bizModel.getModelTag();
+        Map<String, Object> modelTag = bizModel.getInterimVariable();
         InputStream requestFile = (InputStream) modelTag.get("requestFile");
         if (requestFile != null && requestFile.available() > 0) {
             inputStreamList = new ArrayList<>();

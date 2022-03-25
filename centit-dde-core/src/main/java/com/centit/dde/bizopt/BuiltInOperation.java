@@ -101,9 +101,12 @@ public class BuiltInOperation {
 
     public static ResponseData runRequestBody(BizModel bizModel, JSONObject bizOptJson) {
         String bodyString = (String) bizModel.getInterimVariable().get("requestBody");
-        DataSet destDs = BizOptUtils.castObjectToDataSet(bodyString.startsWith("[")?JSONObject.parseObject(bodyString,JSONArray.class):JSONObject.parseObject(bodyString));
-        bizModel.putDataSet(bizOptJson.getString("id"), destDs);
-        return getResponseSuccessData(destDs.getSize());
+        if (StringUtils.isNotBlank(bodyString)){
+            DataSet destDs = BizOptUtils.castObjectToDataSet(bodyString.startsWith("[")?JSONObject.parseObject(bodyString,JSONArray.class):JSONObject.parseObject(bodyString));
+            bizModel.putDataSet(bizOptJson.getString("id"), destDs);
+            return getResponseSuccessData(destDs.getSize());
+        }
+        return getResponseSuccessData(0);
     }
 
     public static ResponseData runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
