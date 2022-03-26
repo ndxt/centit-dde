@@ -760,9 +760,11 @@ public abstract class DataSetOptUtil {
      * @param mainDataSet   主数据集
      * @param slaveDataSet  次数据集
      * @param primaryFields 主键列
+     * @param unionData 是否合并数据，是否用 slaveData中额外的数据项填补 mainData中的数据
      * @return newDataSet
      */
-    public static DataSet intersectTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet, List<Map.Entry<String, String>> primaryFields) {
+    public static DataSet intersectTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet,
+                                              List<Map.Entry<String, String>> primaryFields, boolean unionData) {
         if (mainDataSet == null) {
             return null;
         }
@@ -782,9 +784,12 @@ public abstract class DataSetOptUtil {
         while (i < mainData.size() && j < slaveData.size()) {
             int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields);
             if (nc == 0) {
-                //newRow.putAll(slaveData.get(j));
                 Map<String, Object> newRow = new LinkedHashMap<>();
+                if(unionData){
+                    newRow.putAll(slaveData.get(j));
+                }
                 newRow.putAll(mainData.get(i));
+
                 if (newRow.size() > 0) {
                     newData.add(newRow);
                 }
