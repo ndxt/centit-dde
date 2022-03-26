@@ -590,11 +590,13 @@ public abstract class DataSetOptUtil {
     }
 
     /**
-     * 合并两个数据集
+     * 合并两个数据集; 类似于 数据的 join， 但是不同的是 如果有相同的字段 以mainDataSet为准，
+     * 连接字段最好是主键（或者唯一），否则系统会保证多的哪个dataSet被加入，但不一定会被连接
      *
      * @param mainDataSet   主数据集
      * @param slaveDataSet  次数据集
      * @param primaryFields 主键列
+     * @param join  innerJoin， leftjoin rightjoin alljoin
      * @return DataSet
      */
     public static DataSet joinTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet, List<Map.Entry<String, String>> primaryFields, String join) {
@@ -626,20 +628,22 @@ public abstract class DataSetOptUtil {
                 nInsertSlave = j;
                 boolean incMain = i < mainData.size() - 1 && compareTwoRowWithMap(mainData.get(i), mainData.get(i + 1), primaryFields) != 0;
                 boolean incSlave = j < slaveData.size() - 1 && compareTwoRowWithMap(slaveData.get(j), slaveData.get(j + 1), primaryFields) != 0;
-                if (!incMain && i < mainData.size()) {
-                    i++;
-                }
-                if (!incSlave && j < slaveData.size()) {
-                    j++;
-                }
+
                 boolean inc = (incMain && incSlave) || (!incMain && !incSlave);
                 if (inc) {
                     i++;
                     j++;
+                } else {
+                    if (!incMain && i < mainData.size()) {
+                        i++;
+                    }
+                    if (!incSlave && j < slaveData.size()) {
+                        j++;
+                    }
                 }
             } else if (nc < 0) {
                 if (nInsertMain < i) {
-                    if (ConstantValue.LEFT.equalsIgnoreCase(join) || ConstantValue.ALL.equalsIgnoreCase(join)) {
+                    if (ConstantValue.DATASET_JOIN_TYPE_LEFT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join)) {
                         newRow.putAll(mainData.get(i));
                     }
                     nInsertMain = i;
@@ -647,7 +651,7 @@ public abstract class DataSetOptUtil {
                 i++;
             } else {
                 if (nInsertSlave < j) {
-                    if (ConstantValue.RIGHT.equalsIgnoreCase(join) || ConstantValue.ALL.equalsIgnoreCase(join)) {
+                    if (ConstantValue.DATASET_JOIN_TYPE_RIGHT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join)) {
                         newRow.putAll(slaveData.get(j));
                     }
                     nInsertSlave = j;
@@ -658,14 +662,14 @@ public abstract class DataSetOptUtil {
                 newData.add(newRow);
             }
         }
-        if (ConstantValue.LEFT.equalsIgnoreCase(join) || ConstantValue.ALL.equalsIgnoreCase(join)) {
+        if (ConstantValue.DATASET_JOIN_TYPE_LEFT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join)) {
             while (i < mainData.size()) {
                 Map<String, Object> newRow = new LinkedHashMap<>(mainData.get(i));
                 newData.add(newRow);
                 i++;
             }
         }
-        if (ConstantValue.RIGHT.equalsIgnoreCase(join) || ConstantValue.ALL.equalsIgnoreCase(join)) {
+        if (ConstantValue.DATASET_JOIN_TYPE_RIGHT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join)) {
             while (j < slaveData.size()) {
                 Map<String, Object> newRow = new LinkedHashMap<>(slaveData.get(j));
                 newData.add(newRow);
@@ -675,6 +679,16 @@ public abstract class DataSetOptUtil {
         return new SimpleDataSet(newData);
     }
 
+    /**
+     * 这个没有什么意义；它 其实是 两个集合 先去交集，再更加条件过滤
+     * 可以用 交集 和 过滤 替换，建议废弃
+     *
+     * @param mainDataSet   主数据集
+     * @param slaveDataSet  次数据集
+     * @param primaryFields 主键列
+     * @param formulas 过滤条件
+     * @return newDataset
+     */
     public static DataSet filterByOtherDataSet(DataSet mainDataSet, DataSet slaveDataSet,
                                                List<Map.Entry<String, String>> primaryFields, List<String> formulas) {
         if (mainDataSet == null || slaveDataSet == null) {
@@ -722,6 +736,12 @@ public abstract class DataSetOptUtil {
         return new SimpleDataSet(newData);
     }
 
+    /**
+     * 这个是 连个集合 的 unionALL 操作；如果 需要去掉重复的数据集，用jion来代替
+     * @param mainDataSet   主数据集
+     * @param slaveDataSet  次数据集
+     * @return newDataset
+     */
     public static DataSet unionTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet) {
 
         List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
@@ -736,6 +756,104 @@ public abstract class DataSetOptUtil {
         resultData.addAll(mainData);
         resultData.addAll(slaveData);
         return new SimpleDataSet(resultData);
+    }
+
+    /**
+     * 求两个集合的交集
+     *
+     * @param mainDataSet   主数据集
+     * @param slaveDataSet  次数据集
+     * @param primaryFields 主键列
+     * @return newDataSet
+     */
+    public static DataSet intersectTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet, List<Map.Entry<String, String>> primaryFields) {
+        if (mainDataSet == null) {
+            return null;
+        }
+        if (slaveDataSet == null) {
+            return null;
+        }
+        List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
+        List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
+        List<String> mainFields = new ArrayList<>();
+        List<String> slaveFields = new ArrayList<>();
+        splitMainAndSlave(primaryFields, mainFields, slaveFields);
+        sortByFields(mainData, mainFields);
+        sortByFields(slaveData, slaveFields);
+        int i = 0;
+        int j = 0;
+        List<Map<String, Object>> newData = new ArrayList<>();
+        while (i < mainData.size() && j < slaveData.size()) {
+            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields);
+            if (nc == 0) {
+                //newRow.putAll(slaveData.get(j));
+                Map<String, Object> newRow = new LinkedHashMap<>();
+                newRow.putAll(mainData.get(i));
+                if (newRow.size() > 0) {
+                    newData.add(newRow);
+                }
+                i++;
+                j++;
+            } else if (nc < 0) {
+                i++;
+            } else {
+                j++;
+            }
+
+        }
+        return new SimpleDataSet(newData);
+    }
+
+    /**
+     * 求减集 mainDataSet - slaveDataSet
+     *
+     * @param mainDataSet   主数据集
+     * @param slaveDataSet  次数据集
+     * @param primaryFields 主键列
+     * @return newDataSet
+     */
+    public static DataSet minusTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet, List<Map.Entry<String, String>> primaryFields) {
+        if (mainDataSet == null) {
+            return null;
+        }
+        if (slaveDataSet == null) {
+            return mainDataSet;
+        }
+        List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
+        List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
+        List<String> mainFields = new ArrayList<>();
+        List<String> slaveFields = new ArrayList<>();
+        splitMainAndSlave(primaryFields, mainFields, slaveFields);
+        sortByFields(mainData, mainFields);
+        sortByFields(slaveData, slaveFields);
+        int i = 0;
+        int j = 0;
+        List<Map<String, Object>> newData = new ArrayList<>();
+        while (i < mainData.size() && j < slaveData.size()) {
+            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields);
+            if (nc == 0) {
+                //newRow.putAll(slaveData.get(j));
+                i++;
+                j++;
+            } else if (nc < 0) {
+                Map<String, Object> newRow = new LinkedHashMap<>();
+                newRow.putAll(mainData.get(i));
+                if (newRow.size() > 0) {
+                    newData.add(newRow);
+                }
+                i++;
+            } else {
+                j++;
+            }
+        }
+        while (i < mainData.size()) {
+            Map<String, Object> newRow = new LinkedHashMap<>(mainData.get(i));
+            if (newRow.size() > 0) {
+                newData.add(newRow);
+            }
+            i++;
+        }
+        return new SimpleDataSet(newData);
     }
 
     public static void checkDateSet(DataSet inData, Collection<CheckRule> rules) {

@@ -78,10 +78,10 @@ public class ConstantValue {
     public static final String TASK_TYPE_PUT="5";
     public static final String TASK_TYPE_DELETE="6";
 
-
-    public static final String LEFT = "leftjoin";
-    public static final String RIGHT = "rightjoin";
-    public static final String ALL = "alljoin";
+    public static final String DATASET_JOIN_TYPE_INNER = "innerjoin";
+    public static final String DATASET_JOIN_TYPE_LEFT = "leftjoin";
+    public static final String DATASET_JOIN_TYPE_RIGHT = "rightjoin";
+    public static final String DATASET_JOIN_TYPE_ALL = "alljoin";
 
 
 }

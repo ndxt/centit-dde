@@ -296,6 +296,12 @@ public class BuiltInOperation {
         return getResponseSuccessData(destDS.getSize());
     }
 
+    /**
+     * TODO 去掉这个组件，添加 交集 和 减集 组件
+     * @param bizModel
+     * @param bizOptJson
+     * @return
+     */
     public static ResponseData runFilterExt(BizModel bizModel, JSONObject bizOptJson) {
         String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
         String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
