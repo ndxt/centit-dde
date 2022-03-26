@@ -514,13 +514,14 @@ public abstract class DataSetOptUtil {
     }
 
     /**
-     * 同环比转换
+     * 同环比转换 这个可以用 map + join + filter 代替 所以可以不需要了。
      *
      * @param currDataSet   本期数据集
      * @param lastDataSet   上期数据集
      * @param primaryFields 主键列
      * @return DataSet
      */
+    @Deprecated
     public static DataSet compareTabulation(DataSet currDataSet,
                                             DataSet lastDataSet,
                                             List<Map.Entry<String, String>> primaryFields,
@@ -685,6 +686,7 @@ public abstract class DataSetOptUtil {
      * @param formulas 过滤条件
      * @return newDataset
      */
+    @Deprecated
     public static DataSet filterByOtherDataSet(DataSet mainDataSet, DataSet slaveDataSet,
                                                List<Map.Entry<String, String>> primaryFields, List<String> formulas) {
         if (mainDataSet == null || slaveDataSet == null) {
