@@ -112,31 +112,31 @@ public class CreateWorkFlowBizOperation implements BizOperation {
             }
             switch (columnName){
                 case "modelId":
-                    createFlowOptions.setModelId((String)value);
+                    createFlowOptions.setModelId(JSON.toJSONString(value));
                 case "flowVersion":
                     createFlowOptions.setFlowVersion(Long.valueOf(String.valueOf(value)));
                 case "parentNodeInstId":
-                    createFlowOptions.setParentNodeInstId((String)value);
+                    createFlowOptions.setParentNodeInstId(JSON.toJSONString(value));
                 case "parentFlowInstId":
-                    createFlowOptions.setParentFlowInstId((String)value);
+                    createFlowOptions.setParentFlowInstId(JSON.toJSONString(value));
                 case "flowGroupId":
-                    createFlowOptions.setFlowGroupId((String)value);
+                    createFlowOptions.setFlowGroupId(JSON.toJSONString(value));
                 case "timeLimitStr":
-                    createFlowOptions.setTimeLimitStr((String)value);
+                    createFlowOptions.setTimeLimitStr(JSON.toJSONString(value));
                 case "skipFirstNode":
                     createFlowOptions.setSkipFirstNode(Boolean.valueOf(String.valueOf(value)));
                 case "lockOptUser":
                     createFlowOptions.setLockOptUser(Boolean.valueOf(String.valueOf(value)));
                 case "workUserCode":
-                    createFlowOptions.setWorkUserCode((String)value);
+                    createFlowOptions.setWorkUserCode(JSON.toJSONString(value));
                 case "flowOrganizes":
-                    Map<String, List<String>> flowOrganizes = JSON.parseObject((String) value, Map.class);;
+                    Map<String, List<String>> flowOrganizes = JSON.parseObject(JSON.toJSONString(value), Map.class);
                     createFlowOptions.setFlowOrganizes(flowOrganizes);
                 case "nodeUnits":
-                    Map<String, String> nodeUnits = JSON.parseObject((String) value, Map.class);;
+                    Map<String, String> nodeUnits = JSON.parseObject(JSON.toJSONString(value), Map.class);;
                     createFlowOptions.setNodeUnits(nodeUnits);
                 case "nodeOptUsers":
-                    Map<String, Set<String>>  nodeOptUsers = JSON.parseObject((String) value, Map.class);;
+                    Map<String, Set<String>>  nodeOptUsers = JSON.parseObject(JSON.toJSONString(value), Map.class);;
                     createFlowOptions.setNodeOptUsers(nodeOptUsers);
                 default:
             }

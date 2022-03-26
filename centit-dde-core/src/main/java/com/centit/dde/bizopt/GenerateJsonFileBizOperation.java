@@ -24,7 +24,7 @@ public class GenerateJsonFileBizOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         String requestBody= (String)bizModel.getInterimVariable().get("requestBody");
-        String fileName=bizOptJson.getString("fileName");
+        String fileName=StringUtils.isNotBlank(bizOptJson.getString("fileName"))?bizOptJson.getString("fileName"):System.currentTimeMillis()+"";
         Object data;
         if (StringUtils.isNotBlank(requestBody)){
             data=requestBody;

@@ -30,6 +30,6 @@ public class TransactionCommitOperation implements BizOperation {
             SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
             AbstractSourceConnectThreadHolder.commit(sourceInfo);
         }
-        return BuiltInOperation.getResponseSuccessData(0);
+        return BuiltInOperation.getResponseSuccessData(databaseCodes.length);
     }
 }

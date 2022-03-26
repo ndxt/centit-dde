@@ -23,11 +23,14 @@ public class ExcelBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
-        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String excelExpression=BuiltInOperation.getJsonFieldString(bizOptJson,"excelexpression",null);
-        DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+        String id =bizOptJson.getString("id");
+        String source = bizOptJson.getString("source");
+        //文件流  还是  字段（保存文件的字段）
+        String sourceType = bizOptJson.getString("sourceType");
+        DataSet dataSet = bizModel.fetchDataSetByName(source);
         List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
+        //挂载文件的字段
+        String excelExpression=BuiltInOperation.getJsonFieldString(bizOptJson,"excelexpression",null);
         if (dataSet==null && requestFileInfo==null){
             return BuiltInOperation.getResponseData(0, 500,
                 bizOptJson.getString("SetsName")+"：读取EXCEL文件异常，请指定数据集或者指定对应的流信息！");
@@ -51,7 +54,7 @@ public class ExcelBizOperation implements BizOperation {
             SimpleDataSet  simpleDataSet= excelDataSet.load(null);
             objectList.add(simpleDataSet.getData());
         }
-        bizModel.putDataSet(targetDsName,new SimpleDataSet(objectList));
+        bizModel.putDataSet(id,new SimpleDataSet(objectList));
         return BuiltInOperation.getResponseSuccessData(objectList.size());
     }
 }
