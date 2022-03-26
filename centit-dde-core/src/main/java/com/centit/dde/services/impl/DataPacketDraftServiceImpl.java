@@ -1,13 +1,11 @@
 package com.centit.dde.services.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.dao.DataPacketDraftDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.po.DataPacketParam;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
-import com.centit.dde.utils.DBBatchUtils;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOptMethod;
@@ -26,7 +24,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author zhf

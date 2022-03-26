@@ -1,6 +1,5 @@
 package com.centit.dde.services.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
@@ -8,10 +7,7 @@ import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
-import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOptInfo;
-import com.centit.framework.system.po.OptInfo;
-import com.centit.framework.system.po.OptMethod;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
@@ -22,8 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author zc

@@ -1,7 +1,6 @@
 package com.centit.dde.core;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketInterface;
 
 import java.util.Map;

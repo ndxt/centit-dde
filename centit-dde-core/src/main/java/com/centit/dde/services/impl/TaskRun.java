@@ -15,7 +15,6 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import org.quartz.CronExpression;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

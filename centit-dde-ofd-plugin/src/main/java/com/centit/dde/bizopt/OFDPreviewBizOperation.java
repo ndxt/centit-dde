@@ -21,7 +21,6 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**

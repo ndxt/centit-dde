@@ -4,15 +4,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
-import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryAndParams;
 import com.centit.support.database.utils.QueryUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 

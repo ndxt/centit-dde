@@ -7,12 +7,10 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.TriggerUtils;
 import org.quartz.impl.triggers.CronTriggerImpl;
-import org.springframework.scheduling.support.CronSequenceGenerator;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
