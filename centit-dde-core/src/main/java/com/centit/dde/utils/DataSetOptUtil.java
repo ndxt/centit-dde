@@ -614,6 +614,8 @@ public abstract class DataSetOptUtil {
         int j = 0;
         List<Map<String, Object>> newData = new ArrayList<>();
 
+        final boolean leftJoin = ConstantValue.DATASET_JOIN_TYPE_LEFT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join);
+        final boolean rightJoin = ConstantValue.DATASET_JOIN_TYPE_RIGHT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join);
         while (i < mainData.size() && j < slaveData.size()) {
             int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields);
             Map<String, Object> newRow = new LinkedHashMap<>();
@@ -633,12 +635,12 @@ public abstract class DataSetOptUtil {
                     j++;
                 }
             } else if (nc < 0) {
-                if (ConstantValue.DATASET_JOIN_TYPE_LEFT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join)) {
+                if (leftJoin) {
                     newRow.putAll(mainData.get(i));
                 }
                 i++;
             } else {
-                if (ConstantValue.DATASET_JOIN_TYPE_RIGHT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join)) {
+                if (rightJoin) {
                     newRow.putAll(slaveData.get(j));
                 }
                 j++;
@@ -647,14 +649,14 @@ public abstract class DataSetOptUtil {
                 newData.add(newRow);
             }
         }
-        if (ConstantValue.DATASET_JOIN_TYPE_LEFT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join)) {
+        if (leftJoin) {
             while (i < mainData.size()) {
                 Map<String, Object> newRow = new LinkedHashMap<>(mainData.get(i));
                 newData.add(newRow);
                 i++;
             }
         }
-        if (ConstantValue.DATASET_JOIN_TYPE_RIGHT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join)) {
+        if (rightJoin) {
             while (j < slaveData.size()) {
                 Map<String, Object> newRow = new LinkedHashMap<>(slaveData.get(j));
                 newData.add(newRow);
