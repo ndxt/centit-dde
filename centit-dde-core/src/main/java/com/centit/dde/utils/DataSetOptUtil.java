@@ -14,6 +14,7 @@ import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.image.CaptchaImageUtil;
 import net.sourceforge.pinyin4j.PinyinHelper;
+import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,9 +22,7 @@ import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.StatUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 import java.util.function.Function;
 
@@ -998,6 +997,10 @@ public abstract class DataSetOptUtil {
                 }
             }
         }
+        if (data instanceof  Map){
+            Map<String, Object> mapFirstRow = dataSet.getFirstRow();
+            inputStreams.add((InputStream)mapFirstRow.get(ConstantValue.FILE_CONTENT));
+        }
         if (data instanceof InputStream) {
             inputStreams.add((InputStream) data);
         } else if (data instanceof byte[]) {
@@ -1006,7 +1009,6 @@ public abstract class DataSetOptUtil {
         return inputStreams;
     }
 
-    //获取request请求中的文件（流）
     public static List<InputStream> getRequestFileInfo(BizModel bizModel) throws IOException {
         List<InputStream> inputStreamList = null;
         Map<String, Object> modelTag = bizModel.getInterimVariable();

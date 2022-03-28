@@ -1,5 +1,6 @@
 package com.centit.dde.dataset;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSet;
@@ -34,10 +35,10 @@ public class ExcelDataSet extends FileDataSet {
         ExcelTypeEnum excelTypeEnum = ExcelTypeEnum.checkFileExcelType(inputStreamList.get(0));
         switch (excelTypeEnum) {
             case HSSF:
-                dataSet.setData(excelStreamToArray(inputStreamList.get(1), ExcelTypeEnum.HSSF));
+                dataSet.setData(excelStreamToArray(inputStreamList.get(1), ExcelTypeEnum.HSSF,params));
                 break;
             case XSSF:
-                dataSet.setData(excelStreamToArray(inputStreamList.get(1), ExcelTypeEnum.XSSF));
+                dataSet.setData(excelStreamToArray(inputStreamList.get(1), ExcelTypeEnum.XSSF,params));
                 break;
             default:
                 dataSet.setData(null);
@@ -87,51 +88,99 @@ public class ExcelDataSet extends FileDataSet {
         }
     }
 
-    private static JSONArray excelStreamToArray(InputStream inputStream, ExcelTypeEnum excelType) throws Exception {
+    private static JSONArray excelStreamToArray(InputStream inputStream, ExcelTypeEnum excelType,Map<String, Object> params) throws Exception {
+        JSONObject parseObject = JSON.parseObject(JSON.toJSONString(params));
+        String sheetName = parseObject.getString("sheetName");
+        int headerRow = parseObject.getInteger("headerRow");
+        int beginRow = parseObject.getInteger("beginRow");
+        int endNumber = parseObject.getInteger("endRow");
+        int startColumnNumber =parseObject.getInteger("startColumnNumber");
+        int endColumnNumber =parseObject.getInteger("endColumnNumber");
         Workbook work = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(inputStream) : new XSSFWorkbook(inputStream);
         if (null == work) {
             throw new Exception("创建Excel工作薄为空！");
         }
+        JSONArray sheetData = new JSONArray();
         Sheet sheet;
         Row row;
-        JSONArray jsonArray = new JSONArray();
-        // 遍历Excel中所有的sheet
-        for (int i = 0; i < work.getNumberOfSheets(); i++) {
-            sheet = work.getSheetAt(i);
-            if (sheet == null) {
-                continue;
+        if (StringUtils.isNotBlank(sheetName)){
+            sheet = work.getSheet(sheetName);
+            if(sheet==null){
+                return null;
             }
-            // 取第一行标题
-            row = sheet.getRow(0);
-            Object title[];
-            if (row != null) {
-                title = new String[row.getLastCellNum()];
-                for (int y = row.getFirstCellNum(); y < row.getLastCellNum(); y++) {
-                    Object cellValue = getCellValue(row.getCell(y));
-                    title[y] = cellValue;
-                }
-            } else {
-                continue;
+            row = sheet.getRow(headerRow);
+            if (row==null){
+                return null;
             }
-            // 遍历当前sheet中的所有行
-            for (int j = 1; j < sheet.getLastRowNum() + 1; j++) {
-                row = sheet.getRow(j);
-                JSONObject jsonObject = new JSONObject();
-                // 遍历所有的列
-                for (int y = row.getFirstCellNum(); y < row.getLastCellNum(); y++) {
-                    Object cellValue = getCellValue(row.getCell(y));
-                    Object key = title[y];
-                    if("".equals(cellValue) && "".equals(key)){
-                        continue;
-                    };
-                    jsonObject.put((String) key, cellValue);
+            Object[] header = getHeader(row, startColumnNumber, endColumnNumber);
+            sheetData = getSheetData(sheet, header,
+                beginRow==0?headerRow+1:beginRow,
+                endNumber==0?sheet.getLastRowNum():endNumber,
+                startColumnNumber==0?row.getFirstCellNum():startColumnNumber,
+                endColumnNumber==0?row.getLastCellNum():endColumnNumber
+            );
+        }else {
+            // 遍历Excel中所有的sheet
+            for (int i = 0; i < work.getNumberOfSheets(); i++) {
+                sheet = work.getSheetAt(i);
+                if (sheet == null) {
+                    continue;
                 }
-                jsonArray.add(jsonObject);
+                // 取第一行标题
+                row = sheet.getRow(0);
+                Object title[];
+                if (row != null) {
+                    title = getHeader(row,0, 0);
+                } else {
+                    continue;
+                }
+                sheetData = getSheetData(sheet, title, 1, sheet.getLastRowNum(), row.getFirstCellNum(), row.getLastCellNum());
+            }
+            work.close();
+        }
+        return sheetData;
+    }
+
+    private static  Object[] getHeader(Row row, int startColumnNumber, int endColumnNumber){
+        Object title[];
+        if (endColumnNumber > startColumnNumber){//指定了从第几列到第几列
+            title = new String[endColumnNumber - startColumnNumber];
+            for (int y = startColumnNumber; y < endColumnNumber; y++) {
+                Object cellValue = getCellValue(row.getCell(y));
+                title[y] = cellValue;
+            }
+        }else {//所有列
+            title = new String[row.getLastCellNum()];
+            for (int y = row.getFirstCellNum(); y < row.getLastCellNum(); y++) {
+                Object cellValue = getCellValue(row.getCell(y));
+                title[y] = cellValue;
             }
         }
-        work.close();
+        return title;
+    }
+
+    private static JSONArray getSheetData(Sheet sheet,Object[] title ,int beginRow,int endRow,int startColumnNumber, int endColumnNumber){
+        JSONArray jsonArray = new JSONArray();
+        // 遍历当前sheet中的所有行
+        for (int j = beginRow; j < endRow + 1; j++) {
+            Row row = sheet.getRow(j);
+            JSONObject jsonObject = new JSONObject();
+            // 遍历所有的列
+            for (int y = startColumnNumber; y < endColumnNumber; y++) {
+                Object cellValue = getCellValue(row.getCell(y));
+                Object key = title[y];
+                if("".equals(cellValue) && "".equals(key)){
+                    continue;
+                };
+                jsonObject.put((String) key, cellValue);
+            }
+            jsonArray.add(jsonObject);
+        }
         return jsonArray;
     }
+
+
+
 
     /**
      * 将集合生成Excel文件
