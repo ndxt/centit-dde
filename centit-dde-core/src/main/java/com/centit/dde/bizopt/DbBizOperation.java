@@ -25,7 +25,7 @@ public class DbBizOperation implements BizOperation {
 
     private DataScopePowerManager queryDataScopeFilter;
 
-    public DbBizOperation(SourceInfoDao sourceInfoDao,DataScopePowerManager queryDataScopeFilter) {
+    public DbBizOperation(SourceInfoDao sourceInfoDao, DataScopePowerManager queryDataScopeFilter) {
         this.sourceInfoDao = sourceInfoDao;
         this.queryDataScopeFilter = queryDataScopeFilter;
     }
@@ -34,14 +34,16 @@ public class DbBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", "");
+        String condition = BuiltInOperation.getJsonFieldString(bizOptJson, "condition", "false");
+        String conditionSet = BuiltInOperation.getJsonFieldString(bizOptJson, "conditionSet", "");
         String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
         Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
-        String optId=(String) bizModel.getInterimVariable().get("metadata_optId");
+        String optId = (String) bizModel.getInterimVariable().get("metadata_optId");
         Map<String, Object> mapObject = new HashMap<>();
         if (mapString != null) {
             for (Map.Entry<String, String> map : mapString.entrySet()) {
                 if (!StringBaseOpt.isNvl(map.getValue())) {
-                    mapObject.put(map.getKey(),  VariableFormula.calculate(map.getValue(),new BizModelJSONTransform(bizModel)));
+                    mapObject.put(map.getKey(), VariableFormula.calculate(map.getValue(), new BizModelJSONTransform(bizModel)));
                 }
             }
         }
@@ -55,6 +57,9 @@ public class DbBizOperation implements BizOperation {
         sqlDsr.setSqlSen(sql);
         sqlDsr.setQueryDataScopeFilter(queryDataScopeFilter);
         sqlDsr.setOptId(optId);
+        if ("true".equals(condition) && !StringBaseOpt.isNvl(conditionSet) && bizModel.getDataSet(conditionSet) != null) {
+            sqlDsr.setExtendFilters(bizModel.getDataSet(conditionSet).getDataAsList().get(0));
+        }
         SimpleDataSet dataSet = sqlDsr.load(mapObject);
         bizModel.putDataSet(sourDsName, dataSet);
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());

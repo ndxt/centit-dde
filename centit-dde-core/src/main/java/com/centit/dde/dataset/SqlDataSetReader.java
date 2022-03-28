@@ -9,6 +9,7 @@ import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.product.adapter.api.ISourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
+import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
@@ -37,6 +38,7 @@ public class SqlDataSetReader implements DataSetReader {
     private String sqlSen;
 
     private String optId;
+    private Map<String, Object> extendFilters;
 
     private DataScopePowerManager queryDataScopeFilter;
 
@@ -48,14 +50,16 @@ public class SqlDataSetReader implements DataSetReader {
      */
     @Override
     public SimpleDataSet load(final Map<String, Object> params) throws Exception {
+        buildExtendsSql();
+        params.putAll(extendFilters);
         Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(databaseInfo);
         HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
         QueryAndNamedParams qap = QueryUtils.translateQuery(sqlSen, params);
-        if(request!=null) {
+        if (request != null) {
             String topUnit = WebOptUtils.getCurrentTopUnit(request);
-            String userCode=WebOptUtils.getCurrentUserCode(request);
-            if(StringUtils.isNotBlank(userCode)) {
-                List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,userCode , optId, "api");
+            String userCode = WebOptUtils.getCurrentUserCode(request);
+            if (StringUtils.isNotBlank(userCode)) {
+                List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, userCode, optId, "api");
                 if (filters != null) {
                     DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
                         WebOptUtils.getCurrentUserInfo(request), topUnit, WebOptUtils.getCurrentUnitCode(request));
@@ -69,10 +73,17 @@ public class SqlDataSetReader implements DataSetReader {
             paramsMap.putAll(params);
         }
         paramsMap.putAll(qap.getParams());
-        JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn,qap.getQuery(), paramsMap);
+        JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, qap.getQuery(), paramsMap);
         SimpleDataSet dataSet = new SimpleDataSet();
         dataSet.setData(jsonArray);
         return dataSet;
+    }
+
+    private void buildExtendsSql() {
+        if (extendFilters != null) {
+            String extendSql = " and " + GeneralJsonObjectDao.buildFilterSql(null, null, extendFilters.keySet());
+            sqlSen = sqlSen.replaceAll("\\{condition\\}", extendSql);
+        }
     }
 
     public void setDataSource(ISourceInfo databaseInfo) {
@@ -89,5 +100,13 @@ public class SqlDataSetReader implements DataSetReader {
 
     public void setOptId(String optId) {
         this.optId = optId;
+    }
+
+    public Map<String, Object> getExtendFilters() {
+        return extendFilters;
+    }
+
+    public void setExtendFilters(Map<String, Object> extendFilters) {
+        this.extendFilters = extendFilters;
     }
 }
