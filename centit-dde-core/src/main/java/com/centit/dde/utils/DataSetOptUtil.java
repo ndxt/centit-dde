@@ -613,45 +613,28 @@ public abstract class DataSetOptUtil {
         int i = 0;
         int j = 0;
         List<Map<String, Object>> newData = new ArrayList<>();
-        int nInsertMain = -1;
-        int nInsertSlave = -1;
+
         while (i < mainData.size() && j < slaveData.size()) {
             int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields);
             Map<String, Object> newRow = new LinkedHashMap<>();
             if (nc == 0) {
                 newRow.putAll(slaveData.get(j));
                 newRow.putAll(mainData.get(i));
-                nInsertMain = i;
-                nInsertSlave = j;
-                boolean incMain = i < mainData.size() - 1 && compareTwoRowWithMap(mainData.get(i), mainData.get(i + 1), primaryFields) != 0;
-                boolean incSlave = j < slaveData.size() - 1 && compareTwoRowWithMap(slaveData.get(j), slaveData.get(j + 1), primaryFields) != 0;
+                /** 这边如果需要实现 数据库jion 的 笛卡尔积，需要遍列所有相同的key
+                 *  boolean incMain = i < mainData.size() - 1 && compareTwoRow(mainData.get(i), mainData.get(i + 1), mainFields) != 0;
+                 *  boolean incSlave = j < slaveData.size() - 1 && compareTwoRow(slaveData.get(j), slaveData.get(j + 1), slaveFields) != 0;
+                 **/
+                i++;
+                j++;
 
-                boolean inc = (incMain && incSlave) || (!incMain && !incSlave);
-                if (inc) {
-                    i++;
-                    j++;
-                } else {
-                    if (!incMain && i < mainData.size()) {
-                        i++;
-                    }
-                    if (!incSlave && j < slaveData.size()) {
-                        j++;
-                    }
-                }
             } else if (nc < 0) {
-                if (nInsertMain < i) {
-                    if (ConstantValue.DATASET_JOIN_TYPE_LEFT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join)) {
-                        newRow.putAll(mainData.get(i));
-                    }
-                    nInsertMain = i;
+                if (ConstantValue.DATASET_JOIN_TYPE_LEFT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join)) {
+                    newRow.putAll(mainData.get(i));
                 }
                 i++;
             } else {
-                if (nInsertSlave < j) {
-                    if (ConstantValue.DATASET_JOIN_TYPE_RIGHT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join)) {
-                        newRow.putAll(slaveData.get(j));
-                    }
-                    nInsertSlave = j;
+                if (ConstantValue.DATASET_JOIN_TYPE_RIGHT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join)) {
+                    newRow.putAll(slaveData.get(j));
                 }
                 j++;
             }
