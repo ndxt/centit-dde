@@ -620,13 +620,17 @@ public abstract class DataSetOptUtil {
             if (nc == 0) {
                 newRow.putAll(slaveData.get(j));
                 newRow.putAll(mainData.get(i));
-                /** 这边如果需要实现 数据库jion 的 笛卡尔积，需要遍列所有相同的key
-                 *  boolean incMain = i < mainData.size() - 1 && compareTwoRow(mainData.get(i), mainData.get(i + 1), mainFields) != 0;
-                 *  boolean incSlave = j < slaveData.size() - 1 && compareTwoRow(slaveData.get(j), slaveData.get(j + 1), slaveFields) != 0;
-                 **/
-                i++;
-                j++;
-
+                /** 这边如果需要实现 数据库jion 的 笛卡尔积，需要遍列所有相同的key ， 只确保每一条数据都有对应上*/
+                boolean equalNextMain = i < mainData.size() - 1 && compareTwoRow(mainData.get(i), mainData.get(i + 1), mainFields) == 0;
+                boolean equalNextSlave = j < slaveData.size() - 1 && compareTwoRow(slaveData.get(j), slaveData.get(j + 1), slaveFields) == 0;
+                if(equalNextMain && !equalNextSlave){
+                    i++;
+                } else if(!equalNextMain && equalNextSlave){
+                    j++;
+                } else {
+                    i++;
+                    j++;
+                }
             } else if (nc < 0) {
                 if (ConstantValue.DATASET_JOIN_TYPE_LEFT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join)) {
                     newRow.putAll(mainData.get(i));
