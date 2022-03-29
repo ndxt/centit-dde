@@ -8,12 +8,14 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.json.JSONTransformer;
 import com.centit.support.report.ExcelExportUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -40,6 +42,7 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
         String id = bizOptJson.getString("id");
         String source = bizOptJson.getString("source");
         String fileName=StringUtils.isNotBlank(bizOptJson.getString("fileName"))?bizOptJson.getString("fileName"):System.currentTimeMillis()+"";
+        fileName= (String) JSONTransformer.transformer(fileName, new BizModelJSONTransform(bizModel));
         //模板文件id
         String templateFileId =bizOptJson.getString("templateFileId");
         DataSet dataSet = bizModel.fetchDataSetByName(source);

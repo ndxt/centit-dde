@@ -5,9 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -25,6 +27,7 @@ public class GenerateJsonFileBizOperation implements BizOperation {
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         String requestBody= (String)bizModel.getInterimVariable().get("requestBody");
         String fileName=StringUtils.isNotBlank(bizOptJson.getString("fileName"))?bizOptJson.getString("fileName"):System.currentTimeMillis()+"";
+        fileName= (String) JSONTransformer.transformer(fileName, new BizModelJSONTransform(bizModel));
         Object data;
         if (StringUtils.isNotBlank(requestBody)){
             data=requestBody;
