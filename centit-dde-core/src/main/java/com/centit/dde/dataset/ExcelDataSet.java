@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.common.LeftRightPair;
 import com.centit.support.report.ExcelExportUtil;
 import com.centit.support.report.ExcelImportUtil;
 import com.centit.support.report.ExcelTypeEnum;
@@ -30,14 +31,13 @@ public class ExcelDataSet extends FileDataSet {
     public SimpleDataSet load(Map<String, Object> params) throws Exception {
         SimpleDataSet dataSet = new SimpleDataSet();
         //直接执行ExcelTypeEnum.checkFileExcelType(inputStream) 会导致流损坏，创建Workbook时报错，目前只能通过复制流对象来解决
-        List<InputStream> inputStreamList = cloneInputStream(inputStream);
-        ExcelTypeEnum excelTypeEnum = ExcelTypeEnum.checkFileExcelType(inputStreamList.get(0));
-        switch (excelTypeEnum) {
+        LeftRightPair<ExcelTypeEnum, InputStream> excel = ExcelImportUtil.checkExcelInputStreamType(inputStream);
+        switch (excel.getLeft()) {
             case HSSF:
-                dataSet.setData(excelStreamToArray(inputStreamList.get(1), ExcelTypeEnum.HSSF));
+                dataSet.setData(excelStreamToArray(excel.getRight(), ExcelTypeEnum.HSSF));
                 break;
             case XSSF:
-                dataSet.setData(excelStreamToArray(inputStreamList.get(1), ExcelTypeEnum.XSSF));
+                dataSet.setData(excelStreamToArray(excel.getRight(), ExcelTypeEnum.XSSF));
                 break;
             default:
                 dataSet.setData(null);
@@ -118,7 +118,7 @@ public class ExcelDataSet extends FileDataSet {
                 row = sheet.getRow(j);
                 JSONObject jsonObject = new JSONObject();
                 // 遍历所有的列
-                for (int y = row.getFirstCellNum(); y < row.getLastCellNum(); y++) {
+                for (int y = row.getFirstCellNum(); y < row.getLastCellNum() && y < title.length ; y++) {
                     Object cellValue = getCellValue(row.getCell(y));
                     Object key = title[y];
                     if("".equals(cellValue) && "".equals(key)){
@@ -209,29 +209,7 @@ public class ExcelDataSet extends FileDataSet {
         }
     }
 
-    private static List<InputStream> cloneInputStream(InputStream input) {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = input.read(buffer)) > -1) {
-                baos.write(buffer, 0, len);
-            }
-            baos.flush();
-            List<InputStream> inputStreamList = new ArrayList<>();
-            ByteArrayInputStream byteArrayInputStreamOne = new ByteArrayInputStream(baos.toByteArray());
-            ByteArrayInputStream byteArrayInputStreamTwo = new ByteArrayInputStream(baos.toByteArray());
-            inputStreamList.add(byteArrayInputStreamOne);
-            inputStreamList.add(byteArrayInputStreamTwo);
-            return inputStreamList;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
-    }
-
-
-    /**
+     /**
      * 描述：对表格中数值进行格式化
      *
      * @param cell
