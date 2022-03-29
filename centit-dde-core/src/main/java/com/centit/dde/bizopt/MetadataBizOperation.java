@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.dao.DataPowerFilter;
@@ -15,6 +16,8 @@ import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.product.adapter.po.MetaTable;
 import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaObjectService;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.compiler.VariableFormula;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.database.utils.QueryAndNamedParams;
 
@@ -44,6 +47,7 @@ public class MetadataBizOperation implements BizOperation {
         String id = bizOptJson.getString("id");
         String source = bizOptJson.getString("source");//数据集
         String tableId = bizOptJson.getString("tableLabelName");
+        Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
         Integer withChildrenDeep = bizOptJson.getInteger("withChildrenDeep");
         String optId=(String) bizModel.getInterimVariable().get("metadata_optId");
         SimpleDataSet dataSet = bizModel.getDataSet(source)==null?new SimpleDataSet():(SimpleDataSet)bizModel.getDataSet(source);//数据集参数
@@ -52,6 +56,14 @@ public class MetadataBizOperation implements BizOperation {
             dataSet = new SimpleDataSet(bizModel.getModelTag());
         }
         Map<String, Object> parames = dataSet.getDataAsList().size()>0?dataSet.getDataAsList().get(0):new HashMap<>();
+        if (mapString != null) {
+            for (Map.Entry<String, String> map : mapString.entrySet()) {
+                if (!StringBaseOpt.isNvl(map.getValue())) {
+                    parames.put(map.getKey(),  VariableFormula.calculate(map.getValue(),new BizModelJSONTransform(bizModel)));
+                }
+            }
+        }
+        parames.putAll(bizModel.getModelTag());
         switch (templateType){
             case 1://新建
                 metaObjectService.saveObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
