@@ -887,7 +887,7 @@ public abstract class DataSetOptUtil {
                     char c2 = ((String) data2.get(dataField)).charAt(0);
                     cr =concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c1)).compareTo(concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c2)));
                 }else {
-                    cr = GeneralAlgorithm.compareTwoObject(data1.get(dataField), data2.get(dataField));
+                    cr = GeneralAlgorithm.compareTwoObject(data1.get(dataField), data2.get(dataField),false);
                 }
                 if (cr != 0) {
                     return 0 - cr;
