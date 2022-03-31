@@ -6,11 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.core.SimpleDataSet;
-import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
-import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -24,10 +21,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GenerateExcelFileBizeOperation implements BizOperation {
 
@@ -47,7 +41,8 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
         String templateFileId =bizOptJson.getString("templateFileId");
         DataSet dataSet = bizModel.fetchDataSetByName(source);
         String requestBody= (String)bizModel.getInterimVariable().get("requestBody");
-        if (StringUtils.isNotBlank(templateFileId)){//根据模板生成
+        //根据模板生成
+        if (StringUtils.isNotBlank(templateFileId)){
             //从第几行开始插入
             Integer beginRow =bizOptJson.getInteger("beginRow")==null?0:bizOptJson.getInteger("beginRow");
             //指定写入第几个sheet中
@@ -74,18 +69,17 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
         }
         //获取表达式信息
         Map<String, String> mapInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
-        if (mapInfo != null && mapInfo.size() > 0) {
-            if (dataSet != null) {
-                dataSet = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
-            }
-        }else if (StringUtils.isNotBlank(requestBody)){
-            dataSet= new SimpleDataSet(requestBody);
-        }
         if (dataSet==null){
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：生成EXCEL文件异常，请指定数据集！");
         }
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
-        InputStream inputStream = ExcelDataSet.writeExcel(dataAsList,mapInfo,fileName);
+        List<String> headers = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+        mapInfo.keySet().stream().forEach(header->headers.add(header));
+        mapInfo.values().stream().forEach(value->values.add(value));
+        String[] titles = headers.toArray(new String[mapInfo.size()]);
+        String[] fields = values.toArray(new String[mapInfo.size()]);
+        InputStream inputStream = ExcelExportUtil.generateExcelStream(dataAsList, titles, fields);
         DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName",fileName.endsWith(".xlsx")?fileName:fileName+".xlsx",
             "fileSize", inputStream.available(), "fileContent",inputStream));
         bizModel.putDataSet(id,objectToDataSet);

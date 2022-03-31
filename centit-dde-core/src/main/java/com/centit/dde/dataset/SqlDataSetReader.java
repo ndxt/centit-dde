@@ -51,7 +51,9 @@ public class SqlDataSetReader implements DataSetReader {
     @Override
     public SimpleDataSet load(final Map<String, Object> params) throws Exception {
         buildExtendsSql();
-        params.putAll(extendFilters);
+        if (extendFilters!=null){
+            params.putAll(extendFilters);
+        }
         Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(databaseInfo);
         HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
         QueryAndNamedParams qap = QueryUtils.translateQuery(sqlSen, params);

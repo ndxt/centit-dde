@@ -177,7 +177,7 @@ public class BuiltInOperation {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
         List<String> groupFields = jsonArrayToList(bizOptJson.getJSONArray("exconfig"), "columnName", "index", "");
-        Map<String, String> stat = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "sourcefd", "nodeInstId");
+        Map<String, String> stat = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName", "nodeInstId");
         int count = 0;
         if (stat != null) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);

@@ -1,6 +1,6 @@
 package com.centit.dde.dataset;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
@@ -10,14 +10,13 @@ import com.centit.support.report.ExcelExportUtil;
 import com.centit.support.report.ExcelImportUtil;
 import com.centit.support.report.ExcelTypeEnum;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.*;
 
-import java.io.*;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class ExcelDataSet extends FileDataSet {
 
@@ -34,10 +33,10 @@ public class ExcelDataSet extends FileDataSet {
         LeftRightPair<ExcelTypeEnum, InputStream> excel = ExcelImportUtil.checkExcelInputStreamType(inputStream);
         switch (excel.getLeft()) {
             case HSSF:
-                dataSet.setData(excelStreamToArray(excel.getRight(), ExcelTypeEnum.HSSF));
+                dataSet.setData(excelStreamToArray(excel.getRight(),params));
                 break;
             case XSSF:
-                dataSet.setData(excelStreamToArray(excel.getRight(), ExcelTypeEnum.XSSF));
+                dataSet.setData(excelStreamToArray(excel.getRight(),params));
                 break;
             default:
                 dataSet.setData(null);
@@ -87,165 +86,16 @@ public class ExcelDataSet extends FileDataSet {
         }
     }
 
-    private static JSONArray excelStreamToArray(InputStream inputStream, ExcelTypeEnum excelType) throws Exception {
-        Workbook work = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(inputStream) : new XSSFWorkbook(inputStream);
-        if (null == work) {
-            throw new Exception("创建Excel工作薄为空！");
-        }
-        Sheet sheet;
-        Row row;
-        JSONArray jsonArray = new JSONArray();
-        // 遍历Excel中所有的sheet
-        for (int i = 0; i < work.getNumberOfSheets(); i++) {
-            sheet = work.getSheetAt(i);
-            if (sheet == null) {
-                continue;
-            }
-            // 取第一行标题
-            row = sheet.getRow(0);
-            Object title[];
-            if (row != null) {
-                title = new String[row.getLastCellNum()];
-                for (int y = row.getFirstCellNum(); y < row.getLastCellNum(); y++) {
-                    Object cellValue = getCellValue(row.getCell(y));
-                    title[y] = cellValue;
-                }
-            } else {
-                continue;
-            }
-            // 遍历当前sheet中的所有行
-            for (int j = 1; j < sheet.getLastRowNum() + 1; j++) {
-                row = sheet.getRow(j);
-                JSONObject jsonObject = new JSONObject();
-                // 遍历所有的列
-                for (int y = row.getFirstCellNum(); y < row.getLastCellNum() && y < title.length ; y++) {
-                    Object cellValue = getCellValue(row.getCell(y));
-                    Object key = title[y];
-                    if("".equals(cellValue) && "".equals(key)){
-                        continue;
-                    };
-                    jsonObject.put((String) key, cellValue);
-                }
-                jsonArray.add(jsonObject);
-            }
-        }
-        work.close();
-        return jsonArray;
+    private static List<Map<String, Object>> excelStreamToArray(InputStream inputStream,Map<String, Object> params) throws Exception {
+        JSONObject parseObject = JSON.parseObject(JSON.toJSONString(params));
+        String sheetName = parseObject.getString("sheetName");
+        int headerRow = parseObject.getInteger("headerRow");
+        int beginRow = parseObject.getInteger("beginRow");
+        int endRow = parseObject.getInteger("endRow");
+        int beginColumn=parseObject.getInteger("startColumnNumber");
+        int endColumn =parseObject.getInteger("endColumnNumber");
+        return StringUtils.isNotBlank(sheetName)?
+            ExcelImportUtil.loadMapFromExcelSheet(inputStream,sheetName,headerRow,beginRow,endRow,beginColumn,endColumn):
+            ExcelImportUtil.loadMapFromExcelSheet(inputStream,0,headerRow,beginRow,endRow,beginColumn,endColumn);
     }
-
-    /**
-     * 将集合生成Excel文件
-     *
-     * @param objectList 数据
-     * @return
-     * @throws IOException
-     */
-    public static InputStream writeExcel(List<Map<String, Object>> objectList, Map<String, String> mapInfo,String fileName) throws IOException {
-        //获取数据源的 key, 用于获取列数及设置标题
-        //Map<String, Object> map = objectList.get(0);
-        Set<String> stringSet = mapInfo.keySet();
-        ArrayList<String> headList = new ArrayList<>(stringSet);
-        //定义一个新的工作簿
-        XSSFWorkbook wb = new XSSFWorkbook();
-        //创建一个Sheet页
-        XSSFSheet sheet = wb.createSheet(StringUtils.isNotBlank(fileName)?fileName:System.currentTimeMillis() + "");
-        //设置行高
-        //sheet.setDefaultRowHeight((short) (2 * 200));
-        //为有数据的每列设置列宽
-        //for (int i = 0; i < headList.size(); i++) {
-        // sheet.setColumnWidth(i, 8000);
-        //}
-        //设置单元格字体样式
-        CellStyle cellStyle = wb.createCellStyle();
-        // 指定单元格居中对齐
-        cellStyle.setAlignment(HorizontalAlignment.CENTER);
-        // 指定单元格垂直居中对齐
-        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-//        cellStyle.setWrapText(true);// 指定单元格自动换行
-        // 设置单元格字体
-        Font font = wb.createFont();
-//        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-        font.setFontName("宋体");
-//        font.setFontHeight((short) 300);
-        cellStyle.setFont(font);
-
-        //在sheet里创建第一行，并设置单元格内容为 title (标题)
-        /*XSSFRow titleRow = sheet.createRow(0);
-        XSSFCell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("Excel");
-        //合并单元格CellRangeAddress构造参数依次表示起始行，截至行，起始列， 截至列
-        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, headList.size()));
-        // 创建单元格文字居中样式并设置标题单元格居中
-        XSSFCellStyle cellStyle = wb.createCellStyle();
-        cellStyle.setAlignment(HorizontalAlignment.CENTER);
-        titleCell.setCellStyle(cellStyle);*/
-        //获得表格第二行
-        XSSFRow row = sheet.createRow(0);
-        //根据数据源信息给第二行每一列设置标题
-        for (int i = 0; i < headList.size(); i++) {
-            XSSFCell cell = row.createCell(i);
-            cell.setCellValue(headList.get(i));
-            cell.setCellStyle(cellStyle);
-        }
-        XSSFRow rows;
-        XSSFCell cells;
-        //循环拿到的数据给所有行每一列设置对应的值
-        for (int i = 0; i < objectList.size(); i++) {
-            //在这个sheet页里创建一行
-            rows = sheet.createRow(i + 1);
-            //给该行数据赋值
-            for (int j = 0; j < headList.size(); j++) {
-                String value = objectList.get(i).get(headList.get(j)) == null ? "" : objectList.get(i).get(headList.get(j)).toString();
-                cells = rows.createCell(j);
-                cells.setCellValue(value);
-                cells.setCellStyle(cellStyle);
-            }
-        }
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            wb.write(byteArrayOutputStream);
-            return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-        } finally {
-            wb.close();
-        }
-    }
-
-     /**
-     * 描述：对表格中数值进行格式化
-     *
-     * @param cell
-     * @return
-     */
-    public static Object getCellValue(Cell cell) {
-        if (cell ==null){
-            return "";
-        }
-        Object value = null;
-        DecimalFormat df = new DecimalFormat("0");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
-        DecimalFormat df2 = new DecimalFormat("0");
-        switch (cell.getCellType()) {
-            case STRING:
-                value = cell.getRichStringCellValue().getString();
-                break;
-            case NUMERIC:
-                if ("General".equals(cell.getCellStyle().getDataFormatString())) {
-                    value = df.format(cell.getNumericCellValue());
-                } else if ("m/d/yy".equals(cell.getCellStyle().getDataFormatString())) {
-                    value = sdf.format(cell.getDateCellValue());
-                } else {
-                    value = df2.format(cell.getNumericCellValue());
-                }
-                break;
-            case BOOLEAN:
-                value = cell.getBooleanCellValue();
-                break;
-            case BLANK:
-                value = "";
-                break;
-            default:
-                break;
-        }
-        return value;
-    }
-
 }
