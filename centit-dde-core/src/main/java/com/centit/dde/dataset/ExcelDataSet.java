@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.common.LeftRightPair;
 import com.centit.support.report.ExcelExportUtil;
 import com.centit.support.report.ExcelImportUtil;
 import com.centit.support.report.ExcelTypeEnum;
@@ -28,20 +27,7 @@ public class ExcelDataSet extends FileDataSet {
 
     @Override
     public SimpleDataSet load(Map<String, Object> params) throws Exception {
-        SimpleDataSet dataSet = new SimpleDataSet();
-        //直接执行ExcelTypeEnum.checkFileExcelType(inputStream) 会导致流损坏，创建Workbook时报错，目前只能通过复制流对象来解决
-        LeftRightPair<ExcelTypeEnum, InputStream> excel = ExcelImportUtil.checkExcelInputStreamType(inputStream);
-        switch (excel.getLeft()) {
-            case HSSF:
-                dataSet.setData(excelStreamToArray(excel.getRight(),params));
-                break;
-            case XSSF:
-                dataSet.setData(excelStreamToArray(excel.getRight(),params));
-                break;
-            default:
-                dataSet.setData(null);
-        }
-        return dataSet;
+        return new SimpleDataSet(excelStreamToArray(inputStream,params));
     }
 
     /**
