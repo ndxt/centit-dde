@@ -13,8 +13,6 @@ import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.image.CaptchaImageUtil;
-import net.sourceforge.pinyin4j.PinyinHelper;
-import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +20,9 @@ import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.StatUtils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
 
@@ -31,6 +31,7 @@ import java.util.function.Function;
  */
 public abstract class DataSetOptUtil {
 
+    private static final boolean SORT_NULL_AS_FIRST = false;
     private static Map<String, Function<Object[], Object>> extendFuncs = null;
     //扩展函数表达式
     public static  Map<String, Function<Object[], Object>> makeExtendFuns(){
@@ -218,7 +219,11 @@ public abstract class DataSetOptUtil {
      * @param fields 排序字段
      */
     public static void sortDataSetByFields(DataSet inData, List<String> fields) {
-        sortByFields(inData.getDataAsList(), fields);
+        sortDataSetByFields(inData, fields, SORT_NULL_AS_FIRST);
+    }
+
+    public static void sortDataSetByFields(DataSet inData, List<String> fields, boolean nullAsFirst ) {
+        sortByFields(inData.getDataAsList(), fields, nullAsFirst);
     }
 
     private static double[] listDoubleToArray(List<Double> dblist) {
@@ -334,7 +339,7 @@ public abstract class DataSetOptUtil {
         }
         //按group by字段排序
         if (groupByFields != null && groupByFields.size() > 0) {
-            sortByFields(data, groupByFields);
+            sortByFields(data, groupByFields, false);
         }
 
         List<Map<String, Object>> newData = new ArrayList<>();
@@ -346,7 +351,7 @@ public abstract class DataSetOptUtil {
         }
 
         for (Map<String, Object> row : data) {
-            if (0 != compareTwoRow(preRow, row, groupByFields)) {
+            if (0 != compareTwoRow(preRow, row, groupByFields, SORT_NULL_AS_FIRST)) {
                 if (preRow != null) {
                     //保存newRow
                     Map<String, Object> newRow = makeNewStatRow(groupByFields, statDesc, preRow, tempData);
@@ -416,7 +421,7 @@ public abstract class DataSetOptUtil {
         List<Map<String, Object>> data = inData.getDataAsList();
         List<String> keyRows = ListUtils.union(groupByFields, orderByFields);
         //根据维度进行排序 行头、列头
-        sortByFields(data, keyRows);
+        sortByFields(data, keyRows, SORT_NULL_AS_FIRST);
         Map<String, Object> preRow = null;
         int n = data.size();
         int prePos = 0;
@@ -424,7 +429,7 @@ public abstract class DataSetOptUtil {
         List<Map<String, Object>> newData = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             Map<String, Object> row = data.get(i);
-            if (compareTwoRow(preRow, row, groupByFields) == 0) {
+            if (compareTwoRow(preRow, row, groupByFields, SORT_NULL_AS_FIRST) == 0) {
                 if (preRow != null) {
                     analyseDatasetGroup(newData, data, prePos, i, dvt, refDesc);
                 }
@@ -456,7 +461,7 @@ public abstract class DataSetOptUtil {
         }
         List<String> keyRows = ListUtils.union(rowHeaderFields, colHeaderFields);
         //根据维度进行排序 行头、列头
-        sortByFields(data, keyRows);
+        sortByFields(data, keyRows, SORT_NULL_AS_FIRST);
         List<Map<String, Object>> newData = new ArrayList<>();
         Map<String, Object> preRow = null;
         Map<String, Object> newRow = null;
@@ -464,7 +469,7 @@ public abstract class DataSetOptUtil {
             if (row == null) {
                 continue;
             }
-            if (compareTwoRow(preRow, row, rowHeaderFields) != 0) {
+            if (compareTwoRow(preRow, row, rowHeaderFields, SORT_NULL_AS_FIRST) != 0) {
                 if (preRow != null && newRow != null) {
                     newData.add(newRow);
                 }
@@ -539,12 +544,12 @@ public abstract class DataSetOptUtil {
         List<String> slaveFields = new ArrayList<>();
         splitMainAndSlave(primaryFields, mainFields, slaveFields);
         // 根据主键排序
-        sortByFields(currData, mainFields);
-        sortByFields(lastData, slaveFields);
+        sortByFields(currData, mainFields, SORT_NULL_AS_FIRST);
+        sortByFields(lastData, slaveFields, SORT_NULL_AS_FIRST);
         int i = 0;
         int j = 0;
         while (i < currData.size() && j < lastData.size()) {
-            int nc = compareTwoRowWithMap(currData.get(i), lastData.get(j), primaryFields);
+            int nc = compareTwoRowWithMap(currData.get(i), lastData.get(j), primaryFields, SORT_NULL_AS_FIRST);
             //匹配
             Map<String, Object> newRow = new LinkedHashMap<>();
             if (nc == 0) {
@@ -607,8 +612,8 @@ public abstract class DataSetOptUtil {
         List<String> mainFields = new ArrayList<>();
         List<String> slaveFields = new ArrayList<>();
         splitMainAndSlave(primaryFields, mainFields, slaveFields);
-        sortByFields(mainData, mainFields);
-        sortByFields(slaveData, slaveFields);
+        sortByFields(mainData, mainFields, SORT_NULL_AS_FIRST);
+        sortByFields(slaveData, slaveFields, SORT_NULL_AS_FIRST);
         int i = 0;
         int j = 0;
         List<Map<String, Object>> newData = new ArrayList<>();
@@ -616,15 +621,15 @@ public abstract class DataSetOptUtil {
         final boolean leftJoin = ConstantValue.DATASET_JOIN_TYPE_LEFT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join);
         final boolean rightJoin = ConstantValue.DATASET_JOIN_TYPE_RIGHT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join);
         while (i < mainData.size() && j < slaveData.size()) {
-            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields);
+            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_FIRST);
             Map<String, Object> newRow = new LinkedHashMap<>();
             if (nc == 0) {
                 newRow.putAll(slaveData.get(j));
                 newRow.putAll(mainData.get(i));
                 /** 这边如果需要实现 数据库jion 的 笛卡尔积，需要遍列所有相同的key ， 只确保每一条数据都有对应上
                  * 就是只能保证一对多的情况正确，不能保证多对多的情况正确*/
-                boolean equalNextMain = i < mainData.size() - 1 && compareTwoRow(mainData.get(i), mainData.get(i + 1), mainFields) == 0;
-                boolean equalNextSlave = j < slaveData.size() - 1 && compareTwoRow(slaveData.get(j), slaveData.get(j + 1), slaveFields) == 0;
+                boolean equalNextMain = i < mainData.size() - 1 && compareTwoRow(mainData.get(i), mainData.get(i + 1), mainFields, SORT_NULL_AS_FIRST) == 0;
+                boolean equalNextSlave = j < slaveData.size() - 1 && compareTwoRow(slaveData.get(j), slaveData.get(j + 1), slaveFields, SORT_NULL_AS_FIRST) == 0;
                 if(equalNextMain && !equalNextSlave){
                     i++;
                 } else if(!equalNextMain && equalNextSlave){
@@ -686,15 +691,15 @@ public abstract class DataSetOptUtil {
         List<String> mainFields = new ArrayList<>();
         List<String> slaveFields = new ArrayList<>();
         splitMainAndSlave(primaryFields, mainFields, slaveFields);
-        sortByFields(mainData, mainFields);
-        sortByFields(slaveData, slaveFields);
+        sortByFields(mainData, mainFields, SORT_NULL_AS_FIRST);
+        sortByFields(slaveData, slaveFields, SORT_NULL_AS_FIRST);
 
         int i = 0;
         int j = 0;
         List<Map<String, Object>> newData = new ArrayList<>();
         // 根据主键排序
         while (i < mainData.size() && j < slaveData.size()) {
-            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields);
+            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_FIRST);
             //匹配
             Map<String, Object> newRow = new LinkedHashMap<>();
             if (nc == 0) {
@@ -767,13 +772,13 @@ public abstract class DataSetOptUtil {
         List<String> mainFields = new ArrayList<>();
         List<String> slaveFields = new ArrayList<>();
         splitMainAndSlave(primaryFields, mainFields, slaveFields);
-        sortByFields(mainData, mainFields);
-        sortByFields(slaveData, slaveFields);
+        sortByFields(mainData, mainFields, SORT_NULL_AS_FIRST);
+        sortByFields(slaveData, slaveFields, SORT_NULL_AS_FIRST);
         int i = 0;
         int j = 0;
         List<Map<String, Object>> newData = new ArrayList<>();
         while (i < mainData.size() && j < slaveData.size()) {
-            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields);
+            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_FIRST);
             if (nc == 0) {
                 Map<String, Object> newRow = new LinkedHashMap<>();
                 if(unionData){
@@ -816,13 +821,13 @@ public abstract class DataSetOptUtil {
         List<String> mainFields = new ArrayList<>();
         List<String> slaveFields = new ArrayList<>();
         splitMainAndSlave(primaryFields, mainFields, slaveFields);
-        sortByFields(mainData, mainFields);
-        sortByFields(slaveData, slaveFields);
+        sortByFields(mainData, mainFields, SORT_NULL_AS_FIRST);
+        sortByFields(slaveData, slaveFields, SORT_NULL_AS_FIRST);
         int i = 0;
         int j = 0;
         List<Map<String, Object>> newData = new ArrayList<>();
         while (i < mainData.size() && j < slaveData.size()) {
-            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields);
+            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_FIRST);
             if (nc == 0) {
                 //newRow.putAll(slaveData.get(j));
                 i++;
@@ -865,7 +870,7 @@ public abstract class DataSetOptUtil {
         }
     }
 
-    private static int compareTwoRow(Map<String, Object> data1, Map<String, Object> data2, List<String> fields) {
+    private static int compareTwoRow(Map<String, Object> data1, Map<String, Object> data2, List<String> fields, boolean nullAsFirst) {
         if (data1 == null && data2 == null) {
             return 0;
         }
@@ -881,26 +886,19 @@ public abstract class DataSetOptUtil {
         for (String field : fields) {
             if (field.endsWith(" desc")) {
                 String dataField = field.substring(0, field.length() - 5).trim();
-                int cr;
+                int cr/*;
                 if (isChinese((String)data1.get(dataField))&&isChinese((String) data2.get(dataField))){
                     char c1 = ((String) data1.get(dataField)).charAt(0);
                     char c2 = ((String) data2.get(dataField)).charAt(0);
                     cr =concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c1)).compareTo(concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c2)));
                 }else {
-                    cr = GeneralAlgorithm.compareTwoObject(data1.get(dataField), data2.get(dataField));
-                }
+                    cr*/ = GeneralAlgorithm.compareTwoObject(data1.get(dataField), data2.get(dataField), ! nullAsFirst);
+
                 if (cr != 0) {
                     return 0 - cr;
                 }
             } else {
-                int cr;
-                if (isChinese((String)data1.get(field))&&isChinese((String) data2.get(field))){
-                    char c1 = ((String) data1.get(field)).charAt(0);
-                    char c2 = ((String) data2.get(field)).charAt(0);
-                    cr =concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c1)).compareTo(concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c2)));
-                }else {
-                    cr = GeneralAlgorithm.compareTwoObject(data1.get(field), data2.get(field));
-                }
+                int cr = GeneralAlgorithm.compareTwoObject(data1.get(field), data2.get(field), nullAsFirst);
                 if (cr != 0) {
                     return cr;
                 }
@@ -932,7 +930,7 @@ public abstract class DataSetOptUtil {
         return pinyinSbf.toString();
     }
 
-    private static int compareTwoRowWithMap(Map<String, Object> data1, Map<String, Object> data2, List<Map.Entry<String, String>> fields) {
+    private static int compareTwoRowWithMap(Map<String, Object> data1, Map<String, Object> data2, List<Map.Entry<String, String>> fields, boolean nullAsFirst) {
         if (data1 == null && data2 == null) {
             return 0;
         } else if (fields == null) {
@@ -949,7 +947,7 @@ public abstract class DataSetOptUtil {
 
         for (Map.Entry<String, String> field : fields) {
             int cr = GeneralAlgorithm.compareTwoObject(
-                data1.get(field.getKey()), data2.get(field.getValue()));
+                data1.get(field.getKey()), data2.get(field.getValue()), nullAsFirst);
             if (cr != 0) {
                 return cr;
             }
@@ -957,8 +955,8 @@ public abstract class DataSetOptUtil {
         return 0;
     }
 
-    private static void sortByFields(List<Map<String, Object>> data, List<String> fields) {
-        data.sort((o1, o2) -> compareTwoRow(o1, o2, fields));
+    private static void sortByFields(List<Map<String, Object>> data, List<String> fields, boolean nullAsFirst) {
+        data.sort((o1, o2) -> compareTwoRow(o1, o2, fields, nullAsFirst));
     }
 
     //从dataset 中获取流信息（页面上填写了“文件内容”参数时调用）
