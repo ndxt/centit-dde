@@ -70,6 +70,10 @@ public class ConstantValue {
 
     //dde手动提交事物
     public static final String  COMMIT_TRANSACTION="commitTransaction";
+    //交集
+    public static final String  INTERSECT_DATASET="intersect";
+    //差集
+    public static final String  MINUS_DATASET="minus";
 
     public static final String FINAL_TWO="2";
 

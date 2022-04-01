@@ -128,6 +128,10 @@ public class MetadataBizOperation implements BizOperation {
                 int count  = metaObjectService.updateObjectsByProperties(tableId, jsonObject, bizModel.getModelTag());
                 bizModel.putDataSet(id, new SimpleDataSet(count));
                 return BuiltInOperation.getResponseSuccessData(count);
+            case 11:
+                int resultCount = metaObjectService.mergeObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
+                bizModel.putDataSet(id, new SimpleDataSet(resultCount));
+                return BuiltInOperation.getResponseSuccessData(resultCount);
         }
         return null;
     }
