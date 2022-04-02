@@ -94,7 +94,8 @@ public class PersistenceBizOperation implements BizOperation {
         SqlDataSetWriter dataSetWriter = new SqlDataSetWriter(databaseInfo, tableInfo);
         dataSetWriter.setFieldsMap(BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "propertyName", "primaryKey1"));
         String saveAsWhole = BuiltInOperation.getJsonFieldString(bizOptJson, "saveAsWhole", "false");
-        dataSetWriter.setSaveAsWhole("true".equalsIgnoreCase(saveAsWhole));
+        //设置为true  作为整体提交
+        dataSetWriter.setSaveAsWhole("false".equalsIgnoreCase(saveAsWhole));
         switch (writerType) {
             case WRITER_INDICATE_APPEND:
                 dataSetWriter.append(dataSet);
