@@ -6,9 +6,13 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.datarule.CheckRule;
 import com.centit.dde.datarule.CheckRuleUtils;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
+import com.centit.framework.filter.RequestThreadLocal;
+import com.centit.framework.model.basedata.IDataDictionary;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.support.algorithm.*;
+import com.centit.support.common.JavaBeanMetaData;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
@@ -51,10 +55,10 @@ public abstract class DataSetOptUtil {
             extendFuncs.put("encode", (a) -> new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
             extendFuncs.put("dict", (a) -> {
                 if (a != null && a.length > 1) {
-                    String regex =",";
-                    if (a.length>2) {
+                   String regex =",";
+                    /* if (a.length>2) {
                         regex = StringBaseOpt.objectToString(a[2]);
-                    }
+                    }*/
                     String[] strings=StringBaseOpt.objectToString(a[1]).split(regex);
                     StringBuilder stringBuilder = new StringBuilder();
                     for (String string : strings) {
@@ -62,8 +66,14 @@ public abstract class DataSetOptUtil {
                             stringBuilder.append(regex);
                         }
                         String value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), StringBaseOpt.castObjectToString(string));
-                        value = !value.equals(string)?value:
-                            CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]),StringBaseOpt.castObjectToString(string));
+                        value = !value.equals(string)?value: CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]),StringBaseOpt.castObjectToString(string));
+                        if(StringUtils.isNotBlank(StringBaseOpt.castObjectToString(a[2]))){
+                            IDataDictionary dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]),
+                                StringBaseOpt.castObjectToString(string),
+                                WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest()));
+                            JavaBeanMetaData metaData = JavaBeanMetaData.createBeanMetaDataFromType(IDataDictionary.class);
+                            value = StringBaseOpt.castObjectToString(metaData.getObjectFieldValue(dataPiece, StringBaseOpt.castObjectToString(a[2])));
+                        }
                         stringBuilder.append(value);
                     }
                     return stringBuilder.toString();
@@ -247,16 +257,16 @@ public abstract class DataSetOptUtil {
         }
         Map<String, List<Double>> tempDataDouble = new HashMap<>(statDesc.size());
         for (Triple<String, String, String> tr : statDesc) {
-          if (!"concat".equals(tr.getRight())){
-              tempData.forEach((key, value) -> {
-                  List<Double> doubleList = new ArrayList<>();
-                  List<Object> list = value;
-                  for (Object o : list) {
-                      doubleList.add(NumberBaseOpt.castObjectToDouble(o));
-                  }
-                  tempDataDouble.put(key, doubleList);
-              });
-          }
+            if (!"concat".equals(tr.getRight())){
+                tempData.forEach((key, value) -> {
+                    List<Double> doubleList = new ArrayList<>();
+                    List<Object> list = value;
+                    for (Object o : list) {
+                        doubleList.add(NumberBaseOpt.castObjectToDouble(o));
+                    }
+                    tempDataDouble.put(key, doubleList);
+                });
+            }
         }
         for (Triple<String, String, String> tr : statDesc) {
             Object db;
