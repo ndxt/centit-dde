@@ -9,7 +9,7 @@ import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
-import com.centit.support.json.JSONTransformer;
+import com.centit.support.compiler.Pretreatment;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.InputStream;
@@ -35,12 +35,12 @@ public class ExcelBizOperation implements BizOperation {
         String endRow =  StringUtils.isBlank(bizOptJson.getString("endRow"))?"0":bizOptJson.getString("endRow");
         String startColumnNumber =  StringUtils.isBlank(bizOptJson.getString("startColumnNumber"))?"0":bizOptJson.getString("startColumnNumber");
         String endColumnNumber =  StringUtils.isBlank(bizOptJson.getString("endColumnNumber"))?"0":bizOptJson.getString("endColumnNumber");
-        params.put("sheetName",JSONTransformer.transformer(sheetName, new BizModelJSONTransform(bizModel)));
-        params.put("headerRow",JSONTransformer.transformer(headerRow, new BizModelJSONTransform(bizModel)));
-        params.put("beginRow",JSONTransformer.transformer(beginRow, new BizModelJSONTransform(bizModel)));
-        params.put("endRow",JSONTransformer.transformer(endRow, new BizModelJSONTransform(bizModel)));
-        params.put("startColumnNumber",JSONTransformer.transformer(startColumnNumber, new BizModelJSONTransform(bizModel)));
-        params.put("endColumnNumber",JSONTransformer.transformer(endColumnNumber, new BizModelJSONTransform(bizModel)));
+        params.put("sheetName", Pretreatment.mapTemplateStringAsFormula(sheetName, new BizModelJSONTransform(bizModel)));
+        params.put("headerRow",Pretreatment.mapTemplateStringAsFormula(headerRow, new BizModelJSONTransform(bizModel)));
+        params.put("beginRow",Pretreatment.mapTemplateStringAsFormula(beginRow, new BizModelJSONTransform(bizModel)));
+        params.put("endRow",Pretreatment.mapTemplateStringAsFormula(endRow, new BizModelJSONTransform(bizModel)));
+        params.put("startColumnNumber",Pretreatment.mapTemplateStringAsFormula(startColumnNumber, new BizModelJSONTransform(bizModel)));
+        params.put("endColumnNumber",Pretreatment.mapTemplateStringAsFormula(endColumnNumber, new BizModelJSONTransform(bizModel)));
 
         List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
         DataSet dataSet = bizModel.fetchDataSetByName(source);

@@ -9,7 +9,9 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.json.JSONTransformer;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.compiler.Pretreatment;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -26,8 +28,10 @@ public class GenerateJsonFileBizOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         String requestBody= (String)bizModel.getInterimVariable().get("requestBody");
-        String fileName=StringUtils.isNotBlank(bizOptJson.getString("fileName"))?bizOptJson.getString("fileName"):System.currentTimeMillis()+"";
-        fileName= (String) JSONTransformer.transformer(fileName, new BizModelJSONTransform(bizModel));
+        String fileName=StringUtils.isNotBlank(bizOptJson.getString("fileName"))?
+            StringBaseOpt.castObjectToString(Pretreatment.mapTemplateStringAsFormula(
+                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))):
+            DatetimeOpt.currentTimeWithSecond();
         Object data;
         if (StringUtils.isNotBlank(requestBody)){
             data=requestBody;
