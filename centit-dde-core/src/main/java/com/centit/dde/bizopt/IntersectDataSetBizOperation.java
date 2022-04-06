@@ -20,7 +20,7 @@ public class IntersectDataSetBizOperation implements BizOperation {
         String id = bizOptJson.getString("id");
         String mainDataSet = bizOptJson.getString("mainDataSet");
         String slaveDataSet = bizOptJson.getString("slaveDataSet");
-        boolean unionData =bizOptJson.getBoolean("unionData");
+        boolean unionData =bizOptJson.getBoolean("unionData")==null?false:bizOptJson.getBoolean("unionData");
         Map<String, String> pks = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("primaryFields"), "mainField", "slaveField");
         DataSet dataSet = DataSetOptUtil.intersectTwoDataSet(bizModel.getDataSet(mainDataSet), bizModel.getDataSet(slaveDataSet), new ArrayList<>(pks.entrySet()), unionData);
         bizModel.putDataSet(id,dataSet);
