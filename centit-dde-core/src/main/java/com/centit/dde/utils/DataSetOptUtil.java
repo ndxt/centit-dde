@@ -55,7 +55,7 @@ public abstract class DataSetOptUtil {
             extendFuncs.put("encode", (a) -> new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
             extendFuncs.put("dict", (a) -> {
                 if (a != null && a.length > 1) {
-                   String regex =",";
+                    String regex =",";
                     /* if (a.length>2) {
                         regex = StringBaseOpt.objectToString(a[2]);
                     }*/
@@ -72,7 +72,9 @@ public abstract class DataSetOptUtil {
                                 StringBaseOpt.castObjectToString(string),
                                 WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest()));
                             JavaBeanMetaData metaData = JavaBeanMetaData.createBeanMetaDataFromType(IDataDictionary.class);
-                            value = StringBaseOpt.castObjectToString(metaData.getObjectFieldValue(dataPiece, StringBaseOpt.castObjectToString(a[2])));
+                            if (dataPiece!=null){
+                                value = StringBaseOpt.castObjectToString(metaData.getObjectFieldValue(dataPiece, StringBaseOpt.castObjectToString(a[2])));
+                            }
                         }
                         stringBuilder.append(value);
                     }
