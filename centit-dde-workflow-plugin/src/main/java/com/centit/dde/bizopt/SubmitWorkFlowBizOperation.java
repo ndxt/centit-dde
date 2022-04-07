@@ -8,6 +8,8 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.commons.SubmitOptOptions;
 import com.centit.workflow.service.FlowEngine;
@@ -101,21 +103,28 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
             }
             switch (columnName){
                 case "grantorCode":
-                    submitOptOptions.setGrantorCode((String)value);
+                    submitOptOptions.setGrantorCode(StringBaseOpt.objectToString(value));
+                    break;
                 case "lockOptUser":
-                    submitOptOptions.setLockOptUser(Boolean.valueOf(String.valueOf(value)));
+                    submitOptOptions.setLockOptUser(BooleanBaseOpt.castObjectToBoolean(value));
+                    break;
                 case "workUserCode":
-                    submitOptOptions.setWorkUserCode((String)value);
+                    submitOptOptions.setWorkUserCode(StringBaseOpt.objectToString(value));
+                    break;
                 case "flowOrganizes":
-                    Map<String, List<String>> flowOrganizes = JSON.parseObject((String) value, Map.class);
+                    Map<String, List<String>> flowOrganizes = JSON.parseObject(StringBaseOpt.objectToString(value), Map.class);
                     submitOptOptions.setFlowOrganizes(flowOrganizes);
+                    break;
                 case "nodeUnits":
-                    Map<String, String> nodeUnits = JSON.parseObject((String) value, Map.class);
+                    Map<String, String> nodeUnits = JSON.parseObject(StringBaseOpt.objectToString(value), Map.class);
                     submitOptOptions.setNodeUnits(nodeUnits);
+                    break;
                 case "nodeOptUsers":
-                    Map<String, Set<String>> nodeOptUsers = JSON.parseObject((String) value, Map.class);
+                    Map<String, Set<String>> nodeOptUsers = JSON.parseObject(StringBaseOpt.objectToString(value), Map.class);
                     submitOptOptions.setNodeOptUsers(nodeOptUsers);
+                    break;
                 default:
+                    break;
             }
         }
         Map<String, Object>   objectMap = flowEngine.submitFlowOpt(submitOptOptions);
