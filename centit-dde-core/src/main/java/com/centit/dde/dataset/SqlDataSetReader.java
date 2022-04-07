@@ -14,6 +14,8 @@ import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Connection;
@@ -30,7 +32,7 @@ import java.util.Map;
  * @author zhf
  */
 public class SqlDataSetReader implements DataSetReader {
-
+    public static final Log log = LogFactory.getLog(SqlDataSetReader.class);
     private ISourceInfo databaseInfo;
     /**
      * 参数驱动sql
@@ -85,6 +87,7 @@ public class SqlDataSetReader implements DataSetReader {
         if (extendFilters != null) {
             String extendSql = " and " + GeneralJsonObjectDao.buildFilterSql(null, null, extendFilters.keySet());
             sqlSen = sqlSen.replaceAll("\\{condition\\}", extendSql);
+            log.info(sqlSen);
         }
     }
 
