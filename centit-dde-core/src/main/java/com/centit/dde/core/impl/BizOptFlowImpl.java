@@ -8,10 +8,8 @@ import com.centit.dde.core.*;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.DataPacketDraftDao;
 import com.centit.dde.dao.TaskDetailLogDao;
-import com.centit.dde.po.DataPacket;
-import com.centit.dde.po.DataPacketDraft;
-import com.centit.dde.po.DataPacketInterface;
-import com.centit.dde.po.TaskDetailLog;
+import com.centit.dde.dao.TaskLogDao;
+import com.centit.dde.po.*;
 import com.centit.dde.utils.*;
 import com.centit.dde.vo.CycleVo;
 import com.centit.dde.vo.DataOptVo;
@@ -50,7 +48,6 @@ import java.util.*;
  */
 @Service
 public class BizOptFlowImpl implements BizOptFlow {
-    private static final Logger logger = LoggerFactory.getLogger(BizOptFlowImpl.class);
     public static final String RETURN_RESULT_STATE = "2";
     public static final String RETURN_RESULT_DATASET = "3";
     public static final String RETURN_RESULT_ORIGIN = "4";
@@ -71,6 +68,9 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @Autowired
     private DataPacketDraftDao dataPacketCopyDao;
+
+    @Autowired
+    private TaskLogDao taskLogDao;
 
     @Autowired
     private DataPacketDao dataPacketDao;
@@ -146,9 +146,13 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @Override
     public Object run(DataPacketInterface dataPacket, String logId, Map<String, Object> queryParams,Map<String, Object> interimVariable) throws Exception {
-        SimpleBizModel bizModel = new SimpleBizModel(logId);
+        SimpleBizModel bizModel = new SimpleBizModel(logId==null?dataPacket.getPacketId():logId);
+        if(interimVariable==null){
+            interimVariable = new HashMap<>();
+        }
+        interimVariable.put("logLevel",dataPacket.getLogLevel());
         bizModel.setModelTag(queryParams);
-        bizModel.setInterimVariable(interimVariable==null?new HashMap<>():interimVariable);
+        bizModel.setInterimVariable(interimVariable);
         //标签中默认的3个数据集  将数据set进去   需要在结束标签中移除这3个默认标签的数据  否则会显得返回结果数据很乱
         if (queryParams!=null && queryParams.size()>0){
             bizModel.putDataSet("pathData",new SimpleDataSet(queryParams));
@@ -277,6 +281,10 @@ public class BizOptFlowImpl implements BizOptFlow {
            /* bizModel.removeDataSet("pathData");
             bizModel.removeDataSet("postBodyData");*/
             bizModel.removeDataSet("postFileData");
+            //移除临时日志信息
+            bizModel.removeDataSet("buildLogInfo");
+            //移除临时日志级别参数
+            bizModel.removeDataSet("logLevel");
         }
         stepJson=stepJson.getJSONObject("properties");
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
@@ -435,8 +443,13 @@ public class BizOptFlowImpl implements BizOptFlow {
     }
 
     private void runOneStepOpt(DataOptStep dataOptStep, DataOptVo dataOptVo) {
-        TaskDetailLog detailLog = writeLog(dataOptStep, dataOptVo);
         SimpleBizModel bizModel = dataOptVo.getBizModel();
+        Map<String, Object> interimVariable = bizModel.getInterimVariable();
+        String logLevel = (String)interimVariable.get("logLevel");
+        TaskDetailLog detailLog=null;
+        if (ConstantValue.LOGLEVEL_DEBUG.equals(logLevel)){
+            detailLog = writeLog(dataOptStep, dataOptVo);
+        }
         JSONObject bizOptJson = dataOptStep.getCurrentStep().getJSONObject("properties");
         try {
             BizOperation opt = allOperations.get(bizOptJson.getString("type"));
@@ -446,7 +459,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 throw new ObjectException(responseData, responseData.getCode(), responseData.getMessage());
             }
             JSONObject jsonObject = JSONObject.parseObject(responseData.getData().toString());
-            if (dataOptVo.getLogId() != null) {
+            if (dataOptVo.getLogId() != null && ConstantValue.LOGLEVEL_DEBUG.equals(logLevel)) {
                 detailLog.setSuccessPieces(jsonObject.getIntValue("success"));
                 detailLog.setErrorPieces(jsonObject.getIntValue("error"));
                 detailLog.setLogInfo(BuiltInOperation.getJsonFieldString(jsonObject, "info", "ok"));
@@ -454,6 +467,18 @@ public class BizOptFlowImpl implements BizOptFlow {
                 taskDetailLogDao.updateObject(detailLog);
             }
         } catch (Exception e) {
+            if(ConstantValue.LOGLEVEL_ERROR.equals(logLevel) && interimVariable.containsKey("buildLogInfo")){
+                TaskLog taskLog = (TaskLog)interimVariable.get("buildLogInfo");
+               if (taskLog !=null && StringUtils.isEmpty(taskLog.getLogId())){//主日志只记录一次
+                   taskLog.setRunEndTime(new Date());
+                   taskLog.setOtherMessage("error");
+                   taskLogDao.saveNewObject(taskLog);
+                   dataOptVo.setLogId(taskLog.getLogId());
+               }
+            }
+            if (detailLog==null){
+                detailLog = writeLog(dataOptStep, dataOptVo);
+            }
             String errMsg = ObjectException.extortExceptionMessage(e, 8);
             ResponseData responseData = ResponseData.makeErrorMessageWithData(e, ResponseData.ERROR_OPERATION,
                 errMsg);

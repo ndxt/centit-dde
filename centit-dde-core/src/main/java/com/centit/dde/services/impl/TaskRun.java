@@ -1,5 +1,6 @@
 package com.centit.dde.services.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.dao.DataPacketDao;
@@ -8,12 +9,15 @@ import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.po.*;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.basedata.NoticeMessage;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,12 +30,14 @@ import java.util.Map;
  * @author zhf
  */
 @Service
+@Slf4j
 public class TaskRun {
     private final TaskLogDao taskLogDao;
     private final TaskDetailLogDao taskDetailLogDao;
     private final DataPacketDraftDao dataPacketCopyDao;
     private final DataPacketDao dataPacketDao;
     private final BizOptFlow bizOptFlow;
+
     @Autowired(required = false)
     private NotificationCenter notificationCenter;
 
@@ -51,60 +57,30 @@ public class TaskRun {
         if (interimVariable != null && interimVariable.containsKey("runType")) {
             runType = (String) interimVariable.get("runType");
         }
-        TaskLog taskLog = new TaskLog();
-        Date beginTime = new Date();
         DataPacketInterface dataPacketInterface;
+        TaskLog taskLog = new TaskLog();
+        taskLog.setRunBeginTime(new Date());
         if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
-            DataPacketDraft dataPacketCopy = dataPacketCopyDao.getObjectWithReferences(packetId);
-            dataPacketCopy.setLastRunTime(new Date());
-            dataPacketInterface = dataPacketCopy;
-            taskLog.setRunner("T");
-            taskLog.setApplicationId(dataPacketCopy.getOsId());
-            taskLog.setRunType(dataPacketCopy.getPacketName());
+            dataPacketInterface = dataPacketCopyDao.getObjectWithReferences(packetId);
         } else {
-            DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
-            dataPacket.setLastRunTime(new Date());
-            dataPacketInterface = dataPacket;
-            taskLog.setRunner("A");
-            taskLog.setApplicationId(dataPacket.getOsId());
-            taskLog.setRunType(dataPacket.getPacketName());
+            dataPacketInterface = dataPacketDao.getObjectWithReferences(packetId);
+        }
+        buildLogInfo(taskLog, runType, dataPacketInterface);
+        if (!ConstantValue.LOGLEVEL_ERROR.equals(dataPacketInterface.getLogLevel())){//不记录任何日志
+            //保存日志基本信息
+            taskLogDao.saveNewObject(taskLog);
+        }
+        if (ConstantValue.LOGLEVEL_ERROR.equals(dataPacketInterface.getLogLevel())){
+            interimVariable.put("buildLogInfo",taskLog);
         }
         try {
-            taskLog.setTaskId(packetId);
-            taskLog.setRunBeginTime(beginTime);
-            taskLogDao.saveNewObject(taskLog);
             Object runResult = runStep(dataPacketInterface, taskLog.getLogId(), queryParams,interimVariable);
-            taskLog.setRunEndTime(new Date());
-            if (ConstantValue.FINAL_TWO.equals(dataPacketInterface.getTaskType())
-                && dataPacketInterface.getIsValid()
-                && !StringBaseOpt.isNvl(dataPacketInterface.getTaskCron())) {
-                CronExpression cronExpression = new CronExpression(dataPacketInterface.getTaskCron());
-                dataPacketInterface.setNextRunTime(cronExpression.getNextValidTimeAfter(dataPacketInterface.getLastRunTime()));
+            //更新API信息
+            updateApiData(runType,dataPacketInterface);
+            if (!ConstantValue.LOGLEVEL_ERROR.equals(dataPacketInterface.getLogLevel())){//不记录任何日志
+                //更新日志信息
+                updateLog(taskLog);
             }
-            if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
-                if (ConstantValue.FINAL_TWO.equals(dataPacketInterface.getTaskType())){//定时任务才更新
-                    dataPacketInterface.setNextRunTime(new Date());
-                    DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set next_run_time=? where packet_id=?",
-                        new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
-                }
-                dataPacketCopyDao.mergeObject((DataPacketDraft)dataPacketInterface);
-            } else {
-                if (ConstantValue.FINAL_TWO.equals(dataPacketInterface.getTaskType())) {//定时任务才更新
-                    dataPacketInterface.setNextRunTime(new Date());
-                    DatabaseOptUtils.doExecuteSql(dataPacketDao, "update q_data_packet set next_run_time=? where packet_id=?",
-                        new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
-                    DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set next_run_time=? where packet_id=?",
-                        new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
-                }
-                dataPacketDao.mergeObject((DataPacket)dataPacketInterface);
-                //将正式流程执行的时间同步到草稿表中
-                DataPacket dataPacket = (DataPacket)dataPacketInterface;
-                DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set LAST_RUN_TIME=? where packet_id=?",
-                    new Object[]{dataPacket.getLastRunTime(), dataPacket.getPacketId()});
-            }
-            TaskDetailLog taskDetailLog = taskDetailLogDao.getObjectByProperties(CollectionsOpt.createHashMap("logId", taskLog.getLogId()));
-            taskLog.setOtherMessage("ok".equals(taskDetailLog.getLogInfo())? "ok" : "error");
-            taskLogDao.updateObject(taskLog);
             return runResult;
         } catch (Exception e) {
             dealException(taskLog, dataPacketInterface, e);
@@ -126,8 +102,7 @@ public class TaskRun {
     }
 
     private void dealException(TaskLog taskLog, DataPacketInterface dataPacketInterface, Exception e) {
-        saveDetail(ObjectException.extortExceptionMessage(e, 4),
-            taskLog);
+        saveDetail(ObjectException.extortExceptionMessage(e, 4), taskLog);
         taskLog.setOtherMessage("error");
         taskLog.setRunEndTime(new Date());
         taskLogDao.mergeObject(taskLog);
@@ -147,4 +122,53 @@ public class TaskRun {
         taskDetailLogDao.saveNewObject(detailLog);
     }
 
+    private void buildLogInfo(TaskLog taskLog,String runType,DataPacketInterface dataPacketInterface) {
+        taskLog.setApiType(ConstantValue.RUN_TYPE_COPY.equals(runType) ? "0" : "1");
+        taskLog.setRunner(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
+        taskLog.setApplicationId(dataPacketInterface.getOsId());
+        taskLog.setRunType(dataPacketInterface.getPacketName());
+        taskLog.setTaskId(dataPacketInterface.getPacketId());
+        log.debug("新增API执行日志，日志信息：{}", JSON.toJSONString(taskLog));
+    }
+
+    private void updateLog(TaskLog taskLog) {
+        taskLog.setRunEndTime(new Date());
+        TaskDetailLog taskDetailLog = taskDetailLogDao.getObjectByProperties(CollectionsOpt.createHashMap("logId", taskLog.getLogId()));
+        String message= taskDetailLog==null?"ok":"ok".equals(taskDetailLog.getLogInfo())? "ok" : "error";
+        taskLog.setOtherMessage(message);
+        taskLogDao.updateObject(taskLog);
+        log.debug("更新API执行日志，日志信息：{}", JSON.toJSONString(taskLog));
+    }
+
+    private void updateApiData(String runType,DataPacketInterface dataPacketInterface) throws Exception {
+        dataPacketInterface.setLastRunTime(new Date());
+        if (ConstantValue.FINAL_TWO.equals(dataPacketInterface.getTaskType())
+            && dataPacketInterface.getIsValid()
+            && !StringBaseOpt.isNvl(dataPacketInterface.getTaskCron())) {
+            CronExpression cronExpression = new CronExpression(dataPacketInterface.getTaskCron());
+            dataPacketInterface.setNextRunTime(cronExpression.getNextValidTimeAfter(dataPacketInterface.getLastRunTime()));
+        }
+        if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
+            if (ConstantValue.FINAL_TWO.equals(dataPacketInterface.getTaskType())){//定时任务才更新
+                dataPacketInterface.setNextRunTime(new Date());
+                DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set next_run_time=? where packet_id=?",
+                    new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
+            }
+            dataPacketCopyDao.mergeObject((DataPacketDraft)dataPacketInterface);
+        } else {
+            if (ConstantValue.FINAL_TWO.equals(dataPacketInterface.getTaskType())) {//定时任务才更新
+                dataPacketInterface.setNextRunTime(new Date());
+                DatabaseOptUtils.doExecuteSql(dataPacketDao, "update q_data_packet set next_run_time=? where packet_id=?",
+                    new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
+                DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set next_run_time=? where packet_id=?",
+                    new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
+            }
+            dataPacketDao.mergeObject((DataPacket)dataPacketInterface);
+            //将正式流程执行的时间同步到草稿表中
+            DataPacket dataPacket = (DataPacket)dataPacketInterface;
+            DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set LAST_RUN_TIME=? where packet_id=?",
+                new Object[]{dataPacket.getLastRunTime(), dataPacket.getPacketId()});
+        }
+        log.debug("更新API执行信息，执行类型：{}，更新信息{}", runType,JSON.toJSONString(dataPacketInterface));
+    }
 }

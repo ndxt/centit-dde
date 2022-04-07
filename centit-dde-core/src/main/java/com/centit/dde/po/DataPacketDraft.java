@@ -24,43 +24,40 @@ import java.util.*;
 @ApiModel
 @Data
 @Entity
-@Table(name = "Q_DATA_PACKET_DRAFT")
+@Table(name = "q_data_packet_draft")
 public class DataPacketDraft implements Serializable, DataPacketInterface {
     private static final long serialVersionUID = 1;
 
     @ApiModelProperty(value = "数据处理ID", hidden = true)
     @Id
-    @Column(name = "PACKET_ID")
+    @Column(name = "packet_id")
     @NotBlank(message = "字段不能为空")
     @ValueGenerator(strategy = GeneratorType.UUID)
     private String packetId;
 
     @ApiModelProperty(value = "数据处理名称")
-    @Column(name = "PACKET_NAME")
+    @Column(name = "packet_name")
     @NotBlank(message = "字段不能为空")
     private String packetName;
 
-    /**
-     * 详细描述
-     */
     @ApiModelProperty(value = "详细描述")
-    @Column(name = "PACKET_DESC")
+    @Column(name = "packet_desc")
     private String packetDesc;
 
-    @Column(name = "OWNER_TYPE")
+    @Column(name = "owner_type")
     @ApiModelProperty(value = "属主类别（D:部门；U:用户）")
     private String ownerType;
 
-    @Column(name = "OWNER_CODE")
+    @Column(name = "owner_code")
     @ApiModelProperty(value = "属主代码")
     private String ownerCode;
 
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "DATA_OPT_DESC_JSON")
+    @Column(name = "data_opt_desc_json")
     @ApiModelProperty(value = "数据预处理描述 json格式的数据预处理说明", required = true)
     private JSONObject dataOptDescJson;
 
-    @Column(name = "BUFFER_FRESH_PERIOD")
+    @Column(name = "buffer_fresh_period")
     @ApiModelProperty(value = "缓存时间", required = true)
     private Integer bufferFreshPeriod;
 
@@ -68,17 +65,17 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     @ApiModelProperty(value = "缓存单位, 1:分 2:时 3:日 -1:不缓存")
     private Integer bufferFreshPeriodType;
 
-    @Column(name = "RECORDER")
+    @Column(name = "recorder")
     @ApiModelProperty(value = "创建人", hidden = true)
     @DictionaryMap(fieldName = "recorderName", value = "userCode")
     private String recorder;
 
-    @Column(name = "RECORD_DATE")
+    @Column(name = "record_date")
     @ApiModelProperty(value = "创建时间", hidden = true)
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date recordDate;
 
-    @Column(name = "UPDATE_DATE")
+    @Column(name = "update_date")
     @ApiModelProperty(value = "修改时间", hidden = true)
     //@ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date updateDate;
@@ -89,32 +86,32 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     private String osId;
 
     @ApiModelProperty(value = "所属模块", required = true)
-    @Column(name = "OPT_ID")
+    @Column(name = "opt_id")
     @NotBlank(message = "optId字段不能为空")
     private String optId;
 
-    @Column(name = "TASK_TYPE")
+    @Column(name = "task_type")
     @ApiModelProperty(value = "任务类型,1表示普通任务，2表示定时任务", required = true)
     @NotBlank
     private String taskType;
 
-    @Column(name = "TASK_CRON")
+    @Column(name = "task_cron")
     @ApiModelProperty(value = "任务执行定时器")
     private String taskCron;
 
-    @Column(name = "LAST_RUN_TIME")
+    @Column(name = "last_run_time")
     @ApiModelProperty(value = "上次执行时间")
     private Date lastRunTime;
 
-    @Column(name = "NEXT_RUN_TIME")
+    @Column(name = "next_run_time")
     @ApiModelProperty(value = "下次执行时间")
     private Date nextRunTime;
 
-    @Column(name = "IS_VALID")
+    @Column(name = "is_valid")
     @ApiModelProperty(value = "是否启用", required = true)
     private Boolean isValid;
 
-    @Column(name = "NEED_ROLLBACK")
+    @Column(name = "need_rollback")
     @ApiModelProperty(value = "是否回滚并结束")
     private String needRollback;
 
@@ -122,7 +119,7 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     @ApiModelProperty(value = "发布时间")
     private Date publishDate;
 
-    @Column(name = "EXT_PROPS")
+    @Column(name = "ext_props")
     @ApiModelProperty(value = "队列配置扩展信息，独有配置，公共的配置在资源管理页面添加")
     private JSONObject extProps;
 
@@ -139,6 +136,10 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     @Column(name = "metadata_table_id")
     @ApiModelProperty(value = "通过元数据模板生成接口时会选择一个表，这个存选择的表ID")
     private String metadataTableId;
+
+    @Column(name = "log_level")
+    @ApiModelProperty(value = "日志记录级别，E=ERROR,I=INFO,D=DEBUG")
+    private String logLevel;
 
     @OneToMany(targetEntity = DataPacketParamDraft.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")

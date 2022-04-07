@@ -76,6 +76,11 @@ public class ConstantValue {
     public static final String  MINUS_DATASET="minus";
 
     public static final String FINAL_TWO="2";
+    //日志记录级别
+    public static final String LOGLEVEL_INFO="I";//INFO
+    public static final String LOGLEVEL_ERROR="E";//ERROR
+    public static final String LOGLEVEL_DEBUG="D";//DEBUG
+
 
     public static final String TASK_TYPE_GET="1";
     public static final String TASK_TYPE_POST="3";

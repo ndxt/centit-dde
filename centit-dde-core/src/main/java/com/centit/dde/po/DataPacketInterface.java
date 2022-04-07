@@ -52,4 +52,6 @@ public interface DataPacketInterface {
     Integer getBufferFreshPeriod();
 
     Integer getBufferFreshPeriodType();
+
+    String getLogLevel();
 }

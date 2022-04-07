@@ -20,50 +20,56 @@ import java.util.Date;
 @Data
 @Entity
 @ApiModel
-@Table(name="D_TASK_LOG")
+@Table(name="d_task_log")
 public class TaskLog implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name="LOG_ID")
+    @Column(name="log_id")
     @ValueGenerator(strategy = GeneratorType.UUID)
     @ApiModelProperty(value = "日志ID", hidden = true)
     @NotBlank
     private String logId;
 
-    @Column(name="Task_ID")
+    @Column(name="task_id")
     @ApiModelProperty(value = "任务ID", hidden = true)
     private String taskId;
-    @Column(name="APPLICATION_ID")
-    @ApiModelProperty(value = "任务ID", hidden = true)
+
+    @Column(name="application_id")
+    @ApiModelProperty(value = "项目id", hidden = true)
     private String applicationId;
-    @Column(name="RUN_BEGIN_TIME")
+
+    @Column(name="run_begin_time")
     @ApiModelProperty(value = "执行开始时间")
     private Date runBeginTime;
 
-    @Column(name="RUN_END_TIME")
+    @Column(name="run_end_time")
     @ApiModelProperty(value = "执行结束时间")
     private Date runEndTime;
 
-    @Column(name="RUN_TYPE")
+    @Column(name="run_type")
     @ApiModelProperty(value = "执行方式", required = true)
     private String runType;
 
-    @Column(name="RUNNER")
+    @Column(name="runner")
     @ApiModelProperty(value = "执行人员", hidden = true)
     private String runner;
 
-    @Column(name="OTHER_MESSAGE")
+    @Column(name="other_message")
     @ApiModelProperty(value = "其他提示信息", required = true)
     private String otherMessage;
 
-    @Column(name="ERROR_PIECES")
+    @Column(name="error_pieces")
     @ApiModelProperty(value = "失败条数")
     private String errorPieces;
 
-    @Column(name="SUCCESS_PIECES")
+    @Column(name="success_pieces")
     @ApiModelProperty(value = "成功条数")
     private String successPieces;
+
+    @Column(name="api_type")
+    @ApiModelProperty(value = "API类别，是草稿还是正式运行的日志，0草稿，1正式")
+    private String apiType;
 
    /* @Transient
     private Set<TaskDetailLog> taskDetailLogs;
