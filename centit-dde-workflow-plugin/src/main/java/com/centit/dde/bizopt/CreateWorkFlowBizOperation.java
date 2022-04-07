@@ -8,6 +8,10 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.commons.CreateFlowOptions;
 import com.centit.workflow.po.FlowInstance;
@@ -114,42 +118,44 @@ public class CreateWorkFlowBizOperation implements BizOperation {
             // JOSN.toJavaObject
             switch (columnName){
                 case "modelId":
-                    createFlowOptions.setModelId(JSON.toJSONString(value));
+                    createFlowOptions.setModelId(StringBaseOpt.castObjectToString(value));
                     break;
                 case "flowVersion":
-                    createFlowOptions.setFlowVersion(Long.valueOf(String.valueOf(value)));
+                    createFlowOptions.setFlowVersion(NumberBaseOpt.castObjectToLong(value));
                     break;
                 case "parentNodeInstId":
-                    createFlowOptions.setParentNodeInstId(JSON.toJSONString(value));
+                    createFlowOptions.setParentNodeInstId(StringBaseOpt.castObjectToString(value));
                     break;
                 case "parentFlowInstId":
-                    createFlowOptions.setParentFlowInstId(JSON.toJSONString(value));
+                    createFlowOptions.setParentFlowInstId(StringBaseOpt.castObjectToString(value));
                     break;
                 case "flowGroupId":
-                    createFlowOptions.setFlowGroupId(JSON.toJSONString(value));
+                    createFlowOptions.setFlowGroupId(StringBaseOpt.castObjectToString(value));
                     break;
                 case "timeLimitStr":
-                    createFlowOptions.setTimeLimitStr(JSON.toJSONString(value));
+                    createFlowOptions.setTimeLimitStr(StringBaseOpt.castObjectToString(value));
                     break;
                 case "skipFirstNode":
-                    createFlowOptions.setSkipFirstNode(Boolean.valueOf(String.valueOf(value)));
+                    createFlowOptions.setSkipFirstNode(BooleanBaseOpt.castObjectToBoolean(value));
                     break;
                 case "lockOptUser":
-                    createFlowOptions.setLockOptUser(Boolean.valueOf(String.valueOf(value)));
+                    createFlowOptions.setLockOptUser(BooleanBaseOpt.castObjectToBoolean(value));
                     break;
                 case "workUserCode":
-                    createFlowOptions.setWorkUserCode(JSON.toJSONString(value));
+                    createFlowOptions.setWorkUserCode(StringBaseOpt.castObjectToString(value));
                     break;
                 case "flowOrganizes":
-                    Map<String, List<String>> flowOrganizes = JSON.parseObject(JSON.toJSONString(value), Map.class);
+                    Map<String, List<String>> flowOrganizes =
+                        JSON.parseObject(JSON.toJSONString(value), Map.class);
                     createFlowOptions.setFlowOrganizes(flowOrganizes);
                     break;
                 case "nodeUnits":
-                    Map<String, String> nodeUnits = JSON.parseObject(JSON.toJSONString(value), Map.class);;
+                    Map<String, String> nodeUnits = CollectionsOpt.objectMapToStringMap(
+                        CollectionsOpt.objectToMap(value));
                     createFlowOptions.setNodeUnits(nodeUnits);
                     break;
                 case "nodeOptUsers":
-                    Map<String, Set<String>>  nodeOptUsers = JSON.parseObject(JSON.toJSONString(value), Map.class);;
+                    Map<String, Set<String>>  nodeOptUsers = JSON.parseObject(JSON.toJSONString(value), Map.class);
                     createFlowOptions.setNodeOptUsers(nodeOptUsers);
                     break;
                 default:
