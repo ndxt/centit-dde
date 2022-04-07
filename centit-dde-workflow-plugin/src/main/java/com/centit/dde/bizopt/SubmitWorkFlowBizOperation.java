@@ -21,9 +21,6 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
 
     private FlowEngine flowEngine;
 
-    public SubmitWorkFlowBizOperation() {
-    }
-
     public SubmitWorkFlowBizOperation(FlowEngine flowEngine) {
         this.flowEngine = flowEngine;
     }
