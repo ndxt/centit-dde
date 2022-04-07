@@ -145,8 +145,10 @@ public class CreateWorkFlowBizOperation implements BizOperation {
                     createFlowOptions.setWorkUserCode(StringBaseOpt.castObjectToString(value));
                     break;
                 case "flowOrganizes":
-                    Map<String, List<String>> flowOrganizes =
-                        JSON.parseObject(JSON.toJSONString(value), Map.class);
+                    Map<String, List<String>> flowOrganizes = CollectionsOpt.translateMapType(
+                        CollectionsOpt.objectToMap(value),
+                        StringBaseOpt::objectToString,
+                        StringBaseOpt::objectToStringList);
                     createFlowOptions.setFlowOrganizes(flowOrganizes);
                     break;
                 case "nodeUnits":
@@ -155,7 +157,10 @@ public class CreateWorkFlowBizOperation implements BizOperation {
                     createFlowOptions.setNodeUnits(nodeUnits);
                     break;
                 case "nodeOptUsers":
-                    Map<String, Set<String>>  nodeOptUsers = JSON.parseObject(JSON.toJSONString(value), Map.class);
+                    Map<String, Set<String>>  nodeOptUsers = CollectionsOpt.translateMapType(
+                        CollectionsOpt.objectToMap(value),
+                        StringBaseOpt::objectToString,
+                        StringBaseOpt::objectToStringSet);
                     createFlowOptions.setNodeOptUsers(nodeOptUsers);
                     break;
                 default:
