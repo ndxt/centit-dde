@@ -115,6 +115,7 @@ public class HttpBizOperation implements BizOperation {
                 break;
             case "delete":
                 dataSet = BizOptUtils.castObjectToDataSet(HttpExecutor.simpleDelete(httpExecutorContext, httpUrl, mapObject));
+                break;
             default:
                 break;
         }

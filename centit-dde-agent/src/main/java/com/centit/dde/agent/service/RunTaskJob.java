@@ -49,7 +49,7 @@ public class RunTaskJob extends AbstractQuartzJob {
             Boolean isRunning = runningTask.put(dataPacket.getPacketId(), true);
             if (isRunning != null && isRunning) {
                 logger.info("任务：" + dataPacket.getPacketId() + "仍在执行中忽略这个执行周期");
-                return true;
+                return false;
             }
             try {
                 TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
@@ -60,18 +60,6 @@ public class RunTaskJob extends AbstractQuartzJob {
                 runningTask.put(dataPacket.getPacketId(), false);
             }
         }
-//      //取得命令结果的输出流
-//      InputStream fis=p.getInputStream();
-//      //用一个读输出流类去读
-//      InputStreamReader isr=new InputStreamReader(fis);
-//      //用缓冲器读行
-//      BufferedReader br=new BufferedReader(isr);
-//      String line=null;
-//      //直到读完为止
-//      while((line=br.readLine())!=null)
-//      {
-//          System.out.println(line);
-//      }
         return true;
     }
 

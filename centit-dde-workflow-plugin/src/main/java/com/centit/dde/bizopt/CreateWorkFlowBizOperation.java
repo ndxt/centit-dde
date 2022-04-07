@@ -110,35 +110,50 @@ public class CreateWorkFlowBizOperation implements BizOperation {
             if(StringUtils.isBlank(expression) || value==null){
                 continue;
             }
+            // 这个为什么不用反射 JOSN.toJavaObject，不过这样效率可能会更高一点，但是添加属性时要记得同步
+            // JOSN.toJavaObject
             switch (columnName){
                 case "modelId":
                     createFlowOptions.setModelId(JSON.toJSONString(value));
+                    break;
                 case "flowVersion":
                     createFlowOptions.setFlowVersion(Long.valueOf(String.valueOf(value)));
+                    break;
                 case "parentNodeInstId":
                     createFlowOptions.setParentNodeInstId(JSON.toJSONString(value));
+                    break;
                 case "parentFlowInstId":
                     createFlowOptions.setParentFlowInstId(JSON.toJSONString(value));
+                    break;
                 case "flowGroupId":
                     createFlowOptions.setFlowGroupId(JSON.toJSONString(value));
+                    break;
                 case "timeLimitStr":
                     createFlowOptions.setTimeLimitStr(JSON.toJSONString(value));
+                    break;
                 case "skipFirstNode":
                     createFlowOptions.setSkipFirstNode(Boolean.valueOf(String.valueOf(value)));
+                    break;
                 case "lockOptUser":
                     createFlowOptions.setLockOptUser(Boolean.valueOf(String.valueOf(value)));
+                    break;
                 case "workUserCode":
                     createFlowOptions.setWorkUserCode(JSON.toJSONString(value));
+                    break;
                 case "flowOrganizes":
                     Map<String, List<String>> flowOrganizes = JSON.parseObject(JSON.toJSONString(value), Map.class);
                     createFlowOptions.setFlowOrganizes(flowOrganizes);
+                    break;
                 case "nodeUnits":
                     Map<String, String> nodeUnits = JSON.parseObject(JSON.toJSONString(value), Map.class);;
                     createFlowOptions.setNodeUnits(nodeUnits);
+                    break;
                 case "nodeOptUsers":
                     Map<String, Set<String>>  nodeOptUsers = JSON.parseObject(JSON.toJSONString(value), Map.class);;
                     createFlowOptions.setNodeOptUsers(nodeOptUsers);
+                    break;
                 default:
+                    break;
             }
         }
         FlowInstance   instance = flowEngine.createInstance(createFlowOptions);

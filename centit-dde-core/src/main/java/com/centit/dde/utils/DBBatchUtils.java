@@ -216,6 +216,7 @@ public abstract class DBBatchUtils {
                     case FieldType.BYTE_ARRAY:
                     case FieldType.FILE:
                         object.put(col.getPropertyName(), ByteBaseOpt.castObjectToBytes(fieldValue));
+                        break;
                     default:
                         break;
 
