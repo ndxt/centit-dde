@@ -112,6 +112,6 @@ public class SqlDataSetReader implements DataSetReader {
     }
 
     public void setExtendFilters(Map<String, Object> extendFilters) {
-        this.extendFilters = extendFilters;
+        this.extendFilters = QueryUtils.pretreatParameters(extendFilters);
     }
 }
