@@ -85,7 +85,7 @@ public class SqlDataSetReader implements DataSetReader {
 
     private void buildExtendsSql() {
         if (extendFilters != null) {
-            String extendSql = " and " + GeneralJsonObjectDao.buildFilterSql(null, null, extendFilters.keySet());
+            String extendSql = " and " + GeneralJsonObjectDao.buildFilterSql(null, null, extendFilters);
             sqlSen = sqlSen.replaceAll("\\{condition\\}", extendSql);
             log.info(sqlSen);
         }
