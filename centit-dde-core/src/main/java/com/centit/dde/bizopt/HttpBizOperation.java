@@ -52,7 +52,7 @@ public class HttpBizOperation implements BizOperation {
         String httpMethod = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post");
         String httpUrlCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseId", "");
         String loginUrlCode = BuiltInOperation.getJsonFieldString(bizOptJson, "loginService", null);
-        Object json=JSON.parse(BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", ""));
+        Object json=BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
         String httpUrl = BuiltInOperation.getJsonFieldString(bizOptJson, "httpUrl", null);
         Object requestBody="";
         if(json!=null) {
