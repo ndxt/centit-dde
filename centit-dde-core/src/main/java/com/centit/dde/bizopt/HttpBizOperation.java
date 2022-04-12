@@ -52,11 +52,16 @@ public class HttpBizOperation implements BizOperation {
         String httpMethod = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post");
         String httpUrlCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseId", "");
         String loginUrlCode = BuiltInOperation.getJsonFieldString(bizOptJson, "loginService", null);
-        Object json=BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
+        String json = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
         String httpUrl = BuiltInOperation.getJsonFieldString(bizOptJson, "httpUrl", null);
         Object requestBody="";
         if(json!=null) {
-            requestBody = JSONTransformer.transformer(json, new BizModelJSONTransform(bizModel));
+            String requestBodyData = json.trim();
+            if (requestBodyData.startsWith("{") && requestBodyData.endsWith("}")){
+                requestBody =JSONTransformer.transformer(JSON.parse(json), new BizModelJSONTransform(bizModel));
+            }else {
+                requestBody = JSONTransformer.transformer(json, new BizModelJSONTransform(bizModel));
+            }
         }
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlvalue");
         Map<String, Object> mapObject = new HashMap<>();
