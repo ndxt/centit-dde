@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.config.ElasticSearchConfig;
 import com.centit.dde.core.BizModel;
@@ -8,10 +9,8 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.entity.EsWriteVo;
 import com.centit.dde.factory.PooledRestClientFactory;
-import com.centit.dde.utils.EsIndexNameExistsUtils;
 import com.centit.dde.write.ElasticsearchWriteUtils;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.common.ResponseSingleData;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import org.apache.commons.logging.Log;
@@ -28,47 +27,38 @@ public class EsWriteBizOperation implements BizOperation {
 
     private SourceInfoDao sourceInfoDao;
 
-    public EsWriteBizOperation( ) {
-    }
-
     public EsWriteBizOperation(SourceInfoDao sourceInfoDao) {
         this.sourceInfoDao = sourceInfoDao;
     }
 
-
-
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
-        return writeEs(bizModel, bizOptJson);
-    }
-
-    //ES插入操作
-    private ResponseData writeEs(BizModel bizModel, JSONObject bizOptJson) throws Exception {
-        EsWriteVo esSearchWriteEntity = JSONObject.parseObject(bizOptJson.toJSONString(), EsWriteVo.class);
-        String source = esSearchWriteEntity.getSource();
+        EsWriteVo esWriteVo = JSONObject.parseObject(bizOptJson.toJSONString(), EsWriteVo.class);
+        String id = esWriteVo.getId();
+        String source = esWriteVo.getSource();
+        //组成文档id的字段
+        JSONArray docIds = bizOptJson.getJSONArray("config");
+        if (docIds!=null){
+            docIds.stream().forEach(docIdInfo->{
+                JSONObject fieldInfo =  (JSONObject)docIdInfo;
+                esWriteVo.getDocumentIds().add(fieldInfo.getString("columnName"));
+            });
+        }
         DataSet dataSet = bizModel.getDataSet(source);
         List<Map<String, Object>> data = dataSet.getDataAsList();
         List<String> addData = new ArrayList<>();
-        for (Map<String, Object> datum : data) {
-            String jsonData = JSONObject.toJSONString(datum);
-            addData.add(jsonData);
-        }
-        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(esSearchWriteEntity.getDataSourceId());
+        data.stream().forEach(datum-> addData.add(JSONObject.toJSONString(datum)));
+        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(esWriteVo.getDatabaseId());
         GenericObjectPool<RestHighLevelClient> restHighLevelClientGenericObjectPool = PooledRestClientFactory.obtainclientPool(new ElasticSearchConfig(), sourceInfo);
         RestHighLevelClient restHighLevelClient=null;
         try {
             restHighLevelClient = restHighLevelClientGenericObjectPool.borrowObject();
-            String indexName = esSearchWriteEntity.getIndexName();
-            if (!EsIndexNameExistsUtils.indexNameExists(restHighLevelClient,indexName)){
-                return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+":"+indexName+"索引不存在！");
-            }
-            JSONObject jsonObject = ElasticsearchWriteUtils.batchSaveDocuments(restHighLevelClient,addData, esSearchWriteEntity);
-            bizModel.putDataSet(esSearchWriteEntity.getId(),new SimpleDataSet(jsonObject));
-            return ResponseSingleData.makeResponseData(jsonObject);
+            JSONObject jsonObject = ElasticsearchWriteUtils.batchSaveDocuments(restHighLevelClient,addData, esWriteVo);
+            bizModel.putDataSet(id,new SimpleDataSet(jsonObject));
+            return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(id).getSize());
         }finally {
             restHighLevelClientGenericObjectPool.returnObject(restHighLevelClient);
             log.debug("restHighLevelClient放回连接池中");
         }
     }
-
 }

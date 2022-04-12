@@ -15,7 +15,6 @@ import org.elasticsearch.client.RestHighLevelClient;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PooledRestClientFactory implements PooledObjectFactory<RestHighLevelClient> {
-
     public static final Log log = LogFactory.getLog(PooledRestClientFactory.class);
 
     ElasticSearchConfig elasticSearchConfig;
@@ -34,13 +33,11 @@ public class PooledRestClientFactory implements PooledObjectFactory<RestHighLeve
 
     @Override
     public void destroyObject(PooledObject<RestHighLevelClient> p) throws Exception {
-        //p.getObject().close();
         RestHighLevelClient client = p.getObject();
         if( client!= null && client.ping(RequestOptions.DEFAULT)) {
             try {
                 client.close();
             }catch (Exception e){
-                //ignore
             }
         }
     }
@@ -63,17 +60,13 @@ public class PooledRestClientFactory implements PooledObjectFactory<RestHighLeve
 
     @Override
     public void passivateObject(PooledObject<RestHighLevelClient> p) throws Exception {
-        // Auto-generated method stub
     }
 
     public void setConifg(ElasticSearchConfig elasticSearchConfig) {
         this.elasticSearchConfig = elasticSearchConfig;
     }
 
-
-    private static ConcurrentHashMap<String, GenericObjectPool<RestHighLevelClient>> clientPoolMap
-        = new ConcurrentHashMap<>();
-
+    private static ConcurrentHashMap<String, GenericObjectPool<RestHighLevelClient>> clientPoolMap = new ConcurrentHashMap<>();
 
     public static GenericObjectPool<RestHighLevelClient> obtainclientPool(ElasticSearchConfig config,SourceInfo sourceInfo){
         GenericObjectPool<RestHighLevelClient> clientPool = clientPoolMap.get(sourceInfo.getDatabaseCode());

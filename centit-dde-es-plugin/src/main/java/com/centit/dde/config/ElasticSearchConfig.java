@@ -80,7 +80,6 @@ public class ElasticSearchConfig {
     }
 
     private HttpHost makeHttpHost(String str) {
-        assert StringUtils.isNotEmpty(str);
         String[] address = str.split(":");
         if (address.length == ADDRESS_LENGTH) {
             String ip = address[0];

@@ -99,5 +99,7 @@ public class ConstantValue {
     public static final String DATASET_JOIN_TYPE_RIGHT = "rightjoin";
     public static final String DATASET_JOIN_TYPE_ALL = "alljoin";
 
-
+    //可以2个都选，但是必须选择其中一个
+    public static final String CHECK_RULE_RESULT_TAG = "__check_rule_result";
+    public static final String CHECK_RULE_RESULT_MSG_TAG = "__check_rule_result_msg";
 }

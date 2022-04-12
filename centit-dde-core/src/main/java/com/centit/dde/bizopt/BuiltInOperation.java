@@ -3,13 +3,16 @@ package com.centit.dde.bizopt;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
+import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
-import com.centit.dde.datarule.CheckRule;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
+import com.centit.product.adapter.po.DataCheckRule;
+import com.centit.product.metadata.service.DataCheckRuleService;
+import com.centit.product.metadata.utils.DataCheckResult;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +27,14 @@ import java.util.*;
  * @author zhf
  */
 @SuppressWarnings("unchecked")
-public class BuiltInOperation {
+public class BuiltInOperation implements BizOperation {
+
+    private DataCheckRuleService dataCheckRuleService;
+
+    public BuiltInOperation(DataCheckRuleService dataCheckRuleService) {
+        this.dataCheckRuleService = dataCheckRuleService;
+    }
+
     public static String getJsonFieldString(JSONObject bizOptJson, String fieldName, String defaultValue) {
         String targetDsName = bizOptJson.getString(fieldName);
         if (StringUtils.isBlank(targetDsName)) {
@@ -325,19 +335,55 @@ public class BuiltInOperation {
         return getResponseSuccessData(count);
     }
 
-    public static ResponseData runCheckData(BizModel bizModel, JSONObject bizOptJson) {
-        String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        Object rulesJson = bizOptJson.get("config");
-        int count = 0;
-        if (rulesJson instanceof JSONArray) {
-            List<CheckRule> rules = ((JSONArray) rulesJson).toJavaList(CheckRule.class);
-            DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-            if (dataSet != null) {
-                DataSetOptUtil.checkDateSet(dataSet, rules);
-                count = dataSet.getSize();
-            }
-        }
-        return getResponseSuccessData(count);
+    public  ResponseData runCheckData(BizModel bizModel, JSONObject bizOptJson) {
+        String dataSetId = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
+        //校验信息所挂载的字段
+        String checkRuleResultField =bizOptJson.getString("checkRuleResultField");
+        //是否返回校验结果
+        Boolean checkRuleResult =bizOptJson.getBoolean("checkRuleResult")==null?true:bizOptJson.getBoolean("checkRuleResult");
+        //是否返回校验信息 默认不返回，如果默认返回的话会比较耗时
+        Boolean checkRuleResultMsg = bizOptJson.getBoolean("checkRuleResultMsg")==null?false:bizOptJson.getBoolean("checkRuleResultMsg");
+        DataSet dataSet = bizModel.getDataSet(dataSetId);
+        JSONArray rulesJson = bizOptJson.getJSONArray("config");
+        List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
+        DataCheckResult result = DataCheckResult.create();
+        dataAsList.stream().forEach(data->{
+            rulesJson.stream().forEach(ruleInfo->{
+                if (ruleInfo instanceof  Map){
+                    Map<String, Object> map = CollectionsOpt.objectToMap(ruleInfo);
+                    String checkTypeId = StringBaseOpt.objectToString(map.get("checkType"));
+                    DataCheckRule dataCheckRule = dataCheckRuleService.getObjectById(checkTypeId);
+                    List<Object> checkParams = CollectionsOpt.objectToList(map.get("checkParams"));
+                    if (dataCheckRule!=null  && checkParams!=null){
+                        Map<String, String>  paramMap = new HashMap<>();
+                        String checkField = StringBaseOpt.objectToString(map.get("checkField"));
+                        paramMap.put("checkValue",checkField);
+                        for (int i = 0; i < checkParams.size(); i++) {
+                            Map<String, Object> param = CollectionsOpt.objectToMap(checkParams.get(i));
+                            for (Map.Entry<String, Object> entry : param.entrySet()) {
+                                paramMap.put(entry.getKey(),StringBaseOpt.objectToString(entry.getValue()));
+                            }
+                        }
+                        result.checkData(data,dataCheckRule,paramMap,checkRuleResultMsg);
+                    }
+                }
+                if (data instanceof Map){
+                    Map<String, Object> map = CollectionsOpt.objectToMap(data);
+                    //设置校验结果信息
+                    if (checkRuleResultMsg){
+                        String errorMessage = result.getErrorMessage();
+                        map.put(checkRuleResultField+"_msg",errorMessage);
+                    }
+                    //设置校验结果
+                    if (checkRuleResult){
+                        map.put(checkRuleResultField,result.getResult());
+                    }
+                }
+            });
+            //清除上个对象的校验结果信息
+            result.reset();
+        });
+        return getResponseSuccessData(0);
     }
 
     private static DataSet getArray(DataSet dataSet) {
@@ -352,5 +398,10 @@ public class BuiltInOperation {
             }
         }
         return new SimpleDataSet();
+    }
+
+    @Override
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
+        return  runCheckData( bizModel,  bizOptJson);
     }
 }

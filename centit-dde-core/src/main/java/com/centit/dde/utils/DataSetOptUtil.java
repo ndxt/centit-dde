@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
-import com.centit.dde.datarule.CheckRule;
-import com.centit.dde.datarule.CheckRuleUtils;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
@@ -14,7 +12,6 @@ import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.JavaBeanMetaData;
 import com.centit.support.compiler.ObjectTranslate;
-import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.image.CaptchaImageUtil;
 import org.apache.commons.collections4.ListUtils;
@@ -863,23 +860,6 @@ public abstract class DataSetOptUtil {
             i++;
         }
         return new SimpleDataSet(newData);
-    }
-
-    public static void checkDateSet(DataSet inData, Collection<CheckRule> rules) {
-        List<Map<String, Object>> data = inData.getDataAsList();
-
-        for (Map<String, Object> obj : data) {
-            StringBuilder checkResult = new StringBuilder();
-            for (CheckRule rule : rules) {
-                if (!CheckRuleUtils.checkData(obj, rule)) {
-                    checkResult.append(Pretreatment.mapTemplateString(rule.getErrormsg(), obj)).append(";");
-                }
-            }
-            if (StringUtils.isBlank(checkResult.toString())) {
-                checkResult = new StringBuilder("ok");
-            }
-            obj.put(CheckRuleUtils.CHECK_RULE_RESULT_TAG, checkResult.toString());
-        }
     }
 
     private static int compareTwoRow(Map<String, Object> data1, Map<String, Object> data2, List<String> fields, boolean nullAsFirst) {

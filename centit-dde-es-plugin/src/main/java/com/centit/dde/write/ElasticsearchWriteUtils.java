@@ -17,6 +17,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +31,7 @@ public class ElasticsearchWriteUtils {
     public static JSONObject batchSaveDocuments(RestHighLevelClient restHighLevelClient, List<String> jsonDatas, EsWriteVo esSearchWriteEntity) throws IOException {
         BulkRequest requestBulk = new BulkRequest(esSearchWriteEntity.getIndexName());
         for (String jsonData : jsonDatas) {
-            String documentid = getDocument(jsonData, esSearchWriteEntity.getDocumentIds());
+            String documentid = getDocumentId(jsonData, esSearchWriteEntity.getDocumentIds());
             //判断文档id是否已经存在，如果存在就做更新操作 反之
             if (documentIdExist(restHighLevelClient, esSearchWriteEntity.getIndexName(),documentid)){
                 UpdateRequest updateRequest= new UpdateRequest(esSearchWriteEntity.getIndexName(),documentid);
@@ -46,28 +47,29 @@ public class ElasticsearchWriteUtils {
         int addCount=0;
         int faildCount=0;
         BulkResponse bulkResponse = restHighLevelClient.bulk(requestBulk, RequestOptions.DEFAULT);
-        JSONObject jsonObject = new JSONObject();
+        //成功返回
+        JSONObject result = new JSONObject();
         JSONObject faildData = new JSONObject();
         for(BulkItemResponse bulkItemResponse : bulkResponse){
             DocWriteResponse itemResponse = bulkItemResponse.getResponse();
             if (itemResponse instanceof  IndexResponse){
-                updateCount++;
+                addCount++;
             }
             if (itemResponse instanceof UpdateResponse){
-                addCount++;
+                updateCount++;
             }
             if(bulkItemResponse.isFailed()){
                 faildData.put(bulkItemResponse.getId(),bulkItemResponse.getFailureMessage());
                 faildCount++;
             }
         }
-        jsonObject.put("addCount",addCount);
-        jsonObject.put("updateCount",updateCount);
-        jsonObject.put("faildCount",faildCount);
+        result.put("addCount",addCount);
+        result.put("updateCount",updateCount);
+        result.put("faildCount",faildCount);
         if (faildCount>0){
-            jsonObject.put("errorData",faildData);
+            result.put("errorData",faildData);
         }
-        return jsonObject;
+        return result;
     }
 
     /**
@@ -76,14 +78,11 @@ public class ElasticsearchWriteUtils {
      * @param fields   作为document文档id的字段 （0个或者多个）
      * @return documentid
      */
-    private static String getDocument(String jsonData,String fields){
+    private static String getDocumentId(String jsonData,List<String> fields){
         StringBuilder doucmentId = new StringBuilder();
-        if (StringUtils.isNotBlank(fields)) {
-            String[] fieldArr = fields.split(",");
+        if (fields!=null &&fields.size()>0) {
             JSONObject jsonObject = JSONObject.parseObject(jsonData);
-            for (int i = 0; i < fieldArr.length; i++) {
-                doucmentId.append(jsonObject.get(fieldArr[i]));
-            }
+            fields.stream().forEach(fieldName->doucmentId.append(jsonObject.get(fieldName)));
         }else {
             doucmentId.append(UUID.randomUUID().toString().replaceAll("-",""));
         }

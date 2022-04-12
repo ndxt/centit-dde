@@ -19,6 +19,7 @@ import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.common.ResponseSingleData;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.product.metadata.service.DataCheckRuleService;
 import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
@@ -79,6 +80,9 @@ public class BizOptFlowImpl implements BizOptFlow {
     @Autowired
     private MetaDataCache metaDataCache;
 
+    @Autowired
+    private  DataCheckRuleService dataCheckRuleService;
+
 
     @Autowired(required = false)
     private FileStore fileStore;
@@ -107,7 +111,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("join", BuiltInOperation::runJoin);
         allOperations.put("union", BuiltInOperation::runUnion);
         allOperations.put("filterExt", BuiltInOperation::runFilterExt);
-        allOperations.put("check", BuiltInOperation::runCheckData);
+        allOperations.put("check", new BuiltInOperation(dataCheckRuleService));
         allOperations.put("static", BuiltInOperation::runStaticData);
         allOperations.put("http", new HttpBizOperation(sourceInfoDao));
         allOperations.put("clear", BuiltInOperation::runClear);
@@ -169,6 +173,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             AbstractSourceConnectThreadHolder.commitAndRelease();
         } catch (Exception e) {
             AbstractSourceConnectThreadHolder.rollbackAndRelease();
+            //加个错误日志到数据库中
         }
         return dataOptVo.getPreResult();
     }
