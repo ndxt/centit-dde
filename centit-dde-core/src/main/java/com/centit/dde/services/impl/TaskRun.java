@@ -66,18 +66,17 @@ public class TaskRun {
             dataPacketInterface = dataPacketDao.getObjectWithReferences(packetId);
         }
         buildLogInfo(taskLog, runType, dataPacketInterface);
-        if (!ConstantValue.LOGLEVEL_ERROR.equals(dataPacketInterface.getLogLevel())){//不记录任何日志
+        if ( (ConstantValue.LOGLEVEL_CHECK_INFO & dataPacketInterface.getLogLevel()) != 0){//不记录任何日志
             //保存日志基本信息
             taskLogDao.saveNewObject(taskLog);
-        }
-        if (ConstantValue.LOGLEVEL_ERROR.equals(dataPacketInterface.getLogLevel())){
+        } else {
             interimVariable.put("buildLogInfo",taskLog);
         }
         try {
             Object runResult = runStep(dataPacketInterface, taskLog.getLogId(), queryParams,interimVariable);
             //更新API信息
             updateApiData(runType,dataPacketInterface);
-            if (!ConstantValue.LOGLEVEL_ERROR.equals(dataPacketInterface.getLogLevel())){//不记录任何日志
+            if ((ConstantValue.LOGLEVEL_CHECK_INFO & dataPacketInterface.getLogLevel()) != 0){//不记录任何日志
                 //更新日志信息
                 updateLog(taskLog);
             }

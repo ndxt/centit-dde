@@ -23,10 +23,7 @@ import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
-import com.centit.support.algorithm.BooleanBaseOpt;
-import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.algorithm.ReflectionOpt;
-import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.*;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
 import org.apache.commons.lang3.StringUtils;
@@ -443,9 +440,9 @@ public class BizOptFlowImpl implements BizOptFlow {
     private void runOneStepOpt(DataOptStep dataOptStep, DataOptVo dataOptVo) {
         SimpleBizModel bizModel = dataOptVo.getBizModel();
         Map<String, Object> interimVariable = bizModel.getInterimVariable();
-        String logLevel = (String)interimVariable.get("logLevel");
+        int logLevel = NumberBaseOpt.castObjectToInteger(interimVariable.get("logLevel"), ConstantValue.LOGLEVEL_TYPE_INFO);
         TaskDetailLog detailLog=null;
-        if (ConstantValue.LOGLEVEL_DEBUG.equals(logLevel)){
+        if ((ConstantValue.LOGLEVEL_CHECK_INFO & logLevel) != 0){
             detailLog = writeLog(dataOptStep, dataOptVo);
         }
         JSONObject bizOptJson = dataOptStep.getCurrentStep().getJSONObject("properties");
@@ -457,7 +454,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 throw new ObjectException(responseData, responseData.getCode(), responseData.getMessage());
             }
             JSONObject jsonObject = JSONObject.parseObject(responseData.getData().toString());
-            if (dataOptVo.getLogId() != null && ConstantValue.LOGLEVEL_DEBUG.equals(logLevel)) {
+            if (dataOptVo.getLogId() != null && (ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
                 detailLog.setSuccessPieces(jsonObject.getIntValue("success"));
                 detailLog.setErrorPieces(jsonObject.getIntValue("error"));
                 detailLog.setLogInfo(BuiltInOperation.getJsonFieldString(jsonObject, "info", "ok"));
@@ -465,7 +462,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 taskDetailLogDao.updateObject(detailLog);
             }
         } catch (Exception e) {
-            if(ConstantValue.LOGLEVEL_ERROR.equals(logLevel) && interimVariable.containsKey("buildLogInfo")){
+            if(ConstantValue.LOGLEVEL_TYPE_ERROR == logLevel && interimVariable.containsKey("buildLogInfo")){
                 TaskLog taskLog = (TaskLog)interimVariable.get("buildLogInfo");
                if (taskLog !=null && StringUtils.isEmpty(taskLog.getLogId())){//主日志只记录一次
                    taskLog.setRunEndTime(new Date());

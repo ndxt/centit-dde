@@ -77,10 +77,17 @@ public class ConstantValue {
 
     public static final String FINAL_TWO="2";
     //日志记录级别
-    public static final String LOGLEVEL_INFO="I";//INFO
-    public static final String LOGLEVEL_ERROR="E";//ERROR
-    public static final String LOGLEVEL_DEBUG="D";//DEBUG
+    //public static final String LOGLEVEL_INFO="I";//INFO
+    //public static final String LOGLEVEL_ERROR="E";//ERROR
+    //public static final String LOGLEVEL_DEBUG="D";//DEBUG
 
+    public static final int LOGLEVEL_TYPE_ERROR= 1;//ERROR
+    public static final int LOGLEVEL_TYPE_INFO = 3;//INFO
+    public static final int LOGLEVEL_TYPE_DEBUG= 7;//DEBUG
+    // 1 1 1
+    public static final int LOGLEVEL_CHECK_ERROR= 1;//ERROR
+    public static final int LOGLEVEL_CHECK_INFO = 2; //INFO
+    public static final int LOGLEVEL_CHECK_DEBUG= 4;//DEBUG
 
     public static final String TASK_TYPE_GET="1";
     public static final String TASK_TYPE_POST="3";

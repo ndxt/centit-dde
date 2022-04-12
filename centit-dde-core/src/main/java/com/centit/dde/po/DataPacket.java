@@ -136,8 +136,8 @@ public class DataPacket implements Serializable,DataPacketInterface {
     private String sourceId;
 
     @Column(name = "log_level")
-    @ApiModelProperty(value = "日志记录级别，E=ERROR,I=INFO,D=DEBUG")
-    private String logLevel;
+    @ApiModelProperty(value = "日志记录级别，1=ERROR,3=INFO,7=DEBUG")
+    private Integer logLevel;
 
 
     @OneToMany(targetEntity = DataPacketParam.class)
