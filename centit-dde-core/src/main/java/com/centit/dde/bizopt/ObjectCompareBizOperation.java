@@ -6,9 +6,11 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.CollectionsOpt;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ObjectCompareBizOperation implements BizOperation {
     @Override
@@ -23,9 +25,9 @@ public class ObjectCompareBizOperation implements BizOperation {
 
         Object newDataSet = bizModel.getDataSet(newSource).getData();
 
-        JSONObject oldObject = JSON.parseObject(JSON.toJSONString(oldDataSet));
+        Map<String,Object> oldObject = CollectionsOpt.objectToMap(oldDataSet);
 
-        JSONObject newObject = JSON.parseObject(JSON.toJSONString(newDataSet));
+        Map<String,Object> newObject = CollectionsOpt.objectToMap(newDataSet);
 
         List<JSONObject> compareResult = new ArrayList<>();
         newObject.forEach((newKey,newValue)->{

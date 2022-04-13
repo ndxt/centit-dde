@@ -14,6 +14,7 @@ import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.json.JSONTransformer;
@@ -83,7 +84,7 @@ public class HttpBizOperation implements BizOperation {
             if (httpUrlCodeInfo!=null){
                 JSONObject extProps = httpUrlCodeInfo.getExtProps();
                 if (extProps !=null){
-                    headers = JSON.parseObject(extProps.toJSONString(), Map.class);
+                    headers =CollectionsOpt.objectMapToStringMap(extProps);
                 }
             }
         }

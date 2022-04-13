@@ -78,8 +78,7 @@ public class BizModelServiceImpl implements BizModelService {
     private void makeDataPacketBufId(DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
         String dateString = DatetimeOpt.convertTimestampToString(dataPacket.getRecordDate());
         String params = JSON.toJSONString(paramsMap, SerializerFeature.MapSortField);
-        StringBuffer temp;
-        temp = new StringBuffer("packet:");
+        StringBuilder temp= new StringBuilder("packet:");
         temp.append(dataPacket.getPacketId())
             .append(":")
             .append(params)

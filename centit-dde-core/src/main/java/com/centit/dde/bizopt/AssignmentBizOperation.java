@@ -9,6 +9,7 @@ import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.vo.AssignmentVo;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.SerializationUtils;
@@ -29,8 +30,9 @@ public class AssignmentBizOperation implements BizOperation {
         DataSet dataSet = bizModel.getDataSet(assignmentVo.getSource());
         String assignType = assignmentVo.getAssignType();
         JSONObject dataSetData=null;
-        if (!StringBaseOpt.isNvl(String.valueOf(assignmentVo.getData()))){//根据表达式生成新的数据集
-            dataSetData = (JSONObject)JSONTransformer.transformer(JSON.parse(String.valueOf(assignmentVo.getData())), new BizModelJSONTransform(bizModel));
+        String data = StringBaseOpt.castObjectToString(assignmentVo.getData());
+        if (!StringBaseOpt.isNvl(data)){//根据表达式生成新的数据集
+            dataSetData = (JSONObject)JSONTransformer.transformer(JSON.parse(data), new BizModelJSONTransform(bizModel));
         }
         DataSet newDataSet;
         switch (assignType){
@@ -41,10 +43,10 @@ public class AssignmentBizOperation implements BizOperation {
                 newDataSet=SerializationUtils.clone(new SimpleDataSet(dataSet.getData()));
                 break;
             case "2"://手动赋值
-                Object data =  JSONTransformer.transformer(JSON.parse(assignmentVo.getData()), new BizModelJSONTransform(bizModel));
+                Object transformerdData =  JSONTransformer.transformer(JSON.parse(data), new BizModelJSONTransform(bizModel));
                 Map<String, Object> modelTag = bizModel.getModelTag();
-                if (data instanceof  Map){
-                    modelTag.putAll((Map)data);
+                if (transformerdData instanceof  Map){
+                    modelTag.putAll(CollectionsOpt.objectToMap(transformerdData));
                 }else {
                  modelTag.put(assignmentVo.getId(),data);
                 }
@@ -52,11 +54,9 @@ public class AssignmentBizOperation implements BizOperation {
                 break;
             default://引用数据集
                 List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
-                Map map = JSONObject.parseObject(JSON.toJSONString(dataSetData), Map.class);
+                Map<String,Object> map = CollectionsOpt.objectToMap(dataSetData);
                 for (Map<String, Object> objectMap : dataAsList) {
-                    map.forEach((key,value)->{
-                        objectMap.put((String) key,value);
-                    });
+                    map.forEach((key,value)-> objectMap.put(key,value));
                 }
                 newDataSet = new SimpleDataSet(dataSet);
                 break;

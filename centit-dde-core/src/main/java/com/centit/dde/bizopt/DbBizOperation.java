@@ -38,7 +38,7 @@ public class DbBizOperation implements BizOperation {
         String conditionSet = BuiltInOperation.getJsonFieldString(bizOptJson, "conditionSet", "");
         String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
         Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
-        String optId = (String) bizModel.getInterimVariable().get("metadata_optId");
+        String optId = StringBaseOpt.castObjectToString(bizModel.getInterimVariable().get("metadata_optId"));
         Map<String, Object> mapObject = new HashMap<>();
         if (mapString != null) {
             for (Map.Entry<String, String> map : mapString.entrySet()) {

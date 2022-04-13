@@ -9,6 +9,7 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileInfo;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -39,7 +40,7 @@ public class FileUploadBizOperation implements BizOperation {
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         String fileNameField= (String) bizModel.getModelTag().get("fileName");
         if(fileNameField==null) {
-            fileNameField = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", String.valueOf(System.currentTimeMillis()));
+            fileNameField = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", StringBaseOpt.castObjectToString(System.currentTimeMillis()));
         }
         String fileDataField=BuiltInOperation.getJsonFieldString(bizOptJson,"fileupexpression",null);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
@@ -57,7 +58,7 @@ public class FileUploadBizOperation implements BizOperation {
         List<Map<String, Object>> dataSetDataAsList = dataSet.getDataAsList();
         for (Map<String, Object> dataMap : dataSetDataAsList) {
             FileInfo fileInfo = new FileInfo();
-            fileInfo.setFileName(dataMap.get(fileNameField)==null?fileNameField:String.valueOf(dataMap.get(fileNameField)));
+            fileInfo.setFileName(dataMap.get(fileNameField)==null?fileNameField:StringBaseOpt.castObjectToString(dataMap.get(fileNameField)));
             String fileId;
             Object object = StringUtils.isNotBlank(fileDataField)?dataMap.get(fileDataField):dataSet.getFirstRow().get("fileContent");
             if (object instanceof byte[]){

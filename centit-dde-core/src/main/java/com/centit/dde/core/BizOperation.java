@@ -12,6 +12,5 @@ public interface BizOperation{
     ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception;
 
     default void debugOpt(BizModel bizModel, JSONObject bizOptJson){
-        //return;
     }
 }

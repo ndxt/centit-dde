@@ -27,7 +27,7 @@ public class GenerateJsonFileBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws IOException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String requestBody= (String)bizModel.getInterimVariable().get("requestBody");
+        String requestBody= StringBaseOpt.castObjectToString(bizModel.getInterimVariable().get("requestBody"));
         String fileName=StringUtils.isNotBlank(bizOptJson.getString("fileName"))?
             StringBaseOpt.castObjectToString(Pretreatment.mapTemplateStringAsFormula(
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))):

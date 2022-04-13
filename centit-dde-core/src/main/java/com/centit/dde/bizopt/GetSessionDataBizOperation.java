@@ -10,10 +10,12 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 public class GetSessionDataBizOperation implements BizOperation {
     @Override
@@ -28,10 +30,12 @@ public class GetSessionDataBizOperation implements BizOperation {
             if (request!=null&& StringUtils.isNotBlank(sessionKey)){
                 Object sessionData = ReflectionOpt.attainExpressionValue(WebOptUtils.getCurrentUserDetails(request), sessionKey);
                 if (sessionKey.equals("userInfo") && sessionData!=null ){
-                    JSONObject userInfo = JSON.parseObject(JSON.toJSONString(sessionData));
-                    userInfo.put("userPin",null);
-                    result.put(sessionKey,userInfo);
-                    continue;
+                    if (sessionData instanceof Map){
+                        Map<String,Object> userInfo = CollectionsOpt.objectToMap(sessionData);
+                        userInfo.put("userPin",null);
+                        result.put(sessionKey,userInfo);
+                        continue;
+                    }
                 }
                 if (sessionKey.equals("userInfo.userPin")){
                     result.put(sessionKey,null);

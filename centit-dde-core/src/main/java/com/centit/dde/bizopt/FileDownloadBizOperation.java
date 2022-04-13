@@ -8,6 +8,7 @@ import com.centit.dde.utils.BizOptUtils;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileInputStream;
@@ -53,7 +54,7 @@ public class FileDownloadBizOperation implements BizOperation {
             List<Map<String, Object>> dataSetDataAsList = dataSet.getDataAsList();
             for (Map<String, Object> objectMap : dataSetDataAsList) {
                 for (Object fileId : objectMap.values()) {
-                    InputStream inputStream =new FileInputStream(fileStore.getFile(String.valueOf(fileId)));
+                    InputStream inputStream =new FileInputStream(fileStore.getFile(StringBaseOpt.castObjectToString(fileId)));
                     inputStreams.add(inputStream);
                 }
             }
