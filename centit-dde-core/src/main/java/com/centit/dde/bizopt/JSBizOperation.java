@@ -15,14 +15,6 @@ import org.slf4j.LoggerFactory;
  * @author zhf
  */
 public class JSBizOperation implements BizOperation {
-    private static final Logger logger = LoggerFactory.getLogger(JSBizOperation.class);
-
-    private MetaObjectService metaObjectService;
-
-    public JSBizOperation(MetaObjectService metaObjectService) {
-        this.metaObjectService = metaObjectService;
-    }
-
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         JSRuntimeContext jsRuntimeContext = new JSRuntimeContext();
@@ -33,7 +25,7 @@ public class JSBizOperation implements BizOperation {
             jsRuntimeContext.compileScript(javaScript);
         }
         int count = 0;
-        Object object = jsRuntimeContext.callJsFunc("runOpt", this, bizModel,bizModel.toJsonObject());
+        Object object = jsRuntimeContext.callJsFunc("runOpt",bizModel);
         bizModel.putDataSet(targetDsName,
             BizOptUtils.castObjectToDataSet(object));
         if (object != null) {
