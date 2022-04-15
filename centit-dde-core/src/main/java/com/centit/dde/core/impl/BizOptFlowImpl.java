@@ -115,7 +115,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("static", BuiltInOperation::runStaticData);
         allOperations.put("http", new HttpBizOperation(sourceInfoDao));
         allOperations.put("clear", BuiltInOperation::runClear);
-        allOperations.put("js", new JSBizOperation(metaObjectService));
+        allOperations.put("js", new JSBizOperation());
         allOperations.put("persistence", new PersistenceBizOperation(path, sourceInfoDao, metaDataService));
         allOperations.put("database", new DbBizOperation(sourceInfoDao,queryDataScopeFilter));
         allOperations.put("excel", new ExcelBizOperation());
