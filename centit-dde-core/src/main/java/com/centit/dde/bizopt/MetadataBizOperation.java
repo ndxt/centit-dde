@@ -63,7 +63,10 @@ public class MetadataBizOperation implements BizOperation {
                 }
             }
         }
-        parames.putAll(bizModel.getModelTag());
+        //只有为自定义参数的时候才put进去
+        if("customSource".equals(bizOptJson.getString("sourceType"))){
+            parames.putAll(bizModel.getModelTag());
+        }
         switch (templateType){
             case 1://新建
                 metaObjectService.saveObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
