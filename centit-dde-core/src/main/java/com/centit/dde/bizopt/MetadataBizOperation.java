@@ -64,7 +64,7 @@ public class MetadataBizOperation implements BizOperation {
             }
         }
         //只有为自定义参数的时候才put进去
-        if("customSource".equals(bizOptJson.getString("sourceType"))){
+        if(bizOptJson.getString("sourceType") ==null || "customSource".equals(bizOptJson.getString("sourceType"))){
             parames.putAll(bizModel.getModelTag());
         }
         switch (templateType){

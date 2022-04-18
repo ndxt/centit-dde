@@ -53,12 +53,17 @@ public class DbBizOperation implements BizOperation {
         //选择数据集作为参数
         if(!StringBaseOpt.isNvl(dataSetId)){
             DataSet dataSet = bizModel.getDataSet(dataSetId);
-            List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
-            dataAsList.stream().forEach(map->{
-                mapObject.putAll(map);
-            });
+            if (dataSet != null){
+                List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
+                dataAsList.stream().forEach(map->{
+                    mapObject.putAll(map);
+                });
+            }
         }
-        mapObject.putAll(bizModel.getModelTag());
+        //只有为自定义参数的时候才put进去
+        if(bizOptJson.getString("sourceType") ==null || "customSource".equals(bizOptJson.getString("sourceType"))){
+            mapObject.putAll(bizModel.getModelTag());
+        }
         SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
             return BuiltInOperation.getResponseData(0, 0, "找不到对应的集成数据库：" + databaseCode);
