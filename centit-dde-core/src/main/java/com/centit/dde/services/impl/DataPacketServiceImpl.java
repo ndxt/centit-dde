@@ -119,5 +119,9 @@ public class DataPacketServiceImpl implements DataPacketService {
         return dataPacket;
     }
 
-
+    @Override
+    public void updateDisableStatus(String packetId,String disable) {
+        String sql ="UPDATE q_data_packet SET is_disable= ? WHERE PACKET_ID = ? ";
+        dataPacketDao.getJdbcTemplate().update(sql, new Object[]{disable,packetId});
+    }
 }

@@ -3,6 +3,7 @@ package com.centit.dde.bizopt;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.SqlDataSetReader;
 import com.centit.dde.utils.BizModelJSONTransform;
@@ -14,6 +15,7 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -32,7 +34,8 @@ public class DbBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
-        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
+        String id = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
+        String dataSetId = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", "");
         String condition = BuiltInOperation.getJsonFieldString(bizOptJson, "condition", "false");
         String conditionSet = BuiltInOperation.getJsonFieldString(bizOptJson, "conditionSet", "");
@@ -46,6 +49,14 @@ public class DbBizOperation implements BizOperation {
                     mapObject.put(map.getKey(), VariableFormula.calculate(map.getValue(), new BizModelJSONTransform(bizModel)));
                 }
             }
+        }
+        //选择数据集作为参数
+        if(!StringBaseOpt.isNvl(dataSetId)){
+            DataSet dataSet = bizModel.getDataSet(dataSetId);
+            List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
+            dataAsList.stream().forEach(map->{
+                mapObject.putAll(map);
+            });
         }
         mapObject.putAll(bizModel.getModelTag());
         SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
@@ -61,7 +72,7 @@ public class DbBizOperation implements BizOperation {
             sqlDsr.setExtendFilters(bizModel.getDataSet(conditionSet).getDataAsList().get(0));
         }
         SimpleDataSet dataSet = sqlDsr.load(mapObject);
-        bizModel.putDataSet(sourDsName, dataSet);
+        bizModel.putDataSet(id, dataSet);
         return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
     }
 }

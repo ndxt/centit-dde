@@ -69,19 +69,5 @@ public class TaskLog implements java.io.Serializable {
 
     @Column(name="api_type")
     @ApiModelProperty(value = "API类别，是草稿还是正式运行的日志，0草稿，1正式")
-    private String apiType;
-
-   /* @Transient
-    private Set<TaskDetailLog> taskDetailLogs;
-
-    public Set<TaskDetailLog> getTaskDetailLogs() {
-        if (this.taskDetailLogs == null)
-            this.taskDetailLogs = new HashSet<TaskDetailLog>();
-        return this.taskDetailLogs;
-    }
-
-    public void setTaskDetailLogs(Set<TaskDetailLog> taskDetailLogs) {
-        this.taskDetailLogs = taskDetailLogs;
-    }*/
-
+    private Integer apiType;
 }

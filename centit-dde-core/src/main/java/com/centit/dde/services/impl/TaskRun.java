@@ -14,7 +14,7 @@ import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.basedata.NoticeMessage;
-import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +55,7 @@ public class TaskRun {
     public Object runTask(String packetId, Map<String, Object> queryParams, Map<String, Object> interimVariable){
         String runType = ConstantValue.RUN_TYPE_NORMAL;
         if (interimVariable != null && interimVariable.containsKey("runType")) {
-            runType = (String) interimVariable.get("runType");
+            runType = StringBaseOpt.castObjectToString(interimVariable.get("runType"));
         }
         DataPacketInterface dataPacketInterface;
         TaskLog taskLog = new TaskLog();
@@ -122,18 +122,19 @@ public class TaskRun {
     }
 
     private void buildLogInfo(TaskLog taskLog,String runType,DataPacketInterface dataPacketInterface) {
-        taskLog.setApiType(ConstantValue.RUN_TYPE_COPY.equals(runType) ? "0" : "1");
+        taskLog.setApiType(ConstantValue.RUN_TYPE_COPY.equals(runType) ? 0 : 1);
         taskLog.setRunner(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
         taskLog.setApplicationId(dataPacketInterface.getOsId());
         taskLog.setRunType(dataPacketInterface.getPacketName());
         taskLog.setTaskId(dataPacketInterface.getPacketId());
-        log.debug("新增API执行日志，日志信息：{}", JSON.toJSONString(taskLog));
+        log.debug("新增API执行日志，日志信息：{}", StringBaseOpt.castObjectToString(taskLog));
     }
 
     private void updateLog(TaskLog taskLog) {
         taskLog.setRunEndTime(new Date());
-        TaskDetailLog taskDetailLog = taskDetailLogDao.getObjectByProperties(CollectionsOpt.createHashMap("logId", taskLog.getLogId()));
-        String message= taskDetailLog==null?"ok":"ok".equals(taskDetailLog.getLogInfo())? "ok" : "error";
+        String sql ="SELECT count(log_detail_id) as count  FROM d_task_detail_log WHERE log_id=? and log_info <> ? ";
+        int count = NumberBaseOpt.castObjectToInteger(DatabaseOptUtils.getScalarObjectQuery(taskDetailLogDao, sql, new Object[]{taskLog.getLogId(), "ok"}));
+        String message= count>0?"error":"ok";
         taskLog.setOtherMessage(message);
         taskLogDao.updateObject(taskLog);
         log.debug("更新API执行日志，日志信息：{}", JSON.toJSONString(taskLog));

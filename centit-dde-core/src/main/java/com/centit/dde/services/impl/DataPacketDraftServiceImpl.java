@@ -121,6 +121,12 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
     }
 
     @Override
+    public void updateDisableStatus(String packetId,String disable) {
+        String sql ="UPDATE q_data_packet_draft SET is_disable=? WHERE PACKET_ID = ? ";
+       dataPacketCopyDao.getJdbcTemplate().update(sql, new Object[]{disable,packetId});
+    }
+
+    @Override
     public void updateDataPacketOptJson(String packetId, String dataPacketOptJson) {
         DatabaseOptUtils.batchUpdateObject(dataPacketCopyDao, DataPacketDraft.class,
             CollectionsOpt.createHashMap("dataOptDescJson", dataPacketOptJson),

@@ -139,6 +139,10 @@ public class DataPacket implements Serializable,DataPacketInterface {
     @ApiModelProperty(value = "日志记录级别，1=ERROR,3=INFO,7=DEBUG")
     private Integer logLevel;
 
+    @Column(name = "is_disable")
+    @ApiModelProperty(value = "是否逻辑删除，T：删除，F：未删除", required = true)
+    private Boolean isDisable;
+
 
     @OneToMany(targetEntity = DataPacketParam.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
@@ -152,16 +156,6 @@ public class DataPacket implements Serializable,DataPacketInterface {
     }
 
     @Override
-
-
-
-
-
-
-
-
-
-
     @JSONField(serialize = false)
     public Map<String, Object> getPacketParamsValue() {
         Map<String, Object> params = new HashMap<>(10);

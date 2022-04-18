@@ -54,4 +54,6 @@ public interface DataPacketInterface {
     Integer getBufferFreshPeriodType();
 
     Integer getLogLevel();
+
+    Boolean getIsDisable();
 }

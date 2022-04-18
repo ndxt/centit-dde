@@ -109,6 +109,14 @@ public class BuiltInOperation implements BizOperation {
         return getResponseSuccessData(0);
     }
 
+    public static ResponseData runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
+        InputStream inputStream = (InputStream) bizModel.getInterimVariable().get("requestFile");
+        DataSet destDs = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", "",
+            "fileSize", inputStream.available(), "fileContent", inputStream));
+        bizModel.putDataSet(bizOptJson.getString("id"), destDs);
+        return getResponseSuccessData(destDs.getSize());
+    }
+
     public static ResponseData runRequestBody(BizModel bizModel, JSONObject bizOptJson) {
         String bodyString = (String) bizModel.getInterimVariable().get("requestBody");
         if (StringUtils.isNotBlank(bodyString)){
@@ -118,30 +126,6 @@ public class BuiltInOperation implements BizOperation {
         }
         return getResponseSuccessData(0);
     }
-
-    public static ResponseData runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
-        InputStream inputStream = (InputStream) bizModel.getInterimVariable().get("requestFile");
-        DataSet destDs = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", "",
-            "fileSize", inputStream.available(), "fileContent", inputStream));
-        bizModel.putDataSet(bizOptJson.getString("id"), destDs);
-        return getResponseSuccessData(destDs.getSize());
-    }
-
-/*    public static Object returnExcel(BizModel bizModel, JSONObject bizOptJson) throws Exception {
-        String path = BuiltInOperation.getJsonFieldString(bizOptJson, "source2", "");
-        File excel = new File(SystemTempFileUtils.getRandomTempFilePath());
-        for (Map.Entry<String, DataSet> set : bizModel.getBizData().entrySet()) {
-            if (set.getKey().equals(path) || StringBaseOpt.isNvl(path)) {
-                String[] head = CollectionsOpt.listToArray(set.getValue().getFirstRow().keySet());
-                ExcelExportUtil.appendDataToExcelSheet(excel.getPath(), set.getKey(), (List<Object>) set.getValue().getData(), head, head);
-            }
-        }
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        FileIOOpt.writeInputStreamToOutputStream(new FileInputStream(excel), outStream);
-        FileSystemOpt.deleteFile(excel);
-        return BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", bizModel.getModelName() + ".xlsx",
-            "fileContent", outStream));
-    }*/
 
     public static ResponseData runMap(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
@@ -281,8 +265,6 @@ public class BuiltInOperation implements BizOperation {
         if (map != null) {
             DataSet dataSet = getArray(bizModel.fetchDataSetByName(sour1DsName));
             DataSet dataSet2 = getArray(bizModel.fetchDataSetByName(sour2DsName));
-           /* DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
-            DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);*/
             DataSet destDs = DataSetOptUtil.joinTwoDataSet(dataSet, dataSet2, new ArrayList<>(map.entrySet()), join);
             if (destDs != null) {
                 bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
@@ -351,7 +333,7 @@ public class BuiltInOperation implements BizOperation {
             rulesJson.stream().forEach(ruleInfo->{
                 if (ruleInfo instanceof  Map){
                     Map<String, Object> map = CollectionsOpt.objectToMap(ruleInfo);
-                    String checkTypeId = StringBaseOpt.objectToString(map.get("checkType"));
+                    String checkTypeId = StringBaseOpt.objectToString(map.get("checkTypeId"));
                     DataCheckRule dataCheckRule = dataCheckRuleService.getObjectById(checkTypeId);
                     List<Object> checkParams = CollectionsOpt.objectToList(map.get("checkParams"));
                     if (dataCheckRule!=null  && checkParams!=null){

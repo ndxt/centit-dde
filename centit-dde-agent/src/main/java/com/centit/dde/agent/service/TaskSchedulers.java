@@ -46,6 +46,7 @@ public class TaskSchedulers {
         this.operationLogWriter = operationLogWriter;
         queryParams.put("taskType", "2");
         queryParams.put("isValid", "T");
+        queryParams.put("isDisable", "T");
         if (pathConfig.getOptId() != null && pathConfig.getOptId().length > 0) {
             queryParams.put("optId_in", pathConfig.getOptId());
         }

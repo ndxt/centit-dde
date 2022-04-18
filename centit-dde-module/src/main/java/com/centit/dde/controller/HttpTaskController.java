@@ -159,13 +159,16 @@ public class HttpTaskController extends BaseController {
             dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
         }
         if (dataPacketInterface==null){
-            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "网关数据："+packetId+"不存在！");
+            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "API接口："+packetId+"不存在！");
         }
         if ("2".equals(dataPacketInterface.getTaskType()) || "4".equals(dataPacketInterface.getTaskType())){
-            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "定时任务或消息触发不支持请求，该类型任务会自动触发！");
+            throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "定时任务或消息触发不支持请求，该类型任务会自动触发！");
         }
         if (!taskType.equals(dataPacketInterface.getTaskType())){
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "任务类型和请求方式不匹配，请保持一致！");
+        }
+        if (dataPacketInterface.getIsDisable() != null && !dataPacketInterface.getIsDisable()){
+            throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "API接口已被禁用，请先恢复！");
         }
         Map<String, Object> params = collectRequestParameters(request);
         //保存内部逻辑变量，有些时候需要将某些值传递到其它标签节点，这时候需要用到它

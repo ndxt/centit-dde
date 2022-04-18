@@ -203,7 +203,7 @@ public class DataPacketDraftController extends BaseController {
         dataPacketDraftService.updateDataPacketOptJson(packetId, dataOptDescJson);
     }
 
-    @ApiOperation(value = "删除API网关")
+    @ApiOperation(value = "物理删除API网关")
     @DeleteMapping(value = "/{packetId}")
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
@@ -214,6 +214,18 @@ public class DataPacketDraftController extends BaseController {
         dataPacketService.deleteDataPacket(packetId);
         dataPacketDraftService.deleteDataPacket(packetId);
     }
+
+    @ApiOperation(value = "修改API可用状态")
+    @PutMapping(value = "/{packetId}/{disable}")
+    @WrapUpResponseBody
+    @Transactional(rollbackFor = Exception.class)
+    public void updateDisableStatus(@PathVariable String packetId,@PathVariable String disable) {
+        DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
+        dataPacketService.updateDisableStatus(packetId,disable);
+        dataPacketDraftService.updateDisableStatus(packetId,disable);
+    }
+
 
     @ApiOperation(value = "查询API网关")
     @GetMapping

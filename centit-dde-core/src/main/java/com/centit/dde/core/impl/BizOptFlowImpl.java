@@ -446,9 +446,9 @@ public class BizOptFlowImpl implements BizOptFlow {
     private void runOneStepOpt(DataOptStep dataOptStep, DataOptVo dataOptVo) {
         SimpleBizModel bizModel = dataOptVo.getBizModel();
         Map<String, Object> interimVariable = bizModel.getInterimVariable();
-        int logLevel = NumberBaseOpt.castObjectToInteger(interimVariable.get("logLevel"), ConstantValue.LOGLEVEL_TYPE_INFO);
+        int logLevel = NumberBaseOpt.castObjectToInteger(interimVariable.get("logLevel"));
         TaskDetailLog detailLog=null;
-        if ((ConstantValue.LOGLEVEL_CHECK_INFO & logLevel) != 0){
+        if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0){
             detailLog = writeLog(dataOptStep, dataOptVo);
         }
         JSONObject bizOptJson = dataOptStep.getCurrentStep().getJSONObject("properties");
