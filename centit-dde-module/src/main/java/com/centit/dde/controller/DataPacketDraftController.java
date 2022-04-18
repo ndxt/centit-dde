@@ -9,6 +9,7 @@ import com.centit.dde.services.DataPacketTemplateService;
 import com.centit.dde.utils.HttpParames;
 import com.centit.dde.utils.LoginUserPermissionCheck;
 import com.centit.dde.utils.MetaDataParames;
+import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
@@ -16,6 +17,7 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -215,15 +217,23 @@ public class DataPacketDraftController extends BaseController {
         dataPacketDraftService.deleteDataPacket(packetId);
     }
 
-    @ApiOperation(value = "修改API可用状态")
-    @PutMapping(value = "/{packetId}/{disable}")
+    @ApiOperation(value = "修改API可用状态(T:禁用，F:启用)")
+    @PutMapping(value = "/{packetId}/{disableType}")
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
-    public void updateDisableStatus(@PathVariable String packetId,@PathVariable String disable) {
+    public void updateDisableStatus(@PathVariable String packetId,@PathVariable String disableType) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
         LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
-        dataPacketService.updateDisableStatus(packetId,disable);
-        dataPacketDraftService.updateDisableStatus(packetId,disable);
+        //启用  disableType 必须等于T 或者 F
+        if (!StringBaseOpt.isNvl(disableType) && "F".equals(disableType)){
+            dataPacketService.updateDisableStatus(packetId,disableType);
+            dataPacketDraftService.updateDisableStatus(packetId,disableType);
+        }else if(!StringBaseOpt.isNvl(disableType) && "T".equals(disableType)){//禁用
+            dataPacketService.updateDisableStatus(packetId,disableType);
+            dataPacketDraftService.updateDisableStatus(packetId,disableType);
+        }else {
+            throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "非法传参，参数必须为T或F,传入的参数为："+disableType);
+        }
     }
 
 
@@ -239,7 +249,12 @@ public class DataPacketDraftController extends BaseController {
     @GetMapping(value = "/{packetId}")
     @WrapUpResponseBody
     public DataPacketDraft getDataPacket(@PathVariable String packetId) {
-        return dataPacketDraftService.getDataPacket(packetId);
+        DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
+        //判断api是否处于禁用状态   禁用状态直接返回空   底层接口无法修改才加该判断来实现
+        if (dataPacketDraft !=null && dataPacketDraft.getIsDisable()){
+            return null;
+        }
+        return dataPacketDraft;
     }
 
 

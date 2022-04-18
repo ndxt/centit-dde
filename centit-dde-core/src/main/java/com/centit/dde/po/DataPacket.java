@@ -140,7 +140,7 @@ public class DataPacket implements Serializable,DataPacketInterface {
     private Integer logLevel;
 
     @Column(name = "is_disable")
-    @ApiModelProperty(value = "是否逻辑删除，T：删除，F：未删除", required = true)
+    @ApiModelProperty(value = "是否逻辑删除，T：禁用，F：未禁用", required = true)
     private Boolean isDisable;
 
 

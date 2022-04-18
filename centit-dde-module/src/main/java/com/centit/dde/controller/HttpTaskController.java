@@ -167,7 +167,7 @@ public class HttpTaskController extends BaseController {
         if (!taskType.equals(dataPacketInterface.getTaskType())){
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "任务类型和请求方式不匹配，请保持一致！");
         }
-        if (dataPacketInterface.getIsDisable() != null && !dataPacketInterface.getIsDisable()){
+        if (dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()){
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "API接口已被禁用，请先恢复！");
         }
         Map<String, Object> params = collectRequestParameters(request);
