@@ -127,6 +127,20 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
     }
 
     @Override
+    public void batchDeleteByPacketIds(String[] packetIds) {
+        String delSql ="DELETE FROM q_data_packet_draft WHERE PACKET_ID = ? ";
+        dataPacketCopyDao.getJdbcTemplate().batchUpdate(delSql,new BatchPreparedStatementSetter(){
+            public void setValues(PreparedStatement ps, int i)
+                throws SQLException {
+                ps.setString(1, packetIds[i]);
+            }
+            public int getBatchSize() {
+                return packetIds.length;
+            }
+        });
+    }
+
+    @Override
     public void updateDataPacketOptJson(String packetId, String dataPacketOptJson) {
         DatabaseOptUtils.batchUpdateObject(dataPacketCopyDao, DataPacketDraft.class,
             CollectionsOpt.createHashMap("dataOptDescJson", dataPacketOptJson),

@@ -61,7 +61,7 @@ public class DataPacketDraftController extends BaseController {
     @PostMapping
     @WrapUpResponseBody
     public DataPacketDraft createDataPacket(@RequestBody DataPacketDraft dataPacketDraft, HttpServletRequest request) {
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
         dataPacketDraft.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
         dataPacketDraftService.createDataPacket(dataPacketDraft);
@@ -75,7 +75,7 @@ public class DataPacketDraftController extends BaseController {
     public DataPacketDraft createHttpTypeApi(@RequestBody HttpParames httpParames) {
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setOsId(httpParames.getOsId());
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
         String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringBaseOpt.isNvl(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
@@ -121,7 +121,7 @@ public class DataPacketDraftController extends BaseController {
     public List<DataPacketDraft> createMetaDataApi(@RequestBody MetaDataParames metaDataOrHttpParams) {
         DataPacketDraft dataPacket = new DataPacketDraft();
         dataPacket.setOsId(metaDataOrHttpParams.getOsId());
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacket);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacket.getOsId());
         String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringBaseOpt.isNvl(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
@@ -174,7 +174,10 @@ public class DataPacketDraftController extends BaseController {
     @PutMapping(value = "/{packetId}")
     @WrapUpResponseBody
     public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketDraft dataPacketDraft) throws ParseException  {
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
+        if (dataPacketDraft==null){
+            throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
+        }
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
         dataPacketDraft.setPacketId(packetId);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateStr = dateFormat.format(new Date());
@@ -189,7 +192,10 @@ public class DataPacketDraftController extends BaseController {
     @Transactional(rollbackFor = Exception.class)
     public void publishDataPacket(@PathVariable String packetId) throws ParseException {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
+        if (dataPacketDraft==null){
+            throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "发布数据不存在！");
+        }
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateStr = simpleDateFormat.format(new Date());
         dataPacketDraft.setPublishDate(simpleDateFormat.parse(dateStr));
@@ -201,7 +207,10 @@ public class DataPacketDraftController extends BaseController {
     @WrapUpResponseBody
     public void updateDataPacketOpt(@PathVariable String packetId, @RequestBody String dataOptDescJson) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
+        if (dataPacketDraft==null){
+            throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
+        }
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
         dataPacketDraftService.updateDataPacketOptJson(packetId, dataOptDescJson);
     }
 
@@ -211,7 +220,10 @@ public class DataPacketDraftController extends BaseController {
     @Transactional(rollbackFor = Exception.class)
     public void deleteDataPacket(@PathVariable String packetId) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
+        if (dataPacketDraft==null){
+            throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "删除数据不存在！");
+        }
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
         platformEnvironment.deleteOptDefAndRolepowerByOptCode(dataPacketDraft.getOptCode());
         dataPacketService.deleteDataPacket(packetId);
         dataPacketDraftService.deleteDataPacket(packetId);
@@ -223,7 +235,10 @@ public class DataPacketDraftController extends BaseController {
     @Transactional(rollbackFor = Exception.class)
     public void updateDisableStatus(@PathVariable String packetId,@PathVariable String disableType) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft);
+        if (dataPacketDraft==null){
+            throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
+        }
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
         //启用  disableType 必须等于T 或者 F
         if (!StringBaseOpt.isNvl(disableType) && "F".equals(disableType)){
             dataPacketService.updateDisableStatus(packetId,disableType);
@@ -257,5 +272,16 @@ public class DataPacketDraftController extends BaseController {
         return dataPacketDraft;
     }
 
+
+    @ApiOperation(value = "批量物理删除数据")
+    @PostMapping("batchDeleteByPacketIds")
+    @WrapUpResponseBody
+    public void batchDeleteByPacketIds(@RequestBody String[] packetIds, String osId) {
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,osId);
+        if (packetIds != null && packetIds.length > 0){
+            dataPacketDraftService.batchDeleteByPacketIds(packetIds);
+            dataPacketService.batchDeleteByPacketIds(packetIds);
+        }
+    }
 
 }

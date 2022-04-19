@@ -124,4 +124,18 @@ public class DataPacketServiceImpl implements DataPacketService {
         String sql ="UPDATE q_data_packet SET is_disable= ? WHERE PACKET_ID = ? ";
         dataPacketDao.getJdbcTemplate().update(sql, new Object[]{disable,packetId});
     }
+
+    @Override
+    public void batchDeleteByPacketIds(String[] packetIds) {
+        String delSql ="DELETE FROM q_data_packet WHERE PACKET_ID = ? ";
+        dataPacketDao.getJdbcTemplate().batchUpdate(delSql,new BatchPreparedStatementSetter(){
+            public void setValues(PreparedStatement ps, int i)
+                throws SQLException {
+                ps.setString(1, packetIds[i]);
+            }
+            public int getBatchSize() {
+                return packetIds.length;
+            }
+        });
+    }
 }

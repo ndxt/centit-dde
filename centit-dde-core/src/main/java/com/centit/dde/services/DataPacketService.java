@@ -29,4 +29,6 @@ public interface DataPacketService {
     int[] batchUpdateOptIdByApiId(String optId, List<String> apiIds);
 
     void updateDisableStatus(String packetId,String disable);
+
+    void batchDeleteByPacketIds(String[] packetIds);
 }
