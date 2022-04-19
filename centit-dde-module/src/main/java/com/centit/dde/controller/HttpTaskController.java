@@ -297,7 +297,7 @@ public class HttpTaskController extends BaseController {
     public Object testFormula(String formula, String jsonString) {
         Map object = (Map) JSON.parse(StringEscapeUtils.unescapeHtml4(jsonString));
         VariableFormula variableFormula = new VariableFormula();
-        variableFormula.setExtendFuncMap(DataSetOptUtil.makeExtendFuns());
+        variableFormula.setExtendFuncMap(DataSetOptUtil.extendFuncs);
         variableFormula.setTrans(new ObjectTranslate(object));
         variableFormula.setFormula(StringEscapeUtils.unescapeHtml4(formula));
         return variableFormula.calcFormula();

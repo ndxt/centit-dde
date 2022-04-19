@@ -350,7 +350,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         for (JSONObject jsonObject : linksJson) {
             if (!ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
                 String expression = jsonObject.getString("expression");
-                Object calculate = VariableFormula.calculate(expression, new BizModelJSONTransform(dataOptVo.getBizModel()), DataSetOptUtil.makeExtendFuns());
+                Object calculate = VariableFormula.calculate(expression, new BizModelJSONTransform(dataOptVo.getBizModel()), DataSetOptUtil.extendFuncs);
                 if (BooleanBaseOpt.castObjectToBoolean(calculate, false)) {
                     stepJson = dataOptStep.getOptStep(jsonObject.getString("targetId"));
                     dataOptStep.setCurrentStep(stepJson);

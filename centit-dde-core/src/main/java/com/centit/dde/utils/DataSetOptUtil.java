@@ -33,110 +33,100 @@ import java.util.function.Function;
 public abstract class DataSetOptUtil {
 
     private static final boolean SORT_NULL_AS_FIRST = false;
-    private static Map<String, Function<Object[], Object>> extendFuncs = null;
-    //扩展函数表达式
-    public static  Map<String, Function<Object[], Object>> makeExtendFuns(){
-        if(extendFuncs == null ){
-            extendFuncs = new HashMap<>();
-            extendFuncs.put("toJson", (a) -> JSON.parse(StringBaseOpt.castObjectToString(a[0])));
-            extendFuncs.put("toByteArray", (a) -> {
-                try {
-                    return IOUtils.toByteArray((InputStream) a[0]);
-                } catch (IOException e) {
-                    e.printStackTrace();
+    public static final Map<String, Function<Object[], Object>> extendFuncs = new HashMap<>();
+
+    static {
+        extendFuncs.put("toJson", (a) -> JSON.parse(StringBaseOpt.castObjectToString(a[0])));
+        extendFuncs.put("toByteArray", (a) -> {
+            try {
+                return IOUtils.toByteArray((InputStream) a[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return a;
+        });
+        extendFuncs.put("uuid", (a) -> UuidOpt.getUuidAsString32());
+        extendFuncs.put("random", (a) -> CaptchaImageUtil.getRandomString(NumberBaseOpt.castObjectToInteger(a[0])));
+        extendFuncs.put("encode", (a) -> new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
+        extendFuncs.put("dict", (a) -> {
+            if (a != null && a.length > 1) {
+                String regex = ",";
+                String[] strings = StringBaseOpt.objectToString(a[1]).split(regex);
+                StringBuilder stringBuilder = new StringBuilder();
+                for (String string : strings) {
+                    if (stringBuilder.length() > 0) {
+                        stringBuilder.append(regex);
+                    }
+                    String value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), StringBaseOpt.castObjectToString(string));
+                    value = !value.equals(string) ? value : CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), StringBaseOpt.castObjectToString(string));
+                    if (a.length > 2 && StringUtils.isNotBlank(StringBaseOpt.castObjectToString(a[2]))) {
+                        IDataDictionary dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]),
+                            StringBaseOpt.castObjectToString(string),
+                            WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest()));
+                        JavaBeanMetaData metaData = JavaBeanMetaData.createBeanMetaDataFromType(IDataDictionary.class);
+                        if (dataPiece != null) {
+                            value = StringBaseOpt.castObjectToString(metaData.getObjectFieldValue(dataPiece, StringBaseOpt.castObjectToString(a[2])));
+                        }
+                    }
+                    stringBuilder.append(value);
                 }
+                return stringBuilder.toString();
+            } else {
                 return a;
-            });
-            extendFuncs.put("uuid", (a) -> UuidOpt.getUuidAsString32());
-            extendFuncs.put("random", (a) -> CaptchaImageUtil.getRandomString(NumberBaseOpt.castObjectToInteger(a[0])));
-            extendFuncs.put("encode", (a) -> new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
-            extendFuncs.put("dict", (a) -> {
-                if (a != null && a.length > 1) {
-                    String regex =",";
-                    /* if (a.length>2) {
-                        regex = StringBaseOpt.objectToString(a[2]);
-                    }*/
-                    String[] strings=StringBaseOpt.objectToString(a[1]).split(regex);
-                    StringBuilder stringBuilder = new StringBuilder();
-                    for (String string : strings) {
-                        if (stringBuilder.length() > 0) {
-                            stringBuilder.append(regex);
-                        }
-                        String value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), StringBaseOpt.castObjectToString(string));
-                        value = !value.equals(string)?value: CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]),StringBaseOpt.castObjectToString(string));
-                        if(a.length>2 && StringUtils.isNotBlank(StringBaseOpt.castObjectToString(a[2]))){
-                            IDataDictionary dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]),
-                                StringBaseOpt.castObjectToString(string),
-                                WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest()));
-                            JavaBeanMetaData metaData = JavaBeanMetaData.createBeanMetaDataFromType(IDataDictionary.class);
-                            if (dataPiece!=null){
-                                value = StringBaseOpt.castObjectToString(metaData.getObjectFieldValue(dataPiece, StringBaseOpt.castObjectToString(a[2])));
-                            }
-                        }
-                        stringBuilder.append(value);
-                    }
-                    return stringBuilder.toString();
+            }
+        });
+        extendFuncs.put("dictTrans", (a) -> {
+            if (a != null && a.length > 1) {
+                return CodeRepositoryUtil.transExpression(
+                    StringBaseOpt.castObjectToString(a[0]),
+                    StringBaseOpt.castObjectToString(a[1]));
+            } else {
+                return a;
+            }
+        });
+        extendFuncs.put("replace", (a) -> {
+            if (a != null && a.length > 2) {
+                return StringUtils.replace(StringBaseOpt.castObjectToString(a[0]),
+                    StringBaseOpt.castObjectToString(a[1]), StringBaseOpt.castObjectToString(a[2]));
+            } else if (a != null && a.length > 0) {
+                return a[0];
+            } else {
+                return a;
+            }
+        });
+        extendFuncs.put("size", (a) -> {
+            Object o = Arrays.stream(a).toArray()[0];
+            if (o instanceof Collection) {
+                return ((Collection<?>) o).size();
+            }
+            if (o instanceof Map) {
+                return ((Map<?, ?>) o).size();
+            }
+            return "";
+        });
+        extendFuncs.put("startsWith", (a) -> {
+            Object[] objects = Arrays.stream(a).toArray();
+            if (objects.length == 2) {
+                String regex = (String) objects[0];
+                String value = (String) objects[1];
+                return value.startsWith(regex);
+            }
+            return false;
+        });
+        extendFuncs.put("remove", (a) -> {
+            Object[] objects = Arrays.stream(a).toArray();
+            if (objects.length == 2) {
+                Object index = objects[0];
+                Object value = objects[1];
+                //lsit<String>  list<Map>
+                if (value instanceof List) {
+                    List list = (List) value;
+                    list.remove(index);
+                    return list;
                 }
-                else {
-                    return a;
-                }
-            });
-            extendFuncs.put("dictTrans", (a) -> {
-                if (a != null && a.length > 1) {
-                    return CodeRepositoryUtil.transExpression(
-                        StringBaseOpt.castObjectToString(a[0]),
-                        StringBaseOpt.castObjectToString(a[1]));
-                }
-                else {
-                    return a;
-                }
-            });
-            extendFuncs.put("replace", (a) -> {
-                if (a != null && a.length > 2) {
-                    return StringUtils.replace(StringBaseOpt.castObjectToString(a[0]),
-                        StringBaseOpt.castObjectToString(a[1]),StringBaseOpt.castObjectToString(a[2]));
-                }
-                else if (a != null && a.length>0){
-                    return a[0];
-                } else{
-                    return a;
-                }
-            });
-            extendFuncs.put("size",(a)->{
-                Object o = Arrays.stream(a).toArray()[0];
-                if (o instanceof Collection){
-                    return ((Collection<?>) o).size();
-                }
-                if (o instanceof Map){
-                    return ((Map<?, ?>) o).size();
-                }
-                return "";
-            });
-            extendFuncs.put("startsWith",(a)->{
-                Object[] objects = Arrays.stream(a).toArray();
-                if (objects.length==2){
-                    String regex= (String) objects[0];
-                    String value=  (String)objects[1];
-                    return value.startsWith(regex);
-                }
-                return false;
-            });
-            extendFuncs.put("remove",(a)->{
-                Object[] objects = Arrays.stream(a).toArray();
-                if (objects.length==2){
-                    Object index= objects[0];
-                    Object value=  objects[1];
-                    //lsit<String>  list<Map>
-                    if (value instanceof List){
-                        List list = (List)value;
-                        list.remove(index);
-                        return list;
-                    }
-                }
-                return false;
-            });
-        }
-        return extendFuncs;
+            }
+            return false;
+        });
     }
 
 
@@ -153,7 +143,7 @@ public abstract class DataSetOptUtil {
             return inRow;
         }
         VariableFormula formula = new VariableFormula();
-        formula.setExtendFuncMap(makeExtendFuns());
+        formula.setExtendFuncMap(extendFuncs);
         formula.setTrans(new ObjectTranslate(inRow));
         Map<String, Object> newRow = new LinkedHashMap<>(formulaMap.size());
         for (Map.Entry<String, String> ent : formulaMap) {
@@ -231,7 +221,7 @@ public abstract class DataSetOptUtil {
         sortDataSetByFields(inData, fields, SORT_NULL_AS_FIRST);
     }
 
-    public static void sortDataSetByFields(DataSet inData, List<String> fields, boolean nullAsFirst ) {
+    public static void sortDataSetByFields(DataSet inData, List<String> fields, boolean nullAsFirst) {
         sortByFields(inData.getDataAsList(), fields, nullAsFirst);
     }
 
@@ -256,7 +246,7 @@ public abstract class DataSetOptUtil {
         }
         Map<String, List<Double>> tempDataDouble = new HashMap<>(statDesc.size());
         for (Triple<String, String, String> tr : statDesc) {
-            if (!"concat".equals(tr.getRight())){
+            if (!"concat".equals(tr.getRight())) {
                 tempData.forEach((key, value) -> {
                     List<Double> doubleList = new ArrayList<>();
                     List<Object> list = value;
@@ -304,7 +294,7 @@ public abstract class DataSetOptUtil {
                     for (Object object : objects) {
                         builder.append(object);
                     }
-                    db=builder.toString();
+                    db = builder.toString();
                     break;
                 default:
                     db = tempData.get(tr.getLeft()).size();
@@ -606,7 +596,7 @@ public abstract class DataSetOptUtil {
      * @param mainDataSet   主数据集
      * @param slaveDataSet  次数据集
      * @param primaryFields 主键列
-     * @param join  innerJoin， leftjoin rightjoin alljoin
+     * @param join          innerJoin， leftjoin rightjoin alljoin
      * @return DataSet
      */
     public static DataSet joinTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet, List<Map.Entry<String, String>> primaryFields, String join) {
@@ -639,9 +629,9 @@ public abstract class DataSetOptUtil {
                  * 就是只能保证一对多的情况正确，不能保证多对多的情况正确*/
                 boolean equalNextMain = i < mainData.size() - 1 && compareTwoRow(mainData.get(i), mainData.get(i + 1), mainFields, SORT_NULL_AS_FIRST) == 0;
                 boolean equalNextSlave = j < slaveData.size() - 1 && compareTwoRow(slaveData.get(j), slaveData.get(j + 1), slaveFields, SORT_NULL_AS_FIRST) == 0;
-                if(equalNextMain && !equalNextSlave){
+                if (equalNextMain && !equalNextSlave) {
                     i++;
-                } else if(!equalNextMain && equalNextSlave){
+                } else if (!equalNextMain && equalNextSlave) {
                     j++;
                 } else {
                     i++;
@@ -686,7 +676,7 @@ public abstract class DataSetOptUtil {
      * @param mainDataSet   主数据集
      * @param slaveDataSet  次数据集
      * @param primaryFields 主键列
-     * @param formulas 过滤条件
+     * @param formulas      过滤条件
      * @return newDataset
      */
     @Deprecated
@@ -739,8 +729,9 @@ public abstract class DataSetOptUtil {
 
     /**
      * 这个是 连个集合 的 unionALL 操作；如果 需要去掉重复的数据集，用jion来代替
-     * @param mainDataSet   主数据集
-     * @param slaveDataSet  次数据集
+     *
+     * @param mainDataSet  主数据集
+     * @param slaveDataSet 次数据集
      * @return newDataset
      */
     public static DataSet unionTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet) {
@@ -765,7 +756,7 @@ public abstract class DataSetOptUtil {
      * @param mainDataSet   主数据集
      * @param slaveDataSet  次数据集
      * @param primaryFields 主键列
-     * @param unionData 是否合并数据，是否用 slaveData中额外的数据项填补 mainData中的数据
+     * @param unionData     是否合并数据，是否用 slaveData中额外的数据项填补 mainData中的数据
      * @return newDataSet
      */
     public static DataSet intersectTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet,
@@ -790,7 +781,7 @@ public abstract class DataSetOptUtil {
             int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_FIRST);
             if (nc == 0) {
                 Map<String, Object> newRow = new LinkedHashMap<>();
-                if(unionData){
+                if (unionData) {
                     newRow.putAll(slaveData.get(j));
                 }
                 newRow.putAll(mainData.get(i));
@@ -884,7 +875,7 @@ public abstract class DataSetOptUtil {
                     char c2 = ((String) data2.get(dataField)).charAt(0);
                     cr =concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c1)).compareTo(concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c2)));
                 }else {
-                    cr*/ = GeneralAlgorithm.compareTwoObject(data1.get(dataField), data2.get(dataField), ! nullAsFirst);
+                    cr*/ = GeneralAlgorithm.compareTwoObject(data1.get(dataField), data2.get(dataField), !nullAsFirst);
 
                 if (cr != 0) {
                     return 0 - cr;
@@ -898,8 +889,9 @@ public abstract class DataSetOptUtil {
         }
         return 0;
     }
+
     //判断字符串是否为纯中文 包括中文标点符号
-    private static boolean isChinese(String str){
+    private static boolean isChinese(String str) {
         if (str == null) {
             return false;
         }
@@ -911,6 +903,7 @@ public abstract class DataSetOptUtil {
         }
         return true;
     }
+
     //自定义中文排序方法
     private static String concatPinyinStringArray(String[] pinyinArray) {
         StringBuffer pinyinSbf = new StringBuffer();
@@ -987,9 +980,9 @@ public abstract class DataSetOptUtil {
                 }
             }
         }
-        if (data instanceof  Map){
+        if (data instanceof Map) {
             Map<String, Object> mapFirstRow = dataSet.getFirstRow();
-            inputStreams.add((InputStream)mapFirstRow.get(ConstantValue.FILE_CONTENT));
+            inputStreams.add((InputStream) mapFirstRow.get(ConstantValue.FILE_CONTENT));
         }
         if (data instanceof InputStream) {
             inputStreams.add((InputStream) data);
