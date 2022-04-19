@@ -274,13 +274,16 @@ public class DataPacketDraftController extends BaseController {
 
 
     @ApiOperation(value = "批量物理删除数据")
-    @PostMapping("batchDeleteByPacketIds")
+    @PostMapping("/batchDeleteByPacketIds")
     @WrapUpResponseBody
-    public void batchDeleteByPacketIds(@RequestBody String[] packetIds, String osId) {
+    public void batchDeleteByPacketIds(@RequestBody JSONObject jsonObject) {
+        JSONArray packetIds = jsonObject.getJSONArray("packetIds");
+        String osId = jsonObject.getString("osId");
         LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,osId);
-        if (packetIds != null && packetIds.length > 0){
-            dataPacketDraftService.batchDeleteByPacketIds(packetIds);
-            dataPacketService.batchDeleteByPacketIds(packetIds);
+        if (packetIds != null && packetIds.size() > 0){
+            String[] ids = packetIds.toArray(new String[packetIds.size()]);
+            dataPacketDraftService.batchDeleteByPacketIds(ids);
+            dataPacketService.batchDeleteByPacketIds(ids);
         }
     }
 
