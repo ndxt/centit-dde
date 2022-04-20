@@ -123,7 +123,13 @@ public class TaskRun {
 
     private void buildLogInfo(TaskLog taskLog,String runType,DataPacketInterface dataPacketInterface) {
         taskLog.setApiType(ConstantValue.RUN_TYPE_COPY.equals(runType) ? 0 : 1);
-        taskLog.setRunner(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
+        if (dataPacketInterface !=null){
+            if (!StringBaseOpt.isNvl(dataPacketInterface.getTaskType()) && "2".equals(dataPacketInterface.getTaskType())){
+                taskLog.setRunner("定时任务");
+            }else {
+                taskLog.setRunner(   WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
+            }
+        }
         taskLog.setApplicationId(dataPacketInterface.getOsId());
         taskLog.setRunType(dataPacketInterface.getPacketName());
         taskLog.setTaskId(dataPacketInterface.getPacketId());
