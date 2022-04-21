@@ -445,9 +445,13 @@ public abstract class DataSetOptUtil {
      * @param inData 输入数据集
      * @param colHeaderFields 列头信息
      * @param rowHeaderFields 行头信息
+     * @oaram fieldContainColumn 新的字段是否保留原有的字段明
+     * @param concatStr 字段名连接字符
+     * @param statType 统计方式 0 none 没有 1 only total 只有总计 2 cube 明细和和总计， 有多个分组时有效
      * @return 输出数据集
      */
-    public static DataSet crossTabulation(DataSet inData, List<String> rowHeaderFields, List<String> colHeaderFields) {
+    public static DataSet crossTabulation(DataSet inData, List<String> rowHeaderFields, List<String> colHeaderFields,
+                                          boolean fieldContainColumn, String concatStr, int statType) {
         if (inData == null) {
             return inData;
         }
@@ -458,6 +462,7 @@ public abstract class DataSetOptUtil {
         if (rowHeaderFields.size() + colHeaderFields.size() >= data.get(0).size()) {
             throw new RuntimeException("数据不合法");
         }
+        int colHeaderCount = colHeaderFields.size();
         List<String> keyRows = ListUtils.union(rowHeaderFields, colHeaderFields);
         //根据维度进行排序 行头、列头
         sortByFields(data, keyRows, SORT_NULL_AS_FIRST);
@@ -474,22 +479,46 @@ public abstract class DataSetOptUtil {
                 }
                 // 新建数据临时数据空间
                 newRow = new HashMap<>(rowHeaderFields.size());
+                // rowHeaderFields 一般为分组信息
                 for (String key : rowHeaderFields) {
                     newRow.put(key, row.get(key));
                 }
             }
-            StringBuilder colPrefix = new StringBuilder();
+            // 一般为统计信息
+            StringBuilder colPrefix = new StringBuilder(128);
             for (String key : colHeaderFields) {
-                colPrefix.append(key).append(":").append(row.get(key)).append(":");
+                if(fieldContainColumn){
+                    colPrefix.append(key).append(concatStr);
+                }
+                colPrefix.append(row.get(key)).append(concatStr);
             }
             String prefix = colPrefix.toString();
             for (Map.Entry<String, Object> entry : row.entrySet()) {
                 String key = entry.getKey();
                 if (!keyRows.contains(key)) {
-                    if (newRow == null) {
+                    if (newRow == null) { // 这一句应该永远运行不到
                         newRow = new HashMap<>(row.size());
                     }
                     newRow.put(prefix + key, entry.getValue());
+                    // 添加行统计行统计信息
+                    if(statType != 0){ // _totalSum
+                        String fieldName = key + concatStr + "_totalSum";
+                        Object preSum = newRow.get(fieldName);
+                        newRow.put(fieldName, GeneralAlgorithm.addTwoObject(preSum, entry.getValue()));
+                    }
+                    if(statType == 2 && colHeaderCount > 1) { //_detailSum colHeaderCount == 2
+                        for (String colKek : colHeaderFields) {
+                            StringBuilder detailSumField = new StringBuilder(80);
+                            if(fieldContainColumn){
+                                detailSumField.append(colKek).append(concatStr);
+                            }
+                            detailSumField.append(row.get(colKek)).append(concatStr)
+                                .append(key).append(concatStr).append("_detailSum");
+                            String fieldName = detailSumField.toString();
+                            Object preSum = newRow.get(fieldName);
+                            newRow.put(fieldName, GeneralAlgorithm.addTwoObject(preSum, entry.getValue()));
+                        }
+                    }
                 }
             }
             preRow = row;

@@ -211,7 +211,7 @@ public class BuiltInOperation implements BizOperation {
         int count = 0;
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet != null) {
-            DataSet destDs = DataSetOptUtil.crossTabulation(dataSet, rows, cols);
+            DataSet destDs = DataSetOptUtil.crossTabulation(dataSet, rows, cols, true, ":", 0);
             count = destDs.getSize();
             bizModel.putDataSet(targetDsName, destDs);
         }
