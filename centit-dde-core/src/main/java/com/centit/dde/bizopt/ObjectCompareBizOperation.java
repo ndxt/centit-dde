@@ -1,12 +1,12 @@
 package com.centit.dde.bizopt;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.GeneralAlgorithm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,32 +22,20 @@ public class ObjectCompareBizOperation implements BizOperation {
         String newSource = bizOptJson.getString("newSource");
 
         Object oldDataSet = bizModel.getDataSet(oldSource).getData();
-
         Object newDataSet = bizModel.getDataSet(newSource).getData();
 
         Map<String,Object> oldObject = CollectionsOpt.objectToMap(oldDataSet);
-
         Map<String,Object> newObject = CollectionsOpt.objectToMap(newDataSet);
 
         List<JSONObject> compareResult = new ArrayList<>();
         newObject.forEach((newKey,newValue)->{
-            JSONObject jsonObject = new JSONObject();
             //新对象中的字段在旧对象中不存在
-            if (!oldObject.containsKey(newKey)){
+            Object oldValue = oldObject.get(newKey);
+            if(!GeneralAlgorithm.equals(oldValue, newValue)){
+                JSONObject jsonObject = new JSONObject();
                 jsonObject.put("fieldName",newKey);
-                jsonObject.put("oldValue","");
+                jsonObject.put("oldValue",oldValue);
                 jsonObject.put("newValue",newValue);
-            }else {
-                oldObject.forEach((oldKey,oldValue)->{
-                    //字段相同并且值不相等
-                    if (oldKey.equals(newKey) && !oldValue.equals(newValue)){
-                        jsonObject.put("fieldName",newKey);
-                        jsonObject.put("oldValue",oldValue);
-                        jsonObject.put("newValue",newValue);
-                    }
-                });
-            }
-            if (!jsonObject.isEmpty()){
                 compareResult.add(jsonObject);
             }
         });

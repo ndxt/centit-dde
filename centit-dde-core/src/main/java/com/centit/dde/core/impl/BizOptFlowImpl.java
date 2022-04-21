@@ -106,7 +106,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("stat", BuiltInOperation::runStat);
         allOperations.put("analyse", BuiltInOperation::runAnalyse);
         allOperations.put("cross", BuiltInOperation::runCross);
-        allOperations.put("compare", BuiltInOperation::runCompare);
+        //allOperations.put("compare", BuiltInOperation::runCompare);
         allOperations.put("sort", BuiltInOperation::runSort);
         allOperations.put("join", BuiltInOperation::runJoin);
         allOperations.put("union", BuiltInOperation::runUnion);
