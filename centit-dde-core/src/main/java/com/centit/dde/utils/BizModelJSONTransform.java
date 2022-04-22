@@ -3,6 +3,7 @@ package com.centit.dde.utils;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.compiler.VariableTranslate;
 import com.centit.support.json.JSONTransformDataSupport;
@@ -33,6 +34,11 @@ public class BizModelJSONTransform
         variableFormula.setTrans(this);
         variableFormula.setFormula(expression);
         return variableFormula.calcFormula();
+    }
+
+    @Override
+    public String mapTemplateString(String templateString) {
+        return Pretreatment.mapTemplateStringAsFormula(templateString, this, "", true);
     }
 
     private Object peekStackValue(){

@@ -20,8 +20,9 @@ public class DefineJsonDataBizOperation implements BizOperation {
         String targetDsName =bizOptJson.getString("id");
         String jsonValue=BuiltInOperation.getJsonFieldString(bizOptJson,"jsonValue",null);
         if (StringUtils.isNotEmpty(jsonValue)){
-            jsonValue=!jsonValue.startsWith("{")&&jsonValue.startsWith("\"")==true?jsonValue.replace("\"",""):jsonValue;
-            Object data = JSONTransformer.transformer(jsonValue.startsWith("{")? JSON.parse(jsonValue):jsonValue, new BizModelJSONTransform(bizModel));
+            //jsonValue = !jsonValue.startsWith("{") && jsonValue.startsWith("\"")? jsonValue.replace("\"",""): jsonValue;
+            Object data =
+                JSONTransformer.transformer( jsonValue.startsWith("{") ? JSON.parse(jsonValue) : jsonValue, new BizModelJSONTransform(bizModel));
             bizModel.putDataSet(targetDsName,new SimpleDataSet(data));
         }else {
             return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：表达式不能为空！");
