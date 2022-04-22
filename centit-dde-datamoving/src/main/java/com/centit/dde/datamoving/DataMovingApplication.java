@@ -1,5 +1,7 @@
 package com.centit.dde.datamoving;
 
+import com.centit.dde.po.DataPacket;
+import com.centit.dde.services.DataPacketService;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.fileserver.common.FileStore;
 import com.centit.fileserver.utils.OsFileStore;
@@ -36,7 +38,9 @@ public class DataMovingApplication {
         }
         ConfigurableApplicationContext context = SpringApplication.run(DataMovingApplication.class, args);
         TaskRun taskRun = context.getBean(TaskRun.class);
-        taskRun.runTask(args[0], null,null);
+        DataPacketService dataPacketService = context.getBean(DataPacketService.class);
+        DataPacket dataPacket = dataPacketService.getDataPacket(args[0]);
+        taskRun.runTask(dataPacket, null,null);
         int exitCode = SpringApplication.exit(context, () -> 0);
         System.exit(exitCode);
     }

@@ -172,7 +172,7 @@ public class TaskSchedulers {
                         String value = record.value();
                         //开始处理任务逻辑
                         TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
-                        taskRun.runTask(dataPacket.getPacketId(), JSON.parseObject(value),new HashMap<>());
+                        taskRun.runTask(dataPacket, JSON.parseObject(value),new HashMap<>());
                         try {
                             consumer.commitAsync();//异步提交
                         }catch (Exception e) {

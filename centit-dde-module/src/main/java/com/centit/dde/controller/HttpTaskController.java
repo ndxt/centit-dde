@@ -161,7 +161,7 @@ public class HttpTaskController extends BaseController {
         if (dataPacketInterface==null){
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "API接口："+packetId+"不存在！");
         }
-        if ("2".equals(dataPacketInterface.getTaskType()) || "4".equals(dataPacketInterface.getTaskType())){
+        if (ConstantValue.TASK_TYPE_TIME.equals(dataPacketInterface.getTaskType()) || ConstantValue.TASK_TYPE_MSG.equals(dataPacketInterface.getTaskType())){
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "定时任务或消息触发不支持请求，该类型任务会自动触发！");
         }
         if (!taskType.equals(dataPacketInterface.getTaskType())){
@@ -178,7 +178,7 @@ public class HttpTaskController extends BaseController {
             if (StringUtils.contains(request.getHeader("Content-Type"), "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
                 if (!StringBaseOpt.isNvl(bodyString)) {
-                    interimVariable.put("requestBody", bodyString);
+                    interimVariable.put(ConstantValue.REQUEST_BODY, bodyString);
                 }
             } else {
                 String header = request.getHeader("fileName");
@@ -187,7 +187,7 @@ public class HttpTaskController extends BaseController {
                 }
                 InputStream inputStream = UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight();
                 if (inputStream != null) {
-                    interimVariable.put("requestFile", inputStream);
+                    interimVariable.put(ConstantValue.REQUEST_FILE, inputStream);
                 }
             }
         }
@@ -236,12 +236,11 @@ public class HttpTaskController extends BaseController {
             "表达式:case(string/true/digit,匹配值1,返回值1,[匹配值2,返回值2]),名称:swithcase判断,示例:formula:case(name,'b','c','d','e')  \n" +
             "表达式:match(regex,string),名称:匹配判断,*?为通配符,示例:formula:match('t??t',name)  \n" +
             "表达式:startsWith(regex,string),名称:判断字符串中是以某个字符开头,示例:formula:startsWith('a',name)  \n" +
-            "表达式:regexmatch(regex,string),名称:匹配判断,*?为通配符,示例:formula:regexmatch('t??t',name)  \n" +
+            "表达式:regexmatch(regex,string),名称:匹配判断,示例:formula:regexmatch('t??t',name)  \n" +
             "表达式:regexmatchvalue(regex,string),名称:获取匹配值list,示例:formula:regexmatchvalue('t??t',name)  \n" +
             "表达式:count(listObject),名称:计数,示例:formula:count(1,\"2\",3,\"5\",1,1,4)  \n" +
             "表达式:countnotnull(listObject),名称:计数 非空参数,示例:formula:countnotnull(1,,\"2\",,,,1,1,4)  \n" +
             "表达式:countnull(listObject),名称:计数空参数,示例:formula:countnull(1,,\"2\",,,,1,1,4)  \n" +
-            "表达式:concat(str1,[str2..]),名称:连接字符串,示例:formula:concat('a','b')  \n" +
             "表达式:strcat(str1,[str2..]),名称:连接字符串,示例:formula:strcat('a','b')  \n" +
             "表达式:isempty(string),名称:判断参数是否为空,示例:formula:isempty(name)  \n" +
             "表达式:isnotempty(string),名称:判断参数是否非空,示例:formula:isnotempty(name)  \n" +

@@ -208,10 +208,16 @@ public class BuiltInOperation implements BizOperation {
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
         List<String> rows = jsonArrayToList(bizOptJson.getJSONArray("RowField"), "primaryKey1", "unique", "");
         List<String> cols = jsonArrayToList(bizOptJson.getJSONArray("ColumnsField"), "primaryKey2", "unique", "");
+        //是否保留旧字段
+        Boolean isOldField = bizOptJson.getBoolean("isOldField");
+        //连接符
+        String concatStr = StringBaseOpt.isNvl(bizOptJson.getString("concatStr"))?":":bizOptJson.getString("concatStr");
+        //统计类型
+        int statisticalType = bizOptJson.getIntValue("statisticalType");
         int count = 0;
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet != null) {
-            DataSet destDs = DataSetOptUtil.crossTabulation(dataSet, rows, cols, true, ":", 0);
+            DataSet destDs = DataSetOptUtil.crossTabulation(dataSet, rows, cols, isOldField, concatStr, statisticalType);
             count = destDs.getSize();
             bizModel.putDataSet(targetDsName, destDs);
         }

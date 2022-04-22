@@ -7,6 +7,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.dao.DataPowerFilter;
@@ -49,7 +50,7 @@ public class MetadataBizOperation implements BizOperation {
         String tableId = bizOptJson.getString("tableLabelName");
         Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
         Integer withChildrenDeep = bizOptJson.getInteger("withChildrenDeep");
-        String optId= StringBaseOpt.castObjectToString(bizModel.getInterimVariable().get("metadata_optId"));
+        String optId= StringBaseOpt.castObjectToString(bizModel.getInterimVariable().get(ConstantValue.METADATA_OPTID));
         SimpleDataSet dataSet = bizModel.getDataSet(source)==null?new SimpleDataSet():(SimpleDataSet)bizModel.getDataSet(source);//数据集参数
         Integer templateType = bizOptJson.getInteger("templateType");//操作类型
         if(source==null){

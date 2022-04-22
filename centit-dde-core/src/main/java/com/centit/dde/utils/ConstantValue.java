@@ -52,8 +52,6 @@ public class ConstantValue {
     public static final String DEFINE_JSON_DATA = "defineJsonData";
     //元数据操作组件
     public static final String METADATA_OPERATION ="metadata";
-    //赋值组件
-    public static final String ASSIGNMENT ="assignment";
     //创建工作流组件
     public static final String CREATE_WORKFLOW = "createWorkflow";
     //提交工作流组件
@@ -76,11 +74,8 @@ public class ConstantValue {
     public static final String  MINUS_DATASET="minus";
 
     public static final String FINAL_TWO="2";
-    //日志记录级别
-    //public static final String LOGLEVEL_INFO="I";//INFO
-    //public static final String LOGLEVEL_ERROR="E";//ERROR
-    //public static final String LOGLEVEL_DEBUG="D";//DEBUG
 
+    //日志记录级别
     public static final int LOGLEVEL_TYPE_ERROR= 1;//ERROR
     public static final int LOGLEVEL_TYPE_INFO = 3;//INFO
     public static final int LOGLEVEL_TYPE_DEBUG= 7;//DEBUG
@@ -89,10 +84,15 @@ public class ConstantValue {
     public static final int LOGLEVEL_CHECK_INFO = 2; //INFO
     public static final int LOGLEVEL_CHECK_DEBUG= 4;//DEBUG
 
+    //API任务类型
     public static final String TASK_TYPE_GET="1";
     public static final String TASK_TYPE_POST="3";
     public static final String TASK_TYPE_PUT="5";
     public static final String TASK_TYPE_DELETE="6";
+    //消息触发
+    public static final String TASK_TYPE_MSG="4";
+    //定时任务
+    public static final String TASK_TYPE_TIME="2";
 
     public static final String DATASET_JOIN_TYPE_INNER = "innerjoin";
     public static final String DATASET_JOIN_TYPE_LEFT = "leftjoin";
@@ -102,4 +102,19 @@ public class ConstantValue {
     //可以2个都选，但是必须选择其中一个
     public static final String CHECK_RULE_RESULT_TAG = "__check_rule_result";
     public static final String CHECK_RULE_RESULT_MSG_TAG = "__check_rule_result_msg";
+
+    public static final String PATH_DATA = "pathData";
+    public static final String POST_BODY_DATA = "postBodyData";
+    public static final String POST_FILE_DATA = "postFileData";
+
+    public static final String REQUEST_BODY = "requestBody";
+
+    public static final String REQUEST_FILE = "requestFile";
+
+    public static final String METADATA_OPTID = "metadata_optId";
+    //日志级别
+    public static final String LOG_LEVEL = "logLevel";
+    //日志基本信息
+    public static final String BUILD_LOG_INFO = "buildLogInfo";
+
 }

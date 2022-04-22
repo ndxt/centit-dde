@@ -52,25 +52,19 @@ public class TaskRun {
         this.bizOptFlow = bizOptFlow;
     }
 
-    public Object runTask(String packetId, Map<String, Object> queryParams, Map<String, Object> interimVariable){
+    public Object runTask(DataPacketInterface dataPacketInterface, Map<String, Object> queryParams, Map<String, Object> interimVariable){
         String runType = ConstantValue.RUN_TYPE_NORMAL;
         if (interimVariable != null && interimVariable.containsKey("runType")) {
             runType = StringBaseOpt.castObjectToString(interimVariable.get("runType"));
         }
-        DataPacketInterface dataPacketInterface;
         TaskLog taskLog = new TaskLog();
         taskLog.setRunBeginTime(new Date());
-        if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
-            dataPacketInterface = dataPacketCopyDao.getObjectWithReferences(packetId);
-        } else {
-            dataPacketInterface = dataPacketDao.getObjectWithReferences(packetId);
-        }
         buildLogInfo(taskLog, runType, dataPacketInterface);
         if ( (ConstantValue.LOGLEVEL_CHECK_INFO & dataPacketInterface.getLogLevel()) != 0){//不记录任何日志
             //保存日志基本信息
             taskLogDao.saveNewObject(taskLog);
         } else {
-            interimVariable.put("buildLogInfo",taskLog);
+            interimVariable.put(ConstantValue.BUILD_LOG_INFO,taskLog);
         }
         try {
             Object runResult = runStep(dataPacketInterface, taskLog.getLogId(), queryParams,interimVariable);
@@ -127,7 +121,7 @@ public class TaskRun {
             if (!StringBaseOpt.isNvl(dataPacketInterface.getTaskType()) && "2".equals(dataPacketInterface.getTaskType())){
                 taskLog.setRunner("定时任务");
             }else {
-                taskLog.setRunner(   WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
+                taskLog.setRunner(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
             }
         }
         taskLog.setApplicationId(dataPacketInterface.getOsId());
