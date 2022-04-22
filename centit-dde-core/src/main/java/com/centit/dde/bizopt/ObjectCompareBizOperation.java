@@ -3,6 +3,7 @@ package com.centit.dde.bizopt;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -21,11 +22,13 @@ public class ObjectCompareBizOperation implements BizOperation {
         //新数据
         String newSource = bizOptJson.getString("newSource");
 
-        Object oldDataSet = bizModel.getDataSet(oldSource).getData();
-        Object newDataSet = bizModel.getDataSet(newSource).getData();
-
-        Map<String,Object> oldObject = CollectionsOpt.objectToMap(oldDataSet);
-        Map<String,Object> newObject = CollectionsOpt.objectToMap(newDataSet);
+        DataSet oldDataSet = bizModel.getDataSet(oldSource);
+        DataSet newDataSet = bizModel.getDataSet(newSource);
+        if(oldDataSet==null || newDataSet==null || oldDataSet.getSize() != 1 || newDataSet.getSize() !=1 ){
+            return ResponseData.makeErrorMessage("数据对比组件只能对比单个记录的差异，源和目标数据集都只能有一条记录（DataSet.getSize()==1）。");
+        }
+        Map<String,Object> oldObject = oldDataSet.getFirstRow();
+        Map<String,Object> newObject = newDataSet.getFirstRow();
 
         List<JSONObject> compareResult = new ArrayList<>();
         newObject.forEach((newKey,newValue)->{
