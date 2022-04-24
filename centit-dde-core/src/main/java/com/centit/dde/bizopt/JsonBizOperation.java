@@ -8,6 +8,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.file.FileIOOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -35,9 +36,11 @@ public class JsonBizOperation implements BizOperation {
         List<InputStream> inputStreams;
         if (StringUtils.isNotBlank(jsonexpression)){
             inputStreams = DataSetOptUtil.getInputStreamByFieldName(jsonexpression,dataSet);
-        }else if(requestFileInfo!=null){
-            inputStreams=requestFileInfo;
+        }else if(requestFileInfo != null){
+            //
+            inputStreams = requestFileInfo;
         }else  {
+            // 这个是什么情况啊
             inputStreams = DataSetOptUtil.getInputStreamByFieldName(dataSet);
         }
         if (inputStreams.size()==0){
@@ -52,21 +55,7 @@ public class JsonBizOperation implements BizOperation {
     private List<Object> toJson( List<InputStream> inputStreams) throws IOException {
         List<Object> jsonDatas = new ArrayList<>();
         for (InputStream inputStream : inputStreams) {
-            StringBuilder stringBuilder = new StringBuilder();
-            try(BufferedInputStream  bis = new BufferedInputStream (inputStream);
-                BufferedReader  reader = new BufferedReader  (new InputStreamReader(bis));
-            ) {
-                while (reader.ready()) {
-                    stringBuilder.append((char)reader.read());
-                }
-            }
-
-            if (StringUtils.isNotBlank(stringBuilder.toString()) && stringBuilder.toString().startsWith("[")){
-                jsonDatas.add(JSON.parseArray(stringBuilder.toString()));
-            }else {
-                jsonDatas.add(JSON.parseObject(stringBuilder.toString()));
-            }
-
+            jsonDatas.add(JSON.parse(FileIOOpt.readStringFromInputStream(inputStream )));
         }
         return  jsonDatas;
     }

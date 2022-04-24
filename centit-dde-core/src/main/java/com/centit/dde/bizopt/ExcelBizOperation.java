@@ -51,8 +51,8 @@ public class ExcelBizOperation implements BizOperation {
                 bizOptJson.getString("SetsName")+"：读取EXCEL文件异常，请指定数据集或者指定对应的流信息！");
         }
         List<InputStream> inputStreams;
-        if (requestFileInfo !=null){
-            inputStreams=requestFileInfo;
+        if (requestFileInfo != null){
+            inputStreams = requestFileInfo;
         }else if (StringUtils.isNotBlank(excelExpression)){
             inputStreams  = DataSetOptUtil.getInputStreamByFieldName(excelExpression,dataSet);
         }else {
