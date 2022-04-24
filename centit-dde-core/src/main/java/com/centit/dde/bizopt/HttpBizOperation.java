@@ -10,6 +10,7 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.framework.appclient.HttpReceiveJSON;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
@@ -90,25 +91,29 @@ public class HttpBizOperation implements BizOperation {
         }
         if (RequestThreadLocal.getLocalThreadWrapperRequest()!=null){
             HttpSession session = RequestThreadLocal.getLocalThreadWrapperRequest().getSession();
-            headers.put("x-auth-token", session==null?null:session.getId());
+            headers.put(WebOptUtils.SESSION_ID_TOKEN/*"x-auth-token"*/, session==null?null:session.getId());
         }
         HttpExecutorContext httpExecutorContext = getHttpClientContext(loginUrlInfo);
         httpExecutorContext.headers(headers);
-        if (httpUrlCodeInfo == null && !(httpUrl.startsWith("http://") || httpUrl.startsWith("https://"))){
+        if (httpUrlCodeInfo == null && ( StringUtils.isBlank(httpUrl) || !httpUrl.contains("://")) ){
             return ResponseData.makeErrorMessage(ResponseData.ERROR_PRECONDITION_FAILED,"无效请求地址！");
         }
-        httpUrl=httpUrlCodeInfo == null && (httpUrl.startsWith("http://") || httpUrl.startsWith("https://"))?httpUrl:httpUrlCodeInfo.getDatabaseUrl()+httpUrl;
+        httpUrl= httpUrlCodeInfo == null || httpUrl.contains("://") ?
+            httpUrl : httpUrlCodeInfo.getDatabaseUrl() + httpUrl;
+
         httpUrl = Pretreatment.mapTemplateString(httpUrl,new BizModelJSONTransform(bizModel));
         DataSet dataSet = new SimpleDataSet();
         HttpReceiveJSON receiveJson;
         mapObject.putAll(bizModel.getModelTag());
         switch (httpMethod.toLowerCase()) {
             case "post":
-                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody,false));
+                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
+                    UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody,false));
                 dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
                 break;
             case "put":
-                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext, UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
+                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext,
+                    UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
                 dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
                 break;
             case "get":

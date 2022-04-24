@@ -29,7 +29,8 @@ public class JsonBizOperation implements BizOperation {
 
         List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
         if (dataSet==null&& requestFileInfo==null){
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取JSON文件异常,请指定数据集或者指定对应的流信息！");
+            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")
+                +"：读取JSON文件异常,请指定数据集或者指定对应的流信息！");
         }
         List<InputStream> inputStreams;
         if (StringUtils.isNotBlank(jsonexpression)){
@@ -40,7 +41,8 @@ public class JsonBizOperation implements BizOperation {
             inputStreams = DataSetOptUtil.getInputStreamByFieldName(dataSet);
         }
         if (inputStreams.size()==0){
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：读取JSON文件异常，不支持的流类型转换！");
+            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")
+                +"：读取JSON文件异常，不支持的流类型转换！");
         }
         bizModel.putDataSet(targetDsName, new SimpleDataSet(toJson(inputStreams)));
         return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(targetDsName).getSize());
@@ -58,7 +60,8 @@ public class JsonBizOperation implements BizOperation {
                     stringBuilder.append((char)reader.read());
                 }
             }
-            if (StringUtils.isNotBlank(stringBuilder.toString())&& stringBuilder.toString().startsWith("[")){
+
+            if (StringUtils.isNotBlank(stringBuilder.toString()) && stringBuilder.toString().startsWith("[")){
                 jsonDatas.add(JSON.parseArray(stringBuilder.toString()));
             }else {
                 jsonDatas.add(JSON.parseObject(stringBuilder.toString()));
