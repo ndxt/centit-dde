@@ -31,4 +31,7 @@ public interface DataPacketService {
     void updateDisableStatus(String packetId,String disable);
 
     void batchDeleteByPacketIds(String[] packetIds);
+
+    //清空回收站
+    int clearTrashStand(String osId);
 }

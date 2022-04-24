@@ -103,7 +103,7 @@ public class DataPacketServiceImpl implements DataPacketService {
 
     @Override
     public int[] batchUpdateOptIdByApiId(String optId, List<String> apiIds) {
-        String sql = "UPDATE q_data_packet SET OPT_ID=? WHERE PACKET_ID = ?";
+        String sql = "UPDATE q_data_packet SET OPT_ID=? , IS_DISABLE='F' WHERE PACKET_ID = ?";
         int[] dataPacket = dataPacketDao.getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -137,5 +137,12 @@ public class DataPacketServiceImpl implements DataPacketService {
                 return packetIds.length;
             }
         });
+    }
+
+    @Override
+    public int clearTrashStand(String osId) {
+        String delSql ="DELETE FROM q_data_packet WHERE IS_DISABLE = 'T' AND OS_ID=? ";
+        int delCount = DatabaseOptUtils.doExecuteSql(dataPacketDao, delSql, new Object[]{osId});
+        return  delCount;
     }
 }

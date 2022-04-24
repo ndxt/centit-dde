@@ -19,7 +19,7 @@ import java.io.Serializable;
 @Data
 @Entity
 @Table(name = "Q_DATA_PACKET_PARAM")
-@ApiModel(value = "数据包参数")
+@ApiModel(value = "API网关参数")
 public class DataPacketParam implements Serializable {
 
     private static final long serialVersionUID = 1L;

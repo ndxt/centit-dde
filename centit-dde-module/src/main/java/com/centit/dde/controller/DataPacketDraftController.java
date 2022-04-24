@@ -20,6 +20,7 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -273,8 +274,12 @@ public class DataPacketDraftController extends BaseController {
     }
 
 
-    @ApiOperation(value = "批量物理删除数据")
+    @ApiOperation(value = "批量删除和清空回收站")
     @PostMapping("/batchDeleteByPacketIds")
+    @ApiImplicitParam(
+        name = "jsonObject",
+        value = "批量删除-参数：{packetIds:[\"packetId\"],osId:\"osId\"};清空回收站-参数：{osId:\"osId\"}"
+    )
     @WrapUpResponseBody
     public void batchDeleteByPacketIds(@RequestBody JSONObject jsonObject) {
         JSONArray packetIds = jsonObject.getJSONArray("packetIds");
@@ -284,7 +289,9 @@ public class DataPacketDraftController extends BaseController {
             String[] ids = packetIds.toArray(new String[packetIds.size()]);
             dataPacketDraftService.batchDeleteByPacketIds(ids);
             dataPacketService.batchDeleteByPacketIds(ids);
+        }else if (packetIds==null && !StringBaseOpt.isNvl(osId)){
+            dataPacketDraftService.clearTrashStand(osId);
+            dataPacketService.clearTrashStand(osId);
         }
     }
-
 }

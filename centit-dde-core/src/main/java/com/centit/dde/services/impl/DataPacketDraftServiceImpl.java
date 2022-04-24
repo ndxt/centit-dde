@@ -104,7 +104,7 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
     @Override
     public int[] batchUpdateOptIdByApiId(String optId,List<String> apiIds) {
-        String sql="UPDATE q_data_packet_draft SET OPT_ID=? WHERE PACKET_ID = ? ";
+        String sql="UPDATE q_data_packet_draft SET OPT_ID=? ,IS_DISABLE='F' WHERE PACKET_ID = ? ";
         int[] dataPacket = dataPacketCopyDao.getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -122,7 +122,7 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
     @Override
     public void updateDisableStatus(String packetId,String disable) {
-        String sql ="UPDATE q_data_packet_draft SET is_disable=? WHERE PACKET_ID = ? ";
+        String sql ="UPDATE q_data_packet_draft SET IS_DISABLE=? WHERE PACKET_ID = ? ";
        dataPacketCopyDao.getJdbcTemplate().update(sql, new Object[]{disable,packetId});
     }
 
@@ -138,6 +138,13 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
                 return packetIds.length;
             }
         });
+    }
+
+    @Override
+    public int clearTrashStand(String osId) {
+        String delSql ="DELETE FROM q_data_packet_draft WHERE IS_DISABLE = 'T' AND  OS_ID=? ";
+        int delCount = DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, delSql, new Object[]{osId});
+        return  delCount;
     }
 
     @Override
