@@ -289,7 +289,7 @@ public class DataPacketDraftController extends BaseController {
             String[] ids = packetIds.toArray(new String[packetIds.size()]);
             dataPacketDraftService.batchDeleteByPacketIds(ids);
             dataPacketService.batchDeleteByPacketIds(ids);
-        }else if (packetIds==null && !StringBaseOpt.isNvl(osId)){
+        }else if (!StringBaseOpt.isNvl(osId)){
             dataPacketDraftService.clearTrashStand(osId);
             dataPacketService.clearTrashStand(osId);
         }
