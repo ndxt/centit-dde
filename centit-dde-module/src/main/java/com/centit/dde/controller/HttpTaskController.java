@@ -10,6 +10,7 @@ import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.utils.FormulaParames;
 import com.centit.dde.vo.UpdateOptIdParamVo;
 import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
@@ -212,7 +213,7 @@ public class HttpTaskController extends BaseController {
         JsonResultUtils.writeOriginalObject(bizModel, response);
     }
 
-    @GetMapping(value = "/testformula")
+    @PostMapping(value = "/testformula")
     @ApiOperation(value = "测试表达式", notes =
         "可用表达式  \n" +
             "表达式:toJson(string),名称:转json,示例:formula:toJson(name);json:{name:\\{sex:'man'}}  \n" +
@@ -287,18 +288,18 @@ public class HttpTaskController extends BaseController {
             "表达式:lastofmonth(),名称:求这个月最后一天,示例:formula:lastofmonth(name)  \n" +
             "表达式:random(),名称:生成随机数random(5),random(1,5),random(string,20),random(string,uuid22/uuid32/uuid36)示例:formula:random()  \n" +
             "表达式:hash(),名称:签名计算,hash(object),hash(object,md5/sha,base64),hash(object,hmac-sha1,secret-key),hash(object,hmac-sha1,secret-key,base64)示例:formula:hash(name)  \n" )
-    @ApiImplicitParams({@ApiImplicitParam(
+  /*  @ApiImplicitParams({@ApiImplicitParam(
         name = "formula", value = "表达式"
     ), @ApiImplicitParam(
         name = "jsonString", value = "需要测试的对象，json格式"
-    )})
+    )})*/
     @WrapUpResponseBody
-    public Object testFormula(String formula, String jsonString) {
-        Map object = (Map) JSON.parse(StringEscapeUtils.unescapeHtml4(jsonString));
+    public Object testFormula(@RequestBody FormulaParames formulaParames) {
+        Map object = (Map) JSON.parse(StringEscapeUtils.unescapeHtml4(formulaParames.getJsonString()));
         VariableFormula variableFormula = new VariableFormula();
         variableFormula.setExtendFuncMap(DataSetOptUtil.extendFuncs);
         variableFormula.setTrans(new ObjectTranslate(object));
-        variableFormula.setFormula(StringEscapeUtils.unescapeHtml4(formula));
+        variableFormula.setFormula(StringEscapeUtils.unescapeHtml4(formulaParames.getFormula()));
         return variableFormula.calcFormula();
     }
 
