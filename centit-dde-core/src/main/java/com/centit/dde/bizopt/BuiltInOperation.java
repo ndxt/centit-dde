@@ -14,7 +14,9 @@ import com.centit.framework.common.ResponseSingleData;
 import com.centit.product.adapter.po.DataCheckRule;
 import com.centit.product.metadata.service.DataCheckRuleService;
 import com.centit.product.metadata.utils.DataCheckResult;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 
@@ -210,11 +212,11 @@ public class BuiltInOperation implements BizOperation {
         List<String> rows = jsonArrayToList(bizOptJson.getJSONArray("RowField"), "primaryKey1", "unique", "");
         List<String> cols = jsonArrayToList(bizOptJson.getJSONArray("ColumnsField"), "primaryKey2", "unique", "");
         //是否保留旧字段
-        Boolean isOldField = bizOptJson.getBoolean("isOldField");
+        Boolean isOldField = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getBoolean("isOldField"),true);
         //连接符
-        String concatStr = StringBaseOpt.isNvl(bizOptJson.getString("concatStr"))?":":bizOptJson.getString("concatStr");
+        String concatStr = StringBaseOpt.castObjectToString(bizOptJson.getString("concatStr"),":");
         //统计类型
-        int statisticalType = bizOptJson.getIntValue("statisticalType");
+        int statisticalType = NumberBaseOpt.castObjectToInteger(bizOptJson.getIntValue("statisticalType"),0);
         int count = 0;
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet != null) {

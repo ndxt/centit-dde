@@ -145,6 +145,11 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     @ApiModelProperty(value = "是否逻辑删除，T：禁用，F：未禁用", required = true)
     private Boolean isDisable;
 
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "schema_props")
+    @ApiModelProperty(value = "模式属性")
+    private JSONObject schemaProps;
+
     @OneToMany(targetEntity = DataPacketParamDraft.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
     private List<DataPacketParamDraft> packetParams;
