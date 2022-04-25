@@ -6,7 +6,6 @@ import com.centit.dde.services.DataPacketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Service("ddeDubboTaskRunImpl")
@@ -21,6 +20,6 @@ public class DdeDubboTaskRunImpl implements DdeDubboTaskRun {
     @Override
     public Object runTask(String packetId, Map<String, Object> queryParams) {
         DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
-        return taskRun.runTask(dataPacket,queryParams,new HashMap<>());
+        return taskRun.runTask(dataPacket,queryParams);
     }
 }

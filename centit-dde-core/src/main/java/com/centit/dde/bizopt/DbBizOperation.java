@@ -7,10 +7,12 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.dataset.SqlDataSetReader;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
 
@@ -41,7 +43,13 @@ public class DbBizOperation implements BizOperation {
         String conditionSet = BuiltInOperation.getJsonFieldString(bizOptJson, "conditionSet", "");
         String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
         Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
-        String optId = StringBaseOpt.castObjectToString(bizModel.getInterimVariable().get("metadata_optId"));
+        // 这个地方可以设置更多的内容
+        Object optInfo = bizModel.getStackData(ConstantValue.API_INFO_TAG);
+        String optId = "";
+        if(optInfo instanceof Map){
+            optId = StringBaseOpt.castObjectToString(((Map)optInfo).get("optId"));
+        }
+
         Map<String, Object> mapObject = new HashMap<>();
         if (mapString != null) {
             for (Map.Entry<String, String> map : mapString.entrySet()) {
@@ -62,8 +70,10 @@ public class DbBizOperation implements BizOperation {
         }
         //只有为自定义参数的时候才put进去
         if(bizOptJson.getString("sourceType") ==null || "customSource".equals(bizOptJson.getString("sourceType"))){
-            mapObject.putAll(bizModel.getModelTag());
+            mapObject.putAll(
+                CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
         }
+
         SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
             return BuiltInOperation.getResponseData(0, 0, "找不到对应的集成数据库：" + databaseCode);

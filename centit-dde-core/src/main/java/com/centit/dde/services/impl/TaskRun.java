@@ -52,22 +52,22 @@ public class TaskRun {
         this.bizOptFlow = bizOptFlow;
     }
 
-    public Object runTask(DataPacketInterface dataPacketInterface, Map<String, Object> queryParams, Map<String, Object> interimVariable){
-        String runType = ConstantValue.RUN_TYPE_NORMAL;
-        if (interimVariable != null && interimVariable.containsKey("runType")) {
-            runType = StringBaseOpt.castObjectToString(interimVariable.get("runType"));
-        }
+    public Object runTask(DataPacketInterface dataPacketInterface, Map<String, Object> callStackData){
+
+        String runType = StringBaseOpt.castObjectToString(callStackData.get(ConstantValue.RUN_TYPE_TAG), ConstantValue.RUN_TYPE_NORMAL);
+
         TaskLog taskLog = new TaskLog();
         taskLog.setRunBeginTime(new Date());
         buildLogInfo(taskLog, runType, dataPacketInterface);
+
         if ( (ConstantValue.LOGLEVEL_CHECK_INFO & dataPacketInterface.getLogLevel()) != 0){//不记录任何日志
             //保存日志基本信息
             taskLogDao.saveNewObject(taskLog);
         } else {
-            interimVariable.put(ConstantValue.BUILD_LOG_INFO,taskLog);
+            callStackData.put(ConstantValue.BUILD_LOG_INFO_TAG,taskLog);
         }
         try {
-            Object runResult = runStep(dataPacketInterface, taskLog.getLogId(), queryParams,interimVariable);
+            Object runResult = runStep(dataPacketInterface, taskLog.getLogId(), callStackData);
             //更新API信息
             updateApiData(runType,dataPacketInterface);
             if ((ConstantValue.LOGLEVEL_CHECK_INFO & dataPacketInterface.getLogLevel()) != 0){//不记录任何日志
@@ -81,17 +81,16 @@ public class TaskRun {
         return new Object();
     }
 
-    private Object runStep(DataPacketInterface dataPacketInterface, String logId, Map<String, Object> queryParams,
-                           Map<String, Object> interimVariable) throws Exception {
+    private Object runStep(DataPacketInterface dataPacketInterface, String logId, Map<String, Object> callStackData) throws Exception {
         JSONObject bizOptJson = dataPacketInterface.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
             throw new ObjectException("运行步骤为空");
         }
         Map<String, Object> mapObject = new HashMap<>(dataPacketInterface.getPacketParamsValue());
-        if (queryParams != null) {
-            mapObject.putAll(queryParams);
-        }
-        return bizOptFlow.run(dataPacketInterface, logId, mapObject,interimVariable);
+       // if (queryParams != null) {
+        //    mapObject.putAll(queryParams);
+        //}
+        return bizOptFlow.run(dataPacketInterface, logId, callStackData);
     }
 
     private void dealException(TaskLog taskLog, DataPacketInterface dataPacketInterface, Exception e) {

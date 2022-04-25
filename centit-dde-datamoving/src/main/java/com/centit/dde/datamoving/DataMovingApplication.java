@@ -40,7 +40,7 @@ public class DataMovingApplication {
         TaskRun taskRun = context.getBean(TaskRun.class);
         DataPacketService dataPacketService = context.getBean(DataPacketService.class);
         DataPacket dataPacket = dataPacketService.getDataPacket(args[0]);
-        taskRun.runTask(dataPacket, null,null);
+        taskRun.runTask(dataPacket, null);
         int exitCode = SpringApplication.exit(context, () -> 0);
         System.exit(exitCode);
     }

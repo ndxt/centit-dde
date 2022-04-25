@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -24,12 +26,7 @@ public class SimpleBizModel implements BizModel, Serializable {
      * 或者模型的参数
      * 或者对应关系数据库查询的参数（数据源参数）
      */
-    private Map<String, Object> modelTag;
-
-    /**
-     * 内部需要传递某些值到其它标签作为标识时使用
-     */
-    private Map<String, Object> interimVariable;
+    private Map<String, Object> stackData;
 
     /**
      * 模型数据
@@ -39,11 +36,12 @@ public class SimpleBizModel implements BizModel, Serializable {
 
     public SimpleBizModel(String modelName) {
         this.modelName = modelName;
-        responseMapData=new ResponseMapData(ResponseData.RESULT_OK,"");
+        this.stackData = new HashMap<>(8);
+        this.responseMapData = new ResponseMapData(ResponseData.RESULT_OK,"");
     }
     @Override
     public ResponseMapData getResponseMapData(){
-        return responseMapData;
+        return this.responseMapData;
     }
 
     @Override
@@ -98,7 +96,7 @@ public class SimpleBizModel implements BizModel, Serializable {
                 dataObject.put(map.getKey(),map.getValue()==null?null:map.getValue().getData());
             }
         }
-        dataObject.put("modelTag", modelTag);
+        dataObject.put("stackData", stackData);
         dataObject.put("modelName", this.getModelName());
         return dataObject;
     }
@@ -120,8 +118,8 @@ public class SimpleBizModel implements BizModel, Serializable {
                 }
             }
         }
-        if (modelTag != null && !modelTag.isEmpty()) {
-            dataObject.put("modelTag", modelTag);
+        if (stackData != null && !stackData.isEmpty()) {
+            dataObject.put("stackData", stackData);
         }
         dataObject.put("modelName", this.getModelName());
         return dataObject;
@@ -140,8 +138,8 @@ public class SimpleBizModel implements BizModel, Serializable {
             }
         }
         dataObject.put("modelName", this.getModelName());
-        if (modelTag != null && !modelTag.isEmpty()) {
-            dataObject.put("modelTag", modelTag);
+        if (stackData != null && !stackData.isEmpty()) {
+            dataObject.put("stackData", stackData);
         }
         return dataObject;
     }
@@ -151,27 +149,44 @@ public class SimpleBizModel implements BizModel, Serializable {
         return modelName;
     }
 
+    @Override
+    public Object getStackData(String key) {
+        return stackData.get(key);
+    }
+
+    @Override
+    public void setStackData(String key, Object value) {
+        if(key == null || !key.startsWith("__")){
+            throw new ObjectException("内部堆栈数据必须以'__'开头");
+        }
+        stackData.put(key, value);
+    }
+
+    // 调用栈 复制，避免覆盖，不过这个函数有瑕疵，不能做到深度复制
+    @Override
+    public Map<String, Object> dumpStackData() {
+        return CollectionsOpt.cloneHashMap(stackData);
+    }
+
+    @Override
+    public void restoreStackData(Map<String, Object> dumpData) {
+        this.stackData = dumpData;
+    }
+
+    public void setCallStackData(Map<String, Object> callStack){
+        if(callStack==null){
+            return;
+        }
+        for(Map.Entry<String, Object> ent : callStack.entrySet()){
+            if(ent.getKey().startsWith("__")){
+                stackData.put(ent.getKey(), ent.getValue());
+            }
+        }
+    }
     public void setModelName(String modelName) {
         this.modelName = modelName;
     }
 
-    @Override
-    public Map<String, Object> getModelTag() {
-        return modelTag;
-    }
-
-    public void setModelTag(Map<String, Object> modelTag) {
-        this.modelTag = modelTag;
-    }
-
-    @Override
-    public Map<String, Object> getInterimVariable() {
-        return interimVariable;
-    }
-
-    public void setInterimVariable(Map<String, Object> interimVariable) {
-        this.interimVariable = interimVariable;
-    }
 
     @Override
     public Map<String, DataSet> getBizData() {

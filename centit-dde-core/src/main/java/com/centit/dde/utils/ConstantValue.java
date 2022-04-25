@@ -103,18 +103,17 @@ public class ConstantValue {
     public static final String CHECK_RULE_RESULT_TAG = "__check_rule_result";
     public static final String CHECK_RULE_RESULT_MSG_TAG = "__check_rule_result_msg";
 
-    public static final String PATH_DATA = "pathData";
-    public static final String POST_BODY_DATA = "postBodyData";
-    public static final String POST_FILE_DATA = "postFileData";
-
-    public static final String REQUEST_BODY = "requestBody";
-
-    public static final String REQUEST_FILE = "requestFile";
-
-    public static final String METADATA_OPTID = "metadata_optId";
+    public static final String REQUEST_BODY_TAG = "__request_body";
+    public static final String REQUEST_FILE_TAG = "__request_file";
+    public static final String REQUEST_PARAMS_TAG = "__request_params";
+    public static final String API_INFO_TAG = "__api_info";
+    public static final String MESSAGE_QUEUE_TAG = "__message_queue";
     //日志级别
-    public static final String LOG_LEVEL = "logLevel";
+    public static final String LOG_ID_TAG = "__log_id";
+    public static final String LOG_LEVEL_TAG = "__log_level";
+    public static final String LAST_ERROR_TAG = "__last_error";
+    public static final String RUN_TYPE_TAG = "__run_type";
     //日志基本信息
-    public static final String BUILD_LOG_INFO = "buildLogInfo";
+    public static final String BUILD_LOG_INFO_TAG = "_build_log_info";
 
 }

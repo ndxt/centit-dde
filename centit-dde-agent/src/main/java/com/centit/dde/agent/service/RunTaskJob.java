@@ -55,7 +55,7 @@ public class RunTaskJob extends AbstractQuartzJob {
                 TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
                 logger.info(String.format("execute scheduled tasks,taskName:%s,taskID：%s,cron expression：%s,execute time:%s",
                     dataPacket.getPacketName(),dataPacket.getPacketId(),dataPacket.getTaskCron(),getDate(dataPacket.getTaskCron())));
-                taskRun.runTask(dataPacket, null,new HashMap<>());
+                taskRun.runTask(dataPacket, new HashMap<>());
             } finally {
                 runningTask.put(dataPacket.getPacketId(), false);
             }

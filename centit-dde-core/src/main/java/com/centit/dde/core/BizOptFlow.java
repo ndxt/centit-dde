@@ -10,7 +10,11 @@ import java.util.Map;
  * @author zhf
  */
 public interface BizOptFlow {
+
     void registerOperation(String key, BizOperation opt);
-    Object run(DataPacketInterface dataPacket, String logId, Map<String, Object> queryParams,Map<String, Object> interimVariable) throws Exception;
+
+    Object run(DataPacketInterface dataPacket, String logId, Map<String, Object> callStackData) throws Exception;
+
+    @Deprecated
     BizModel debug(JSONObject bizOptJson);
 }

@@ -7,6 +7,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.utils.BizOptUtils;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
@@ -110,7 +111,7 @@ public class BuiltInOperation implements BizOperation {
     }
 
     public static ResponseData runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
-        InputStream inputStream = (InputStream) bizModel.getInterimVariable().get("requestFile");
+        InputStream inputStream = (InputStream) bizModel.getStackData(ConstantValue.REQUEST_FILE_TAG);
         DataSet destDs = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", "",
             "fileSize", inputStream.available(), "fileContent", inputStream));
         bizModel.putDataSet(bizOptJson.getString("id"), destDs);
@@ -118,7 +119,7 @@ public class BuiltInOperation implements BizOperation {
     }
 
     public static ResponseData runRequestBody(BizModel bizModel, JSONObject bizOptJson) {
-        String bodyString = (String) bizModel.getInterimVariable().get("requestBody");
+        String bodyString = (String) bizModel.getStackData(ConstantValue.REQUEST_BODY_TAG);
         if (StringUtils.isNotBlank(bodyString)){
             DataSet destDs = BizOptUtils.castObjectToDataSet(bodyString.startsWith("[")?JSONObject.parseObject(bodyString,JSONArray.class):JSONObject.parseObject(bodyString));
             bizModel.putDataSet(bizOptJson.getString("id"), destDs);

@@ -28,21 +28,22 @@ public class BizModelServiceImpl implements BizModelService {
 
     @Autowired
     private TaskRun taskRun;
+
     private String key;
     private Jedis jedis;
 
 
     @Override
-    public Object fetchBizModel(DataPacketInterface dataPacket, Map<String, Object> paramsMap,Map<String, Object> interimVariable) {
+    public Object fetchBizModel(DataPacketInterface dataPacket, Map<String, Object> callStackData) {
         //元数据组件做数据范围查询的时候需要该值，只能从这儿set进去
-        interimVariable.put(ConstantValue.METADATA_OPTID,dataPacket.getOptId());
+        //interimVariable.put(ConstantValue.METADATA_OPTID,dataPacket.getOptId());
         if (notNeedBuf(dataPacket)) {
-            return taskRun.runTask(dataPacket, paramsMap,interimVariable);
+            return taskRun.runTask(dataPacket, callStackData);
         }
-        Object bizModel = fetchBizModelFromBuf(dataPacket, paramsMap);
+        Object bizModel = fetchBizModelFromBuf(dataPacket, callStackData);
         if (bizModel==null){//第一次执行或者换成失效的时候执行
-            bizModel = taskRun.runTask(dataPacket, paramsMap,interimVariable);
-            bizmodelService.setBizModelBuf(bizModel, dataPacket, paramsMap);
+            bizModel = taskRun.runTask(dataPacket, callStackData);
+            bizmodelService.setBizModelBuf(bizModel, dataPacket, callStackData);
         }
         return bizModel;
     }
@@ -91,7 +92,7 @@ public class BizModelServiceImpl implements BizModelService {
     }
 
     @Override
-    public void setBizModelBuf(Object bizModel, DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
+    public void setBizModelBuf(Object bizModel, DataPacketInterface dataPacket, Map<String, Object> callStackData) {
         if (notNeedBuf(dataPacket) || keyNotExpired()) {
             return;
         }

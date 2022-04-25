@@ -1024,8 +1024,7 @@ public abstract class DataSetOptUtil {
 
     public static List<InputStream> getRequestFileInfo(BizModel bizModel) throws IOException {
         List<InputStream> inputStreamList = null;
-        Map<String, Object> modelTag = bizModel.getInterimVariable();
-        InputStream requestFile = (InputStream) modelTag.get("requestFile");
+        InputStream requestFile = (InputStream) bizModel.getStackData(ConstantValue.REQUEST_FILE_TAG);
         if (requestFile != null && requestFile.available() > 0) {
             inputStreamList = new ArrayList<>();
             inputStreamList.add(requestFile);

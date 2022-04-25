@@ -4,11 +4,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
 /**
- * @author zhf
+ * @author codefan@sina.com
  */
 public interface BizModel {
     SimpleBizModel EMPTY_BIZ_MODEL
@@ -19,19 +20,28 @@ public interface BizModel {
      * @return 模型名称; 可以作为主DataSet的名称
      */
     String getModelName();
+
     ResponseMapData getResponseMapData();
     void addResponseMapData(String sKey, ResponseData objValue);
     /**
-     * 模型的标识， 就是对应的主键
+     * 堆栈变量，key必须以 __开头
      * @return  或者对应关系数据库查询的参数（数据源参数）
+     * __api_info
+     * __request_body
+     * __request_file
+     * __request_params
+     * __log_level
+     * __message_queue
+     * __last_error
+     * @see com.centit.dde.utils.ConstantValue
      */
-    Map<String, Object> getModelTag();
+    Object getStackData(String key);
 
-    /**
-     * 存放内部逻辑使用的临时变量
-     * @return
-     */
-    Map<String, Object> getInterimVariable();
+    void setStackData(String key, Object value);
+
+    Map<String, Object> dumpStackData();
+
+    void restoreStackData(Map<String, Object> dumpData);
     /**
      * @return  模型数据 key为关联关系链， value为dataSet
      */
@@ -68,12 +78,24 @@ public interface BizModel {
     }
 
     default DataSet fetchDataSetByName(String relationPath){
+
+        if(StringUtils.isBlank(relationPath)){
+            return null;
+        }
+
+        if(relationPath.startsWith("__")){
+            Object obj = getStackData(relationPath);
+            if(obj != null){
+                return new SimpleDataSet(obj);
+            }
+        }
         Map<String, DataSet> dss = getBizData();
         if(dss == null) {
-            return new SimpleDataSet();
+            return null;
         }
-        if (dss.containsKey(relationPath)) {
-            return dss.get(relationPath);
+        DataSet data = dss.get(relationPath);
+        if(data !=null ){
+            return data;
         }
         return dss.values().stream().filter(
             ds -> ds.getDataSetName()

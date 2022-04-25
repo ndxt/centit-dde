@@ -26,8 +26,6 @@ import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.file.FileIOOpt;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -173,26 +171,30 @@ public class HttpTaskController extends BaseController {
         }
         Map<String, Object> params = collectRequestParameters(request);
         //保存内部逻辑变量，有些时候需要将某些值传递到其它标签节点，这时候需要用到它
-        Map<String, Object> interimVariable = new HashMap<>();
-        interimVariable.put("runType", runType);
+        Map<String, Object> callStackData = new HashMap<>();
+        callStackData.put(ConstantValue.RUN_TYPE_TAG, runType);
         if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod()) ) {
             if (StringUtils.contains(request.getHeader("Content-Type"), "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
-                if (!StringBaseOpt.isNvl(bodyString)) {
-                    interimVariable.put(ConstantValue.REQUEST_BODY, bodyString);
-                }
+                //JSON.parse()
+                callStackData.put(ConstantValue.REQUEST_BODY_TAG, JSON.parse(bodyString));
             } else {
                 String header = request.getHeader("fileName");
                 if (header != null) {
-                    interimVariable.put("fileName", header);
+                    String fileName = StringBaseOpt.castObjectToString(params.get("fileName"));
+                    if(StringUtils.isBlank(fileName)){
+                        params.put("fileName", header);
+                    }
                 }
                 InputStream inputStream = UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight();
                 if (inputStream != null) {
-                    interimVariable.put(ConstantValue.REQUEST_FILE, inputStream);
+                    callStackData.put(ConstantValue.REQUEST_FILE_TAG, inputStream);
                 }
             }
         }
-        bizModel = bizmodelService.fetchBizModel(dataPacketInterface, params,interimVariable);
+        callStackData.put(ConstantValue.REQUEST_PARAMS_TAG, params);
+        bizModel = bizmodelService.fetchBizModel(dataPacketInterface, callStackData);
+
         boolean isFileDown = bizModel instanceof ResponseData
             && BizOptFlowImpl.FILE_DOWNLOAD.equals(((ResponseData) bizModel).getMessage());
         if (isFileDown) {

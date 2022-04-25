@@ -5,10 +5,12 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileInfo;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,7 +40,7 @@ public class FileUploadBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String fileNameField= (String) bizModel.getModelTag().get("fileName");
+        String fileNameField= (String) CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)).get("fileName");
         if(fileNameField==null) {
             fileNameField = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", StringBaseOpt.castObjectToString(System.currentTimeMillis()));
         }

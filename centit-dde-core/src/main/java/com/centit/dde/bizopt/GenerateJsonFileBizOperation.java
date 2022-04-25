@@ -27,17 +27,14 @@ public class GenerateJsonFileBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws IOException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String requestBody= StringBaseOpt.castObjectToString(bizModel.getInterimVariable().get("requestBody"));
-        String fileName=StringUtils.isNotBlank(bizOptJson.getString("fileName"))?
+
+        String fileName = StringUtils.isNotBlank(bizOptJson.getString("fileName"))?
             StringBaseOpt.castObjectToString(Pretreatment.mapTemplateStringAsFormula(
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))):
             DatetimeOpt.currentTimeWithSecond();
-        Object data;
-        if (StringUtils.isNotBlank(requestBody)){
-            data=requestBody;
-        } else {
-            data = bizModel.fetchDataSetByName(sourDsName).getData();
-        }
+
+        Object data = bizModel.fetchDataSetByName(sourDsName).getData();
+
         String object = JSON.toJSONString(data);
         InputStream inputStream = new ByteArrayInputStream(object.getBytes());
         DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName.endsWith(".json")?fileName:fileName+".json",

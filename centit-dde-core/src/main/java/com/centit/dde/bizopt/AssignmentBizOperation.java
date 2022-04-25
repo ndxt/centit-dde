@@ -7,6 +7,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.AssignmentVo;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -44,7 +45,7 @@ public class AssignmentBizOperation implements BizOperation {
                 break;
             case "2"://手动赋值
                 Object transformerdData =  JSONTransformer.transformer(JSON.parse(data), new BizModelJSONTransform(bizModel));
-                Map<String, Object> modelTag = bizModel.getModelTag();
+                Map<String, Object> modelTag = CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
                 if (transformerdData instanceof  Map){
                     modelTag.putAll(CollectionsOpt.objectToMap(transformerdData));
                 }else {

@@ -8,9 +8,8 @@ import java.util.Map;
  * @author zhf
  */
 public interface BizModelService {
-    void setBizModelBuf(Object bizModel, DataPacketInterface dataPacket, Map<String, Object> paramsMap);
 
-    Object fetchBizModel(DataPacketInterface dataPacket, Map<String, Object> paramsMap,Map<String, Object> interimVariable);
+    void setBizModelBuf(Object bizModel, DataPacketInterface dataPacket, Map<String, Object> callStackData);
 
-
+    Object fetchBizModel(DataPacketInterface dataPacket, Map<String, Object> callStackData);
 }

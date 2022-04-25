@@ -17,6 +17,7 @@ import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.product.adapter.po.MetaTable;
 import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaObjectService;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.database.utils.PageDesc;
@@ -50,11 +51,16 @@ public class MetadataBizOperation implements BizOperation {
         String tableId = bizOptJson.getString("tableLabelName");
         Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
         Integer withChildrenDeep = bizOptJson.getInteger("withChildrenDeep");
-        String optId= StringBaseOpt.castObjectToString(bizModel.getInterimVariable().get(ConstantValue.METADATA_OPTID));
+        Object optInfo = bizModel.getStackData(ConstantValue.API_INFO_TAG);
+        String optId = "";
+        if(optInfo instanceof Map){
+            optId = StringBaseOpt.castObjectToString(((Map)optInfo).get("optId"));
+        }
+        //String optId= StringBaseOpt.castObjectToString(bizModel.getInterimVariable().get(ConstantValue.METADATA_OPTID));
         SimpleDataSet dataSet = bizModel.getDataSet(source)==null?new SimpleDataSet():(SimpleDataSet)bizModel.getDataSet(source);//数据集参数
         Integer templateType = bizOptJson.getInteger("templateType");//操作类型
         if(source==null){
-            dataSet = new SimpleDataSet(bizModel.getModelTag());
+            dataSet = new SimpleDataSet(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
         }
         Map<String, Object> parames = dataSet.getDataAsList().size()>0?dataSet.getDataAsList().get(0):new HashMap<>();
         if (mapString != null) {
@@ -66,7 +72,7 @@ public class MetadataBizOperation implements BizOperation {
         }
         //只有为自定义参数的时候才put进去
         if(bizOptJson.getString("sourceType") ==null || "customSource".equals(bizOptJson.getString("sourceType"))){
-            parames.putAll(bizModel.getModelTag());
+            parames.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
         }
         switch (templateType){
             case 1://新建
@@ -129,7 +135,8 @@ public class MetadataBizOperation implements BizOperation {
                 return BuiltInOperation.getResponseSuccessData(delCount);
             case 10://根据条件修改字段值
                 JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(parames), JSONObject.class);
-                int count  = metaObjectService.updateObjectsByProperties(tableId, jsonObject, bizModel.getModelTag());
+                int count  = metaObjectService.updateObjectsByProperties(tableId, jsonObject,
+                    CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
                 bizModel.putDataSet(id, new SimpleDataSet(count));
                 return BuiltInOperation.getResponseSuccessData(count);
             case 11:
