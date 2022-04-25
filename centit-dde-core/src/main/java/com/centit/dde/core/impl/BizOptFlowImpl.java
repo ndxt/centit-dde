@@ -10,10 +10,7 @@ import com.centit.dde.dao.DataPacketDraftDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.po.*;
-import com.centit.dde.utils.BizModelJSONTransform;
-import com.centit.dde.utils.CloneUtils;
-import com.centit.dde.utils.ConstantValue;
-import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.utils.*;
 import com.centit.dde.vo.CycleVo;
 import com.centit.dde.vo.DataOptVo;
 import com.centit.fileserver.common.FileStore;
@@ -160,9 +157,13 @@ public class BizOptFlowImpl implements BizOptFlow {
             bizModel.putDataSet(ConstantValue.PATH_DATA,new SimpleDataSet(queryParams));
         }
         if (interimVariable.containsKey(ConstantValue.REQUEST_BODY)){
-            Object requestBody = interimVariable.get(ConstantValue.REQUEST_BODY);
-            JSONObject jsonObject = JSON.parseObject(StringBaseOpt.castObjectToString(requestBody));
-            bizModel.putDataSet(ConstantValue.POST_BODY_DATA,new SimpleDataSet(jsonObject));
+            String requestBody = StringBaseOpt.castObjectToString(interimVariable.get(ConstantValue.REQUEST_BODY));
+            if (StringUtils.isNotBlank(requestBody)){
+                DataSet destDs = BizOptUtils.castObjectToDataSet(requestBody.startsWith("[")?
+                    JSON.parseArray(requestBody):
+                    JSON.parseObject(requestBody));
+                bizModel.putDataSet(ConstantValue.POST_BODY_DATA,destDs);
+            }
         }
         if (interimVariable.containsKey(ConstantValue.REQUEST_FILE)){
             bizModel.putDataSet(ConstantValue.POST_FILE_DATA,new SimpleDataSet(interimVariable.get(ConstantValue.REQUEST_FILE)));
