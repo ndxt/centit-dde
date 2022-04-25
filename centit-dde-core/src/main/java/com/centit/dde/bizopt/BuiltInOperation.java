@@ -213,7 +213,7 @@ public class BuiltInOperation implements BizOperation {
         //是否保留旧字段
         Boolean isOldField = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getBoolean("isOldField"),true);
         //连接符
-        String concatStr = StringBaseOpt.castObjectToString(bizOptJson.getBoolean("isOldField"),":");
+        String concatStr = StringBaseOpt.castObjectToString(bizOptJson.getString("concatStr"),":");
         //统计类型
         int statisticalType = NumberBaseOpt.castObjectToInteger(bizOptJson.getIntValue("statisticalType"),0);
         int count = 0;
