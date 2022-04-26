@@ -48,18 +48,15 @@ public class MetadataBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");
-        String source = bizOptJson.getString("source");//数据集
+        //数据集
+        String source = bizOptJson.getString("source");
         String tableId = bizOptJson.getString("tableLabelName");
         Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
         Integer withChildrenDeep = bizOptJson.getInteger("withChildrenDeep");
-        Object optInfo = bizModel.getStackData(ConstantValue.API_INFO_TAG);
-        String optId = "";
-        if(optInfo instanceof Map){
-            optId = StringBaseOpt.castObjectToString(((Map)optInfo).get("optId"));
-        }
-        //String optId= StringBaseOpt.castObjectToString(bizModel.getInterimVariable().get(ConstantValue.METADATA_OPTID));
-        SimpleDataSet dataSet = bizModel.getDataSet(source)==null?new SimpleDataSet():(SimpleDataSet)bizModel.getDataSet(source);//数据集参数
-        Integer templateType = bizOptJson.getInteger("templateType");//操作类型
+        //数据集参数
+        SimpleDataSet dataSet = bizModel.getDataSet(source)==null?new SimpleDataSet():(SimpleDataSet)bizModel.getDataSet(source);
+        //操作类型
+        Integer templateType = bizOptJson.getInteger("templateType");
         if(source==null){
             dataSet = new SimpleDataSet(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
         }
@@ -91,7 +88,7 @@ public class MetadataBizOperation implements BizOperation {
             case 4://查询
                 HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
                 String topUnit = WebOptUtils.getCurrentTopUnit(request);
-                List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, WebOptUtils.getCurrentUserCode(request), optId, "api");
+                List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, WebOptUtils.getCurrentUserCode(request), dataOptContext.getOptId(), "api");
                 String extFilter = null;
                 PageDesc pageDesc = new PageDesc();
                 if (parames.get("pageNo")!=null){

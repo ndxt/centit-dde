@@ -1,8 +1,10 @@
 package com.centit.dde.services.impl;
 
 import com.centit.dde.adapter.DdeDubboTaskRun;
+import com.centit.dde.core.DataOptContext;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
+import com.centit.dde.utils.ConstantValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ public class DdeDubboTaskRunImpl implements DdeDubboTaskRun {
     @Override
     public Object runTask(String packetId, Map<String, Object> queryParams) {
         DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
-        return taskRun.runTask(dataPacket,queryParams);
+        DataOptContext dataOptContext = new DataOptContext();
+        dataOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, queryParams);
+        return taskRun.runTask(dataPacket,dataOptContext);
     }
 }

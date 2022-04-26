@@ -108,12 +108,8 @@ public class ConstantValue {
     public static final String SESSION_DATA_TAG = "__session_data";
     public static final String MESSAGE_QUEUE_TAG = "__queue_message";
     public static final String MODULE_CALL_TAG = "__module_params";
-    //日志级别
-    //public static final String LOG_ID_TAG = "__log_id";
-    //public static final String LOG_LEVEL_TAG = "__log_level";
-    //public static final String LAST_ERROR_TAG = "__last_error";
-    //public static final String RUN_TYPE_TAG = "__run_type";
-    //日志基本信息
-    //public static final String BUILD_LOG_INFO_TAG = "_build_log_info";
+
+
+
 
 }

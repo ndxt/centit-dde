@@ -3,9 +3,11 @@ package com.centit.dde.consumer.task;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.core.DataOptContext;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.impl.TaskRun;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import org.apache.commons.codec.binary.Hex;
@@ -172,7 +174,9 @@ public class TaskSchedulers {
                         String value = record.value();
                         //开始处理任务逻辑
                         TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
-                        taskRun.runTask(dataPacket, JSON.parseObject(value),new HashMap<>());
+                        DataOptContext dataOptContext=new DataOptContext();
+                        dataOptContext.setStackData(ConstantValue.MESSAGE_QUEUE_TAG,JSON.parseObject(value));
+                        taskRun.runTask(dataPacket, dataOptContext);
                         try {
                             consumer.commitAsync();//异步提交
                         }catch (Exception e) {

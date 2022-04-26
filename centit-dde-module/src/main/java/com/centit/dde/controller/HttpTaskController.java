@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -72,28 +73,28 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "草稿：立即执行任务GET")
     public void runGetDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                         HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_COPY,ConstantValue.TASK_TYPE_GET, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, ConstantValue.TASK_TYPE_GET, request, response);
     }
 
     @PostMapping(value = "/draft/{packetId}")
     @ApiOperation(value = "草稿：立即执行任务POST")
     public void runPostDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                          HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_COPY,ConstantValue.TASK_TYPE_POST, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, ConstantValue.TASK_TYPE_POST, request, response);
     }
 
     @PutMapping(value = "/draft/{packetId}")
     @ApiOperation(value = "草稿：立即执行任务PUT")
     public void runPutDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                         HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_COPY,ConstantValue.TASK_TYPE_PUT, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, ConstantValue.TASK_TYPE_PUT, request, response);
     }
 
     @DeleteMapping(value = "/draft/{packetId}")
     @ApiOperation(value = "草稿：立即执行任务DELETE")
     public void runDelDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                         HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_COPY,ConstantValue.TASK_TYPE_DELETE, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, ConstantValue.TASK_TYPE_DELETE, request, response);
     }
 
 
@@ -105,32 +106,32 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "发布：立即执行任务GET")
     public void runGetTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                    HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL,ConstantValue.TASK_TYPE_GET, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_GET, request, response);
     }
 
     @PostMapping(value = "/{packetId}")
     @ApiOperation(value = "发布：立即执行任务POST")
     public void runPostTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                     HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL,ConstantValue.TASK_TYPE_POST, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_POST, request, response);
     }
 
     @PutMapping(value = "/{packetId}")
     @ApiOperation(value = "发布：立即执行任务PUT")
     public void runPutTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                    HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL,ConstantValue.TASK_TYPE_PUT, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_PUT, request, response);
     }
 
     @DeleteMapping(value = "/{packetId}")
     @ApiOperation(value = "发布：立即执行任务DELETE")
     public void runDelTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                    HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL,ConstantValue.TASK_TYPE_DELETE, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_DELETE, request, response);
     }
 
-    private void judgePower(@PathVariable String packetId,String runType) {
-        if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
+    private void judgePower(@PathVariable String packetId, String runType) {
+        if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
             String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
             if (StringBaseOpt.isNvl(loginUser)) {
                 loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
@@ -158,34 +159,34 @@ public class HttpTaskController extends BaseController {
         } else {
             dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
         }
-        if (dataPacketInterface==null){
-            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "API接口："+packetId+"不存在！");
+        if (dataPacketInterface == null) {
+            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "API接口：" + packetId + "不存在！");
         }
-        if (ConstantValue.TASK_TYPE_TIME.equals(dataPacketInterface.getTaskType()) || ConstantValue.TASK_TYPE_MSG.equals(dataPacketInterface.getTaskType())){
+        if (ConstantValue.TASK_TYPE_TIME.equals(dataPacketInterface.getTaskType()) || ConstantValue.TASK_TYPE_MSG.equals(dataPacketInterface.getTaskType())) {
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "定时任务或消息触发不支持请求，该类型任务会自动触发！");
         }
-        if (!taskType.equals(dataPacketInterface.getTaskType())){
+        if (!taskType.equals(dataPacketInterface.getTaskType())) {
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "任务类型和请求方式不匹配，请保持一致！");
         }
-        if (dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()){
+        if (dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()) {
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "API接口已被禁用，请先恢复！");
         }
-        Map<String, Object> params = collectRequestParameters(request);
+        //根据api默认值初始化
+        Map<String, Object> params = new HashMap<>(dataPacketInterface.getPacketParamsValue());
+        params.putAll(collectRequestParameters(request));
         //保存内部逻辑变量，有些时候需要将某些值传递到其它标签节点，这时候需要用到它
         DataOptContext dataOptContext = new DataOptContext();
-
         dataOptContext.setRunType(runType);
-
-        if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod()) ) {
+        dataOptContext.setDebugId((String) params.getOrDefault("debugId",""));
+        if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
             if (StringUtils.contains(request.getHeader("Content-Type"), "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
-                //JSON.parse()
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, JSON.parse(bodyString));
             } else {
                 String header = request.getHeader("fileName");
                 if (header != null) {
                     String fileName = StringBaseOpt.castObjectToString(params.get("fileName"));
-                    if(StringUtils.isBlank(fileName)){
+                    if (StringUtils.isBlank(fileName)) {
                         params.put("fileName", header);
                     }
                 }
@@ -197,15 +198,14 @@ public class HttpTaskController extends BaseController {
         }
         dataOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, params);
         bizModel = bizmodelService.fetchBizModel(dataPacketInterface, dataOptContext);
-
         boolean isFileDown = bizModel instanceof ResponseData
             && BizOptFlowImpl.FILE_DOWNLOAD.equals(((ResponseData) bizModel).getMessage());
         if (isFileDown) {
             InputStream in;
-            DataSet dataSet= (DataSet) ((ResponseData) bizModel).getData();
+            DataSet dataSet = (DataSet) ((ResponseData) bizModel).getData();
             Map<String, Object> mapFirstRow = dataSet.getFirstRow();
             if (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream) {
-                ByteArrayOutputStream outputStream = (ByteArrayOutputStream)mapFirstRow.get(ConstantValue.FILE_CONTENT);
+                ByteArrayOutputStream outputStream = (ByteArrayOutputStream) mapFirstRow.get(ConstantValue.FILE_CONTENT);
                 in = new ByteArrayInputStream(outputStream.toByteArray());
             } else {
                 in = (InputStream) mapFirstRow.get(ConstantValue.FILE_CONTENT);
@@ -292,7 +292,7 @@ public class HttpTaskController extends BaseController {
             "表达式:truncdate(),名称:截断日期  第二个参数  Y ，M , D 分别返回一年、月的第一天 ，或者一日的零点,示例:formula:truncdate(name,'y')  \n" +
             "表达式:lastofmonth(),名称:求这个月最后一天,示例:formula:lastofmonth(name)  \n" +
             "表达式:random(),名称:生成随机数random(5),random(1,5),random(string,20),random(string,uuid22/uuid32/uuid36)示例:formula:random()  \n" +
-            "表达式:hash(),名称:签名计算,hash(object),hash(object,md5/sha,base64),hash(object,hmac-sha1,secret-key),hash(object,hmac-sha1,secret-key,base64)示例:formula:hash(name)  \n" )
+            "表达式:hash(),名称:签名计算,hash(object),hash(object,md5/sha,base64),hash(object,hmac-sha1,secret-key),hash(object,hmac-sha1,secret-key,base64)示例:formula:hash(name)  \n")
   /*  @ApiImplicitParams({@ApiImplicitParam(
         name = "formula", value = "表达式"
     ), @ApiImplicitParam(

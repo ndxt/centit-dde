@@ -5,6 +5,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.OFDConvertVo;
 import com.centit.fileserver.common.FileInfo;
 import com.centit.fileserver.common.FileStore;
@@ -34,7 +35,7 @@ public class OFDConvertBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
-        Map<String, Object> modelTag = bizModel.getModelTag();
+        Map<String, Object> modelTag = (Map<String, Object>) bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG);
         OFDConvertVo ofdConvertVo = bizOptJson.toJavaObject(OFDConvertVo.class);
         String fileIdMaps = (String) modelTag.get("fileId");
         String fileids = StringUtils.isNotBlank(fileIdMaps) ? fileIdMaps : ofdConvertVo.getFileid();

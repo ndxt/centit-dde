@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.config.ElasticSearchConfig;
 import com.centit.dde.dao.DataPacketDao;
-import com.centit.dde.entity.EsReadVo;
+import com.centit.dde.entity.EsQueryVo;
 import com.centit.dde.entity.EsWriteVo;
 import com.centit.dde.factory.PooledRestClientFactory;
 import com.centit.dde.po.DataPacket;
@@ -38,13 +38,13 @@ public class TestController {
 
     @PostMapping("matchall")
     @ApiOperation("全部查询测试")
-    public Object matchAll(@RequestBody EsReadVo esReadVo){
-        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(esReadVo.getDataSourceId());
+    public Object matchAll(@RequestBody EsQueryVo esReadVo){
+        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(esReadVo.getDatabaseId());
         GenericObjectPool<RestHighLevelClient> restHighLevelClientGenericObjectPool = PooledRestClientFactory.obtainclientPool(new ElasticSearchConfig(), sourceInfo);
         RestHighLevelClient restHighLevelClient=null;
         try {
             restHighLevelClient = restHighLevelClientGenericObjectPool.borrowObject();
-            JSONObject query = ElasticsearchReadUtils.query(restHighLevelClient, esReadVo);
+            JSONObject query = ElasticsearchReadUtils.executeQuery(restHighLevelClient,null, esReadVo);
             return query;
         } catch (Exception e) {
             e.printStackTrace();
@@ -71,7 +71,7 @@ public class TestController {
             }
             EsWriteVo esWriteVo = new EsWriteVo();
             esWriteVo.setIndexName("q_data_packet");
-            esWriteVo.setDocumentIds("packetId");
+            esWriteVo.setDocumentIds(new ArrayList<>());
             return ElasticsearchWriteUtils.batchSaveDocuments(restHighLevelClient,list,esWriteVo);
         } catch (Exception e) {
             e.printStackTrace();

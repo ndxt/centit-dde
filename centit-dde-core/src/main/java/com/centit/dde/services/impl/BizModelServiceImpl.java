@@ -38,7 +38,8 @@ public class BizModelServiceImpl implements BizModelService {
         Jedis redis = fetchJedisPool();
 
         Object bizModel = fetchBizModelFromBuf(redis, key);
-        if (bizModel==null){//第一次执行或者换成失效的时候执行
+        //第一次执行或者换成失效的时候执行
+        if (bizModel==null){
             bizModel = taskRun.runTask(dataPacket, optContext);
             setBizModelBuf(bizModel, dataPacket, redis, key);
         }

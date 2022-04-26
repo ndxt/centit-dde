@@ -41,11 +41,7 @@ public class DbBizOperation implements BizOperation {
         String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
         Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
         // 这个地方可以设置更多的内容
-        Object optInfo = bizModel.getStackData(ConstantValue.API_INFO_TAG);
-        String optId = "";
-        if(optInfo instanceof Map){
-            optId = StringBaseOpt.castObjectToString(((Map)optInfo).get("optId"));
-        }
+
 
         Map<String, Object> mapObject = new HashMap<>();
         if (mapString != null) {
@@ -79,7 +75,7 @@ public class DbBizOperation implements BizOperation {
         sqlDsr.setDataSource(databaseInfo);
         sqlDsr.setSqlSen(sql);
         sqlDsr.setQueryDataScopeFilter(queryDataScopeFilter);
-        sqlDsr.setOptId(optId);
+        sqlDsr.setOptId(dataOptContext.getOptId());
         if ("true".equals(condition) && !StringBaseOpt.isNvl(conditionSet) && bizModel.getDataSet(conditionSet) != null) {
             sqlDsr.setExtendFilters(bizModel.getDataSet(conditionSet).getDataAsList().get(0));
         }
