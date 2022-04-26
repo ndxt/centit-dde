@@ -48,9 +48,11 @@ public class SimpleBizModel implements BizModel, Serializable {
 
     @Override
     public void addResponseMapData(String sKey, ResponseData objValue) {
+        //
+        this.responseMapData.setCode(objValue.getCode());
         if(ResponseData.RESULT_OK != objValue.getCode()) {
-            this.responseMapData.setCode(objValue.getCode());
-            this.responseMapData.setMessage(StringUtils.join(this.responseMapData.getMessage(), objValue.getMessage()));
+            this.responseMapData.setMessage(StringUtils.join(this.responseMapData.getMessage(),
+                objValue.getMessage()));
         }
         this.responseMapData.addResponseData(sKey,objValue);
     }
@@ -215,25 +217,31 @@ public class SimpleBizModel implements BizModel, Serializable {
         if(StringUtils.isBlank(relationPath)){
             return null;
         }
-        String dateSetName = relationPath;
+        String dataSetName = relationPath;
         //补丁 等全部修复代码后移除
         switch (relationPath){
             case "modelTag":
             case "pathData":
-                dateSetName = ConstantValue.REQUEST_PARAMS_TAG;
+                dataSetName = ConstantValue.REQUEST_PARAMS_TAG;
                 break;
             case "requestBody":
-                dateSetName = ConstantValue.REQUEST_BODY_TAG;
+                dataSetName = ConstantValue.REQUEST_BODY_TAG;
                 break;
             case "requestFile":
-                dateSetName = ConstantValue.REQUEST_FILE_TAG;
+                dataSetName = ConstantValue.REQUEST_FILE_TAG;
+                break;
+            case "responseDataCode":
+                dataSetName = ConstantValue.LAST_ERROR_TAG;
                 break;
         }
 
-        if(dateSetName.startsWith("__")){
-            Object obj = getStackData(dateSetName);
+        if(dataSetName.startsWith("__")){
+            Object obj = getStackData(dataSetName);
             if(obj != null){
                 return new SimpleDataSet(obj);
+            }
+            if(ConstantValue.LAST_ERROR_TAG.equals(dataSetName)){
+                return new SimpleDataSet(this.getResponseMapData());
             }
         }
 
@@ -242,7 +250,7 @@ public class SimpleBizModel implements BizModel, Serializable {
             return null;
         }
 
-        DataSet data = dss.get(dateSetName);
+        DataSet data = dss.get(dataSetName);
         if(data !=null ){
             return data;
         }

@@ -25,7 +25,6 @@ public class ConstantValue {
 
     public static final String CURRENT_USER = "currentUser";
     public static final String DATASET_SIZE = "dataSetSize";
-    public static final String RESPONSE_DATA_CODE="responseDataCode";
     public static final String RUN_TYPE_NORMAL = "N";
     public static final String RUN_TYPE_COPY = "D";
     public static final String CYCLE_TYPE_RANGE = "range";
@@ -108,7 +107,7 @@ public class ConstantValue {
     public static final String SESSION_DATA_TAG = "__session_data";
     public static final String MESSAGE_QUEUE_TAG = "__queue_message";
     public static final String MODULE_CALL_TAG = "__module_params";
-
+    public static final String LAST_ERROR_TAG = "__last_error";
 
 
 

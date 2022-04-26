@@ -301,7 +301,10 @@ public class BizOptFlowImpl implements BizOptFlow {
                     dataOptStep.setCurrentStep(stepJson);
                     return;
                 }
-            }else if (ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
+            }
+        }
+        for (JSONObject jsonObject : linksJson) {
+            if (ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
                 stepJson = dataOptStep.getOptStep(jsonObject.getString("targetId"));
                 dataOptStep.setCurrentStep(stepJson);
                 return;
