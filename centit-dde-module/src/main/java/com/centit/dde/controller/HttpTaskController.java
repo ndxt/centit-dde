@@ -197,7 +197,10 @@ public class HttpTaskController extends BaseController {
             }
         }
         dataOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, params);
+        dataOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, WebOptUtils.getCurrentUserDetails(request));
+
         bizModel = bizmodelService.fetchBizModel(dataPacketInterface, dataOptContext);
+
         boolean isFileDown = bizModel instanceof ResponseData
             && BizOptFlowImpl.FILE_DOWNLOAD.equals(((ResponseData) bizModel).getMessage());
         if (isFileDown) {
