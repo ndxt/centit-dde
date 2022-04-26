@@ -48,8 +48,10 @@ public class SimpleBizModel implements BizModel, Serializable {
 
     @Override
     public void addResponseMapData(String sKey, ResponseData objValue) {
-        this.responseMapData.setCode(objValue.getCode());
-        this.responseMapData.setMessage(StringUtils.join(this.responseMapData.getMessage(),objValue.getMessage()));
+        if(ResponseData.RESULT_OK != objValue.getCode()) {
+            this.responseMapData.setCode(objValue.getCode());
+            this.responseMapData.setMessage(StringUtils.join(this.responseMapData.getMessage(), objValue.getMessage()));
+        }
         this.responseMapData.addResponseData(sKey,objValue);
     }
 
