@@ -1,21 +1,17 @@
 package com.centit.dde.bizopt;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.common.WebOptUtils;
-import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.ReflectionOpt;
-import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 public class GetSessionDataBizOperation implements BizOperation {
@@ -23,39 +19,26 @@ public class GetSessionDataBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");
         JSONArray config = bizOptJson.getJSONArray("config");
-        HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
-        JSONObject result = new JSONObject();
+        CentitUserDetails currentUserDetails = (CentitUserDetails)bizModel.fetchDataSetByName(ConstantValue.SESSION_DATA_TAG);
+        // 这个本来就不应该有 userPin
+        if(currentUserDetails != null && currentUserDetails.getUserInfo() != null) {
+            currentUserDetails.getUserInfo().remove("userPin");
+        }
 
         if (config == null || config.size() == 0){
-            CentitUserDetails currentUserDetails = WebOptUtils.getCurrentUserDetails(request);
-            result = JSON.parseObject(JSON.toJSONString(currentUserDetails));
-            if (result.getJSONObject("userInfo")!=null){
-                result.getJSONObject("userInfo").put("userPin",null);
-            }
+            bizModel.putDataSet(id, new SimpleDataSet(currentUserDetails));
         } else {
+            Map<String, Object> result = new HashMap<>(8);
             for (Object o : config) {
                 JSONObject jsonObject = (JSONObject) o;
                 String sessionKey = jsonObject.getString("sessionKey");
-                if (request != null && StringUtils.isNotBlank(sessionKey)) {
-                    Object sessionData = ReflectionOpt.attainExpressionValue(WebOptUtils.getCurrentUserDetails(request), sessionKey);
-                    if (sessionKey.equals("userInfo") && sessionData != null) {
-                        if (sessionData instanceof Map) {
-                            Map<String, Object> userInfo = CollectionsOpt.objectToMap(sessionData);
-                            userInfo.put("userPin", null);
-                            result.put(sessionKey, userInfo);
-                            continue;
-                        }
-                    }
-                    if (sessionKey.equals("userInfo.userPin")) {
-                        result.put(sessionKey, null);
-                        continue;
-                    }
+                Object sessionData = ReflectionOpt.attainExpressionValue(currentUserDetails, sessionKey);
+                if(sessionData!=null) {
                     result.put(sessionKey, sessionData);
                 }
             }
+            bizModel.putDataSet(id, new SimpleDataSet(result));
         }
-
-        bizModel.putDataSet(id,new SimpleDataSet(result));
         return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(id).getSize());
     }
 }

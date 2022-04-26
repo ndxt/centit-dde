@@ -3,10 +3,7 @@ package com.centit.dde.bizopt;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.core.BizModel;
-import com.centit.dde.core.BizOperation;
-import com.centit.dde.core.DataOptContext;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.*;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
@@ -19,10 +16,13 @@ import com.centit.product.adapter.po.MetaTable;
 import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.database.utils.QueryAndNamedParams;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -48,30 +48,35 @@ public class MetadataBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");
-        //数据集
-        String source = bizOptJson.getString("source");
+
         String tableId = bizOptJson.getString("tableLabelName");
-        Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
-        Integer withChildrenDeep = bizOptJson.getInteger("withChildrenDeep");
-        //数据集参数
-        SimpleDataSet dataSet = bizModel.getDataSet(source)==null?new SimpleDataSet():(SimpleDataSet)bizModel.getDataSet(source);
+
         //操作类型
         Integer templateType = bizOptJson.getInteger("templateType");
-        if(source==null){
-            dataSet = new SimpleDataSet(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
-        }
-        Map<String, Object> parames = dataSet.getDataAsList().size()>0?dataSet.getDataAsList().get(0):new HashMap<>();
-        if (mapString != null) {
-            for (Map.Entry<String, String> map : mapString.entrySet()) {
-                if (!StringBaseOpt.isNvl(map.getValue())) {
-                    parames.put(map.getKey(),  VariableFormula.calculate(map.getValue(),new BizModelJSONTransform(bizModel)));
+        String paramsType = bizOptJson.getString("sourceType");
+        Map<String, Object> parames;
+        // 自定义参数类型
+        if("customSource".equals(paramsType)){
+            Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
+            parames = new HashMap<>(16);
+            if (mapString != null) {
+                for (Map.Entry<String, String> map : mapString.entrySet()) {
+                    if (!StringBaseOpt.isNvl(map.getValue())) {
+                        parames.put(map.getKey(),  VariableFormula.calculate(map.getValue(),new BizModelJSONTransform(bizModel)));
+                    }
                 }
             }
+            //添加 url参数
+            Map<String, Object> urlParams = CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
+            parames = CollectionsOpt.unionTwoMap(parames, urlParams);
+        } else {
+            //数据集参数
+            String source = bizOptJson.getString("source");
+            DataSet dataSet = bizModel.fetchDataSetByName(StringUtils.isBlank(source)?ConstantValue.REQUEST_PARAMS_TAG:source);
+            parames = dataSet.getFirstRow(); //数据集
         }
-        //只有为自定义参数的时候才put进去
-        if(bizOptJson.getString("sourceType") ==null || "customSource".equals(bizOptJson.getString("sourceType"))){
-            parames.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
-        }
+
+        Integer withChildrenDeep = bizOptJson.getInteger("withChildrenDeep");
         switch (templateType){
             case 1://新建
                 metaObjectService.saveObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
@@ -92,11 +97,11 @@ public class MetadataBizOperation implements BizOperation {
                 String extFilter = null;
                 PageDesc pageDesc = new PageDesc();
                 if (parames.get("pageNo")!=null){
-                    pageDesc.setPageNo(Integer.valueOf(String.valueOf(parames.get("pageNo"))));
+                    pageDesc.setPageNo(NumberBaseOpt.castObjectToInteger(parames.get("pageNo")));
                     parames.remove("pageNo");
                 }
                 if ( parames.get("pageSize")!=null){
-                    pageDesc.setPageSize(Integer.valueOf(String.valueOf(parames.get("pageSize"))));
+                    pageDesc.setPageSize(NumberBaseOpt.castObjectToInteger(parames.get("pageSize")));
                     parames.remove("pageSize");
                 }
                 if (filters != null) {
@@ -123,7 +128,13 @@ public class MetadataBizOperation implements BizOperation {
                 bizModel.putDataSet(id, new SimpleDataSet(data));
                 return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(id).getSize());
             case 9://批量删除
-                List<Map> delParames = JSON.parseArray(JSON.toJSONString(dataSet.getDataAsList()),Map.class);
+            {
+                String source = bizOptJson.getString("source");
+                if("customSource".equals(paramsType) || StringUtils.isBlank(source)){
+                    throw new ObjectException("批量删除时不能设置为自定义参数形式");
+                }
+                DataSet dataSet = bizModel.fetchDataSetByName(source);
+                List<Map<String, Object>> delParames = dataSet.getDataAsList();
                 int delCount =0;
                 for (Map parame : delParames) {
                     metaObjectService.deleteObjectWithChildren(tableId,parame,withChildrenDeep == null ? 1 : withChildrenDeep);
@@ -131,6 +142,7 @@ public class MetadataBizOperation implements BizOperation {
                 }
                 bizModel.putDataSet(id, new SimpleDataSet(delCount));
                 return BuiltInOperation.getResponseSuccessData(delCount);
+            }
             case 10://根据条件修改字段值
                 JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(parames), JSONObject.class);
                 int count  = metaObjectService.updateObjectsByProperties(tableId, jsonObject,

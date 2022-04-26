@@ -118,9 +118,8 @@ public class BuiltInOperation implements BizOperation {
     }
 
     public static ResponseData runRequestBody(BizModel bizModel, JSONObject bizOptJson) {
-        String bodyString = (String) bizModel.getStackData(ConstantValue.REQUEST_BODY_TAG);
-        if (StringUtils.isNotBlank(bodyString)){
-            DataSet destDs = BizOptUtils.castObjectToDataSet(bodyString.startsWith("[")?JSONObject.parseObject(bodyString,JSONArray.class):JSONObject.parseObject(bodyString));
+        DataSet destDs = bizModel.fetchDataSetByName(ConstantValue.REQUEST_BODY_TAG);
+        if(destDs!=null) {
             bizModel.putDataSet(bizOptJson.getString("id"), destDs);
             return getResponseSuccessData(destDs.getSize());
         }

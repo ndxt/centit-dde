@@ -2,7 +2,6 @@ package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.dao.DataPacketDao;
@@ -25,8 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author zhf

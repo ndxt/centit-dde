@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
