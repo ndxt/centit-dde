@@ -84,7 +84,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     private MetaDataCache metaDataCache;
 
     @Autowired
-    private  DataCheckRuleService dataCheckRuleService;
+    private DataCheckRuleService dataCheckRuleService;
 
     @Autowired(required = false)
     private FileStore fileStore;
@@ -118,7 +118,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("clear", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runClear(bizModel, bizOptJson));
         allOperations.put("js", new JSBizOperation());
         allOperations.put("persistence", new PersistenceBizOperation(path, sourceInfoDao, metaDataService));
-        allOperations.put("database", new DbBizOperation(sourceInfoDao,queryDataScopeFilter));
+        allOperations.put("database", new DbBizOperation(sourceInfoDao, queryDataScopeFilter));
         allOperations.put("excel", new ExcelBizOperation());
         allOperations.put("csv", new CsvBizOperation());
         allOperations.put("json", new JsonBizOperation());
@@ -130,7 +130,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.DEFINE_JSON_DATA, new DefineJsonDataBizOperation());
         allOperations.put(ConstantValue.FILE_UPLOAD, new FileUploadBizOperation(fileStore));
         allOperations.put(ConstantValue.FILE_DOWNLOAD, new FileDownloadBizOperation(fileStore));
-        allOperations.put(ConstantValue.METADATA_OPERATION, new MetadataBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
+        allOperations.put(ConstantValue.METADATA_OPERATION, new MetadataBizOperation(metaObjectService, queryDataScopeFilter, metaDataCache));
         allOperations.put(ConstantValue.COMPARE_SOURCE, new ObjectCompareBizOperation());
         allOperations.put(ConstantValue.SESSION_DATA, new GetSessionDataBizOperation());
         allOperations.put(ConstantValue.COMMIT_TRANSACTION, new TransactionCommitOperation(sourceInfoDao));
@@ -155,7 +155,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         dataOptContext.setOptId(dataPacket.getOptId());
         dataOptContext.setLogLevel(dataPacket.getLogLevel());
         try {
-            runModule(bizModel,dataOptStep, dataOptContext);
+            runModule(bizModel, dataOptStep, dataOptContext);
             AbstractSourceConnectThreadHolder.commitAndRelease();
         } catch (Exception e) {
             AbstractSourceConnectThreadHolder.rollbackAndRelease();
@@ -170,7 +170,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             if (dataOptStep.isEndStep()) {
                 return;
             }
-            runStep(bizModel,dataOptStep, dataOptContext);
+            runStep(bizModel, dataOptStep, dataOptContext);
         }
     }
 
@@ -178,12 +178,12 @@ public class BizOptFlowImpl implements BizOptFlow {
         JSONObject stepJson = dataOptStep.getCurrentStep().getJSONObject("properties");
         String stepType = stepJson.getString("type");
         if (ConstantValue.RESULTS.equals(stepType)) {
-            returnResult(bizModel,dataOptStep);
+            dataOptContext.setReturnResult(returnResult(bizModel, dataOptStep));
             dataOptStep.setEndStep();
             return;
         }
         if (ConstantValue.BRANCH.equals(stepType)) {
-            setBatchStep(bizModel,dataOptStep);
+            setBatchStep(bizModel, dataOptStep);
             return;
         }
         // 模块调用
@@ -192,38 +192,30 @@ public class BizOptFlowImpl implements BizOptFlow {
             // 先将第一个api的请求数据暂存起来，等模块调度结束后需要恢复回去，
             // 这样做的目的是为了解决另第二个api的参数不能影响到第一个api的参数 参数的作用域不同
             Map<String, Object> stackData = bizModel.dumpStackData();
-            moduleSchedule(bizModel,dataOptStep, dataOptContext);
+            moduleSchedule(bizModel, dataOptStep, dataOptContext);
 
             bizModel.restoreStackData(stackData);
         } else if (ConstantValue.CYCLE.equals(stepType)) {
             //当节点为“结束循环”时，将对应的循环节点信息set到json中
-            runCycle(bizModel,dataOptStep, dataOptContext);
+            runCycle(bizModel, dataOptStep, dataOptContext);
         } else {
-            runOneStepOpt(bizModel,dataOptStep, dataOptContext);
+            runOneStepOpt(bizModel, dataOptStep, dataOptContext);
         }
         //断点调试，指定节点数据返回
-        String debugId = StringBaseOpt.castObjectToString( dataOptContext.getDebugId());
-        if (StringUtils.isNotBlank(debugId) && debugId.equals(stepJson.getString("id"))){
-            dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions","1");
+        String debugId = StringBaseOpt.castObjectToString(dataOptContext.getDebugId());
+        if (StringUtils.isNotBlank(debugId) && debugId.equals(stepJson.getString("id"))) {
+            dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions", "1");
             String source = stepJson.getString("source");
             //设置返回节点  内部方法会通过这个source 来判断返回具体的某个节点 这个只能重置为当前ID 下面再重置回去
-            dataOptStep.getCurrentStep().getJSONObject("properties").put("source",stepJson.getString("id"));
-            Object returnResult = returnResult(bizModel,dataOptStep);
+            dataOptStep.getCurrentStep().getJSONObject("properties").put("source", stepJson.getString("id"));
             //恢复原始JSON数据，否则后面更新的时候会将原本的数据替换为当前节点id
-            dataOptStep.getCurrentStep().getJSONObject("properties").put("source",source);
+            dataOptStep.getCurrentStep().getJSONObject("properties").put("source", source);
             JSONObject bizData = new JSONObject();
-            if (returnResult!=null){
-                JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(returnResult));
-                JSONObject data = jsonObject.getJSONObject("data");
-                if (data!=null){
-                    JSONObject dump = new JSONObject();
-                    dump.put("allNodeData", bizModel.getBizData());
-                    dump.put("stackData", bizModel.dumpStackData());
-                    //dump.put("responseMapData",dataOptVo.getBizModel().getResponseMapData());
-                    bizData.put("currentNodeData",data.getJSONObject(debugId));
-                    bizData.put("dump",dump);
-                }
-            }
+            JSONObject dump = new JSONObject();
+            dump.put("allNodeData", bizModel.getBizData());
+            dump.put("stackData", bizModel.dumpStackData());
+            bizData.put("currentNodeData", bizModel.getDataSet(debugId));
+            bizData.put("dump", dump);
             dataOptContext.setReturnResult(bizData);
             dataOptStep.setEndStep();
             return;
@@ -239,48 +231,48 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
     }
 
-    private Object returnResult(SimpleBizModel bizModel, DataOptStep dataOptStep){
+    private Object returnResult(SimpleBizModel bizModel, DataOptStep dataOptStep) {
         JSONObject stepJson = dataOptStep.getCurrentStep();
-        stepJson=stepJson.getJSONObject("properties");
+        stepJson = stepJson.getJSONObject("properties");
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", "1");
         String dataSetId;
         if (bizModel != null && bizModel.getResponseMapData().getCode() != ResponseData.RESULT_OK || RETURN_RESULT_STATE.equals(type)) {
-            ResponseMapData responseMapData=bizModel.getResponseMapData();
-            ResponseSingleData responseSingleData= new ResponseSingleData(responseMapData.getCode(),responseMapData.getMessage());
+            ResponseMapData responseMapData = bizModel.getResponseMapData();
+            ResponseSingleData responseSingleData = new ResponseSingleData(responseMapData.getCode(), responseMapData.getMessage());
             responseSingleData.setData(responseMapData.getData());
             return responseSingleData;
         }
-        if(RETURN_RESULT_DATASET.equals(type) || RETURN_RESULT_ORIGIN.equals(type)){
+        if (RETURN_RESULT_DATASET.equals(type) || RETURN_RESULT_ORIGIN.equals(type)) {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
-            DataSet dataSet=bizModel.fetchDataSetByName(dataSetId);
-            if(RETURN_RESULT_DATASET.equals(type)){
+            DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
+            if (RETURN_RESULT_DATASET.equals(type)) {
                 Map<String, Object> mapFirstRow = dataSet.getFirstRow();
-                ResponseSingleData responseSingleData= new ResponseSingleData();
+                ResponseSingleData responseSingleData = new ResponseSingleData();
                 boolean isFile = mapFirstRow != null && mapFirstRow.containsKey(ConstantValue.FILE_CONTENT)
                     && (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream
                     || mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof InputStream);
                 if (isFile) {
-                    responseSingleData= new ResponseSingleData(FILE_DOWNLOAD);
+                    responseSingleData = new ResponseSingleData(FILE_DOWNLOAD);
                     responseSingleData.setData(dataSet);
                     return responseSingleData;
                 }
                 responseSingleData.setMessage("OK");
                 responseSingleData.setData(dataSet.getData());
                 return responseSingleData;
-            }else{
-                return dataSet==null?null:dataSet.getData();
+            } else {
+                return dataSet == null ? null : dataSet.getData();
             }
         }
         //返回异常信息
-        if(RETURN_RESULT_ERROR.equals(type)){
+        if (RETURN_RESULT_ERROR.equals(type)) {
             String code = stepJson.getString("code");
-            String message =stepJson.getString("message");
+            String message = stepJson.getString("message");
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
-            DataSet dataSet=bizModel.fetchDataSetByName(dataSetId);
+            DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
             ResponseSingleData response = new ResponseSingleData();
-            response.setCode(code==null?0:Integer.valueOf(code));
+            response.setCode(code == null ? 0 : Integer.valueOf(code));
             response.setMessage(message);
-            if(dataSet!=null){
+            if (dataSet != null) {
                 response.setData(dataSet.getData());
             }
             return response;
@@ -290,7 +282,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         Map<String, DataSet> bizData = bizModel.getBizData();
         for (Map.Entry<String, DataSet> dataSetEntry : bizData.entrySet()) {
             String key = dataSetEntry.getKey();
-            returnData.put(key,bizData.get(key)==null?null:bizData.get(key).getData());
+            returnData.put(key, bizData.get(key) == null ? null : bizData.get(key).getData());
         }
         response.setData(returnData);
         return response;
@@ -298,7 +290,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     private void setBatchStep(SimpleBizModel bizModel, DataOptStep dataOptStep) {
         JSONObject stepJson = dataOptStep.getCurrentStep();
-        stepJson=stepJson.getJSONObject("properties");
+        stepJson = stepJson.getJSONObject("properties");
         String stepId = stepJson.getString("id");
         List<JSONObject> linksJson = dataOptStep.getNextLinks(stepId);
         for (JSONObject jsonObject : linksJson) {
@@ -310,7 +302,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                     dataOptStep.setCurrentStep(stepJson);
                     return;
                 }
-            }else if (ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
+            } else if (ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
                 stepJson = dataOptStep.getOptStep(jsonObject.getString("targetId"));
                 dataOptStep.setCurrentStep(stepJson);
                 return;
@@ -321,7 +313,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     private void runCycle(SimpleBizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) throws Exception {
         JSONObject stepJson = dataOptStep.getCurrentStep();
-        stepJson=stepJson.getJSONObject("properties");
+        stepJson = stepJson.getJSONObject("properties");
         CycleVo cycleVo = stepJson.toJavaObject(CycleVo.class);
         //循环节点的下个节点信息
         JSONObject startNode = dataOptStep.getNextStep(cycleVo.getId());
@@ -398,39 +390,39 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     private void runOneStepOpt(SimpleBizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) {
         int logLevel = dataOptContext.getLogLevel();
-        TaskDetailLog detailLog=null;
-        if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0){
+        TaskDetailLog detailLog = null;
+        if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
             detailLog = writeLog(dataOptStep, dataOptContext);
         }
         JSONObject bizOptJson = dataOptStep.getCurrentStep().getJSONObject("properties");
         try {
             BizOperation opt = allOperations.get(bizOptJson.getString("type"));
-            ResponseData responseData = opt.runOpt(bizModel, bizOptJson,dataOptContext);
+            ResponseData responseData = opt.runOpt(bizModel, bizOptJson, dataOptContext);
             dataOptContext.setReturnResult(responseData);
             if (responseData.getCode() != ResponseData.RESULT_OK) {
                 throw new ObjectException(responseData, responseData.getCode(), responseData.getMessage());
             }
-            Map<String,Object> jsonObject = CollectionsOpt.objectToMap(responseData.getData());
-            if (detailLog != null && dataOptContext.getLogId() != null  && (ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
+            Map<String, Object> jsonObject = CollectionsOpt.objectToMap(responseData.getData());
+            if (detailLog != null && dataOptContext.getLogId() != null && (ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
                 detailLog.setSuccessPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("success")));
                 detailLog.setErrorPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("error")));
                 String info = StringBaseOpt.castObjectToString(jsonObject.get("info"));
-                detailLog.setLogInfo(StringUtils.isBlank(info)?"ok":info);
+                detailLog.setLogInfo(StringUtils.isBlank(info) ? "ok" : info);
                 detailLog.setRunEndTime(new Date());
                 taskDetailLogDao.updateObject(detailLog);
             }
         } catch (Exception e) {
-            if(ConstantValue.LOGLEVEL_TYPE_ERROR == logLevel){
+            if (ConstantValue.LOGLEVEL_TYPE_ERROR == logLevel) {
                 TaskLog taskLog = dataOptContext.getTaskLog();
                 //主日志只记录一次
-                if (taskLog !=null && StringUtils.isEmpty(taskLog.getLogId())){
+                if (taskLog != null && StringUtils.isEmpty(taskLog.getLogId())) {
                     taskLog.setRunEndTime(new Date());
                     taskLog.setOtherMessage("error");
                     taskLogDao.saveNewObject(taskLog);
                     dataOptContext.setLogId(taskLog.getLogId());
                 }
             }
-            if (detailLog==null){
+            if (detailLog == null) {
                 detailLog = writeLog(dataOptStep, dataOptContext);
             }
             String errMsg = ObjectException.extortExceptionMessage(e, 8);
@@ -450,7 +442,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             return detailLog;
         }
         JSONObject bizOptJson = dataOptStep.getCurrentStep();
-        bizOptJson=bizOptJson.getJSONObject("properties");
+        bizOptJson = bizOptJson.getJSONObject("properties");
         String sOptType = bizOptJson.getString("type");
         String processName = bizOptJson.getString("processName");
         if (StringBaseOpt.isNvl(processName)) {
@@ -479,10 +471,10 @@ public class BizOptFlowImpl implements BizOptFlow {
         JSONObject stepJson = dataOptStep.getCurrentStep().getJSONObject("properties");
 
         Map<String, Object> queryParams = CollectionsOpt.cloneHashMap(
-                CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
+            CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
 
         queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue"));
-        queryParams.entrySet().forEach(entry->{
+        queryParams.entrySet().forEach(entry -> {
             String key = entry.getKey();
             Object calculateValue = VariableFormula.calculate(String.valueOf(queryParams.get(key)),
                 new BizModelJSONTransform(bizModel));
@@ -504,10 +496,10 @@ public class BizOptFlowImpl implements BizOptFlow {
             dataPacketInterface = dataPacket;
         }
         String taskType = dataPacketInterface.getTaskType();
-        if (ConstantValue.TASK_TYPE_TIME.equals(taskType) || ConstantValue.TASK_TYPE_MSG.equals(taskType)){
+        if (ConstantValue.TASK_TYPE_TIME.equals(taskType) || ConstantValue.TASK_TYPE_MSG.equals(taskType)) {
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "定时任务或消息触发不支持请求，该类型任务会自动触发！");
         }
-        if (dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()){
+        if (dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()) {
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "API接口已被禁用，请先恢复！");
         }
         DataOptContext moduleOptContext = new DataOptContext();
@@ -515,13 +507,13 @@ public class BizOptFlowImpl implements BizOptFlow {
         moduleOptContext.setTaskLog(dataOptContext.getTaskLog());
         moduleOptContext.setOptId(dataOptContext.getOptId());
         moduleOptContext.setNeedRollback(dataOptContext.getNeedRollback());
-        moduleOptContext.setStackData(ConstantValue.MODULE_CALL_TAG,queryParams);
-        Object bizData = run(dataPacketInterface,moduleOptContext);
+        moduleOptContext.setStackData(ConstantValue.MODULE_CALL_TAG, queryParams);
+        Object bizData = run(dataPacketInterface, moduleOptContext);
 
-        if (bizData !=null) {
-            if (bizData instanceof ResponseData){
+        if (bizData != null) {
+            if (bizData instanceof ResponseData) {
                 bizModel.putDataSet(stepJson.getString("id"), new SimpleDataSet(((ResponseSingleData) bizData).getData()));
-            }else {
+            } else {
                 bizModel.putDataSet(stepJson.getString("id"), new SimpleDataSet(bizData));
             }
         }
