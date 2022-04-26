@@ -5,6 +5,7 @@ import com.centit.dde.utils.ConstantValue;
 import com.centit.support.common.ObjectException;
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -26,15 +27,16 @@ public class DataOptContext {
 
 
     public DataOptContext() {
+        this.callStackData = new HashMap<>(8);
     }
 
     //String runType = StringBaseOpt.castObjectToString(bizModel.getStackData(ConstantValue.RUN_TYPE_TAG));
-    public String getRunType(){
-        return ConstantValue.RUN_TYPE_COPY.equals(runType)? runType: ConstantValue.RUN_TYPE_NORMAL;
+    public String getRunType() {
+        return ConstantValue.RUN_TYPE_COPY.equals(runType) ? runType : ConstantValue.RUN_TYPE_NORMAL;
     }
 
     public void setStackData(String key, Object value) {
-        if(key == null || !key.startsWith("__")){
+        if (key == null || !key.startsWith("__")) {
             throw new ObjectException("内部堆栈数据必须以'__'开头");
         }
         callStackData.put(key, value);

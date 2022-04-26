@@ -68,10 +68,7 @@ public class SimpleBizModel implements BizModel, Serializable {
     @JSONField(deserialize = false, serialize = false)
     @Override
     public DataSet getDataSet(String relationPath){
-        if(bizData!=null){
-            return bizData.get(relationPath);
-        }
-        return new SimpleDataSet();
+        return fetchDataSetByName(relationPath);
     }
 
     @Override
