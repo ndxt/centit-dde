@@ -1,10 +1,7 @@
 package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.core.BizModel;
-import com.centit.dde.core.BizOperation;
-import com.centit.dde.core.DataSet;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.*;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.GeneralAlgorithm;
 
@@ -14,7 +11,7 @@ import java.util.Map;
 
 public class ObjectCompareBizOperation implements BizOperation {
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");
         //原始数据
         String oldSource = bizOptJson.getString("oldSource");

@@ -2,10 +2,7 @@ package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.core.BizModel;
-import com.centit.dde.core.BizOperation;
-import com.centit.dde.core.DataSet;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.*;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.file.FileIOOpt;
@@ -23,7 +20,7 @@ import java.util.List;
 public class JsonBizOperation implements BizOperation {
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws IOException {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         String jsonexpression=BuiltInOperation.getJsonFieldString(bizOptJson,"jsonexpression",null);

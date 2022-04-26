@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
+import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
@@ -16,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 public class DefineJsonDataBizOperation implements BizOperation {
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String targetDsName =bizOptJson.getString("id");
         String jsonValue=BuiltInOperation.getJsonFieldString(bizOptJson,"jsonValue",null);
         if (StringUtils.isNotEmpty(jsonValue)){

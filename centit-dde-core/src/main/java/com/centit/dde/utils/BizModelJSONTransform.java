@@ -122,18 +122,11 @@ public class BizModelJSONTransform
                 currentDateSet.getData(),
                 valuePath);
         }
-        //表达式只能访问 MODEL_TAG 中的请求参数
-        if(ConstantValue.MODEL_TAG.equals(dataSetName)){
-            if(StringUtils.isBlank(valuePath)) {
-                return data.getStackData(ConstantValue.REQUEST_PARAMS_TAG);
-            } else {
-                return ReflectionOpt.attainExpressionValue(
-                    this.data.getStackData(ConstantValue.REQUEST_PARAMS_TAG), valuePath);
-            }
-        }
+
         if(ConstantValue.MODEL_NAME.equals(dataSetName)){
             return this.data.getModelName();
         }
+
         if(ConstantValue.RESPONSE_DATA_CODE.equals(dataSetName)){
             return this.data.getResponseMapData().getCode();
         }

@@ -33,6 +33,7 @@ public interface BizModel {
      * __log_level
      * __message_queue
      * __last_error
+     * __return_data
      * @see com.centit.dde.utils.ConstantValue
      */
     Object getStackData(String key);
@@ -77,29 +78,5 @@ public interface BizModel {
         return getDataSet(this.getModelName());
     }
 
-    default DataSet fetchDataSetByName(String relationPath){
-
-        if(StringUtils.isBlank(relationPath)){
-            return null;
-        }
-
-        if(relationPath.startsWith("__")){
-            Object obj = getStackData(relationPath);
-            if(obj != null){
-                return new SimpleDataSet(obj);
-            }
-        }
-        Map<String, DataSet> dss = getBizData();
-        if(dss == null) {
-            return null;
-        }
-        DataSet data = dss.get(relationPath);
-        if(data !=null ){
-            return data;
-        }
-        return dss.values().stream().filter(
-            ds -> ds.getDataSetName()
-                .equals(relationPath)).findFirst()
-                .orElse(null);
-    }
+    DataSet fetchDataSetByName(String relationPath);
 }

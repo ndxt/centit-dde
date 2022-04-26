@@ -1,10 +1,7 @@
 package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.core.BizModel;
-import com.centit.dde.core.BizOperation;
-import com.centit.dde.core.DataSet;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.*;
 import com.centit.dde.vo.OFDPreviewVo;
 import com.centit.framework.common.ResponseData;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +28,7 @@ public class OFDPreviewBizOperation implements BizOperation {
     public static final Log log = LogFactory.getLog(OFDPreviewBizOperation.class);
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         OFDPreviewVo ofdPreviewVo = bizOptJson.toJavaObject(OFDPreviewVo.class);
         String httpUrl = ofdPreviewVo.getHttpUrl();
         if (StringUtils.isBlank(httpUrl)) {

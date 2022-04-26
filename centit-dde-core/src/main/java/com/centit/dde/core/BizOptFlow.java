@@ -15,6 +15,4 @@ public interface BizOptFlow {
 
     Object run(DataPacketInterface dataPacket, String logId, Map<String, Object> callStackData) throws Exception;
 
-    @Deprecated
-    BizModel debug(JSONObject bizOptJson);
 }

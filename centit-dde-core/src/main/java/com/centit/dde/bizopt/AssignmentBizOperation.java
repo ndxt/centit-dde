@@ -2,10 +2,7 @@ package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.core.BizModel;
-import com.centit.dde.core.BizOperation;
-import com.centit.dde.core.DataSet;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.*;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.AssignmentVo;
@@ -26,7 +23,7 @@ import java.util.Map;
 public class AssignmentBizOperation implements BizOperation {
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         AssignmentVo assignmentVo =bizOptJson.toJavaObject(AssignmentVo.class);
         DataSet dataSet = bizModel.getDataSet(assignmentVo.getSource());
         String assignType = assignmentVo.getAssignType();

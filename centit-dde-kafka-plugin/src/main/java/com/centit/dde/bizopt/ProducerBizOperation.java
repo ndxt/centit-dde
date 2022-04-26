@@ -2,10 +2,7 @@ package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.core.BizModel;
-import com.centit.dde.core.BizOperation;
-import com.centit.dde.core.DataSet;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.*;
 import com.centit.dde.producer.KafkaProducerConfig;
 import com.centit.dde.producer.ProducerEntity;
 import com.centit.framework.common.ResponseData;
@@ -27,7 +24,7 @@ public class ProducerBizOperation implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws ExecutionException, InterruptedException {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws ExecutionException, InterruptedException {
         ProducerEntity producerEntity = JSON.parseObject(JSON.toJSONString(bizOptJson), ProducerEntity.class);
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(producerEntity.getDatabaseId());
         DataSet dataSet = bizModel.getDataSet(producerEntity.getSource());

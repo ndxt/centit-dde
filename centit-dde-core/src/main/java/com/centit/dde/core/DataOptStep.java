@@ -21,6 +21,7 @@ public class DataOptStep {
     }
 
     private void mapData(JSONObject dataOptJson) {
+        //这个什么意思 所有的节点吗？
         JSONArray nodes = dataOptJson.getJSONArray("nodes");
         for (Object obj : nodes) {
             if (obj instanceof JSONObject) {

@@ -32,7 +32,7 @@ public class EsQueryBizOperation implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext){
         EsQueryVo esReadVo = JSONObject.parseObject(bizOptJson.toJSONString(), EsQueryVo.class);
         //es服务地址
         String dataSourceId = esReadVo.getDatabaseId();

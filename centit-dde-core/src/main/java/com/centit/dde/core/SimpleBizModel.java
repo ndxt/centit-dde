@@ -2,9 +2,11 @@ package com.centit.dde.core;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,6 +34,7 @@ public class SimpleBizModel implements BizModel, Serializable {
      * 模型数据
      */
     private Map<String, DataSet> bizData;
+
     private ResponseMapData responseMapData;
 
     public SimpleBizModel(String modelName) {
@@ -206,5 +209,49 @@ public class SimpleBizModel implements BizModel, Serializable {
 
     public static SimpleBizModel createSingleDataSetModel(DataSet dataSet) {
         return createSingleDataSetModel(BizModel.DEFAULT_MODEL_NAME, dataSet);
+    }
+
+    @Override
+    public DataSet fetchDataSetByName(String relationPath){
+
+        if(StringUtils.isBlank(relationPath)){
+            return null;
+        }
+        String dateSetName = relationPath;
+        //补丁 等全部修复代码后移除
+        switch (relationPath){
+            case "modelTag":
+            case "pathData":
+                dateSetName = ConstantValue.REQUEST_PARAMS_TAG;
+                break;
+            case "requestBody":
+                dateSetName = ConstantValue.REQUEST_BODY_TAG;
+                break;
+            case "requestFile":
+                dateSetName = ConstantValue.REQUEST_FILE_TAG;
+                break;
+        }
+
+        if(dateSetName.startsWith("__")){
+            Object obj = getStackData(dateSetName);
+            if(obj != null){
+                return new SimpleDataSet(obj);
+            }
+        }
+
+        Map<String, DataSet> dss = getBizData();
+        if(dss == null) {
+            return null;
+        }
+
+        DataSet data = dss.get(dateSetName);
+        if(data !=null ){
+            return data;
+        }
+
+        return dss.values().stream().filter(
+                ds -> ds.getDataSetName()
+                    .equals(relationPath)).findFirst()
+            .orElse(null);
     }
 }

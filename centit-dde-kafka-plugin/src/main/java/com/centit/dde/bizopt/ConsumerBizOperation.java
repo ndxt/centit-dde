@@ -7,6 +7,7 @@ import com.centit.dde.consumer.ConsumerEntity;
 import com.centit.dde.consumer.KafkaConsumerConfig;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
+import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.SourceInfo;
@@ -32,10 +33,11 @@ public class ConsumerBizOperation implements BizOperation {
      * 这样就可能造成数据取出来消费掉了，但是后续的处理异常了，这个没法控制
      * @param bizModel
      * @param bizOptJson
+     * @param dataOptContext
      * @return
      */
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson){
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext){
         ConsumerEntity consumerEntity = JSON.parseObject(JSON.toJSONString(bizOptJson), ConsumerEntity.class);
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(consumerEntity.getDatabaseId());
         JSONObject extProps = sourceInfo.getExtProps();

@@ -3,6 +3,7 @@ package com.centit.dde.bizopt;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
+import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.vo.OFDConvertVo;
 import com.centit.fileserver.common.FileInfo;
@@ -32,7 +33,7 @@ public class OFDConvertBizOperation implements BizOperation {
 
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         Map<String, Object> modelTag = bizModel.getModelTag();
         OFDConvertVo ofdConvertVo = bizOptJson.toJavaObject(OFDConvertVo.class);
         String fileIdMaps = (String) modelTag.get("fileId");

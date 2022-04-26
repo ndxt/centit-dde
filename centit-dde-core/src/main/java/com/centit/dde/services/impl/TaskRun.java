@@ -3,6 +3,7 @@ package com.centit.dde.services.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizOptFlow;
+import com.centit.dde.core.DataOptContext;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.DataPacketDraftDao;
 import com.centit.dde.dao.TaskDetailLogDao;
@@ -52,9 +53,9 @@ public class TaskRun {
         this.bizOptFlow = bizOptFlow;
     }
 
-    public Object runTask(DataPacketInterface dataPacketInterface, Map<String, Object> callStackData){
+    public Object runTask(DataPacketInterface dataPacketInterface, DataOptContext optContext){
 
-        String runType = StringBaseOpt.castObjectToString(callStackData.get(ConstantValue.RUN_TYPE_TAG), ConstantValue.RUN_TYPE_NORMAL);
+        //String runType = //StringBaseOpt.castObjectToString(callStackData.get(ConstantValue.RUN_TYPE_TAG), ConstantValue.RUN_TYPE_NORMAL);
 
         TaskLog taskLog = new TaskLog();
         taskLog.setRunBeginTime(new Date());

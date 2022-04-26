@@ -2,6 +2,7 @@ package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.impl.BizOptFlowImpl;
 import com.centit.dde.po.DataPacketInterface;
@@ -38,7 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -145,7 +145,8 @@ public class HttpTaskController extends BaseController {
         }
     }
 
-    private void returnObject(String packetId, String runType,String taskType, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void returnObject(String packetId, String runType, String taskType,
+                              HttpServletRequest request, HttpServletResponse response) throws IOException {
         //暂时先把登录验证关闭掉
         /*   if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
             judgePower(packetId,runType);
@@ -171,13 +172,15 @@ public class HttpTaskController extends BaseController {
         }
         Map<String, Object> params = collectRequestParameters(request);
         //保存内部逻辑变量，有些时候需要将某些值传递到其它标签节点，这时候需要用到它
-        Map<String, Object> callStackData = new HashMap<>();
-        callStackData.put(ConstantValue.RUN_TYPE_TAG, runType);
+        DataOptContext dataOptContext = new DataOptContext();
+
+        dataOptContext.setRunType(runType);
+
         if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod()) ) {
             if (StringUtils.contains(request.getHeader("Content-Type"), "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
                 //JSON.parse()
-                callStackData.put(ConstantValue.REQUEST_BODY_TAG, JSON.parse(bodyString));
+                dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, JSON.parse(bodyString));
             } else {
                 String header = request.getHeader("fileName");
                 if (header != null) {
@@ -188,12 +191,12 @@ public class HttpTaskController extends BaseController {
                 }
                 InputStream inputStream = UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight();
                 if (inputStream != null) {
-                    callStackData.put(ConstantValue.REQUEST_FILE_TAG, inputStream);
+                    dataOptContext.setStackData(ConstantValue.REQUEST_FILE_TAG, inputStream);
                 }
             }
         }
-        callStackData.put(ConstantValue.REQUEST_PARAMS_TAG, params);
-        bizModel = bizmodelService.fetchBizModel(dataPacketInterface, callStackData);
+        dataOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, params);
+        bizModel = bizmodelService.fetchBizModel(dataPacketInterface, dataOptContext);
 
         boolean isFileDown = bizModel instanceof ResponseData
             && BizOptFlowImpl.FILE_DOWNLOAD.equals(((ResponseData) bizModel).getMessage());

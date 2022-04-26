@@ -1,5 +1,6 @@
 package com.centit.dde.services;
 
+import com.centit.dde.core.DataOptContext;
 import com.centit.dde.po.DataPacketInterface;
 
 import java.util.Map;
@@ -9,7 +10,5 @@ import java.util.Map;
  */
 public interface BizModelService {
 
-    void setBizModelBuf(Object bizModel, DataPacketInterface dataPacket, Map<String, Object> callStackData);
-
-    Object fetchBizModel(DataPacketInterface dataPacket, Map<String, Object> callStackData);
+    Object fetchBizModel(DataPacketInterface dataPacket, DataOptContext optContext);
 }

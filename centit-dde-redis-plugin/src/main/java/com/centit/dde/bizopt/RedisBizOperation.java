@@ -6,6 +6,7 @@ import com.centit.dde.config.RedisConfig;
 import com.centit.dde.config.RedisTypeEnum;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
+import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.SimpleDataSet;
 import com.centit.dde.entity.RedisParamVo;
 import com.centit.framework.common.ResponseData;
@@ -25,7 +26,7 @@ public class RedisBizOperation implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception{
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception{
         RedisParamVo redisParamVo = JSON.parseObject(bizOptJson.toJSONString(), RedisParamVo.class);
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById("dataSourceId");
         RedisConfig redisConfig = new RedisConfig();

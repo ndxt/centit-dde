@@ -9,8 +9,6 @@ import com.centit.framework.common.ResponseData;
 @FunctionalInterface
 public interface BizOperation{
     //int
-    ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson) throws Exception;
+    ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception;
 
-    default void debugOpt(BizModel bizModel, JSONObject bizOptJson){
-    }
 }
