@@ -32,8 +32,12 @@ public class TaskLog implements java.io.Serializable {
     private String logId;
 
     @Column(name="task_id")
-    @ApiModelProperty(value = "任务ID", hidden = true)
+    @ApiModelProperty(value = "API网关ID", hidden = true)
     private String taskId;
+
+    @Column(name="opt_id")
+    @ApiModelProperty(value = "菜单ID", hidden = true)
+    private String optId;
 
     @Column(name="application_id")
     @ApiModelProperty(value = "项目id", hidden = true)

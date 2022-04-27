@@ -1,6 +1,7 @@
 package com.centit.dde.services;
 
 import com.centit.dde.po.TaskLog;
+import com.centit.dde.vo.StatisticsParameter;
 import com.centit.support.database.utils.PageDesc;
 
 import java.util.List;
@@ -39,5 +40,5 @@ public interface TaskLogManager{
 
     void deleteTaskLogById(String logId);
 
-
+    Map<String,Object> getLogStatisticsInfo(StatisticsParameter parameter);
 }

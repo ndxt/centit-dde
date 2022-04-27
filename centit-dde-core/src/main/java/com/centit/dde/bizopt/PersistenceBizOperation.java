@@ -44,23 +44,6 @@ public class PersistenceBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws FileNotFoundException {
-        String dataType = BuiltInOperation.getJsonFieldString(bizOptJson, "dataType", "D");
-        ResponseData jsonObject = new ResponseSingleData();
-        switch (dataType) {
-            case "E":
-                writeExcelFile(bizModel, bizOptJson);
-                break;
-            case "C":
-                writeCsvFile(bizModel, bizOptJson);
-                break;
-            default:
-                jsonObject = writeDatabase(bizModel, bizOptJson);
-                break;
-        }
-        return jsonObject;
-    }
-
-    private ResponseData writeDatabase(BizModel bizModel, JSONObject bizOptJson) {
         String isRun = BuiltInOperation.getJsonFieldString(bizOptJson, "isRun", "T");
         if (ConstantValue.FALSE.equalsIgnoreCase(isRun)) {
             return new ResponseSingleData();
@@ -113,33 +96,6 @@ public class PersistenceBizOperation implements BizOperation {
             return BuiltInOperation.createResponseData(dataSetWriter.getSuccessNums(), dataSetWriter.getErrorNums(), dataSetWriter.getInfo());
         }
         return BuiltInOperation.createResponseSuccessData(dataSetWriter.getSuccessNums());
-    }
-
-    private void writeCsvFile(BizModel bizModel, JSONObject bizOptJson) throws FileNotFoundException {
-        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        String fileName = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", null);
-        if (exportPath == null) {
-            throw new ObjectException(bizOptJson,
-                ObjectException.NULL_EXCEPTION, "配置文件没有设置保存文件路径");
-        }
-        CsvDataSet dataSetWriter = new CsvDataSet();
-        dataSetWriter.setFilePath(exportPath + File.separator + fileName);
-        BuiltInOperation.runAppend(bizModel, bizOptJson);
-        dataSetWriter.save(bizModel.getBizData().get(sourDsName));
-        //return bizModel;
-    }
-
-    private void writeExcelFile(BizModel bizModel, JSONObject bizOptJson) throws FileNotFoundException {
-        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        String fileName = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", null);
-        if (exportPath == null) {
-            throw new ObjectException(bizOptJson,
-                ObjectException.NULL_EXCEPTION, "配置文件没有设置保存文件路径");
-        }
-        FileDataSet dataSetWriter = new ExcelDataSet();
-        dataSetWriter.setFilePath(exportPath + File.separator + fileName);
-        dataSetWriter.save(bizModel.getBizData().get(sourDsName));
-        //return bizModel;
     }
 
 }
