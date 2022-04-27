@@ -1,6 +1,8 @@
 package com.centit.dde.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.framework.common.WebOptUtils;
@@ -1029,5 +1031,33 @@ public abstract class DataSetOptUtil {
             inputStreamList.add(requestFile);
         }
         return inputStreamList;
+    }
+
+    //获取数据集参数或者自定义参数
+    public static Map<String, Object> getDataSetParames(BizModel bizModel, JSONObject bizOptJson){
+        //参数类型
+        String paramsType = bizOptJson.getString("paramsType");
+        Map<String, Object> parames;
+        // 自定义参数类型
+        if("customSource".equals(paramsType)){
+            Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
+            parames = new HashMap<>(16);
+            if (mapString != null) {
+                for (Map.Entry<String, String> map : mapString.entrySet()) {
+                    if (!StringBaseOpt.isNvl(map.getValue())) {
+                        parames.put(map.getKey(),  VariableFormula.calculate(map.getValue(),new BizModelJSONTransform(bizModel)));
+                    }
+                }
+            }
+            //添加 url参数
+            Map<String, Object> urlParams = CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
+            parames = CollectionsOpt.unionTwoMap(parames, urlParams);
+        } else {
+            //数据集参数
+            String source = bizOptJson.getString("source");
+            DataSet dataSet = bizModel.fetchDataSetByName(StringUtils.isBlank(source)?ConstantValue.REQUEST_PARAMS_TAG:source);
+            parames = dataSet.getFirstRow(); //数据集
+        }
+        return parames;
     }
 }

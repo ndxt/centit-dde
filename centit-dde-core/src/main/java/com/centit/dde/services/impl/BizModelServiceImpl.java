@@ -30,8 +30,6 @@ public class BizModelServiceImpl implements BizModelService {
 
     @Override
     public DataOptResult runBizModel(DataPacketInterface dataPacket, DataOptContext optContext) {
-        //元数据组件做数据范围查询的时候需要该值，只能从这儿set进去
-        //interimVariable.put(ConstantValue.METADATA_OPTID,dataPacket.getOptId());
         if (notNeedBuf(dataPacket)) {
             return taskRun.runTask(dataPacket, optContext);
         }

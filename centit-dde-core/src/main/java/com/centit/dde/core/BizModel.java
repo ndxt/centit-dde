@@ -3,8 +3,6 @@ package com.centit.dde.core;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.dde.utils.ConstantValue;
-import com.centit.framework.common.ResponseData;
-import com.centit.framework.common.ResponseMapData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
@@ -207,10 +205,10 @@ public class BizModel implements  Serializable {
             case "pathData":
                 dataSetName = ConstantValue.REQUEST_PARAMS_TAG;
                 break;
-            case "requestBody":
+            case "postBodyData":
                 dataSetName = ConstantValue.REQUEST_BODY_TAG;
                 break;
-            case "requestFile":
+            case "postFileData":
                 dataSetName = ConstantValue.REQUEST_FILE_TAG;
                 break;
             case "responseDataCode":

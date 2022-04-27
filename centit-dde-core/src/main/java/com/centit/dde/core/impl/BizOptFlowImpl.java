@@ -15,7 +15,6 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.dde.vo.CycleVo;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.common.ResponseSingleData;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.product.metadata.dao.SourceInfoDao;
@@ -129,7 +128,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.DEFINE_JSON_DATA, new DefineJsonDataBizOperation());
         allOperations.put(ConstantValue.FILE_UPLOAD, new FileUploadBizOperation(fileStore));
         allOperations.put(ConstantValue.FILE_DOWNLOAD, new FileDownloadBizOperation(fileStore));
-        allOperations.put(ConstantValue.METADATA_OPERATION, new MetadataBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
+        allOperations.put(ConstantValue.METADATA_OPERATION_QUERY,
+            new MetadataQueryBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
+        allOperations.put(ConstantValue.METADATA_OPERATION_UPDATE, new MetadataUpdateBizOperation(metaObjectService));
         allOperations.put(ConstantValue.COMPARE_SOURCE, new ObjectCompareBizOperation());
         allOperations.put(ConstantValue.SESSION_DATA, new GetSessionDataBizOperation());
         allOperations.put(ConstantValue.COMMIT_TRANSACTION, new TransactionCommitOperation(sourceInfoDao));

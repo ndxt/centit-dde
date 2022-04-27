@@ -48,8 +48,10 @@ public class ConstantValue {
     public static final String FILE_DOWNLOAD = "fileDownload";
     //定义JSON数据组件
     public static final String DEFINE_JSON_DATA = "defineJsonData";
-    //元数据操作组件
-    public static final String METADATA_OPERATION ="metadata";
+    //元数据操作查询组件
+    public static final String METADATA_OPERATION_QUERY ="metadataQuery";
+    //元数据操作查询组件
+    public static final String METADATA_OPERATION_UPDATE ="metadataUpdate";
     //创建工作流组件
     public static final String CREATE_WORKFLOW = "createWorkflow";
     //提交工作流组件

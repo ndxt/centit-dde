@@ -54,16 +54,9 @@ public class TaskRun {
     }
 
     public DataOptResult runTask(DataPacketInterface dataPacketInterface, DataOptContext optContext) {
-
-        //String runType = //StringBaseOpt.castObjectToString(callStackData.get(ConstantValue.RUN_TYPE_TAG), ConstantValue.RUN_TYPE_NORMAL);
-
-        TaskLog taskLog = new TaskLog();
-        taskLog.setRunBeginTime(new Date());
-        buildLogInfo(taskLog, optContext.getRunType(), dataPacketInterface);
-//不记录任何日志
+        TaskLog taskLog = buildLogInfo(optContext.getRunType(), dataPacketInterface);
         if ((ConstantValue.LOGLEVEL_CHECK_INFO & dataPacketInterface.getLogLevel()) != 0) {
-            //保存日志基本信息
-            taskLogDao.saveNewObject(taskLog);
+            taskLogDao.saveNewObject(taskLog);//保存日志基本信息
         } else {
             optContext.setTaskLog(taskLog);
         }
@@ -72,9 +65,7 @@ public class TaskRun {
             DataOptResult runResult = runOptModule(dataPacketInterface, optContext);
             //更新API信息
             updateApiData(optContext.getRunType(), dataPacketInterface);
-            //不记录任何日志
             if ((ConstantValue.LOGLEVEL_CHECK_INFO & dataPacketInterface.getLogLevel()) != 0) {
-                //更新日志信息
                 updateLog(taskLog);
             }
             return runResult;
@@ -115,7 +106,9 @@ public class TaskRun {
         taskDetailLogDao.saveNewObject(detailLog);
     }
 
-    private void buildLogInfo(TaskLog taskLog, String runType, DataPacketInterface dataPacketInterface) {
+    private TaskLog buildLogInfo(String runType, DataPacketInterface dataPacketInterface) {
+        TaskLog taskLog = new TaskLog();
+        taskLog.setRunBeginTime(new Date());
         taskLog.setApiType(ConstantValue.RUN_TYPE_COPY.equals(runType) ? 0 : 1);
         if (dataPacketInterface != null) {
             if (!StringBaseOpt.isNvl(dataPacketInterface.getTaskType()) && "2".equals(dataPacketInterface.getTaskType())) {
@@ -129,6 +122,7 @@ public class TaskRun {
         taskLog.setRunType(dataPacketInterface.getPacketName());
         taskLog.setTaskId(dataPacketInterface.getPacketId());
         log.debug("新增API执行日志，日志信息：{}", StringBaseOpt.castObjectToString(taskLog));
+        return taskLog;
     }
 
     private void updateLog(TaskLog taskLog) {
