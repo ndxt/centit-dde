@@ -1,13 +1,18 @@
 package com.centit.dde.bizopt;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.core.*;
+import com.centit.dde.core.BizModel;
+import com.centit.dde.core.BizOperation;
+import com.centit.dde.core.DataOptContext;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.producer.KafkaProducerConfig;
-import com.centit.dde.producer.ProducerEntity;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
@@ -55,7 +60,7 @@ public class ProducerBizOperation implements BizOperation {
                 if (res!=null){
                     resut.set("消息发送成功，topic="+ res.topic()+"，分区="+res.partition()+"，offset="+res.offset());
                 }
-                bizModel.putDataSet(id,new SimpleDataSet(resut));
+                bizModel.putDataSet(id,new DataSet(resut));
             }else {
                 //异步发送添加回调函数,展示信息 不会阻塞
                 producer.send(record, (metadata, exception) -> {
