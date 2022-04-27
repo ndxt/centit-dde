@@ -17,7 +17,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class ConsumerBizOperation implements BizOperation {
     private SourceInfoDao sourceInfoDao;
@@ -41,10 +40,13 @@ public class ConsumerBizOperation implements BizOperation {
         if (StringUtils.isBlank(topic) || StringUtils.isBlank(databaseId)){
             return ResponseData.makeErrorMessage("Kafka服务地址或topic不能为空！");
         }
-        String groupId = bizOptJson.getString("groupId");
         SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(databaseId);
         if (sourceInfo==null){
             return ResponseData.makeErrorMessage("Kafka服务资源不存在或已被删除！");
+        }
+        String groupId = bizOptJson.getString("groupId");
+        if(StringUtils.isBlank(groupId)){
+            return ResponseData.makeErrorMessage("分组id不能为空！");
         }
         JSONObject extProps = sourceInfo.getExtProps();
         if (extProps == null){
@@ -54,8 +56,9 @@ public class ConsumerBizOperation implements BizOperation {
         KafkaConsumer consumer = KafkaConsumerConfig.getKafkaConsumer(extProps,sourceInfo);
         List<String> values = new ArrayList<>();
         try {
-            //同步提交offset
-            consumer.subscribe(Pattern.compile(topic));
+            ArrayList<Object> objects = new ArrayList<>();
+            objects.add(topic);
+            consumer.subscribe(objects);
             ConsumerRecords<String, String> records = consumer.poll(1000);
             for (ConsumerRecord<String, String> record : records) {
                 values.add(record.value());

@@ -224,10 +224,10 @@ public class SimpleBizModel implements BizModel, Serializable {
             case "pathData":
                 dataSetName = ConstantValue.REQUEST_PARAMS_TAG;
                 break;
-            case "requestBody":
+            case "postBodyData":
                 dataSetName = ConstantValue.REQUEST_BODY_TAG;
                 break;
-            case "requestFile":
+            case "postFileData":
                 dataSetName = ConstantValue.REQUEST_FILE_TAG;
                 break;
             case "responseDataCode":

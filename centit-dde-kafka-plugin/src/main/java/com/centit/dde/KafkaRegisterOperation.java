@@ -23,6 +23,6 @@ public class KafkaRegisterOperation{
         //消息推送实例
         bizOptFlow.registerOperation("kafkaSCZ",new ProducerBizOperation(sourceInfoDao));
         //消息订阅实例
-        bizOptFlow.registerOperation("consumer",new ConsumerBizOperation(sourceInfoDao));
+        bizOptFlow.registerOperation("kafkaXF",new ConsumerBizOperation(sourceInfoDao));
     }
 }

@@ -20,7 +20,9 @@ public class KafkaProducerConfig {
         JSONObject extProps = sourceInfo.getExtProps();
         if (extProps!=null){
             extProps.forEach((key,value)->{
-                properties.put(key,value);
+                if (key !=null && value!=null){
+                    properties.put(key,value);
+                }
             });
         }
         String username = sourceInfo.getUsername();

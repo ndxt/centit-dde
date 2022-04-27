@@ -8,6 +8,7 @@ import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -43,10 +44,10 @@ public class ProducerBizOperation implements BizOperation {
         //指定发送key
         String key = bizOptJson.getString("key");
         //是否异步发送
-        Boolean isAsyn = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getBoolean("isAsyn"),true);
+        Boolean isAsyn = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getBoolean("isAsyn"),false);
 
         DataSet dataSet = bizModel.fetchDataSetByName(source);
-        ProducerRecord<String, Object> record = new ProducerRecord<>(topic, partition, key, dataSet.getData());
+        ProducerRecord<String, String> record = new ProducerRecord<>(topic, partition, key, StringBaseOpt.castObjectToString(dataSet.getData()));
         AtomicReference<String> resut= new AtomicReference<>("");
         String id = bizOptJson.getString("id");
         try{
