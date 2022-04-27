@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -8,6 +9,8 @@ import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 
 /**
  * 提交当前线程的事物
@@ -22,15 +25,17 @@ public class TransactionCommitOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
-        String[] databaseCodes = bizOptJson.getObject("databaseName",String[].class);
-        if (databaseCodes==null || databaseCodes.length==0){//默认提交当前线程所有事物
+        JSONArray databaseName = bizOptJson.getJSONArray("databaseName");
+        Object[] databaseCodeArr = CollectionsOpt.listToArray(databaseName);
+        if (databaseCodeArr==null || databaseCodeArr.length==0){//默认提交当前线程所有事物
             AbstractSourceConnectThreadHolder.commitAll();
             return BuiltInOperation.createResponseSuccessData(0);
         }
-        for (String databaseCode : databaseCodes) {//提交选中库的事物
-            SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+        for (Object databaseCode : databaseCodeArr) {//提交选中库的事物
+            String databaseCodeStr = StringBaseOpt.castObjectToString(databaseCode);
+            SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(databaseCodeStr);
             AbstractSourceConnectThreadHolder.commit(sourceInfo);
         }
-        return BuiltInOperation.createResponseSuccessData(databaseCodes.length);
+        return BuiltInOperation.createResponseSuccessData(databaseCodeArr.length);
     }
 }
