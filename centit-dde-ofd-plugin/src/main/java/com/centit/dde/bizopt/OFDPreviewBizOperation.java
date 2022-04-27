@@ -45,7 +45,7 @@ public class OFDPreviewBizOperation implements BizOperation {
                 return ResponseData.makeErrorMessage("请求预览服务异常！");
             }
             String previewUrl = httpUrl + "reader?file=" + jsonObject.getString("name");
-            bizModel.putDataSet(ofdPreviewVo.getId(), new SimpleDataSet(previewUrl));
+            bizModel.putDataSet(ofdPreviewVo.getId(), new DataSet(previewUrl));
             return ResponseData.makeSuccessResponse("ok");
         }
         return null;

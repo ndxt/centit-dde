@@ -38,7 +38,7 @@ public class AssignmentBizOperation implements BizOperation {
                 if (dataSet==null){
                     return BuiltInOperation.createResponseData(0, 500, bizOptJson.getString("SetsName")+"：未指定数据集，或指定数据集值为NULL！");
                 }
-                newDataSet=SerializationUtils.clone(new SimpleDataSet(dataSet.getData()));
+                newDataSet=SerializationUtils.clone(new DataSet(dataSet.getData()));
                 break;
             case "2"://手动赋值
                 Object transformerdData =  JSONTransformer.transformer(JSON.parse(data), new BizModelJSONTransform(bizModel));
@@ -48,7 +48,7 @@ public class AssignmentBizOperation implements BizOperation {
                 }else {
                  modelTag.put(assignmentVo.getId(),data);
                 }
-                newDataSet = new SimpleDataSet(data);
+                newDataSet = new DataSet(data);
                 break;
             default://引用数据集
                 List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
@@ -56,7 +56,7 @@ public class AssignmentBizOperation implements BizOperation {
                 for (Map<String, Object> objectMap : dataAsList) {
                     map.forEach((key,value)-> objectMap.put(key,value));
                 }
-                newDataSet = new SimpleDataSet(dataSet);
+                newDataSet = new DataSet(dataSet);
                 break;
         }
         bizModel.putDataSet(assignmentVo.getId(),newDataSet);

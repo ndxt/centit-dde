@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -38,7 +38,7 @@ public class DeleteWorkFlowBizOperation implements BizOperation {
             return  ResponseData.makeErrorMessage(500,"flowInstId或userCode不能为空！");
         }
         boolean deleteFlowInstById = flowManager.deleteFlowInstById(flowInstId,userCode);
-        bizModel.putDataSet(id,new SimpleDataSet(deleteFlowInstById));
+        bizModel.putDataSet(id,new DataSet(deleteFlowInstById));
         return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
     }
 }

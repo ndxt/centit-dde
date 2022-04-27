@@ -7,7 +7,7 @@ import com.centit.dde.config.RedisTypeEnum;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.entity.RedisParamVo;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
@@ -51,7 +51,7 @@ public class RedisBizOperation implements BizOperation {
         setRedisTemplate.invoke(instance,redisTemplate);
         Method method=aClass.getMethod(redisParamVo.getMethodName(),parameterTypes);
         Object invoke = method.invoke(instance, redisParamVo.getMethodParam());
-        bizModel.putDataSet(redisParamVo.getId(),new SimpleDataSet(invoke));
+        bizModel.putDataSet(redisParamVo.getId(),new DataSet(invoke));
         return ResponseSingleData.makeResponseData(bizModel.getDataSet(redisParamVo.getId()).getSize());
     }
 }

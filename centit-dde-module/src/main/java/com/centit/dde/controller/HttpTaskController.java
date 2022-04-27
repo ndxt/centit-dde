@@ -3,6 +3,7 @@ package com.centit.dde.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataOptContext;
+import com.centit.dde.core.DataOptResult;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.impl.BizOptFlowImpl;
 import com.centit.dde.po.DataPacketInterface;
@@ -199,13 +200,11 @@ public class HttpTaskController extends BaseController {
         dataOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, params);
         dataOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, WebOptUtils.getCurrentUserDetails(request));
 
-        bizModel = bizmodelService.fetchBizModel(dataPacketInterface, dataOptContext);
+        DataOptResult result = bizmodelService.runBizModel(dataPacketInterface, dataOptContext);
 
-        boolean isFileDown = bizModel instanceof ResponseData
-            && BizOptFlowImpl.FILE_DOWNLOAD.equals(((ResponseData) bizModel).getMessage());
-        if (isFileDown) {
+        if (result.getResultType() == DataOptResult.RETURN_FILE_STREAM) {
             InputStream in;
-            DataSet dataSet = (DataSet) ((ResponseData) bizModel).getData();
+            DataSet dataSet = new DataSet(result.getResultObject());
             Map<String, Object> mapFirstRow = dataSet.getFirstRow();
             if (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream) {
                 ByteArrayOutputStream outputStream = (ByteArrayOutputStream) mapFirstRow.get(ConstantValue.FILE_CONTENT);
@@ -218,7 +217,11 @@ public class HttpTaskController extends BaseController {
                 in.available(), fileName, request.getParameter("downloadType"), null);
             return;
         }
-        JsonResultUtils.writeOriginalObject(bizModel, response);
+        if (result.getResultType() == DataOptResult.RETURN_DATA_AS_RAW) {
+            JsonResultUtils.writeOriginalObject(result.getResultObject(), response);
+        } else {
+            JsonResultUtils.writeOriginalObject(result.toResponseData(), response);
+        }
     }
 
     @PostMapping(value = "/testformula")

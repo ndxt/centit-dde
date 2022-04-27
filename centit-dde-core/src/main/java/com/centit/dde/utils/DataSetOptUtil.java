@@ -3,7 +3,6 @@ package com.centit.dde.utils;
 import com.alibaba.fastjson.JSON;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.core.SimpleDataSet;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
@@ -167,7 +166,7 @@ public abstract class DataSetOptUtil {
         for (Map<String, Object> obj : data) {
             newData.add(mapDataRow(obj, formulaMap));
         }
-        return new SimpleDataSet(newData);
+        return new DataSet(newData);
     }
 
     /**
@@ -206,7 +205,7 @@ public abstract class DataSetOptUtil {
                 newData.add(obj);
             }
         }
-        SimpleDataSet outDataSet = new SimpleDataSet(newData);
+        DataSet outDataSet = new DataSet(newData);
         outDataSet.setDataSetName(inData.getDataSetName());
         return outDataSet;
     }
@@ -373,7 +372,7 @@ public abstract class DataSetOptUtil {
             Map<String, Object> newRow = makeNewStatRow(groupByFields, statDesc, preRow, tempData);
             newData.add(newRow);
         }
-        return new SimpleDataSet(newData);
+        return new DataSet(newData);
     }
 
     /*public static DataSet sumRollupDataset(DataSet inData,
@@ -437,7 +436,7 @@ public abstract class DataSetOptUtil {
             preRow = row;
         }
         analyseDatasetGroup(newData, data, prePos, n, dvt, refDesc);
-        return new SimpleDataSet(newData);
+        return new DataSet(newData);
     }
 
     /***
@@ -528,7 +527,7 @@ public abstract class DataSetOptUtil {
         if (preRow != null && newRow != null) {
             newData.add(newRow);
         }
-        return new SimpleDataSet(newData);
+        return new DataSet(newData);
     }
 
     private static void appendData(Map<String, Object> newRow, Map<String, Object> oldData,
@@ -560,7 +559,7 @@ public abstract class DataSetOptUtil {
                                             List<Map.Entry<String, String>> primaryFields,
                                             Collection<Map.Entry<String, String>> formulaMap) {
         if (currDataSet == null || lastDataSet == null) {
-            return new SimpleDataSet();
+            return new DataSet();
         }
         List<Map<String, Object>> currData = currDataSet.getDataAsList();
         List<Map<String, Object>> lastData = lastDataSet.getDataAsList();
@@ -609,7 +608,7 @@ public abstract class DataSetOptUtil {
             newData.add(mapDataRow(newRow, formulaMap));
             j++;
         }
-        return new SimpleDataSet(newData);
+        return new DataSet(newData);
     }
 
     private static void splitMainAndSlave(List<Map.Entry<String, String>> primaryFields, List<String> mainFields, List<String> slaveFields) {
@@ -696,7 +695,7 @@ public abstract class DataSetOptUtil {
                 j++;
             }
         }
-        return new SimpleDataSet(newData);
+        return new DataSet(newData);
     }
 
     /**
@@ -713,7 +712,7 @@ public abstract class DataSetOptUtil {
     public static DataSet filterByOtherDataSet(DataSet mainDataSet, DataSet slaveDataSet,
                                                List<Map.Entry<String, String>> primaryFields, List<String> formulas) {
         if (mainDataSet == null || slaveDataSet == null) {
-            return new SimpleDataSet();
+            return new DataSet();
         }
         List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
         List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
@@ -754,7 +753,7 @@ public abstract class DataSetOptUtil {
                 newData.add(newRow);
             }
         }
-        return new SimpleDataSet(newData);
+        return new DataSet(newData);
     }
 
     /**
@@ -769,15 +768,15 @@ public abstract class DataSetOptUtil {
         List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
         List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
         if (mainData == null) {
-            return new SimpleDataSet(slaveData);
+            return new DataSet(slaveData);
         }
         if (slaveData == null) {
-            return new SimpleDataSet(mainData);
+            return new DataSet(mainData);
         }
         List<Map<String, Object>> resultData = new ArrayList<>(mainData.size() + slaveData.size());
         resultData.addAll(mainData);
         resultData.addAll(slaveData);
-        return new SimpleDataSet(resultData);
+        return new DataSet(resultData);
     }
 
     /**
@@ -828,7 +827,7 @@ public abstract class DataSetOptUtil {
             }
 
         }
-        return new SimpleDataSet(newData);
+        return new DataSet(newData);
     }
 
     /**
@@ -880,7 +879,7 @@ public abstract class DataSetOptUtil {
             }
             i++;
         }
-        return new SimpleDataSet(newData);
+        return new DataSet(newData);
     }
 
     private static int compareTwoRow(Map<String, Object> data1, Map<String, Object> data2, List<String> fields, boolean nullAsFirst) {

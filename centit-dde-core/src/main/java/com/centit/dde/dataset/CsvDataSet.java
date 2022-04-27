@@ -1,7 +1,6 @@
 package com.centit.dde.dataset;
 
 import com.centit.dde.core.DataSet;
-import com.centit.dde.core.SimpleDataSet;
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
 import lombok.Data;
@@ -40,10 +39,10 @@ public class CsvDataSet extends FileDataSet {
     }
 
     @Override
-    public SimpleDataSet load(Map<String, Object> params) throws Exception {
+    public DataSet load(Map<String, Object> params) throws Exception {
         List<Map<String, Object>> list = new ArrayList<>();
         readCsvFile(list);
-        SimpleDataSet dataSet = new SimpleDataSet();
+        DataSet dataSet = new DataSet();
         dataSet.setData(list);
         return dataSet;
     }

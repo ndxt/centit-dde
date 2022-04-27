@@ -3,7 +3,6 @@ package com.centit.dde.dataset;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.core.SimpleDataSet;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.report.ExcelExportUtil;
 import com.centit.support.report.ExcelImportUtil;
@@ -26,8 +25,8 @@ public class ExcelDataSet extends FileDataSet {
     }
 
     @Override
-    public SimpleDataSet load(Map<String, Object> params) throws Exception {
-        return new SimpleDataSet(excelStreamToArray(inputStream,params));
+    public DataSet load(Map<String, Object> params) throws Exception {
+        return new DataSet(excelStreamToArray(inputStream,params));
     }
 
     /**

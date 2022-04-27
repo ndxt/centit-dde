@@ -34,7 +34,7 @@ public class ProducerBizOperation implements BizOperation {
             producerEntity.getKey(),
             JSON.toJSONString(dataSet.getData()));
         KafkaProducer  producer = KafkaProducerConfig.getKafkaProducer(sourceInfo);
-        SimpleDataSet simpleDataSet = new SimpleDataSet();
+        DataSet simpleDataSet = new DataSet();
         AtomicReference<String> resut= new AtomicReference<>("");
         if (!producerEntity.getIsAsyn()){
             //同步发送   会阻塞

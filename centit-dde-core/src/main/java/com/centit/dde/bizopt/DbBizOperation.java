@@ -79,7 +79,7 @@ public class DbBizOperation implements BizOperation {
         if ("true".equals(condition) && !StringBaseOpt.isNvl(conditionSet) && bizModel.getDataSet(conditionSet) != null) {
             sqlDsr.setExtendFilters(bizModel.getDataSet(conditionSet).getDataAsList().get(0));
         }
-        SimpleDataSet dataSet = sqlDsr.load(mapObject);
+        DataSet dataSet = sqlDsr.load(mapObject);
         bizModel.putDataSet(id, dataSet);
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }

@@ -63,10 +63,10 @@ public class ExcelBizOperation implements BizOperation {
         for (InputStream inputStream : inputStreams) {
             ExcelDataSet excelDataSet = new ExcelDataSet();
             excelDataSet.setInputStream(inputStream);
-            SimpleDataSet  simpleDataSet= excelDataSet.load(params);
+            DataSet simpleDataSet= excelDataSet.load(params);
             objectList.add(simpleDataSet.getData());
         }
-        bizModel.putDataSet(id,new SimpleDataSet(objectList));
+        bizModel.putDataSet(id,new DataSet(objectList));
         return BuiltInOperation.createResponseSuccessData(objectList.size());
     }
 }

@@ -43,10 +43,10 @@ public class CsvBizOperation implements BizOperation {
         for (InputStream inputStream : inputStreams) {
             CsvDataSet csvDataSet = new CsvDataSet();
             csvDataSet.setInputStream(inputStream);
-            SimpleDataSet  simpleDataSet= csvDataSet.load(null);
+            DataSet simpleDataSet= csvDataSet.load(null);
             objectList.add(simpleDataSet.getData());
         }
-        SimpleDataSet simpleDataSet = new SimpleDataSet(objectList);
+        DataSet simpleDataSet = new DataSet(objectList);
         bizModel.putDataSet(targetDsName,simpleDataSet);
         return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
     }

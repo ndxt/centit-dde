@@ -3,7 +3,6 @@ package com.centit.dde.dataset;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.core.SimpleDataSet;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.file.FileIOOpt;
 import org.slf4j.Logger;
@@ -23,13 +22,13 @@ public class JSONDataSet extends FileDataSet {
      * @return dataSet 数据集
      */
     @Override
-    public SimpleDataSet load(Map<String, Object> params) throws Exception{
+    public DataSet load(Map<String, Object> params) throws Exception{
         if (params != null && BooleanBaseOpt.castObjectToBoolean(
             params.get("isJSONArray"), false)) {
             JSONArray json = JSON.parseArray(FileIOOpt.readStringFromFile(this.getFilePath()));
-            return new SimpleDataSet(json);
+            return new DataSet(json);
         } else {
-            return JSON.parseObject(FileIOOpt.readStringFromFile(this.getFilePath()), SimpleDataSet.class);
+            return JSON.parseObject(FileIOOpt.readStringFromFile(this.getFilePath()), DataSet.class);
         }
     }
 

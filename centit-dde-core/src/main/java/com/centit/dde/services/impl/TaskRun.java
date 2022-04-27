@@ -4,12 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.core.DataOptContext;
+import com.centit.dde.core.DataOptResult;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.DataPacketDraftDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.po.*;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
@@ -51,7 +53,7 @@ public class TaskRun {
         this.bizOptFlow = bizOptFlow;
     }
 
-    public Object runTask(DataPacketInterface dataPacketInterface, DataOptContext optContext) {
+    public DataOptResult runTask(DataPacketInterface dataPacketInterface, DataOptContext optContext) {
 
         //String runType = //StringBaseOpt.castObjectToString(callStackData.get(ConstantValue.RUN_TYPE_TAG), ConstantValue.RUN_TYPE_NORMAL);
 
@@ -67,7 +69,7 @@ public class TaskRun {
         }
         try {
             optContext.setLogId(taskLog.getLogId());
-            Object runResult = runStep(dataPacketInterface, optContext);
+            DataOptResult runResult = runOptModule(dataPacketInterface, optContext);
             //更新API信息
             updateApiData(optContext.getRunType(), dataPacketInterface);
             //不记录任何日志
@@ -78,11 +80,13 @@ public class TaskRun {
             return runResult;
         } catch (Exception e) {
             dealException(taskLog, dataPacketInterface, e);
+            //创建一个错误的返回结果
+            return DataOptResult.createExceptionResult(ResponseData.makeErrorMessageWithData(
+                taskLog, ResponseData.ERROR_OPERATION, ObjectException.extortExceptionMessage(e)));
         }
-        return new Object();
     }
 
-    private Object runStep(DataPacketInterface dataPacketInterface, DataOptContext dataOptContext) throws Exception {
+    private DataOptResult runOptModule(DataPacketInterface dataPacketInterface, DataOptContext dataOptContext) throws Exception {
         JSONObject bizOptJson = dataPacketInterface.getDataOptDescJson();
         if (bizOptJson.isEmpty()) {
             throw new ObjectException("运行步骤为空");

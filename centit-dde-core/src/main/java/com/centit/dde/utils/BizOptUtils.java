@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.core.SimpleBizModel;
-import com.centit.dde.core.SimpleDataSet;
 import com.centit.support.algorithm.CollectionsOpt;
 
 import java.util.ArrayList;
@@ -28,13 +26,13 @@ public abstract class BizOptUtils {
             }
         }
         DataSet dataSet = castObjectToDataSet(obj);
-        return SimpleBizModel.createSingleDataSetModel(dataSet);
+        return BizModel.createSingleDataSetModel(dataSet);
     }
 
     @SuppressWarnings("unchecked")
     public static DataSet castObjectToDataSet(Object obj) {
         if(obj==null){
-            return new SimpleDataSet();
+            return new DataSet();
         }
         if(obj instanceof DataSet){
             return (DataSet)obj;
@@ -44,9 +42,9 @@ public abstract class BizOptUtils {
             Map<String, Object> objectMap = (Map<String, Object>)obj;
             if( objectMap.containsKey("dataSetName") && objectMap.containsKey("data")){
                 JSONObject jobj = (JSONObject)JSON.toJSON(obj);
-                return JSON.toJavaObject(jobj, SimpleDataSet.class);
+                return JSON.toJavaObject(jobj, DataSet.class);
             } else {
-                return new SimpleDataSet(objectMap);
+                return new DataSet(objectMap);
             }
         } else if(obj instanceof Collection){
             Collection<Object> objs = (Collection<Object>)obj;
@@ -59,11 +57,11 @@ public abstract class BizOptUtils {
                         DataSet.SINGLE_DATA_FIELD_NAME,object));
                 }
             }
-            SimpleDataSet dataSet = new SimpleDataSet();
+            DataSet dataSet = new DataSet();
             dataSet.setData(data);
             return dataSet;
         } else {
-            return new SimpleDataSet(obj);
+            return new DataSet(obj);
         }
     }
 }

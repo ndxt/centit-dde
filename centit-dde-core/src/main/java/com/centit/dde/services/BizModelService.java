@@ -1,6 +1,7 @@
 package com.centit.dde.services;
 
 import com.centit.dde.core.DataOptContext;
+import com.centit.dde.core.DataOptResult;
 import com.centit.dde.po.DataPacketInterface;
 
 /**
@@ -8,5 +9,5 @@ import com.centit.dde.po.DataPacketInterface;
  */
 public interface BizModelService {
 
-    Object fetchBizModel(DataPacketInterface dataPacket, DataOptContext optContext);
+    DataOptResult runBizModel(DataPacketInterface dataPacket, DataOptContext optContext);
 }

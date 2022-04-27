@@ -8,7 +8,7 @@ import com.centit.dde.consumer.KafkaConsumerConfig;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.DataSet;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
@@ -64,8 +64,8 @@ public class ConsumerBizOperation implements BizOperation {
         for (ConsumerRecord<String, String> record : records) {
             values.add(record.value());
         }
-        SimpleDataSet simpleDataSet = new SimpleDataSet(values);
-        bizModel.putDataSet(consumerEntity.getId(),simpleDataSet);
-        return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
+        DataSet dataSet = new DataSet(values);
+        bizModel.putDataSet(consumerEntity.getId(), dataSet);
+        return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }
 }

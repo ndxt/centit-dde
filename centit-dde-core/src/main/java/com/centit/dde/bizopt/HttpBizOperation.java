@@ -100,7 +100,7 @@ public class HttpBizOperation implements BizOperation {
             httpUrl : httpUrlCodeInfo.getDatabaseUrl() + httpUrl;
 
         httpUrl = Pretreatment.mapTemplateString(httpUrl,new BizModelJSONTransform(bizModel));
-        DataSet dataSet = new SimpleDataSet();
+        DataSet dataSet = new DataSet();
         HttpReceiveJSON receiveJson;
         mapObject.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
         switch (httpMethod.toLowerCase()) {

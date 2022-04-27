@@ -38,7 +38,7 @@ public class ObjectCompareBizOperation implements BizOperation {
                 compareResult.add(jsonObject);
             }
         });
-        bizModel.putDataSet(id, new SimpleDataSet(compareResult));
+        bizModel.putDataSet(id, new DataSet(compareResult));
         return BuiltInOperation.createResponseSuccessData(compareResult.size());
     }
 }

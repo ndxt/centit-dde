@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.json.JSONTransformer;
@@ -24,7 +24,7 @@ public class DefineJsonDataBizOperation implements BizOperation {
             //jsonValue = !jsonValue.startsWith("{") && jsonValue.startsWith("\"")? jsonValue.replace("\"",""): jsonValue;
             Object data =
                 JSONTransformer.transformer( jsonValue.startsWith("{") ? JSON.parse(jsonValue) : jsonValue, new BizModelJSONTransform(bizModel));
-            bizModel.putDataSet(targetDsName,new SimpleDataSet(data));
+            bizModel.putDataSet(targetDsName,new DataSet(data));
         }else {
             return BuiltInOperation.createResponseData(0, 500, bizOptJson.getString("SetsName")+"：表达式不能为空！");
         }

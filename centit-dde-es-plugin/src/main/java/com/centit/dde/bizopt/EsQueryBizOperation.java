@@ -42,7 +42,7 @@ public class EsQueryBizOperation implements BizOperation {
         try {
             restHighLevelClient = restHighLevelClientGenericObjectPool.borrowObject();
             JSONObject result = ElasticsearchReadUtils.executeQuery(restHighLevelClient,bizModel,esReadVo);
-            bizModel.putDataSet(esReadVo.getId(),new SimpleDataSet(result));
+            bizModel.putDataSet(esReadVo.getId(),new DataSet(result));
             return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(esReadVo.getId()).getSize());
         }catch (Exception e){
             return BuiltInOperation.createResponseData(0, 500,"查询es数据异常,异常信息："+e.getMessage());
@@ -56,7 +56,7 @@ public class EsQueryBizOperation implements BizOperation {
         String ips = "127.0.0.1:9200,127.0.0.1:9201,127.0.0.1:9202";
         RestClientBuilder restClientBuilder = new ElasticSearchConfig().restClientBuilder(ips);
         RestHighLevelClient restHighLevelClient=new RestHighLevelClient(restClientBuilder);
-        SimpleBizModel simpleBizModel = new SimpleBizModel("test");
+        BizModel simpleBizModel = new BizModel("test");
        /* List<String> ids = new ArrayList<>();
         ids.add("FILE_SVR");
         ids.add("zp_Qn5R5ROSo4sf-eovoWA");*/
@@ -64,7 +64,7 @@ public class EsQueryBizOperation implements BizOperation {
         param.put("osId","zp_Qn5R5ROSo4sf-eovoWA");
         param.put("content","数据集");
         param.put("title","数据库");
-        SimpleDataSet dataSet = new SimpleDataSet(param);
+        DataSet dataSet = new DataSet(param);
         Map<String, DataSet> map = new HashMap<>();
         map.put("es11",dataSet);
         simpleBizModel.setBizData(map);

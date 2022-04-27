@@ -10,6 +10,6 @@ public interface BizOptFlow {
 
     void registerOperation(String key, BizOperation opt);
 
-    Object run(DataPacketInterface dataPacket, DataOptContext dataOptContext) throws Exception;
+    DataOptResult run(DataPacketInterface dataPacket, DataOptContext dataOptContext) throws Exception;
 
 }

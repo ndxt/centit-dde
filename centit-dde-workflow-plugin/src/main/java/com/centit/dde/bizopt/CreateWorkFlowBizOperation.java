@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.BooleanBaseOpt;
@@ -178,7 +178,7 @@ public class CreateWorkFlowBizOperation implements BizOperation {
         }
         FlowInstance   instance = flowEngine.createInstance(createFlowOptions);
         if (instance!=null){
-            bizModel.putDataSet(id,new SimpleDataSet(instance));
+            bizModel.putDataSet(id,new DataSet(instance));
         }
         return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
     }

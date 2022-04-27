@@ -1,6 +1,6 @@
 package com.centit.dde.utils;
 
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.DataSet;
 import org.apache.commons.lang3.SerializationUtils;
 
 /**
@@ -10,7 +10,7 @@ import org.apache.commons.lang3.SerializationUtils;
  */
 public class CloneUtils {
 
-    public static SimpleDataSet clone(SimpleDataSet dataSet){
+    public static DataSet clone(DataSet dataSet){
        return SerializationUtils.clone(dataSet);
     }
 }

@@ -69,7 +69,7 @@ public class FileUploadBizOperation implements BizOperation {
             }
             fileIds.add(fileId);
         }
-        bizModel.putDataSet(targetDsName,new SimpleDataSet(fileIds));
+        bizModel.putDataSet(targetDsName,new DataSet(fileIds));
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }
 }

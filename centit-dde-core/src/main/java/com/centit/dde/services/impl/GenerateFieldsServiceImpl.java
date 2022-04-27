@@ -2,7 +2,7 @@ package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.dataset.JSONDataSet;
@@ -69,7 +69,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        SimpleDataSet dataSet = csvDataSet.load(null);
+        DataSet dataSet = csvDataSet.load(null);
         JSONArray result = new JSONArray();
         for (int i = 0; i < dataSet.getDataAsList().size(); i++) {
             if (i >= 20) {
@@ -90,7 +90,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        SimpleDataSet dataSet = jsonDataSet.load(null);
+        DataSet dataSet = jsonDataSet.load(null);
         JSONArray result = new JSONArray();
         for (int i = 0; i < dataSet.getDataAsList().size(); i++) {
             if (i >= 20) {
@@ -131,7 +131,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
 
     @Override
     public List<ColumnSchema> generateJsonFields(Map<String, Object> params) {
-        Class c = SimpleDataSet.class;
+        Class c = DataSet.class;
         Field[] columns = c.getDeclaredFields();
         List<String> sColumns = new ArrayList<>();
         for (Field s : columns) {

@@ -16,7 +16,7 @@ public class DataOptContext {
     private TaskLog taskLog;
     private String optId;
     private String debugId;
-    private Object returnResult;
+    //private Object returnResult;
     private Integer logLevel;
     /**
      * 调用参数

@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.security.model.CentitUserDetails;
@@ -26,7 +26,7 @@ public class GetSessionDataBizOperation implements BizOperation {
         }
 
         if (config == null || config.size() == 0){
-            bizModel.putDataSet(id, new SimpleDataSet(currentUserDetails));
+            bizModel.putDataSet(id, new DataSet(currentUserDetails));
         } else {
             Map<String, Object> result = new HashMap<>(8);
             for (Object o : config) {
@@ -37,7 +37,7 @@ public class GetSessionDataBizOperation implements BizOperation {
                     result.put(sessionKey, sessionData);
                 }
             }
-            bizModel.putDataSet(id, new SimpleDataSet(result));
+            bizModel.putDataSet(id, new DataSet(result));
         }
         return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
     }

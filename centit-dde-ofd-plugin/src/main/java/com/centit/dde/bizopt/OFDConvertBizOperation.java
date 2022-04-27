@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.OFDConvertVo;
 import com.centit.fileserver.common.FileInfo;
@@ -66,7 +66,7 @@ public class OFDConvertBizOperation implements BizOperation {
         HTTPAgent httpAgent = new HTTPAgent(ofdConvertVo.getHttpUrl());
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         httpAgent.officesToOFD(fileList, stream);
-        bizModel.putDataSet(ofdConvertVo.getId(), new SimpleDataSet(stream));
+        bizModel.putDataSet(ofdConvertVo.getId(), new DataSet(stream));
         for(File file:fileList){
             file.delete();
         }

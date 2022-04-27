@@ -3,6 +3,7 @@ package com.centit.dde.services.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.centit.dde.core.DataOptContext;
+import com.centit.dde.core.DataOptResult;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.services.BizModelService;
 import com.centit.dde.utils.ConstantValue;
@@ -28,7 +29,7 @@ public class BizModelServiceImpl implements BizModelService {
     private TaskRun taskRun;
 
     @Override
-    public Object fetchBizModel(DataPacketInterface dataPacket, DataOptContext optContext) {
+    public DataOptResult runBizModel(DataPacketInterface dataPacket, DataOptContext optContext) {
         //元数据组件做数据范围查询的时候需要该值，只能从这儿set进去
         //interimVariable.put(ConstantValue.METADATA_OPTID,dataPacket.getOptId());
         if (notNeedBuf(dataPacket)) {
@@ -36,14 +37,20 @@ public class BizModelServiceImpl implements BizModelService {
         }
         String key = makeDataPacketBufId(dataPacket, optContext.getCallStackData());
         Jedis redis = fetchJedisPool();
-
-        Object bizModel = fetchBizModelFromBuf(redis, key);
+        DataOptResult optResult = null;
+        Object bufData = fetchBizModelFromBuf(redis, key);
         //第一次执行或者换成失效的时候执行
-        if (bizModel==null){
-            bizModel = taskRun.runTask(dataPacket, optContext);
-            setBizModelBuf(bizModel, dataPacket, redis, key);
+        if (bufData==null){
+            optResult = taskRun.runTask(dataPacket, optContext);
+            if( optResult.getResultType() == DataOptResult.RETURN_OPT_DATA ) {
+                setBizModelBuf(optResult.getResultObject(), dataPacket, redis, key);
+            }
+        } else {
+            optResult = new DataOptResult();
+            optResult.setResultObject(bufData);
         }
-        return bizModel;
+        redis.close();
+        return optResult;
     }
 
     private boolean notNeedBuf(DataPacketInterface dataPacket) {
@@ -58,18 +65,16 @@ public class BizModelServiceImpl implements BizModelService {
     private Object fetchBizModelFromBuf( Jedis jedis, String key) {
 
         Object object = null;
-        if (keyNotExpired(jedis, key)) {
-            try {
-                byte[] byt = jedis.get(key.getBytes());
-                ByteArrayInputStream bis = new ByteArrayInputStream(byt);
-                ObjectInputStream ois = new ObjectInputStream(bis);
-                object = ois.readObject();
-                bis.close();
-                ois.close();
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-            jedis.close();
+
+        try {
+            byte[] byt = jedis.get(key.getBytes());
+            ByteArrayInputStream bis = new ByteArrayInputStream(byt);
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            object = ois.readObject();
+            bis.close();
+            ois.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
         return object;
     }
@@ -86,17 +91,17 @@ public class BizModelServiceImpl implements BizModelService {
     }
 
     private Jedis fetchJedisPool() {
-        return jedisPool.getResource();
+         return jedisPool.getResource();
     }
 
-    private void setBizModelBuf(Object bizModel, DataPacketInterface dataPacket, Jedis jedis, String key) {
-        if (notNeedBuf(dataPacket) || keyNotExpired(jedis, key)) {
+    private void setBizModelBuf(Object returnData, DataPacketInterface dataPacket, Jedis jedis, String key) {
+        if (notNeedBuf(dataPacket)) {
             return;
         }
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(bizModel);
+            oos.writeObject(returnData);
             byte[] byt = bos.toByteArray();
             jedis.set(key.getBytes(), byt);
             int seconds = dataPacket.getBufferFreshPeriod();
@@ -114,10 +119,6 @@ public class BizModelServiceImpl implements BizModelService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        jedis.close();
     }
 
-    private boolean keyNotExpired( Jedis jedis, String key) {
-        return jedis.get(key.getBytes()) != null && (jedis.get(key.getBytes()).length > 0);
-    }
 }

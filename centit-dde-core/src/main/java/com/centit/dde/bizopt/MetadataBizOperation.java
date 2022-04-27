@@ -80,15 +80,15 @@ public class MetadataBizOperation implements BizOperation {
         switch (templateType){
             case 1://新建
                 metaObjectService.saveObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
-                bizModel.putDataSet(id, new SimpleDataSet(parames));
+                bizModel.putDataSet(id, new DataSet(parames));
                 return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
             case 2://修改
                 int upcount= metaObjectService.updateObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
-                bizModel.putDataSet(id, new SimpleDataSet(upcount));
+                bizModel.putDataSet(id, new DataSet(upcount));
                 return BuiltInOperation.createResponseSuccessData(upcount);
             case 3://删除
                 metaObjectService.deleteObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
-                bizModel.putDataSet(id, new SimpleDataSet(1));
+                bizModel.putDataSet(id, new DataSet(1));
                 return BuiltInOperation.createResponseSuccessData(1);
             case 4://查询
                 HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
@@ -118,14 +118,14 @@ public class MetadataBizOperation implements BizOperation {
                 JSONArray  jsonArray =metaObjectService.pageQueryObjects(tableId, extFilter, parames,null, pageDesc);
                 PageQueryResult<Object>  result = PageQueryResult.createResult(jsonArray, pageDesc);
                 if (parames.get("closePage")!=null){//返回接口元数数据，不含分页信息
-                    bizModel.putDataSet(id, new SimpleDataSet(jsonArray));
+                    bizModel.putDataSet(id, new DataSet(jsonArray));
                 }else {
-                    bizModel.putDataSet(id, new SimpleDataSet(result));//返回带分页的数据
+                    bizModel.putDataSet(id, new DataSet(result));//返回带分页的数据
                 }
                 return BuiltInOperation.createResponseSuccessData(jsonArray.size());
             case 5://查看
                 Map<String, Object> data = metaObjectService.getObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
-                bizModel.putDataSet(id, new SimpleDataSet(data));
+                bizModel.putDataSet(id, new DataSet(data));
                 return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
             case 9://批量删除
             {
@@ -140,18 +140,18 @@ public class MetadataBizOperation implements BizOperation {
                     metaObjectService.deleteObjectWithChildren(tableId,parame,withChildrenDeep == null ? 1 : withChildrenDeep);
                     delCount++;
                 }
-                bizModel.putDataSet(id, new SimpleDataSet(delCount));
+                bizModel.putDataSet(id, new DataSet(delCount));
                 return BuiltInOperation.createResponseSuccessData(delCount);
             }
             case 10://根据条件修改字段值
                 JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(parames), JSONObject.class);
                 int count  = metaObjectService.updateObjectsByProperties(tableId, jsonObject,
                     CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
-                bizModel.putDataSet(id, new SimpleDataSet(count));
+                bizModel.putDataSet(id, new DataSet(count));
                 return BuiltInOperation.createResponseSuccessData(count);
             case 11:
                 int resultCount = metaObjectService.mergeObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
-                bizModel.putDataSet(id, new SimpleDataSet(resultCount));
+                bizModel.putDataSet(id, new DataSet(resultCount));
                 return BuiltInOperation.createResponseSuccessData(resultCount);
         }
         return null;

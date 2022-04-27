@@ -2,7 +2,7 @@ package com.centit.dde.dataset;
 
 import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.core.DataSetReader;
-import com.centit.dde.core.SimpleDataSet;
+import com.centit.dde.core.DataSet;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.service.DataScopePowerManager;
@@ -51,7 +51,7 @@ public class SqlDataSetReader implements DataSetReader {
      * @return dataSet 数据集
      */
     @Override
-    public SimpleDataSet load(final Map<String, Object> params) throws Exception {
+    public DataSet load(final Map<String, Object> params) throws Exception {
         buildExtendsSql();
         if (extendFilters!=null){
             params.putAll(extendFilters);
@@ -78,7 +78,7 @@ public class SqlDataSetReader implements DataSetReader {
         }
         paramsMap.putAll(qap.getParams());
         JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, qap.getQuery(), paramsMap);
-        SimpleDataSet dataSet = new SimpleDataSet();
+        DataSet dataSet = new DataSet();
         dataSet.setData(jsonArray);
         return dataSet;
     }
