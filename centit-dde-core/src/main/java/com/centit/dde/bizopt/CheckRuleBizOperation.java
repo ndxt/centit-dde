@@ -10,6 +10,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.DataCheckRule;
 import com.centit.product.metadata.service.DataCheckRuleService;
 import com.centit.product.metadata.utils.DataCheckResult;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 
@@ -31,9 +32,9 @@ public class CheckRuleBizOperation implements BizOperation {
         //校验信息所挂载的字段
         String checkRuleResultField =bizOptJson.getString("checkRuleResultField");
         //是否返回校验结果
-        Boolean checkRuleResult =bizOptJson.getBoolean("checkRuleResult")==null?true:bizOptJson.getBoolean("checkRuleResult");
+        Boolean checkRuleResult = BooleanBaseOpt.castObjectToBoolean( bizOptJson.getBoolean("checkRuleResult"),true);
         //是否返回校验信息 默认不返回，如果默认返回的话会比较耗时
-        Boolean checkRuleResultMsg = bizOptJson.getBoolean("checkRuleResultMsg")==null?false:bizOptJson.getBoolean("checkRuleResultMsg");
+        Boolean checkRuleResultMsg =BooleanBaseOpt.castObjectToBoolean( bizOptJson.getBoolean("checkRuleResultMsg"),false);
         DataSet dataSet = bizModel.getDataSet(dataSetId);
         JSONArray rulesJson = bizOptJson.getJSONArray("config");
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
