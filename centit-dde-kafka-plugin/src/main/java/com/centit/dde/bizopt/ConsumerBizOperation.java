@@ -12,6 +12,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -19,7 +20,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class ConsumerBizOperation implements BizOperation {
     private SourceInfoDao sourceInfoDao;
@@ -37,35 +37,43 @@ public class ConsumerBizOperation implements BizOperation {
      * @return
      */
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext){
-        ConsumerEntity consumerEntity = JSON.parseObject(JSON.toJSONString(bizOptJson), ConsumerEntity.class);
-        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(consumerEntity.getDatabaseId());
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext)throws Exception{
+        String databaseId = bizOptJson.getString("databaseId");
+        String topic = bizOptJson.getString("topic");
+        if (StringUtils.isBlank(topic) || StringUtils.isBlank(databaseId)){
+            return ResponseData.makeErrorMessage("Kafka服务地址或topic不能为空！");
+        }
+        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(databaseId);
+        if (sourceInfo==null){
+            return ResponseData.makeErrorMessage("Kafka服务资源不存在或已被删除！");
+        }
+        String groupId = bizOptJson.getString("groupId");
+        if(StringUtils.isBlank(groupId)){
+            return ResponseData.makeErrorMessage("分组id不能为空！");
+        }
         JSONObject extProps = sourceInfo.getExtProps();
-        extProps.put(ConsumerConfig.GROUP_ID_CONFIG,consumerEntity.getGroupId());
+        if (extProps == null){
+            extProps = new JSONObject();
+        }
+        extProps.put(ConsumerConfig.GROUP_ID_CONFIG,groupId);
         KafkaConsumer consumer = KafkaConsumerConfig.getKafkaConsumer(extProps,sourceInfo);
-        JSONArray topics = consumerEntity.getTopic();
-        if (topics!=null || topics.size()==0){
-           throw  new RuntimeException("topic不能为空！");
-        }
-        //正则表达式方式订阅消息
-        if (topics.size()==1 && topics.getString(0).contains(".*")){
-            consumer.subscribe(Pattern.compile(topics.getString(0)));
-        }else {
-            //设置主题，可多个
-            consumer.subscribe(topics);
-        }
-        ConsumerRecords<String, String> records = consumer.poll(1000);
-        //同步提交offset
-        consumer.commitSync();
-        if (consumer!=null){
-            consumer.close();
-        }
         List<String> values = new ArrayList<>();
-        for (ConsumerRecord<String, String> record : records) {
-            values.add(record.value());
+        try {
+            ArrayList<Object> objects = new ArrayList<>();
+            objects.add(topic);
+            consumer.subscribe(objects);
+            ConsumerRecords<String, String> records = consumer.poll(1000);
+            for (ConsumerRecord<String, String> record : records) {
+                values.add(record.value());
+            }
+            consumer.commitSync();
+        } finally {
+            if (consumer!=null){
+                consumer.close();
+            }
         }
-        DataSet dataSet = new DataSet(values);
-        bizModel.putDataSet(consumerEntity.getId(), dataSet);
-        return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+        String id = bizOptJson.getString("id");
+        bizModel.putDataSet(id, new DataSet(values));
+        return BuiltInOperation.createResponseSuccessData(values.size());
     }
 }

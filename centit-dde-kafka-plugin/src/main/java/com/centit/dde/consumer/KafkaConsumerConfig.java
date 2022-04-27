@@ -18,11 +18,11 @@ public class KafkaConsumerConfig {
         //设置Key和Value的序列化类    配置默认值，页面填写了后直接覆盖
         proper.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         proper.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-        if (properties != null) {
-            properties.forEach((key,value)->{
+        properties.forEach((key,value)->{
+            if (key !=null && value!=null){
                 proper.put(key,value);
-            });
-        }
+            }
+        });
         //Kafka broker 列表  放最后，避免页面填写参数时填写该参数   直接覆盖页面填写的broker列表
         proper.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, sourceInfo.getDatabaseUrl());
         String username = sourceInfo.getUsername();
@@ -34,7 +34,6 @@ public class KafkaConsumerConfig {
                 + "password=\"" + AESSecurityUtils.decryptBase64String(passwd, "0123456789abcdefghijklmnopqrstuvwxyzABCDEF") + "\";";
             proper.setProperty("sasl.jaas.config", jassc);
         }
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(proper);
-        return consumer;
+        return new KafkaConsumer<String, String>(proper);
     }
 }

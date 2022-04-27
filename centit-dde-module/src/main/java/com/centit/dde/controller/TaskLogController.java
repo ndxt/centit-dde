@@ -1,5 +1,6 @@
 package com.centit.dde.controller;
 
+import com.centit.dde.vo.StatisticsParameter;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.TaskLogManager;
 import com.centit.framework.core.controller.BaseController;
@@ -74,4 +75,12 @@ public class TaskLogController extends BaseController {
     public TaskLog getTaskLog(@PathVariable String logId){
         return taskLogManager.getLog(logId);
     }
+
+    @PostMapping(value = "/statistics")
+    @ApiOperation(value = "日志统计")
+    @WrapUpResponseBody
+    public Map<String, Object> getLogStatisticsInfo(@RequestBody StatisticsParameter parameter){
+        return taskLogManager.getLogStatisticsInfo(parameter);
+    }
+
 }

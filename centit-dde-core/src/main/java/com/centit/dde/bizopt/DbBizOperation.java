@@ -37,7 +37,6 @@ public class DbBizOperation implements BizOperation {
         String dataSetId = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", "");
         String condition = BuiltInOperation.getJsonFieldString(bizOptJson, "condition", "false");
-        String conditionSet = BuiltInOperation.getJsonFieldString(bizOptJson, "conditionSet", "");
         String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
         Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
         // 这个地方可以设置更多的内容
@@ -76,8 +75,12 @@ public class DbBizOperation implements BizOperation {
         sqlDsr.setSqlSen(sql);
         sqlDsr.setQueryDataScopeFilter(queryDataScopeFilter);
         sqlDsr.setOptId(dataOptContext.getOptId());
-        if ("true".equals(condition) && !StringBaseOpt.isNvl(conditionSet) && bizModel.getDataSet(conditionSet) != null) {
-            sqlDsr.setExtendFilters(bizModel.getDataSet(conditionSet).getDataAsList().get(0));
+        if ("true".equals(condition) ){//&& !StringBaseOpt.isNvl(conditionSet) && bizModel.getDataSet(conditionSet) != null) {
+            String conditionSet = BuiltInOperation.getJsonFieldString(bizOptJson, "conditionSet", "");
+            DataSet dataSet = bizModel.getDataSet(conditionSet);
+            if(dataSet != null){
+                sqlDsr.setExtendFilters(dataSet.getFirstRow());
+            }
         }
         DataSet dataSet = sqlDsr.load(mapObject);
         bizModel.putDataSet(id, dataSet);

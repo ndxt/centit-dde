@@ -6,9 +6,9 @@ import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.services.DataPacketTemplateService;
-import com.centit.dde.utils.HttpParames;
+import com.centit.dde.vo.HttpParameter;
 import com.centit.dde.utils.LoginUserPermissionCheck;
-import com.centit.dde.utils.MetaDataParames;
+import com.centit.dde.vo.MetaDataParameter;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
@@ -73,7 +73,7 @@ public class DataPacketDraftController extends BaseController {
     @PostMapping("/http-type")
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
-    public DataPacketDraft createHttpTypeApi(@RequestBody HttpParames httpParames) {
+    public DataPacketDraft createHttpTypeApi(@RequestBody HttpParameter httpParames) {
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setOsId(httpParames.getOsId());
         LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
@@ -107,6 +107,7 @@ public class DataPacketDraftController extends BaseController {
         dataPacketDraft.setTaskType(taskType);
         dataPacketDraft.setOptId(httpParames.getOptId());
         dataPacketDraft.setOsId(httpParames.getOsId());
+        dataPacketDraft.setLogLevel(3);
         dataPacketDraft.setPacketName(httpParames.getPacketName());
         dataPacketDraft.setPacketDesc(httpParames.getPacketName());
         dataPacketDraft.setDataOptDescJson(content);
@@ -119,7 +120,7 @@ public class DataPacketDraftController extends BaseController {
     @PostMapping("/metadata/api")
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
-    public List<DataPacketDraft> createMetaDataApi(@RequestBody MetaDataParames metaDataOrHttpParams) {
+    public List<DataPacketDraft> createMetaDataApi(@RequestBody MetaDataParameter metaDataOrHttpParams) {
         DataPacketDraft dataPacket = new DataPacketDraft();
         dataPacket.setOsId(metaDataOrHttpParams.getOsId());
         LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacket.getOsId());
@@ -138,7 +139,7 @@ public class DataPacketDraftController extends BaseController {
         return dataPacketDraftList;
     }
 
-    private DataPacketDraft createDataPacket(MetaDataParames metaDataOrHttpParams, Integer type){
+    private DataPacketDraft createDataPacket(MetaDataParameter metaDataOrHttpParams, Integer type){
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setBufferFreshPeriod(-1);
         dataPacketDraft.setIsValid(true);
@@ -166,6 +167,7 @@ public class DataPacketDraftController extends BaseController {
             }
         }
         dataPacketDraft.setMetadataTableId(tableId);
+        dataPacketDraft.setLogLevel(3);
         dataPacketDraft.setDataOptDescJson(content);
         return  dataPacketDraft;
     }

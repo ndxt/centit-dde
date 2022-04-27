@@ -12,8 +12,8 @@ import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
-import com.centit.dde.utils.FormulaParames;
-import com.centit.dde.vo.UpdateOptIdParamVo;
+import com.centit.dde.vo.FormulaParameter;
+import com.centit.dde.vo.UpdateOptIdParameter;
 import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseData;
@@ -305,7 +305,7 @@ public class HttpTaskController extends BaseController {
         name = "jsonString", value = "需要测试的对象，json格式"
     )})*/
     @WrapUpResponseBody
-    public Object testFormula(@RequestBody FormulaParames formulaParames) {
+    public Object testFormula(@RequestBody FormulaParameter formulaParames) {
         Map object = (Map) JSON.parse(StringEscapeUtils.unescapeHtml4(formulaParames.getJsonString()));
         VariableFormula variableFormula = new VariableFormula();
         variableFormula.setExtendFuncMap(DataSetOptUtil.extendFuncs);
@@ -317,7 +317,7 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "修改数据所属业务模块(删除菜单迁移数据(接口页面))")
     @PutMapping(value = "/updateOptId")
     @Transactional(rollbackFor = Exception.class)
-    public ResponseData updateOptIdByOptCodes(@RequestBody UpdateOptIdParamVo updateOptIdParamVo) {
+    public ResponseData updateOptIdByOptCodes(@RequestBody UpdateOptIdParameter updateOptIdParamVo) {
         int[] optdefCount = platformEnvironment.updateOptIdByOptCodes(updateOptIdParamVo.getOptId(), Arrays.asList(updateOptIdParamVo.getOptCodes()));
         String[] apiIds = updateOptIdParamVo.getApiIds();
         int[] dataPacketDraftCount = apiIds != null && apiIds.length > 0 ? dataPacketDraftService.batchUpdateOptIdByApiId(updateOptIdParamVo.getOptId(), Arrays.asList(apiIds)) : null;

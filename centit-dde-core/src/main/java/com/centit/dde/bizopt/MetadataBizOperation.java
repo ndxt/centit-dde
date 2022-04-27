@@ -143,12 +143,6 @@ public class MetadataBizOperation implements BizOperation {
                 bizModel.putDataSet(id, new DataSet(delCount));
                 return BuiltInOperation.createResponseSuccessData(delCount);
             }
-            case 10://根据条件修改字段值
-                JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(parames), JSONObject.class);
-                int count  = metaObjectService.updateObjectsByProperties(tableId, jsonObject,
-                    CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
-                bizModel.putDataSet(id, new DataSet(count));
-                return BuiltInOperation.createResponseSuccessData(count);
             case 11:
                 int resultCount = metaObjectService.mergeObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
                 bizModel.putDataSet(id, new DataSet(resultCount));
