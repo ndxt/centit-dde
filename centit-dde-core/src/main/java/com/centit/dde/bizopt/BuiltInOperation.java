@@ -8,9 +8,6 @@ import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
-import com.centit.product.adapter.po.DataCheckRule;
-import com.centit.product.metadata.service.DataCheckRuleService;
-import com.centit.product.metadata.utils.DataCheckResult;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -27,13 +24,7 @@ import java.util.*;
  * @author zhf
  */
 @SuppressWarnings("unchecked")
-public class BuiltInOperation implements BizOperation {
-
-    private DataCheckRuleService dataCheckRuleService;
-
-    public BuiltInOperation(DataCheckRuleService dataCheckRuleService) {
-        this.dataCheckRuleService = dataCheckRuleService;
-    }
+public abstract class BuiltInOperation {
 
     public static String getJsonFieldString(JSONObject bizOptJson, String fieldName, String defaultValue) {
         String targetDsName = bizOptJson.getString(fieldName);
@@ -268,8 +259,8 @@ public class BuiltInOperation implements BizOperation {
         String join = getJsonFieldString(bizOptJson, "operation", "join");
         Map<String, String> map = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("configfield"), "primaryKey1", "primaryKey2");
         if (map != null) {
-            DataSet dataSet = getArray(bizModel.fetchDataSetByName(sour1DsName));
-            DataSet dataSet2 = getArray(bizModel.fetchDataSetByName(sour2DsName));
+            DataSet dataSet =bizModel.fetchDataSetByName(sour1DsName);
+            DataSet dataSet2 =bizModel.fetchDataSetByName(sour2DsName);
             DataSet destDs = DataSetOptUtil.joinTwoDataSet(dataSet, dataSet2, new ArrayList<>(map.entrySet()), join);
             if (destDs != null) {
                 bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
@@ -282,8 +273,8 @@ public class BuiltInOperation implements BizOperation {
     public static ResponseData runUnion(BizModel bizModel, JSONObject bizOptJson) {
         String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
         String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
-        DataSet dataSet = getArray(bizModel.fetchDataSetByName(sour1DsName));
-        DataSet dataSet2 = getArray(bizModel.fetchDataSetByName(sour2DsName));
+        DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
+        DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
         DataSet destDs = DataSetOptUtil.unionTwoDataSet(dataSet, dataSet2);
         bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
         return createResponseSuccessData(destDs.getSize());
@@ -311,8 +302,8 @@ public class BuiltInOperation implements BizOperation {
         String targetDsName = getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         List<String> formulas = jsonArrayToList(bizOptJson.getJSONArray("config"), "expression", "expression2", "");
         Map<String, String> pks = jsonArrayToMap(bizOptJson.getJSONArray("primaryKeyList"), "primaryKey1", "primaryKey2");
-        DataSet dataSet = getArray(bizModel.fetchDataSetByName(sour1DsName));
-        DataSet dataSet2 = getArray(bizModel.fetchDataSetByName(sour2DsName));
+        DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
+        DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
         int count = 0;
         if (dataSet != null && dataSet2 != null) {
             DataSet destDs = DataSetOptUtil.filterByOtherDataSet(dataSet, dataSet2, new ArrayList<>(pks.entrySet()), formulas);
@@ -322,73 +313,4 @@ public class BuiltInOperation implements BizOperation {
         return createResponseSuccessData(count);
     }
 
-    public  ResponseData runCheckData(BizModel bizModel, JSONObject bizOptJson) {
-        String dataSetId = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        //校验信息所挂载的字段
-        String checkRuleResultField =bizOptJson.getString("checkRuleResultField");
-        //是否返回校验结果
-        Boolean checkRuleResult =bizOptJson.getBoolean("checkRuleResult")==null?true:bizOptJson.getBoolean("checkRuleResult");
-        //是否返回校验信息 默认不返回，如果默认返回的话会比较耗时
-        Boolean checkRuleResultMsg = bizOptJson.getBoolean("checkRuleResultMsg")==null?false:bizOptJson.getBoolean("checkRuleResultMsg");
-        DataSet dataSet = bizModel.getDataSet(dataSetId);
-        JSONArray rulesJson = bizOptJson.getJSONArray("config");
-        List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
-        DataCheckResult result = DataCheckResult.create();
-        dataAsList.stream().forEach(data->{
-            rulesJson.stream().forEach(ruleInfo->{
-                if (ruleInfo instanceof  Map){
-                    Map<String, Object> map = CollectionsOpt.objectToMap(ruleInfo);
-                    String checkTypeId = StringBaseOpt.objectToString(map.get("checkTypeId"));
-                    DataCheckRule dataCheckRule = dataCheckRuleService.getObjectById(checkTypeId);
-                    List<Object> checkParams = CollectionsOpt.objectToList(map.get("checkParams"));
-                    if (dataCheckRule!=null  && checkParams!=null){
-                        Map<String, String>  paramMap = new HashMap<>();
-                        String checkField = StringBaseOpt.objectToString(map.get("checkField"));
-                        paramMap.put("checkValue",checkField);
-                        for (int i = 0; i < checkParams.size(); i++) {
-                            Map<String, Object> param = CollectionsOpt.objectToMap(checkParams.get(i));
-                            for (Map.Entry<String, Object> entry : param.entrySet()) {
-                                paramMap.put(entry.getKey(),StringBaseOpt.objectToString(entry.getValue()));
-                            }
-                        }
-                        result.checkData(data,dataCheckRule,paramMap,checkRuleResultMsg);
-                    }
-                }
-                if (data instanceof Map){
-                    Map<String, Object> map = CollectionsOpt.objectToMap(data);
-                    //设置校验结果信息
-                    if (checkRuleResultMsg){
-                        String errorMessage = result.getErrorMessage();
-                        map.put(checkRuleResultField+"_msg",errorMessage);
-                    }
-                    //设置校验结果
-                    if (checkRuleResult){
-                        map.put(checkRuleResultField,result.getResult());
-                    }
-                }
-            });
-            //清除上个对象的校验结果信息
-            result.reset();
-        });
-        return createResponseSuccessData(0);
-    }
-
-    private static DataSet getArray(DataSet dataSet) {
-        if (dataSet.getData() instanceof List) {
-            return dataSet;
-        }
-        for (Map<String, Object> map : dataSet.getDataAsList()) {
-            for (String key : map.keySet()) {
-                if (map.get(key) instanceof List) {
-                    return new SimpleDataSet(map.get(key));
-                }
-            }
-        }
-        return new SimpleDataSet();
-    }
-
-    @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
-        return  runCheckData( bizModel,  bizOptJson);
-    }
 }
