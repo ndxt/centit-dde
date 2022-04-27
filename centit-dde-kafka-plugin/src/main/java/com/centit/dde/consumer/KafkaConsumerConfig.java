@@ -18,11 +18,9 @@ public class KafkaConsumerConfig {
         //设置Key和Value的序列化类    配置默认值，页面填写了后直接覆盖
         proper.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         proper.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-        if (properties != null) {
-            properties.forEach((key,value)->{
-                proper.put(key,value);
-            });
-        }
+        properties.forEach((key,value)->{
+            proper.put(key,value);
+        });
         //Kafka broker 列表  放最后，避免页面填写参数时填写该参数   直接覆盖页面填写的broker列表
         proper.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, sourceInfo.getDatabaseUrl());
         String username = sourceInfo.getUsername();
