@@ -52,7 +52,7 @@ public class EsWriteBizOperation implements BizOperation {
             restHighLevelClient = restHighLevelClientGenericObjectPool.borrowObject();
             JSONObject jsonObject = ElasticsearchWriteUtils.batchSaveDocuments(restHighLevelClient,addData, esWriteVo);
             bizModel.putDataSet(id,new SimpleDataSet(jsonObject));
-            return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(id).getSize());
+            return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
         }finally {
             restHighLevelClientGenericObjectPool.returnObject(restHighLevelClient);
             log.debug("restHighLevelClient放回连接池中");

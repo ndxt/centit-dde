@@ -59,6 +59,6 @@ public class ProducerBizOperation implements BizOperation {
         if (producer!=null){
             producer.close();
         }
-        return  BuiltInOperation.getResponseSuccessData(simpleDataSet.getSize());
+        return  BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
     }
 }

@@ -66,6 +66,6 @@ public class ConsumerBizOperation implements BizOperation {
         }
         SimpleDataSet simpleDataSet = new SimpleDataSet(values);
         bizModel.putDataSet(consumerEntity.getId(),simpleDataSet);
-        return BuiltInOperation.getResponseSuccessData(simpleDataSet.getSize());
+        return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
     }
 }

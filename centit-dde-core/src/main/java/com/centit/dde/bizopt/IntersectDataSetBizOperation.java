@@ -29,6 +29,6 @@ public class IntersectDataSetBizOperation implements BizOperation {
         DataSet dataSet = DataSetOptUtil.intersectTwoDataSet(bizModel.getDataSet(mainDataSet),
             bizModel.getDataSet(slaveDataSet), new ArrayList<>(pks.entrySet()), unionData);
         bizModel.putDataSet(id,dataSet);
-        return BuiltInOperation.getResponseSuccessData(dataSet==null?0:dataSet.getSize());
+        return BuiltInOperation.createResponseSuccessData(dataSet==null?0:dataSet.getSize());
     }
 }

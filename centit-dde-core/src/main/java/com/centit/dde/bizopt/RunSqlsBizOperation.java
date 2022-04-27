@@ -44,8 +44,8 @@ public class RunSqlsBizOperation implements BizOperation {
                 Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfoDao.getDatabaseInfoById((databaseCode)));
                 count += DatabaseAccess.doExecuteSql(conn, q.getQuery(), q.getParams());
             }
-            return BuiltInOperation.getResponseSuccessData(count);
+            return BuiltInOperation.createResponseSuccessData(count);
         }
-        return BuiltInOperation.getResponseSuccessData(0);
+        return BuiltInOperation.createResponseSuccessData(0);
     }
 }

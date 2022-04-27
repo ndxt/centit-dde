@@ -49,7 +49,7 @@ public class FileDownloadBizOperation implements BizOperation {
             //文件id存放在数据集中的情况
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
             if (dataSet==null){
-                return BuiltInOperation.getResponseData(0, 500,
+                return BuiltInOperation.createResponseData(0, 500,
                     bizOptJson.getString("SetsName")+"：文件下载失败，请选择数据集！");
             }
             List<Map<String, Object>> dataSetDataAsList = dataSet.getDataAsList();
@@ -63,6 +63,6 @@ public class FileDownloadBizOperation implements BizOperation {
         DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", "",
             "fileSize", inputStreams.get(0).available(), "fileContent", inputStreams.get(0)));
         bizModel.putDataSet(targetDsName,objectToDataSet);
-        return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(targetDsName).getSize());
+        return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(targetDsName).getSize());
     }
 }

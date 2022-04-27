@@ -26,8 +26,8 @@ public class DefineJsonDataBizOperation implements BizOperation {
                 JSONTransformer.transformer( jsonValue.startsWith("{") ? JSON.parse(jsonValue) : jsonValue, new BizModelJSONTransform(bizModel));
             bizModel.putDataSet(targetDsName,new SimpleDataSet(data));
         }else {
-            return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：表达式不能为空！");
+            return BuiltInOperation.createResponseData(0, 500, bizOptJson.getString("SetsName")+"：表达式不能为空！");
         }
-        return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(targetDsName).getSize());
+        return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(targetDsName).getSize());
     }
 }

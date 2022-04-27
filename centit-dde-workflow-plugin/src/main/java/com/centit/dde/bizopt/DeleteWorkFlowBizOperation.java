@@ -39,6 +39,6 @@ public class DeleteWorkFlowBizOperation implements BizOperation {
         }
         boolean deleteFlowInstById = flowManager.deleteFlowInstById(flowInstId,userCode);
         bizModel.putDataSet(id,new SimpleDataSet(deleteFlowInstById));
-        return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(id).getSize());
+        return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
     }
 }

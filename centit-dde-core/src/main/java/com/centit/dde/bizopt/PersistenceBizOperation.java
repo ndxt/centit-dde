@@ -70,26 +70,26 @@ public class PersistenceBizOperation implements BizOperation {
         String tableId = BuiltInOperation.getJsonFieldString(bizOptJson, "tableLabelName", null);
         String writerType = BuiltInOperation.getJsonFieldString(bizOptJson, "writerType", "merge");
         if (databaseCode == null || tableId == null) {
-            return BuiltInOperation.getResponseData(0, 0,
+            return BuiltInOperation.createResponseData(0, 0,
                 "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
         }
         SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
-            return BuiltInOperation.getResponseData(0, 0,
+            return BuiltInOperation.createResponseData(0, 0,
                 "数据库信息无效：" + databaseCode);
         }
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet == null) {
-            return BuiltInOperation.getResponseData(0, 0,
+            return BuiltInOperation.createResponseData(0, 0,
                 "数据源信息无效：" + sourDsName);
         }
         TableInfo tableInfo = metaDataService.getMetaTableWithRelations(tableId);
         if (tableInfo == null) {
-            return BuiltInOperation.getResponseData(0, 0,
+            return BuiltInOperation.createResponseData(0, 0,
                 "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
         }
         if (bizOptJson.get(ConstantValue.CONFIG) == null) {
-            return BuiltInOperation.getResponseData(0, 0,
+            return BuiltInOperation.createResponseData(0, 0,
                 "没有配置交换字段");
         }
         SqlDataSetWriter dataSetWriter = new SqlDataSetWriter(databaseInfo, tableInfo);
@@ -110,9 +110,9 @@ public class PersistenceBizOperation implements BizOperation {
                 break;
         }
         if (dataSetWriter.getErrorNums() > 0) {
-            return BuiltInOperation.getResponseData(dataSetWriter.getSuccessNums(), dataSetWriter.getErrorNums(), dataSetWriter.getInfo());
+            return BuiltInOperation.createResponseData(dataSetWriter.getSuccessNums(), dataSetWriter.getErrorNums(), dataSetWriter.getInfo());
         }
-        return BuiltInOperation.getResponseSuccessData(dataSetWriter.getSuccessNums());
+        return BuiltInOperation.createResponseSuccessData(dataSetWriter.getSuccessNums());
     }
 
     private void writeCsvFile(BizModel bizModel, JSONObject bizOptJson) throws FileNotFoundException {

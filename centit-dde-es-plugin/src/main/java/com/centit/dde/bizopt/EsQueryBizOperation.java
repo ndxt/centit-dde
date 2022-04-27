@@ -43,9 +43,9 @@ public class EsQueryBizOperation implements BizOperation {
             restHighLevelClient = restHighLevelClientGenericObjectPool.borrowObject();
             JSONObject result = ElasticsearchReadUtils.executeQuery(restHighLevelClient,bizModel,esReadVo);
             bizModel.putDataSet(esReadVo.getId(),new SimpleDataSet(result));
-            return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(esReadVo.getId()).getSize());
+            return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(esReadVo.getId()).getSize());
         }catch (Exception e){
-            return BuiltInOperation.getResponseData(0, 500,"查询es数据异常,异常信息："+e.getMessage());
+            return BuiltInOperation.createResponseData(0, 500,"查询es数据异常,异常信息："+e.getMessage());
         } finally {
             restHighLevelClientGenericObjectPool.returnObject(restHighLevelClient);
             log.debug("restHighLevelClient放回连接池中");

@@ -39,6 +39,6 @@ public class GetSessionDataBizOperation implements BizOperation {
             }
             bizModel.putDataSet(id, new SimpleDataSet(result));
         }
-        return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(id).getSize());
+        return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
     }
 }

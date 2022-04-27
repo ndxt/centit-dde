@@ -46,7 +46,7 @@ public class ReportBizOperation implements BizOperation {
         ByteArrayInputStream in = generateWord(bizModel, filePath, params);
         DataSet dataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName, "fileContent", word2Pdf(in)));
         bizModel.putDataSet(sourDsName, dataSet);
-        return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
+        return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }
 
     private FieldsMetadata getFieldsMetadata(Map<String, String> params, JSONObject docData) throws Exception {

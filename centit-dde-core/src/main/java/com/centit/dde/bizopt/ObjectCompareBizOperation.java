@@ -39,6 +39,6 @@ public class ObjectCompareBizOperation implements BizOperation {
             }
         });
         bizModel.putDataSet(id, new SimpleDataSet(compareResult));
-        return BuiltInOperation.getResponseSuccessData(compareResult.size());
+        return BuiltInOperation.createResponseSuccessData(compareResult.size());
     }
 }

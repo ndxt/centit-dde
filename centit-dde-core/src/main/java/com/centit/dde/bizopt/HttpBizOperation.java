@@ -117,7 +117,7 @@ public class HttpBizOperation implements BizOperation {
             case "get":
                 receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGet(httpExecutorContext, httpUrl, mapObject));
                 if (receiveJson.getCode() != ResponseData.RESULT_OK) {
-                    return BuiltInOperation.getResponseData(0, receiveJson.getCode(), receiveJson.getMessage());
+                    return BuiltInOperation.createResponseData(0, receiveJson.getCode(), receiveJson.getMessage());
                 } else {
                     dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
                 }
@@ -130,9 +130,9 @@ public class HttpBizOperation implements BizOperation {
         }
         if (dataSet != null) {
             bizModel.putDataSet(sourDsName, dataSet);
-            return BuiltInOperation.getResponseSuccessData(dataSet.getSize());
+            return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         } else {
-            return BuiltInOperation.getResponseData(0, 0, "无数据");
+            return BuiltInOperation.createResponseData(0, 0, "无数据");
         }
     }
 }

@@ -41,6 +41,6 @@ public class GenerateJsonFileBizOperation implements BizOperation {
         DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName.endsWith(".json")?fileName:fileName+".json",
             "fileSize", inputStream.available(), "fileContent",inputStream));
         bizModel.putDataSet(targetDsName,objectToDataSet);
-        return BuiltInOperation.getResponseSuccessData(objectToDataSet.getSize());
+        return BuiltInOperation.createResponseSuccessData(objectToDataSet.getSize());
     }
 }

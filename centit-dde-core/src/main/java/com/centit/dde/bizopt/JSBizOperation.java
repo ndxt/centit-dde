@@ -29,7 +29,7 @@ public class JSBizOperation implements BizOperation {
         if (object != null) {
             count = bizModel.fetchDataSetByName(targetDsName).getSize();
         }
-        return BuiltInOperation.getResponseSuccessData(count);
+        return BuiltInOperation.createResponseSuccessData(count);
     }
 
 }

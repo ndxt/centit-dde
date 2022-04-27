@@ -81,15 +81,15 @@ public class MetadataBizOperation implements BizOperation {
             case 1://新建
                 metaObjectService.saveObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
                 bizModel.putDataSet(id, new SimpleDataSet(parames));
-                return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(id).getSize());
+                return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
             case 2://修改
                 int upcount= metaObjectService.updateObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
                 bizModel.putDataSet(id, new SimpleDataSet(upcount));
-                return BuiltInOperation.getResponseSuccessData(upcount);
+                return BuiltInOperation.createResponseSuccessData(upcount);
             case 3://删除
                 metaObjectService.deleteObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
                 bizModel.putDataSet(id, new SimpleDataSet(1));
-                return BuiltInOperation.getResponseSuccessData(1);
+                return BuiltInOperation.createResponseSuccessData(1);
             case 4://查询
                 HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
                 String topUnit = WebOptUtils.getCurrentTopUnit(request);
@@ -122,11 +122,11 @@ public class MetadataBizOperation implements BizOperation {
                 }else {
                     bizModel.putDataSet(id, new SimpleDataSet(result));//返回带分页的数据
                 }
-                return BuiltInOperation.getResponseSuccessData(jsonArray.size());
+                return BuiltInOperation.createResponseSuccessData(jsonArray.size());
             case 5://查看
                 Map<String, Object> data = metaObjectService.getObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
                 bizModel.putDataSet(id, new SimpleDataSet(data));
-                return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(id).getSize());
+                return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
             case 9://批量删除
             {
                 String source = bizOptJson.getString("source");
@@ -141,18 +141,18 @@ public class MetadataBizOperation implements BizOperation {
                     delCount++;
                 }
                 bizModel.putDataSet(id, new SimpleDataSet(delCount));
-                return BuiltInOperation.getResponseSuccessData(delCount);
+                return BuiltInOperation.createResponseSuccessData(delCount);
             }
             case 10://根据条件修改字段值
                 JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(parames), JSONObject.class);
                 int count  = metaObjectService.updateObjectsByProperties(tableId, jsonObject,
                     CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
                 bizModel.putDataSet(id, new SimpleDataSet(count));
-                return BuiltInOperation.getResponseSuccessData(count);
+                return BuiltInOperation.createResponseSuccessData(count);
             case 11:
                 int resultCount = metaObjectService.mergeObjectWithChildren(tableId, parames, withChildrenDeep == null ? 1 : withChildrenDeep);
                 bizModel.putDataSet(id, new SimpleDataSet(resultCount));
-                return BuiltInOperation.getResponseSuccessData(resultCount);
+                return BuiltInOperation.createResponseSuccessData(resultCount);
         }
         return null;
     }

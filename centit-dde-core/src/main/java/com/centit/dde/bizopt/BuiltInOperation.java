@@ -43,7 +43,7 @@ public class BuiltInOperation implements BizOperation {
         return targetDsName;
     }
 
-    static ResponseData getResponseSuccessData(int count) {
+    static ResponseData createResponseSuccessData(int count) {
         JSONObject map = new JSONObject();
         map.put("info", "ok");
         map.put("success", count);
@@ -51,7 +51,7 @@ public class BuiltInOperation implements BizOperation {
         return ResponseSingleData.makeResponseData(map);
     }
 
-    static ResponseData getResponseData(int success, int error, String info) {
+    static ResponseData createResponseData(int success, int error, String info) {
         JSONObject map = new JSONObject();
         map.put("info", info);
         map.put("success", success);
@@ -106,7 +106,7 @@ public class BuiltInOperation implements BizOperation {
     }
 
     public static ResponseData runStart(BizModel bizModel, JSONObject bizOptJson) {
-        return getResponseSuccessData(0);
+        return createResponseSuccessData(0);
     }
 
     public static ResponseData runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
@@ -114,16 +114,16 @@ public class BuiltInOperation implements BizOperation {
         DataSet destDs = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", "",
             "fileSize", inputStream.available(), "fileContent", inputStream));
         bizModel.putDataSet(bizOptJson.getString("id"), destDs);
-        return getResponseSuccessData(destDs.getSize());
+        return createResponseSuccessData(destDs.getSize());
     }
 
     public static ResponseData runRequestBody(BizModel bizModel, JSONObject bizOptJson) {
         DataSet destDs = bizModel.fetchDataSetByName(ConstantValue.REQUEST_BODY_TAG);
         if(destDs!=null) {
             bizModel.putDataSet(bizOptJson.getString("id"), destDs);
-            return getResponseSuccessData(destDs.getSize());
+            return createResponseSuccessData(destDs.getSize());
         }
-        return getResponseSuccessData(0);
+        return createResponseSuccessData(0);
     }
 
     public static ResponseData runMap(BizModel bizModel, JSONObject bizOptJson) {
@@ -133,7 +133,7 @@ public class BuiltInOperation implements BizOperation {
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         DataSet destDs = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
         bizModel.putDataSet(targetDsName, destDs);
-        return getResponseSuccessData(destDs.getSize());
+        return createResponseSuccessData(destDs.getSize());
     }
 
     public static ResponseData runAppend(BizModel bizModel, JSONObject bizOptJson) {
@@ -147,7 +147,7 @@ public class BuiltInOperation implements BizOperation {
                 DataSetOptUtil.appendDeriveField(dataSet, mapInfo.entrySet());
             }
         }
-        return getResponseSuccessData(count);
+        return createResponseSuccessData(count);
     }
 
     public static ResponseData runFilter(BizModel bizModel, JSONObject bizOptJson) {
@@ -163,7 +163,7 @@ public class BuiltInOperation implements BizOperation {
                 bizModel.putDataSet(targetDsName, destDs);
             }
         }
-        return getResponseSuccessData(count);
+        return createResponseSuccessData(count);
     }
 
     public static ResponseData runStat(BizModel bizModel, JSONObject bizOptJson) {
@@ -180,7 +180,7 @@ public class BuiltInOperation implements BizOperation {
                 bizModel.putDataSet(targetDsName, destDs);
             }
         }
-        return getResponseSuccessData(count);
+        return createResponseSuccessData(count);
     }
 
     public static ResponseData runAnalyse(BizModel bizModel, JSONObject bizOptJson) {
@@ -199,7 +199,7 @@ public class BuiltInOperation implements BizOperation {
                 bizModel.putDataSet(targetDsName, destDs);
             }
         }
-        return getResponseSuccessData(count);
+        return createResponseSuccessData(count);
     }
 
     public static ResponseData runCross(BizModel bizModel, JSONObject bizOptJson) {
@@ -220,14 +220,14 @@ public class BuiltInOperation implements BizOperation {
             count = destDs.getSize();
             bizModel.putDataSet(targetDsName, destDs);
         }
-        return getResponseSuccessData(count);
+        return createResponseSuccessData(count);
     }
 
     public static ResponseData runCompare(BizModel bizModel, JSONObject bizOptJson) {
         String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
         String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
         if (sour1DsName == null || sour2DsName == null) {
-            return getResponseSuccessData(0);
+            return createResponseSuccessData(0);
         }
         String targetDsName = getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         Map<String, String> analyse = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
@@ -240,7 +240,7 @@ public class BuiltInOperation implements BizOperation {
             count = destDs.getSize();
             bizModel.putDataSet(targetDsName, destDs);
         }
-        return getResponseSuccessData(count);
+        return createResponseSuccessData(count);
     }
 
     public static ResponseData runSort(BizModel bizModel, JSONObject bizOptJson) {
@@ -248,7 +248,7 @@ public class BuiltInOperation implements BizOperation {
         List<String> orderByFields = jsonArrayToList(bizOptJson.getJSONArray("config"), "columnName", "orderBy", "desc");
         DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
         DataSetOptUtil.sortDataSetByFields(dataSet, orderByFields);
-        return getResponseSuccessData(dataSet.getSize());
+        return createResponseSuccessData(dataSet.getSize());
     }
 
     public static ResponseData runClear(BizModel bizModel, JSONObject bizOptJson) {
@@ -259,7 +259,7 @@ public class BuiltInOperation implements BizOperation {
         if (sets.size() == 0) {
             bizModel.getBizData().clear();
         }
-        return getResponseSuccessData(0);
+        return createResponseSuccessData(0);
     }
 
     public static ResponseData runJoin(BizModel bizModel, JSONObject bizOptJson) {
@@ -273,10 +273,10 @@ public class BuiltInOperation implements BizOperation {
             DataSet destDs = DataSetOptUtil.joinTwoDataSet(dataSet, dataSet2, new ArrayList<>(map.entrySet()), join);
             if (destDs != null) {
                 bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
-                return getResponseSuccessData(destDs.getSize());
+                return createResponseSuccessData(destDs.getSize());
             }
         }
-        return getResponseSuccessData(0);
+        return createResponseSuccessData(0);
     }
 
     public static ResponseData runUnion(BizModel bizModel, JSONObject bizOptJson) {
@@ -286,14 +286,14 @@ public class BuiltInOperation implements BizOperation {
         DataSet dataSet2 = getArray(bizModel.fetchDataSetByName(sour2DsName));
         DataSet destDs = DataSetOptUtil.unionTwoDataSet(dataSet, dataSet2);
         bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
-        return getResponseSuccessData(destDs.getSize());
+        return createResponseSuccessData(destDs.getSize());
     }
 
     public static ResponseData runStaticData(BizModel bizModel, JSONObject bizOptJson) {
         JSONArray ja = bizOptJson.getJSONArray("data");
         DataSet destDS = BizOptUtils.castObjectToDataSet(ja);
         bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDS);
-        return getResponseSuccessData(destDS.getSize());
+        return createResponseSuccessData(destDS.getSize());
     }
 
     /**
@@ -306,7 +306,7 @@ public class BuiltInOperation implements BizOperation {
         String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
         String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
         if (sour1DsName == null || sour2DsName == null) {
-            return getResponseSuccessData(0);
+            return createResponseSuccessData(0);
         }
         String targetDsName = getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         List<String> formulas = jsonArrayToList(bizOptJson.getJSONArray("config"), "expression", "expression2", "");
@@ -319,7 +319,7 @@ public class BuiltInOperation implements BizOperation {
             count = destDs.getSize();
             bizModel.putDataSet(targetDsName, destDs);
         }
-        return getResponseSuccessData(count);
+        return createResponseSuccessData(count);
     }
 
     public  ResponseData runCheckData(BizModel bizModel, JSONObject bizOptJson) {
@@ -370,7 +370,7 @@ public class BuiltInOperation implements BizOperation {
             //清除上个对象的校验结果信息
             result.reset();
         });
-        return getResponseSuccessData(0);
+        return createResponseSuccessData(0);
     }
 
     private static DataSet getArray(DataSet dataSet) {

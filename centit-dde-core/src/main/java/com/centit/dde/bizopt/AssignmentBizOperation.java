@@ -36,7 +36,7 @@ public class AssignmentBizOperation implements BizOperation {
         switch (assignType){
             case "1"://复制数据集
                 if (dataSet==null){
-                    return BuiltInOperation.getResponseData(0, 500, bizOptJson.getString("SetsName")+"：未指定数据集，或指定数据集值为NULL！");
+                    return BuiltInOperation.createResponseData(0, 500, bizOptJson.getString("SetsName")+"：未指定数据集，或指定数据集值为NULL！");
                 }
                 newDataSet=SerializationUtils.clone(new SimpleDataSet(dataSet.getData()));
                 break;
@@ -60,6 +60,6 @@ public class AssignmentBizOperation implements BizOperation {
                 break;
         }
         bizModel.putDataSet(assignmentVo.getId(),newDataSet);
-        return BuiltInOperation.getResponseSuccessData(bizModel.getDataSet(assignmentVo.getId()).getSize());
+        return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(assignmentVo.getId()).getSize());
     }
 }

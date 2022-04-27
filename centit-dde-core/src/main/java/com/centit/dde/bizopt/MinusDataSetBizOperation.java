@@ -24,6 +24,6 @@ public class MinusDataSetBizOperation implements BizOperation {
         Map<String, String> pks = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("primaryFields"), "mainField", "slaveField");
         DataSet dataSet = DataSetOptUtil.minusTwoDataSet(bizModel.getDataSet(mainDataSet), bizModel.getDataSet(slaveDataSet), new ArrayList<>(pks.entrySet()));
         bizModel.putDataSet(id,dataSet);
-        return BuiltInOperation.getResponseSuccessData(dataSet==null?0:dataSet.getSize());
+        return BuiltInOperation.createResponseSuccessData(dataSet==null?0:dataSet.getSize());
     }
 }

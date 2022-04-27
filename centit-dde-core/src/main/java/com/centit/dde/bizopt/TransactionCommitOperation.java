@@ -25,12 +25,12 @@ public class TransactionCommitOperation implements BizOperation {
         String[] databaseCodes = bizOptJson.getObject("databaseName",String[].class);
         if (databaseCodes==null || databaseCodes.length==0){//默认提交当前线程所有事物
             AbstractSourceConnectThreadHolder.commitAll();
-            return BuiltInOperation.getResponseSuccessData(0);
+            return BuiltInOperation.createResponseSuccessData(0);
         }
         for (String databaseCode : databaseCodes) {//提交选中库的事物
             SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
             AbstractSourceConnectThreadHolder.commit(sourceInfo);
         }
-        return BuiltInOperation.getResponseSuccessData(databaseCodes.length);
+        return BuiltInOperation.createResponseSuccessData(databaseCodes.length);
     }
 }
