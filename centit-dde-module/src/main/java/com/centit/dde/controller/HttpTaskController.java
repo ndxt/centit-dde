@@ -203,18 +203,15 @@ public class HttpTaskController extends BaseController {
         DataOptResult result = bizmodelService.runBizModel(dataPacketInterface, dataOptContext);
 
         if (result.getResultType() == DataOptResult.RETURN_FILE_STREAM) {
-            InputStream in;
-            DataSet dataSet = new DataSet(result.getResultObject());
-            Map<String, Object> mapFirstRow = dataSet.getFirstRow();
-            if (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream) {
-                ByteArrayOutputStream outputStream = (ByteArrayOutputStream) mapFirstRow.get(ConstantValue.FILE_CONTENT);
-                in = new ByteArrayInputStream(outputStream.toByteArray());
+            String fileName = result.getReturnFilename();
+            InputStream in = result.getReturnFileStream();
+            if(in!=null && fileName!=null) {
+                UploadDownloadUtils.downFileRange(request, response, in,
+                    in.available(), fileName, request.getParameter("downloadType"), null);
             } else {
-                in = (InputStream) mapFirstRow.get(ConstantValue.FILE_CONTENT);
+                JsonResultUtils.writeOriginalObject(
+                    ResponseData.makeErrorMessage("没不错误，没有返回的文件实体！"), response);
             }
-            String fileName = (String) mapFirstRow.get(ConstantValue.FILE_NAME);
-            UploadDownloadUtils.downFileRange(request, response, in,
-                in.available(), fileName, request.getParameter("downloadType"), null);
             return;
         }
         if (result.getResultType() == DataOptResult.RETURN_DATA_AS_RAW) {

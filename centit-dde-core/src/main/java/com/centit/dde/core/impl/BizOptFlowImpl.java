@@ -47,6 +47,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     public static final String RETURN_RESULT_ALL_DATASET = "1";
     public static final String RETURN_RESULT_STATE = "2";
     public static final String RETURN_RESULT_DATASET = "3";
+    //RETURN_DATA_AS_RAW
     public static final String RETURN_RESULT_ORIGIN = "4";
     public static final String RETURN_RESULT_ERROR = "5";
 
@@ -248,14 +249,18 @@ public class BizOptFlowImpl implements BizOptFlow {
                 bizModel.getOptResult().setResultType(DataOptResult.RETURN_CODE_AND_MESSAGE);
             } else {
                 bizModel.getOptResult().setResultObject(dataSet.getData());
-
                 if (RETURN_RESULT_DATASET.equals(type)) {
                     Map<String, Object> mapFirstRow = dataSet.getFirstRow();
-                    boolean isFile = mapFirstRow != null && mapFirstRow.containsKey(ConstantValue.FILE_CONTENT)
-                        && (mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof OutputStream
-                        || mapFirstRow.get(ConstantValue.FILE_CONTENT) instanceof InputStream);
-
-                    bizModel.getOptResult().setResultType(isFile ? DataOptResult.RETURN_FILE_STREAM : DataOptResult.RETURN_OPT_DATA);
+                    boolean isFile = mapFirstRow != null;
+                    if(isFile) {
+                        Object fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
+                        if(fileData instanceof OutputStream || fileData instanceof InputStream){
+                            String fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
+                            bizModel.getOptResult().setResultFile(fileName, fileData);
+                            return;
+                        }
+                    }
+                    bizModel.getOptResult().setResultType(DataOptResult.RETURN_OPT_DATA);
                 } else {
                     bizModel.getOptResult().setResultType(DataOptResult.RETURN_DATA_AS_RAW);
                 }

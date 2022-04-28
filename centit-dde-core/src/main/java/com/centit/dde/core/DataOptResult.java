@@ -1,20 +1,26 @@
 package com.centit.dde.core;
 
+import com.alibaba.fastjson.JSON;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ToResponseData;
 import com.centit.support.common.LeftRightPair;
-import lombok.Data;
+import com.centit.support.common.ObjectException;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 public class DataOptResult implements ToResponseData {
 
     public static final int RETURN_CODE_AND_MESSAGE = 1;
     public static final int  RETURN_OPT_DATA = 0;
     public static final int  RETURN_DATA_AS_RAW = 2;
     public static final int  RETURN_FILE_STREAM = 3;
+
     /**
      * 返回结果类型
      * 数据集
@@ -23,6 +29,7 @@ public class DataOptResult implements ToResponseData {
      * 错误
      */
     private int resultType;
+
 
     private ResponseData lastError;
 
@@ -39,6 +46,69 @@ public class DataOptResult implements ToResponseData {
         if(ResponseData.RESULT_OK != objValue.getCode()) {
             errorStepResult.add(new LeftRightPair<>(sKey, objValue));
         }
+    }
+
+    public ResponseData getLastError() {
+        return lastError;
+    }
+
+    public int getResultType() {
+        return resultType;
+    }
+
+    public void setResultType(int resultType) {
+        if(RETURN_FILE_STREAM==resultType){
+            throw new ObjectException("不能直接将结果设置为文件类型，请调用setResultFile方法");
+        }
+        this.resultType = resultType;
+    }
+
+    public Object getResultObject() {
+        return resultObject;
+    }
+
+    public void setResultObject(Object resultObject) {
+        this.resultObject = resultObject;
+    }
+
+    public void setResultFile(String fileName, Object fileData) {
+        this.resultType = RETURN_FILE_STREAM;
+        this.resultObject =  new LeftRightPair<String, Object>(fileName, fileData);
+    }
+
+    public String getReturnFilename() {
+        if(this.resultType != RETURN_FILE_STREAM){
+            return null;
+        }
+        LeftRightPair<String, Object> fileInfo =(LeftRightPair<String, Object >)this.resultObject;
+        return fileInfo.getLeft();
+    }
+    public InputStream getReturnFileStream() {
+        if(this.resultType != RETURN_FILE_STREAM){
+            return null;
+        }
+        LeftRightPair<String, Object> fileInfo =(LeftRightPair<String, Object >)this.resultObject;
+        Object data = fileInfo.getRight();
+        if(data == null) {
+            return null;
+        }
+        if (data instanceof InputStream) {
+            return (InputStream)data;
+        }
+        if (data instanceof OutputStream) {
+            ByteArrayOutputStream outputStream = (ByteArrayOutputStream) data;
+            return new ByteArrayInputStream(outputStream.toByteArray());
+        }
+
+        if(data instanceof byte[]) {
+            return new ByteArrayInputStream((byte[]) data);
+        }
+
+        if(data instanceof String){
+            return new ByteArrayInputStream(((String) data).getBytes(StandardCharsets.UTF_8));
+        }
+        String dataStr = JSON.toJSONString(data);
+        return new ByteArrayInputStream(dataStr.getBytes(StandardCharsets.UTF_8));
     }
 
     public boolean hasErrors(){
