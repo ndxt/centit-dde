@@ -5,20 +5,14 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.dataset.CsvDataSet;
-import com.centit.dde.dataset.ExcelDataSet;
-import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.dataset.SqlDataSetWriter;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.common.ResponseSingleData;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.service.MetaDataService;
-import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 
 
@@ -44,10 +38,6 @@ public class PersistenceBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws FileNotFoundException {
-        String isRun = BuiltInOperation.getJsonFieldString(bizOptJson, "isRun", "T");
-        if (ConstantValue.FALSE.equalsIgnoreCase(isRun)) {
-            return new ResponseSingleData();
-        }
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
         String tableId = BuiltInOperation.getJsonFieldString(bizOptJson, "tableLabelName", null);

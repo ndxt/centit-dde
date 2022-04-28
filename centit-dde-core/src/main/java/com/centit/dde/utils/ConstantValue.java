@@ -49,6 +49,8 @@ public class ConstantValue {
     //定义JSON数据组件
     public static final String DEFINE_JSON_DATA = "defineJsonData";
     //元数据操作查询组件
+    public static final String METADATA_OPERATION ="metadata";
+    //元数据操作查询组件
     public static final String METADATA_OPERATION_QUERY ="metadataQuery";
     //元数据操作查询组件
     public static final String METADATA_OPERATION_UPDATE ="metadataUpdate";
@@ -58,6 +60,10 @@ public class ConstantValue {
     public static final String SUBMIT_WORKFLOW ="submitWorkflow";
     //删除工作流组件
     public static final String DELETE_WORKFLOW ="deleteWorkflow";
+    //获取流程待办组件
+    public static final String USER_TASK_WORKFLOW ="userTaskWorkflow";
+    public static final String INST_NODES_WORKFLOW ="instNodesWorkFlow";
+
     //
     public static final String COMPARE_SOURCE="compareSource";
     //获取session数据

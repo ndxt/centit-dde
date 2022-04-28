@@ -75,9 +75,9 @@ public class MetadataQueryBizOperation implements BizOperation {
                     extFilter = qap.getQuery();
                 }
                 JSONArray  jsonArray =metaObjectService.pageQueryObjects(tableId, extFilter, parames,null, pageDesc);
-                PageQueryResult<Object>  result = PageQueryResult.createResult(jsonArray, pageDesc);
                 Boolean isReturnPageInfo = bizOptJson.getBoolean("isReturnPageInfo");
                 if (isReturnPageInfo){
+                    PageQueryResult<Object>  result = PageQueryResult.createResult(jsonArray, pageDesc);
                     bizModel.putDataSet(id, new DataSet(result));//返回带分页的数据
                 }else {
                     //返回接口元数数据，不含分页信息

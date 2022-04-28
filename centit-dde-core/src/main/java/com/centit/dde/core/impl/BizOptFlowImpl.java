@@ -129,6 +129,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.DEFINE_JSON_DATA, new DefineJsonDataBizOperation());
         allOperations.put(ConstantValue.FILE_UPLOAD, new FileUploadBizOperation(fileStore));
         allOperations.put(ConstantValue.FILE_DOWNLOAD, new FileDownloadBizOperation(fileStore));
+        //为了兼容历史数据保留着  现已拆分为元数据查询  和  元数据更新 2个组件
+        allOperations.put(ConstantValue.METADATA_OPERATION,
+            new MetadataBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
         allOperations.put(ConstantValue.METADATA_OPERATION_QUERY,
             new MetadataQueryBizOperation(metaObjectService,queryDataScopeFilter,metaDataCache));
         allOperations.put(ConstantValue.METADATA_OPERATION_UPDATE, new MetadataUpdateBizOperation(metaObjectService));
