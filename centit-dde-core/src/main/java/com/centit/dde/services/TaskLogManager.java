@@ -41,4 +41,6 @@ public interface TaskLogManager{
     void deleteTaskLogById(String logId);
 
     Map<String,Object> getLogStatisticsInfo(StatisticsParameter parameter);
+
+    int deleteTaskLog(String runBeginTime,Boolean isError);
 }
