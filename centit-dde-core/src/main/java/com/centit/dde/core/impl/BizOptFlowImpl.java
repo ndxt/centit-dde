@@ -287,15 +287,17 @@ public class BizOptFlowImpl implements BizOptFlow {
             return;
         }
 
-        Map<String, Object> returnData = new HashMap<>();
         Map<String, DataSet> bizData = bizModel.getBizData();
-        for (Map.Entry<String, DataSet> dataSetEntry : bizData.entrySet()) {
-            DataSet dataSet = dataSetEntry.getValue();
-            if(dataSet!=null) {
-                returnData.put(dataSetEntry.getKey(), dataSet.getData());
+        if (bizData != null){
+            Map<String, Object> returnData = new HashMap<>();
+            for (Map.Entry<String, DataSet> dataSetEntry : bizData.entrySet()) {
+                DataSet dataSet = dataSetEntry.getValue();
+                if(dataSet!=null) {
+                    returnData.put(dataSetEntry.getKey(), dataSet.getData());
+                }
             }
+            bizModel.getOptResult().setResultObject(returnData);
         }
-        bizModel.getOptResult().setResultObject(returnData);
         bizModel.getOptResult().setResultType(DataOptResult.RETURN_OPT_DATA);
     }
 
@@ -487,7 +489,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         JSONObject stepJson = dataOptStep.getCurrentStep().getJSONObject("properties");
 
         Map<String, Object> queryParams = CollectionsOpt.cloneHashMap(
-                CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
+            CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
 
         queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue"));
         queryParams.entrySet().forEach(entry->{
