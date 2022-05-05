@@ -37,7 +37,6 @@ public class RunSqlsBizOperation implements BizOperation {
         Map<String, Object> parames = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
         QueryAndNamedParams qap = QueryUtils.translateQuery(sql, parames);
         QueryAndParams q = QueryAndParams.createFromQueryAndNamedParams(qap);
-        //这个连接需要手动关闭吗？
         Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfoDao.getDatabaseInfoById((databaseCode)));
         int count = DatabaseAccess.doExecuteSql(conn, q.getQuery(), q.getParams());
         return BuiltInOperation.createResponseSuccessData(count);
