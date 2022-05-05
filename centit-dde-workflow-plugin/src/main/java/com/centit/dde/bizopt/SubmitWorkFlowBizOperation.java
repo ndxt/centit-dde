@@ -63,12 +63,15 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                 //字段名
                 String variableName = StringBaseOpt.objectToString(flowVariable.get("variableName"));
                 //字段值
-                Object transform = JSONTransformer.transformer(flowVariable.get("expression"), new BizModelJSONTransform(bizModel));
-                boolean isGlobal = BooleanBaseOpt.castObjectToBoolean(flowVariable.get("isGlobal"), false);
-                if (isGlobal) {//全局流程变量
-                    globalVariables.put(variableName, transform);
-                } else {
-                    variables.put(variableName, transform);
+                Object expression = flowVariable.get("expression");
+                if (expression!=null){
+                    Object transform = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
+                    boolean isGlobal = BooleanBaseOpt.castObjectToBoolean(flowVariable.get("isGlobal"), false);
+                    if (isGlobal) {//全局流程变量
+                        globalVariables.put(variableName, transform);
+                    } else {
+                        variables.put(variableName, transform);
+                    }
                 }
             }
             submitOptOptions.setVariables(variables);
@@ -81,11 +84,14 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
             for (Object role : roleInfo) {
                 Map<String, Object> roleMap = CollectionsOpt.objectToMap(role);
                 String roleCode = StringBaseOpt.objectToString(roleMap.get("roleCode"));
-                Object transform = JSONTransformer.transformer(roleMap.get("expression"), new BizModelJSONTransform(bizModel));
-                if (transform instanceof List) {
-                    flowRoleUsers.put(roleCode, StringBaseOpt.objectToStringList(transform));
-                } else {
-                    throw new ObjectException("办件角色参数必须是个集合！");
+                Object expression = roleMap.get("expression");
+                if (expression != null){
+                    Object transform = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
+                    if (transform instanceof List) {
+                        flowRoleUsers.put(roleCode, StringBaseOpt.objectToStringList(transform));
+                    } else {
+                        throw new ObjectException("办件角色参数必须是个集合！");
+                    }
                 }
             }
             submitOptOptions.setFlowRoleUsers(flowRoleUsers);
@@ -97,10 +103,8 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                     Map<String, Object> map = CollectionsOpt.objectToMap(fieldInfo);
                     String columnName = StringBaseOpt.objectToString(map.get("columnName"));
                     String expression = StringBaseOpt.objectToString(map.get("expression"));
+                    if (StringUtils.isBlank(expression)) continue;
                     Object value = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
-                    if (StringUtils.isBlank(columnName) || StringUtils.isBlank(expression) || value == null) {
-                        continue;
-                    }
                     switch (columnName) {
                         case "grantorCode":
                             submitOptOptions.setGrantorCode(StringBaseOpt.objectToString(value));

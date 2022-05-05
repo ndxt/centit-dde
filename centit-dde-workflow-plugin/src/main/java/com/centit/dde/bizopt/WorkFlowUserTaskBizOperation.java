@@ -12,8 +12,8 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.compiler.Pretreatment;
 import com.centit.support.database.utils.PageDesc;
+import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.po.UserTask;
 import com.centit.workflow.service.FlowEngine;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +42,7 @@ public class WorkFlowUserTaskBizOperation implements BizOperation {
             Map<String, Object> fieldMap = CollectionsOpt.objectToMap(fieldInfo);
             String fieldValue = StringBaseOpt.castObjectToString(fieldMap.get("fieldValue"));
             if (StringUtils.isNotBlank(fieldValue)){
-                String formulaValue = Pretreatment.mapTemplateStringAsFormula(fieldValue, new BizModelJSONTransform(bizModel));
+                String formulaValue =  StringBaseOpt.castObjectToString(JSONTransformer.transformer(fieldValue, new BizModelJSONTransform(bizModel)));
                 queryParam.put(StringBaseOpt.castObjectToString(fieldMap.get("fieldName")),formulaValue);
             }
         }
