@@ -64,7 +64,7 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                 String variableName = StringBaseOpt.objectToString(flowVariable.get("variableName"));
                 //字段值
                 Object expression = flowVariable.get("expression");
-                if (expression!=null){
+                if (expression != null){
                     Object transform = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
                     boolean isGlobal = BooleanBaseOpt.castObjectToBoolean(flowVariable.get("isGlobal"), false);
                     if (isGlobal) {//全局流程变量
