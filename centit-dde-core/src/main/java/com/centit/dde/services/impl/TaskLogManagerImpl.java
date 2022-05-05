@@ -80,21 +80,21 @@ public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog, Long, Tas
             " where to_days(run_begin_time) = to_days(now()) " +
             " and other_message is not NULL " +
             " [:packetId | AND task_id=:packetId ] " +
-            " [:optID | AND OPT_ID=:optId] "+
+            " [:optId | AND OPT_ID=:optId] "+
             " GROUP BY other_message " +
             " UNION ALL" +
             " SELECT 'weeks' as time,other_message as message,count(*) as num FROM d_task_log " +
             " where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(run_begin_time) " +
             " and other_message is not NULL  " +
             " [:packetId | AND task_id=:packetId ] " +
-            " [:optID | AND OPT_ID=:optId] "+
+            " [:optId | AND OPT_ID=:optId] "+
             " GROUP BY other_message" +
             " UNION ALL" +
             " SELECT 'month' as time,other_message as message,count(*) as num FROM d_task_log " +
             " where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(run_begin_time) " +
             " and other_message is not NULL " +
             " [:packetId | AND task_id=:packetId ] " +
-            " [:optID | AND OPT_ID=:optId] "+
+            " [:optId | AND OPT_ID=:optId] "+
             " GROUP BY other_message";
         QueryAndNamedParams pieData = QueryUtils.translateQuery(pieSql, queryparameter);
         JSONArray pieDataList = DatabaseOptUtils.listObjectsByNamedSqlAsJson(taskLogDao,pieData.getQuery(), pieData.getParams());

@@ -16,9 +16,6 @@ public class DeleteWorkFlowBizOperation implements BizOperation {
 
     private FlowManager flowManager;
 
-    public DeleteWorkFlowBizOperation() {
-    }
-
     public DeleteWorkFlowBizOperation(FlowManager flowManager) {
         this.flowManager=flowManager;
     }
