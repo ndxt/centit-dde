@@ -153,7 +153,6 @@ public class HttpTaskController extends BaseController {
         /*   if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
             judgePower(packetId,runType);
         }*/
-        Object bizModel;
         DataPacketInterface dataPacketInterface;
         if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
             dataPacketInterface = dataPacketService.getDataPacket(packetId);

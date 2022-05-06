@@ -11,11 +11,13 @@ import com.centit.dde.utils.LoginUserPermissionCheck;
 import com.centit.dde.vo.MetaDataParameter;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
@@ -23,6 +25,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -30,9 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author zhf
@@ -243,10 +244,10 @@ public class DataPacketDraftController extends BaseController {
         }
         LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
         //启用  disableType 必须等于T 或者 F
-        if (!StringBaseOpt.isNvl(disableType) && "F".equals(disableType)){
+        if ("F".equals(disableType)){
             dataPacketService.updateDisableStatus(packetId,disableType);
             dataPacketDraftService.updateDisableStatus(packetId,disableType);
-        }else if(!StringBaseOpt.isNvl(disableType) && "T".equals(disableType)){//禁用
+        }else if("T".equals(disableType)){//禁用
             dataPacketService.updateDisableStatus(packetId,disableType);
             dataPacketDraftService.updateDisableStatus(packetId,disableType);
         }else {
@@ -258,9 +259,17 @@ public class DataPacketDraftController extends BaseController {
     @ApiOperation(value = "查询API网关")
     @GetMapping
     @WrapUpResponseBody
-    public PageQueryResult<DataPacketDraft> listDataPacket(HttpServletRequest request, PageDesc pageDesc) {
+    public PageQueryResult<Map<String,Object>> listDataPacket(HttpServletRequest request, PageDesc pageDesc) {
         List<DataPacketDraft> list = dataPacketDraftService.listDataPacket(BaseController.collectRequestParameters(request), pageDesc);
-        return PageQueryResult.createResult(list, pageDesc);
+        List<Map<String,Object>> returnList = new ArrayList<>();
+        list.stream().forEach(dataPacketDraft -> {
+            String optId = dataPacketDraft.getOptId();
+            Map<String, Object> dataPacketInfo = CollectionsOpt.objectToMap(dataPacketDraft);
+            String optName = CodeRepositoryUtil.getValue("optId", optId);
+            dataPacketInfo.put("optName",optName);
+            returnList.add(dataPacketInfo);
+        });
+        return PageQueryResult.createResult(returnList, pageDesc);
     }
 
     @ApiOperation(value = "查询单个API网关")

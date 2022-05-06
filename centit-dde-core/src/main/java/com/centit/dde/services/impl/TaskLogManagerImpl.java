@@ -2,9 +2,9 @@ package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.dao.TaskLogDao;
-import com.centit.dde.vo.StatisticsParameter;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.TaskLogManager;
+import com.centit.dde.vo.StatisticsParameter;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -77,31 +77,40 @@ public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog, Long, Tas
         //饼图统计
         String  pieSql=
             " SELECT 'day' as time,other_message as message,count(*) as num FROM d_task_log " +
-            " where to_days(run_begin_time) = to_days(now()) " +
-            " and other_message is not NULL " +
-            " [:packetId | AND task_id=:packetId ] " +
-            " [:optID | AND OPT_ID=:optId] "+
-            " GROUP BY other_message " +
-            " UNION ALL" +
-            " SELECT 'weeks' as time,other_message as message,count(*) as num FROM d_task_log " +
-            " where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(run_begin_time) " +
-            " and other_message is not NULL  " +
-            " [:packetId | AND task_id=:packetId ] " +
-            " [:optID | AND OPT_ID=:optId] "+
-            " GROUP BY other_message" +
-            " UNION ALL" +
-            " SELECT 'month' as time,other_message as message,count(*) as num FROM d_task_log " +
-            " where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(run_begin_time) " +
-            " and other_message is not NULL " +
-            " [:packetId | AND task_id=:packetId ] " +
-            " [:optID | AND OPT_ID=:optId] "+
-            " GROUP BY other_message";
+                " where to_days(run_begin_time) = to_days(now()) " +
+                " and other_message is not NULL " +
+                " [:packetId | AND task_id=:packetId ] " +
+                " [:optId | AND OPT_ID=:optId] "+
+                " GROUP BY other_message " +
+                " UNION ALL" +
+                " SELECT 'weeks' as time,other_message as message,count(*) as num FROM d_task_log " +
+                " where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(run_begin_time) " +
+                " and other_message is not NULL  " +
+                " [:packetId | AND task_id=:packetId ] " +
+                " [:optId | AND OPT_ID=:optId] "+
+                " GROUP BY other_message" +
+                " UNION ALL" +
+                " SELECT 'month' as time,other_message as message,count(*) as num FROM d_task_log " +
+                " where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(run_begin_time) " +
+                " and other_message is not NULL " +
+                " [:packetId | AND task_id=:packetId ] " +
+                " [:optId | AND OPT_ID=:optId] "+
+                " GROUP BY other_message";
         QueryAndNamedParams pieData = QueryUtils.translateQuery(pieSql, queryparameter);
         JSONArray pieDataList = DatabaseOptUtils.listObjectsByNamedSqlAsJson(taskLogDao,pieData.getQuery(), pieData.getParams());
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put("brokenLineData",dataList);
         hashMap.put("pieData",pieDataList);
         return hashMap;
+    }
+
+    @Override
+    public int deleteTaskLog(String runBeginTime,Boolean isError) {
+        StringBuilder sql=new StringBuilder("delete from d_task_log  where DATE(run_begin_time) <= ? ");
+        if (!isError){
+            sql.append(" AND other_message !='error' ");
+        }
+        return DatabaseOptUtils.doExecuteSql(taskLogDao,sql.toString(),new Object[]{runBeginTime});
     }
 
 }

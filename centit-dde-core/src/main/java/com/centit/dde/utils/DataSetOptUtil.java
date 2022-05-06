@@ -1036,7 +1036,7 @@ public abstract class DataSetOptUtil {
     //获取数据集参数或者自定义参数
     public static Map<String, Object> getDataSetParames(BizModel bizModel, JSONObject bizOptJson){
         //参数类型
-        String paramsType = bizOptJson.getString("paramsType");
+        String paramsType = bizOptJson.getString("sourceType");
         Map<String, Object> parames;
         // 自定义参数类型
         if("customSource".equals(paramsType)){

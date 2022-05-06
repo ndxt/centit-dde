@@ -9,10 +9,7 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.common.ObjectException;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,23 +47,8 @@ public class MetadataUpdateBizOperation implements BizOperation {
                 int resultCount = metaObjectService.mergeObjectWithChildren(tableId, parames, withChildrenDeep);
                 bizModel.putDataSet(id, new DataSet(resultCount));
                 return BuiltInOperation.createResponseSuccessData(resultCount);
-            case 9://批量删除
-            {
-                String source = bizOptJson.getString("source");
-                if("customSource".equals(bizOptJson.getString("sourceType")) || StringUtils.isBlank(source)){
-                    throw new ObjectException("批量删除时不能设置为自定义参数形式");
-                }
-                DataSet dataSet = bizModel.fetchDataSetByName(source);
-                List<Map<String, Object>> delParames = dataSet.getDataAsList();
-                int delCount =0;
-                for (Map parame : delParames) {
-                    metaObjectService.deleteObjectWithChildren(tableId,parame,withChildrenDeep == null ? 1 : withChildrenDeep);
-                    delCount++;
-                }
-                bizModel.putDataSet(id, new DataSet(delCount));
-                return BuiltInOperation.createResponseSuccessData(delCount);
-            }
+            default:
+                return ResponseData.makeErrorMessage("未知操作类型！");
         }
-        return ResponseData.makeErrorMessage("未知操作类型！");
     }
 }

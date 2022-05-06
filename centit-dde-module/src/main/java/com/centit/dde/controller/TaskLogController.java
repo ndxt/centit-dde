@@ -1,14 +1,17 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.vo.StatisticsParameter;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.po.TaskLog;
+import com.centit.dde.services.TaskDetailLogManager;
 import com.centit.dde.services.TaskLogManager;
+import com.centit.dde.vo.StatisticsParameter;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,9 +33,13 @@ public class TaskLogController extends BaseController {
     private static final Log log = LogFactory.getLog(TaskLogController.class);
 
     private final TaskLogManager taskLogManager;
+
+    private final TaskDetailLogManager taskDetailLogManager;
+
     @Autowired
-    public TaskLogController(TaskLogManager taskLogManager) {
+    public TaskLogController(TaskLogManager taskLogManager,TaskDetailLogManager taskDetailLogManager) {
         this.taskLogManager = taskLogManager;
+        this.taskDetailLogManager=taskDetailLogManager;
     }
 
     @PostMapping
@@ -81,6 +88,23 @@ public class TaskLogController extends BaseController {
     @WrapUpResponseBody
     public Map<String, Object> getLogStatisticsInfo(@RequestBody StatisticsParameter parameter){
         return taskLogManager.getLogStatisticsInfo(parameter);
+    }
+
+
+    @DeleteMapping(value = "/{runBeginTime}/{isError}")
+    @ApiOperation(value = "删除某个时间段之前的日志")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "runBeginTime",value = "指定开始时间"),
+        @ApiImplicitParam(name = "isError",value = "是否包含错误信息"),
+    })
+    @WrapUpResponseBody
+    public JSONObject delLogInfoAndLogDetail(@PathVariable String runBeginTime, @PathVariable Boolean isError){
+        int taskLogCount = taskLogManager.deleteTaskLog(runBeginTime, isError);
+        int taskDetailLogCount = taskDetailLogManager.delTaskDetailLog(runBeginTime, isError);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("taskLogCount",taskLogCount);
+        jsonObject.put("taskDetailLogCount",taskDetailLogCount);
+        return jsonObject;
     }
 
 }

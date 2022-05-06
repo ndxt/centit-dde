@@ -39,4 +39,6 @@ public interface TaskDetailLogManager {
     void updateTaskDetailLog(TaskDetailLog detailLog);
 
     void delTaskDetailLog(String logDetailId);
+    //删除指定时间之前的数据
+    int delTaskDetailLog(String runBeginTime,Boolean isError);
 }

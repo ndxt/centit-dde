@@ -3,6 +3,7 @@ package com.centit.dde.services.impl;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.services.TaskDetailLogManager;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import com.centit.support.database.utils.PageDesc;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,15 @@ public class TaskDetailLogManagerImpl extends BaseEntityManagerImpl<TaskDetailLo
     @Override
     public void delTaskDetailLog(String logDetailId) {
         this.taskDetailLogDao.deleteObjectById(logDetailId);
+    }
+
+    @Override
+    public int delTaskDetailLog(String runBeginTime,Boolean isError) {
+        StringBuilder sqlDetail=new StringBuilder("delete from d_task_detail_log  where DATE(run_begin_time) <= ? ");
+        if (!isError){
+            sqlDetail.append(" AND log_info = 'ok'  ");
+        }
+        return DatabaseOptUtils.doExecuteSql(taskDetailLogDao,sqlDetail.toString(),new Object[]{runBeginTime});
     }
 }
 

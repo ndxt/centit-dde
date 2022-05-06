@@ -1,11 +1,10 @@
 package com.centit.dde.bizopt;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
-import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
@@ -13,8 +12,10 @@ import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryAndParams;
 import com.centit.support.database.utils.QueryUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
+import java.util.Map;
 
 /**
  * @author zhf
@@ -28,24 +29,16 @@ public class RunSqlsBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
-        JSONArray jsonArray = bizOptJson.getJSONArray("config");
-        if (jsonArray != null) {
-            int count = 0;
-            for (Object object : jsonArray) {
-                JSONObject jsonObject = (JSONObject) object;
-                QueryAndNamedParams qap = QueryUtils.translateQuery(jsonObject.getString("sql"), new BizModelJSONTransform(bizModel));
-                QueryAndParams q = QueryAndParams.createFromQueryAndNamedParams(qap);
-                String databaseCode="";
-                if (jsonObject.get("databaseName") instanceof String){
-                    databaseCode=jsonObject.getString("databaseName");
-                }else {
-                    databaseCode = jsonObject.getJSONObject("databaseName").getString("value");
-                }
-                Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfoDao.getDatabaseInfoById((databaseCode)));
-                count += DatabaseAccess.doExecuteSql(conn, q.getQuery(), q.getParams());
-            }
-            return BuiltInOperation.createResponseSuccessData(count);
+        String databaseCode = bizOptJson.getString("databaseName");
+        String sql = bizOptJson.getString("sql");
+        if (StringUtils.isBlank(databaseCode) || StringUtils.isBlank(sql)){
+            return ResponseData.makeErrorMessage("数据库或sql不能为空！");
         }
-        return BuiltInOperation.createResponseSuccessData(0);
+        Map<String, Object> parames = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
+        QueryAndNamedParams qap = QueryUtils.translateQuery(sql, parames);
+        QueryAndParams q = QueryAndParams.createFromQueryAndNamedParams(qap);
+        Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfoDao.getDatabaseInfoById((databaseCode)));
+        int count = DatabaseAccess.doExecuteSql(conn, q.getQuery(), q.getParams());
+        return BuiltInOperation.createResponseSuccessData(count);
     }
 }
