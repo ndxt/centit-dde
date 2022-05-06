@@ -42,13 +42,12 @@ public abstract class BuiltInOperation {
         return ResponseSingleData.makeResponseData(map);
     }
 
-    static ResponseData createResponseData(int success, int error, String info) {
+    static ResponseData createResponseData(int success, int error, int errorCode, String info) {
         JSONObject map = new JSONObject();
-        map.put("info", info);
         map.put("success", success);
-        map.put("error", error == 0 ? 1 : error);
+        map.put("error", error);
         ResponseSingleData result = ResponseSingleData.makeResponseData(map);
-        result.setCode(ResponseData.ERROR_OPERATION);
+        result.setCode(errorCode);
         result.setMessage(info);
         return result;
     }

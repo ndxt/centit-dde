@@ -45,7 +45,7 @@ public class EsQueryBizOperation implements BizOperation {
             bizModel.putDataSet(esReadVo.getId(),new DataSet(result));
             return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(esReadVo.getId()).getSize());
         }catch (Exception e){
-            return BuiltInOperation.createResponseData(0, 500,"查询es数据异常,异常信息："+e.getMessage());
+            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,"查询es数据异常,异常信息："+e.getMessage());
         } finally {
             restHighLevelClientGenericObjectPool.returnObject(restHighLevelClient);
             log.debug("restHighLevelClient放回连接池中");

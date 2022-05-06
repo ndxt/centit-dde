@@ -28,7 +28,7 @@ public class JsonBizOperation implements BizOperation {
 
         List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
         if (dataSet==null&& requestFileInfo==null){
-            return BuiltInOperation.createResponseData(0, 500, bizOptJson.getString("SetsName")
+            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")
                 +"：读取JSON文件异常,请指定数据集或者指定对应的流信息！");
         }
         List<InputStream> inputStreams;
@@ -42,7 +42,7 @@ public class JsonBizOperation implements BizOperation {
             inputStreams = DataSetOptUtil.getInputStreamByFieldName(dataSet);
         }
         if (inputStreams.size()==0){
-            return BuiltInOperation.createResponseData(0, 500, bizOptJson.getString("SetsName")
+            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")
                 +"：读取JSON文件异常，不支持的流类型转换！");
         }
         bizModel.putDataSet(targetDsName, new DataSet(toJson(inputStreams)));

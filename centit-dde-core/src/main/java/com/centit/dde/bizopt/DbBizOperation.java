@@ -68,7 +68,7 @@ public class DbBizOperation implements BizOperation {
 
         SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
-            return BuiltInOperation.createResponseData(0, 0, "找不到对应的集成数据库：" + databaseCode);
+            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, "找不到对应的集成数据库：" + databaseCode);
         }
         SqlDataSetReader sqlDsr = new SqlDataSetReader();
         sqlDsr.setDataSource(databaseInfo);

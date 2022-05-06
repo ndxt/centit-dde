@@ -33,7 +33,7 @@ public class AssignmentBizOperation implements BizOperation {
 
         DataSet targetDataSet =bizModel.fetchDataSetByName(targetDsName);
         if(dataSet == null  || targetDataSet==null){
-            return BuiltInOperation.createResponseData(0, ResponseData.ERROR_USER_CONFIG,
+            return BuiltInOperation.createResponseData(0,1, ResponseData.ERROR_USER_CONFIG,
                 "配置信息出错，找不到对应的数据集："+targetDsName+"，"+sourceDsName+"。");
         }
         Object sourceData = new DatasetVariableTranslate(dataSet).getVarValue(formula);

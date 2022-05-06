@@ -44,7 +44,7 @@ public class ExcelBizOperation implements BizOperation {
         //挂载文件的字段
         String excelExpression=BuiltInOperation.getJsonFieldString(bizOptJson,"excelexpression",null);
         if (dataSet==null && requestFileInfo==null){
-            return BuiltInOperation.createResponseData(0, 500,
+            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
                 bizOptJson.getString("SetsName")+"：读取EXCEL文件异常，请指定数据集或者指定对应的流信息！");
         }
         List<InputStream> inputStreams;
@@ -56,7 +56,7 @@ public class ExcelBizOperation implements BizOperation {
             inputStreams = DataSetOptUtil.getInputStreamByFieldName(dataSet);
         }
         if (inputStreams.size()==0){
-            return BuiltInOperation.createResponseData(0, 500,
+            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
                 bizOptJson.getString("SetsName")+"：读取EXCEL文件异常，不支持的流类型转换！");
         }
         List<Object> objectList = new ArrayList<>();

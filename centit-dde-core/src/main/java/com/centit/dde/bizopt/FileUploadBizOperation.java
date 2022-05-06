@@ -44,7 +44,7 @@ public class FileUploadBizOperation implements BizOperation {
         String fileDataField=BuiltInOperation.getJsonFieldString(bizOptJson,"fileupexpression",null);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet==null){
-            return BuiltInOperation.createResponseData(0, 500,
+            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
                 bizOptJson.getString("SetsName")+"：文件上传失败，请选择数据集！");
         }
         if (dataSet!=null && StringUtils.isNotBlank(fileNameField)&&StringUtils.isNotBlank(fileDataField)){
@@ -65,7 +65,7 @@ public class FileUploadBizOperation implements BizOperation {
             }else if (object instanceof InputStream){
                 fileId = fileStore.saveFile(fileInfo, 0,(InputStream) object);
             }else {
-                return  BuiltInOperation.createResponseData(0, 500, bizOptJson.getString("SetsName")+"：上传文件失败，不支持的流类型转换！");
+                return  BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")+"：上传文件失败，不支持的流类型转换！");
             }
             fileIds.add(fileId);
         }

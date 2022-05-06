@@ -49,7 +49,7 @@ public class FileDownloadBizOperation implements BizOperation {
             //文件id存放在数据集中的情况
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
             if (dataSet==null){
-                return BuiltInOperation.createResponseData(0, 500,
+                return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
                     bizOptJson.getString("SetsName")+"：文件下载失败，请选择数据集！");
             }
             List<Map<String, Object>> dataSetDataAsList = dataSet.getDataAsList();

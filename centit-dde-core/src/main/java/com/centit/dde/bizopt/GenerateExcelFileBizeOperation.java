@@ -52,7 +52,7 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
             String sheetName = bizOptJson.getString("sheetName");
             InputStream inputStream = fileStore.loadFileStream(templateFileId);
             if (inputStream==null){
-                return  BuiltInOperation.createResponseData(0, 500, bizOptJson.getString("SetsName")+"：Excel模板不存在，请先上传模板！");
+                return  BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")+"：Excel模板不存在，请先上传模板！");
             }
             Object data = dataSet.getData();
             JSONArray jsonArray = JSON.parseArray(JSON.toJSONString(data));
@@ -73,7 +73,7 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
         //获取表达式信息
         Map<String, String> mapInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
         if (dataSet==null){
-            return BuiltInOperation.createResponseData(0, 500, bizOptJson.getString("SetsName")+"：生成EXCEL文件异常，请指定数据集！");
+            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")+"：生成EXCEL文件异常，请指定数据集！");
         }
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
         List<String> headers = new ArrayList<>();
