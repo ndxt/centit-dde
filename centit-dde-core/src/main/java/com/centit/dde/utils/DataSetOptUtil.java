@@ -390,7 +390,7 @@ public abstract class DataSetOptUtil {
 
     private static void analyseDatasetGroup(List<Map<String, Object>> newData, List<Map<String, Object>> data,
                                             int offset, int endPos,
-                                            DatasetVariableTranslate dvt,
+                                            DataArrayVariableTranslate dvt,
                                             Collection<Map.Entry<String, String>> refDesc) {
         dvt.setOffset(offset);
         dvt.setLength(endPos - offset);
@@ -425,7 +425,7 @@ public abstract class DataSetOptUtil {
         Map<String, Object> preRow = null;
         int n = data.size();
         int prePos = 0;
-        DatasetVariableTranslate dvt = new DatasetVariableTranslate(data);
+        DataArrayVariableTranslate dvt = new DataArrayVariableTranslate(data);
         List<Map<String, Object>> newData = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             Map<String, Object> row = data.get(i);

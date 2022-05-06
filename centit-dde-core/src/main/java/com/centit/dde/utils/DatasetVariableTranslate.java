@@ -1,22 +1,20 @@
 package com.centit.dde.utils;
 
-import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.dde.core.DataSet;
+import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableTranslate;
-
-import java.util.List;
-import java.util.Map;
+import com.centit.support.json.JSONTransformDataSupport;
 
 /**
  * @author zhf
  */
-public class DatasetVariableTranslate implements VariableTranslate {
+public class DatasetVariableTranslate
+    implements VariableTranslate, JSONTransformDataSupport {
 
-    private List<Map<String, Object>> dataSet;
-    private int offset;
-    private int length;
-    private int currentPos;
+    private DataSet dataSet;
 
-    public DatasetVariableTranslate(List<Map<String, Object>> dataSet) {
+    public DatasetVariableTranslate(DataSet dataSet) {
         this.dataSet = dataSet;
     }
 
@@ -33,47 +31,17 @@ public class DatasetVariableTranslate implements VariableTranslate {
         if(dataSet ==null) {
             return "";
         }
-        int n = varName.lastIndexOf('.');
-
-        if(n>0){
-            String fieldName = varName.substring(0,n);
-            if(n<varName.length()) {
-                String indexStr = varName.substring(n + 1);
-                if (indexStr.charAt(0) == '_'){
-                    int pos = NumberBaseOpt.castObjectToInteger(indexStr.substring(1),0);
-                    if(currentPos + pos < offset + length){
-                        return dataSet.get(currentPos + pos).get(fieldName);
-                    }else{
-                        return "";
-                    }
-                }else{
-                    int pos = NumberBaseOpt.castObjectToInteger(indexStr,0);
-                    if(currentPos - pos >= offset){
-                        return dataSet.get(currentPos - pos).get(fieldName);
-                    }else{
-                        return "";
-                    }
-                }
-            }
-        }
-
-        return dataSet.get(currentPos).get(varName);
+        return ReflectionOpt.attainExpressionValue(dataSet.getData(), varName);
     }
 
-    public void setDataSet(List<Map<String, Object>> varObj) {
-        this.dataSet = varObj;
+    @Override
+    public Object attainExpressionValue(String expression) {
+        return getVarValue(expression);
     }
 
-    public void setOffset(int offset) {
-        this.offset = offset;
-    }
-
-    public void setLength(int length) {
-        this.length = length;
-    }
-
-    public void setCurrentPos(int currentPos) {
-        this.currentPos = currentPos;
+    @Override
+    public String mapTemplateString(String templateString) {
+        return Pretreatment.mapTemplateStringAsFormula(templateString, this, "", true);
     }
 }
 
