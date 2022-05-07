@@ -230,6 +230,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (ConstantValue.TRUE.equals(dataOptContext.getNeedRollback())) {
             //如果API不能允许报错，报错就中断
             if (bizModel.getOptResult().getLastError().getCode() == ResponseData.ERROR_OPERATION) {
+                returnResult(bizModel, dataOptStep);
                 dataOptStep.setEndStep();
                 AbstractSourceConnectThreadHolder.rollbackAndRelease();
             }
@@ -447,8 +448,8 @@ public class BizOptFlowImpl implements BizOptFlow {
                 detailLog.setLogInfo(e.getMessage());
             } else {
                 String errMsg = ObjectException.extortExceptionMessage(e, 8);
-                ResponseData responseData = ResponseData.makeErrorMessageWithData(e, ResponseData.ERROR_OPERATION,
-                    errMsg);
+                ResponseData responseData = ResponseData.makeErrorMessageWithData(errMsg, ResponseData.ERROR_OPERATION,
+                    e.getMessage());
                 bizModel.getOptResult().addLastStepResult(bizOptJson.getString("id"), responseData);
                 detailLog.setLogInfo(errMsg);
             }
