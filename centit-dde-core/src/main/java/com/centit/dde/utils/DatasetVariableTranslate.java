@@ -3,6 +3,7 @@ package com.centit.dde.utils;
 import com.centit.dde.core.DataSet;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.compiler.Pretreatment;
+import com.centit.support.compiler.VariableFormula;
 import com.centit.support.compiler.VariableTranslate;
 import com.centit.support.json.JSONTransformDataSupport;
 
@@ -36,7 +37,14 @@ public class DatasetVariableTranslate
 
     @Override
     public Object attainExpressionValue(String expression) {
-        return getVarValue(expression);
+        if(".".equals(expression)){
+            return this.dataSet.getData();
+        }
+        VariableFormula variableFormula = new VariableFormula();
+        variableFormula.setExtendFuncMap(DataSetOptUtil.extendFuncs);
+        variableFormula.setTrans(this);
+        variableFormula.setFormula(expression);
+        return variableFormula.calcFormula();
     }
 
     @Override
