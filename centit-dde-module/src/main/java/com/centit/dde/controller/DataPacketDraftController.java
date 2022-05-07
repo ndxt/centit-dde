@@ -318,7 +318,7 @@ public class DataPacketDraftController extends BaseController {
         String packetName = jsonObject.getString("packetName");
         String optId = jsonObject.getString("optId");
         if (StringUtils.isBlank(packetId) || StringUtils.isBlank(packetName) || StringUtils.isBlank(optId)){
-            return ResponseData.makeErrorMessage("缺少参数，请检测请求参数是否正确！");
+            return ResponseData.makeErrorMessage("缺少参数，请检查请求参数是否正确！");
         }
         DataPacketDraft dataPacket = dataPacketDraftService.getDataPacket(packetId);
         if (dataPacket == null) return ResponseData.makeErrorMessage("复制的API接口不存在！");
