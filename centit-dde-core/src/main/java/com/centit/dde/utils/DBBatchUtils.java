@@ -49,18 +49,19 @@ public abstract class DBBatchUtils {
         }
         String sql = GeneralJsonObjectDao.buildInsertSql(tableInfo, fields);
         LeftRightPair<String, List<String>> sqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
-        int n = 0;
+        int rowIndex = 0;
         QueryLogUtils.printSql(logger, sqlPair.getLeft(), sqlPair.getRight());
         try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())) {
+            int rowCount = objects.size();
             for (Map<String, Object> object : objects) {
                 if (fieldsMap != null) {
-                    object = DataSetOptUtil.mapDataRow(object, fieldsMap.entrySet());
+                    object = DataSetOptUtil.mapDataRow(object, rowIndex, rowCount, fieldsMap.entrySet());
                     prepareObjectForSave(tableInfo, object);
                 }
                 DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object);
-                n++;
+                rowIndex++;
                 stmt.addBatch();
-                if (n % INT_BATCH_NUM == 0) {
+                if (rowIndex % INT_BATCH_NUM == 0) {
                     stmt.executeBatch();
                     stmt.clearBatch();
                 }
@@ -70,7 +71,7 @@ public abstract class DBBatchUtils {
         } catch (SQLException e) {
             throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
         }
-        return n;
+        return rowIndex;
     }
 
     public static int batchUpdateObjects(final Connection conn,
@@ -90,10 +91,13 @@ public abstract class DBBatchUtils {
         int n = 0;
         QueryLogUtils.printSql(logger, sqlPair.getLeft(), sqlPair.getRight());
         try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())) {
+            int rowCount = objects.size();
+            int rowIndex = 0;
             for (Map<String, Object> object : objects) {
                 if (fieldsMap != null) {
-                    object = DataSetOptUtil.mapDataRow(object, fieldsMap.entrySet());
+                    object = DataSetOptUtil.mapDataRow(object, rowIndex, rowCount, fieldsMap.entrySet());
                 }
+                rowIndex++;
                 DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object);
                 n += stmt.executeUpdate();
             }
@@ -129,11 +133,15 @@ public abstract class DBBatchUtils {
         try (PreparedStatement checkStmt = conn.prepareStatement(checkSqlPair.getLeft());
              PreparedStatement insertStmt = conn.prepareStatement(insertSqlPair.getLeft());
              PreparedStatement updateStmt = conn.prepareStatement(updateSqlPair.getLeft())) {
+
+            int rowCount = objects.size();
+            int rowIndex = 0;
             for (Map<String, Object> object : objects) {
                 if (fieldsMap != null) {
-                    object = DataSetOptUtil.mapDataRow(object, fieldsMap.entrySet());
+                    object = DataSetOptUtil.mapDataRow(object, rowIndex, rowCount, fieldsMap.entrySet());
                     prepareObjectForSave(tableInfo, object);
                 }
+                rowIndex++;
                 DatabaseAccess.setQueryStmtParameters(checkStmt, checkSqlPair.getRight(), object);
                 ResultSet rs = checkStmt.executeQuery();
                 exists = false;

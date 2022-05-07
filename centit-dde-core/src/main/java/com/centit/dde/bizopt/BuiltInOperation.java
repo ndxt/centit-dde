@@ -2,7 +2,8 @@ package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.core.*;
+import com.centit.dde.core.BizModel;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
@@ -213,26 +214,6 @@ public abstract class BuiltInOperation {
         return createResponseSuccessData(count);
     }
 
-    public static ResponseData runCompare(BizModel bizModel, JSONObject bizOptJson) {
-        String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
-        String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
-        if (sour1DsName == null || sour2DsName == null) {
-            return createResponseSuccessData(0);
-        }
-        String targetDsName = getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
-        Map<String, String> analyse = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
-        Map<String, String> pks = jsonArrayToMap(bizOptJson.getJSONArray("configfield"), "primaryKey1", "primaryKey2");
-        DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
-        DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
-        int count = 0;
-        if (dataSet != null && dataSet2 != null && pks != null) {
-            DataSet destDs = DataSetOptUtil.compareTabulation(dataSet, dataSet2, new ArrayList<>(pks.entrySet()), analyse == null ? null : analyse.entrySet());
-            count = destDs.getSize();
-            bizModel.putDataSet(targetDsName, destDs);
-        }
-        return createResponseSuccessData(count);
-    }
-
     public static ResponseData runSort(BizModel bizModel, JSONObject bizOptJson) {
         String sour1DsName = getJsonFieldString(bizOptJson, "source", null);
         List<String> orderByFields = jsonArrayToList(bizOptJson.getJSONArray("config"), "columnName", "orderBy", "desc");
@@ -284,32 +265,6 @@ public abstract class BuiltInOperation {
         DataSet destDS = BizOptUtils.castObjectToDataSet(ja);
         bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDS);
         return createResponseSuccessData(destDS.getSize());
-    }
-
-    /**
-     * TODO 去掉这个组件，添加 交集 和 减集 组件
-     * @param bizModel
-     * @param bizOptJson
-     * @return
-     */
-    public static ResponseData runFilterExt(BizModel bizModel, JSONObject bizOptJson) {
-        String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
-        String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
-        if (sour1DsName == null || sour2DsName == null) {
-            return createResponseSuccessData(0);
-        }
-        String targetDsName = getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
-        List<String> formulas = jsonArrayToList(bizOptJson.getJSONArray("config"), "expression", "expression2", "");
-        Map<String, String> pks = jsonArrayToMap(bizOptJson.getJSONArray("primaryKeyList"), "primaryKey1", "primaryKey2");
-        DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
-        DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
-        int count = 0;
-        if (dataSet != null && dataSet2 != null) {
-            DataSet destDs = DataSetOptUtil.filterByOtherDataSet(dataSet, dataSet2, new ArrayList<>(pks.entrySet()), formulas);
-            count = destDs.getSize();
-            bizModel.putDataSet(targetDsName, destDs);
-        }
-        return createResponseSuccessData(count);
     }
 
 }

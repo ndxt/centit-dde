@@ -1,18 +1,15 @@
 package com.centit.dde.utils;
 
 import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.compiler.Pretreatment;
-import com.centit.support.compiler.VariableFormula;
 import com.centit.support.compiler.VariableTranslate;
-import com.centit.support.json.JSONTransformDataSupport;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * @author zhf
+ * @author codefan@sina.com
  */
-public class DataArrayVariableTranslate
+public class DataRowGroupVariableTranslate
     implements VariableTranslate {
 
     private List<Map<String, Object>> dataSet;
@@ -20,7 +17,7 @@ public class DataArrayVariableTranslate
     private int length;
     private int currentPos;
 
-    public DataArrayVariableTranslate(List<Map<String, Object>> dataSet) {
+    public DataRowGroupVariableTranslate(List<Map<String, Object>> dataSet) {
         this.dataSet = dataSet;
     }
 

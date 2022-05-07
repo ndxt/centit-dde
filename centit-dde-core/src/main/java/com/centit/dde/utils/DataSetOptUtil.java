@@ -12,7 +12,6 @@ import com.centit.framework.model.basedata.IDataDictionary;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.JavaBeanMetaData;
-import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.image.CaptchaImageUtil;
 import org.apache.commons.collections4.ListUtils;
@@ -29,7 +28,7 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * @author zhf
+ * @author codefan@sina.com
  */
 public abstract class DataSetOptUtil {
 
@@ -138,18 +137,17 @@ public abstract class DataSetOptUtil {
      * @param formulaMap 字段映射关系
      * @return 新的数据集
      */
-    static Map<String, Object> mapDataRow(Map<String, Object> inRow,
+    static Map<String, Object> mapDataRow(Map<String, Object> inRow, int rowInd, int rowCount,
                                           Collection<Map.Entry<String, String>> formulaMap) {
         if (formulaMap == null) {
             return inRow;
         }
         VariableFormula formula = new VariableFormula();
         formula.setExtendFuncMap(extendFuncs);
-        formula.setTrans(new ObjectTranslate(inRow));
+        formula.setTrans(new DataRowVariableTranslate(inRow, rowInd, rowCount));
         Map<String, Object> newRow = new LinkedHashMap<>(formulaMap.size());
         for (Map.Entry<String, String> ent : formulaMap) {
             formula.setFormula(ent.getValue());
-
             newRow.put(ent.getKey(), formula.calcFormula());
         }
         return newRow;
@@ -165,8 +163,11 @@ public abstract class DataSetOptUtil {
     public static DataSet mapDateSetByFormula(DataSet inData, Collection<Map.Entry<String, String>> formulaMap) {
         List<Map<String, Object>> data = inData.getDataAsList();
         List<Map<String, Object>> newData = new ArrayList<>(data.size());
+        int rowCount = data.size();
+        int rowIndex = 0;
         for (Map<String, Object> obj : data) {
-            newData.add(mapDataRow(obj, formulaMap));
+            newData.add(mapDataRow(obj, rowIndex, rowCount, formulaMap));
+            rowIndex++;
         }
         return new DataSet(newData);
     }
@@ -179,8 +180,11 @@ public abstract class DataSetOptUtil {
      */
     public static void appendDeriveField(DataSet inData, Collection<Map.Entry<String, String>> formulaMap) {
         List<Map<String, Object>> data = inData.getDataAsList();
+        int rowCount = data.size();
+        int rowIndex = 0;
         for (Map<String, Object> obj : data) {
-            obj.putAll(mapDataRow(obj, formulaMap));
+            obj.putAll(mapDataRow(obj, rowIndex, rowCount, formulaMap));
+            rowIndex++;
         }
     }
 
@@ -193,16 +197,19 @@ public abstract class DataSetOptUtil {
      */
     public static DataSet filterDateSet(DataSet inData, List<String> formulas) {
         List<Map<String, Object>> data = inData.getDataAsList();
-        List<Map<String, Object>> newData = new ArrayList<>(data.size());
+        int rowCount = data.size();
+        int rowIndex = 0;
+        List<Map<String, Object>> newData = new ArrayList<>(rowCount+1);
         for (Map<String, Object> obj : data) {
             boolean canAdd = true;
             for (String formula : formulas) {
                 if (!BooleanBaseOpt.castObjectToBoolean(
-                    VariableFormula.calculate(formula, obj), false)) {
+                    VariableFormula.calculate(formula, new DataRowVariableTranslate(obj,rowIndex, rowCount), extendFuncs), false)) {
                     canAdd = false;
                     break;
                 }
             }
+            rowIndex ++;
             if (canAdd) {
                 newData.add(obj);
             }
@@ -390,7 +397,7 @@ public abstract class DataSetOptUtil {
 
     private static void analyseDatasetGroup(List<Map<String, Object>> newData, List<Map<String, Object>> data,
                                             int offset, int endPos,
-                                            DataArrayVariableTranslate dvt,
+                                            DataRowGroupVariableTranslate dvt,
                                             Collection<Map.Entry<String, String>> refDesc) {
         dvt.setOffset(offset);
         dvt.setLength(endPos - offset);
@@ -425,7 +432,7 @@ public abstract class DataSetOptUtil {
         Map<String, Object> preRow = null;
         int n = data.size();
         int prePos = 0;
-        DataArrayVariableTranslate dvt = new DataArrayVariableTranslate(data);
+        DataRowGroupVariableTranslate dvt = new DataRowGroupVariableTranslate(data);
         List<Map<String, Object>> newData = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             Map<String, Object> row = data.get(i);
@@ -547,72 +554,6 @@ public abstract class DataSetOptUtil {
         }
     }
 
-    /**
-     * 同环比转换 这个可以用 map + join + filter 代替 所以可以不需要了。
-     *
-     * @param currDataSet   本期数据集
-     * @param lastDataSet   上期数据集
-     * @param primaryFields 主键列
-     * @return DataSet
-     */
-    @Deprecated
-    public static DataSet compareTabulation(DataSet currDataSet,
-                                            DataSet lastDataSet,
-                                            List<Map.Entry<String, String>> primaryFields,
-                                            Collection<Map.Entry<String, String>> formulaMap) {
-        if (currDataSet == null || lastDataSet == null) {
-            return new DataSet();
-        }
-        List<Map<String, Object>> currData = currDataSet.getDataAsList();
-        List<Map<String, Object>> lastData = lastDataSet.getDataAsList();
-        if (currData == null || lastData == null) {
-            throw new RuntimeException("数据不合法");
-        }
-
-        List<Map<String, Object>> newData = new ArrayList<>();
-        List<String> mainFields = new ArrayList<>();
-        List<String> slaveFields = new ArrayList<>();
-        splitMainAndSlave(primaryFields, mainFields, slaveFields);
-        // 根据主键排序
-        sortByFields(currData, mainFields, SORT_NULL_AS_FIRST);
-        sortByFields(lastData, slaveFields, SORT_NULL_AS_FIRST);
-        int i = 0;
-        int j = 0;
-        while (i < currData.size() && j < lastData.size()) {
-            int nc = compareTwoRowWithMap(currData.get(i), lastData.get(j), primaryFields, SORT_NULL_AS_FIRST);
-            //匹配
-            Map<String, Object> newRow = new LinkedHashMap<>();
-            if (nc == 0) {
-                appendData(newRow, currData.get(i), mainFields, "_l", true);
-                appendData(newRow, lastData.get(j), slaveFields, "_r", false);
-                i++;
-                j++;
-            } else if (nc < 0) {
-                appendData(newRow, currData.get(i), mainFields, "_l", true);
-                i++;
-            } else {
-                appendData(newRow, lastData.get(j), slaveFields, "_r", true);
-                j++;
-            }
-            newData.add(mapDataRow(newRow, formulaMap));
-        }
-
-        while (i < currData.size()) {
-            Map<String, Object> newRow = new LinkedHashMap<>();
-            appendData(newRow, currData.get(i), mainFields, "_l", true);
-            newData.add(mapDataRow(newRow, formulaMap));
-            i++;
-        }
-
-        while (j < lastData.size()) {
-            Map<String, Object> newRow = new LinkedHashMap<>();
-            appendData(newRow, lastData.get(j), slaveFields, "_r", true);
-            newData.add(mapDataRow(newRow, formulaMap));
-            j++;
-        }
-        return new DataSet(newData);
-    }
-
     private static void splitMainAndSlave(List<Map.Entry<String, String>> primaryFields, List<String> mainFields, List<String> slaveFields) {
         for (Map.Entry<String, String> field : primaryFields) {
             mainFields.add(field.getKey());
@@ -700,63 +641,6 @@ public abstract class DataSetOptUtil {
         return new DataSet(newData);
     }
 
-    /**
-     * 这个没有什么意义；它 其实是 两个集合 先去交集，再更加条件过滤
-     * 可以用 交集 和 过滤 替换，建议废弃
-     *
-     * @param mainDataSet   主数据集
-     * @param slaveDataSet  次数据集
-     * @param primaryFields 主键列
-     * @param formulas      过滤条件
-     * @return newDataset
-     */
-    @Deprecated
-    public static DataSet filterByOtherDataSet(DataSet mainDataSet, DataSet slaveDataSet,
-                                               List<Map.Entry<String, String>> primaryFields, List<String> formulas) {
-        if (mainDataSet == null || slaveDataSet == null) {
-            return new DataSet();
-        }
-        List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
-        List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
-        List<String> mainFields = new ArrayList<>();
-        List<String> slaveFields = new ArrayList<>();
-        splitMainAndSlave(primaryFields, mainFields, slaveFields);
-        sortByFields(mainData, mainFields, SORT_NULL_AS_FIRST);
-        sortByFields(slaveData, slaveFields, SORT_NULL_AS_FIRST);
-
-        int i = 0;
-        int j = 0;
-        List<Map<String, Object>> newData = new ArrayList<>();
-        // 根据主键排序
-        while (i < mainData.size() && j < slaveData.size()) {
-            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_FIRST);
-            //匹配
-            Map<String, Object> newRow = new LinkedHashMap<>();
-            if (nc == 0) {
-                boolean canAdd = true;
-                for (String formula : formulas) {
-                    if (!BooleanBaseOpt.castObjectToBoolean(
-                        VariableFormula.calculate(formula, slaveData.get(j)), false)) {
-                        canAdd = false;
-                        break;
-                    }
-                }
-                if (canAdd) {
-                    newRow.putAll(mainData.get(i));
-                }
-                i++;
-                j++;
-            } else if (nc < 0) {
-                i++;
-            } else {
-                j++;
-            }
-            if (newRow.size() != 0) {
-                newData.add(newRow);
-            }
-        }
-        return new DataSet(newData);
-    }
 
     /**
      * 这个是 连个集合 的 unionALL 操作；如果 需要去掉重复的数据集，用jion来代替
@@ -921,30 +805,6 @@ public abstract class DataSetOptUtil {
         return 0;
     }
 
-    //判断字符串是否为纯中文 包括中文标点符号
-    private static boolean isChinese(String str) {
-        if (str == null) {
-            return false;
-        }
-        char[] ch = str.toCharArray();
-        for (char c : ch) {
-            if (c < 0x4E00 || c > 0x9FBF) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    //自定义中文排序方法
-    private static String concatPinyinStringArray(String[] pinyinArray) {
-        StringBuffer pinyinSbf = new StringBuffer();
-        if ((pinyinArray != null) && (pinyinArray.length > 0)) {
-            for (int i = 0; i < pinyinArray.length; i++) {
-                pinyinSbf.append(pinyinArray[i]);
-            }
-        }
-        return pinyinSbf.toString();
-    }
 
     private static int compareTwoRowWithMap(Map<String, Object> data1, Map<String, Object> data2, List<Map.Entry<String, String>> fields, boolean nullAsFirst) {
         if (data1 == null && data2 == null) {
@@ -1045,7 +905,7 @@ public abstract class DataSetOptUtil {
             if (mapString != null) {
                 for (Map.Entry<String, String> map : mapString.entrySet()) {
                     if (!StringBaseOpt.isNvl(map.getValue())) {
-                        parames.put(map.getKey(),  VariableFormula.calculate(map.getValue(),new BizModelJSONTransform(bizModel)));
+                        parames.put(map.getKey(),  VariableFormula.calculate(map.getValue(), new BizModelJSONTransform(bizModel)));
                     }
                 }
             }
