@@ -15,7 +15,6 @@ import com.centit.search.service.Impl.ESIndexer;
 import com.centit.search.service.IndexerSearcherFactory;
 import com.centit.support.algorithm.StringBaseOpt;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,27 +38,30 @@ public class EsWriteBizOperation implements BizOperation {
         DataSet dataSet = bizModel.getDataSet(dataSetId);
         if (dataSet == null ) return ResponseData.makeErrorMessage("选择的数据集不存在！");
 
-        ESIndexer esSearcher;
+        ESIndexer esIndexer;
+        ESDocument esDocument;
         switch (indexType){
             case "indexObject":
-                esSearcher = IndexerSearcherFactory.obtainIndexer(esServerConfig, ObjectDocument.class);
+                esIndexer = IndexerSearcherFactory.obtainIndexer(esServerConfig, ObjectDocument.class);
+                esDocument = new ObjectDocument();
                 break;
             case "indexFile":
-                esSearcher = IndexerSearcherFactory.obtainIndexer(esServerConfig, FileDocument.class);
+                esIndexer = IndexerSearcherFactory.obtainIndexer(esServerConfig, FileDocument.class);
+                esDocument = new FileDocument();
                 break;
             default:
                 return ResponseData.makeErrorMessage("未知索引类型！");
         }
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
-        List<String> returnList = new ArrayList<>();
         Map<String, String> mapInfo = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
         dataAsList.stream().forEach(documentInfo -> {
             DataSet destDs = DataSetOptUtil.mapDateSetByFormula(new DataSet(documentInfo), mapInfo.entrySet());
-            String eSDocumentInfo = StringBaseOpt.castObjectToString(destDs.getData());
-            ESDocument esDocument = JSONObject.parseObject(eSDocumentInfo, ESDocument.class);
-            String returnResult = esSearcher.saveNewDocument(esDocument);
-            returnList.add(returnResult);
+            if (destDs != null){
+                String eSDocumentInfo = StringBaseOpt.castObjectToString(destDs.getFirstRow());
+                ESDocument esDocumentInfo = JSONObject.parseObject(eSDocumentInfo, esDocument.getClass());
+                esIndexer.mergeDocument(esDocumentInfo);
+            }
         });
-        return BuiltInOperation.createResponseSuccessData(returnList.size());
+        return BuiltInOperation.createResponseSuccessData(dataAsList.size());
     }
 }
