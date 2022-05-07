@@ -25,7 +25,7 @@ public class AssignmentBizOperation implements BizOperation {
         //数据来源
         String sourceDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", null);
         //复制类型
-        //assignType 复制类型， assign 直接赋值， property 对属性复制 ， append 追加元素
+        //assignType 复制类型， assign 直接赋值， property 对属性复制 ， append 追加元素, merge 合并属性
         String assignType = BuiltInOperation.getJsonFieldString(bizOptJson, "assignType", "assign");
         //取值表达式
         String formula = BuiltInOperation.getJsonFieldString(bizOptJson, "formula", ".");
@@ -71,6 +71,21 @@ public class AssignmentBizOperation implements BizOperation {
                 List<Map<String, Object>> objList = targetDataSet.getDataAsList();
                 objList.add(CollectionsOpt.objectToMap(sourceData));
                 targetDataSet.setData(objList);
+            }
+        } else if("merge".equals(assignType)){ // 追加
+            if( targetDataSet.getSize() < 1){
+                targetDataSet.setData(sourceData);
+            } else if( targetDataSet.getSize() == 1){
+                targetDataSet.setData(CollectionsOpt.unionTwoMap(
+                     CollectionsOpt.objectToMap(sourceData), targetDataSet.getFirstRow()));
+            } else  {
+                List<Map<String, Object>> objList = targetDataSet.getDataAsList();
+                List<Map<String, Object>> jsonList = new ArrayList<>(objList.size() +1);
+                for(Map<String, Object> objMap : objList){
+                    jsonList.add(CollectionsOpt.unionTwoMap(
+                        CollectionsOpt.objectToMap(sourceData), objMap));
+                }
+                targetDataSet.setData(jsonList);
             }
         } else { // 对目标对象赋值 assign || property == '.'
             targetDataSet.setData(sourceData);
