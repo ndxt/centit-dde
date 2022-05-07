@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.TaskLogManager;
+import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.dde.vo.StatisticsParameter;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
@@ -70,6 +71,7 @@ public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog, Long, Tas
             " FROM " +
             " d_task_log dtl " +
             " WHERE to_days(run_begin_time) = to_days(now()) " +
+            " [:optId | AND OPT_ID=:optId] "+
             " [:packetId | AND task_id=:packetId] " +
             " GROUP BY time ";
         QueryAndNamedParams params = QueryUtils.translateQuery(sql, queryparameter);
@@ -105,12 +107,12 @@ public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog, Long, Tas
     }
 
     @Override
-    public int deleteTaskLog(String runBeginTime,Boolean isError) {
-        StringBuilder sql=new StringBuilder("delete from d_task_log  where DATE(run_begin_time) <= ? ");
-        if (!isError){
+    public int deleteTaskLog(DelTaskLogParameter delTaskLogParameter) {
+        StringBuilder sql=new StringBuilder("delete from d_task_log  where task_id =? AND DATE(run_begin_time) <=? ");
+        if (!delTaskLogParameter.getIsError()){
             sql.append(" AND other_message !='error' ");
         }
-        return DatabaseOptUtils.doExecuteSql(taskLogDao,sql.toString(),new Object[]{runBeginTime});
+        return DatabaseOptUtils.doExecuteSql(taskLogDao,sql.toString(),new Object[]{delTaskLogParameter.getPacketId(),delTaskLogParameter.getRunBeginTime()});
     }
 
 }

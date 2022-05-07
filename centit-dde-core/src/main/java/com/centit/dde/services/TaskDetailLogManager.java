@@ -2,6 +2,7 @@ package com.centit.dde.services;
 
 
 import com.centit.dde.po.TaskDetailLog;
+import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.support.database.utils.PageDesc;
 
 import java.util.List;
@@ -40,5 +41,5 @@ public interface TaskDetailLogManager {
 
     void delTaskDetailLog(String logDetailId);
     //删除指定时间之前的数据
-    int delTaskDetailLog(String runBeginTime,Boolean isError);
+    int delTaskDetailLog(DelTaskLogParameter delTaskLogParameter);
 }

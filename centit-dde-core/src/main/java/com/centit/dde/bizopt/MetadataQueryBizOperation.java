@@ -57,10 +57,10 @@ public class MetadataQueryBizOperation implements BizOperation {
                 List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,currentUserCode, dataOptContext.getOptId(), "api");
                 String extFilter = null;
                 PageDesc pageDesc = new PageDesc();
-                if (parames.get("pageNo")!=null){
+                if (parames.get("pageNo") != null){
                     pageDesc.setPageNo(NumberBaseOpt.castObjectToInteger(parames.get("pageNo")));
                 }
-                if (parames.get("pageSize")!=null){
+                if (parames.get("pageSize") != null){
                     pageDesc.setPageSize(NumberBaseOpt.castObjectToInteger(parames.get("pageSize")));
                 }
                 if (filters != null) {
