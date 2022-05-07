@@ -1,6 +1,7 @@
 package com.centit.dde.services;
 
 import com.centit.dde.po.TaskLog;
+import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.dde.vo.StatisticsParameter;
 import com.centit.support.database.utils.PageDesc;
 
@@ -42,5 +43,5 @@ public interface TaskLogManager{
 
     Map<String,Object> getLogStatisticsInfo(StatisticsParameter parameter);
 
-    int deleteTaskLog(String runBeginTime,Boolean isError);
+    int deleteTaskLog(DelTaskLogParameter delTaskLogParameter);
 }

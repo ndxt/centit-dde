@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.TaskDetailLogManager;
 import com.centit.dde.services.TaskLogManager;
+import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.dde.vo.StatisticsParameter;
+import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
@@ -13,6 +15,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,20 +94,18 @@ public class TaskLogController extends BaseController {
     }
 
 
-    @DeleteMapping(value = "/{runBeginTime}/{isError}")
+    @PostMapping(value = "delLogInfoAndLogDetail")
     @ApiOperation(value = "删除某个时间段之前的日志")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "runBeginTime",value = "指定开始时间"),
-        @ApiImplicitParam(name = "isError",value = "是否包含错误信息"),
-    })
     @WrapUpResponseBody
-    public JSONObject delLogInfoAndLogDetail(@PathVariable String runBeginTime, @PathVariable Boolean isError){
-        int taskLogCount = taskLogManager.deleteTaskLog(runBeginTime, isError);
-        int taskDetailLogCount = taskDetailLogManager.delTaskDetailLog(runBeginTime, isError);
+    public ResponseData delLogInfoAndLogDetail(@RequestBody DelTaskLogParameter delTaskLogParameter){
+        if (StringUtils.isBlank(delTaskLogParameter.getPacketId()))return ResponseData.makeErrorMessage("主键不能为空！");
+        if (StringUtils.isBlank(delTaskLogParameter.getRunBeginTime()))return ResponseData.makeErrorMessage("删除时间不能为空！");
+        int taskLogCount = taskLogManager.deleteTaskLog(delTaskLogParameter);
+        int taskDetailLogCount = taskDetailLogManager.delTaskDetailLog(delTaskLogParameter);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("taskLogCount",taskLogCount);
         jsonObject.put("taskDetailLogCount",taskDetailLogCount);
-        return jsonObject;
+        return ResponseData.makeResponseData(jsonObject);
     }
 
 }

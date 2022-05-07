@@ -1,18 +1,19 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.DataCheckRule;
-import com.centit.product.metadata.service.DataCheckRuleService;
 import com.centit.product.metadata.utils.DataCheckResult;
-import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.json.JSONTransformer;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,55 +21,48 @@ import java.util.Map;
 
 public class CheckRuleBizOperation implements BizOperation {
 
-    private DataCheckRuleService dataCheckRuleService;
-
-    public CheckRuleBizOperation(DataCheckRuleService dataCheckRuleService) {
-        this.dataCheckRuleService = dataCheckRuleService;
-    }
-
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
-        String dataSetId = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        //校验信息所挂载的字段
-        String checkRuleResultField =bizOptJson.getString("checkRuleResultField");
-        //是否返回校验结果
-        Boolean checkRuleResult = BooleanBaseOpt.castObjectToBoolean( bizOptJson.getBoolean("checkRuleResult"),true);
-        //是否返回校验信息 默认不返回，如果默认返回的话会比较耗时
-        Boolean checkRuleResultMsg =BooleanBaseOpt.castObjectToBoolean( bizOptJson.getBoolean("checkRuleResultMsg"),false);
+        String dataSetId = bizOptJson.getString("source");
         DataSet dataSet = bizModel.getDataSet(dataSetId);
-        JSONArray rulesJson = bizOptJson.getJSONArray("config");
+        if (dataSet == null) return ResponseData.makeErrorMessage("校验数据不能为空！");
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
         DataCheckResult result = DataCheckResult.create();
-        dataAsList.stream().forEach(data->{
+        JSONArray rulesJson = bizOptJson.getJSONArray("config");
+        String checkRuleResultMsgField =bizOptJson.getString("checkRuleResultMsgField");
+        String checkRuleResultField =bizOptJson.getString("checkRuleResultField");
+        //界面2个勾选框的值
+        JSONArray checkRuleMsg = bizOptJson.getJSONArray("checkRuleMsg");
+        if (checkRuleMsg == null || checkRuleMsg.size() == 0) return ResponseData.makeErrorMessage("校验信息不能为空！");
+        //是否返回校验信息，默认不返回
+        boolean isReturnCheckMsg = checkRuleMsg.contains("checkRuleResultMsgField");
+        //是否返回校验结果
+        boolean isReturnCheckResult = checkRuleMsg.contains("checkRuleResultField");
+        dataAsList.stream().forEach(dataInfo->{
             rulesJson.stream().forEach(ruleInfo->{
-                if (ruleInfo instanceof  Map){
-                    Map<String, Object> map = CollectionsOpt.objectToMap(ruleInfo);
-                    String checkTypeId = StringBaseOpt.objectToString(map.get("checkTypeId"));
-                    DataCheckRule dataCheckRule = dataCheckRuleService.getObjectById(checkTypeId);
-                    List<Object> checkParams = CollectionsOpt.objectToList(map.get("checkParams"));
-                    if (dataCheckRule!=null  && checkParams!=null){
-                        Map<String, String>  paramMap = new HashMap<>();
-                        String checkField = StringBaseOpt.objectToString(map.get("checkField"));
-                        paramMap.put("checkValue",checkField);
-                        for (int i = 0; i < checkParams.size(); i++) {
-                            Map<String, Object> param = CollectionsOpt.objectToMap(checkParams.get(i));
-                            for (Map.Entry<String, Object> entry : param.entrySet()) {
-                                paramMap.put(entry.getKey(),StringBaseOpt.objectToString(entry.getValue()));
-                            }
-                        }
-                        result.checkData(data,dataCheckRule,paramMap,checkRuleResultMsg);
-                    }
+                JSONObject  dataCheckRuleInfo = JSON.parseObject(StringBaseOpt.castObjectToString(ruleInfo));
+                String checkField = dataCheckRuleInfo.getString("checkField");
+                Map<String, String>  paramMap = new HashMap<>();
+                paramMap.put("checkValue",checkField);
+                JSONArray checkParams = dataCheckRuleInfo.getJSONArray("checkParams");
+                for (Object checkParam : checkParams) {
+                    Map<String, Object> param = CollectionsOpt.objectToMap(checkParam);
+                    String params = StringBaseOpt.objectToString(param.get("params"));
+                    //StringBaseOpt.objectToString(param.get("paramValue"));
+                    String paramValue = StringBaseOpt.castObjectToString(
+                        JSONTransformer.transformer(param.get("paramValue"), new BizModelJSONTransform(bizModel)));
+                    paramMap.put(params,paramValue);
                 }
-                if (data instanceof Map){
-                    Map<String, Object> map = CollectionsOpt.objectToMap(data);
-                    //设置校验结果信息
-                    if (checkRuleResultMsg){
-                        String errorMessage = result.getErrorMessage();
-                        map.put(checkRuleResultField+"_msg",errorMessage);
+                JSONObject checkType = dataCheckRuleInfo.getJSONObject("checkType");
+                DataCheckRule dataCheckRule = checkType.getObject("option", DataCheckRule.class);
+                result.checkData(dataInfo,dataCheckRule,paramMap,isReturnCheckMsg);
+                if (dataInfo instanceof Map){
+                    Map<String, Object> map = CollectionsOpt.objectToMap(dataInfo);
+                    if (isReturnCheckResult){
+                        map.put(checkRuleResultField, result.getResult());
                     }
-                    //设置校验结果
-                    if (checkRuleResult){
-                        map.put(checkRuleResultField,result.getResult());
+                    if (isReturnCheckMsg){
+                        map.put(checkRuleResultMsgField,result.getErrorMessage());
                     }
                 }
             });

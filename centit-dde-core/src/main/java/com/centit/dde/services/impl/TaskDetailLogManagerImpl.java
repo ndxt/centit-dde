@@ -3,6 +3,7 @@ package com.centit.dde.services.impl;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.services.TaskDetailLogManager;
+import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import com.centit.support.database.utils.PageDesc;
@@ -56,12 +57,12 @@ public class TaskDetailLogManagerImpl extends BaseEntityManagerImpl<TaskDetailLo
     }
 
     @Override
-    public int delTaskDetailLog(String runBeginTime,Boolean isError) {
-        StringBuilder sqlDetail=new StringBuilder("delete from d_task_detail_log  where DATE(run_begin_time) <= ? ");
-        if (!isError){
+    public int delTaskDetailLog(DelTaskLogParameter delTaskLogParameter) {
+        StringBuilder sqlDetail=new StringBuilder("delete from d_task_detail_log  where task_id=? AND DATE(run_begin_time) <= ? ");
+        if (!delTaskLogParameter.getIsError()){
             sqlDetail.append(" AND log_info = 'ok'  ");
         }
-        return DatabaseOptUtils.doExecuteSql(taskDetailLogDao,sqlDetail.toString(),new Object[]{runBeginTime});
+        return DatabaseOptUtils.doExecuteSql(taskDetailLogDao,sqlDetail.toString(),new Object[]{delTaskLogParameter.getPacketId(),delTaskLogParameter.getRunBeginTime()});
     }
 }
 

@@ -307,4 +307,28 @@ public class DataPacketDraftController extends BaseController {
             dataPacketService.clearTrashStand(osId);
         }
     }
+
+    @ApiOperation(value = "API复制接口")
+    @PostMapping("/ApiCopy")
+    @ApiImplicitParam(
+        name = "jsonObject",
+        value = "API复制接口-参数：{\"packetId\":\"\",\"packetName\":\"\",\"optId\":\"\"}"
+    )
+    @WrapUpResponseBody
+    public ResponseData ApiCopy(@RequestBody JSONObject jsonObject) {
+        String packetId = jsonObject.getString("packetId");
+        String packetName = jsonObject.getString("packetName");
+        String optId = jsonObject.getString("optId");
+        if (StringUtils.isBlank(packetId) || StringUtils.isBlank(packetName) || StringUtils.isBlank(optId)){
+            return ResponseData.makeErrorMessage("缺少参数，请检查请求参数是否正确！");
+        }
+        DataPacketDraft dataPacket = dataPacketDraftService.getDataPacket(packetId);
+        if (dataPacket == null) return ResponseData.makeErrorMessage("复制的API接口不存在！");
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacket.getOsId());
+        dataPacket.setPacketId(null);
+        dataPacket.setPacketName(packetName);
+        dataPacket.setOptId(optId);
+        dataPacketDraftService.createDataPacket(dataPacket);
+        return ResponseData.successResponse;
+    }
 }

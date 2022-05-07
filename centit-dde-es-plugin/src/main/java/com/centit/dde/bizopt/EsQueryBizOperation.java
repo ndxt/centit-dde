@@ -1,114 +1,73 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.dde.config.ElasticSearchConfig;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.entity.EsQueryVo;
-import com.centit.dde.entity.FieldAttributeInfo;
-import com.centit.dde.factory.PooledRestClientFactory;
-import com.centit.dde.query.ElasticsearchReadUtils;
-import com.centit.dde.query.EsQueryType;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
-import com.centit.product.adapter.po.SourceInfo;
-import com.centit.product.metadata.dao.SourceInfoDao;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
+import com.centit.search.document.FileDocument;
+import com.centit.search.document.ObjectDocument;
+import com.centit.search.service.ESServerConfig;
+import com.centit.search.service.Impl.ESSearcher;
+import com.centit.search.service.IndexerSearcherFactory;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.json.JSONTransformer;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class EsQueryBizOperation implements BizOperation {
-    public static final Log log = LogFactory.getLog(EsQueryBizOperation.class);
+    private ESServerConfig esServerConfig;
 
-    private SourceInfoDao sourceInfoDao;
-
-    public EsQueryBizOperation(SourceInfoDao sourceInfoDao) {
-        this.sourceInfoDao=sourceInfoDao;
+    public EsQueryBizOperation(ESServerConfig esServerConfig) {
+        this.esServerConfig = esServerConfig;
     }
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext){
-        EsQueryVo esReadVo = JSONObject.parseObject(bizOptJson.toJSONString(), EsQueryVo.class);
-        //es服务地址
-        String dataSourceId = esReadVo.getDatabaseId();
-        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(dataSourceId);
-        GenericObjectPool<RestHighLevelClient> restHighLevelClientGenericObjectPool = PooledRestClientFactory.obtainclientPool(new ElasticSearchConfig(), sourceInfo);
-        RestHighLevelClient restHighLevelClient = null;
-        try {
-            restHighLevelClient = restHighLevelClientGenericObjectPool.borrowObject();
-            JSONObject result = ElasticsearchReadUtils.executeQuery(restHighLevelClient,bizModel,esReadVo);
-            bizModel.putDataSet(esReadVo.getId(),new DataSet(result));
-            return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(esReadVo.getId()).getSize());
-        }catch (Exception e){
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,"查询es数据异常,异常信息："+e.getMessage());
-        } finally {
-            restHighLevelClientGenericObjectPool.returnObject(restHighLevelClient);
-            log.debug("restHighLevelClient放回连接池中");
+        String indexType = bizOptJson.getString("indexType");
+        if (StringBaseOpt.isNvl(indexType)) return ResponseData.makeErrorMessage("请选择查询的索引类型！");
+
+        String queryParameter = bizOptJson.getString("queryParameter");
+        if(StringBaseOpt.isNvl(queryParameter)) return ResponseData.makeErrorMessage("查询内容不能为空！");
+
+        JSONArray fieldAttributeInfos = bizOptJson.getJSONArray("fieldAttributeInfos");
+        Map<String,Object> queryParam = new HashMap<>();
+        fieldAttributeInfos.stream().forEach(fieldAttributeInfo->{
+            Map<String, Object> fieldInfo = CollectionsOpt.objectToMap(fieldAttributeInfo);
+            String fieldName = StringBaseOpt.castObjectToString(fieldInfo.get("fieldName"));
+            Object fieldValue = JSONTransformer.transformer(fieldInfo.get("value"), new BizModelJSONTransform(bizModel));
+            if (!StringBaseOpt.isNvl(fieldName) && fieldValue != null){
+                queryParam.put(fieldName,fieldValue);
+            }
+        });
+
+        ESSearcher esSearcher;
+        switch (indexType){
+            case "indexObject":
+                esSearcher = IndexerSearcherFactory.obtainSearcher(esServerConfig, ObjectDocument.class);
+                break;
+            case "indexFile":
+                esSearcher = IndexerSearcherFactory.obtainSearcher(esServerConfig, FileDocument.class);
+                break;
+            default:
+                return ResponseData.makeErrorMessage("未知索引类型！");
         }
-    }
 
-    public static void main(String[] args) throws Exception {
-        String ips = "127.0.0.1:9200,127.0.0.1:9201,127.0.0.1:9202";
-        RestClientBuilder restClientBuilder = new ElasticSearchConfig().restClientBuilder(ips);
-        RestHighLevelClient restHighLevelClient=new RestHighLevelClient(restClientBuilder);
-        BizModel simpleBizModel = new BizModel("test");
-       /* List<String> ids = new ArrayList<>();
-        ids.add("FILE_SVR");
-        ids.add("zp_Qn5R5ROSo4sf-eovoWA");*/
-        Map<String, Object> param = new HashMap<>();
-        param.put("osId","zp_Qn5R5ROSo4sf-eovoWA");
-        param.put("content","数据集");
-        param.put("title","数据库");
-        DataSet dataSet = new DataSet(param);
-        Map<String, DataSet> map = new HashMap<>();
-        map.put("es11",dataSet);
-        simpleBizModel.setBizData(map);
-        EsQueryVo esQueryVo = new EsQueryVo();
-        esQueryVo.setExplain(false);
-        esQueryVo.setQueryIndex(new String[]{"objects"});
-        esQueryVo.setId("es11");
-        esQueryVo.setPageNo(1);
-        esQueryVo.setPageSize(5);
-        esQueryVo.setTimeout(10);
-        List<FieldAttributeInfo> fieldAttributeInfoList = new ArrayList<>();
-        FieldAttributeInfo fieldAttributeInfo1 = new FieldAttributeInfo();
-        fieldAttributeInfo1.setFieldName("osId");
-        fieldAttributeInfo1.setExpression("es11.osId");
-        fieldAttributeInfo1.setOperator(EsQueryType.FILTER);
-        fieldAttributeInfo1.setIsHighligh(true);
-        fieldAttributeInfo1.setAnalyze("ik_max_word");
-        fieldAttributeInfo1.setQueryType(EsQueryType.TERM);
-        fieldAttributeInfoList.add(fieldAttributeInfo1);
+        int pageNo = NumberBaseOpt.castObjectToInteger(queryParam.get("pageNo"),1);
+        int pageSize = NumberBaseOpt.castObjectToInteger(queryParam.get("pageSize"),20);
 
-        FieldAttributeInfo fieldAttributeInfo2 = new FieldAttributeInfo();
-        fieldAttributeInfo2.setFieldName("content");
-        fieldAttributeInfo2.setExpression("es11.content");
-        fieldAttributeInfo2.setOperator(EsQueryType.FILTER);
-        fieldAttributeInfo2.setIsHighligh(true);
-        fieldAttributeInfo2.setAnalyze("ik_max_word");
-        fieldAttributeInfo2.setQueryType(EsQueryType.MATCH);
-        fieldAttributeInfoList.add(fieldAttributeInfo2);
-
-        FieldAttributeInfo fieldAttributeInfo3 = new FieldAttributeInfo();
-        fieldAttributeInfo3.setFieldName("title");
-        fieldAttributeInfo3.setExpression("es11.title");
-        fieldAttributeInfo3.setOperator(EsQueryType.MUST);
-        fieldAttributeInfo3.setIsHighligh(true);
-        fieldAttributeInfo3.setAnalyze("ik_max_word");
-        fieldAttributeInfo3.setQueryType(EsQueryType.MATCH);
-        fieldAttributeInfoList.add(fieldAttributeInfo3);
-
-        esQueryVo.setFieldAttributeInfos(fieldAttributeInfoList);
-        JSONObject jsonObject = ElasticsearchReadUtils.executeQuery(restHighLevelClient, simpleBizModel, esQueryVo);
-        System.out.println(jsonObject.toJSONString());
-        restHighLevelClient.close();
+        String id = bizOptJson.getString("id");
+        Pair<Long, List<Map<String, Object>>> search = esSearcher.search(queryParam, queryParameter, pageNo, pageSize);
+        DataSet dataSet = new DataSet(search);
+        bizModel.putDataSet(id,dataSet);
+        return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }
 }

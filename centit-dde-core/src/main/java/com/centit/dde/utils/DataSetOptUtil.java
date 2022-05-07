@@ -897,6 +897,7 @@ public abstract class DataSetOptUtil {
     public static Map<String, Object> getDataSetParames(BizModel bizModel, JSONObject bizOptJson){
         //参数类型
         String paramsType = bizOptJson.getString("sourceType");
+        if (paramsType == null) return new HashMap<>();
         Map<String, Object> parames;
         // 自定义参数类型
         if("customSource".equals(paramsType)){
