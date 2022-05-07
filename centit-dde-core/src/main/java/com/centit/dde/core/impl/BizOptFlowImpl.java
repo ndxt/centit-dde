@@ -110,7 +110,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("sort", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runSort(bizModel1, bizOptJson1));
         allOperations.put("join", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runJoin(bizModel1, bizOptJson1));
         allOperations.put("union", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runUnion(bizModel, bizOptJson));
-        allOperations.put("filterExt", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runFilterExt(bizModel, bizOptJson));
+        //allOperations.put("filterExt", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runFilterExt(bizModel, bizOptJson));
         allOperations.put("check", new CheckRuleBizOperation());
         allOperations.put("static", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runStaticData(bizModel, bizOptJson));
         allOperations.put("http", new HttpBizOperation(sourceInfoDao));
