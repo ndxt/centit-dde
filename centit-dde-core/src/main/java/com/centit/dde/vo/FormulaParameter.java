@@ -13,6 +13,8 @@ public class FormulaParameter {
 
     @ApiModelProperty(value = "表达式")
     private String formula;
+    @ApiModelProperty(value = "获取变量")
+    private Boolean getVariable=false;
 
     @ApiModelProperty(value = "需要测试的对象，json格式")
     private String jsonString;

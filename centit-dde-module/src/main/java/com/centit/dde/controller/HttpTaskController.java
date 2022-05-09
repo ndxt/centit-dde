@@ -294,19 +294,18 @@ public class HttpTaskController extends BaseController {
             "表达式:lastofmonth(),名称:求这个月最后一天,示例:formula:lastofmonth(name)  \n" +
             "表达式:random(),名称:生成随机数random(5),random(1,5),random(string,20),random(string,uuid22/uuid32/uuid36)示例:formula:random()  \n" +
             "表达式:hash(),名称:签名计算,hash(object),hash(object,md5/sha,base64),hash(object,hmac-sha1,secret-key),hash(object,hmac-sha1,secret-key,base64)示例:formula:hash(name)  \n")
-  /*  @ApiImplicitParams({@ApiImplicitParam(
-        name = "formula", value = "表达式"
-    ), @ApiImplicitParam(
-        name = "jsonString", value = "需要测试的对象，json格式"
-    )})*/
     @WrapUpResponseBody
-    public Object testFormula(@RequestBody FormulaParameter formulaParames) {
-        Map object = (Map) JSON.parse(StringEscapeUtils.unescapeHtml4(formulaParames.getJsonString()));
-        VariableFormula variableFormula = new VariableFormula();
-        variableFormula.setExtendFuncMap(DataSetOptUtil.extendFuncs);
-        variableFormula.setTrans(new ObjectTranslate(object));
-        variableFormula.setFormula(StringEscapeUtils.unescapeHtml4(formulaParames.getFormula()));
-        return variableFormula.calcFormula();
+    public Object testFormula(@RequestBody FormulaParameter formulaParams) {
+        if(formulaParams.getGetVariable()){
+            return VariableFormula.attainFormulaVariable(StringEscapeUtils.unescapeHtml4(formulaParams.getFormula()));
+        }else {
+            Map object = (Map) JSON.parse(StringEscapeUtils.unescapeHtml4(formulaParams.getJsonString()));
+            VariableFormula variableFormula = new VariableFormula();
+            variableFormula.setExtendFuncMap(DataSetOptUtil.extendFuncs);
+            variableFormula.setTrans(new ObjectTranslate(object));
+            variableFormula.setFormula(StringEscapeUtils.unescapeHtml4(formulaParams.getFormula()));
+            return variableFormula.calcFormula();
+        }
     }
 
     @ApiOperation(value = "修改数据所属业务模块(删除菜单迁移数据(接口页面))")
