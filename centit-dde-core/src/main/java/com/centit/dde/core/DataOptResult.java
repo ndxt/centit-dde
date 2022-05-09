@@ -6,15 +6,12 @@ import com.centit.framework.common.ToResponseData;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.common.ObjectException;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataOptResult implements ToResponseData {
+public class DataOptResult implements ToResponseData, Serializable {
 
     public static final int RETURN_CODE_AND_MESSAGE = 1;
     public static final int  RETURN_OPT_DATA = 0;
