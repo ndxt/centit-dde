@@ -67,6 +67,12 @@ public class ConstantValue {
     //赋值组件
     public static final String ASSIGNMENT = "assignment";
 
+    //ftp文件下载组件
+    public static final String FTP_FILE_DOWNLOAD = "ftpDownload";
+
+    //ftp文件上传组件
+    public static final String FTP_FILE_UPLOAD = "ftpUpload";
+
     //
     public static final String COMPARE_SOURCE="compareSource";
     //获取session数据
