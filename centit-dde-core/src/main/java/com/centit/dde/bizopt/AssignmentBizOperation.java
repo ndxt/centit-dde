@@ -26,7 +26,7 @@ public class AssignmentBizOperation implements BizOperation {
         //数据来源
         String sourceDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", null);
         //复制类型
-        //assignType 复制类型， assign 直接赋值， property 对属性复制 ， append 追加元素, merge 合并属性
+        //assignType 赋值类型， assign 直接赋值， property 对属性复制 ， append 追加元素, merge 合并属性
         String assignType = BuiltInOperation.getJsonFieldString(bizOptJson, "assignType", "assign");
         //取值表达式
         String formula = BuiltInOperation.getJsonFieldString(bizOptJson, "formula", ".");
@@ -40,7 +40,7 @@ public class AssignmentBizOperation implements BizOperation {
         Object sourceData = new DatasetVariableTranslate(dataSet).getVarValue(formula);
         String property = null;
         if("property".equals(assignType)) {
-            //复制属性
+            //赋值属性
             property = BuiltInOperation.getJsonFieldString(bizOptJson, "property", ".");
         }
         // 对属性赋值

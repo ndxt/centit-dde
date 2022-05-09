@@ -163,14 +163,16 @@ public class DataPacketDraftController extends BaseController {
         for (Object node : nodes) {
             JSONObject nodeData = (JSONObject) node;
             JSONObject properties = nodeData.getJSONObject("properties");
-            if ("metadata".equals(properties.getString("type"))){
-                properties.put("tableLabelName",tableId);
-                properties.put("templateType",type==6||type==7?1:type);
+            String metadataType = properties.getString("type");
+            if (StringUtils.isNotBlank(metadataType) && metadataType.startsWith("metadata")){
+                properties.put("tableId",tableId);
+                properties.put("templateType",type==6 || type==7?1:type);
                 properties.put("databaseName",dataBaseCode);
             }
         }
         dataPacketDraft.setMetadataTableId(tableId);
         dataPacketDraft.setLogLevel(3);
+        dataPacketDraft.setNeedRollback("T");
         dataPacketDraft.setDataOptDescJson(content);
         return  dataPacketDraft;
     }
