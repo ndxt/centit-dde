@@ -64,10 +64,9 @@ public class EsQueryBizOperation implements BizOperation {
         int pageNo = NumberBaseOpt.castObjectToInteger(queryParam.get("pageNo"),1);
         int pageSize = NumberBaseOpt.castObjectToInteger(queryParam.get("pageSize"),20);
 
-        String id = bizOptJson.getString("id");
         Pair<Long, List<Map<String, Object>>> search = esSearcher.search(queryParam, queryParameter, pageNo, pageSize);
-        DataSet dataSet = new DataSet(search);
-        bizModel.putDataSet(id,dataSet);
+        DataSet dataSet = new DataSet(search.getValue());
+        bizModel.putDataSet(bizOptJson.getString("id"),dataSet);
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }
 }
