@@ -140,6 +140,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.COMMIT_TRANSACTION, new TransactionCommitOperation(sourceInfoDao));
         allOperations.put(ConstantValue.INTERSECT_DATASET, new IntersectDataSetBizOperation());
         allOperations.put(ConstantValue.MINUS_DATASET, new MinusDataSetBizOperation());
+        allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentBizOperation());
     }
 
     @Override

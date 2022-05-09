@@ -64,6 +64,9 @@ public class ConstantValue {
     public static final String USER_TASK_WORKFLOW ="userTaskWorkflow";
     public static final String INST_NODES_WORKFLOW ="instNodesWorkFlow";
 
+    //赋值组件
+    public static final String ASSIGNMENT = "assignment";
+
     //
     public static final String COMPARE_SOURCE="compareSource";
     //获取session数据
