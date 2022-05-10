@@ -443,20 +443,11 @@ public class BizOptFlowImpl implements BizOptFlow {
             if (detailLog == null) {
                 detailLog = writeLog(dataOptStep, dataOptContext);
             }
-            if (e instanceof ObjectException) {
-                ObjectException objectException=(ObjectException)e;
-                bizModel.getOptResult().addLastStepResult(bizOptJson.getString("id"), (ResponseData) (objectException.getObjectData()));
-                detailLog.setLogInfo(e.getMessage());
-            } else {
-                String errMsg = ObjectException.extortExceptionMessage(e, 8);
-                ResponseData responseData = ResponseData.makeErrorMessageWithData(errMsg, ResponseData.ERROR_OPERATION,
-                    e.getMessage());
-                bizModel.getOptResult().addLastStepResult(bizOptJson.getString("id"), responseData);
-                detailLog.setLogInfo(errMsg);
-            }
-            //dataOptContext.setReturnResult(responseData);
-
-
+            String errMsg = ObjectException.extortExceptionMessage(e, 8);
+            ResponseData responseData = ResponseData.makeErrorMessageWithData(errMsg, ResponseData.ERROR_OPERATION,
+                e.getMessage());
+            bizModel.getOptResult().addLastStepResult(bizOptJson.getString("id"), responseData);
+            detailLog.setLogInfo(errMsg);
             detailLog.setRunEndTime(new Date());
             taskDetailLogDao.updateObject(detailLog);
         }
