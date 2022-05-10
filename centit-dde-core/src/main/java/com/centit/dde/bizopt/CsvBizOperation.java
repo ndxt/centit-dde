@@ -24,7 +24,7 @@ public class CsvBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String csvExpressions=BuiltInOperation.getJsonFieldString(bizOptJson,"csvexpressions",null);
+        String csvExpressions = BuiltInOperation.getJsonFieldString(bizOptJson,"csvexpressions",null);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
         if(dataSet ==null && requestFileInfo==null){

@@ -21,6 +21,7 @@ public class ConstantValue {
     public static final String TRUE = "T";
     public static final String CONFIG = "config";
     public static final String FILE_CONTENT = "fileContent";
+    public static final String FILE_SIZE = "fileSize";
     public static final String FILE_NAME = "fileName";
 
     public static final String CURRENT_USER = "currentUser";

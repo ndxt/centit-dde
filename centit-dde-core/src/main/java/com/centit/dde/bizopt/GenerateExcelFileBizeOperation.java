@@ -9,6 +9,7 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -83,8 +84,10 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
         String[] titles = headers.toArray(new String[mapInfo.size()]);
         String[] fields = values.toArray(new String[mapInfo.size()]);
         InputStream inputStream = ExcelExportUtil.generateExcelStream(dataAsList, titles, fields);
-        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName",fileName.endsWith(".xlsx")?fileName:fileName+".xlsx",
-            "fileSize", inputStream.available(), "fileContent",inputStream));
+        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap(
+            ConstantValue.FILE_NAME,fileName.endsWith(".xlsx")?fileName:fileName+".xlsx",
+            ConstantValue.FILE_SIZE, inputStream.available(),
+            ConstantValue.FILE_CONTENT,inputStream));
         bizModel.putDataSet(id,objectToDataSet);
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }

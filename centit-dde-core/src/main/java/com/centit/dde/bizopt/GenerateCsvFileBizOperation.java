@@ -8,6 +8,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
@@ -38,8 +39,10 @@ public class GenerateCsvFileBizOperation implements BizOperation {
             return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")+"：生成CSV文件异常，请指定数据集！");
         }
         InputStream inputStream = CsvDataSet.createCsvStream(dataSet);
-        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName.endsWith(".csv")?fileName:fileName+".csv",
-            "fileSize", inputStream.available(), "fileContent",inputStream));
+        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap(
+            ConstantValue.FILE_NAME, fileName.endsWith(".csv")?fileName:fileName+".csv",
+            ConstantValue.FILE_SIZE, inputStream.available(),
+            ConstantValue.FILE_CONTENT,inputStream));
         bizModel.putDataSet(targetDsName,objectToDataSet);
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }
