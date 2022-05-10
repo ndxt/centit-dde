@@ -50,6 +50,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     //RETURN_DATA_AS_RAW
     public static final String RETURN_RESULT_ORIGIN = "4";
     public static final String RETURN_RESULT_ERROR = "5";
+    public static final String RETURN_RESULT_FILE = "6";
 
     @Value("${os.file.base.dir:./file_home/export}")
     private String path;
@@ -98,8 +99,10 @@ public class BizOptFlowImpl implements BizOptFlow {
     public void init() {
         //allOperations.put(ConstantValue.SCHEDULER, (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runStart(bizModel1, bizOptJson1));//模块调度
         allOperations.put("start", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runStart(bizModel1, bizOptJson1));//起始节点
+
         allOperations.put("postData", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runRequestBody(bizModel, bizOptJson));//获取post数据
         allOperations.put("postFile", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runRequestFile(bizModel, bizOptJson));//获取post文件
+
         allOperations.put("map", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runMap(bizModel1, bizOptJson1));
         allOperations.put("filter", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runFilter(bizModel1, bizOptJson1));
         allOperations.put("append", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runAppend(bizModel1, bizOptJson1));
@@ -136,7 +139,9 @@ public class BizOptFlowImpl implements BizOptFlow {
             new MetadataQueryBizOperation(metaObjectService, queryDataScopeFilter, metaDataCache));
         allOperations.put(ConstantValue.METADATA_OPERATION_UPDATE, new MetadataUpdateBizOperation(metaObjectService));
         allOperations.put(ConstantValue.COMPARE_SOURCE, new ObjectCompareBizOperation());
+
         allOperations.put(ConstantValue.SESSION_DATA, new GetSessionDataBizOperation());
+
         allOperations.put(ConstantValue.COMMIT_TRANSACTION, new TransactionCommitOperation(sourceInfoDao));
         allOperations.put(ConstantValue.INTERSECT_DATASET, new IntersectDataSetBizOperation());
         allOperations.put(ConstantValue.MINUS_DATASET, new MinusDataSetBizOperation());
@@ -261,7 +266,8 @@ public class BizOptFlowImpl implements BizOptFlow {
                         Object fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
                         if (fileData instanceof OutputStream || fileData instanceof InputStream) {
                             String fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
-                            bizModel.getOptResult().setResultFile(fileName, fileData);
+                            int fileSize = NumberBaseOpt.castObjectToInteger(mapFirstRow.get(ConstantValue.FILE_SIZE), -1);
+                            bizModel.getOptResult().setResultFile(fileName, fileSize, fileData);
                             return;
                         }
                     }
@@ -270,6 +276,15 @@ public class BizOptFlowImpl implements BizOptFlow {
                     bizModel.getOptResult().setResultType(DataOptResult.RETURN_DATA_AS_RAW);
                 }
             }
+            return;
+        } else if(RETURN_RESULT_FILE.equals(type)){
+            dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
+            DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
+            Map<String, Object> mapFirstRow = dataSet.getFirstRow();
+            String fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
+            int fileSize = NumberBaseOpt.castObjectToInteger(mapFirstRow.get(ConstantValue.FILE_SIZE), -1);
+            Object fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
+            bizModel.getOptResult().setResultFile(fileName, fileSize, fileData);
             return;
         }
         //返回异常信息

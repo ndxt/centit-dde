@@ -20,6 +20,7 @@ import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.ObjectTranslate;
@@ -182,16 +183,22 @@ public class HttpTaskController extends BaseController {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, JSON.parse(bodyString));
             } else {
-                String header = request.getHeader("fileName");
-                if (header != null) {
-                    String fileName = StringBaseOpt.castObjectToString(params.get("fileName"));
-                    if (StringUtils.isBlank(fileName)) {
-                        params.put("fileName", header);
+                String fileName = request.getHeader("fileName");
+                if (fileName != null) {
+                    String fileName2 = StringBaseOpt.castObjectToString(params.get("fileName"));
+                    if (StringUtils.isBlank(fileName2)) {
+                        params.put("fileName", fileName);
+                    } else {
+                        fileName = fileName2;
                     }
                 }
                 InputStream inputStream = UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight();
                 if (inputStream != null) {
-                    dataOptContext.setStackData(ConstantValue.REQUEST_FILE_TAG, inputStream);
+                    dataOptContext.setStackData(ConstantValue.REQUEST_FILE_TAG,
+                        CollectionsOpt.createHashMap(
+                            "fileName", fileName,
+                            "fileSize", inputStream.available(),
+                            "fileContent", inputStream));
                 }
             }
         }

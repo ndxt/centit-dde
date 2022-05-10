@@ -1,8 +1,12 @@
 package com.centit.dde.core;
 
 import com.alibaba.fastjson.JSON;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ToResponseData;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.common.ObjectException;
 
@@ -10,6 +14,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class DataOptResult implements ToResponseData, Serializable {
 
@@ -68,24 +73,35 @@ public class DataOptResult implements ToResponseData, Serializable {
         this.resultObject = resultObject;
     }
 
-    public void setResultFile(String fileName, Object fileData) {
+    public void setResultFile(String fileName, int fileSize, Object fileData) {
         this.resultType = RETURN_FILE_STREAM;
-        this.resultObject =  new LeftRightPair<String, Object>(fileName, fileData);
+        this.resultObject =  CollectionsOpt.createHashMap(
+            ConstantValue.FILE_NAME, fileName,
+            ConstantValue.FILE_SIZE, fileSize,
+            ConstantValue.FILE_CONTENT, fileData);
+    }
+
+    public int getReturnFileSize() {
+        if(this.resultType != RETURN_FILE_STREAM){
+            return -1;
+        }
+        Map<String, Object> fileInfo = (Map<String, Object> )this.resultObject;
+        return NumberBaseOpt.castObjectToInteger(fileInfo.get(ConstantValue.FILE_SIZE));
     }
 
     public String getReturnFilename() {
         if(this.resultType != RETURN_FILE_STREAM){
             return null;
         }
-        LeftRightPair<String, Object> fileInfo =(LeftRightPair<String, Object >)this.resultObject;
-        return fileInfo.getLeft();
+        Map<String, Object> fileInfo = (Map<String, Object> )this.resultObject;
+        return StringBaseOpt.castObjectToString(fileInfo.get(ConstantValue.FILE_NAME));
     }
     public InputStream getReturnFileStream() {
         if(this.resultType != RETURN_FILE_STREAM){
             return null;
         }
-        LeftRightPair<String, Object> fileInfo =(LeftRightPair<String, Object >)this.resultObject;
-        Object data = fileInfo.getRight();
+        Map<String, Object> fileInfo = (Map<String, Object> )this.resultObject;
+        Object data = fileInfo.get(ConstantValue.FILE_CONTENT);
         if(data == null) {
             return null;
         }

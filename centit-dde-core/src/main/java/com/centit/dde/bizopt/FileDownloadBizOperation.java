@@ -6,6 +6,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizOptUtils;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -60,8 +61,10 @@ public class FileDownloadBizOperation implements BizOperation {
                 }
             }
         }
-        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", "",
-            "fileSize", inputStreams.get(0).available(), "fileContent", inputStreams.get(0)));
+        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap(
+            ConstantValue.FILE_NAME, "",
+            ConstantValue.FILE_SIZE, inputStreams.get(0).available(),
+            ConstantValue.FILE_CONTENT, inputStreams.get(0)));
         bizModel.putDataSet(targetDsName,objectToDataSet);
         return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(targetDsName).getSize());
     }

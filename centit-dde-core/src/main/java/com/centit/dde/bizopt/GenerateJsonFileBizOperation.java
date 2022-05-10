@@ -8,6 +8,7 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
@@ -38,8 +39,10 @@ public class GenerateJsonFileBizOperation implements BizOperation {
 
         String object = JSON.toJSONString(data);
         InputStream inputStream = new ByteArrayInputStream(object.getBytes());
-        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName.endsWith(".json")?fileName:fileName+".json",
-            "fileSize", inputStream.available(), "fileContent",inputStream));
+        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap(
+            ConstantValue.FILE_NAME, fileName.endsWith(".json")?fileName:fileName+".json",
+            ConstantValue.FILE_SIZE, inputStream.available(),
+            ConstantValue.FILE_CONTENT,inputStream));
         bizModel.putDataSet(targetDsName,objectToDataSet);
         return BuiltInOperation.createResponseSuccessData(objectToDataSet.getSize());
     }
