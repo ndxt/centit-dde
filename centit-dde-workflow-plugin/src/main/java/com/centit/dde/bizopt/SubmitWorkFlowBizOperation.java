@@ -29,6 +29,7 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
     public SubmitWorkFlowBizOperation(FlowEngine flowEngine) {
         this.flowEngine = flowEngine;
     }
+
     //process WorkFlowUserTask
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
@@ -36,19 +37,19 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
         String nodeInstId = bizOptJson.getString("nodeInstId");
         String unitCode = bizOptJson.getString("unitCode");
         String userCode = bizOptJson.getString("userCode");
-        if (StringUtils.isBlank(nodeInstId)){
-            return  ResponseData.makeErrorMessage(500,"nodeInstId不能为空！");
+        if (StringUtils.isBlank(nodeInstId)) {
+            return ResponseData.makeErrorMessage(500, "nodeInstId不能为空！");
         }
-        if (StringUtils.isBlank(unitCode)){
-            return  ResponseData.makeErrorMessage(500,"unitCode不能为空！");
+        if (StringUtils.isBlank(unitCode)) {
+            return ResponseData.makeErrorMessage(500, "unitCode不能为空！");
         }
-        if (StringUtils.isBlank(userCode)){
-            return  ResponseData.makeErrorMessage(500,"userCode不能为空！");
+        if (StringUtils.isBlank(userCode)) {
+            return ResponseData.makeErrorMessage(500, "userCode不能为空！");
         }
         SubmitOptOptions submitOptOptions = SubmitOptOptions.create();
         String nodeInstIdFormula = StringBaseOpt.castObjectToString(JSONTransformer.transformer(nodeInstId, new BizModelJSONTransform(bizModel)));
-        String unitCodeFormula =StringBaseOpt.castObjectToString(JSONTransformer.transformer(unitCode, new BizModelJSONTransform(bizModel)));
-        String userCodeFormula =StringBaseOpt.castObjectToString(JSONTransformer.transformer(userCode, new BizModelJSONTransform(bizModel)));
+        String unitCodeFormula = StringBaseOpt.castObjectToString(JSONTransformer.transformer(unitCode, new BizModelJSONTransform(bizModel)));
+        String userCodeFormula = StringBaseOpt.castObjectToString(JSONTransformer.transformer(userCode, new BizModelJSONTransform(bizModel)));
         submitOptOptions.setNodeInstId(nodeInstIdFormula);
         submitOptOptions.setUnitCode(unitCodeFormula);
         submitOptOptions.setUserCode(userCodeFormula);
@@ -64,7 +65,7 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                 String variableName = StringBaseOpt.objectToString(flowVariable.get("variableName"));
                 //字段值
                 Object expression = flowVariable.get("expression");
-                if (expression != null){
+                if (expression != null) {
                     Object transform = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
                     boolean isGlobal = BooleanBaseOpt.castObjectToBoolean(flowVariable.get("isGlobal"), false);
                     if (isGlobal) {//全局流程变量
@@ -85,19 +86,15 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                 Map<String, Object> roleMap = CollectionsOpt.objectToMap(role);
                 String roleCode = StringBaseOpt.objectToString(roleMap.get("roleCode"));
                 Object expression = roleMap.get("expression");
-                if (expression != null){
+                if (expression != null) {
                     Object transform = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
-                    if (transform instanceof List) {
-                        flowRoleUsers.put(roleCode, StringBaseOpt.objectToStringList(transform));
-                    } else {
-                        throw new ObjectException("办件角色参数必须是个集合！");
-                    }
+                    flowRoleUsers.put(roleCode, StringBaseOpt.objectToStringList(transform));
                 }
             }
             submitOptOptions.setFlowRoleUsers(flowRoleUsers);
         }
         JSONArray fieldInfos = bizOptJson.getJSONArray("config");
-        if (fieldInfos != null){
+        if (fieldInfos != null) {
             for (Object fieldInfo : fieldInfos) {
                 if (fieldInfo instanceof Map) {
                     Map<String, Object> map = CollectionsOpt.objectToMap(fieldInfo);
@@ -140,8 +137,8 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                 }
             }
         }
-        Map<String, Object>  objectMap = flowEngine.submitFlowOpt(submitOptOptions);
-        bizModel.putDataSet(id,new DataSet(objectMap));
+        Map<String, Object> objectMap = flowEngine.submitFlowOpt(submitOptOptions);
+        bizModel.putDataSet(id, new DataSet(objectMap));
         return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
     }
 }
