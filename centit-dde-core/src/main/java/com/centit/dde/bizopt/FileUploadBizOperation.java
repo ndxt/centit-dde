@@ -61,6 +61,7 @@ public class FileUploadBizOperation implements BizOperation {
         for (Map<String, Object> dataMap : dataSetDataAsList) {
             FileInfo fileInfo = new FileInfo();
             fileInfo.setFileName(dataMap.get(fileNameField)==null?fileNameField:StringBaseOpt.castObjectToString(dataMap.get(fileNameField)));
+            //TODO 添加 当前 租户、应用信息、业务信息、当前用户、当前机构 等等信息
             String fileId;
             Object object = StringUtils.isNotBlank(fileDataField)?dataMap.get(fileDataField):dataSet.getFirstRow().get("fileContent");
             if (object instanceof byte[]){

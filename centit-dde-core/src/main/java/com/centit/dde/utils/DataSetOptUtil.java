@@ -21,9 +21,8 @@ import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.StatUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Function;
 
@@ -835,62 +834,50 @@ public abstract class DataSetOptUtil {
         data.sort((o1, o2) -> compareTwoRow(o1, o2, fields, nullAsFirst));
     }
 
-    //从dataset 中获取流信息（页面上填写了“文件内容”参数时调用）
-    public static List<InputStream> getInputStreamByFieldName(String fieldName, DataSet dataSet) {
-        List<InputStream> inputStreams = new ArrayList<>();
-        Map<String, String> mapInfo = new HashMap<>();
-        mapInfo.put(fieldName, fieldName);
-        if (dataSet != null) {
-            DataSet destDs = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
-            List<Map<String, Object>> dataAsList = destDs.getDataAsList();
-            for (Map<String, Object> objectMap : dataAsList) {
-                InputStream inputStream;
-                Object object = objectMap.get(fieldName);
-                if (object instanceof byte[]) {
-                    inputStream = new ByteArrayInputStream((byte[]) object);
-                    inputStreams.add(inputStream);
-                } else if (object instanceof InputStream) {
-                    inputStream = (InputStream) object;
-                    inputStreams.add(inputStream);
-                }
-            }
+    public static Map<String, Object> getFileFormDataset(DataSet dataSet, JSONObject jsonStep){
+        Map<String, Object> mapFirstRow = dataSet.getFirstRow();
+        String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep,  ConstantValue.FILE_CONTENT, "");
+        String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
+        String fileName;
+        if(StringUtils.isNotBlank(fileNameDesc)){
+            fileName = new DatasetVariableTranslate(dataSet).mapTemplateString(fileNameDesc);
+        } else {
+            fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
         }
-        return inputStreams;
+        Object fileData;
+        if(StringUtils.isNotBlank(fileContentDesc)){
+            fileData = mapFirstRow.get(fileContentDesc);
+        } else {
+            fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
+        }
+        return  CollectionsOpt.createHashMap(
+            ConstantValue.FILE_NAME, fileName,
+            ConstantValue.FILE_SIZE, -1,
+            ConstantValue.FILE_CONTENT, fileData);
     }
 
-    //从dataset 中获取流信息（页面上没填写“文件内容”参数时调用）
-    public static List<InputStream> getInputStreamByFieldName(DataSet dataSet) {
-        List<InputStream> inputStreams = new ArrayList<>();
-        Object data = dataSet.getData();
-        if (data instanceof List) {
-            for (Object datum : (List) data) {//必须保证集合中全部都是byte[]或者InputStream流
-                if (datum instanceof InputStream) {
-                    inputStreams.add((InputStream) datum);
-                } else if (datum instanceof byte[]) {
-                    inputStreams.add(new ByteArrayInputStream((byte[]) datum));
-                }
-            }
-        }
-        if (data instanceof Map) {
-            Map<String, Object> mapFirstRow = dataSet.getFirstRow();
-            inputStreams.add((InputStream) mapFirstRow.get(ConstantValue.FILE_CONTENT));
+    public static InputStream getInputStreamFormFile( Map<String, Object> fileInfo){
+        Object data = fileInfo.get(ConstantValue.FILE_CONTENT);
+        if(data == null) {
+            return null;
         }
         if (data instanceof InputStream) {
-            inputStreams.add((InputStream) data);
-        } else if (data instanceof byte[]) {
-            inputStreams.add(new ByteArrayInputStream((byte[]) data));
+            return (InputStream)data;
         }
-        return inputStreams;
-    }
+        if (data instanceof OutputStream) {
+            ByteArrayOutputStream outputStream = (ByteArrayOutputStream) data;
+            return new ByteArrayInputStream(outputStream.toByteArray());
+        }
 
-    public static List<InputStream> getRequestFileInfo(BizModel bizModel) throws IOException {
-        List<InputStream> inputStreamList = null;
-        InputStream requestFile = (InputStream) bizModel.getStackData(ConstantValue.REQUEST_FILE_TAG);
-        if (requestFile != null && requestFile.available() > 0) {
-            inputStreamList = new ArrayList<>();
-            inputStreamList.add(requestFile);
+        if(data instanceof byte[]) {
+            return new ByteArrayInputStream((byte[]) data);
         }
-        return inputStreamList;
+
+        if(data instanceof String){
+            return new ByteArrayInputStream(((String) data).getBytes(StandardCharsets.UTF_8));
+        }
+        String dataStr = JSON.toJSONString(data);
+        return new ByteArrayInputStream(dataStr.getBytes(StandardCharsets.UTF_8));
     }
 
     //获取数据集参数或者自定义参数

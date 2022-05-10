@@ -265,9 +265,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                     if (isFile) {
                         Object fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
                         if (fileData instanceof OutputStream || fileData instanceof InputStream) {
-                            String fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
-                            int fileSize = NumberBaseOpt.castObjectToInteger(mapFirstRow.get(ConstantValue.FILE_SIZE), -1);
-                            bizModel.getOptResult().setResultFile(fileName, fileSize, fileData);
+                            bizModel.getOptResult().setResultFile(mapFirstRow);
                             return;
                         }
                     }
@@ -280,11 +278,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         } else if(RETURN_RESULT_FILE.equals(type)){
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
             DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
-            Map<String, Object> mapFirstRow = dataSet.getFirstRow();
-            String fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
-            int fileSize = NumberBaseOpt.castObjectToInteger(mapFirstRow.get(ConstantValue.FILE_SIZE), -1);
-            Object fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
-            bizModel.getOptResult().setResultFile(fileName, fileSize, fileData);
+            Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, stepJson);
+            bizModel.getOptResult().setResultFile(fileInfo);
             return;
         }
         //返回异常信息

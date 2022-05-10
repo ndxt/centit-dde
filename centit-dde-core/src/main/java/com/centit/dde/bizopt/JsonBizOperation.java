@@ -9,12 +9,10 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.file.FileIOOpt;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -26,38 +24,21 @@ public class JsonBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String jsonexpression=BuiltInOperation.getJsonFieldString(bizOptJson,"jsonexpression",null);
+
+
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
 
-        List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
-        if (dataSet==null&& requestFileInfo==null){
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")
-                +"：读取JSON文件异常,请指定数据集或者指定对应的流信息！");
-        }
-        List<InputStream> inputStreams;
-        if (StringUtils.isNotBlank(jsonexpression)){
-            inputStreams = DataSetOptUtil.getInputStreamByFieldName(jsonexpression,dataSet);
-        }else if(requestFileInfo != null){
-            //
-            inputStreams = requestFileInfo;
-        }else  {
-            // 这个是什么情况啊
-            inputStreams = DataSetOptUtil.getInputStreamByFieldName(dataSet);
-        }
-        if (inputStreams.size()==0){
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")
+        Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
+
+        InputStream inputStream = DataSetOptUtil.getInputStreamFormFile(fileInfo);
+        if(inputStream !=null) {
+            DataSet simpleDataSet =  new DataSet(JSON.parse(FileIOOpt.readStringFromInputStream(inputStream )));
+            bizModel.putDataSet(targetDsName, simpleDataSet);
+            return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
+        }else {
+            return BuiltInOperation.createResponseData(0,1,ResponseData.ERROR_OPERATION,bizOptJson.getString("SetsName")
                 +"：读取JSON文件异常，不支持的流类型转换！");
         }
-        bizModel.putDataSet(targetDsName, new DataSet(toJson(inputStreams)));
-        return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(targetDsName).getSize());
     }
 
-    //将流转出json文件
-    private List<Object> toJson( List<InputStream> inputStreams) throws IOException {
-        List<Object> jsonDatas = new ArrayList<>();
-        for (InputStream inputStream : inputStreams) {
-            jsonDatas.add(JSON.parse(FileIOOpt.readStringFromInputStream(inputStream )));
-        }
-        return  jsonDatas;
-    }
 }

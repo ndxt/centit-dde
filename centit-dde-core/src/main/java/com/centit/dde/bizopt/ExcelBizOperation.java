@@ -13,9 +13,7 @@ import com.centit.support.compiler.Pretreatment;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -42,34 +40,19 @@ public class ExcelBizOperation implements BizOperation {
         params.put("startColumnNumber",Pretreatment.mapTemplateStringAsFormula(startColumnNumber, new BizModelJSONTransform(bizModel)));
         params.put("endColumnNumber",Pretreatment.mapTemplateStringAsFormula(endColumnNumber, new BizModelJSONTransform(bizModel)));
 
-        List<InputStream> requestFileInfo = DataSetOptUtil.getRequestFileInfo(bizModel);
         DataSet dataSet = bizModel.fetchDataSetByName(source);
-        //挂载文件的字段
-        String excelExpression=BuiltInOperation.getJsonFieldString(bizOptJson,"excelexpression",null);
-        if (dataSet==null && requestFileInfo==null){
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
-                bizOptJson.getString("SetsName")+"：读取EXCEL文件异常，请指定数据集或者指定对应的流信息！");
-        }
-        List<InputStream> inputStreams;
-        if (requestFileInfo != null){
-            inputStreams = requestFileInfo;
-        }else if (StringUtils.isNotBlank(excelExpression)){
-            inputStreams  = DataSetOptUtil.getInputStreamByFieldName(excelExpression,dataSet);
-        }else {
-            inputStreams = DataSetOptUtil.getInputStreamByFieldName(dataSet);
-        }
-        if (inputStreams.size()==0){
+        Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
+        InputStream inputStream = DataSetOptUtil.getInputStreamFormFile(fileInfo);
+
+        if (inputStream == null){
             return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
                 bizOptJson.getString("SetsName")+"：读取EXCEL文件异常，不支持的流类型转换！");
         }
-        List<Object> objectList = new ArrayList<>();
-        for (InputStream inputStream : inputStreams) {
-            ExcelDataSet excelDataSet = new ExcelDataSet();
-            excelDataSet.setInputStream(inputStream);
-            DataSet simpleDataSet= excelDataSet.load(params);
-            objectList.add(simpleDataSet.getData());
-        }
-        bizModel.putDataSet(id,new DataSet(objectList));
-        return BuiltInOperation.createResponseSuccessData(objectList.size());
+
+        ExcelDataSet excelDataSet = new ExcelDataSet();
+        excelDataSet.setInputStream(inputStream);
+        DataSet simpleDataSet= excelDataSet.load(params);
+        bizModel.putDataSet(id, simpleDataSet);
+        return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
     }
 }

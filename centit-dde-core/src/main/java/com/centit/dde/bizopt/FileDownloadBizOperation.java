@@ -53,6 +53,7 @@ public class FileDownloadBizOperation implements BizOperation {
                 return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
                     bizOptJson.getString("SetsName")+"：文件下载失败，请选择数据集！");
             }
+            //TODO 这个循环没有意义
             List<Map<String, Object>> dataSetDataAsList = dataSet.getDataAsList();
             for (Map<String, Object> objectMap : dataSetDataAsList) {
                 for (Object fileId : objectMap.values()) {
@@ -61,6 +62,7 @@ public class FileDownloadBizOperation implements BizOperation {
                 }
             }
         }
+        //TODO 获取文件信息
         DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap(
             ConstantValue.FILE_NAME, "",
             ConstantValue.FILE_SIZE, inputStreams.get(0).available(),

@@ -12,7 +12,6 @@ import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.common.ObjectException;
 import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.commons.CreateFlowOptions;
 import com.centit.workflow.po.FlowInstance;

@@ -1,17 +1,16 @@
 package com.centit.dde.core;
 
-import com.alibaba.fastjson.JSON;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ToResponseData;
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.common.ObjectException;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -73,12 +72,9 @@ public class DataOptResult implements ToResponseData, Serializable {
         this.resultObject = resultObject;
     }
 
-    public void setResultFile(String fileName, int fileSize, Object fileData) {
+    public void setResultFile(Map<String, Object> fileInfo) {
         this.resultType = RETURN_FILE_STREAM;
-        this.resultObject =  CollectionsOpt.createHashMap(
-            ConstantValue.FILE_NAME, fileName,
-            ConstantValue.FILE_SIZE, fileSize,
-            ConstantValue.FILE_CONTENT, fileData);
+        this.resultObject =  fileInfo;
     }
 
     public int getReturnFileSize() {
@@ -101,27 +97,7 @@ public class DataOptResult implements ToResponseData, Serializable {
             return null;
         }
         Map<String, Object> fileInfo = (Map<String, Object> )this.resultObject;
-        Object data = fileInfo.get(ConstantValue.FILE_CONTENT);
-        if(data == null) {
-            return null;
-        }
-        if (data instanceof InputStream) {
-            return (InputStream)data;
-        }
-        if (data instanceof OutputStream) {
-            ByteArrayOutputStream outputStream = (ByteArrayOutputStream) data;
-            return new ByteArrayInputStream(outputStream.toByteArray());
-        }
-
-        if(data instanceof byte[]) {
-            return new ByteArrayInputStream((byte[]) data);
-        }
-
-        if(data instanceof String){
-            return new ByteArrayInputStream(((String) data).getBytes(StandardCharsets.UTF_8));
-        }
-        String dataStr = JSON.toJSONString(data);
-        return new ByteArrayInputStream(dataStr.getBytes(StandardCharsets.UTF_8));
+        return DataSetOptUtil.getInputStreamFormFile(fileInfo);
     }
 
     public boolean hasErrors(){
