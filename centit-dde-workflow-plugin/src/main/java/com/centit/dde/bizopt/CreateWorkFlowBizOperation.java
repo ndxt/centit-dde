@@ -58,7 +58,7 @@ public class CreateWorkFlowBizOperation implements BizOperation {
             return ResponseData.makeErrorMessage(500, "flowOptTag不能为空！");
         }
         String id = bizOptJson.getString("id");
-        String unitCodeTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(unitCode ,new BizModelJSONTransform(bizModel)));
+        String unitCodeTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(unitCode, new BizModelJSONTransform(bizModel)));
         String userCodeTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(userCode, new BizModelJSONTransform(bizModel)));
         String flowOptNameTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowOptName, new BizModelJSONTransform(bizModel)));
         String flowOptTagTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowOptTag, new BizModelJSONTransform(bizModel)));
@@ -79,7 +79,7 @@ public class CreateWorkFlowBizOperation implements BizOperation {
                 String variableName = StringBaseOpt.objectToString(flowVariable.get("variableName"));
                 //字段值
                 Object expression = flowVariable.get("expression");
-                if (expression != null){
+                if (expression != null) {
                     Object transform = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
                     boolean isGlobal = BooleanBaseOpt.castObjectToBoolean(flowVariable.get("isGlobal"), false);
                     if (isGlobal) {//全局流程变量
@@ -100,27 +100,23 @@ public class CreateWorkFlowBizOperation implements BizOperation {
                 Map<String, Object> roleMap = CollectionsOpt.objectToMap(role);
                 String roleCode = StringBaseOpt.objectToString(roleMap.get("roleCode"));
                 Object expression = roleMap.get("expression");
-                if (expression != null){
+                if (expression != null) {
                     Object transform = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
-                    if (transform instanceof List) {
-                        flowRoleUsers.put(roleCode, StringBaseOpt.objectToStringList(transform));
-                    } else {
-                        throw new ObjectException("办件角色参数必须是集合！");
-                    }
+                    flowRoleUsers.put(roleCode, StringBaseOpt.objectToStringList(transform));
                 }
             }
             createFlowOptions.setFlowRoleUsers(flowRoleUsers);
         }
         //字段信息
         JSONArray fieldInfos = bizOptJson.getJSONArray("config");
-        if (fieldInfos != null){
+        if (fieldInfos != null) {
             for (Object fieldInfo : fieldInfos) {
                 Map<String, Object> map = CollectionsOpt.objectToMap(fieldInfo);
                 String expression = StringBaseOpt.objectToString(map.get("expression"));
-                if(StringUtils.isBlank(expression)) continue;
-                Object value =JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
+                if (StringUtils.isBlank(expression)) continue;
+                Object value = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
                 String columnName = StringBaseOpt.objectToString(map.get("columnName"));
-                switch (columnName){
+                switch (columnName) {
                     case "modelId":
                         createFlowOptions.setModelId(StringBaseOpt.castObjectToString(value));
                         break;
@@ -161,7 +157,7 @@ public class CreateWorkFlowBizOperation implements BizOperation {
                         createFlowOptions.setNodeUnits(nodeUnits);
                         break;
                     case "nodeOptUsers":
-                        Map<String, Set<String>>  nodeOptUsers = CollectionsOpt.translateMapType(
+                        Map<String, Set<String>> nodeOptUsers = CollectionsOpt.translateMapType(
                             CollectionsOpt.objectToMap(value),
                             StringBaseOpt::objectToString,
                             StringBaseOpt::objectToStringSet);
@@ -172,9 +168,9 @@ public class CreateWorkFlowBizOperation implements BizOperation {
                 }
             }
         }
-        FlowInstance   instance = flowEngine.createInstance(createFlowOptions);
-        if (instance!=null){
-            bizModel.putDataSet(id,new DataSet(instance));
+        FlowInstance instance = flowEngine.createInstance(createFlowOptions);
+        if (instance != null) {
+            bizModel.putDataSet(id, new DataSet(instance));
         }
         return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
     }
