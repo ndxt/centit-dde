@@ -31,10 +31,13 @@ public class FtpDownloadOperation extends FtpOperation {
             return BuiltInOperation.createResponseData(0,1,ResponseData.ERROR_USER_CONFIG,
                 "FPT服务配置信息错误！");
         }
-        ftpClient.changeWorkingDirectory(filePath);
         ByteArrayOutputStream outs = new ByteArrayOutputStream();
-        ftpClient.retrieveFile(fileName, outs);
-        disConnectFtp(ftpClient);
+        try {
+            ftpClient.changeWorkingDirectory(filePath);
+            ftpClient.retrieveFile(fileName, outs);
+        } finally {
+            disConnectFtp(ftpClient);
+        }
         // outs.close();
         DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(
             CollectionsOpt.createHashMap(ConstantValue.FILE_NAME, fileName,

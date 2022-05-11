@@ -35,11 +35,13 @@ public class FtpUploadOperation extends FtpOperation {
             return BuiltInOperation.createResponseData(0,1,ResponseData.ERROR_USER_CONFIG,
                 "FPT服务配置信息错误！");
         }
-        ftpClient.changeWorkingDirectory(path);
-        ftpClient.storeFile(StringBaseOpt.castObjectToString(fileInfo.get(ConstantValue.FILE_NAME)),
-            DataSetOptUtil.getInputStreamFormFile(fileInfo));
-
-        disConnectFtp(ftpClient);
+        try{
+            ftpClient.changeWorkingDirectory(path);
+            ftpClient.storeFile(StringBaseOpt.castObjectToString(fileInfo.get(ConstantValue.FILE_NAME)),
+                DataSetOptUtil.getInputStreamFormFile(fileInfo));
+        } finally {
+            disConnectFtp(ftpClient);
+        }
         return BuiltInOperation.createResponseSuccessData(1);
     }
 }
