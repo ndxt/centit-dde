@@ -23,7 +23,7 @@
      <!--   <module>centit-dde-ofd-plugin</module>-->
         <module>centit-dde-workflow-plugin</module>
         <module>centit-dde-kafka-plugin</module>
-        <module>centit-dde-consumer-server</module>
+<!--        <module>centit-dde-consumer-server</module>-->
         <module>centit-dde-dubbo-adapter</module>
         <module>centit-dde-dubbo-server-config</module>
         <module>centit-dde-dubbo-client-config</module>

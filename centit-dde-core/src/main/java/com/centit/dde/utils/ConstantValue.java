@@ -61,6 +61,7 @@ public class ConstantValue {
     public static final String SUBMIT_WORKFLOW ="submitWorkflow";
     //删除工作流组件
     public static final String DELETE_WORKFLOW ="deleteWorkflow";
+    public static final String MANAGER_WORKFLOW ="managerWorkflow";
     //获取流程待办组件
     public static final String USER_TASK_WORKFLOW ="userTaskWorkflow";
     public static final String INST_NODES_WORKFLOW ="instNodesWorkFlow";
@@ -89,7 +90,7 @@ public class ConstantValue {
     //差集
     public static final String  MINUS_DATASET="minus";
 
-    public static final String FINAL_TWO="2";
+    public static final String TASK_TYPE_AGENT ="2";
 
     //日志记录级别
     public static final int LOGLEVEL_TYPE_ERROR= 1;//ERROR
@@ -127,6 +128,8 @@ public class ConstantValue {
     public static final String MODULE_CALL_TAG = "__module_params";
     public static final String LAST_ERROR_TAG = "__last_error";
 
-
+    public static final int STOP_WFINST=1;
+    public static final int SUSPEND_WFINST=2;
+    public static final int ACTIVE_WFINST=3;
 
 }
