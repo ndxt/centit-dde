@@ -2,6 +2,7 @@ package com.centit.dde.agent.service;
 
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -44,7 +45,7 @@ public class TaskSchedulers {
         this.dataPacketDao = dataPacketDao;
         this.scheduler = scheduler;
         this.operationLogWriter = operationLogWriter;
-        queryParams.put("taskType", "2");
+        queryParams.put("taskType", ConstantValue.TASK_TYPE_AGENT);
         queryParams.put("isValid", "T");
         queryParams.put("isDisable", "F");
         if (pathConfig.getOptId() != null && pathConfig.getOptId().length > 0) {

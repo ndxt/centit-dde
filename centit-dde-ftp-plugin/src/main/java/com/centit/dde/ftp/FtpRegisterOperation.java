@@ -2,22 +2,26 @@ package com.centit.dde.ftp;
 
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.utils.ConstantValue;
-import org.springframework.stereotype.Component;
+import com.centit.product.metadata.dao.SourceInfoDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
-@Component
+@Service
 public class FtpRegisterOperation {
-    @Resource
+
+    @Autowired
     BizOptFlow bizOptFlow;
 
+    @Autowired
+    SourceInfoDao sourceInfoDao;
 
     @PostConstruct
     void registerOperation(){
         //注册FTP下载组件
-        bizOptFlow.registerOperation(ConstantValue.FTP_FILE_DOWNLOAD,new FtpFileDownLoadOperation());
+        bizOptFlow.registerOperation(ConstantValue.FTP_FILE_DOWNLOAD,new FtpDownloadOperation(sourceInfoDao));
         //注册FTP上传组件
-        bizOptFlow.registerOperation(ConstantValue.FTP_FILE_UPLOAD,new FtpFileUpLoadOperation());
+        bizOptFlow.registerOperation(ConstantValue.FTP_FILE_UPLOAD,new FtpUploadOperation(sourceInfoDao));
     }
 }
