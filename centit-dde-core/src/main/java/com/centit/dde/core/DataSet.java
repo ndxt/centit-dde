@@ -57,6 +57,7 @@ public class DataSet implements DataSetReader, Serializable {
      *
      * @return DataSet 的类型
      */
+    @JSONField(serialize = false)
     public String getDataSetType() {
         if (this.data == null) {
             return "E"; //empty
