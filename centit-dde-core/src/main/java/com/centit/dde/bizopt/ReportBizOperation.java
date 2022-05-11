@@ -6,6 +6,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizOptUtils;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -44,7 +45,9 @@ public class ReportBizOperation implements BizOperation {
             + ".pdf";
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName");
         ByteArrayInputStream in = generateWord(bizModel, filePath, params);
-        DataSet dataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", fileName, "fileContent", word2Pdf(in)));
+        DataSet dataSet = BizOptUtils.castObjectToDataSet(
+            CollectionsOpt.createHashMap(ConstantValue.FILE_NAME, fileName,
+                ConstantValue.FILE_CONTENT, word2Pdf(in)));
         bizModel.putDataSet(sourDsName, dataSet);
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }
