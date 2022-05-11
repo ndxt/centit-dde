@@ -1,7 +1,5 @@
-package com.centit.dde;
+package com.centit.dde.es;
 
-import com.centit.dde.bizopt.EsQueryBizOperation;
-import com.centit.dde.bizopt.EsWriteBizOperation;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.search.service.ESServerConfig;
