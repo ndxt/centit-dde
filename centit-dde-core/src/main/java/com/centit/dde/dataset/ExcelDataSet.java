@@ -57,12 +57,12 @@ public class ExcelDataSet extends FileDataSet {
             path = this.getFilePath();
         } else {
             String fileDate = DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), "YYYYMMddHHmmss");
-            path = this.getFilePath() + File.separator + fileDate;
+            path = this.getFilePath() + File.separator + fileDate.substring(0,8);
             File filepath = new File(path);
             if (!filepath.exists()) {
                 filepath.mkdirs();
             }
-            path = path + File.separator + "sys.xls";
+            path = path + File.separator + fileDate.substring(8)+ "sys.xls";
         }
         try {
             ExcelExportUtil.appendDataToExcelSheet(path, 0, fields, dataSet.getDataAsList().get(0).keySet().toArray(new String[0]));

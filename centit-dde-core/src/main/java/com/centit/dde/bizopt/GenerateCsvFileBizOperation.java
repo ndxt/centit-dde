@@ -38,7 +38,7 @@ public class GenerateCsvFileBizOperation implements BizOperation {
         if (dataSet==null){
             return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")+"：生成CSV文件异常，请指定数据集！");
         }
-        InputStream inputStream = CsvDataSet.createCsvStream(dataSet);
+        InputStream inputStream = CsvDataSet.createCsvStream(dataSet, bizOptJson);
         DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap(
             ConstantValue.FILE_NAME, fileName.endsWith(".csv")?fileName:fileName+".csv",
             ConstantValue.FILE_SIZE, inputStream.available(),
