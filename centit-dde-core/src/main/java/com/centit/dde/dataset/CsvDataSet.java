@@ -86,32 +86,30 @@ public class CsvDataSet extends FileDataSet {
      */
     @Override
     public void save(DataSet dataSet) {
-        OutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(new File(filePath));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-            outputStream, Charset.forName("gbk")));
-        CsvWriter csvWriter = new CsvWriter(writer, ',');
-        csvWriter.setTextQualifier('"');
-        csvWriter.setUseTextQualifier(true);
-        csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR.charAt(0));
-        List<Map<String, Object>> list = dataSet.getDataAsList();
-        Collections.sort(list, (o1, o2) -> Integer.compare(o2.size(), o1.size()));
-        int iHead = 0;
-        for (Map<String, Object> row : list) {
-            if (iHead == 0) {
-                try {
-                    csvWriter.writeRecord(row.keySet().toArray(new String[0]));
-                } catch (IOException e) {
-                    e.printStackTrace();
+        try (OutputStream outputStream = new FileOutputStream(filePath);
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                // 为什么是gbk， 这个是否可以作为一个参数从前端传入，
+                // 默认应该是 utf-8
+                outputStream, Charset.forName("gbk")))){
+
+            CsvWriter csvWriter = new CsvWriter(writer, ',');
+            csvWriter.setTextQualifier('"');
+            csvWriter.setUseTextQualifier(true);
+            csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR.charAt(0));
+            List<Map<String, Object>> list = dataSet.getDataAsList();
+            Collections.sort(list, (o1, o2) -> Integer.compare(o2.size(), o1.size()));
+            int iHead = 0;
+            for (Map<String, Object> row : list) {
+                if (iHead == 0) {
+                    try {
+                        csvWriter.writeRecord(row.keySet().toArray(new String[0]));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-            iHead++;
-            try {
-                List<String> splitedRows = new ArrayList<String>();
+                iHead++;
+
+                List<String> splitedRows = new ArrayList<>();
                 for (String key : list.get(0).keySet()) {
                     Object column = row.get(key);
                     if (null != column) {
@@ -123,12 +121,13 @@ public class CsvDataSet extends FileDataSet {
                 }
                 csvWriter.writeRecord(splitedRows.toArray(new String[0]));
 
-            } catch (IOException e) {
-                e.printStackTrace();
+
             }
+            csvWriter.close();
+        } catch ( IOException e) {
+            e.printStackTrace();
         }
-        csvWriter.close();
-        IOUtils.closeQuietly(outputStream);
+        //IOUtils.closeQuietly(outputStream);
     }
 
 

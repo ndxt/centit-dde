@@ -1,8 +1,6 @@
 package com.centit.dde.ftp;
 
 import com.centit.dde.core.BizOptFlow;
-import com.centit.dde.ftp.download.FtpFileDownLoadOperation;
-import com.centit.dde.ftp.upload.FtpFileUpLoadOperation;
 import com.centit.dde.utils.ConstantValue;
 import org.springframework.stereotype.Component;
 

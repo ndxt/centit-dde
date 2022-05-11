@@ -35,7 +35,7 @@ public abstract class BuiltInOperation {
         return targetDsName;
     }
 
-    static ResponseData createResponseSuccessData(int count) {
+    public static ResponseData createResponseSuccessData(int count) {
         JSONObject map = new JSONObject();
         map.put("info", "ok");
         map.put("success", count);
@@ -43,7 +43,7 @@ public abstract class BuiltInOperation {
         return ResponseSingleData.makeResponseData(map);
     }
 
-    static ResponseData createResponseData(int success, int error, int errorCode, String info) {
+    public static ResponseData createResponseData(int success, int error, int errorCode, String info) {
         JSONObject map = new JSONObject();
         map.put("success", success);
         map.put("error", error);
