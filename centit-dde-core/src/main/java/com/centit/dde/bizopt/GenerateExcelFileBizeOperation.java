@@ -64,8 +64,10 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             xssfWorkbook.write(byteArrayOutputStream);
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName",fileName.endsWith(".xlsx")?fileName:fileName+".xlsx",
-                "fileSize", inputStream.available(), "fileContent",byteArrayInputStream));
+            DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap(
+                ConstantValue.FILE_NAME, fileName.endsWith(".xlsx")?fileName:fileName+".xlsx",
+                ConstantValue.FILE_SIZE, inputStream.available(),
+                ConstantValue.FILE_CONTENT ,byteArrayInputStream));
             bizModel.putDataSet(id,objectToDataSet);
             byteArrayOutputStream.close();
             xssfWorkbook.close();
