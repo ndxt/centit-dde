@@ -1,7 +1,5 @@
 package com.centit.dde.agent.service;
 
-import com.centit.dde.core.DataOptContext;
-import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.support.quartz.AbstractQuartzJob;
@@ -56,9 +54,7 @@ public class RunTaskJob extends AbstractQuartzJob {
                 TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
                 logger.info(String.format("execute scheduled tasks,taskName:%s,taskID：%s,cron expression：%s,execute time:%s",
                     dataPacket.getPacketName(),dataPacket.getPacketId(),dataPacket.getTaskCron(),getDate(dataPacket.getTaskCron())));
-                DataPacketDao dataPacketDao = ContextUtils.getBean(DataPacketDao.class);
-                DataPacket dataPacketById = dataPacketDao.getObjectById(dataPacket.getPacketId());
-                taskRun.runTask(dataPacketById, new DataOptContext());
+                taskRun.runTask(dataPacket);
             } finally {
                 runningTask.put(dataPacket.getPacketId(), false);
             }
