@@ -127,6 +127,7 @@ public class DataSet implements DataSetReader, Serializable {
     /**
      * @return 数据集大小
      */
+    @JSONField(serialize = false)
     public int getSize() {
         if (this.data == null) {
             return 0;
