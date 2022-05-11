@@ -127,7 +127,7 @@ public class TaskRun {
 
     private void updateLog(TaskLog taskLog) {
         taskLog.setRunEndTime(new Date());
-        String sql ="SELECT count(*) as count  FROM d_task_detail_log WHERE log_id=? and log_info <> ? ";
+        String sql ="SELECT count(*) as count FROM d_task_detail_log WHERE log_id=? and log_info not like ? ";
         int count = NumberBaseOpt.castObjectToInteger(DatabaseOptUtils.getScalarObjectQuery(taskDetailLogDao, sql, new Object[]{taskLog.getLogId(), "ok"}));
         String message = count > 0 ? "error" : "ok";
         taskLog.setOtherMessage(message);
