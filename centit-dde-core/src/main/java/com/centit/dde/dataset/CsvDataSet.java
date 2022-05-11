@@ -1,9 +1,11 @@
 package com.centit.dde.dataset;
 
 import com.centit.dde.core.DataSet;
+import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
 import lombok.Data;
@@ -61,7 +63,8 @@ public class CsvDataSet extends FileDataSet {
             CsvReader csvReader = new CsvReader(reader);
             csvReader.setDelimiter(',');
             csvReader.setSafetySwitch(false);
-
+            // firstRowAsHeader 如果是true则以第一行为key生成一个map，如果第一行不够长，后面的key自动为 column+i
+            // 如果firstRowAsHeader为false，则必须要指定每一列的key，不够长同样自动为column+i
             List<String> headers = null;// = new ArrayList<>()
             if (params == null || BooleanBaseOpt.castObjectToBoolean(params.get("firstRowAsHeader"), true)) {
                 if (csvReader.readRecord()) {
@@ -106,6 +109,24 @@ public class CsvDataSet extends FileDataSet {
     }
 
     public static void saveCsv2OutStream(DataSet dataSet, OutputStream outs, Map<String, Object> params) throws IOException {
+        // firstRowAsHeader 如果是true则将所有的key作为第一行，后面按照key的顺序对齐
+        // 如果firstRowAsHeader为false，则必须要指定每一列的key，只保存对应的key列，多余的列不保存
+        boolean firstRowAsHeader = params == null ||
+            BooleanBaseOpt.castObjectToBoolean(params.get("firstRowAsHeader"), true);
+        List<String> columnNames = null;
+        List<Map<String, Object>> list = dataSet.getDataAsList();
+        if(firstRowAsHeader){
+            columnNames = StringBaseOpt.objectToStringList(params.get("headers"));
+        } else {
+            Set<String> headers = new HashSet<>(20);
+            for (Map<String, Object> row : list) {
+                headers.addAll(row.keySet());
+            }
+            columnNames = CollectionsOpt.cloneList(headers);
+        }
+        if(columnNames==null || columnNames.size()==0){
+            throw new ObjectException(ResponseData.ERROR_USER_CONFIG,"配置信息有错，或者数据为空！");
+        }
         try (
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outs, Charset.forName(getCharset(params))))) {
 
@@ -113,15 +134,7 @@ public class CsvDataSet extends FileDataSet {
             csvWriter.setTextQualifier('"');
             csvWriter.setUseTextQualifier(true);
             csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR.charAt(0));
-            List<Map<String, Object>> list = dataSet.getDataAsList();
 
-            boolean firstRowAsHeader = params == null ||
-                BooleanBaseOpt.castObjectToBoolean(params.get("firstRowAsHeader"), true);
-            Set<String> headers = new HashSet<>(20);
-            for(Map<String, Object> row : list){
-                headers.addAll(row.keySet());
-            }
-            List<String> columnNames = CollectionsOpt.cloneList(headers);
             if(firstRowAsHeader){
                 csvWriter.writeRecord(CollectionsOpt.listToArray(columnNames));
             }
