@@ -35,21 +35,21 @@ public class WorkFlowUserTaskBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
-        Map<String ,Object> queryParam = new HashMap<>();
+        Map<String, Object> queryParam = new HashMap<>();
         JSONArray paramList = bizOptJson.getJSONArray("paramList");
         //构建查询参数
         for (Object fieldInfo : paramList) {
             Map<String, Object> fieldMap = CollectionsOpt.objectToMap(fieldInfo);
             String fieldValue = StringBaseOpt.castObjectToString(fieldMap.get("fieldValue"));
-            if (StringUtils.isNotBlank(fieldValue)){
-                String formulaValue =  StringBaseOpt.castObjectToString(JSONTransformer.transformer(fieldValue, new BizModelJSONTransform(bizModel)));
-                queryParam.put(StringBaseOpt.castObjectToString(fieldMap.get("fieldName")),formulaValue);
+            if (StringUtils.isNotBlank(fieldValue)) {
+                String formulaValue = StringBaseOpt.castObjectToString(JSONTransformer.transformer(fieldValue, new BizModelJSONTransform(bizModel)));
+                queryParam.put(StringBaseOpt.castObjectToString(fieldMap.get("fieldName")), formulaValue);
             }
         }
         Object pageNo = queryParam.get("pageNo");
         Object pageSize = queryParam.get("pageSize");
         PageDesc pageDesc = null;
-        if (pageNo!=null && pageSize!=null){
+        if (pageNo != null && pageSize != null) {
             pageDesc = new PageDesc();
             pageDesc.setPageNo(NumberBaseOpt.castObjectToInteger(pageNo));
             pageDesc.setPageSize(NumberBaseOpt.castObjectToInteger(pageSize));
@@ -57,37 +57,50 @@ public class WorkFlowUserTaskBizOperation implements BizOperation {
         String userCode = StringBaseOpt.castObjectToString(queryParam.get("userCode"));
         List<UserTask> userTask;
         Integer taskType = bizOptJson.getInteger("taskType");
-        switch (taskType){
-            case 1://静态待办
+        switch (taskType) {
+            //静态待办
+            case 1:
                 userTask = flowEngine.listUserStaticTask(queryParam, pageDesc);
                 break;
-            case 2://委托待办
-                userTask= flowEngine.listUserGrantorTask(queryParam, pageDesc);
+            //委托待办
+            case 2:
+                userTask = flowEngine.listUserGrantorTask(queryParam, pageDesc);
                 break;
-            case 3://岗位待办
-                if (StringUtils.isBlank(userCode)){
+            //岗位待办
+            case 3:
+                if (StringUtils.isBlank(userCode)) {
                     return ResponseData.makeErrorMessage("userCode不能为空！");
                 }
                 userTask = flowEngine.listUserDynamicTask(queryParam, pageDesc);
                 break;
-            case 4://自己和委托的待办
+            //自己和委托的待办
+            case 4:
                 userTask = flowEngine.listUserStaticAndGrantorTask(queryParam, pageDesc);
                 break;
-            case 5://所有待办
-                if (StringUtils.isBlank(userCode)){
+            //所有待办
+            case 5:
+                if (StringUtils.isBlank(userCode)) {
                     return ResponseData.makeErrorMessage("userCode不能为空！");
                 }
                 userTask = flowEngine.listUserAllTask(queryParam, new PageDesc());
+                break;
+            //获取流程所有活动节点的任务列表
+            case 6:
+                String flowInstId = StringBaseOpt.castObjectToString(queryParam.get("flowInstId"));
+                if (StringUtils.isBlank(flowInstId)) {
+                    return ResponseData.makeErrorMessage("flowInstId不能为空！");
+                }
+                userTask = flowEngine.listFlowActiveNodeOperators(flowInstId);
                 break;
             default:
                 return ResponseData.makeErrorMessage("未知操作类型！");
         }
         String id = bizOptJson.getString("id");
-        if (pageDesc!=null){
+        if (pageDesc != null) {
             PageQueryResult<Object> result = PageQueryResult.createResult(CollectionsOpt.objectToList(userTask), pageDesc);
-            bizModel.putDataSet(id, new DataSet(result));//返回带分页的数据
-        }else {
-            bizModel.putDataSet(id,new DataSet(userTask));
+            bizModel.putDataSet(id, new DataSet(result));
+        } else {
+            bizModel.putDataSet(id, new DataSet(userTask));
         }
         return BuiltInOperation.createResponseSuccessData(userTask.size());
     }
