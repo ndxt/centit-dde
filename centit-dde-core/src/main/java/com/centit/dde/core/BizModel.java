@@ -141,7 +141,12 @@ public class BizModel implements  Serializable {
     }
 
     public Object getStackData(String key) {
-        return stackData.get(key);
+        Object object=stackData.get(key);
+        if(object==null){
+            return new HashMap<>(1);
+        }else{
+            return object;
+        }
     }
 
     public void setStackData(String key, Object value) {

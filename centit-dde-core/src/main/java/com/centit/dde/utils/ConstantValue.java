@@ -90,7 +90,7 @@ public class ConstantValue {
     //差集
     public static final String  MINUS_DATASET="minus";
 
-    public static final String FINAL_TWO="2";
+    public static final String TASK_TYPE_AGENT ="2";
 
     //日志记录级别
     public static final int LOGLEVEL_TYPE_ERROR= 1;//ERROR

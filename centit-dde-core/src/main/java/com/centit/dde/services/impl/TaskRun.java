@@ -53,10 +53,16 @@ public class TaskRun {
         this.bizOptFlow = bizOptFlow;
     }
 
+    public void agentRunTask(String dataPacketId) {
+        DataPacket dataPacket = dataPacketDao.getObjectById(dataPacketId);
+        runTask(dataPacket, new DataOptContext());
+    }
+
     public DataOptResult runTask(DataPacketInterface dataPacketInterface, DataOptContext optContext) {
         TaskLog taskLog = buildLogInfo(optContext.getRunType(), dataPacketInterface);
         if ((ConstantValue.LOGLEVEL_CHECK_INFO & dataPacketInterface.getLogLevel()) != 0) {
-            taskLogDao.saveNewObject(taskLog);//保存日志基本信息
+            //保存日志基本信息
+            taskLogDao.saveNewObject(taskLog);
         } else {
             optContext.setTaskLog(taskLog);
         }
@@ -111,7 +117,7 @@ public class TaskRun {
         taskLog.setRunBeginTime(new Date());
         taskLog.setApiType(ConstantValue.RUN_TYPE_COPY.equals(runType) ? 0 : 1);
         if (dataPacketInterface != null) {
-            if (!StringBaseOpt.isNvl(dataPacketInterface.getTaskType()) && "2".equals(dataPacketInterface.getTaskType())) {
+            if (!StringBaseOpt.isNvl(dataPacketInterface.getTaskType()) && ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())) {
                 taskLog.setRunner("定时任务");
             } else {
                 taskLog.setRunner(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
@@ -127,7 +133,7 @@ public class TaskRun {
 
     private void updateLog(TaskLog taskLog) {
         taskLog.setRunEndTime(new Date());
-        String sql ="SELECT count(*) as count FROM d_task_detail_log WHERE log_id=? and log_info not like ? ";
+        String sql = "SELECT count(*) as count FROM d_task_detail_log WHERE log_id=? and log_info not like ? ";
         int count = NumberBaseOpt.castObjectToInteger(DatabaseOptUtils.getScalarObjectQuery(taskDetailLogDao, sql, new Object[]{taskLog.getLogId(), "ok"}));
         String message = count > 0 ? "error" : "ok";
         taskLog.setOtherMessage(message);
@@ -137,21 +143,21 @@ public class TaskRun {
 
     private void updateApiData(String runType, DataPacketInterface dataPacketInterface) throws Exception {
         dataPacketInterface.setLastRunTime(new Date());
-        if (ConstantValue.FINAL_TWO.equals(dataPacketInterface.getTaskType())
+        if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())
             && dataPacketInterface.getIsValid()
             && !StringBaseOpt.isNvl(dataPacketInterface.getTaskCron())) {
             CronExpression cronExpression = new CronExpression(dataPacketInterface.getTaskCron());
             dataPacketInterface.setNextRunTime(cronExpression.getNextValidTimeAfter(dataPacketInterface.getLastRunTime()));
         }
         if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
-            if (ConstantValue.FINAL_TWO.equals(dataPacketInterface.getTaskType())) {//定时任务才更新
+            if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())) {//定时任务才更新
                 dataPacketInterface.setNextRunTime(new Date());
                 DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set next_run_time=? where packet_id=?",
                     new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
             }
             dataPacketCopyDao.mergeObject((DataPacketDraft) dataPacketInterface);
         } else {
-            if (ConstantValue.FINAL_TWO.equals(dataPacketInterface.getTaskType())) {//定时任务才更新
+            if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())) {//定时任务才更新
                 dataPacketInterface.setNextRunTime(new Date());
                 DatabaseOptUtils.doExecuteSql(dataPacketDao, "update q_data_packet set next_run_time=? where packet_id=?",
                     new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
