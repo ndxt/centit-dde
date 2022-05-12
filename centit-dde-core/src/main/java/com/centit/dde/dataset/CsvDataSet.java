@@ -1,10 +1,16 @@
 package com.centit.dde.dataset;
 
 import com.centit.dde.core.DataSet;
+import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
 import lombok.Data;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -15,15 +21,7 @@ import java.util.*;
  */
 @Data
 public class CsvDataSet extends FileDataSet {
-
-    /**
-     * 读取 dataSet 数据集
-     *
-     * @param params 模块的自定义参数
-     * @return dataSet 数据集
-     */
-    private Map<String, Object> params;
-
+    private static String DEFAULT_CHARSET = "gbk";// "utf-8";
     private InputStream inputStream;
 
     @Override
@@ -38,46 +36,63 @@ public class CsvDataSet extends FileDataSet {
         this.inputStream = inputStream;
     }
 
+    private static String getCharset(Map<String, Object> params){
+        if(params == null){
+            return DEFAULT_CHARSET;
+        }
+        String charSet = StringBaseOpt.castObjectToString(params.get("charsetType"));
+        if(StringUtils.isBlank(charSet)){
+            return DEFAULT_CHARSET;
+        }
+        return charSet;
+    }
     @Override
     public DataSet load(Map<String, Object> params) throws Exception {
-        List<Map<String, Object>> list = new ArrayList<>();
-        readCsvFile(list);
+
+        List<Map<String, Object>> list = readCsvFile(params);
         DataSet dataSet = new DataSet();
         dataSet.setData(list);
         return dataSet;
     }
 
-    private void readCsvFile(List<Map<String, Object>> list) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
-            Charset.forName("gbk")), 8192);
-        CsvReader csvReader = new CsvReader(reader);
-        csvReader.setDelimiter(',');
-        csvReader.setSafetySwitch(false);
-        if (csvReader.readRecord()) {
-            String[] splitHead = csvReader.getValues();
+    private List<Map<String, Object>> readCsvFile(Map<String, Object> params) throws IOException {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
+            Charset.forName(getCharset(params))), 8192)) {
+
+            CsvReader csvReader = new CsvReader(reader);
+            csvReader.setDelimiter(',');
+            csvReader.setSafetySwitch(false);
+            // firstRowAsHeader 如果是true则以第一行为key生成一个map，如果第一行不够长，后面的key自动为 column+i
+            // 如果firstRowAsHeader为false，则必须要指定每一列的key，不够长同样自动为column+i
+            List<String> headers = null;// = new ArrayList<>()
+            if (params == null || BooleanBaseOpt.castObjectToBoolean(params.get("firstRowAsHeader"), true)) {
+                if (csvReader.readRecord()) {
+                    String[] splitHead = csvReader.getValues();
+                    headers = CollectionsOpt.arrayToList(splitHead);
+                }
+            } else {
+                headers = StringBaseOpt.objectToStringList(params.get("headers"));
+            }
+
+            if (headers == null) {
+                headers = new ArrayList<>();
+            }
+            int headLen = headers.size();
+
             while (csvReader.readRecord()) {
                 Map<String, Object> map = new HashMap<>();
                 String[] splitResult = csvReader.getValues();
-                for (int i = 0; i < splitHead.length; i++) {
-                    map.put(splitHead[i], splitResult[i]);
+                for (int i = 0; i < splitResult.length; i++) {
+                    String columnName = i < headLen ? headers.get(i) : "column" + i;
+                    map.put(columnName, splitResult[i]);
                 }
                 list.add(map);
             }
+            csvReader.close();
+            return list;
         }
-        csvReader.close();
     }
-
-    public String[] getColumns() throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
-            Charset.forName("gbk")), 8192);
-        CsvReader csvReader = new CsvReader(reader);
-        csvReader.setDelimiter(',');
-        if (csvReader.readRecord()) {
-            return csvReader.getValues();
-        }
-        return new String[0];
-    }
-
 
     /**
      * 将 dataSet 数据集 持久化
@@ -86,92 +101,74 @@ public class CsvDataSet extends FileDataSet {
      */
     @Override
     public void save(DataSet dataSet) {
-        try (OutputStream outputStream = new FileOutputStream(filePath);
-             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                // 为什么是gbk， 这个是否可以作为一个参数从前端传入，
-                // 默认应该是 utf-8
-                outputStream, Charset.forName("gbk")))){
-
-            CsvWriter csvWriter = new CsvWriter(writer, ',');
-            csvWriter.setTextQualifier('"');
-            csvWriter.setUseTextQualifier(true);
-            csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR.charAt(0));
-            List<Map<String, Object>> list = dataSet.getDataAsList();
-            Collections.sort(list, (o1, o2) -> Integer.compare(o2.size(), o1.size()));
-            int iHead = 0;
-            for (Map<String, Object> row : list) {
-                if (iHead == 0) {
-                    try {
-                        csvWriter.writeRecord(row.keySet().toArray(new String[0]));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                iHead++;
-
-                List<String> splitedRows = new ArrayList<>();
-                for (String key : list.get(0).keySet()) {
-                    Object column = row.get(key);
-                    if (null != column) {
-                        splitedRows.add(column.toString());
-                    } else {
-                        splitedRows.add("");
-                    }
-
-                }
-                csvWriter.writeRecord(splitedRows.toArray(new String[0]));
-
-
-            }
-            csvWriter.close();
-        } catch ( IOException e) {
+        try (OutputStream outputStream = new FileOutputStream(filePath)){
+            saveCsv2OutStream(dataSet, outputStream, null);
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        //IOUtils.closeQuietly(outputStream);
     }
 
-
-    public static InputStream createCsvStream(DataSet dataSet) throws IOException {
+    public static void saveCsv2OutStream(DataSet dataSet, OutputStream outs, Map<String, Object> params) throws IOException {
+        // firstRowAsHeader 如果是true则将所有的key作为第一行，后面按照key的顺序对齐
+        // 如果firstRowAsHeader为false，则必须要指定每一列的key，只保存对应的key列，多余的列不保存
+        boolean firstRowAsHeader = params == null ||
+            BooleanBaseOpt.castObjectToBoolean(params.get("firstRowAsHeader"), true);
+        List<String> columnNames = null;
+        List<Map<String, Object>> list = dataSet.getDataAsList();
+        if(firstRowAsHeader){
+            columnNames = StringBaseOpt.objectToStringList(params.get("headers"));
+        } else {
+            Set<String> headers = new HashSet<>(20);
+            for (Map<String, Object> row : list) {
+                headers.addAll(row.keySet());
+            }
+            columnNames = CollectionsOpt.cloneList(headers);
+        }
+        if(columnNames==null || columnNames.size()==0){
+            throw new ObjectException(ResponseData.ERROR_USER_CONFIG,"配置信息有错，或者数据为空！");
+        }
         try (
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(byteArrayOutputStream, Charset.forName("gbk")));
-        ) {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outs, Charset.forName(getCharset(params))))) {
+
             CsvWriter csvWriter = new CsvWriter(writer, ',');
             csvWriter.setTextQualifier('"');
             csvWriter.setUseTextQualifier(true);
             csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR.charAt(0));
-            List<Map<String, Object>> list = dataSet.getDataAsList();
-            Collections.sort(list, (o1, o2) -> Integer.compare(o2.size(), o1.size()));
-            int iHead = 0;
+
+            if(firstRowAsHeader){
+                csvWriter.writeRecord(CollectionsOpt.listToArray(columnNames));
+            }
+
+            String [] values = new String[columnNames.size()];
             for (Map<String, Object> row : list) {
-                if (iHead == 0) {
-                    try {
-                        csvWriter.writeRecord(row.keySet().toArray(new String[0]));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                for(int i=0; i<columnNames.size(); i++){
+                    values[i] = StringBaseOpt.castObjectToString(row.get(columnNames.get(i)),"");
                 }
-                iHead++;
-                try {
-                    List<String> splitedRows = new ArrayList<String>();
-                    for (String key : list.get(0).keySet()) {
-                        Object column = row.get(key);
-                        if (null != column) {
-                            splitedRows.add(column.toString());
-                        } else {
-                            splitedRows.add("");
-                        }
-                    }
-                    csvWriter.writeRecord(splitedRows.toArray(new String[0]));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                csvWriter.writeRecord(values);
             }
             csvWriter.flush();
-            if (csvWriter != null) {
-                csvWriter.close();
-            }
+            csvWriter.close();
+        }
+    }
+
+    public static InputStream createCsvStream(DataSet dataSet, Map<String, Object> params) throws IOException {
+        try (
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()
+        ) {
+            saveCsv2OutStream(dataSet, byteArrayOutputStream, params);
             return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
         }
     }
+
+    public String[] getColumns() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
+            Charset.forName(DEFAULT_CHARSET)), 8192);
+        CsvReader csvReader = new CsvReader(reader);
+        csvReader.setDelimiter(',');
+        if (csvReader.readRecord()) {
+            return csvReader.getValues();
+        }
+        return new String[0];
+    }
+
 }
