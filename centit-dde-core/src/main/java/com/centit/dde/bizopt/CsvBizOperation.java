@@ -8,8 +8,10 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.CollectionsOpt;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 
@@ -22,22 +24,18 @@ public class CsvBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-
         Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
-
         InputStream inputStream = DataSetOptUtil.getInputStreamFormFile(fileInfo);
-        if(inputStream !=null) {
+        if (inputStream != null) {
             CsvDataSet csvDataSet = new CsvDataSet();
             csvDataSet.setInputStream(inputStream);
-            DataSet simpleDataSet = csvDataSet.load(null);
-
+            DataSet simpleDataSet = csvDataSet.load(bizOptJson);
             bizModel.putDataSet(targetDsName, simpleDataSet);
             return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
-        }else {
-            return BuiltInOperation.createResponseData(0,1,ResponseData.ERROR_OPERATION,
-                bizOptJson.getString("SetsName")+"：读取CSV文件异常，不支持的流类型转换！");
+        } else {
+            return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
+                bizOptJson.getString("SetsName") + "：读取CSV文件异常，不支持的流类型转换！");
         }
     }
 }

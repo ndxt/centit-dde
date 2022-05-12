@@ -1,5 +1,8 @@
 package com.centit.dde.dataset;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSet;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.BooleanBaseOpt;
@@ -116,7 +119,12 @@ public class CsvDataSet extends FileDataSet {
         List<String> columnNames = null;
         List<Map<String, Object>> list = dataSet.getDataAsList();
         if(firstRowAsHeader){
-            columnNames = StringBaseOpt.objectToStringList(params.get("headers"));
+            JSONObject jsonObject=JSONObject.parseObject((String) params.get("headers"));
+            JSONArray jsonArray=jsonObject.getJSONArray("headers");
+            for(int i=0;i<jsonArray.size();i++) {
+                JSONObject jsonObject1= jsonArray.getJSONObject(i);
+                columnNames.add(jsonObject1.getString("header"));
+            }
         } else {
             Set<String> headers = new HashSet<>(20);
             for (Map<String, Object> row : list) {
