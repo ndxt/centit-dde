@@ -24,21 +24,16 @@ public class JsonBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-
-
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-
         Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
-
         InputStream inputStream = DataSetOptUtil.getInputStreamFormFile(fileInfo);
-        if(inputStream !=null) {
-            DataSet simpleDataSet =  new DataSet(JSON.parse(FileIOOpt.readStringFromInputStream(inputStream )));
+        if (inputStream != null) {
+            DataSet simpleDataSet = new DataSet(JSON.parse(FileIOOpt.readStringFromInputStream(inputStream)));
             bizModel.putDataSet(targetDsName, simpleDataSet);
             return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
-        }else {
-            return BuiltInOperation.createResponseData(0,1,ResponseData.ERROR_OPERATION,bizOptJson.getString("SetsName")
-                +"：读取JSON文件异常，不支持的流类型转换！");
+        } else {
+            return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")
+                + "：读取JSON文件异常，不支持的流类型转换！");
         }
     }
-
 }

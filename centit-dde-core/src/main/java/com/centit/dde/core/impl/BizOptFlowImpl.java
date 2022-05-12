@@ -164,6 +164,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         dataOptContext.setNeedRollback(dataPacket.getNeedRollback());
         dataOptContext.setOptId(dataPacket.getOptId());
         dataOptContext.setLogLevel(dataPacket.getLogLevel());
+        dataOptContext.setPacketId(dataPacket.getPacketId());
+        dataOptContext.setOsId(dataPacket.getOsId());
         try {
             runModule(bizModel, dataOptStep, dataOptContext);
             AbstractSourceConnectThreadHolder.commitAndRelease();
