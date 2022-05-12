@@ -7,6 +7,7 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.dde.utils.DatasetVariableTranslate;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -15,8 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,44 +29,34 @@ public class FileDownloadBizOperation implements BizOperation {
         this.fileStore = fileStore;
     }
 
-    public FileDownloadBizOperation() {
-    }
-
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        //支持多个逗号隔开
-        String fileIds=BuiltInOperation.getJsonFieldString(bizOptJson,"fileId",null);
-        List<InputStream> inputStreams = new ArrayList<>();
-        if (StringUtils.isNotBlank(fileIds)){//直接填写文件id的请求，直接下载文件
-            String[] split = fileIds.split(",");
-            for (String fileId : split) {
-                InputStream inputStream = new FileInputStream(fileStore.getFile(fileId));
-                inputStreams.add(inputStream);
-            }
-        }else {
-            //文件id存放在数据集中的情况
-            DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-            if (dataSet==null){
-                return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
-                    bizOptJson.getString("SetsName")+"：文件下载失败，请选择数据集！");
-            }
-            //TODO 这个循环没有意义
-            List<Map<String, Object>> dataSetDataAsList = dataSet.getDataAsList();
-            for (Map<String, Object> objectMap : dataSetDataAsList) {
-                for (Object fileId : objectMap.values()) {
-                    InputStream inputStream =new FileInputStream(fileStore.getFile(StringBaseOpt.castObjectToString(fileId)));
-                    inputStreams.add(inputStream);
-                }
-            }
+        String fileId = BuiltInOperation.getJsonFieldString(bizOptJson, "fileId", "");
+        String fileName = BuiltInOperation.getJsonFieldString(bizOptJson, ConstantValue.FILE_NAME, "");
+        DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+        if (dataSet == null) {
+            return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
+                bizOptJson.getString("SetsName") + "：文件下载失败，请选择数据集！");
         }
-        //TODO 获取文件信息
+        Map<String, Object> mapFirstRow = dataSet.getFirstRow();
+        if(StringUtils.isNotBlank(fileId)){
+            fileId = new DatasetVariableTranslate(dataSet).mapTemplateString(fileId);
+        } else {
+            fileId = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_ID));
+        }
+        InputStream inputStream = new FileInputStream(fileStore.getFile(fileId));
+        if(StringUtils.isNotBlank(fileName)){
+            fileName = new DatasetVariableTranslate(dataSet).mapTemplateString(fileName);
+        } else {
+            fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
+        }
         DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap(
-            ConstantValue.FILE_NAME, "",
-            ConstantValue.FILE_SIZE, inputStreams.get(0).available(),
-            ConstantValue.FILE_CONTENT, inputStreams.get(0)));
-        bizModel.putDataSet(targetDsName,objectToDataSet);
+            ConstantValue.FILE_NAME, fileName,
+            ConstantValue.FILE_SIZE, inputStream.available(),
+            ConstantValue.FILE_CONTENT, inputStream));
+        bizModel.putDataSet(targetDsName, objectToDataSet);
         return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(targetDsName).getSize());
     }
 }

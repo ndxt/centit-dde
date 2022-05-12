@@ -29,14 +29,11 @@ public class GenerateJsonFileBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-
         String fileName = StringUtils.isNotBlank(bizOptJson.getString("fileName"))?
             StringBaseOpt.castObjectToString(Pretreatment.mapTemplateStringAsFormula(
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))):
             DatetimeOpt.currentTimeWithSecond();
-
         Object data = bizModel.fetchDataSetByName(sourDsName).getData();
-
         String object = JSON.toJSONString(data);
         InputStream inputStream = new ByteArrayInputStream(object.getBytes());
         DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap(
