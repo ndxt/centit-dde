@@ -75,7 +75,7 @@ public class CsvDataSet extends FileDataSet {
                     headers = CollectionsOpt.arrayToList(splitHead);
                 }
             } else {
-                headers = StringBaseOpt.objectToStringList(params.get("headers"));
+                setColumnNames(params, headers);;
             }
 
             if (headers == null) {
@@ -119,12 +119,7 @@ public class CsvDataSet extends FileDataSet {
         List<String> columnNames = null;
         List<Map<String, Object>> list = dataSet.getDataAsList();
         if(firstRowAsHeader){
-            JSONObject jsonObject=JSONObject.parseObject((String) params.get("headers"));
-            JSONArray jsonArray=jsonObject.getJSONArray("headers");
-            for(int i=0;i<jsonArray.size();i++) {
-                JSONObject jsonObject1= jsonArray.getJSONObject(i);
-                columnNames.add(jsonObject1.getString("header"));
-            }
+            setColumnNames(params, columnNames);
         } else {
             Set<String> headers = new HashSet<>(20);
             for (Map<String, Object> row : list) {
@@ -156,6 +151,21 @@ public class CsvDataSet extends FileDataSet {
             }
             csvWriter.flush();
             csvWriter.close();
+        }
+    }
+
+    private static void setColumnNames(Map<String, Object> params, List<String> columnNames) {
+        if(params.get("headers")==null){
+            return;
+        }
+        if (columnNames == null) {
+            columnNames = new ArrayList<>();
+        }
+        JSONObject jsonObject=JSONObject.parseObject((String) params.get("headers"));
+        JSONArray jsonArray=jsonObject.getJSONArray("headers");
+        for(int i=0;i<jsonArray.size();i++) {
+            JSONObject jsonObject1= jsonArray.getJSONObject(i);
+            columnNames.add(jsonObject1.getString("header"));
         }
     }
 
