@@ -12,6 +12,9 @@ import java.util.Map;
 public class DataRowGroupVariableTranslate
     implements VariableTranslate {
 
+    String ROW_INDEX_LABEL = DataRowVariableTranslate.ROW_INDEX_LABEL;
+    String GROUP_INDEX_LABEL = "__group_index";
+
     private List<Map<String, Object>> dataSet;
     private int offset;
     private int length;
@@ -31,6 +34,15 @@ public class DataRowGroupVariableTranslate
       */
     @Override
     public Object getVarValue(String varName) {
+
+        if(ROW_INDEX_LABEL.equals(varName)){
+            return this.currentPos;
+        }
+
+        if(GROUP_INDEX_LABEL.equals(varName)){
+            return this.currentPos - this.offset;
+        }
+
         if(dataSet ==null) {
             return "";
         }

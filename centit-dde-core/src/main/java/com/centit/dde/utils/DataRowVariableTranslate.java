@@ -9,8 +9,8 @@ import com.centit.support.compiler.VariableTranslate;
 public class DataRowVariableTranslate
     implements VariableTranslate {
 
-    String ROW_INDEX_LABEL = "__row_index";
-    String ROW_COUNT_LABEL = "__row_count";
+    public static final String ROW_INDEX_LABEL = "__row_index";
+    public static final String ROW_COUNT_LABEL = "__row_count";
 
     private Object rowData;
     private int  rowInd;
