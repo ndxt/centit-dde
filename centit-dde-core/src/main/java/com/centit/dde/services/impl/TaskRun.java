@@ -52,11 +52,6 @@ public class TaskRun {
         this.dataPacketDao = dataPacketDao;
         this.bizOptFlow = bizOptFlow;
     }
-    //定时任务使用，定时任务传入的dataPacket对象大字段为空，需要重新查询一次
-    public DataOptResult runTask(DataPacketInterface dataPacketInterface) {
-        DataPacket objectById = dataPacketDao.getObjectById(dataPacketInterface.getPacketId());
-        return runTask(objectById, new DataOptContext());
-    }
 
     public void agentRunTask(String dataPacketId) {
         DataPacket dataPacket = dataPacketDao.getObjectById(dataPacketId);
