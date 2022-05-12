@@ -150,10 +150,10 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     @ApiModelProperty(value = "模式属性")
     private JSONObject schemaProps;
 
-    @Column(name = "return_type")
+    @Column(name = "request_body_type")
     @ApiModelProperty(value = "api数据类型  O:对象，F:文件")
     @NotBlank
-    private String returnType;
+    private String requestBodyType;
 
     @OneToMany(targetEntity = DataPacketParamDraft.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
