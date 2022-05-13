@@ -38,7 +38,7 @@ public class AssignmentBizOperation implements BizOperation {
                 "配置信息出错，找不到对应的数据集："+targetDsName+"，"+sourceDsName+"。");
         }
         Object sourceData = StringUtils.isBlank(formula)?
-            dataSet.getData():new DatasetVariableTranslate(dataSet).getVarValue(formula);
+            dataSet.getData() : new DatasetVariableTranslate(dataSet).getVarValue(formula);
         String property = null;
         if("property".equals(assignType)) {
             //赋值属性

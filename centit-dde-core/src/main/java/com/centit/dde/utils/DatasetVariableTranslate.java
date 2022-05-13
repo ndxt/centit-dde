@@ -13,7 +13,7 @@ import com.centit.support.json.JSONTransformDataSupport;
 public class DatasetVariableTranslate
     implements VariableTranslate, JSONTransformDataSupport {
 
-    private DataSet dataSet;
+    private final DataSet dataSet;
 
     public DatasetVariableTranslate(DataSet dataSet) {
         this.dataSet = dataSet;
@@ -30,7 +30,7 @@ public class DatasetVariableTranslate
     @Override
     public Object getVarValue(String varName) {
         if(dataSet ==null) {
-            return "";
+            return null;
         }
         return ReflectionOpt.attainExpressionValue(dataSet.getData(), varName);
     }
