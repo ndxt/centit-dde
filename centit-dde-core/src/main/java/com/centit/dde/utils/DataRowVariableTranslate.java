@@ -12,9 +12,9 @@ public class DataRowVariableTranslate
     public static final String ROW_INDEX_LABEL = "__row_index";
     public static final String ROW_COUNT_LABEL = "__row_count";
 
-    private Object rowData;
-    private int  rowInd;
-    private Object rowCount;
+    private final Object rowData;
+    private final int rowInd;
+    private final int rowCount;
 
 
     public DataRowVariableTranslate(Object data, int rowInd, int rowCount) {
