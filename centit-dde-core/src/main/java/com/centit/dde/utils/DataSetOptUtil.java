@@ -435,7 +435,8 @@ public abstract class DataSetOptUtil {
         List<Map<String, Object>> newData = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             Map<String, Object> row = data.get(i);
-            if (compareTwoRow(preRow, row, groupByFields, SORT_NULL_AS_FIRST) == 0) {
+            //主键不相等，开启新的一组
+            if (compareTwoRow(preRow, row, groupByFields, SORT_NULL_AS_FIRST) != 0) {
                 if (preRow != null) {
                     analyseDatasetGroup(newData, data, prePos, i, dvt, refDesc);
                 }
@@ -768,18 +769,18 @@ public abstract class DataSetOptUtil {
     }
 
     private static int compareTwoRow(Map<String, Object> data1, Map<String, Object> data2, List<String> fields, boolean nullAsFirst) {
-        if (data1 == null && data2 == null) {
+        if ((data1 == null && data2 == null)|| (fields == null)) {
             return 0;
         }
+
         if (data1 == null) {
-            return -1;
+            return nullAsFirst?-1:1;
         }
+
         if (data2 == null) {
-            return 1;
+            return nullAsFirst?1:-1;
         }
-        if (fields == null) {
-            return 0;
-        }
+
         for (String field : fields) {
             if (field.endsWith(" desc")) {
                 String dataField = field.substring(0, field.length() - 5).trim();
