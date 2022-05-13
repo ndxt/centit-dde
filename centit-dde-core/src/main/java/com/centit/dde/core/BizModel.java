@@ -222,13 +222,10 @@ public class BizModel implements  Serializable {
         }
 
         if(dataSetName.startsWith("__")){
-            Object obj = getStackData(dataSetName);
-            if(obj != null){
-                return new DataSet(obj);
-            }
             if(ConstantValue.LAST_ERROR_TAG.equals(dataSetName)){
                 return new DataSet(optResult.getLastError());
             }
+            return new DataSet(getStackData(dataSetName));
         }
 
         Map<String, DataSet> dss = getBizData();
