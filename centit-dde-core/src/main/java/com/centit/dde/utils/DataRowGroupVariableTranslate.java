@@ -65,7 +65,7 @@ public class DataRowGroupVariableTranslate
                 String fieldName = varName.substring(0, n);
                 int pos = NumberBaseOpt.castObjectToInteger(indexStr.substring(1), 0);
                 if (currentPos + pos < offset + length) {
-                    return dataSet.get(currentPos + pos).get(fieldName);
+                    return ReflectionOpt.attainExpressionValue(dataSet.get(currentPos + pos), fieldName);
                 } else {
                     return null;
                 }
@@ -73,7 +73,7 @@ public class DataRowGroupVariableTranslate
                 String fieldName = varName.substring(0, n);
                 int pos = NumberBaseOpt.castObjectToInteger(indexStr, 0);
                 if (currentPos - pos >= offset) {
-                    return dataSet.get(currentPos - pos).get(fieldName);
+                    return ReflectionOpt.attainExpressionValue(dataSet.get(currentPos - pos), fieldName);
                 } else {
                     return null;
                 }
