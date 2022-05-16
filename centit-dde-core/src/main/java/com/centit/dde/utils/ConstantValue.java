@@ -134,5 +134,7 @@ public class ConstantValue {
     public static final int ACTIVE_WFINST=3;
 
     public static final String DOUBLE_UNDERLINE = "__";
+    public static final String FILE_REQUEST_TYPE="file";
+    public static final String HTTP_REQUEST_PREFIX="://";
 
 }

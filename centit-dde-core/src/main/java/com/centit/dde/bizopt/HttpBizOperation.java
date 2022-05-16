@@ -9,6 +9,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.appclient.HttpReceiveJSON;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
@@ -26,6 +27,7 @@ import com.centit.support.network.UrlOptUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpSession;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,13 +59,22 @@ public class HttpBizOperation implements BizOperation {
         String loginUrlCode = BuiltInOperation.getJsonFieldString(bizOptJson, "loginService", null);
         String json = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
         String httpUrl = BuiltInOperation.getJsonFieldString(bizOptJson, "httpUrl", null);
+        String requestType=BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
         Object requestBody="";
-        if(json!=null) {
-            String requestBodyData = json.trim();
-            if (requestBodyData.startsWith("{") && requestBodyData.endsWith("}")){
-                requestBody =JSONTransformer.transformer(JSON.parse(json), new BizModelJSONTransform(bizModel));
-            }else {
-                requestBody = JSONTransformer.transformer(json, new BizModelJSONTransform(bizModel));
+        InputStream inputStream = null;
+        if(ConstantValue.FILE_REQUEST_TYPE.equals(requestType)){
+            String source = bizOptJson.getString("source");
+            DataSet dataSet = bizModel.fetchDataSetByName(source);
+            Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
+            inputStream = DataSetOptUtil.getInputStreamFormFile(fileInfo);
+        }else {
+            if (json != null) {
+                String requestBodyData = json.trim();
+                if (requestBodyData.startsWith("{") && requestBodyData.endsWith("}")) {
+                    requestBody = JSONTransformer.transformer(JSON.parse(json), new BizModelJSONTransform(bizModel));
+                } else {
+                    requestBody = JSONTransformer.transformer(json, new BizModelJSONTransform(bizModel));
+                }
             }
         }
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlvalue");
@@ -92,11 +103,11 @@ public class HttpBizOperation implements BizOperation {
         }
         if (RequestThreadLocal.getLocalThreadWrapperRequest()!=null){
             HttpSession session = RequestThreadLocal.getLocalThreadWrapperRequest().getSession();
-            headers.put(WebOptUtils.SESSION_ID_TOKEN/*"x-auth-token"*/, session==null?null:session.getId());
+            headers.put(WebOptUtils.SESSION_ID_TOKEN, session==null?null:session.getId());
         }
         HttpExecutorContext httpExecutorContext = getHttpClientContext(loginUrlInfo);
         httpExecutorContext.headers(headers);
-        if (httpUrlCodeInfo == null && ( StringUtils.isBlank(httpUrl) || !httpUrl.contains("://")) ){
+        if (httpUrlCodeInfo == null && ( StringUtils.isBlank(httpUrl) || !httpUrl.contains(ConstantValue.HTTP_REQUEST_PREFIX)) ){
             return ResponseData.makeErrorMessage(ResponseData.ERROR_PRECONDITION_FAILED,"无效请求地址！");
         }
         httpUrl= httpUrlCodeInfo == null || httpUrl.contains("://") ?
@@ -108,8 +119,13 @@ public class HttpBizOperation implements BizOperation {
         mapObject.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
         switch (httpMethod.toLowerCase()) {
             case "post":
-                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
-                    UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody,false));
+                if(ConstantValue.FILE_REQUEST_TYPE.equals(requestType) && inputStream!=null){
+                    receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
+                        UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), inputStream));
+                }else {
+                    receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
+                        UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody, false));
+                }
                 dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
                 break;
             case "put":
