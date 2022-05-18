@@ -14,6 +14,8 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutableTriple;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,47 +55,18 @@ public abstract class BuiltInOperation {
         return result;
     }
 
-    public static Map<String, String> jsonArrayToMap(JSONArray json, String key, String... value) {
+    public static Map<String, String> jsonArrayToMap(JSONArray json, String key, String value) {
         if (json != null) {
             LinkedHashMap<String, String> map = new LinkedHashMap<>();
             for (Object o : json) {
                 JSONObject temp = (JSONObject) o;
                 if (!StringBaseOpt.isNvl(temp.getString(key))) {
-                    StringBuilder values = new StringBuilder();
-                    for (int i = 0; i < value.length; i++) {
-                        values.append(temp.getString(value[i]));
-                        if (i < value.length - 1) {
-                            values.append(":");
-                        }
-                    }
-                    map.put(temp.getString(key), values.toString());
+                    map.put(temp.getString(key), temp.getString(value));
                 }
             }
             return map;
         }
         return Collections.EMPTY_MAP;
-    }
-
-    private static List<String> jsonArrayToList(JSONArray json, String key, String value, String compare) {
-        if (json != null) {
-            List<String> list = new ArrayList<>(json.size());
-            for (Object o : json) {
-                JSONObject temp = (JSONObject) o;
-                if (!StringBaseOpt.isNvl(temp.getString(key))) {
-                    if (compare.equalsIgnoreCase(temp.getString(value))) {
-                        if (!list.contains(temp.getString(key) + " " + temp.getString(value))) {
-                            list.add(temp.getString(key) + " " + temp.getString(value));
-                        }
-                    } else {
-                        if (!list.contains(temp.getString(key))) {
-                            list.add(temp.getString(key));
-                        }
-                    }
-                }
-            }
-            return list;
-        }
-        return Collections.emptyList();
     }
 
     public static ResponseData runStart(BizModel bizModel, JSONObject bizOptJson) {
@@ -144,7 +117,9 @@ public abstract class BuiltInOperation {
     public static ResponseData runFilter(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
-        List<String> formula = jsonArrayToList(bizOptJson.getJSONArray("configfield"), "paramValidateRegex", "column", "");
+        List<String> formula = CollectionsOpt.mapCollectionToList(bizOptJson.getJSONArray("configfield"),
+            (a) -> ((JSONObject) a).getString("paramValidateRegex"), true);
+
         int count = 0;
         if (formula != null) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
@@ -160,16 +135,20 @@ public abstract class BuiltInOperation {
     public static ResponseData runStat(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
-        List<String> groupFields = jsonArrayToList(bizOptJson.getJSONArray("exconfig"), "columnName", "index", "");
-        Map<String, String> stat = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName", "nodeInstId");
+        List<String> groupFields = CollectionsOpt.mapCollectionToList(bizOptJson.getJSONArray("exconfig"),
+            (a) -> ((JSONObject) a).getString("columnName"), true);
+        List<Triple<String, String, String>> statDesc = CollectionsOpt.mapCollectionToList(
+            bizOptJson.getJSONArray("config"),
+            (a) -> new MutableTriple<>( ((JSONObject) a).getString("columnName"),
+                ((JSONObject) a).getString("cName"),
+                 ((JSONObject) a).getString("nodeInstId"))    );
+
         int count = 0;
-        if (stat != null) {
+        if (statDesc != null) {
             DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-            if (dataSet != null) {
-                DataSet destDs = DataSetOptUtil.statDataset(dataSet, groupFields, stat);
-                count = destDs.getSize();
-                bizModel.putDataSet(targetDsName, destDs);
-            }
+            DataSet destDs = DataSetOptUtil.statDataset(dataSet, groupFields, statDesc);
+            count = destDs.getSize();
+            bizModel.putDataSet(targetDsName, destDs);
         }
         return createResponseSuccessData(count);
     }
@@ -177,8 +156,12 @@ public abstract class BuiltInOperation {
     public static ResponseData runAnalyse(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
-        List<String> orderFields = jsonArrayToList(bizOptJson.getJSONArray("sortconfig"), "sortName", "order", "desc");
-        List<String> groupFields = jsonArrayToList(bizOptJson.getJSONArray("exconfig"), "groupName", "groupName", "");
+        List<String> orderFields = CollectionsOpt.mapCollectionToList(bizOptJson.getJSONArray("sortconfig"),
+            (a) -> ((JSONObject) a).getString("sortName"), true);
+
+        List<String> groupFields = CollectionsOpt.mapCollectionToList(bizOptJson.getJSONArray("exconfig"),
+            (a) -> ((JSONObject) a).getString("groupName"), true);
+
         int count = 0;
         Map<String, String> analyse = jsonArrayToMap(bizOptJson.getJSONArray("configfield"), "columnName", "expression");
         if (analyse != null) {
@@ -196,8 +179,12 @@ public abstract class BuiltInOperation {
     public static ResponseData runCross(BizModel bizModel, JSONObject bizOptJson) {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
-        List<String> rows = jsonArrayToList(bizOptJson.getJSONArray("RowField"), "primaryKey1", "unique", "");
-        List<String> cols = jsonArrayToList(bizOptJson.getJSONArray("ColumnsField"), "primaryKey2", "unique", "");
+        List<String> rows =  CollectionsOpt.mapCollectionToList(bizOptJson.getJSONArray("RowField"),
+            (a) -> ((JSONObject) a).getString("primaryKey1"), true);
+
+        List<String> cols = CollectionsOpt.mapCollectionToList(bizOptJson.getJSONArray("ColumnsField"),
+            (a) -> ((JSONObject) a).getString("primaryKey2"), true);
+
         //是否保留旧字段
         Boolean isOldField = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getBoolean("isOldField"),true);
         //连接符
@@ -216,14 +203,50 @@ public abstract class BuiltInOperation {
 
     public static ResponseData runSort(BizModel bizModel, JSONObject bizOptJson) {
         String sour1DsName = getJsonFieldString(bizOptJson, "source", null);
-        List<String> orderByFields = jsonArrayToList(bizOptJson.getJSONArray("config"), "columnName", "orderBy", "desc");
+        List<String> orderByFields = CollectionsOpt.mapCollectionToList(bizOptJson.getJSONArray("config"),
+            (a)-> {
+                JSONObject obj = (JSONObject) a;
+                String fieldName = obj.getString("columnName");
+                if(StringUtils.isBlank(fieldName)){
+                    return null;
+                }
+                String orderBy = obj.getString("orderBy");
+                if("desc".equalsIgnoreCase(orderBy)){
+                    fieldName = fieldName + " desc";
+                }
+                return fieldName;
+            }, true);
         DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
         DataSetOptUtil.sortDataSetByFields(dataSet, orderByFields);
         return createResponseSuccessData(dataSet.getSize());
     }
 
+    public static ResponseData runSortAsTree(BizModel bizModel, JSONObject bizOptJson) {
+        String sour1DsName = getJsonFieldString(bizOptJson, "source", null);
+        String parentExpress = getJsonFieldString(bizOptJson, "parentExpress", null);
+        String childExpress = getJsonFieldString(bizOptJson, "childExpress", null);
+        DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
+        DataSetOptUtil.sortDataSetAsTree(dataSet, parentExpress, childExpress);
+        return createResponseSuccessData(dataSet.getSize());
+    }
+
+    public static ResponseData runToTree(BizModel bizModel, JSONObject bizOptJson) {
+        String sour1DsName = getJsonFieldString(bizOptJson, "source", null);
+        String targetDsName = getJsonFieldString(bizOptJson, "id", sour1DsName);
+        String parentExpress = getJsonFieldString(bizOptJson, "parentExpress", null);
+        String childExpress = getJsonFieldString(bizOptJson, "childExpress", null);
+        String childrenFiled = getJsonFieldString(bizOptJson, "childrenFiled", "children");
+        DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
+        DataSet destDs = DataSetOptUtil.toTreeDataSet(dataSet, parentExpress, childExpress, childrenFiled);
+        bizModel.putDataSet(targetDsName, destDs);
+        return createResponseSuccessData(destDs.getSize());
+    }
+
+
     public static ResponseData runClear(BizModel bizModel, JSONObject bizOptJson) {
-        List<String> sets = jsonArrayToList(bizOptJson.getJSONArray("config"), "paramValidateRegex", "index", "");
+        List<String> sets = CollectionsOpt.mapCollectionToList(bizOptJson.getJSONArray("config"),
+            (a) -> ((JSONObject) a).getString("paramValidateRegex"), true);
+
         for (String s : sets) {
             bizModel.putDataSet(s, null);
         }

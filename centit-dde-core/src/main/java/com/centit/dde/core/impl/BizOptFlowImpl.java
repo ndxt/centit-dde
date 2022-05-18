@@ -111,6 +111,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("cross", (bizModel2, bizOptJson2, dataOptContext) -> BuiltInOperation.runCross(bizModel2, bizOptJson2));
         //allOperations.put("compare", BuiltInOperation::runCompare);
         allOperations.put("sort", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runSort(bizModel1, bizOptJson1));
+        allOperations.put("sortAsTree", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runSortAsTree(bizModel1, bizOptJson1));
+        allOperations.put("toTree", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runToTree(bizModel1, bizOptJson1));
         allOperations.put("join", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runJoin(bizModel1, bizOptJson1));
         allOperations.put("union", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runUnion(bizModel, bizOptJson));
         //allOperations.put("filterExt", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runFilterExt(bizModel, bizOptJson));

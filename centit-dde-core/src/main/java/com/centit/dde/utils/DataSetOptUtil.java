@@ -1,6 +1,7 @@
 package com.centit.dde.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
@@ -218,6 +219,26 @@ public abstract class DataSetOptUtil {
         return outDataSet;
     }
 
+    public static void sortDataSetAsTree(DataSet dataSet, String parentExpress, String childExpress){
+        CollectionsOpt.sortAsTree(dataSet.getDataAsList(),
+            (p, c) -> GeneralAlgorithm.equals(
+                VariableFormula.calculate(parentExpress, p),
+                VariableFormula.calculate(childExpress, c),
+                false
+            )
+        );
+    }
+
+    public static DataSet toTreeDataSet(DataSet dataSet, String parentExpress, String childExpress, String childrenFiled){
+        JSONArray treeJSON = CollectionsOpt.sortAsTreeAndToJSON2(dataSet.getDataAsList(),
+            (p, c) -> GeneralAlgorithm.equals(
+                VariableFormula.calculate(parentExpress, p),
+                VariableFormula.calculate(childExpress, c),
+                false
+            ), childrenFiled
+        );
+        return new DataSet(treeJSON);
+    }
     /**
      * 对数据集进行排序
      *
@@ -312,7 +333,7 @@ public abstract class DataSetOptUtil {
         return newRow;
     }
 
-    public static DataSet statDataset(DataSet inData,
+    /*public static DataSet statDataset(DataSet inData,
                                       List<String> groupByFields,
                                       Map<String, String> statDesc) {
         List<Triple<String, String, String>> sd = new ArrayList<>(statDesc.size());
@@ -323,7 +344,7 @@ public abstract class DataSetOptUtil {
             }
         }
         return statDataset(inData, groupByFields, sd);
-    }
+    }*/
 
     /**
      * 分组统计 , 如果 List&gt;String&lt; groupbyFields 为null 或者 空 就是统计所有的（仅返回一行）
@@ -333,7 +354,7 @@ public abstract class DataSetOptUtil {
      * @param statDesc      统计描述; 新字段名， 源字段名， 统计方式 （求和，最大，最小，平均，方差，标准差）
      * @return 返回数据集
      */
-    private static DataSet statDataset(DataSet inData,
+    public static DataSet statDataset(DataSet inData,
                                        List<String> groupByFields,
                                        List<Triple<String, String, String>> statDesc) {
         if (inData == null) {//|| groupByFields == null
@@ -780,18 +801,16 @@ public abstract class DataSetOptUtil {
         if (data2 == null) {
             return nullAsFirst?1:-1;
         }
-
+        /*
+        if (isChinese((String)data1.get(dataField))&&isChinese((String) data2.get(dataField))){
+            char c1 = ((String) data1.get(dataField)).charAt(0);
+            char c2 = ((String) data2.get(dataField)).charAt(0);
+            cr =concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c1)).compareTo(concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c2)));
+        }*/
         for (String field : fields) {
             if (field.endsWith(" desc")) {
                 String dataField = field.substring(0, field.length() - 5).trim();
-                int cr/*;
-                if (isChinese((String)data1.get(dataField))&&isChinese((String) data2.get(dataField))){
-                    char c1 = ((String) data1.get(dataField)).charAt(0);
-                    char c2 = ((String) data2.get(dataField)).charAt(0);
-                    cr =concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c1)).compareTo(concatPinyinStringArray(PinyinHelper.toHanyuPinyinStringArray(c2)));
-                }else {
-                    cr*/ = GeneralAlgorithm.compareTwoObject(data1.get(dataField), data2.get(dataField), !nullAsFirst);
-
+                int cr = GeneralAlgorithm.compareTwoObject(data1.get(dataField), data2.get(dataField), !nullAsFirst);
                 if (cr != 0) {
                     return 0 - cr;
                 }
