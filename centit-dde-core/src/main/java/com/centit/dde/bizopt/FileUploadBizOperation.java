@@ -48,14 +48,18 @@ public class FileUploadBizOperation implements BizOperation {
         fileInfo.setFileName(StringBaseOpt.objectToString(mapFileInfo.get(ConstantValue.FILE_NAME)));
         fileInfo.setOptId(dataOptContext.getOptId());
         fileInfo.setOsId(dataOptContext.getOsId());
+        //TODO optTag 这个不是当前业务主键，这个应该是不对的
         fileInfo.setOptTag(dataOptContext.getPacketId());
         fileInfo.setOptMethod("api");
-        Object session=bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
+        fileInfo.setFileOwner(dataOptContext.getCurrentUserCode());
+        fileInfo.setFileUnit(dataOptContext.getCurrentUnitCode());
+
+        /*Object session=bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
         if(session instanceof CentitUserDetails){
             CentitUserDetails centitUserDetails=(CentitUserDetails)session;
             fileInfo.setFileUnit(centitUserDetails.getTopUnitCode());
             fileInfo.setFileOwner(centitUserDetails.getUserCode());
-        }
+        }*/
         String fileId=fileStore.saveFile(fileInfo, -1, DataSetOptUtil.getInputStreamFormFile(mapFileInfo));
         fileInfo.setFileId(fileId);
         bizModel.putDataSet(targetDsName, new DataSet(fileInfo));

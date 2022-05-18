@@ -14,6 +14,7 @@ import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.JavaBeanMetaData;
 import com.centit.support.compiler.VariableFormula;
+import com.centit.support.file.FileIOOpt;
 import com.centit.support.image.CaptchaImageUtil;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.IOUtils;
@@ -878,26 +879,7 @@ public abstract class DataSetOptUtil {
 
     public static InputStream getInputStreamFormFile( Map<String, Object> fileInfo){
         Object data = fileInfo.get(ConstantValue.FILE_CONTENT);
-        if(data == null) {
-            return null;
-        }
-        if (data instanceof InputStream) {
-            return (InputStream)data;
-        }
-        if (data instanceof OutputStream) {
-            ByteArrayOutputStream outputStream = (ByteArrayOutputStream) data;
-            return new ByteArrayInputStream(outputStream.toByteArray());
-        }
-
-        if(data instanceof byte[]) {
-            return new ByteArrayInputStream((byte[]) data);
-        }
-
-        if(data instanceof String){
-            return new ByteArrayInputStream(((String) data).getBytes(StandardCharsets.UTF_8));
-        }
-        String dataStr = JSON.toJSONString(data);
-        return new ByteArrayInputStream(dataStr.getBytes(StandardCharsets.UTF_8));
+        return FileIOOpt.castObjectToInputStream(data);
     }
 
     //获取数据集参数或者自定义参数

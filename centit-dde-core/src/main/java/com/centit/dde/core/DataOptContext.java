@@ -2,6 +2,7 @@ package com.centit.dde.core;
 
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.support.common.ObjectException;
 import lombok.Data;
 
@@ -41,5 +42,21 @@ public class DataOptContext {
             throw new ObjectException("内部堆栈数据必须以'__'开头");
         }
         callStackData.put(key, value);
+    }
+
+    public String getCurrentUserCode(){
+        CentitUserDetails currentUserDetails = (CentitUserDetails)callStackData.get(ConstantValue.SESSION_DATA_TAG);
+        if(currentUserDetails!=null){
+            return currentUserDetails.getUserCode();
+        }
+        return null;
+    }
+
+    public String getCurrentUnitCode(){
+        CentitUserDetails currentUserDetails = (CentitUserDetails)callStackData.get(ConstantValue.SESSION_DATA_TAG);
+        if(currentUserDetails!=null){
+            return currentUserDetails.getCurrentUnitCode();
+        }
+        return null;
     }
 }
