@@ -37,7 +37,7 @@ public class DataOptContext {
     }
 
     public void setStackData(String key, Object value) {
-        if (key == null || !key.startsWith("__")) {
+        if (key == null || !key.startsWith(ConstantValue.DOUBLE_UNDERLINE)) {
             throw new ObjectException("内部堆栈数据必须以'__'开头");
         }
         callStackData.put(key, value);

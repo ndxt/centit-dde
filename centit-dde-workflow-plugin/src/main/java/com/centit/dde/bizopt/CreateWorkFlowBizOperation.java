@@ -81,10 +81,12 @@ public class CreateWorkFlowBizOperation implements BizOperation {
                 if (expression != null) {
                     Object transform = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
                     boolean isGlobal = BooleanBaseOpt.castObjectToBoolean(flowVariable.get("isGlobal"), false);
-                    if (isGlobal) {//全局流程变量
-                        globalVariables.put(variableName, transform);
-                    } else {
-                        variables.put(variableName, transform);
+                    if(transform!=null) {
+                        if (isGlobal) {//全局流程变量
+                            globalVariables.put(variableName, transform);
+                        } else {
+                            variables.put(variableName, transform);
+                        }
                     }
                 }
             }

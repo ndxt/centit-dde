@@ -17,6 +17,7 @@ import java.util.Map;
 public class BizModel implements  Serializable {
     private static final long serialVersionUID = 1L;
 
+
     public static BizModel EMPTY_BIZ_MODEL
         = new BizModel("EMPTY_BIZ_MODEL");
     public static String DEFAULT_MODEL_NAME = "bizModel";
@@ -150,7 +151,7 @@ public class BizModel implements  Serializable {
     }
 
     public void setStackData(String key, Object value) {
-        if(key == null || !key.startsWith("__")){
+        if(key == null || !key.startsWith(ConstantValue.DOUBLE_UNDERLINE)){
             throw new ObjectException("内部堆栈数据必须以'__'开头");
         }
         stackData.put(key, value);
@@ -170,7 +171,7 @@ public class BizModel implements  Serializable {
             return;
         }
         for(Map.Entry<String, Object> ent : callStack.entrySet()){
-            if(ent.getKey().startsWith("__")){
+            if(ent.getKey().startsWith(ConstantValue.DOUBLE_UNDERLINE)){
                 stackData.put(ent.getKey(), ent.getValue());
             }
         }
@@ -221,14 +222,11 @@ public class BizModel implements  Serializable {
                 break;
         }
 
-        if(dataSetName.startsWith("__")){
-            Object obj = getStackData(dataSetName);
-            if(obj != null){
-                return new DataSet(obj);
-            }
+        if(dataSetName.startsWith(ConstantValue.DOUBLE_UNDERLINE)){
             if(ConstantValue.LAST_ERROR_TAG.equals(dataSetName)){
                 return new DataSet(optResult.getLastError());
             }
+            return new DataSet(getStackData(dataSetName));
         }
 
         Map<String, DataSet> dss = getBizData();
