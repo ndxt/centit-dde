@@ -57,10 +57,11 @@ public class CreateWorkFlowBizOperation implements BizOperation {
             return ResponseData.makeErrorMessage(500, "flowOptTag不能为空！");
         }
         String id = bizOptJson.getString("id");
-        String unitCodeTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(unitCode, new BizModelJSONTransform(bizModel)));
-        String userCodeTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(userCode, new BizModelJSONTransform(bizModel)));
-        String flowOptNameTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowOptName, new BizModelJSONTransform(bizModel)));
-        String flowOptTagTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowOptTag, new BizModelJSONTransform(bizModel)));
+        BizModelJSONTransform bizModelJSONTransform = new BizModelJSONTransform(bizModel);
+        String unitCodeTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(unitCode, bizModelJSONTransform));
+        String userCodeTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(userCode, bizModelJSONTransform));
+        String flowOptNameTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowOptName,bizModelJSONTransform));
+        String flowOptTagTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowOptTag, bizModelJSONTransform));
         CreateFlowOptions createFlowOptions = CreateFlowOptions.create();
         createFlowOptions.setFlowCode(flowCode);
         createFlowOptions.setFlowOptTag(flowOptTagTran);
@@ -79,7 +80,7 @@ public class CreateWorkFlowBizOperation implements BizOperation {
                 //字段值
                 Object expression = flowVariable.get("expression");
                 if (expression != null) {
-                    Object transform = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
+                    Object transform = JSONTransformer.transformer(expression, bizModelJSONTransform);
                     boolean isGlobal = BooleanBaseOpt.castObjectToBoolean(flowVariable.get("isGlobal"), false);
                     if(transform!=null) {
                         if (isGlobal) {//全局流程变量
@@ -102,7 +103,7 @@ public class CreateWorkFlowBizOperation implements BizOperation {
                 String roleCode = StringBaseOpt.objectToString(roleMap.get("roleCode"));
                 Object expression = roleMap.get("expression");
                 if (expression != null) {
-                    Object transform = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
+                    Object transform = JSONTransformer.transformer(expression,bizModelJSONTransform);
                     flowRoleUsers.put(roleCode, StringBaseOpt.objectToStringList(transform));
                 }
             }
@@ -115,7 +116,7 @@ public class CreateWorkFlowBizOperation implements BizOperation {
                 Map<String, Object> map = CollectionsOpt.objectToMap(fieldInfo);
                 String expression = StringBaseOpt.objectToString(map.get("expression"));
                 if (StringUtils.isBlank(expression)) continue;
-                Object value = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
+                Object value = JSONTransformer.transformer(expression,bizModelJSONTransform);
                 String columnName = StringBaseOpt.objectToString(map.get("columnName"));
                 switch (columnName) {
                     case "modelId":

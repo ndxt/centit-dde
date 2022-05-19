@@ -47,9 +47,10 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
             return ResponseData.makeErrorMessage(500, "userCode不能为空！");
         }
         SubmitOptOptions submitOptOptions = SubmitOptOptions.create();
-        String nodeInstIdFormula = StringBaseOpt.castObjectToString(JSONTransformer.transformer(nodeInstId, new BizModelJSONTransform(bizModel)));
-        String unitCodeFormula = StringBaseOpt.castObjectToString(JSONTransformer.transformer(unitCode, new BizModelJSONTransform(bizModel)));
-        String userCodeFormula = StringBaseOpt.castObjectToString(JSONTransformer.transformer(userCode, new BizModelJSONTransform(bizModel)));
+        BizModelJSONTransform bizModelJSONTransform = new BizModelJSONTransform(bizModel);
+        String nodeInstIdFormula = StringBaseOpt.castObjectToString(JSONTransformer.transformer(nodeInstId, bizModelJSONTransform));
+        String unitCodeFormula = StringBaseOpt.castObjectToString(JSONTransformer.transformer(unitCode, bizModelJSONTransform));
+        String userCodeFormula = StringBaseOpt.castObjectToString(JSONTransformer.transformer(userCode, bizModelJSONTransform));
         submitOptOptions.setNodeInstId(nodeInstIdFormula);
         submitOptOptions.setUnitCode(unitCodeFormula);
         submitOptOptions.setUserCode(userCodeFormula);
@@ -66,7 +67,7 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                 //字段值
                 Object expression = flowVariable.get("expression");
                 if (expression != null) {
-                    Object transform = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
+                    Object transform = JSONTransformer.transformer(expression,bizModelJSONTransform);
                     if(transform!=null) {
                         boolean isGlobal = BooleanBaseOpt.castObjectToBoolean(flowVariable.get("isGlobal"), false);
                         if (isGlobal) {//全局流程变量
@@ -89,7 +90,7 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                 String roleCode = StringBaseOpt.objectToString(roleMap.get("roleCode"));
                 Object expression = roleMap.get("expression");
                 if (expression != null) {
-                    Object transform = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
+                    Object transform = JSONTransformer.transformer(expression,bizModelJSONTransform);
                     flowRoleUsers.put(roleCode, StringBaseOpt.objectToStringList(transform));
                 }
             }
@@ -103,7 +104,7 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                     String columnName = StringBaseOpt.objectToString(map.get("columnName"));
                     String expression = StringBaseOpt.objectToString(map.get("expression"));
                     if (StringUtils.isBlank(expression)) continue;
-                    Object value = JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel));
+                    Object value = JSONTransformer.transformer(expression,bizModelJSONTransform);
                     switch (columnName) {
                         case "grantorCode":
                             submitOptOptions.setGrantorCode(StringBaseOpt.objectToString(value));
