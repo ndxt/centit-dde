@@ -10,6 +10,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.DataCheckRule;
+import com.centit.product.metadata.service.DataCheckRuleService;
 import com.centit.product.metadata.utils.DataCheckResult;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -21,17 +22,23 @@ import java.util.Map;
 
 public class CheckRuleBizOperation implements BizOperation {
 
+    private DataCheckRuleService dataCheckRuleService;
+
+    public CheckRuleBizOperation(DataCheckRuleService dataCheckRuleService) {
+        this.dataCheckRuleService = dataCheckRuleService;
+    }
+
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String dataSetId = bizOptJson.getString("source");
         DataSet dataSet = bizModel.getDataSet(dataSetId);
         if (dataSet == null) return ResponseData.makeErrorMessage("校验数据不能为空！");
+
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
         DataCheckResult result = DataCheckResult.create();
         JSONArray rulesJson = bizOptJson.getJSONArray("config");
         String checkRuleResultMsgField =bizOptJson.getString("checkRuleResultMsgField");
         String checkRuleResultField =bizOptJson.getString("checkRuleResultField");
-        //界面2个勾选框的值
         JSONArray checkRuleMsg = bizOptJson.getJSONArray("checkRuleMsg");
         if (checkRuleMsg == null || checkRuleMsg.size() == 0) return ResponseData.makeErrorMessage("校验信息不能为空！");
         //是否返回校验信息，默认不返回
@@ -48,14 +55,13 @@ public class CheckRuleBizOperation implements BizOperation {
                 for (Object checkParam : checkParams) {
                     Map<String, Object> param = CollectionsOpt.objectToMap(checkParam);
                     String params = StringBaseOpt.objectToString(param.get("params"));
-                    //StringBaseOpt.objectToString(param.get("paramValue"));
                     String paramValue = StringBaseOpt.castObjectToString(
                         JSONTransformer.transformer(param.get("paramValue"), new BizModelJSONTransform(bizModel)));
                     paramMap.put(params,paramValue);
                 }
                 JSONObject checkType = dataCheckRuleInfo.getJSONObject("checkType");
-                DataCheckRule dataCheckRule = checkType.getObject("option", DataCheckRule.class);
-                result.checkData(dataInfo,dataCheckRule,paramMap,isReturnCheckMsg);
+                DataCheckRule dataCheckRule = dataCheckRuleService.getObjectById("id");
+                result.checkData(dataInfo,dataCheckRule,paramMap,isReturnCheckMsg,true);
                 if (dataInfo instanceof Map){
                     Map<String, Object> map = CollectionsOpt.objectToMap(dataInfo);
                     if (isReturnCheckResult){
