@@ -34,7 +34,7 @@ public class CheckRuleBizOperation implements BizOperation {
         DataSet dataSet = bizModel.getDataSet(dataSetId);
         if (dataSet == null) return ResponseData.makeErrorMessage("校验数据不能为空！");
 
-        List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
+
         DataCheckResult result = DataCheckResult.create();
         JSONArray rulesJson = bizOptJson.getJSONArray("config");
         String checkRuleResultMsgField =bizOptJson.getString("checkRuleResultMsgField");
@@ -45,23 +45,29 @@ public class CheckRuleBizOperation implements BizOperation {
         boolean isReturnCheckMsg = checkRuleMsg.contains("checkRuleResultMsgField");
         //是否返回校验结果
         boolean isReturnCheckResult = checkRuleMsg.contains("checkRuleResultField");
-        dataAsList.stream().forEach(dataInfo->{
+
+        BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
+        for(Map<String, Object> dataInfo : dataSet.getDataAsList()){
+
+            //TODO 把这个也更改为 for 不要用 这个
             rulesJson.stream().forEach(ruleInfo->{
-                JSONObject  dataCheckRuleInfo = JSON.parseObject(StringBaseOpt.castObjectToString(ruleInfo));
-                String checkField = dataCheckRuleInfo.getString("checkField");
-                Map<String, String>  paramMap = new HashMap<>();
-                paramMap.put("checkValue",checkField);
-                JSONArray checkParams = dataCheckRuleInfo.getJSONArray("checkParams");
-                for (Object checkParam : checkParams) {
-                    Map<String, Object> param = CollectionsOpt.objectToMap(checkParam);
-                    String params = StringBaseOpt.objectToString(param.get("params"));
-                    String paramValue = StringBaseOpt.castObjectToString(
-                        JSONTransformer.transformer(param.get("paramValue"), new BizModelJSONTransform(bizModel)));
-                    paramMap.put(params,paramValue);
+                JSONObject  dataCheckRuleInfo = (JSONObject)ruleInfo;
+                Map<String, Object> paramMap = new HashMap<>(4);
+                for (Object o :  dataCheckRuleInfo.getJSONArray("checkParams")) {
+                    JSONObject temp = (JSONObject) o;
+                    if (!StringBaseOpt.isNvl(temp.getString("params"))) {
+                        paramMap.put(temp.getString("params"),
+                                JSONTransformer.transformer(temp.get("paramValue"), transform));
+                    }
                 }
-                JSONObject checkType = dataCheckRuleInfo.getJSONObject("checkType");
+
+                String checkField = dataCheckRuleInfo.getString("checkField");
+                paramMap.put("checkValue",
+                        JSONTransformer.transformer(checkField, transform));
+
+                //JSONObject checkType = dataCheckRuleInfo.getJSONObject("checkType");
                 DataCheckRule dataCheckRule = dataCheckRuleService.getObjectById("id");
-                result.checkData(dataInfo,dataCheckRule,paramMap,isReturnCheckMsg,true);
+                result.runCkeckRule(dataCheckRule,paramMap,isReturnCheckMsg,true);
                 if (dataInfo instanceof Map){
                     Map<String, Object> map = CollectionsOpt.objectToMap(dataInfo);
                     if (isReturnCheckResult){
@@ -74,7 +80,7 @@ public class CheckRuleBizOperation implements BizOperation {
             });
             //清除上个对象的校验结果信息
             result.reset();
-        });
+        }
         return BuiltInOperation.createResponseSuccessData(0);
     }
 }
