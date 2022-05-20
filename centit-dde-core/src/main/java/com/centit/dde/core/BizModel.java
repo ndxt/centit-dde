@@ -144,7 +144,7 @@ public class BizModel implements  Serializable {
     public Object getStackData(String key) {
         Object object=stackData.get(key);
         if(object==null){
-            return new HashMap<>(1);
+            return new HashMap<>(0);
         }else{
             return object;
         }

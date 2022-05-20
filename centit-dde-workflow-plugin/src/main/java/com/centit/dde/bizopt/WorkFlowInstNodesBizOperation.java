@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * 获取流程实列组件
  */
-public class WorkFlowInstNodesBizOperation  implements BizOperation {
+public class WorkFlowInstNodesBizOperation implements BizOperation {
 
     private FlowManager flowManager;
 
@@ -34,40 +34,34 @@ public class WorkFlowInstNodesBizOperation  implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext){
+        String id = bizOptJson.getString("id");
         String queryType = bizOptJson.getString("queryType");
-        if (StringUtils.isBlank(queryType)){
+        if (StringUtils.isBlank(queryType)) {
             return ResponseData.makeErrorMessage("请选择获取类别！");
         }
-        Map<String,Object>  queryParam = new HashMap<>();
-        if (!"ALL".equals(queryType)){
-            queryParam.put("nodeState",queryType);
+        Map<String, Object> queryParam = new HashMap<>(10);
+        if (!"ALL".equals(queryType)) {
+            queryParam.put("nodeState", queryType);
         }
         JSONArray paramList = bizOptJson.getJSONArray("paramList");
         for (Object fieldInfo : paramList) {
             Map<String, Object> fieldMap = CollectionsOpt.objectToMap(fieldInfo);
             String fieldValue = StringBaseOpt.castObjectToString(fieldMap.get("fieldValue"));
-            if (StringUtils.isNotBlank(fieldValue)){
-                String formulaValue =  StringBaseOpt.castObjectToString(JSONTransformer.transformer(fieldValue, new BizModelJSONTransform(bizModel)));
-                queryParam.put(StringBaseOpt.castObjectToString(fieldMap.get("fieldName")),formulaValue);
+            if (StringUtils.isNotBlank(fieldValue)) {
+                String formulaValue = StringBaseOpt.castObjectToString(JSONTransformer.transformer(fieldValue, new BizModelJSONTransform(bizModel)));
+                queryParam.put(StringBaseOpt.castObjectToString(fieldMap.get("fieldName")), formulaValue);
             }
         }
-        PageDesc pageDesc =null;
+        PageDesc pageDesc = new PageDesc();
         Object pageNo = queryParam.get("pageNo");
         Object pageSize = queryParam.get("pageSize");
-        if (pageNo!=null && pageSize!=null){
-            pageDesc = new PageDesc();
+        if (pageNo != null && pageSize != null) {
             pageDesc.setPageNo(NumberBaseOpt.castObjectToInteger(pageNo));
             pageDesc.setPageSize(NumberBaseOpt.castObjectToInteger(pageSize));
         }
-        List<NodeInstance> nodeInstances = flowManager.listNodeInstance(queryParam,pageDesc);
-        String id = bizOptJson.getString("id");
-        if (pageDesc!=null){
-            PageQueryResult<Object> result = PageQueryResult.createResult(CollectionsOpt.objectToList(nodeInstances), pageDesc);
-            bizModel.putDataSet(id, new DataSet(result));//返回带分页的数据
-        }else {
-            bizModel.putDataSet(id,new DataSet(nodeInstances));
-        }
-        return BuiltInOperation.createResponseSuccessData(nodeInstances.size());
+        ResponseData nodeInstances = flowManager.dubboNodeInstance(queryParam, pageDesc);
+        bizModel.putDataSet(id, new DataSet(nodeInstances.getData()));
+        return BuiltInOperation.createResponseSuccessData(1);
     }
 }

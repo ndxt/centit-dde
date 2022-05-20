@@ -68,6 +68,10 @@ public class DataPacketParamDraft implements Serializable {
     @ApiModelProperty(value = "参数默认值")
     private String paramDefaultValue;
 
+    @Column(name = "IS_REQUIRED")
+    @ApiModelProperty(value = "是否必填")
+    private String isRequired;
+
     @Column(name = "PARAM_ORDER")
     @ApiModelProperty(value = "条件序号")
     private int paramOrder;

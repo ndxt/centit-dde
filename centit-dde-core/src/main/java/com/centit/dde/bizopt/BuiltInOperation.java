@@ -141,7 +141,7 @@ public abstract class BuiltInOperation {
             bizOptJson.getJSONArray("config"),
             (a) -> new MutableTriple<>( ((JSONObject) a).getString("columnName"),
                 ((JSONObject) a).getString("cName"),
-                 ((JSONObject) a).getString("nodeInstId"))    );
+                 ((JSONObject) a).getString("statType"))    );
 
         int count = 0;
         if (statDesc != null) {

@@ -8,6 +8,7 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.core.dao.DictionaryMapUtils;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -35,7 +36,8 @@ public class WorkFlowUserTaskBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
-        Map<String, Object> queryParam = new HashMap<>();
+        String id = bizOptJson.getString("id");
+        Map<String, Object> queryParam = new HashMap<>(10);
         JSONArray paramList = bizOptJson.getJSONArray("paramList");
         //构建查询参数
         for (Object fieldInfo : paramList) {
@@ -48,41 +50,45 @@ public class WorkFlowUserTaskBizOperation implements BizOperation {
         }
         Object pageNo = queryParam.get("pageNo");
         Object pageSize = queryParam.get("pageSize");
-        PageDesc pageDesc = null;
+        PageDesc pageDesc = new PageDesc();
         if (pageNo != null && pageSize != null) {
-            pageDesc = new PageDesc();
             pageDesc.setPageNo(NumberBaseOpt.castObjectToInteger(pageNo));
             pageDesc.setPageSize(NumberBaseOpt.castObjectToInteger(pageSize));
         }
         String userCode = StringBaseOpt.castObjectToString(queryParam.get("userCode"));
-        List<UserTask> userTask;
+        ResponseData responseData;
         Integer taskType = bizOptJson.getInteger("taskType");
         switch (taskType) {
             //静态待办
             case 1:
-                userTask = flowEngine.listUserStaticTask(queryParam, pageDesc);
+                responseData = flowEngine.dubboUserStaticTask(queryParam, pageDesc);
+                bizModel.putDataSet(id, new DataSet(responseData.getData()));
                 break;
             //委托待办
             case 2:
-                userTask = flowEngine.listUserGrantorTask(queryParam, pageDesc);
+                responseData =flowEngine.dubboUserGrantorTask(queryParam, pageDesc);
+                bizModel.putDataSet(id, new DataSet(responseData.getData()));
                 break;
             //岗位待办
             case 3:
                 if (StringUtils.isBlank(userCode)) {
                     return ResponseData.makeErrorMessage("userCode不能为空！");
                 }
-                userTask = flowEngine.listUserDynamicTask(queryParam, pageDesc);
+                responseData = flowEngine.dubboUserDynamicTask(queryParam, pageDesc);
+                bizModel.putDataSet(id, new DataSet(responseData.getData()));
                 break;
             //自己和委托的待办
             case 4:
-                userTask = flowEngine.listUserStaticAndGrantorTask(queryParam, pageDesc);
+                responseData = flowEngine.dubboUserStaticAndGrantorTask(queryParam, pageDesc);
+                bizModel.putDataSet(id, new DataSet(responseData.getData()));
                 break;
             //所有待办
             case 5:
                 if (StringUtils.isBlank(userCode)) {
                     return ResponseData.makeErrorMessage("userCode不能为空！");
                 }
-                userTask = flowEngine.listUserAllTask(queryParam, new PageDesc());
+                responseData = flowEngine.dubboUserAllTask(queryParam, pageDesc);
+                bizModel.putDataSet(id, new DataSet(responseData.getData()));
                 break;
             //获取流程所有活动节点的任务列表
             case 6:
@@ -90,18 +96,12 @@ public class WorkFlowUserTaskBizOperation implements BizOperation {
                 if (StringUtils.isBlank(flowInstId)) {
                     return ResponseData.makeErrorMessage("flowInstId不能为空！");
                 }
-                userTask = flowEngine.listFlowActiveNodeOperators(flowInstId);
+                List<UserTask> userTask = flowEngine.listFlowActiveNodeOperators(flowInstId);
+                bizModel.putDataSet(id, new DataSet(DictionaryMapUtils.objectsToJSONArray(userTask)));
                 break;
             default:
                 return ResponseData.makeErrorMessage("未知操作类型！");
         }
-        String id = bizOptJson.getString("id");
-        if (pageDesc != null) {
-            PageQueryResult<Object> result = PageQueryResult.createResult(CollectionsOpt.objectToList(userTask), pageDesc);
-            bizModel.putDataSet(id, new DataSet(result));
-        } else {
-            bizModel.putDataSet(id, new DataSet(userTask));
-        }
-        return BuiltInOperation.createResponseSuccessData(userTask.size());
+        return BuiltInOperation.createResponseSuccessData(1);
     }
 }
