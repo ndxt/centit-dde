@@ -304,7 +304,7 @@ public class HttpTaskController extends BaseController {
     @WrapUpResponseBody
     public Object testFormula(@RequestBody FormulaParameter formulaParams) {
         if(formulaParams.getGetVariable()){
-            return VariableFormula.attainFormulaVariable(StringEscapeUtils.unescapeHtml4(formulaParams.getFormula()));
+            return VariableFormula.attainFormulaVariable(StringEscapeUtils.unescapeHtml4(formulaParams.getFormula()),DataSetOptUtil.extendFuncs);
         }else {
             Map object = (Map) JSON.parse(StringEscapeUtils.unescapeHtml4(formulaParams.getJsonString()));
             VariableFormula variableFormula = new VariableFormula();
