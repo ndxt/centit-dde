@@ -187,6 +187,7 @@ public abstract class DataSetOptUtil {
             obj.putAll(mapDataRow(obj, rowIndex, rowCount, formulaMap));
             rowIndex++;
         }
+        inData.setData(data);
     }
 
     /**
