@@ -1,6 +1,5 @@
 package com.centit.dde.bizopt;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -41,6 +40,89 @@ public class HttpBizOperation implements BizOperation {
         this.sourceInfoDao = sourceInfoDao;
     }
 
+
+    @Override
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
+        //请求服务ip地址
+        String serverIpAddressId = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseId", "");
+        if (StringUtils.isBlank(serverIpAddressId))
+            return BuiltInOperation.createResponseData(0,1, 500, "服务ip地址不能为空！");
+
+        //请求接口
+        String interfaceAddress = BuiltInOperation.getJsonFieldString(bizOptJson, "httpUrl", null);
+        if(StringUtils.isBlank(interfaceAddress))
+            return BuiltInOperation.createResponseData(0,1, 500, "接口地址不能为空！");
+
+        SourceInfo  sourceInfo = sourceInfoDao.getDatabaseInfoById(serverIpAddressId);
+        if (sourceInfo == null)
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_PRECONDITION_FAILED,"无效请求地址！");
+
+        String serverIpAddress = sourceInfo.getDatabaseUrl();
+        String  requestServerAddress = serverIpAddress + interfaceAddress;
+        requestServerAddress = Pretreatment.mapTemplateString(requestServerAddress,new BizModelJSONTransform(bizModel));
+
+        //构建请求头数据
+        Map<String, String> headers = new HashMap<>();
+        if (RequestThreadLocal.getLocalThreadWrapperRequest() != null){
+            HttpSession session = RequestThreadLocal.getLocalThreadWrapperRequest().getSession();
+            headers.put(WebOptUtils.SESSION_ID_TOKEN, session == null ? null : session.getId());
+        }
+        HttpExecutorContext httpExecutorContext = getHttpClientContext(sourceInfo);
+        if (sourceInfo.getExtProps() != null){
+            Map<String, String> extProps = CollectionsOpt.objectMapToStringMap(sourceInfo.getExtProps());
+            headers.putAll(extProps);
+            headers.remove("SSL");
+        }
+        httpExecutorContext.headers(headers);
+        //获取请求参数
+        Map<String, Object> requestParams = getRequestParams(bizOptJson);
+        //添加url中的参数
+        requestParams.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
+        //请求方式
+        String requestMode = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post");
+        HttpReceiveJSON receiveJson = null;
+        switch (requestMode.toLowerCase()) {
+            case "post":
+                String requestType = BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
+                if (ConstantValue.HTTP_REQUEST_PREFIX.equals(requestType)){
+                    InputStream requestFile = getRequestFile(bizOptJson,bizModel);
+                    if (requestFile != null){
+                        receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
+                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestFile));
+                    }
+                }else {
+                    Object requestBody = getRequestBody(bizOptJson, bizModel);
+                    receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
+                        UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
+                }
+                break;
+            case "put":
+                Object requestBody = getRequestBody(bizOptJson, bizModel);
+                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext,
+                    UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
+                break;
+            case "get":
+                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGet(httpExecutorContext, requestServerAddress, requestParams));
+                if (receiveJson.getCode() != ResponseData.RESULT_OK) {
+                    return BuiltInOperation.createResponseData(0,1, receiveJson.getCode(), receiveJson.getMessage());
+                }
+                break;
+            case "delete":
+                DataSet dataSet = BizOptUtils.castObjectToDataSet(HttpExecutor.simpleDelete(httpExecutorContext, requestServerAddress, requestParams));
+                return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+            default:
+                return BuiltInOperation.createResponseData(0,1, 500, "无效请求！");
+        }
+        if (receiveJson != null){
+            DataSet dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
+            String id = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
+            bizModel.putDataSet(id, dataSet);
+            return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+        } else {
+            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, "无数据");
+        }
+    }
+
     private HttpExecutorContext getHttpClientContext(SourceInfo databaseInfo) throws Exception {
         if (databaseInfo != null) {
             HttpExecutorContext executorContext = AbstractSourceConnectThreadHolder.fetchHttpContext(databaseInfo);
@@ -51,32 +133,9 @@ public class HttpBizOperation implements BizOperation {
         return HttpExecutorContext.create();
     }
 
-    @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
-        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
-        String httpMethod = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post");
-        String httpUrlCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseId", "");
-        String loginUrlCode = BuiltInOperation.getJsonFieldString(bizOptJson, "loginService", null);
-        String json = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
-        String httpUrl = BuiltInOperation.getJsonFieldString(bizOptJson, "httpUrl", null);
-        String requestType=BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
-        Object requestBody="";
-        InputStream inputStream = null;
-        if(ConstantValue.FILE_REQUEST_TYPE.equals(requestType)){
-            String source = bizOptJson.getString("source");
-            DataSet dataSet = bizModel.fetchDataSetByName(source);
-            Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
-            inputStream = DataSetOptUtil.getInputStreamFormFile(fileInfo);
-        }else {
-            if (json != null) {
-                String requestBodyData = json.trim();
-                if (requestBodyData.startsWith("{") && requestBodyData.endsWith("}")) {
-                    requestBody = JSONTransformer.transformer(JSON.parse(json), new BizModelJSONTransform(bizModel));
-                } else {
-                    requestBody = JSONTransformer.transformer(json, new BizModelJSONTransform(bizModel));
-                }
-            }
-        }
+    //计算请求参数列表中的参数
+    private Map<String, Object> getRequestParams(JSONObject bizOptJson){
+        //请求参数列表
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlvalue");
         Map<String, Object> mapObject = new HashMap<>();
         if (params != null) {
@@ -86,72 +145,23 @@ public class HttpBizOperation implements BizOperation {
                 }
             }
         }
-        SourceInfo loginUrlInfo=null;
-        if (StringUtils.isNotBlank(loginUrlCode)){
-            loginUrlInfo = sourceInfoDao.getDatabaseInfoById(loginUrlCode);
-        }
-        SourceInfo httpUrlCodeInfo=null;
-        Map<String, String> headers = new HashMap<>();
-        if (StringUtils.isNotBlank(httpUrlCode)){
-            httpUrlCodeInfo = sourceInfoDao.getDatabaseInfoById(httpUrlCode);
-            if (httpUrlCodeInfo!=null){
-                JSONObject extProps = httpUrlCodeInfo.getExtProps();
-                if (extProps !=null){
-                    headers =CollectionsOpt.objectMapToStringMap(extProps);
-                }
-            }
-        }
-        if (RequestThreadLocal.getLocalThreadWrapperRequest()!=null){
-            HttpSession session = RequestThreadLocal.getLocalThreadWrapperRequest().getSession();
-            headers.put(WebOptUtils.SESSION_ID_TOKEN, session==null?null:session.getId());
-        }
-        HttpExecutorContext httpExecutorContext = getHttpClientContext(loginUrlInfo);
-        httpExecutorContext.headers(headers);
-        if (httpUrlCodeInfo == null && ( StringUtils.isBlank(httpUrl) || !httpUrl.contains(ConstantValue.HTTP_REQUEST_PREFIX)) ){
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_PRECONDITION_FAILED,"无效请求地址！");
-        }
-        httpUrl= httpUrlCodeInfo == null || httpUrl.contains("://") ?
-            httpUrl : httpUrlCodeInfo.getDatabaseUrl() + httpUrl;
+        return mapObject;
+    }
 
-        httpUrl = Pretreatment.mapTemplateString(httpUrl,new BizModelJSONTransform(bizModel));
-        DataSet dataSet = new DataSet();
-        HttpReceiveJSON receiveJson;
-        mapObject.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
-        switch (httpMethod.toLowerCase()) {
-            case "post":
-                if(ConstantValue.FILE_REQUEST_TYPE.equals(requestType) && inputStream!=null){
-                    receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
-                        UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), inputStream));
-                }else {
-                    receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
-                        UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody, false));
-                }
-                dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
-                break;
-            case "put":
-                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext,
-                    UrlOptUtils.appendParamsToUrl(httpUrl, mapObject), requestBody));
-                dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
-                break;
-            case "get":
-                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGet(httpExecutorContext, httpUrl, mapObject));
-                if (receiveJson.getCode() != ResponseData.RESULT_OK) {
-                    return BuiltInOperation.createResponseData(0,1, receiveJson.getCode(), receiveJson.getMessage());
-                } else {
-                    dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
-                }
-                break;
-            case "delete":
-                dataSet = BizOptUtils.castObjectToDataSet(HttpExecutor.simpleDelete(httpExecutorContext, httpUrl, mapObject));
-                break;
-            default:
-                break;
+    private Object getRequestBody(JSONObject bizOptJson,BizModel bizModel){
+        Object requestBody="";
+        String json = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
+        if (json != null) {
+            requestBody = JSONTransformer.transformer(json.trim(), new BizModelJSONTransform(bizModel));
         }
-        if (dataSet != null) {
-            bizModel.putDataSet(sourDsName, dataSet);
-            return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
-        } else {
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, "无数据");
-        }
+        return requestBody;
+    }
+
+    private InputStream getRequestFile(JSONObject bizOptJson,BizModel bizModel){
+        String source = bizOptJson.getString("source");
+        DataSet dataSet = bizModel.fetchDataSetByName(source);
+        Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
+        InputStream inputStream = DataSetOptUtil.getInputStreamFormFile(fileInfo);
+        return inputStream;
     }
 }
