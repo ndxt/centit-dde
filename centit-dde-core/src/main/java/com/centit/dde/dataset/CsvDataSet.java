@@ -75,7 +75,7 @@ public class CsvDataSet extends FileDataSet {
                     headers = CollectionsOpt.arrayToList(splitHead);
                 }
             } else {
-                setColumnNames(params, headers);;
+                headers = loadColumnNames(params);;
             }
 
             if (headers == null) {
@@ -118,15 +118,17 @@ public class CsvDataSet extends FileDataSet {
             BooleanBaseOpt.castObjectToBoolean(params.get("firstRowAsHeader"), true);
         List<String> columnNames = null;
         List<Map<String, Object>> list = dataSet.getDataAsList();
-        if(firstRowAsHeader){
-            setColumnNames(params, columnNames);
-        } else {
+
+        if (firstRowAsHeader) {
             Set<String> headers = new HashSet<>(20);
             for (Map<String, Object> row : list) {
                 headers.addAll(row.keySet());
             }
             columnNames = CollectionsOpt.cloneList(headers);
+        } else {
+            columnNames = loadColumnNames(params);
         }
+
         if(columnNames==null || columnNames.size()==0){
             throw new ObjectException(ResponseData.ERROR_USER_CONFIG,"配置信息有错，或者数据为空！");
         }
@@ -154,20 +156,18 @@ public class CsvDataSet extends FileDataSet {
         }
     }
 
-    private static void setColumnNames(Map<String, Object> params, List<String> columnNames) {
+    private static List<String> loadColumnNames(Map<String, Object> params) {
         if(params.get("headers")==null){
-            return;
+            return null;
         }
-        if (columnNames == null) {
-            columnNames = new ArrayList<>();
-        }
+        List<String> columnNames = null;
         //TODO 这个都不对，这些参数的准备 需要放到外面
-        JSONObject jsonObject=JSONObject.parseObject((String) params.get("headers"));
-        JSONArray jsonArray=jsonObject.getJSONArray("headers");
-        for(int i=0;i<jsonArray.size();i++) {
-            JSONObject jsonObject1= jsonArray.getJSONObject(i);
-            columnNames.add(jsonObject1.getString("header"));
+        Object header = params.get("headers");
+        if(header instanceof Collection){
+            columnNames = CollectionsOpt.mapCollectionToList((Collection<? extends Object>) header,
+                (a) -> ((JSONObject)a).getString("header"));
         }
+        return columnNames;
     }
 
     public static InputStream createCsvStream(DataSet dataSet, Map<String, Object> params) throws IOException {
