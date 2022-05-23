@@ -41,13 +41,13 @@ public class CheckRuleBizOperation implements BizOperation {
         boolean isReturnCheckMsg = checkRuleMsg.contains("checkRuleResultMsgField");
         //是否返回校验结果
         boolean isReturnCheckResult = checkRuleMsg.contains("checkRuleResultField");
-        JSONArray rulesJson = bizOptJson.getJSONArray("config");
         //校验信息挂载字段
         String checkRuleResultMsgField =bizOptJson.getString("checkRuleResultMsgField");
         //校验结果挂载字段
         String checkRuleResultField =bizOptJson.getString("checkRuleResultField");
         //获取所有的校验规则id
         List<String>  ruleIds = new ArrayList<>();
+        JSONArray rulesJson = bizOptJson.getJSONArray("config");
         for (Object ruleInfo : rulesJson) {
             JSONObject  dataCheckRuleInfo = (JSONObject)ruleInfo;
             String ruleId = dataCheckRuleInfo.getJSONObject("checkType").getString("key");
