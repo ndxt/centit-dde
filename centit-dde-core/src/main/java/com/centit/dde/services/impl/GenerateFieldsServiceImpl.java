@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.CsvDataSet;
-import com.centit.dde.dataset.ExcelDataSet;
 import com.centit.dde.dataset.JSONDataSet;
 import com.centit.dde.dataset.SqlDataSetWriter;
 import com.centit.dde.services.GenerateFieldsService;
@@ -107,7 +106,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
         return QueryUtils.getSqlTemplateParameters(sql);
     }
 
-    @Override
+   /* @Override
     public List<ColumnSchema> generateExcelFields(Map<String, Object> params) {
         ExcelDataSet excelDataSet = new ExcelDataSet();
         try {
@@ -116,7 +115,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
             e.printStackTrace();
         }
         return getColumnSchemas(Arrays.asList(excelDataSet.getColumns()),false);
-    }
+    }*/
 
     @Override
     public List<ColumnSchema> generateCsvFields(Map<String, Object> params) throws IOException {

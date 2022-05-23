@@ -69,9 +69,9 @@ public class GenerateFieldsController extends BaseController {
         sql = StringEscapeUtils.unescapeHtml4(sql);
         Map<String, Object> params = collectRequestParameters(request);
         switch (dataType) {
-            case "E":
-                params.put("FileId", sql);
-                return generateFieldsService.generateExcelFields(params);
+            //case "E":
+                //params.put("FileId", sql);
+                //return generateFieldsService.generateExcelFields(params);
             case "C":
                 params.put("FileId", sql);
                 return generateFieldsService.generateCsvFields(params);

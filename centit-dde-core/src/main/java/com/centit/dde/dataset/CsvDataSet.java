@@ -161,6 +161,7 @@ public class CsvDataSet extends FileDataSet {
         if (columnNames == null) {
             columnNames = new ArrayList<>();
         }
+        //TODO 这个都不对，这些参数的准备 需要放到外面
         JSONObject jsonObject=JSONObject.parseObject((String) params.get("headers"));
         JSONArray jsonArray=jsonObject.getJSONArray("headers");
         for(int i=0;i<jsonArray.size();i++) {

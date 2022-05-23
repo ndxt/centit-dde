@@ -17,6 +17,7 @@ import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.report.ExcelExportUtil;
+import com.centit.support.report.ExcelImportUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -59,7 +60,9 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
             JSONArray jsonArray = JSON.parseArray(JSON.toJSONString(data));
             XSSFWorkbook xssfWorkbook =new XSSFWorkbook(inputStream);
             XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
-            Map<Integer, String> mapInfo = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
+            Map<String, String> mapInfoDesc = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
+            Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
+
             ExcelExportUtil.saveObjectsToExcelSheet(sheet,jsonArray,mapInfo,beginRow,true);
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             xssfWorkbook.write(byteArrayOutputStream);
@@ -95,24 +98,4 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
     }
 
 
-    private static Map<Integer, String> jsonArrayToMap(JSONArray json, String key, String... value) {
-        if (json != null) {
-            LinkedHashMap<Integer, String> map = new LinkedHashMap<>();
-            for (Object o : json) {
-                JSONObject temp = (JSONObject) o;
-                if (!StringBaseOpt.isNvl(temp.getString(key))) {
-                    StringBuilder values = new StringBuilder();
-                    for (int i = 0; i < value.length; i++) {
-                        values.append(temp.getString(value[i]));
-                        if (i < value.length - 1) {
-                            values.append(":");
-                        }
-                    }
-                    map.put(temp.getInteger(key), values.toString());
-                }
-            }
-            return map;
-        }
-        return Collections.EMPTY_MAP;
-    }
 }
