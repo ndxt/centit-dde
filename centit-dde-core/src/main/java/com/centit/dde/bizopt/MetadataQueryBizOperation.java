@@ -86,8 +86,9 @@ public class MetadataQueryBizOperation implements BizOperation {
                 return BuiltInOperation.createResponseSuccessData(jsonArray.size());
             case 2://查看
                 Map<String, Object> data = metaObjectService.getObjectWithChildren(tableId, parames, withChildrenDeep);
-                bizModel.putDataSet(id, new DataSet(data));
-                return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
+                DataSet dataSet = new DataSet(data);
+                bizModel.putDataSet(id, dataSet);
+                return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
         return ResponseData.makeErrorMessage("未知查询类型！");
     }
