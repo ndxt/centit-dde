@@ -137,4 +137,6 @@ public class ConstantValue {
     public static final String FILE_REQUEST_TYPE="file";
     public static final String HTTP_REQUEST_PREFIX="://";
 
+    public static final String HEADERS = "headers";
+
 }

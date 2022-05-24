@@ -13,7 +13,7 @@ import com.centit.dde.utils.CloneUtils;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.dde.vo.CycleVo;
-import com.centit.fileserver.common.FileStore;
+import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
 import com.centit.framework.core.service.DataScopePowerManager;
@@ -87,7 +87,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     private DataCheckRuleService dataCheckRuleService;
 
     @Autowired(required = false)
-    private FileStore fileStore;
+    private FileInfoOpt fileInfoOpt;
 
     private Map<String, BizOperation> allOperations;
 
@@ -127,13 +127,13 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("csv", new CsvBizOperation());
         allOperations.put("json", new JsonBizOperation());
         allOperations.put("sqlS", new RunSqlBizOperation(sourceInfoDao));
-        allOperations.put("SSD", new ReportBizOperation(fileStore));
+        allOperations.put("SSD", new ReportBizOperation(fileInfoOpt));
         allOperations.put(ConstantValue.GENERATE_CSV, new GenerateCsvFileBizOperation());
         allOperations.put(ConstantValue.GENERATE_JSON, new GenerateJsonFileBizOperation());
-        allOperations.put(ConstantValue.GENERAT_EXCEL, new GenerateExcelFileBizeOperation(fileStore));
+        allOperations.put(ConstantValue.GENERAT_EXCEL, new GenerateExcelFileBizeOperation(fileInfoOpt));
         allOperations.put(ConstantValue.DEFINE_JSON_DATA, new DefineJsonDataBizOperation());
-        allOperations.put(ConstantValue.FILE_UPLOAD, new FileUploadBizOperation(fileStore));
-        allOperations.put(ConstantValue.FILE_DOWNLOAD, new FileDownloadBizOperation(fileStore));
+        allOperations.put(ConstantValue.FILE_UPLOAD, new FileUploadBizOperation(fileInfoOpt));
+        allOperations.put(ConstantValue.FILE_DOWNLOAD, new FileDownloadBizOperation(fileInfoOpt));
         //为了兼容历史数据保留着  现已拆分为元数据查询  和  元数据更新 2个组件
         allOperations.put(ConstantValue.METADATA_OPERATION,
             new MetadataBizOperation(metaObjectService, queryDataScopeFilter, metaDataCache));

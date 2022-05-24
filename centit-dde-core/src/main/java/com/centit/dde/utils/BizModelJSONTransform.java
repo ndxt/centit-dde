@@ -16,19 +16,22 @@ import java.util.List;
  * @author zhf
  */
 public class BizModelJSONTransform
-    implements VariableTranslate, JSONTransformDataSupport{
+    implements VariableTranslate, JSONTransformDataSupport {
     private BizModel data;
     private int stackLength;
     private List<Object> stack;
 
-    public BizModelJSONTransform(BizModel obj){
+    public BizModelJSONTransform(BizModel obj) {
         this.data = obj;
         this.stackLength = 0;
         this.stack = new ArrayList<>(10);
     }
 
     @Override
-    public Object attainExpressionValue(String expression){
+    public Object attainExpressionValue(String expression) {
+        if (expression == null) {
+            return null;
+        }
         VariableFormula variableFormula = new VariableFormula();
         variableFormula.setExtendFuncMap(DataSetOptUtil.extendFuncs);
         variableFormula.setTrans(this);
@@ -41,13 +44,13 @@ public class BizModelJSONTransform
         return Pretreatment.mapTemplateStringAsFormula(templateString, this, "", true);
     }
 
-    private Object peekStackValue(){
-        return stackLength> 1 ? stack.get(stackLength-2): null;
+    private Object peekStackValue() {
+        return stackLength > 1 ? stack.get(stackLength - 2) : null;
     }
 
     @Override
-    public void pushStackValue(Object value){
-        if(stack.size()>stackLength){
+    public void pushStackValue(Object value) {
+        if (stack.size() > stackLength) {
             stack.set(stackLength, value);
         } else {
             stack.add(value);
@@ -56,34 +59,34 @@ public class BizModelJSONTransform
     }
 
     @Override
-    public Object popStackValue(){
-        Object obj = stackLength>0? stack.get(stackLength-1): null;
-        if(stackLength>0){
-            stackLength-- ;
+    public Object popStackValue() {
+        Object obj = stackLength > 0 ? stack.get(stackLength - 1) : null;
+        if (stackLength > 0) {
+            stackLength--;
         }
         return obj;
     }
 
     @Override
     public Object getVarValue(String labelName) {
-        if(labelName.startsWith(ConstantValue.BACKSLASH)){
+        if (labelName.startsWith(ConstantValue.BACKSLASH)) {
             return fetchRootData(labelName.substring(1));
-        } else if(labelName.startsWith(ConstantValue.DOUBLE_SPOT)){
+        } else if (labelName.startsWith(ConstantValue.DOUBLE_SPOT)) {
             return ReflectionOpt.attainExpressionValue(
                 peekStackValue(),
                 labelName.substring(2));
-        } else if(labelName.startsWith(ConstantValue.SPOT)){
-            if(stackLength>0) {
+        } else if (labelName.startsWith(ConstantValue.SPOT)) {
+            if (stackLength > 0) {
                 return ReflectionOpt.attainExpressionValue(
-                    stack.get(stackLength-1),
+                    stack.get(stackLength - 1),
                     labelName.substring(1));
             } else {
                 return fetchRootData(labelName.substring(1));
             }
         } else {
-            if(stackLength>0) {
+            if (stackLength > 0) {
                 return ReflectionOpt.attainExpressionValue(
-                    stack.get(stackLength-1),
+                    stack.get(stackLength - 1),
                     labelName);
             } else {
                 return fetchRootData(labelName);
@@ -91,31 +94,31 @@ public class BizModelJSONTransform
         }
     }
 
-    private Object fetchRootData(String labelName){
-        if(StringUtils.isBlank(labelName)){
+    private Object fetchRootData(String labelName) {
+        if (StringUtils.isBlank(labelName)) {
             return this.data;
         }
 
-        String dataSetName , valuePath;
+        String dataSetName, valuePath;
         int pointIndex = labelName.indexOf('.');
         int pointIndex2 = labelName.indexOf('[');
-        if(pointIndex2>0 && pointIndex2<pointIndex){
+        if (pointIndex2 > 0 && pointIndex2 < pointIndex) {
             pointIndex = pointIndex2;
         }
-        if(pointIndex>0){
+        if (pointIndex > 0) {
             dataSetName = labelName.substring(0, pointIndex);
-            valuePath = labelName.substring(pointIndex+1);
+            valuePath = labelName.substring(pointIndex + 1);
         } else {
             dataSetName = labelName;
             valuePath = null;
         }
 
         DataSet currentDateSet = this.data.fetchDataSetByName(dataSetName);
-        if(currentDateSet!=null){
-            if(StringUtils.isBlank(valuePath)){
+        if (currentDateSet != null) {
+            if (StringUtils.isBlank(valuePath)) {
                 return currentDateSet.getData();
             }
-            if(ConstantValue.DATASET_SIZE.equals(valuePath)){
+            if (ConstantValue.DATASET_SIZE.equals(valuePath)) {
                 return currentDateSet.getSize();
             }
             return ReflectionOpt.attainExpressionValue(
@@ -123,7 +126,7 @@ public class BizModelJSONTransform
                 valuePath);
         }
 
-        if(ConstantValue.MODEL_NAME.equals(dataSetName)){
+        if (ConstantValue.MODEL_NAME.equals(dataSetName)) {
             return this.data.getModelName();
         }
         return "";

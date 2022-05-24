@@ -7,7 +7,7 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.ConstantValue;
-import com.centit.fileserver.common.FileStore;
+import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.ReflectionOpt;
@@ -31,14 +31,14 @@ import java.util.Map;
  * @author zhf
  */
 public class ReportBizOperation implements BizOperation {
-    FileStore fileStore;
+    private FileInfoOpt fileInfoOpt;
 
-    public ReportBizOperation(FileStore fileStore) {
-        this.fileStore = fileStore;
+    public ReportBizOperation(FileInfoOpt fileInfoOpt) {
+        this.fileInfoOpt = fileInfoOpt;
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws  Exception{
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String filePath = bizOptJson.getString("fileId");
         String fileName = Pretreatment.mapTemplateString(BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()), bizModel)
@@ -96,7 +96,7 @@ public class ReportBizOperation implements BizOperation {
             docData.put(placeholder, new ByteArrayImageProvider((byte[]) fieldValue));
         } else if (fieldValue instanceof String) {
             String fileId = StringBaseOpt.castObjectToString(fieldValue);
-            docData.put(placeholder, new ByteArrayImageProvider(FileIOOpt.readBytesFromFile(fileStore.getFile(fileId))));
+            docData.put(placeholder, new ByteArrayImageProvider(FileIOOpt.readBytesFromFile(fileInfoOpt.getFile(fileId))));
         }
     }
 
@@ -104,7 +104,7 @@ public class ReportBizOperation implements BizOperation {
         JSONObject docData = dataModel.toJsonObject(false);
         // 准备图片元数据
         FieldsMetadata metadata = getFieldsMetadata(params, docData);
-        try (InputStream in = new FileInputStream(fileStore.getFile(filePath))) {
+        try (InputStream in = new FileInputStream(fileInfoOpt.getFile(filePath))) {
             // 1) Load ODT file and set Velocity template engine and cache it to the registry
             IXDocReport report = XDocReportRegistry.getRegistry().loadReport(in, TemplateEngineKind.Freemarker, false);
             // 2) Create Java model context

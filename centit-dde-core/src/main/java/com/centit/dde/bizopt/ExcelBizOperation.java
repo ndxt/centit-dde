@@ -32,7 +32,6 @@ public class ExcelBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id =bizOptJson.getString("id");
         String source = bizOptJson.getString("source");
-        Map<String, Object> params = new HashMap<>();
         BizModelJSONTransform modelTrasform = new BizModelJSONTransform(bizModel);
         String sheetName = bizOptJson.getString("sheetName");
         if( StringUtils.isNotBlank(sheetName)) {
@@ -49,7 +48,7 @@ public class ExcelBizOperation implements BizOperation {
             modelTrasform.attainExpressionValue(bizOptJson.getString("endRow")), 0);
 
 
-        boolean headerInRow = BooleanBaseOpt.castObjectToBoolean(params.get("headerInRow"), true);
+        boolean headerInRow = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("headerInRow"), true);
         if(headerInRow){
             String startColumnNumber =
                 StringBaseOpt.castObjectToString(modelTrasform.attainExpressionValue(bizOptJson.getString("startColumnNumber")));

@@ -5,8 +5,10 @@ import com.alibaba.nacos.api.annotation.NacosProperties;
 import com.alibaba.nacos.spring.context.annotation.config.EnableNacosConfig;
 import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySource;
 import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySources;
-import com.centit.fileserver.client.ClientAsFileStore;
+import com.centit.fileserver.client.FileClient;
 import com.centit.fileserver.client.FileClientImpl;
+import com.centit.fileserver.client.FileInfoOptClient;
+import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.config.SpringSecurityDaoConfig;
@@ -39,7 +41,7 @@ import redis.clients.jedis.JedisPool;
         value = org.springframework.stereotype.Controller.class))
 @Configuration
 @EnableNacosConfig(globalProperties = @NacosProperties(serverAddr = "${nacos.server-addr}"))
-@NacosPropertySources({@NacosPropertySource(dataId = "${nacos.system-dataid}",groupId = "CENTIT", autoRefreshed = true)}
+@NacosPropertySources({@NacosPropertySource(dataId = "${nacos.system-dataid}", groupId = "CENTIT", autoRefreshed = true)}
 )
 public class ServiceConfig {
     Logger logger = LoggerFactory.getLogger(ServiceConfig.class);
@@ -69,8 +71,8 @@ public class ServiceConfig {
 
     @Bean
     public JedisPool jedisPool() {
-        logger.info("------------------------redisPort-----------------------:"+redisPort);
-        JedisPool jedisPool= new JedisPool(redisHost,redisPort);
+        logger.info("------------------------redisPort-----------------------:" + redisPort);
+        JedisPool jedisPool = new JedisPool(redisHost, redisPort);
         return jedisPool;
     }
 
@@ -83,7 +85,7 @@ public class ServiceConfig {
     }
 
     @Bean
-    public DataScopePowerManager queryDataScopeFilter(){
+    public DataScopePowerManager queryDataScopeFilter() {
         return new DataScopePowerManagerImpl();
     }
 
@@ -98,15 +100,15 @@ public class ServiceConfig {
     }
 
     @Bean
-    public FileClientImpl fileClient() {
+    public FileClient fileClient() {
         FileClientImpl fileClient = new FileClientImpl();
         fileClient.init(fileserver, fileserver, "u0000000", "000000", fileserver);
         return fileClient;
     }
 
     @Bean
-    public ClientAsFileStore fileStore(@Autowired FileClientImpl fileClient) {
-        ClientAsFileStore fileStoreBean = new ClientAsFileStore();
+    public FileInfoOpt fileInfoOpt(@Autowired FileClient fileClient) {
+        FileInfoOptClient fileStoreBean = new FileInfoOptClient();
         fileStoreBean.setFileClient(fileClient);
         return fileStoreBean;
     }

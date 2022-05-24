@@ -8,7 +8,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DatasetVariableTranslate;
-import com.centit.fileserver.common.FileStore;
+import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -23,10 +23,10 @@ import java.util.Map;
  */
 public class FileDownloadBizOperation implements BizOperation {
 
-    FileStore fileStore;
+    private FileInfoOpt fileInfoOpt;
 
-    public FileDownloadBizOperation(FileStore fileStore) {
-        this.fileStore = fileStore;
+    public FileDownloadBizOperation(FileInfoOpt fileInfoOpt) {
+        this.fileInfoOpt = fileInfoOpt;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class FileDownloadBizOperation implements BizOperation {
         } else {
             fileId = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_ID));
         }
-        InputStream inputStream = new FileInputStream(fileStore.getFile(fileId));
+        InputStream inputStream = new FileInputStream(fileInfoOpt.getFile(fileId));
         if(StringUtils.isNotBlank(fileName)){
             fileName = new DatasetVariableTranslate(dataSet).mapTemplateString(fileName);
         } else {
