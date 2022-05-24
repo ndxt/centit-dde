@@ -5,7 +5,7 @@ import org.springframework.context.ApplicationContext;
 /**
  * @author zhf
  */
-public class ContextUtils {
+public final class ContextUtils {
     private static ApplicationContext context;
 
     private ContextUtils() {
