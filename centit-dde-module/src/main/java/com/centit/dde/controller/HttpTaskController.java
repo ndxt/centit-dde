@@ -184,7 +184,7 @@ public class HttpTaskController extends BaseController {
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, JSON.parse(bodyString));
             } else {
                 String fileName = request.getHeader("fileName");
-                if (fileName != null) {
+                if (fileName == null) {
                     String fileName2 = StringBaseOpt.castObjectToString(params.get("fileName"));
                     if (StringUtils.isBlank(fileName2)) {
                         params.put("fileName", fileName);
