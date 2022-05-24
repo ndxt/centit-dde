@@ -2,6 +2,8 @@ package com.centit.dde.dataset;
 
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.core.DataSetReader;
+import com.centit.dde.core.DataSetWriter;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.BooleanBaseOpt;
@@ -20,16 +22,14 @@ import java.util.*;
 /**
  * @author zhf
  */
-public class CsvDataSet extends FileDataSet {
+public class CsvDataSet implements DataSetReader, DataSetWriter {
     private static String DEFAULT_CHARSET = "gbk";
     private InputStream inputStream;
 
-    @Override
+    protected String filePath;
+
     public void setFilePath(String filePath) throws FileNotFoundException {
-        super.filePath = filePath;
-        if (new File(filePath).exists()) {
-            inputStream = new FileInputStream(filePath);
-        }
+        this.filePath = filePath;
     }
 
     public void setInputStream(InputStream inputStream) {

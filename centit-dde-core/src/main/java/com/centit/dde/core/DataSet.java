@@ -17,6 +17,16 @@ public class DataSet implements DataSetReader, Serializable {
     public static String SINGLE_DATA_SET_DEFAULT_NAME = "default";
     public static String SINGLE_DATA_FIELD_NAME = "scalar";
 
+    /**
+     * 返回 DataSet 的名称
+     */
+    private String dataSetName;
+    /**
+     * 数据集中的数据
+     * 是一个 对象（Map）列表；可以类比为JSONArray
+     */
+    protected Object data;
+
     public DataSet() {
         dataSetName = DataSet.SINGLE_DATA_SET_DEFAULT_NAME;
         this.data = Collections.emptyList();
@@ -31,16 +41,6 @@ public class DataSet implements DataSetReader, Serializable {
         this.data = data;
         this.dataSetName = dataSetName;
     }
-
-    /**
-     * 返回 DataSet 的名称
-     */
-    private String dataSetName;
-    /**
-     * 数据集中的数据
-     * 是一个 对象（Map）列表；可以类比为JSONArray
-     */
-    protected Object data;
 
     public String getDataSetName() {
         return dataSetName;
