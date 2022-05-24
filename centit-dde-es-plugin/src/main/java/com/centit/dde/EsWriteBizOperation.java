@@ -37,16 +37,23 @@ public class EsWriteBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
 
         String dataSetId = bizOptJson.getString("source");
-        if (StringBaseOpt.isNvl(dataSetId)) return ResponseData.makeErrorMessage("请选择需要写入的数据！");
+        if (StringBaseOpt.isNvl(dataSetId)) {
+            return ResponseData.makeErrorMessage("请选择需要写入的数据！");
+        }
 
         DataSet dataSet = bizModel.getDataSet(dataSetId);
-        if (dataSet == null ) return ResponseData.makeErrorMessage("选择的数据集不存在！");
+        if (dataSet == null ){
+            return ResponseData.makeErrorMessage("选择的数据集不存在！");
+        }
 
         boolean indexFile = "indexFile".equals(bizOptJson.get("indexType"));
         ESIndexer esIndexer = indexFile ? IndexerSearcherFactory.obtainIndexer(esServerConfig, FileDocument.class)
-                 :IndexerSearcherFactory.obtainIndexer(esServerConfig, ObjectDocument.class);
+            :IndexerSearcherFactory.obtainIndexer(esServerConfig, ObjectDocument.class);
 
         String optTag = bizOptJson.getString("optTag");
+        if (StringUtils.isBlank(optTag)){
+            return ResponseData.makeErrorMessage("业务主键不能为空！");
+        }
         if(indexFile){
             FileDocument fileInfo = new FileDocument();
             fileInfo.setOptId(dataOptContext.getOptId());
@@ -108,7 +115,9 @@ public class EsWriteBizOperation implements BizOperation {
                 objInfo.setOptTag(StringBaseOpt.castObjectToString(formula.calcFormula(optTag)));
                 objInfo.contentObject(documentInfo);
                 String title = bizOptJson.getString("title");
-                objInfo.setTitle(StringBaseOpt.castObjectToString(formula.calcFormula(title)));
+                if (StringUtils.isNotBlank(title)){
+                    objInfo.setTitle(StringBaseOpt.castObjectToString(formula.calcFormula(title)));
+                }
                 objInfo.setCreateTime(new Date());
                 esIndexer.mergeDocument(objInfo);
             }
