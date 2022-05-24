@@ -1,4 +1,4 @@
-package com.centit.dde.es;
+package com.centit.dde;
 
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.utils.ConstantValue;
