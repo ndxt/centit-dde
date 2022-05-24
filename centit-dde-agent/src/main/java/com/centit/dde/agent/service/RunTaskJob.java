@@ -1,7 +1,5 @@
 package com.centit.dde.agent.service;
 
-import com.centit.dde.core.DataOptContext;
-import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.support.quartz.AbstractQuartzJob;
