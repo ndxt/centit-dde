@@ -65,7 +65,11 @@
             <artifactId>centit-dde-dubbo-server-config</artifactId>
             <version>${centit.fileserver.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>fileserver-client</artifactId>
+            <version>${centit.fileserver.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
