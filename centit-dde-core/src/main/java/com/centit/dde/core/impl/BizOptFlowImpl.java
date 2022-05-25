@@ -283,7 +283,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         } else if(RETURN_RESULT_FILE.equals(type)){
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
             DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
-            FileDataSet fileInfo= DataSetOptUtil.getFileFormDataset(dataSet, stepJson);
+            FileDataSet fileInfo= DataSetOptUtil.attainFileDataset(dataSet, stepJson);
             bizModel.getOptResult().setResultFile(fileInfo.getFirstRow());
             return;
         }

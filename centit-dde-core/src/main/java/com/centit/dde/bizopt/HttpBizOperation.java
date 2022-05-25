@@ -161,7 +161,7 @@ public class HttpBizOperation implements BizOperation {
     private InputStream getRequestFile(JSONObject bizOptJson,BizModel bizModel){
         String source = bizOptJson.getString("source");
         DataSet dataSet = bizModel.fetchDataSetByName(source);
-        FileDataSet fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
+        FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
         InputStream inputStream = fileInfo.getFileInputStream();
         return inputStream;
     }

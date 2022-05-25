@@ -856,7 +856,7 @@ public abstract class DataSetOptUtil {
         data.sort((o1, o2) -> compareTwoRow(o1, o2, fields, nullAsFirst));
     }
 
-    public static FileDataSet getFileFormDataset(DataSet dataSet, JSONObject jsonStep){
+    public static FileDataSet attainFileDataset(DataSet dataSet, JSONObject jsonStep){
         if(dataSet instanceof FileDataSet){
             return (FileDataSet) dataSet;
         }
@@ -875,7 +875,16 @@ public abstract class DataSetOptUtil {
         } else {
             fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
         }
-        return new FileDataSet(fileName, -1, fileData);
+        HashMap<String, Object> fileInfo = new HashMap<>();
+        for(Map.Entry<String, Object> entry : mapFirstRow.entrySet()){
+            if(! StringUtils.equalsAny(entry.getKey(), fileContentDesc, fileNameDesc)){
+                fileInfo.put(entry.getKey(), entry.getValue());
+            }
+        }
+        FileDataSet fileDataset =  new FileDataSet();
+        fileDataset.setFileInfo(fileInfo);
+        fileDataset.setFileContent(fileName, -1, fileData);
+        return fileDataset;
     }
 
     public static InputStream getInputStreamFormFile( Map<String, Object> fileInfo){

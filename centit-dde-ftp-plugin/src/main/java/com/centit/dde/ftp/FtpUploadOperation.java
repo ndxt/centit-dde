@@ -25,7 +25,7 @@ public class FtpUploadOperation extends FtpOperation {
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         String path = BuiltInOperation.getJsonFieldString(bizOptJson, "filePath", "/");
 
-        FileDataSet fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
+        FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
 
         FTPClient ftpClient = connectFtp(ftpServiceId);
         if(ftpClient==null){

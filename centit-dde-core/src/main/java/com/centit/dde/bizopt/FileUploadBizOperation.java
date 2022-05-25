@@ -32,7 +32,7 @@ public class FileUploadBizOperation implements BizOperation {
             return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
                 bizOptJson.getString("SetsName") + "：文件上传失败，请选择数据集！");
         }
-        FileDataSet mapFileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
+        FileDataSet mapFileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
         FileInfo fileInfo = new FileInfo();
         fileInfo.setFileName(mapFileInfo.getFileName());
         fileInfo.setOptId(dataOptContext.getOptId());

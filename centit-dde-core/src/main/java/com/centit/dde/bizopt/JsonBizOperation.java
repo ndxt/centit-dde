@@ -25,7 +25,7 @@ public class JsonBizOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-        FileDataSet fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
+        FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
         InputStream inputStream = fileInfo.getFileInputStream();
         if (inputStream != null) {
             DataSet simpleDataSet = new DataSet(JSON.parse(FileIOOpt.readStringFromInputStream(inputStream)));
