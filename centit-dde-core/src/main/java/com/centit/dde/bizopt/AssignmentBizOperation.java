@@ -10,7 +10,6 @@ import com.centit.dde.utils.DatasetVariableTranslate;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.json.JSONOpt;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,30 +22,32 @@ public class AssignmentBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         //赋值目标
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "target", null);
+
         //数据来源
         String sourceDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", null);
-        //复制类型
-        //assignType 赋值类型， assign 直接赋值， property 对属性复制 ， append 追加元素, merge 合并属性
-        String assignType = BuiltInOperation.getJsonFieldString(bizOptJson, "assignType", "assign");
-        //取值表达式
-        String formula = BuiltInOperation.getJsonFieldString(bizOptJson, "formula", ".");
-        DataSet dataSet =bizModel.fetchDataSetByName(sourceDsName);
 
-        DataSet targetDataSet =bizModel.fetchDataSetByName(targetDsName);
-        if(dataSet == null  || targetDataSet==null){
+        DataSet targetDataSet = bizModel.fetchDataSetByName(targetDsName);
+        DataSet dataSet = bizModel.fetchDataSetByName(sourceDsName);
+        if(dataSet == null  || targetDataSet == null){
             return BuiltInOperation.createResponseData(0,1, ResponseData.ERROR_USER_CONFIG,
                 "配置信息出错，找不到对应的数据集："+targetDsName+"，"+sourceDsName+"。");
         }
-        Object sourceData = StringUtils.isBlank(formula)?
-            dataSet.getData() : new DatasetVariableTranslate(dataSet).getVarValue(formula);
-        String property = null;
-        if("property".equals(assignType)) {
-            //赋值属性
-            property = BuiltInOperation.getJsonFieldString(bizOptJson, "property", ".");
-        }
+
+        //assignType 赋值类型， assign 直接赋值， property 对属性复制 ， append 追加元素, merge 合并属性
+        String assignType = BuiltInOperation.getJsonFieldString(bizOptJson, "assignType", "assign");
+
+        //取值表达式
+        String formula = BuiltInOperation.getJsonFieldString(bizOptJson, "formula", ".");
+
+        //计算赋值数据
+        Object sourceData = ".".equals(formula) ? dataSet.getData() : new DatasetVariableTranslate(dataSet).getVarValue(formula);
+
         // 对属性赋值
-        if("property".equals(assignType) && StringUtils.isNotBlank(property) && !".".equals(property)){
-            // property
+        if("property".equals(assignType)){
+            String property = BuiltInOperation.getJsonFieldString(bizOptJson, "attributeName", ".");
+            if (".".equals(property)){
+               return ResponseData.makeErrorMessage("属性名称不能为空！");
+            }
             if( targetDataSet.getSize() < 1){
                 JSONObject jsonObject = new JSONObject();
                 JSONOpt.appendData(jsonObject, property, sourceData);
