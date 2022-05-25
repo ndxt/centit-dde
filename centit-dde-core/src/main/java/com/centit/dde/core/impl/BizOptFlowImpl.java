@@ -7,6 +7,7 @@ import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.DataPacketDraftDao;
 import com.centit.dde.dao.TaskDetailLogDao;
 import com.centit.dde.dao.TaskLogDao;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.po.*;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.CloneUtils;
@@ -282,8 +283,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         } else if(RETURN_RESULT_FILE.equals(type)){
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
             DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
-            Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, stepJson);
-            bizModel.getOptResult().setResultFile(fileInfo);
+            FileDataSet fileInfo= DataSetOptUtil.getFileFormDataset(dataSet, stepJson);
+            bizModel.getOptResult().setResultFile(fileInfo.getFirstRow());
             return;
         }
         //返回异常信息

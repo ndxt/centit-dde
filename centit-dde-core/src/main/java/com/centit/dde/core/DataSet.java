@@ -20,7 +20,7 @@ public class DataSet implements DataSetReader, Serializable {
     /**
      * 返回 DataSet 的名称
      */
-    private String dataSetName;
+    protected String dataSetName;
     /**
      * 数据集中的数据
      * 是一个 对象（Map）列表；可以类比为JSONArray
@@ -29,7 +29,7 @@ public class DataSet implements DataSetReader, Serializable {
 
     public DataSet() {
         dataSetName = DataSet.SINGLE_DATA_SET_DEFAULT_NAME;
-        this.data = Collections.emptyList();
+        this.data = null;// Collections.emptyList();
     }
 
     public DataSet(Object data) {

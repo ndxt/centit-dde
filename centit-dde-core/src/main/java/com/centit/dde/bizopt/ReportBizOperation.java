@@ -4,12 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
-import com.centit.dde.core.DataSet;
-import com.centit.dde.utils.BizOptUtils;
-import com.centit.dde.utils.ConstantValue;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
@@ -45,9 +42,10 @@ public class ReportBizOperation implements BizOperation {
             + ".pdf";
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName");
         ByteArrayInputStream in = generateWord(bizModel, filePath, params);
-        DataSet dataSet = BizOptUtils.castObjectToDataSet(
-            CollectionsOpt.createHashMap(ConstantValue.FILE_NAME, fileName,
-                ConstantValue.FILE_CONTENT, word2Pdf(in)));
+
+        FileDataSet dataSet =new FileDataSet(fileName,
+            -1, word2Pdf(in));
+
         bizModel.putDataSet(sourDsName, dataSet);
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }

@@ -7,12 +7,10 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
-import com.centit.dde.utils.BizOptUtils;
-import com.centit.dde.utils.ConstantValue;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
@@ -69,10 +67,10 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             xssfWorkbook.write(byteArrayOutputStream);
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap(
-                ConstantValue.FILE_NAME, fileName.endsWith(".xlsx") ? fileName : fileName + ".xlsx",
-                ConstantValue.FILE_SIZE, inputStream.available(),
-                ConstantValue.FILE_CONTENT, byteArrayInputStream));
+
+            FileDataSet objectToDataSet =new FileDataSet(fileName.endsWith(".xlsx") ? fileName : fileName + ".xlsx",
+                byteArrayOutputStream.size(), byteArrayInputStream);
+
             bizModel.putDataSet(id, objectToDataSet);
             byteArrayOutputStream.close();
             xssfWorkbook.close();
@@ -86,15 +84,16 @@ public class GenerateExcelFileBizeOperation implements BizOperation {
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
         List<String> headers = new ArrayList<>();
         List<String> values = new ArrayList<>();
-        mapInfo.keySet().stream().forEach(header -> headers.add(header));
-        mapInfo.values().stream().forEach(value -> values.add(value));
+        mapInfo.keySet().forEach(header -> headers.add(header));
+        mapInfo.values().forEach(value -> values.add(value));
+
         String[] titles = headers.toArray(new String[mapInfo.size()]);
         String[] fields = values.toArray(new String[mapInfo.size()]);
         InputStream inputStream = ExcelExportUtil.generateExcelStream(dataAsList, titles, fields);
-        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap(
-            ConstantValue.FILE_NAME, fileName.endsWith(".xlsx") ? fileName : fileName + ".xlsx",
-            ConstantValue.FILE_SIZE, inputStream.available(),
-            ConstantValue.FILE_CONTENT, inputStream));
+
+        FileDataSet objectToDataSet =new FileDataSet(fileName.endsWith(".xlsx") ? fileName : fileName + ".xlsx",
+            inputStream.available(), inputStream);
+
         bizModel.putDataSet(id, objectToDataSet);
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }

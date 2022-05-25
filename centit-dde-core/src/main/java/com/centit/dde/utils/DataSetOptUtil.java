@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
@@ -855,7 +856,10 @@ public abstract class DataSetOptUtil {
         data.sort((o1, o2) -> compareTwoRow(o1, o2, fields, nullAsFirst));
     }
 
-    public static Map<String, Object> getFileFormDataset(DataSet dataSet, JSONObject jsonStep){
+    public static FileDataSet getFileFormDataset(DataSet dataSet, JSONObject jsonStep){
+        if(dataSet instanceof FileDataSet){
+            return (FileDataSet) dataSet;
+        }
         Map<String, Object> mapFirstRow = dataSet.getFirstRow();
         String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep,  ConstantValue.FILE_CONTENT, "");
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
@@ -871,10 +875,7 @@ public abstract class DataSetOptUtil {
         } else {
             fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
         }
-        return  CollectionsOpt.createHashMap(
-            ConstantValue.FILE_NAME, fileName,
-            ConstantValue.FILE_SIZE, -1,
-            ConstantValue.FILE_CONTENT, fileData);
+        return new FileDataSet(fileName, -1, fileData);
     }
 
     public static InputStream getInputStreamFormFile( Map<String, Object> fileInfo){

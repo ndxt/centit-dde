@@ -6,11 +6,11 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.CsvDataSet;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 
 import java.io.InputStream;
-import java.util.Map;
 
 
 /**
@@ -23,8 +23,8 @@ public class CsvBizOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-        Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
-        InputStream inputStream = DataSetOptUtil.getInputStreamFormFile(fileInfo);
+        FileDataSet fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
+        InputStream inputStream = fileInfo.getFileInputStream();
         if (inputStream != null) {
             CsvDataSet csvDataSet = new CsvDataSet();
             csvDataSet.setInputStream(inputStream);

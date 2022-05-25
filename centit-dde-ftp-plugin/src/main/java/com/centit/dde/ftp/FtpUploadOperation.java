@@ -5,14 +5,11 @@ import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.utils.ConstantValue;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
-import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.net.ftp.FTPClient;
-
-import java.util.Map;
 
 public class FtpUploadOperation extends FtpOperation {
 
@@ -28,7 +25,7 @@ public class FtpUploadOperation extends FtpOperation {
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         String path = BuiltInOperation.getJsonFieldString(bizOptJson, "filePath", "/");
 
-        Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
+        FileDataSet fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
 
         FTPClient ftpClient = connectFtp(ftpServiceId);
         if(ftpClient==null){
@@ -37,8 +34,8 @@ public class FtpUploadOperation extends FtpOperation {
         }
         try{
             ftpClient.changeWorkingDirectory(path);
-            ftpClient.storeFile(StringBaseOpt.castObjectToString(fileInfo.get(ConstantValue.FILE_NAME)),
-                DataSetOptUtil.getInputStreamFormFile(fileInfo));
+            ftpClient.storeFile(fileInfo.getFileName(),
+                fileInfo.getFileInputStream());
         } finally {
             disConnectFtp(ftpClient);
         }

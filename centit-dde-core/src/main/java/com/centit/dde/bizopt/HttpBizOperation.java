@@ -5,6 +5,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.ConstantValue;
@@ -160,8 +161,8 @@ public class HttpBizOperation implements BizOperation {
     private InputStream getRequestFile(JSONObject bizOptJson,BizModel bizModel){
         String source = bizOptJson.getString("source");
         DataSet dataSet = bizModel.fetchDataSetByName(source);
-        Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
-        InputStream inputStream = DataSetOptUtil.getInputStreamFormFile(fileInfo);
+        FileDataSet fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
+        InputStream inputStream = fileInfo.getFileInputStream();
         return inputStream;
     }
 }

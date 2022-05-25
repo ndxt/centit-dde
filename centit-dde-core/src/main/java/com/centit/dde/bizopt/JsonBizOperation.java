@@ -6,13 +6,13 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.file.FileIOOpt;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 
 /**
@@ -25,8 +25,8 @@ public class JsonBizOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-        Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
-        InputStream inputStream = DataSetOptUtil.getInputStreamFormFile(fileInfo);
+        FileDataSet fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
+        InputStream inputStream = fileInfo.getFileInputStream();
         if (inputStream != null) {
             DataSet simpleDataSet = new DataSet(JSON.parse(FileIOOpt.readStringFromInputStream(inputStream)));
             bizModel.putDataSet(targetDsName, simpleDataSet);

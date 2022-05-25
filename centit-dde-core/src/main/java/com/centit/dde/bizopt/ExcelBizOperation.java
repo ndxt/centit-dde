@@ -5,6 +5,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
@@ -17,7 +18,6 @@ import com.centit.support.report.ExcelImportUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,8 +39,8 @@ public class ExcelBizOperation implements BizOperation {
         }
 
         DataSet dataSet = bizModel.fetchDataSetByName(source);
-        Map<String, Object> fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
-        InputStream inputStream = DataSetOptUtil.getInputStreamFormFile(fileInfo);
+        FileDataSet fileInfo = DataSetOptUtil.getFileFormDataset(dataSet, bizOptJson);
+        InputStream inputStream = fileInfo.getFileInputStream();
 
         int beginRow = NumberBaseOpt.castObjectToInteger(
             modelTrasform.attainExpressionValue(bizOptJson.getString("beginRow")), 0);

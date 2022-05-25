@@ -5,12 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
-import com.centit.dde.core.DataSet;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
-import com.centit.dde.utils.BizOptUtils;
-import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
@@ -18,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * 生成json文件节点信息
@@ -35,11 +31,11 @@ public class GenerateJsonFileBizOperation implements BizOperation {
             DatetimeOpt.currentTimeWithSecond();
         Object data = bizModel.fetchDataSetByName(sourDsName).getData();
         String object = JSON.toJSONString(data);
-        InputStream inputStream = new ByteArrayInputStream(object.getBytes());
-        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap(
-            ConstantValue.FILE_NAME, fileName.endsWith(".json")?fileName:fileName+".json",
-            ConstantValue.FILE_SIZE, inputStream.available(),
-            ConstantValue.FILE_CONTENT,inputStream));
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(object.getBytes());
+
+        FileDataSet objectToDataSet =new FileDataSet(fileName.endsWith(".json")?fileName:fileName+".json",
+            inputStream.available(), inputStream);
+
         bizModel.putDataSet(targetDsName,objectToDataSet);
         return BuiltInOperation.createResponseSuccessData(objectToDataSet.getSize());
     }
