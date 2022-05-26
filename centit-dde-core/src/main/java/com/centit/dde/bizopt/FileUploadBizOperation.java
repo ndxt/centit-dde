@@ -10,6 +10,7 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.fileserver.po.FileInfo;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.StringBaseOpt;
 
 /**
  * 文件上传节点
@@ -30,9 +31,13 @@ public class FileUploadBizOperation implements BizOperation {
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
         if (dataSet == null) {
             return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
-                bizOptJson.getString("SetsName") + "：文件上传失败，请选择数据集！");
+                "文件上传失败，请选择数据集！");
         }
         FileDataSet mapFileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
+        if(StringBaseOpt.isNvl(mapFileInfo.getFileName())){
+            return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
+                sourDsName + "：文件上传失败，该数据集文件名称不能为空！");
+        }
         FileInfo fileInfo = new FileInfo();
         fileInfo.setFileName(mapFileInfo.getFileName());
         fileInfo.setOptId(dataOptContext.getOptId());
