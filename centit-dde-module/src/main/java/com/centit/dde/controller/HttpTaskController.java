@@ -1,6 +1,7 @@
 package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataOptResult;
@@ -313,6 +314,25 @@ public class HttpTaskController extends BaseController {
             variableFormula.setFormula(StringEscapeUtils.unescapeHtml4(formulaParams.getFormula()));
             return variableFormula.calcFormula();
         }
+    }
+
+    @ApiOperation(value = "DDE扩展函数接口")
+    @GetMapping(value = "/extensionFunction")
+    public JSONArray extensionFunction(){
+        String  extensionFunction = "[" +
+            "{\"toJson\": \"转json,示例:formula:toJson(name);json:{name:{sex:'man'}}\"},"+
+            "{\"toByteArray\": \"把输入流转为byte数组,示例:formula:toByteArray(name)\"},"+
+            "{\"uuid\": \"获取uuid,示例:formula:uuid()\"},"+
+            "{\"random\": \"获取随机数,示例:formula:random(6)\"},"+
+            "{\"encode\": \"对字符串加密,示例:formula:encode(name)\"},"+
+            "{\"dict\": \"获取代码对应的数据字典,示例:formula:dict('userCode',name)\"},"+
+            "{\"dictTrans\": \"获取代码表达式对应的数据字典,示例:formula:dictTrans('userCode',names),names为逗号分开多个name组成\"},"+
+            "{\"replace\": \"替换字符串,示例:formula:replace('abc','b','a')\"},"+
+            "{\"size\": \"获取数组多少元素,示例:formula:size(names)\"},"+
+            "{\"startsWith\": \"判断字符串中是以某个字符开头,示例:formula:startsWith('a',name)\"},"+
+            "{\"remove\": \"移除list集合中的元素,示例:formula:remove(2,list)\"}"+
+            "]";
+        return JSON.parseArray(extensionFunction);
     }
 
     @ApiOperation(value = "修改数据所属业务模块(删除菜单迁移数据(接口页面))")
