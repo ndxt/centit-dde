@@ -86,7 +86,7 @@ public abstract class DBBatchUtils {
             Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
         }
         String sql = GeneralJsonObjectDao.buildUpdateSql(tableInfo, fields) +
-            " where " + GeneralJsonObjectDao.buildFilterSqlByPk(tableInfo, null);
+            " where " + GeneralJsonObjectDao.buildFilterSqlByPkUseColumnName(tableInfo, null);
         LeftRightPair<String, List<String>> sqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
         int n = 0;
         QueryLogUtils.printSql(logger, sqlPair.getLeft(), sqlPair.getRight());
@@ -120,13 +120,13 @@ public abstract class DBBatchUtils {
         LeftRightPair<String, List<String>> insertSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
         sql = GeneralJsonObjectDao.buildUpdateSql(tableInfo, fields);
         if (null != sql) {
-            sql += " where " + GeneralJsonObjectDao.buildFilterSqlByPk(tableInfo, null);
+            sql += " where " + GeneralJsonObjectDao.buildFilterSqlByPkUseColumnName(tableInfo, null);
         } else {
             sql = "";
         }
         LeftRightPair<String, List<String>> updateSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
         sql = "select count(*) as checkExists from " + tableInfo.getTableName()
-            + " where " + GeneralJsonObjectDao.buildFilterSqlByPk(tableInfo, null);
+            + " where " + GeneralJsonObjectDao.buildFilterSqlByPkUseColumnName(tableInfo, null);
         LeftRightPair<String, List<String>> checkSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
         int n = 0, insert = 0, update = 0;
         boolean exists = false;
