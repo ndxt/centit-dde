@@ -366,6 +366,9 @@ public abstract class DataSetOptUtil {
         if (data == null || data.size() == 0) {
             return inData;
         }
+        if(groupByFields==null){
+            groupByFields=new ArrayList<>(0);
+        }
         //按group by字段排序
         if (groupByFields != null && groupByFields.size() > 0) {
             sortByFields(data, groupByFields, false);
