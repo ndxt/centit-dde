@@ -105,6 +105,8 @@ public class DataPacketDraftController extends BaseController {
                 properties.put("databaseId",httpParames.getHttpUrlCode());
             }
         }
+        JSONObject schemaProps = dataPacketTemplate.getJSONObject("schemaProps");
+        dataPacketDraft.setSchemaProps(schemaProps);
         dataPacketDraft.setBufferFreshPeriod(-1);
         dataPacketDraft.setIsValid(true);
         dataPacketDraft.setTaskType(taskType);
@@ -126,7 +128,7 @@ public class DataPacketDraftController extends BaseController {
     public List<DataPacketDraft> createMetaDataApi(@RequestBody MetaDataParameter metaDataOrHttpParams) {
         DataPacketDraft dataPacket = new DataPacketDraft();
         dataPacket.setOsId(metaDataOrHttpParams.getOsId());
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacket.getOsId());
+        //LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacket.getOsId());
         String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringBaseOpt.isNvl(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
@@ -170,6 +172,8 @@ public class DataPacketDraftController extends BaseController {
                 properties.put("databaseName",dataBaseCode);
             }
         }
+        JSONObject schemaProps = dataPacketTemplate.getJSONObject("schemaProps");
+        dataPacketDraft.setSchemaProps(schemaProps);
         dataPacketDraft.setMetadataTableId(tableId);
         dataPacketDraft.setLogLevel(3);
         dataPacketDraft.setNeedRollback("T");

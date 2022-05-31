@@ -45,8 +45,8 @@ public class DataPacketTemplateServiceImpl implements DataPacketTemplateService 
 
     @Override
     public JSONObject getDataPacketTemplateByType(Integer type) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM q_data_packet_template WHERE is_valid = 0  and template_type = ? ");
-        return DatabaseOptUtils.getObjectBySqlAsJson(dataPacketTemplateDao, sql.toString(),new Object[]{type});
+        String sql = "SELECT * FROM q_data_packet_template WHERE is_valid = 0  and template_type = ? ";
+        return DatabaseOptUtils.getObjectBySqlAsJson(dataPacketTemplateDao, sql,new Object[]{type});
     }
 
     @Override

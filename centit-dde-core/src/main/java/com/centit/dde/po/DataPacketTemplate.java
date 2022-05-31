@@ -85,4 +85,7 @@ public class DataPacketTemplate  implements Serializable {
     @ApiModelProperty(value = "任务类型：1：GET请求，2：表示定时任务,3：POST请求,4：表示消息触发，5：PUT请求,6：DELETE请求")
     private String taskType;
 
+    @Column(name = "schema_props")
+    @ApiModelProperty(value = "模式属性")
+    private JSONObject schemaProps;
 }
