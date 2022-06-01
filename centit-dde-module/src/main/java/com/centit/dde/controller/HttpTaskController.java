@@ -32,6 +32,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.ConfigAttribute;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +43,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -178,7 +180,7 @@ public class HttpTaskController extends BaseController {
         //保存内部逻辑变量，有些时候需要将某些值传递到其它标签节点，这时候需要用到它
         DataOptContext dataOptContext = new DataOptContext();
         dataOptContext.setRunType(runType);
-        dataOptContext.setDebugId((String) params.getOrDefault("debugId",""));
+        dataOptContext.setDebugId((String) params.getOrDefault("debugId", ""));
         if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
             if (StringUtils.contains(request.getHeader("Content-Type"), "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
@@ -211,7 +213,7 @@ public class HttpTaskController extends BaseController {
         if (result.getResultType() == DataOptResult.RETURN_FILE_STREAM) {
             String fileName = result.getReturnFilename();
             InputStream in = result.getReturnFileStream();
-            if(in!=null && fileName!=null) {
+            if (in != null && fileName != null) {
                 UploadDownloadUtils.downFileRange(request, response, in,
                     in.available(), fileName, request.getParameter("downloadType"), null);
             } else {
@@ -304,9 +306,9 @@ public class HttpTaskController extends BaseController {
             "表达式:hash(),名称:签名计算,hash(object),hash(object,md5/sha,base64),hash(object,hmac-sha1,secret-key),hash(object,hmac-sha1,secret-key,base64)示例:formula:hash(name)  \n")
     @WrapUpResponseBody
     public Object testFormula(@RequestBody FormulaParameter formulaParams) {
-        if(formulaParams.getGetVariable()){
-            return VariableFormula.attainFormulaVariable(StringEscapeUtils.unescapeHtml4(formulaParams.getFormula()),DataSetOptUtil.extendFuncs);
-        }else {
+        if (formulaParams.getGetVariable()) {
+            return VariableFormula.attainFormulaVariable(StringEscapeUtils.unescapeHtml4(formulaParams.getFormula()), DataSetOptUtil.extendFuncs);
+        } else {
             Map object = (Map) JSON.parse(StringEscapeUtils.unescapeHtml4(formulaParams.getJsonString()));
             VariableFormula variableFormula = new VariableFormula();
             variableFormula.setExtendFuncMap(DataSetOptUtil.extendFuncs);
@@ -318,19 +320,19 @@ public class HttpTaskController extends BaseController {
 
     @ApiOperation(value = "DDE扩展函数接口")
     @GetMapping(value = "/extensionFunction")
-    public JSONArray extensionFunction(){
-        String  extensionFunction = "[" +
-            "{\"toJson\": \"转json,示例:formula:toJson(name);json:{name:{sex:'man'}}\"},"+
-            "{\"toByteArray\": \"把输入流转为byte数组,示例:formula:toByteArray(name)\"},"+
-            "{\"uuid\": \"获取uuid,示例:formula:uuid()\"},"+
-            "{\"random\": \"获取随机数,示例:formula:random(6)\"},"+
-            "{\"encode\": \"对字符串加密,示例:formula:encode(name)\"},"+
-            "{\"dict\": \"获取代码对应的数据字典,示例:formula:dict('userCode',name)\"},"+
-            "{\"dictTrans\": \"获取代码表达式对应的数据字典,示例:formula:dictTrans('userCode',names),names为逗号分开多个name组成\"},"+
-            "{\"replace\": \"替换字符串,示例:formula:replace('abc','b','a')\"},"+
-            "{\"size\": \"获取数组多少元素,示例:formula:size(names)\"},"+
-            "{\"startsWith\": \"判断字符串中是以某个字符开头,示例:formula:startsWith('a',name)\"},"+
-            "{\"remove\": \"移除list集合中的元素,示例:formula:remove(2,list)\"}"+
+    public JSONArray extensionFunction() {
+        String extensionFunction = "[" +
+            "{\"toJson\": \"转json,示例:formula:toJson(name);json:{name:{sex:'man'}}\"}," +
+            "{\"toByteArray\": \"把输入流转为byte数组,示例:formula:toByteArray(name)\"}," +
+            "{\"uuid\": \"获取uuid,示例:formula:uuid()\"}," +
+            "{\"random\": \"获取随机数,示例:formula:random(6)\"}," +
+            "{\"encode\": \"对字符串加密,示例:formula:encode(name)\"}," +
+            "{\"dict\": \"获取代码对应的数据字典,示例:formula:dict('userCode',name)\"}," +
+            "{\"dictTrans\": \"获取代码表达式对应的数据字典,示例:formula:dictTrans('userCode',names),names为逗号分开多个name组成\"}," +
+            "{\"replace\": \"替换字符串,示例:formula:replace('abc','b','a')\"}," +
+            "{\"size\": \"获取数组多少元素,示例:formula:size(names)\"}," +
+            "{\"startsWith\": \"判断字符串中是以某个字符开头,示例:formula:startsWith('a',name)\"}," +
+            "{\"remove\": \"移除list集合中的元素,示例:formula:remove(2,list)\"}" +
             "]";
         return JSON.parseArray(extensionFunction);
     }
@@ -348,6 +350,13 @@ public class HttpTaskController extends BaseController {
         result.put("dataPacketDraftCount", dataPacketDraftCount);
         result.put("dataPacketCount", dataPacketCount);
         return ResponseData.makeSuccessResponse(result.toJSONString());
+    }
+
+    @ApiOperation(value = "查询单个API网关权限")
+    @GetMapping(value = "/roles/{apiId}")
+    @WrapUpResponseBody
+    public List<ConfigAttribute> getRolesWithApiId(@PathVariable String apiId) {
+        return platformEnvironment.getRolesWithApiId(apiId);
     }
 
 }
