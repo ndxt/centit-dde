@@ -17,6 +17,7 @@ import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.operationlog.RecordOperationLog;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
@@ -184,6 +185,8 @@ public class DataPacketDraftController extends BaseController {
 
     @ApiOperation(value = "编辑API网关")
     @PutMapping(value = "/{packetId}")
+    @RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}更新api",
+        tag = "{packetId}")
     @WrapUpResponseBody
     public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketDraft dataPacketDraft) throws ParseException  {
         if (dataPacketDraft==null){
