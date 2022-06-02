@@ -85,7 +85,7 @@ public class HttpBizOperation implements BizOperation {
         switch (requestMode.toLowerCase()) {
             case "post":
                 String requestType = BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
-                if (ConstantValue.HTTP_REQUEST_PREFIX.equals(requestType)){
+                if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)){
                     InputStream requestFile = getRequestFile(bizOptJson,bizModel);
                     if (requestFile != null){
                         receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
