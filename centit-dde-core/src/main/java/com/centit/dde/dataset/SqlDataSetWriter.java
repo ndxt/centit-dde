@@ -29,7 +29,6 @@ import java.util.Map;
  */
 @Data
 public class SqlDataSetWriter implements DataSetWriter {
-    public static String WRITER_ERROR_TAG = "rmdb_dataset_writer_result";
     private static final Logger logger = LoggerFactory.getLogger(SqlDataSetWriter.class);
 
     private ISourceInfo dataSource;
@@ -38,6 +37,8 @@ public class SqlDataSetWriter implements DataSetWriter {
     private int successNums;
     private int errorNums;
     private String info;
+    private String writeTag;
+    private String writeMsg;
 
     public void setFieldsMap(Map fieldsMap) {
         this.fieldsMap = fieldsMap;
@@ -51,11 +52,13 @@ public class SqlDataSetWriter implements DataSetWriter {
      */
     private boolean saveAsWhole;
 
-    public SqlDataSetWriter(ISourceInfo dataSource, TableInfo tableInfo) {
+    public SqlDataSetWriter(ISourceInfo dataSource, TableInfo tableInfo, String writeTag, String writeMsg) {
         this.saveAsWhole = true;
         this.connection = null;
         this.tableInfo = tableInfo;
         this.dataSource = dataSource;
+        this.writeMsg = writeMsg;
+        this.writeTag = writeTag;
     }
 
     private void fetchConnect() {
@@ -107,11 +110,13 @@ public class SqlDataSetWriter implements DataSetWriter {
                         dealResultMsg(row);
                         successNums++;
                     } else {
-                        row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "执行无结果" + iResult);
+                        row.put(writeTag,false);
+                        row.put(writeMsg, "执行无结果" + iResult);
                         errorNums++;
                     }
                 } catch (SQLException e) {
-                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
+                    row.put(writeTag,false);
+                    row.put(writeMsg, e.getMessage());
                     errorNums++;
                     if ((info.length() + e.getMessage().length()) <= 2000) {
                         info = info.concat(e.getMessage());
@@ -161,11 +166,13 @@ public class SqlDataSetWriter implements DataSetWriter {
                         dealResultMsg(row);
                         successNums++;
                     } else {
-                        row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "执行无结果" + iResult);
+                        row.put(writeTag,false);
+                        row.put(writeMsg, "执行无结果" + iResult);
                         errorNums++;
                     }
                 } catch (SQLException | ObjectException e) {
-                    row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
+                    row.put(writeTag,false);
+                    row.put(writeMsg, e.getMessage());
                     errorNums++;
                     if ((info.length() + e.getMessage().length()) <= 2000) {
                         info = info.concat(e.getMessage());
@@ -177,17 +184,21 @@ public class SqlDataSetWriter implements DataSetWriter {
     }
 
     private void dealResultMsg(Map<String, Object> row) {
-        row.put(FieldType.mapPropName(WRITER_ERROR_TAG), "ok");
+        row.put(writeTag, true);
+        row.put(writeMsg,"ok");
     }
+
     private void dealWholeException(DataSet dataSet, SQLException e) {
         successNums = 0;
         errorNums = 0;
         info = e.getMessage();
         for (Map<String, Object> row : dataSet.getDataAsList()) {
-            row.put(FieldType.mapPropName(WRITER_ERROR_TAG), e.getMessage());
+            row.put(writeTag,false);
+            row.put(writeMsg, e.getMessage());
             errorNums++;
         }
     }
+
     public void setSaveAsWhole(boolean saveAsWhole) {
         this.saveAsWhole = saveAsWhole;
     }

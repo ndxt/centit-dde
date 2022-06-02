@@ -20,7 +20,8 @@ import java.io.FileNotFoundException;
  * @author zhf
  */
 public class PersistenceBizOperation implements BizOperation {
-
+    private static String WRITER_ERROR_TAG = "__rmdb_writer_result";
+    private static String WRITER_ERROR_MSG = "__rmdb_writer_result_msg";
     private String exportPath;
     private static final String WRITER_INDICATE_APPEND = "append";
     private static final String WRITER_INDICATE_MERGE = "merge";
@@ -42,6 +43,8 @@ public class PersistenceBizOperation implements BizOperation {
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
         String tableId = BuiltInOperation.getJsonFieldString(bizOptJson, "tableLabelName", null);
         String writerType = BuiltInOperation.getJsonFieldString(bizOptJson, "writerType", "merge");
+        String resultMsg =BuiltInOperation.getJsonFieldString(bizOptJson,"resultMsg",WRITER_ERROR_MSG);
+        String result =BuiltInOperation.getJsonFieldString(bizOptJson,"result",WRITER_ERROR_TAG);
         if (databaseCode == null || tableId == null) {
             return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
                 "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
@@ -65,7 +68,7 @@ public class PersistenceBizOperation implements BizOperation {
             return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
                 "没有配置交换字段");
         }
-        SqlDataSetWriter dataSetWriter = new SqlDataSetWriter(databaseInfo, tableInfo);
+        SqlDataSetWriter dataSetWriter = new SqlDataSetWriter(databaseInfo, tableInfo,result,resultMsg);
         dataSetWriter.setFieldsMap(BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "propertyName", "primaryKey1"));
         String saveAsWhole = BuiltInOperation.getJsonFieldString(bizOptJson, "saveAsWhole", "false");
         //设置为true  作为整体提交

@@ -184,13 +184,13 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
                     columnSchemas.add(col);
                 }
             }
-            ColumnSchema col = new ColumnSchema();
-            col.setColumnCode(SqlDataSetWriter.WRITER_ERROR_TAG);
-            col.setPropertyName(FieldType.mapPropName(SqlDataSetWriter.WRITER_ERROR_TAG));
-            col.setColumnName(col.getPropertyName());
-            col.setDataType(FieldType.STRING);
-            col.setIsStatData("F");
-            columnSchemas.add(col);
+//            ColumnSchema col = new ColumnSchema();
+//            col.setColumnCode(SqlDataSetWriter.WRITER_ERROR_TAG);
+//            col.setPropertyName(FieldType.mapPropName(SqlDataSetWriter.WRITER_ERROR_TAG));
+//            col.setColumnName(col.getPropertyName());
+//            col.setDataType(FieldType.STRING);
+//            col.setIsStatData("F");
+//            columnSchemas.add(col);
         }
         return columnSchemas;
     }
