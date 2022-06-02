@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -47,29 +48,29 @@ public class HttpBizOperation implements BizOperation {
         //请求服务ip地址
         String serverIpAddressId = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseId", "");
         if (StringUtils.isBlank(serverIpAddressId))
-            return BuiltInOperation.createResponseData(0,1, 500, "服务ip地址不能为空！");
+            return BuiltInOperation.createResponseData(0, 1, 500, "服务ip地址不能为空！");
 
         //请求接口
         String interfaceAddress = BuiltInOperation.getJsonFieldString(bizOptJson, "httpUrl", null);
-        if(StringUtils.isBlank(interfaceAddress))
-            return BuiltInOperation.createResponseData(0,1, 500, "接口地址不能为空！");
+        if (StringUtils.isBlank(interfaceAddress))
+            return BuiltInOperation.createResponseData(0, 1, 500, "接口地址不能为空！");
 
-        SourceInfo  sourceInfo = sourceInfoDao.getDatabaseInfoById(serverIpAddressId);
+        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(serverIpAddressId);
         if (sourceInfo == null)
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_PRECONDITION_FAILED,"无效请求地址！");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_PRECONDITION_FAILED, "无效请求地址！");
 
         String serverIpAddress = sourceInfo.getDatabaseUrl();
-        String  requestServerAddress = serverIpAddress + interfaceAddress;
-        requestServerAddress = Pretreatment.mapTemplateString(requestServerAddress,new BizModelJSONTransform(bizModel));
+        String requestServerAddress = serverIpAddress + interfaceAddress;
+        requestServerAddress = Pretreatment.mapTemplateString(requestServerAddress, new BizModelJSONTransform(bizModel));
 
         //构建请求头数据
         Map<String, String> headers = new HashMap<>();
-        if (RequestThreadLocal.getLocalThreadWrapperRequest() != null){
+        if (RequestThreadLocal.getLocalThreadWrapperRequest() != null) {
             HttpSession session = RequestThreadLocal.getLocalThreadWrapperRequest().getSession();
             headers.put(WebOptUtils.SESSION_ID_TOKEN, session == null ? null : session.getId());
         }
         HttpExecutorContext httpExecutorContext = getHttpClientContext(sourceInfo);
-        if (sourceInfo.getExtProps() != null){
+        if (sourceInfo.getExtProps() != null) {
             Map<String, String> extProps = CollectionsOpt.objectMapToStringMap(sourceInfo.getExtProps());
             headers.putAll(extProps);
             headers.remove("SSL");
@@ -85,13 +86,13 @@ public class HttpBizOperation implements BizOperation {
         switch (requestMode.toLowerCase()) {
             case "post":
                 String requestType = BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
-                if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)){
-                    InputStream requestFile = getRequestFile(bizOptJson,bizModel);
-                    if (requestFile != null){
+                if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)) {
+                    InputStream requestFile = getRequestFile(bizOptJson, bizModel);
+                    if (requestFile != null) {
                         receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
                             UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestFile));
                     }
-                }else {
+                } else {
                     Object requestBody = getRequestBody(bizOptJson, bizModel);
                     receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
                         UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
@@ -105,22 +106,22 @@ public class HttpBizOperation implements BizOperation {
             case "get":
                 receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGet(httpExecutorContext, requestServerAddress, requestParams));
                 if (receiveJson.getCode() != ResponseData.RESULT_OK) {
-                    return BuiltInOperation.createResponseData(0,1, receiveJson.getCode(), receiveJson.getMessage());
+                    return BuiltInOperation.createResponseData(0, 1, receiveJson.getCode(), receiveJson.getMessage());
                 }
                 break;
             case "delete":
                 DataSet dataSet = BizOptUtils.castObjectToDataSet(HttpExecutor.simpleDelete(httpExecutorContext, requestServerAddress, requestParams));
                 return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
             default:
-                return BuiltInOperation.createResponseData(0,1, 500, "无效请求！");
+                return BuiltInOperation.createResponseData(0, 1, 500, "无效请求！");
         }
-        if (receiveJson != null){
+        if (receiveJson != null) {
             DataSet dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
             String id = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
             bizModel.putDataSet(id, dataSet);
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         } else {
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, "无数据");
+            return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION, "无数据");
         }
     }
 
@@ -135,7 +136,7 @@ public class HttpBizOperation implements BizOperation {
     }
 
     //计算请求参数列表中的参数
-    private Map<String, Object> getRequestParams(JSONObject bizOptJson){
+    private Map<String, Object> getRequestParams(JSONObject bizOptJson) {
         //请求参数列表
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlvalue");
         Map<String, Object> mapObject = new HashMap<>();
@@ -149,16 +150,22 @@ public class HttpBizOperation implements BizOperation {
         return mapObject;
     }
 
-    private Object getRequestBody(JSONObject bizOptJson,BizModel bizModel){
-        Object requestBody="";
+    private Object getRequestBody(JSONObject bizOptJson, BizModel bizModel) {
+        Object requestBody = "";
         String json = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
         if (json != null) {
-            requestBody = JSONTransformer.transformer(json.trim(), new BizModelJSONTransform(bizModel));
+            String requestBodyData = json.trim();
+            if (requestBodyData.startsWith("{") && requestBodyData.endsWith("}")) {
+                requestBody = JSONTransformer.transformer(JSON.parse(json), new BizModelJSONTransform(bizModel));
+            } else {
+                requestBody = JSONTransformer.transformer(json, new BizModelJSONTransform(bizModel));
+            }
         }
         return requestBody;
     }
 
-    private InputStream getRequestFile(JSONObject bizOptJson,BizModel bizModel){
+
+    private InputStream getRequestFile(JSONObject bizOptJson, BizModel bizModel) {
         String source = bizOptJson.getString("source");
         DataSet dataSet = bizModel.fetchDataSetByName(source);
         FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
