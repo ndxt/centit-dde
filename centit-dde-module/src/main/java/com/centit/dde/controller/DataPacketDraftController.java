@@ -184,9 +184,13 @@ public class DataPacketDraftController extends BaseController {
 
 
     @ApiOperation(value = "编辑API网关")
+    @ApiImplicitParam(
+        name = "packetId", value = "apiID号",
+        required = true, paramType = "path", dataType = "String"
+    )
     @PutMapping(value = "/{packetId}")
     @RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}更新api",
-        tag = "{packetId}")
+        tag = "{packetId}",newValue = "无内容")
     @WrapUpResponseBody
     public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketDraft dataPacketDraft) throws ParseException  {
         if (dataPacketDraft==null){
