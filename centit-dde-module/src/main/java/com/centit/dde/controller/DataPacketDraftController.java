@@ -190,7 +190,7 @@ public class DataPacketDraftController extends BaseController {
     )
     @PutMapping(value = "/{packetId}")
     @RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}更新api",
-        tag = "{packetId}",newValue = "无内容")
+        tag = "{arg0}",newValue = "无")
     @WrapUpResponseBody
     public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketDraft dataPacketDraft) throws ParseException  {
         if (dataPacketDraft==null){
