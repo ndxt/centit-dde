@@ -21,34 +21,36 @@ public class ManagerWorkFlowBizOperation implements BizOperation {
     private FlowManager flowManager;
 
     public ManagerWorkFlowBizOperation(FlowManager flowManager) {
-        this.flowManager=flowManager;
+        this.flowManager = flowManager;
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext){
-        String id = bizOptJson.getString("id");
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
         String flowInstId = StringBaseOpt.objectToString(
             JSONTransformer.transformer(
                 bizOptJson.getString("flowInstId"),
                 new BizModelJSONTransform(bizModel)));
-        String userCode = ((CentitUserDetails)bizModel.getStackData(ConstantValue.SESSION_DATA_TAG)).getUserCode();
-        Integer taskType = bizOptJson.getInteger("taskType");
-        if (StringUtils.isBlank(flowInstId)){
-            return  ResponseData.makeErrorMessage(500,"flowInstId不能为空！");
+        String userCode="";
+        if (bizModel.getStackData(ConstantValue.SESSION_DATA_TAG) instanceof CentitUserDetails) {
+            userCode = ((CentitUserDetails) bizModel.getStackData(ConstantValue.SESSION_DATA_TAG)).getUserCode();
         }
-        switch (taskType){
+        Integer taskType = bizOptJson.getInteger("taskType");
+        if (StringUtils.isBlank(flowInstId)) {
+            return ResponseData.makeErrorMessage(500, "flowInstId不能为空！");
+        }
+        switch (taskType) {
             case ConstantValue.STOP_WFINST:
-                flowManager.stopInstance(flowInstId,userCode,dataOptContext.getOptId());
+                flowManager.stopInstance(flowInstId, userCode, dataOptContext.getOptId());
                 break;
             case ConstantValue.SUSPEND_WFINST:
-                flowManager.suspendInstance(flowInstId,userCode,dataOptContext.getOptId());
+                flowManager.suspendInstance(flowInstId, userCode, dataOptContext.getOptId());
                 break;
             case ConstantValue.ACTIVE_WFINST:
-                flowManager.activizeInstance(flowInstId,userCode,dataOptContext.getOptId());
+                flowManager.activizeInstance(flowInstId, userCode, dataOptContext.getOptId());
                 break;
             default:
                 break;
         }
-        return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
+        return BuiltInOperation.createResponseSuccessData(1);
     }
 }
