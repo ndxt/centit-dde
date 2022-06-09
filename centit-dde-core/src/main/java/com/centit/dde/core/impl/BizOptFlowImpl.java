@@ -172,9 +172,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         try {
             runModule(bizModel, dataOptStep, dataOptContext);
             AbstractSourceConnectThreadHolder.commitAndRelease();
-        } catch (Exception e) {
+        } catch (Exception exception) {
             AbstractSourceConnectThreadHolder.rollbackAndRelease();
-            throw new Exception(e.getMessage());
+            throw exception;
         }
         return bizModel.getOptResult();
     }
