@@ -174,7 +174,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             AbstractSourceConnectThreadHolder.commitAndRelease();
         } catch (Exception e) {
             AbstractSourceConnectThreadHolder.rollbackAndRelease();
-            //加个错误日志到数据库中
+            throw new Exception(e.getMessage());
         }
         return bizModel.getOptResult();
     }
