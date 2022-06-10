@@ -24,6 +24,7 @@ import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
+import com.centit.product.oa.service.OptFlowNoInfoManager;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
@@ -89,6 +90,8 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @Autowired(required = false)
     private FileInfoOpt fileInfoOpt;
+    @Autowired
+    private OptFlowNoInfoManager optFlowNoInfoManager;
 
     private Map<String, BizOperation> allOperations;
 
@@ -99,24 +102,22 @@ public class BizOptFlowImpl implements BizOptFlow {
     @PostConstruct
     public void init() {
         //allOperations.put(ConstantValue.SCHEDULER, (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runStart(bizModel1, bizOptJson1));//模块调度
-        allOperations.put("start", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runStart(bizModel1, bizOptJson1));//起始节点
+        allOperations.put("start", (bizModel, bizOptJson, dataOptContext)-> BuiltInOperation.runStart());
 
-        allOperations.put("postData", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runRequestBody(bizModel, bizOptJson));//获取post数据
-        allOperations.put("postFile", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runRequestFile(bizModel, bizOptJson));//获取post文件
+        allOperations.put("postData", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runRequestBody(bizModel, bizOptJson));
+        allOperations.put("postFile", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runRequestFile(bizModel, bizOptJson));
 
-        allOperations.put("map", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runMap(bizModel1, bizOptJson1));
-        allOperations.put("filter", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runFilter(bizModel1, bizOptJson1));
-        allOperations.put("append", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runAppend(bizModel1, bizOptJson1));
-        allOperations.put("stat", (bizModel2, bizOptJson2, dataOptContext) -> BuiltInOperation.runStat(bizModel2, bizOptJson2));
-        allOperations.put("analyse", (bizModel3, bizOptJson3, dataOptContext) -> BuiltInOperation.runAnalyse(bizModel3, bizOptJson3));
-        allOperations.put("cross", (bizModel2, bizOptJson2, dataOptContext) -> BuiltInOperation.runCross(bizModel2, bizOptJson2));
-        //allOperations.put("compare", BuiltInOperation::runCompare);
-        allOperations.put("sort", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runSort(bizModel1, bizOptJson1));
-        allOperations.put("sortAsTree", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runSortAsTree(bizModel1, bizOptJson1));
-        allOperations.put("toTree", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runToTree(bizModel1, bizOptJson1));
-        allOperations.put("join", (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runJoin(bizModel1, bizOptJson1));
+        allOperations.put("map", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runMap(bizModel, bizOptJson));
+        allOperations.put("filter", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runFilter(bizModel, bizOptJson));
+        allOperations.put("append", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runAppend(bizModel, bizOptJson));
+        allOperations.put("stat", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runStat(bizModel, bizOptJson));
+        allOperations.put("analyse", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runAnalyse(bizModel, bizOptJson));
+        allOperations.put("cross", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runCross(bizModel, bizOptJson));
+        allOperations.put("sort", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runSort(bizModel, bizOptJson));
+        allOperations.put("sortAsTree", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runSortAsTree(bizModel, bizOptJson));
+        allOperations.put("toTree", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runToTree(bizModel, bizOptJson));
+        allOperations.put("join", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runJoin(bizModel, bizOptJson));
         allOperations.put("union", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runUnion(bizModel, bizOptJson));
-        //allOperations.put("filterExt", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runFilterExt(bizModel, bizOptJson));
         allOperations.put("check", new CheckRuleBizOperation(dataCheckRuleService));
         allOperations.put("static", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runStaticData(bizModel, bizOptJson));
         allOperations.put("http", new HttpBizOperation(sourceInfoDao));
@@ -129,6 +130,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("json", new JsonBizOperation());
         allOperations.put("sqlS", new RunSqlBizOperation(sourceInfoDao));
         allOperations.put("SSD", new ReportBizOperation(fileInfoOpt));
+        allOperations.put("optflow", new OptflowSerialNumberBizOperation(optFlowNoInfoManager));
+        allOperations.put("unit", new UnitFilterBizOperation());
+        allOperations.put("user", new UserFilterBizOperation());
         allOperations.put(ConstantValue.GENERATE_CSV, new GenerateCsvFileBizOperation());
         allOperations.put(ConstantValue.GENERATE_JSON, new GenerateJsonFileBizOperation());
         allOperations.put(ConstantValue.GENERAT_EXCEL, new GenerateExcelFileBizeOperation(fileInfoOpt));
@@ -280,10 +284,10 @@ public class BizOptFlowImpl implements BizOptFlow {
                 }
             }
             return;
-        } else if(RETURN_RESULT_FILE.equals(type)){
+        } else if (RETURN_RESULT_FILE.equals(type)) {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
             DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
-            FileDataSet fileInfo= DataSetOptUtil.attainFileDataset(dataSet, stepJson);
+            FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, stepJson);
             bizModel.getOptResult().setResultFile(fileInfo.getFirstRow());
             return;
         }
