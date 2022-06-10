@@ -51,15 +51,15 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         if(StringBaseOpt.isNvl(dataPacketCopy.getPacketId())) {
             dataPacketCopy.setPacketId(UuidOpt.getUuidAsString32());
         }
-        dataPacketCopy.setOptCode(creatApiOptMethod(dataPacketCopy));
+        //dataPacketCopy.setOptCode(creatApiOptMethod(dataPacketCopy));
         dataPacketCopyDao.saveNewObject(dataPacketCopy);
         dataPacketCopyDao.saveObjectReferences(dataPacketCopy);
     }
 
-    private String creatApiOptMethod(DataPacketDraft dataPacket) {
-        if (platformEnvironment != null) {
-            OptMethod result = assemblyOptMethodGet(dataPacket);
-            IOptMethod iOptMethod = platformEnvironment.addOptMethod(result);
+    private String mergeApiOptMethod(DataPacketDraft dataPacket) {
+        OptMethod result = assemblyOptMethodGet(dataPacket);
+        if (platformEnvironment != null && result != null) {
+            IOptMethod iOptMethod = platformEnvironment.mergeOptMethod(result);
             return iOptMethod==null?null:iOptMethod.getOptCode();
         }
         return null;
@@ -73,7 +73,29 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         result.setApiId(dataPacket.getPacketId());
         result.setOptMethod("api");
         result.setOptUrl("/dde/run/" + dataPacket.getPacketId());
-        result.setOptReq("CRUD");
+        String taskType = dataPacket.getTaskType();
+        switch (taskType){
+            case "1":
+                taskType="R";
+                break;
+            case "2":
+            case "4":
+            case "7":
+                platformEnvironment.deleteOptMethod(dataPacket.getPacketId());
+                return null;
+            case "3":
+                taskType="C";
+                break;
+            case "5":
+                taskType="U";
+                break;
+            case "6":
+                taskType="D";
+                break;
+            default:
+                taskType="未知类型";
+        }
+        result.setOptReq(taskType);
         result.setOptDesc("请求api网关接口");
         result.setOptType(OPTMETHOD_OPTTYPE_API);
         return result;
@@ -89,10 +111,12 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
     @Override
     public void publishDataPacket(DataPacketDraft dataPacketCopy) {
-        String sql = "update q_data_packet_draft SET publish_date=? WHERE  PACKET_ID=? ";
-        dataPacketCopyDao.getJdbcTemplate().update(sql, new Object[]{dataPacketCopy.getPublishDate(), dataPacketCopy.getPacketId()});
+        String optCode = mergeApiOptMethod(dataPacketCopy);
+        String sql = "update q_data_packet_draft SET publish_date=? ,opt_code=?  WHERE  PACKET_ID=? ";
+        dataPacketCopyDao.getJdbcTemplate().update(sql, new Object[]{dataPacketCopy.getPublishDate(),optCode, dataPacketCopy.getPacketId()});
         DataPacket dataPacket = new DataPacket();
         BeanUtils.copyProperties(dataPacketCopy, dataPacket);
+        dataPacket.setOptCode(dataPacketCopy.getPacketId());
         List<DataPacketParam> dataPacketParamList = new ArrayList<>();
         if (dataPacketCopy.getPacketParams()!=null){
            dataPacketCopy.getPacketParams().forEach(dataPacketParamDraft -> {
