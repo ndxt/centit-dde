@@ -539,7 +539,7 @@ public abstract class DataSetOptUtil {
                     if(statType != 0){ // _totalSum
                         String fieldName = key + concatStr + "_totalSum";
                         Object preSum = newRow.get(fieldName);
-                        newRow.put(fieldName, GeneralAlgorithm.addTwoObject(preSum, entry.getValue()));
+                        newRow.put(fieldName, GeneralAlgorithm.addTwoObject(preSum, entry.getValue(), true));
                     }
                     if(statType == 2 && colHeaderCount > 1) { //_detailSum colHeaderCount == 2
                         for (String colKek : colHeaderFields) {
@@ -551,7 +551,7 @@ public abstract class DataSetOptUtil {
                                 .append(key).append(concatStr).append("_detailSum");
                             String fieldName = detailSumField.toString();
                             Object preSum = newRow.get(fieldName);
-                            newRow.put(fieldName, GeneralAlgorithm.addTwoObject(preSum, entry.getValue()));
+                            newRow.put(fieldName, GeneralAlgorithm.addTwoObject(preSum, entry.getValue(), true));
                         }
                     }
                 }
