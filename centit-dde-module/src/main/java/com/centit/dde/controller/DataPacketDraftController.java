@@ -2,6 +2,7 @@ package com.centit.dde.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
@@ -21,6 +22,7 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.operationlog.RecordOperationLog;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
@@ -67,7 +69,7 @@ public class DataPacketDraftController extends BaseController {
     @PostMapping
     @WrapUpResponseBody
     public DataPacketDraft createDataPacket(@RequestBody DataPacketDraft dataPacketDraft, HttpServletRequest request) {
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
         dataPacketDraft.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
         dataPacketDraft.setLogLevel(ConstantValue.LOGLEVEL_TYPE_ERROR);
@@ -82,7 +84,7 @@ public class DataPacketDraftController extends BaseController {
     public DataPacketDraft createHttpTypeApi(@RequestBody HttpParameter httpParames) {
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setOsId(httpParames.getOsId());
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
         String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringBaseOpt.isNvl(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
@@ -95,17 +97,17 @@ public class DataPacketDraftController extends BaseController {
         for (Object node : nodes) {
             JSONObject nodeData = (JSONObject) node;
             JSONObject properties = nodeData.getJSONObject("properties");
-            if ("htts".equals(properties.getString("type"))){
-                if (StringUtils.isNotBlank(httpParames.getRequestBody())){
-                    properties.put("querySQL",httpParames.getRequestBody());
+            if ("htts".equals(properties.getString("type"))) {
+                if (StringUtils.isNotBlank(httpParames.getRequestBody())) {
+                    properties.put("querySQL", httpParames.getRequestBody());
                 }
-                if (httpParames.getParamesList()!=null&&httpParames.getParamesList().length>0){
-                    properties.put("parameterList",httpParames.getParamesList());
+                if (httpParames.getParamesList() != null && httpParames.getParamesList().length > 0) {
+                    properties.put("parameterList", httpParames.getParamesList());
                 }
-                properties.put("httpUrl",httpParames.getMethodName());
-                properties.put("loginService",httpParames.getLoginUrlCode());
-                properties.put("requestMode",httpParames.getMethodType());
-                properties.put("databaseId",httpParames.getHttpUrlCode());
+                properties.put("httpUrl", httpParames.getMethodName());
+                properties.put("loginService", httpParames.getLoginUrlCode());
+                properties.put("requestMode", httpParames.getMethodType());
+                properties.put("databaseId", httpParames.getHttpUrlCode());
             }
         }
         JSONObject schemaProps = dataPacketTemplate.getJSONObject("schemaProps");
@@ -131,7 +133,7 @@ public class DataPacketDraftController extends BaseController {
     public List<DataPacketDraft> createMetaDataApi(@RequestBody MetaDataParameter metaDataOrHttpParams) {
         DataPacketDraft dataPacket = new DataPacketDraft();
         dataPacket.setOsId(metaDataOrHttpParams.getOsId());
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacket.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacket.getOsId());
         String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringBaseOpt.isNvl(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
@@ -147,7 +149,7 @@ public class DataPacketDraftController extends BaseController {
         return dataPacketDraftList;
     }
 
-    private DataPacketDraft createDataPacket(MetaDataParameter metaDataOrHttpParams, Integer type){
+    private DataPacketDraft createDataPacket(MetaDataParameter metaDataOrHttpParams, Integer type) {
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setBufferFreshPeriod(-1);
         dataPacketDraft.setIsValid(true);
@@ -155,7 +157,7 @@ public class DataPacketDraftController extends BaseController {
         dataPacketDraft.setOptId(metaDataOrHttpParams.getOptId());
         dataPacketDraft.setOsId(metaDataOrHttpParams.getOsId());
         JSONObject dataPacketTemplate = dataPacketTemplateService.getDataPacketTemplateByType(type);
-        String tableName=metaDataOrHttpParams.getTableName();
+        String tableName = metaDataOrHttpParams.getTableName();
         String packetTemplateName = dataPacketTemplate.getString("packetTemplateName");
         String replace = packetTemplateName.replace("{name}", tableName);
         dataPacketDraft.setTaskType(dataPacketTemplate.getString("taskType"));
@@ -169,10 +171,10 @@ public class DataPacketDraftController extends BaseController {
             JSONObject nodeData = (JSONObject) node;
             JSONObject properties = nodeData.getJSONObject("properties");
             String metadataType = properties.getString("type");
-            if (StringUtils.isNotBlank(metadataType) && metadataType.startsWith("metadata")){
-                properties.put("tableId",tableId);
-                properties.put("templateType",type==6 || type==7?1:type);
-                properties.put("databaseName",dataBaseCode);
+            if (StringUtils.isNotBlank(metadataType) && metadataType.startsWith("metadata")) {
+                properties.put("tableId", tableId);
+                properties.put("templateType", type == 6 || type == 7 ? 1 : type);
+                properties.put("databaseName", dataBaseCode);
             }
         }
         JSONObject schemaProps = dataPacketTemplate.getJSONObject("schemaProps");
@@ -181,7 +183,7 @@ public class DataPacketDraftController extends BaseController {
         dataPacketDraft.setLogLevel(ConstantValue.LOGLEVEL_TYPE_ERROR);
         dataPacketDraft.setNeedRollback("T");
         dataPacketDraft.setDataOptDescJson(content);
-        return  dataPacketDraft;
+        return dataPacketDraft;
     }
 
 
@@ -192,13 +194,13 @@ public class DataPacketDraftController extends BaseController {
     )
     @PutMapping(value = "/{packetId}")
     @RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}更新api",
-        tag = "{arg0}",newValue = "无")
+        tag = "{arg0}", newValue = "无")
     @WrapUpResponseBody
-    public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketDraft dataPacketDraft) throws ParseException  {
-        if (dataPacketDraft==null){
+    public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketDraft dataPacketDraft) throws ParseException {
+        if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
         dataPacketDraft.setPacketId(packetId);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateStr = dateFormat.format(new Date());
@@ -213,10 +215,10 @@ public class DataPacketDraftController extends BaseController {
     @Transactional(rollbackFor = Exception.class)
     public void publishDataPacket(@PathVariable String packetId) throws ParseException {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        if (dataPacketDraft==null){
+        if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "发布数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateStr = simpleDateFormat.format(new Date());
         dataPacketDraft.setPublishDate(simpleDateFormat.parse(dateStr));
@@ -228,10 +230,10 @@ public class DataPacketDraftController extends BaseController {
     @WrapUpResponseBody
     public void updateDataPacketOpt(@PathVariable String packetId, @RequestBody String dataOptDescJson) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        if (dataPacketDraft==null){
+        if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
         dataPacketDraftService.updateDataPacketOptJson(packetId, dataOptDescJson);
     }
 
@@ -241,10 +243,10 @@ public class DataPacketDraftController extends BaseController {
     @Transactional(rollbackFor = Exception.class)
     public void deleteDataPacket(@PathVariable String packetId) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        if (dataPacketDraft==null){
+        if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "删除数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
         platformEnvironment.deleteOptDefAndRolepowerByOptCode(dataPacketDraft.getOptCode());
         dataPacketService.deleteDataPacket(packetId);
         dataPacketDraftService.deleteDataPacket(packetId);
@@ -254,21 +256,21 @@ public class DataPacketDraftController extends BaseController {
     @PutMapping(value = "/{packetId}/{disableType}")
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
-    public void updateDisableStatus(@PathVariable String packetId,@PathVariable String disableType) {
+    public void updateDisableStatus(@PathVariable String packetId, @PathVariable String disableType) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        if (dataPacketDraft==null){
+        if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
         //启用  disableType 必须等于T 或者 F
-        if ("F".equals(disableType)){
-            dataPacketService.updateDisableStatus(packetId,disableType);
-            dataPacketDraftService.updateDisableStatus(packetId,disableType);
-        }else if("T".equals(disableType)){//禁用
-            dataPacketService.updateDisableStatus(packetId,disableType);
-            dataPacketDraftService.updateDisableStatus(packetId,disableType);
-        }else {
-            throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "非法传参，参数必须为T或F,传入的参数为："+disableType);
+        if ("F".equals(disableType) || "T".equals(disableType)) {
+            DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
+            if (dataPacket != null) {
+                dataPacketService.updateDisableStatus(packetId, disableType);
+            }
+            dataPacketDraftService.updateDisableStatus(packetId, disableType);
+        } else {
+            throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "非法传参，参数必须为T或F,传入的参数为：" + disableType);
         }
         //删除权限数据
         platformEnvironment.deleteOptDefAndRolepowerByOptCode(dataPacketDraft.getOptCode());
@@ -278,14 +280,14 @@ public class DataPacketDraftController extends BaseController {
     @ApiOperation(value = "查询API网关")
     @GetMapping
     @WrapUpResponseBody
-    public PageQueryResult<Map<String,Object>> listDataPacket(HttpServletRequest request, PageDesc pageDesc) {
+    public PageQueryResult<Map<String, Object>> listDataPacket(HttpServletRequest request, PageDesc pageDesc) {
         List<DataPacketDraft> list = dataPacketDraftService.listDataPacket(BaseController.collectRequestParameters(request), pageDesc);
-        List<Map<String,Object>> returnList = new ArrayList<>();
+        List<Map<String, Object>> returnList = new ArrayList<>();
         list.stream().forEach(dataPacketDraft -> {
             String optId = dataPacketDraft.getOptId();
             Map<String, Object> dataPacketInfo = CollectionsOpt.objectToMap(dataPacketDraft);
             String optName = CodeRepositoryUtil.getValue("optId", optId);
-            dataPacketInfo.put("optName",optName);
+            dataPacketInfo.put("optName", optName);
             returnList.add(dataPacketInfo);
         });
         return PageQueryResult.createResult(returnList, pageDesc);
@@ -297,7 +299,7 @@ public class DataPacketDraftController extends BaseController {
     public DataPacketDraft getDataPacket(@PathVariable String packetId) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
         //判断api是否处于禁用状态   禁用状态直接返回空   底层接口无法修改才加该判断来实现
-        if (dataPacketDraft !=null && dataPacketDraft.getIsDisable()){
+        if (dataPacketDraft != null && dataPacketDraft.getIsDisable()) {
             return null;
         }
         return dataPacketDraft;
@@ -314,12 +316,12 @@ public class DataPacketDraftController extends BaseController {
     public void batchDeleteByPacketIds(@RequestBody JSONObject jsonObject) {
         JSONArray packetIds = jsonObject.getJSONArray("packetIds");
         String osId = jsonObject.getString("osId");
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,osId);
-        if (packetIds != null && packetIds.size() > 0){
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, osId);
+        if (packetIds != null && packetIds.size() > 0) {
             String[] ids = packetIds.toArray(new String[packetIds.size()]);
             dataPacketDraftService.batchDeleteByPacketIds(ids);
             dataPacketService.batchDeleteByPacketIds(ids);
-        }else if (!StringBaseOpt.isNvl(osId)){
+        } else if (!StringBaseOpt.isNvl(osId)) {
             dataPacketDraftService.clearTrashStand(osId);
             dataPacketService.clearTrashStand(osId);
         }
@@ -333,18 +335,27 @@ public class DataPacketDraftController extends BaseController {
     )
     @WrapUpResponseBody
     public ResponseData ApiCopy(@RequestBody JSONObject jsonObject) {
-        String packetId = jsonObject.getString("packetId");
+        String copyPacketId = jsonObject.getString("packetId");
         String packetName = jsonObject.getString("packetName");
         String optId = jsonObject.getString("optId");
-        if (StringUtils.isBlank(packetId) || StringUtils.isBlank(packetName) || StringUtils.isBlank(optId)){
+        if (StringUtils.isBlank(copyPacketId) || StringUtils.isBlank(packetName) || StringUtils.isBlank(optId)) {
             return ResponseData.makeErrorMessage("缺少参数，请检查请求参数是否正确！");
         }
-        DataPacketDraft dataPacket = dataPacketDraftService.getDataPacket(packetId);
+        DataPacketDraft dataPacket = dataPacketDraftService.getDataPacket(copyPacketId);
         if (dataPacket == null) return ResponseData.makeErrorMessage("复制的API接口不存在！");
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacket.getOsId());
-        dataPacket.setPacketId(null);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacket.getOsId());
+        String packetId = UuidOpt.getUuidAsString32();
+        dataPacket.setPacketId(packetId);
         dataPacket.setPacketName(packetName);
         dataPacket.setOptId(optId);
+        dataPacket.setPublishDate(null);
+        JSONObject schemaJson = dataPacket.getSchemaProps();
+        if (schemaJson != null) {
+            String schemaString = JSONObject.toJSONString(schemaJson);
+            schemaString = StringUtils.replace(schemaString, copyPacketId, packetId);
+            schemaJson = JSONObject.parseObject(schemaString);
+            dataPacket.setSchemaProps(schemaJson);
+        }
         dataPacketDraftService.createDataPacket(dataPacket);
         return ResponseData.successResponse;
     }
