@@ -12,6 +12,10 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -73,40 +77,39 @@ public class CsvDataSet implements DataSetReader, DataSetWriter {
         List<Map<String, Object>> list = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
             Charset.forName(getCharset(params))), 8192)) {
-
-            CsvReader csvReader = new CsvReader(reader);
-            csvReader.setDelimiter(',');
-            csvReader.setSafetySwitch(false);
             // firstRowAsHeader 如果是true则以第一行为key生成一个map，如果第一行不够长，后面的key自动为 column+i
             // 如果firstRowAsHeader为false，则必须要指定每一列的key，不够长同样自动为column+i
-            List<String> headers = null;
             boolean firstRowAsHeader = params == null ||
                 BooleanBaseOpt.castObjectToBoolean(params.get("firstRowAsHeader"), true);
+            CSVFormat csvFormat = CSVFormat.EXCEL;
+            CSVParser csvParser = csvFormat.parse(reader);
+            List<CSVRecord> recordList = csvParser.getRecords();
+            List<String> headers = null;
             if (firstRowAsHeader) {
-                if (csvReader.readRecord()) {
-                    String[] splitHead = csvReader.getValues();
-                    headers = CollectionsOpt.arrayToList(splitHead);
+                if (recordList != null) {
+                    CSVRecord record = recordList.get(0);
+                    headers = new ArrayList<>(record.size());
+                    Iterator<String> iterator = record.iterator();
+                    while (iterator.hasNext()){
+                        headers.add(iterator.next());
+                    }
                 }
             } else {
                 headers = loadColumnNames(params);
             }
-
-            if (headers == null) {
-                headers = new ArrayList<>();
-            }
+            csvFormat.withHeader(CollectionsOpt.listToArray(headers));
             int headLen = headers.size();
-
-            while (csvReader.readRecord()) {
-                String[] splitResult = csvReader.getValues();
-                int splitResultLength = splitResult.length;
+            for (int k = 1; k < recordList.size(); k++) {
+                CSVRecord record = recordList.get(k);
+                int splitResultLength = record.size();
                 Map<String, Object> map = new HashMap<>(splitResultLength);
                 for (int i = 0; i < splitResultLength; i++) {
                     String columnName = i < headLen ? headers.get(i) : "column" + i;
-                    map.put(columnName, splitResult[i]);
+                    map.put(columnName, record.get(i));
                 }
                 list.add(map);
             }
-            csvReader.close();
+            csvParser.close();
             return list;
         }
     }
@@ -136,25 +139,16 @@ public class CsvDataSet implements DataSetReader, DataSetWriter {
         }
         try (
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outs, Charset.forName(getCharset(params))))) {
-
-            CsvWriter csvWriter = new CsvWriter(writer, ',');
-            csvWriter.setTextQualifier('"');
-            csvWriter.setUseTextQualifier(true);
-            csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR.charAt(0));
-
-            if (firstRowAsHeader) {
-                csvWriter.writeRecord(CollectionsOpt.listToArray(columnNames));
-            }
-
+            CSVPrinter csvPrinter = CSVFormat.EXCEL.withHeader(CollectionsOpt.listToArray(columnNames)).print(writer);
             String[] values = new String[columnNames.size()];
             for (Map<String, Object> row : list) {
                 for (int i = 0; i < columnNames.size(); i++) {
                     values[i] = StringBaseOpt.castObjectToString(row.get(columnNames.get(i)), "");
                 }
-                csvWriter.writeRecord(values);
+                csvPrinter.printRecord(values);
             }
-            csvWriter.flush();
-            csvWriter.close();
+            csvPrinter.flush();
+            csvPrinter.close();
         }
     }
 
