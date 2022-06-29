@@ -18,7 +18,7 @@ import java.io.InputStream;
 /**
  * @author zhf
  */
-public class JsonBizOperation implements BizOperation {
+public class ReadJsonFileOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {

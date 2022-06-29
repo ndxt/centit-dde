@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author zhf
  */
-public class JSBizOperation implements BizOperation {
+public class InnerJSOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         JSRuntimeContext jsRuntimeContext = new JSRuntimeContext();

@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * @author zhf
  */
-public class UnitFilterBizOperation implements BizOperation {
+public class UnitFilterOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext){
         Object centitUserDetails = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);

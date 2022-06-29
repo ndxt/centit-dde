@@ -26,7 +26,7 @@ import java.util.Map;
  * @author codefan
  * 读取excel中的内容
  */
-public class ExcelBizOperation implements BizOperation {
+public class ReadExcelOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {

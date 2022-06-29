@@ -15,11 +15,11 @@ import java.util.Map;
 /**
  * 元数据更新组件
  */
-public class MetadataUpdateBizOperation implements BizOperation {
+public class MetadataUpdateOperation implements BizOperation {
     private  MetaObjectService metaObjectService;
 
 
-    public MetadataUpdateBizOperation(MetaObjectService metaObjectService) {
+    public MetadataUpdateOperation(MetaObjectService metaObjectService) {
         this.metaObjectService = metaObjectService;
     }
 

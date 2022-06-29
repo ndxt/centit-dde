@@ -31,20 +31,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MetadataBizOperation implements BizOperation {
+public class MetadataOperation implements BizOperation {
     private  MetaObjectService metaObjectService;
 
     private DataScopePowerManager queryDataScopeFilter;
 
     private MetaDataCache metaDataCache;
 
-    public MetadataBizOperation(MetaObjectService metaObjectService, DataScopePowerManager queryDataScopeFilter, MetaDataCache metaDataCache) {
+    public MetadataOperation(MetaObjectService metaObjectService, DataScopePowerManager queryDataScopeFilter, MetaDataCache metaDataCache) {
         this.metaObjectService = metaObjectService;
         this.queryDataScopeFilter=queryDataScopeFilter;
         this.metaDataCache=metaDataCache;
     }
 
-    public MetadataBizOperation() {
+    public MetadataOperation() {
     }
 
     @Override

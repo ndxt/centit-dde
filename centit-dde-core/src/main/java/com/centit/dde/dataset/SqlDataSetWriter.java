@@ -7,7 +7,6 @@ import com.centit.product.adapter.api.ISourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
-import com.centit.support.database.utils.FieldType;
 import com.centit.support.database.utils.PersistenceException;
 import lombok.Data;
 import org.slf4j.Logger;

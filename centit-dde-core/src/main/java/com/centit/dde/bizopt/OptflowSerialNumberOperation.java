@@ -21,12 +21,12 @@ import java.util.Map;
 /**
  * @author zhf
  */
-public class OptflowSerialNumberBizOperation implements BizOperation {
+public class OptflowSerialNumberOperation implements BizOperation {
     private OptFlowNoInfoManager optFlowNoInfoManager;
     private final String PRODUCE = "A";
     private final String PREVIEW = "B";
 
-    public OptflowSerialNumberBizOperation(OptFlowNoInfoManager optFlowNoInfoManager) {
+    public OptflowSerialNumberOperation(OptFlowNoInfoManager optFlowNoInfoManager) {
         this.optFlowNoInfoManager = optFlowNoInfoManager;
     }
 

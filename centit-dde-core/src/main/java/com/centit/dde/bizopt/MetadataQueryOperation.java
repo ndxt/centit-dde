@@ -28,14 +28,14 @@ import java.util.Map;
 /**
  * 元数据查询组件
  */
-public class MetadataQueryBizOperation implements BizOperation {
+public class MetadataQueryOperation implements BizOperation {
     private  MetaObjectService metaObjectService;
 
     private DataScopePowerManager queryDataScopeFilter;
 
     private MetaDataCache metaDataCache;
 
-    public MetadataQueryBizOperation(MetaObjectService metaObjectService, DataScopePowerManager queryDataScopeFilter, MetaDataCache metaDataCache) {
+    public MetadataQueryOperation(MetaObjectService metaObjectService, DataScopePowerManager queryDataScopeFilter, MetaDataCache metaDataCache) {
         this.metaObjectService = metaObjectService;
         this.queryDataScopeFilter=queryDataScopeFilter;
         this.metaDataCache=metaDataCache;

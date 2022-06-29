@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class AssignmentBizOperation implements BizOperation {
+public class AssignmentOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {

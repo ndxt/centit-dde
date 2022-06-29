@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ObjectCompareBizOperation implements BizOperation {
+public class ObjectCompareOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");

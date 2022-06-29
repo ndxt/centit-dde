@@ -18,12 +18,12 @@ import java.util.Map;
 /**
  * @author zhf
  */
-public class DbBizOperation implements BizOperation {
+public class QuerySqlOperation implements BizOperation {
     private SourceInfoDao sourceInfoDao;
 
     private DataScopePowerManager queryDataScopeFilter;
 
-    public DbBizOperation(SourceInfoDao sourceInfoDao, DataScopePowerManager queryDataScopeFilter) {
+    public QuerySqlOperation(SourceInfoDao sourceInfoDao, DataScopePowerManager queryDataScopeFilter) {
         this.sourceInfoDao = sourceInfoDao;
         this.queryDataScopeFilter = queryDataScopeFilter;
     }

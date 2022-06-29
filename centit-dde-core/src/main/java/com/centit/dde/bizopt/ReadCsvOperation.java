@@ -16,7 +16,7 @@ import java.io.InputStream;
 /**
  * @author zhf
  */
-public class CsvBizOperation implements BizOperation {
+public class ReadCsvOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {

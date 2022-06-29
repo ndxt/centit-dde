@@ -118,41 +118,41 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("toTree", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runToTree(bizModel, bizOptJson));
         allOperations.put("join", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runJoin(bizModel, bizOptJson));
         allOperations.put("union", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runUnion(bizModel, bizOptJson));
-        allOperations.put("check", new CheckRuleBizOperation(dataCheckRuleService));
+        allOperations.put("check", new CheckRuleOperation(dataCheckRuleService));
         allOperations.put("static", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runStaticData(bizModel, bizOptJson));
-        allOperations.put("http", new HttpBizOperation(sourceInfoDao));
+        allOperations.put("http", new HttpServiceOperation(sourceInfoDao));
         allOperations.put("clear", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runClear(bizModel, bizOptJson));
-        allOperations.put("js", new JSBizOperation());
-        allOperations.put("persistence", new PersistenceBizOperation(path, sourceInfoDao, metaDataService));
-        allOperations.put("database", new DbBizOperation(sourceInfoDao, queryDataScopeFilter));
-        allOperations.put("excel", new ExcelBizOperation());
-        allOperations.put("csv", new CsvBizOperation());
-        allOperations.put("json", new JsonBizOperation());
-        allOperations.put("sqlS", new RunSqlBizOperation(sourceInfoDao));
-        allOperations.put("SSD", new ReportBizOperation(fileInfoOpt));
-        allOperations.put("optflow", new OptflowSerialNumberBizOperation(optFlowNoInfoManager));
-        allOperations.put("unit", new UnitFilterBizOperation());
-        allOperations.put("user", new UserFilterBizOperation());
-        allOperations.put(ConstantValue.GENERATE_CSV, new GenerateCsvFileBizOperation());
-        allOperations.put(ConstantValue.GENERATE_JSON, new GenerateJsonFileBizOperation());
-        allOperations.put(ConstantValue.GENERAT_EXCEL, new GenerateExcelFileBizeOperation(fileInfoOpt));
-        allOperations.put(ConstantValue.DEFINE_JSON_DATA, new DefineJsonDataBizOperation());
-        allOperations.put(ConstantValue.FILE_UPLOAD, new FileUploadBizOperation(fileInfoOpt));
-        allOperations.put(ConstantValue.FILE_DOWNLOAD, new FileDownloadBizOperation(fileInfoOpt));
+        allOperations.put("js", new InnerJSOperation());
+        allOperations.put("persistence", new PersistenceDBOperation(path, sourceInfoDao, metaDataService));
+        allOperations.put("database", new QuerySqlOperation(sourceInfoDao, queryDataScopeFilter));
+        allOperations.put("excel", new ReadExcelOperation());
+        allOperations.put("csv", new ReadCsvOperation());
+        allOperations.put("json", new ReadJsonFileOperation());
+        allOperations.put("sqlS", new RunSqlOperation(sourceInfoDao));
+        allOperations.put("SSD", new DocReportOperation(fileInfoOpt));
+        allOperations.put("optflow", new OptflowSerialNumberOperation(optFlowNoInfoManager));
+        allOperations.put("unit", new UnitFilterOperation());
+        allOperations.put("user", new UserFilterOperation());
+        allOperations.put(ConstantValue.GENERATE_CSV, new WriteCsvOperation());
+        allOperations.put(ConstantValue.GENERATE_JSON, new WriteJsonFileOperation());
+        allOperations.put(ConstantValue.GENERAT_EXCEL, new WriteExcelOperation(fileInfoOpt));
+        allOperations.put(ConstantValue.DEFINE_JSON_DATA, new DefineJsonDataOperation());
+        allOperations.put(ConstantValue.FILE_UPLOAD, new FileUploadOperation(fileInfoOpt));
+        allOperations.put(ConstantValue.FILE_DOWNLOAD, new FileDownloadOperation(fileInfoOpt));
         //为了兼容历史数据保留着  现已拆分为元数据查询  和  元数据更新 2个组件
         allOperations.put(ConstantValue.METADATA_OPERATION,
-            new MetadataBizOperation(metaObjectService, queryDataScopeFilter, metaDataCache));
+            new MetadataOperation(metaObjectService, queryDataScopeFilter, metaDataCache));
         allOperations.put(ConstantValue.METADATA_OPERATION_QUERY,
-            new MetadataQueryBizOperation(metaObjectService, queryDataScopeFilter, metaDataCache));
-        allOperations.put(ConstantValue.METADATA_OPERATION_UPDATE, new MetadataUpdateBizOperation(metaObjectService));
-        allOperations.put(ConstantValue.COMPARE_SOURCE, new ObjectCompareBizOperation());
+            new MetadataQueryOperation(metaObjectService, queryDataScopeFilter, metaDataCache));
+        allOperations.put(ConstantValue.METADATA_OPERATION_UPDATE, new MetadataUpdateOperation(metaObjectService));
+        allOperations.put(ConstantValue.COMPARE_SOURCE, new ObjectCompareOperation());
 
-        allOperations.put(ConstantValue.SESSION_DATA, new GetSessionDataBizOperation());
+        allOperations.put(ConstantValue.SESSION_DATA, new SessionDataOperation());
 
         allOperations.put(ConstantValue.COMMIT_TRANSACTION, new TransactionCommitOperation(sourceInfoDao));
-        allOperations.put(ConstantValue.INTERSECT_DATASET, new IntersectDataSetBizOperation());
-        allOperations.put(ConstantValue.MINUS_DATASET, new MinusDataSetBizOperation());
-        allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentBizOperation());
+        allOperations.put(ConstantValue.INTERSECT_DATASET, new IntersectDataSetOperation());
+        allOperations.put(ConstantValue.MINUS_DATASET, new MinusDataSetOperation());
+        allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentOperation());
     }
 
     @Override

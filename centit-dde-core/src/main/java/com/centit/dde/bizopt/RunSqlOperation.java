@@ -22,10 +22,10 @@ import java.util.Map;
 /**
  * @author zhf
  */
-public class RunSqlBizOperation implements BizOperation {
+public class RunSqlOperation implements BizOperation {
     private SourceInfoDao sourceInfoDao;
 
-    public RunSqlBizOperation(SourceInfoDao sourceInfoDao) {
+    public RunSqlOperation(SourceInfoDao sourceInfoDao) {
         this.sourceInfoDao = sourceInfoDao;
     }
 

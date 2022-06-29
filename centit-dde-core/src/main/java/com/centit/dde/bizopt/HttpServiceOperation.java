@@ -35,10 +35,10 @@ import java.util.Map;
 /**
  * @author zhf
  */
-public class HttpBizOperation implements BizOperation {
+public class HttpServiceOperation implements BizOperation {
     private SourceInfoDao sourceInfoDao;
 
-    public HttpBizOperation(SourceInfoDao sourceInfoDao) {
+    public HttpServiceOperation(SourceInfoDao sourceInfoDao) {
         this.sourceInfoDao = sourceInfoDao;
     }
 

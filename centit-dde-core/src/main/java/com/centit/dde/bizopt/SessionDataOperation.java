@@ -14,7 +14,7 @@ import com.centit.support.algorithm.ReflectionOpt;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GetSessionDataBizOperation implements BizOperation {
+public class SessionDataOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");

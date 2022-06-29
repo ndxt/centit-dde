@@ -19,7 +19,7 @@ import java.io.IOException;
 /**
  * 生成json文件节点信息
  */
-public class GenerateJsonFileBizOperation implements BizOperation {
+public class WriteJsonFileOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {

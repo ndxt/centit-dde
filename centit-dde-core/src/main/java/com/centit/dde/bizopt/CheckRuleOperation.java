@@ -21,11 +21,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CheckRuleBizOperation implements BizOperation {
+public class CheckRuleOperation implements BizOperation {
 
     private DataCheckRuleService dataCheckRuleService;
 
-    public CheckRuleBizOperation(DataCheckRuleService dataCheckRuleService) {
+    public CheckRuleOperation(DataCheckRuleService dataCheckRuleService) {
         this.dataCheckRuleService = dataCheckRuleService;
     }
 

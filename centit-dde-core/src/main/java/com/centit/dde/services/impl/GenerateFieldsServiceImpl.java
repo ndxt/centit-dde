@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.JSONDataSet;
-import com.centit.dde.dataset.SqlDataSetWriter;
 import com.centit.dde.services.GenerateFieldsService;
 import com.centit.dde.vo.ColumnSchema;
 import com.centit.fileserver.common.FileStore;

@@ -19,7 +19,7 @@ import java.io.FileNotFoundException;
 /**
  * @author zhf
  */
-public class PersistenceBizOperation implements BizOperation {
+public class PersistenceDBOperation implements BizOperation {
     private static String WRITER_ERROR_TAG = "__rmdb_writer_result";
     private static String WRITER_ERROR_MSG = "__rmdb_writer_result_msg";
     private String exportPath;
@@ -29,9 +29,9 @@ public class PersistenceBizOperation implements BizOperation {
     private SourceInfoDao sourceInfoDao;
     private MetaDataService metaDataService;
 
-    public PersistenceBizOperation(String exportPath,
-                                   SourceInfoDao sourceInfoDao,
-                                   MetaDataService metaDataService) {
+    public PersistenceDBOperation(String exportPath,
+                                  SourceInfoDao sourceInfoDao,
+                                  MetaDataService metaDataService) {
         this.exportPath = exportPath;
         this.sourceInfoDao = sourceInfoDao;
         this.metaDataService = metaDataService;

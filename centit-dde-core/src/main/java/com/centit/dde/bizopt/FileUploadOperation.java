@@ -15,11 +15,11 @@ import com.centit.support.algorithm.StringBaseOpt;
 /**
  * 文件上传节点
  */
-public class FileUploadBizOperation implements BizOperation {
+public class FileUploadOperation implements BizOperation {
 
     private FileInfoOpt fileInfoOpt;
 
-    public FileUploadBizOperation(FileInfoOpt fileInfoOpt) {
+    public FileUploadOperation(FileInfoOpt fileInfoOpt) {
         this.fileInfoOpt = fileInfoOpt;
     }
 

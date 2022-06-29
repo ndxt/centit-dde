@@ -19,7 +19,7 @@ import java.io.InputStream;
 /**
  * 生成CSV文件节点信息
  */
-public class GenerateCsvFileBizOperation implements BizOperation {
+public class WriteCsvOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {

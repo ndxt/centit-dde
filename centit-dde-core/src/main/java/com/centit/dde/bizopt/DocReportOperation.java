@@ -27,10 +27,10 @@ import java.util.Map;
 /**
  * @author zhf
  */
-public class ReportBizOperation implements BizOperation {
+public class DocReportOperation implements BizOperation {
     private FileInfoOpt fileInfoOpt;
 
-    public ReportBizOperation(FileInfoOpt fileInfoOpt) {
+    public DocReportOperation(FileInfoOpt fileInfoOpt) {
         this.fileInfoOpt = fileInfoOpt;
     }
 

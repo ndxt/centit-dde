@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * 定义JSON 数据
  */
-public class DefineJsonDataBizOperation implements BizOperation {
+public class DefineJsonDataOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {

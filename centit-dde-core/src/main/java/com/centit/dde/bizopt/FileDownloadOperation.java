@@ -21,11 +21,11 @@ import java.util.Map;
 /**
  * 文件下载节点
  */
-public class FileDownloadBizOperation implements BizOperation {
+public class FileDownloadOperation implements BizOperation {
 
     private FileInfoOpt fileInfoOpt;
 
-    public FileDownloadBizOperation(FileInfoOpt fileInfoOpt) {
+    public FileDownloadOperation(FileInfoOpt fileInfoOpt) {
         this.fileInfoOpt = fileInfoOpt;
     }
 

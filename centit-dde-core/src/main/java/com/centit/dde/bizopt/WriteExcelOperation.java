@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class GenerateExcelFileBizeOperation implements BizOperation {
+public class WriteExcelOperation implements BizOperation {
 
     private FileInfoOpt fileInfoOpt;
 
-    public GenerateExcelFileBizeOperation(FileInfoOpt fileInfoOpt) {
+    public WriteExcelOperation(FileInfoOpt fileInfoOpt) {
         this.fileInfoOpt = fileInfoOpt;
     }
 
