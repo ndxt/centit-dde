@@ -32,13 +32,12 @@ public class WriteCsvOperation implements BizOperation {
             DatetimeOpt.currentTimeWithSecond();
 
         DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
-
         if (dataSet==null){
             return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")+"：生成CSV文件异常，请指定数据集！");
         }
         InputStream inputStream = CsvDataSet.createCsvStream(dataSet, bizOptJson);
 
-        FileDataSet objectToDataSet =new FileDataSet(fileName.endsWith(".csv")?fileName:fileName+".csv",
+        FileDataSet objectToDataSet = new FileDataSet(fileName.endsWith(".csv")?fileName:fileName+".csv",
             inputStream.available(), inputStream);
         bizModel.putDataSet(targetDsName,objectToDataSet);
 

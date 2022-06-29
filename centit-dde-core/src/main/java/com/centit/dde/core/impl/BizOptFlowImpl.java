@@ -133,6 +133,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("optflow", new OptflowSerialNumberOperation(optFlowNoInfoManager));
         allOperations.put("unit", new UnitFilterOperation());
         allOperations.put("user", new UserFilterOperation());
+
+        allOperations.put(ConstantValue.ENCRYPT, new EncryptOperation());
+        allOperations.put(ConstantValue.DECIPHER, new DecipherOperation());
         allOperations.put(ConstantValue.GENERATE_CSV, new WriteCsvOperation());
         allOperations.put(ConstantValue.GENERATE_JSON, new WriteJsonFileOperation());
         allOperations.put(ConstantValue.GENERAT_EXCEL, new WriteExcelOperation(fileInfoOpt));

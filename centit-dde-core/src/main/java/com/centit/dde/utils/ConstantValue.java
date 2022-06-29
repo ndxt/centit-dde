@@ -38,8 +38,12 @@ public class ConstantValue {
     public static final String RESULTS = "results";
     public static final String SCHEDULER = "schedule";
     public static final String BRANCH = "branch";
-    //生成json文件组件
+    //加密组件
     public static final String GENERATE_JSON = "generateJson";
+    //解密组件
+    public static final String DECIPHER = "decipher";
+    //生成json文件组件
+    public static final String ENCRYPT = "encrypt";
     //生成CSV文件组件
     public static final String GENERATE_CSV= "generateCsv";
     //生成EXCEL文件组件
