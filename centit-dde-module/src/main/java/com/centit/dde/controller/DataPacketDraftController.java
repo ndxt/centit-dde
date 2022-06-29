@@ -6,6 +6,7 @@ import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.services.DataPacketTemplateService;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.LoginUserPermissionCheck;
 import com.centit.dde.vo.HttpParameter;
 import com.centit.dde.vo.MetaDataParameter;
@@ -69,6 +70,7 @@ public class DataPacketDraftController extends BaseController {
         LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment,dataPacketDraft.getOsId());
         dataPacketDraft.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
+        dataPacketDraft.setLogLevel(ConstantValue.LOGLEVEL_TYPE_ERROR);
         dataPacketDraftService.createDataPacket(dataPacketDraft);
         return dataPacketDraft;
     }
@@ -113,7 +115,7 @@ public class DataPacketDraftController extends BaseController {
         dataPacketDraft.setTaskType(taskType);
         dataPacketDraft.setOptId(httpParames.getOptId());
         dataPacketDraft.setOsId(httpParames.getOsId());
-        dataPacketDraft.setLogLevel(3);
+        dataPacketDraft.setLogLevel(ConstantValue.LOGLEVEL_TYPE_ERROR);
         dataPacketDraft.setPacketName(httpParames.getPacketName());
         dataPacketDraft.setPacketDesc(httpParames.getPacketName());
         dataPacketDraft.setDataOptDescJson(content);
@@ -176,7 +178,7 @@ public class DataPacketDraftController extends BaseController {
         JSONObject schemaProps = dataPacketTemplate.getJSONObject("schemaProps");
         dataPacketDraft.setSchemaProps(schemaProps);
         dataPacketDraft.setMetadataTableId(tableId);
-        dataPacketDraft.setLogLevel(3);
+        dataPacketDraft.setLogLevel(ConstantValue.LOGLEVEL_TYPE_ERROR);
         dataPacketDraft.setNeedRollback("T");
         dataPacketDraft.setDataOptDescJson(content);
         return  dataPacketDraft;
