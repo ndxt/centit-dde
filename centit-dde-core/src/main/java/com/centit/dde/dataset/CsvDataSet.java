@@ -10,13 +10,10 @@ import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
-import com.csvreader.CsvReader;
-import com.csvreader.CsvWriter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -65,12 +62,15 @@ public class CsvDataSet implements DataSetReader, DataSetWriter {
     public String[] getColumns() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
             Charset.forName(DEFAULT_CHARSET)), 8192);
-        CsvReader csvReader = new CsvReader(reader);
-        csvReader.setDelimiter(',');
-        if (csvReader.readRecord()) {
-            return csvReader.getValues();
+        CSVParser csvParser = CSVFormat.EXCEL.parse(reader);
+        List<CSVRecord> records = csvParser.getRecords();
+        CSVRecord record  = records.get(0);
+        List<String> headers = new ArrayList<>(record.size());
+        Iterator<String> iterator = record.iterator();
+        while (iterator.hasNext()){
+            headers.add(iterator.next());
         }
-        return new String[0];
+        return CollectionsOpt.listToArray(headers);
     }
 
     private List<Map<String, Object>> readCsvFile(Map<String, Object> params) throws IOException {
