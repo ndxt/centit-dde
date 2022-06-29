@@ -20,7 +20,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 /**
- * @author zhf
+ * @author zhou_c@centit.com
  */
 public class CsvDataSet implements DataSetReader, DataSetWriter {
     private static String DEFAULT_CHARSET = "gbk";

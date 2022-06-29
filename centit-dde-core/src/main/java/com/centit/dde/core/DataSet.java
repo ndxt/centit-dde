@@ -1,5 +1,6 @@
 package com.centit.dde.core;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.support.algorithm.CollectionsOpt;
 
@@ -177,6 +178,10 @@ public class DataSet implements DataSetReader, Serializable {
     @Override
     public DataSet load(Map<String, Object> params) {
         return this;
+    }
+
+    public String toJSONString(){
+        return JSON.toJSONString(this.data);
     }
 
 }
