@@ -152,7 +152,7 @@ public class HttpServiceOperation implements BizOperation {
 
     private Object getRequestBody(JSONObject bizOptJson, BizModel bizModel) {
         Object requestBody = "";
-        String json = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
+        String json = BuiltInOperation.getJsonFieldString(bizOptJson, "requestBody", "");
         if (json != null) {
             String requestBodyData = json.trim();
             if (requestBodyData.startsWith("{") && requestBodyData.endsWith("}")) {
