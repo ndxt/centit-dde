@@ -59,7 +59,7 @@ public class DecipherOperation implements BizOperation {
         byte[] objectText = "SM4".equalsIgnoreCase(algorithm)?
             //这个国密算法有很多策略，现在也搞不懂，随便搞一个
             SM4Util.decryptEcbPadding(password.getBytes(StandardCharsets.UTF_8), cipherBytes):
-            AESSecurityUtils.encrypt(cipherBytes, password);
+            AESSecurityUtils.decrypt(cipherBytes, password);
 
         String jsonString = new String(objectText);
         DataSet objectToDataSet = new DataSet(JSON.parse(jsonString));
