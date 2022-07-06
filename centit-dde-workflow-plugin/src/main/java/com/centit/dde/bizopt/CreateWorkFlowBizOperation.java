@@ -62,8 +62,9 @@ public class CreateWorkFlowBizOperation implements BizOperation {
         String userCodeTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(userCode, bizModelJSONTransform));
         String flowOptNameTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowOptName,bizModelJSONTransform));
         String flowOptTagTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowOptTag, bizModelJSONTransform));
+        String flowCodeTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowCode, bizModelJSONTransform));
         CreateFlowOptions createFlowOptions = CreateFlowOptions.create();
-        createFlowOptions.setFlowCode(flowCode);
+        createFlowOptions.setFlowCode(flowCodeTran);
         createFlowOptions.setFlowOptTag(flowOptTagTran);
         createFlowOptions.setUnitCode(unitCodeTran);
         createFlowOptions.setUserCode(userCodeTran);
