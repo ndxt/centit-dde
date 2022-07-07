@@ -33,7 +33,7 @@ public class ObjectCompareOperation implements BizOperation {
         newObject.forEach((newKey,newValue)->{
             //新对象中的字段在旧对象中不存在
             Object oldValue = oldObject.get(newKey);
-            if(!GeneralAlgorithm.equals(oldValue, newValue)){
+            if(GeneralAlgorithm.compareTwoObject(oldValue, newValue)!=0){
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("fieldName",newKey);
                 jsonObject.put("oldValue",oldValue);
