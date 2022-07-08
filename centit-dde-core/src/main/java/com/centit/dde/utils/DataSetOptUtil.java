@@ -37,17 +37,7 @@ public abstract class DataSetOptUtil {
     public static final Map<String, Function<Object[], Object>> extendFuncs = new HashMap<>();
 
     static {
-        extendFuncs.put("toJson", (a) -> JSON.parse(StringBaseOpt.castObjectToString(a[0])));
-        extendFuncs.put("toByteArray", (a) -> {
-            try {
-                return IOUtils.toByteArray((InputStream) a[0]);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return a;
-        });
         extendFuncs.put("uuid", (a) -> UuidOpt.getUuidAsString32());
-        extendFuncs.put("random", (a) -> CaptchaImageUtil.getRandomString(NumberBaseOpt.castObjectToInteger(a[0])));
         extendFuncs.put("encode", (a) -> new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
         extendFuncs.put("dict", (a) -> {
             if (a != null && a.length > 1) {
@@ -85,16 +75,6 @@ public abstract class DataSetOptUtil {
                 return a;
             }
         });
-        extendFuncs.put("replace", (a) -> {
-            if (a != null && a.length > 2) {
-                return StringUtils.replace(StringBaseOpt.castObjectToString(a[0]),
-                    StringBaseOpt.castObjectToString(a[1]), StringBaseOpt.castObjectToString(a[2]));
-            } else if (a != null && a.length > 0) {
-                return a[0];
-            } else {
-                return a;
-            }
-        });
         extendFuncs.put("size", (a) -> {
             Object o = Arrays.stream(a).toArray()[0];
             if (o instanceof Collection) {
@@ -104,29 +84,6 @@ public abstract class DataSetOptUtil {
                 return ((Map<?, ?>) o).size();
             }
             return "";
-        });
-        extendFuncs.put("startsWith", (a) -> {
-            Object[] objects = Arrays.stream(a).toArray();
-            if (objects.length == 2) {
-                String regex = (String) objects[0];
-                String value = (String) objects[1];
-                return value.startsWith(regex);
-            }
-            return false;
-        });
-        extendFuncs.put("remove", (a) -> {
-            Object[] objects = Arrays.stream(a).toArray();
-            if (objects.length == 2) {
-                Object index = objects[0];
-                Object value = objects[1];
-                //lsit<String>  list<Map>
-                if (value instanceof List) {
-                    List list = (List) value;
-                    list.remove(index);
-                    return list;
-                }
-            }
-            return false;
         });
     }
 
