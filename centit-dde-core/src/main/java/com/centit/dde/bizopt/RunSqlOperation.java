@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
@@ -53,9 +54,10 @@ public class RunSqlOperation implements BizOperation {
             if (StringUtils.isBlank(databaseCode) || StringUtils.isBlank(sql)) {
                 return ResponseData.makeErrorMessage("数据库或sql不能为空！");
             }
-            Map<String, Object> parames = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
-            QueryAndNamedParams qap = QueryUtils.translateQuery(sql, parames);
+            Map<String, Object> params = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
+            QueryAndNamedParams qap = QueryUtils.translateQuery(sql, params);
             QueryAndParams q = QueryAndParams.createFromQueryAndNamedParams(qap);
+            bizModel.putDataSet(bizOptJson.getString("id"),new DataSet(qap));
             Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfoDao.getDatabaseInfoById((databaseCode)));
             count = DatabaseAccess.doExecuteSql(conn, q.getQuery(), q.getParams());
         }
