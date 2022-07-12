@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataOptResult;
+import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.services.BizModelService;
 import com.centit.dde.services.DataPacketDraftService;
@@ -17,12 +18,14 @@ import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.CachedMap;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.VariableFormula;
@@ -60,13 +63,33 @@ public class HttpTaskController extends BaseController {
     private final DataPacketService dataPacketService;
     private final DataPacketDraftService dataPacketDraftService;
     private final BizModelService bizmodelService;
-
+    private static CachedMap<String, DataPacketInterface> dataPacketCachedMap;
 
     public HttpTaskController(DataPacketService dataPacketService, DataPacketDraftService dataPacketDraftService,
                               BizModelService bizmodelService) {
         this.dataPacketService = dataPacketService;
         this.dataPacketDraftService = dataPacketDraftService;
         this.bizmodelService = bizmodelService;
+        dataPacketCachedMap = new CachedMap<>(
+            this::getDataPacketOptStep,
+            CodeRepositoryCache.CACHE_FRESH_PERIOD_SECONDS
+        );
+    }
+
+    public static void evictCache(String dataPacketIdWithType) {
+        dataPacketCachedMap.evictIdentifiedCache(dataPacketIdWithType);
+    }
+
+    private DataPacketInterface getDataPacketOptStep(String dataPacketIdWithType) {
+        DataPacketInterface dataPacketInterface;
+        String runType = dataPacketIdWithType.substring(0, 1);
+        String dataPacketId = dataPacketIdWithType.substring(1);
+        if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
+            dataPacketInterface = dataPacketService.getDataPacket(dataPacketId);
+        } else {
+            dataPacketInterface = dataPacketDraftService.getDataPacket(dataPacketId);
+        }
+        return dataPacketInterface;
     }
 
     /**
@@ -156,12 +179,7 @@ public class HttpTaskController extends BaseController {
         /*   if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
             judgePower(packetId,runType);
         }*/
-        DataPacketInterface dataPacketInterface;
-        if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
-            dataPacketInterface = dataPacketService.getDataPacket(packetId);
-        } else {
-            dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
-        }
+        DataPacketInterface dataPacketInterface = dataPacketCachedMap.getCachedValue(runType + packetId);
         if (dataPacketInterface == null) {
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "API接口：" + packetId + "不存在！");
         }

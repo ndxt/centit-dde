@@ -1,6 +1,7 @@
 package com.centit.dde.po;
 
 import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.core.DataOptStep;
 
 import java.util.Date;
 import java.util.Map;
@@ -56,4 +57,6 @@ public interface DataPacketInterface {
     Integer getLogLevel();
 
     Boolean getIsDisable();
+
+    DataOptStep getDataOptStep();
 }

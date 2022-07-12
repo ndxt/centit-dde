@@ -2,6 +2,7 @@ package com.centit.dde.po;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.centit.dde.core.DataOptStep;
 import com.centit.framework.core.dao.DictionaryMap;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -25,7 +26,7 @@ import java.util.*;
 @Data
 @Entity
 @Table(name = "q_data_packet")
-public class DataPacket implements Serializable,DataPacketInterface {
+public class DataPacket implements Serializable, DataPacketInterface {
     private static final long serialVersionUID = 1;
 
     @ApiModelProperty(value = "数据处理ID", hidden = true)
@@ -156,6 +157,14 @@ public class DataPacket implements Serializable,DataPacketInterface {
     @OneToMany(targetEntity = DataPacketParam.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
     private List<DataPacketParam> packetParams;
+
+    @Transient
+    private DataOptStep dataOptStep;
+
+    public void setDataOptDescJson(JSONObject dataOptDescJson){
+        this.dataOptDescJson=dataOptDescJson;
+        dataOptStep=new DataOptStep(dataOptDescJson);
+    }
 
     public List<DataPacketParam> getPacketParams() {
         if (packetParams == null) {

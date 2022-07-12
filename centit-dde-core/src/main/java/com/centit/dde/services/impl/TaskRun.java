@@ -148,27 +148,14 @@ public class TaskRun {
             && !StringBaseOpt.isNvl(dataPacketInterface.getTaskCron())) {
             CronExpression cronExpression = new CronExpression(dataPacketInterface.getTaskCron());
             dataPacketInterface.setNextRunTime(cronExpression.getNextValidTimeAfter(dataPacketInterface.getLastRunTime()));
+        }else {
+            dataPacketInterface.setNextRunTime(null);
         }
         if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
-            if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())) {//定时任务才更新
-                dataPacketInterface.setNextRunTime(new Date());
-                DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set next_run_time=? where packet_id=?",
-                    new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
-            }
-            dataPacketCopyDao.mergeObject((DataPacketDraft) dataPacketInterface);
+            dataPacketCopyDao.updateObject(new String[]{"lastRunTime"}, (DataPacketDraft) dataPacketInterface);
         } else {
-            if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())) {//定时任务才更新
-                dataPacketInterface.setNextRunTime(new Date());
-                DatabaseOptUtils.doExecuteSql(dataPacketDao, "update q_data_packet set next_run_time=? where packet_id=?",
-                    new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
-                DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set next_run_time=? where packet_id=?",
-                    new Object[]{dataPacketInterface.getNextRunTime(), dataPacketInterface.getPacketId()});
-            }
-            dataPacketDao.mergeObject((DataPacket) dataPacketInterface);
-            //将正式流程执行的时间同步到草稿表中
-            DataPacket dataPacket = (DataPacket) dataPacketInterface;
-            DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, "update q_data_packet_draft set LAST_RUN_TIME=? where packet_id=?",
-                new Object[]{dataPacket.getLastRunTime(), dataPacket.getPacketId()});
+            dataPacketDao.updateObject(new String[]{"lastRunTime","nextRunTime"},(DataPacket) dataPacketInterface);
+            dataPacketCopyDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, (DataPacketDraft) dataPacketInterface);
         }
         log.debug("更新API执行信息，执行类型：{}，更新信息{}", runType, JSON.toJSONString(dataPacketInterface));
     }

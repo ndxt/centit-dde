@@ -2,6 +2,7 @@ package com.centit.dde.po;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.centit.dde.core.DataOptStep;
 import com.centit.framework.core.dao.DictionaryMap;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -161,6 +162,14 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
 
     @ApiModelProperty(hidden = true)
     private Object optMethod;
+
+    @Transient
+    private DataOptStep dataOptStep;
+
+    public void setDataOptDescJson(JSONObject dataOptDescJson){
+        this.dataOptDescJson=dataOptDescJson;
+        dataOptStep=new DataOptStep(dataOptDescJson);
+    }
 
     public List<DataPacketParamDraft> getPacketParams() {
         if (packetParams == null) {

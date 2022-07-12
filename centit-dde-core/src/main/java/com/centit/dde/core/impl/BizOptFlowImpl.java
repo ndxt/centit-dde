@@ -169,7 +169,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         BizModel bizModel = new BizModel(dataOptContext.getLogId());
 
         bizModel.setCallStackData(dataOptContext.getCallStackData());
-        DataOptStep dataOptStep = new DataOptStep(dataPacket.getDataOptDescJson());
+        DataOptStep dataOptStep = dataPacket.getDataOptStep();
 
         dataOptContext.setNeedRollback(dataPacket.getNeedRollback());
         dataOptContext.setOptId(dataPacket.getOptId());
