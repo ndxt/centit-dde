@@ -168,7 +168,9 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
 
     public void setDataOptDescJson(JSONObject dataOptDescJson){
         this.dataOptDescJson=dataOptDescJson;
-        dataOptStep=new DataOptStep(dataOptDescJson);
+        if(dataOptDescJson!=null) {
+            dataOptStep = new DataOptStep(dataOptDescJson);
+        }
     }
 
     public List<DataPacketParamDraft> getPacketParams() {
