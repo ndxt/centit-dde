@@ -130,7 +130,7 @@ public class DataOptStep {
         return  new JSONObject();
     }
     public boolean isEndStep() {
-        return currentStep.isEmpty();
+        return currentStep==null ||currentStep.isEmpty();
     }
 
     public void setCurrentStep(JSONObject currentStep) {
