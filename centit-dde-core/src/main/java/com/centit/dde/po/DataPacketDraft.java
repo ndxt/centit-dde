@@ -164,6 +164,7 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     private Object optMethod;
 
     @Transient
+    @JSONField(serialize = false)
     private DataOptStep dataOptStep;
 
     public void setDataOptDescJson(JSONObject dataOptDescJson){
