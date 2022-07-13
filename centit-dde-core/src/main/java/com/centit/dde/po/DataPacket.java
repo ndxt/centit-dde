@@ -159,6 +159,7 @@ public class DataPacket implements Serializable, DataPacketInterface {
     private List<DataPacketParam> packetParams;
 
     @Transient
+    @JSONField(serialize = false)
     private DataOptStep dataOptStep;
 
     public void setDataOptDescJson(JSONObject dataOptDescJson){
