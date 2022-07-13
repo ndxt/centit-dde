@@ -92,10 +92,10 @@ public class TaskRun {
     }
 
     private void dealException(TaskLog taskLog, DataPacketInterface dataPacketInterface, Exception e) {
-        saveDetail(ObjectException.extortExceptionMessage(e, 4), taskLog);
         taskLog.setOtherMessage("error");
         taskLog.setRunEndTime(new Date());
         taskLogDao.mergeObject(taskLog);
+        saveDetail(ObjectException.extortExceptionMessage(e, 4), taskLog);
         notificationCenter.sendMessage("system", "system",
             NoticeMessage.create().operation("dde").method("run").subject("任务执行异常")
                 .content(dataPacketInterface.getPacketId() + ":" + dataPacketInterface.getPacketName()));
@@ -127,7 +127,6 @@ public class TaskRun {
         taskLog.setApplicationId(dataPacketInterface.getOsId());
         taskLog.setRunType(dataPacketInterface.getPacketName());
         taskLog.setTaskId(dataPacketInterface.getPacketId());
-        log.debug("新增API执行日志，日志信息：{}", StringBaseOpt.castObjectToString(taskLog));
         return taskLog;
     }
 
@@ -155,8 +154,11 @@ public class TaskRun {
             dataPacketCopyDao.updateObject(new String[]{"lastRunTime"}, (DataPacketDraft) dataPacketInterface);
         } else {
             dataPacketDao.updateObject(new String[]{"lastRunTime","nextRunTime"},(DataPacket) dataPacketInterface);
-            dataPacketCopyDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, (DataPacketDraft) dataPacketInterface);
+            DataPacketDraft dataPacketDraft=new DataPacketDraft();
+            dataPacketDraft.setPacketId(dataPacketInterface.getPacketId());
+            dataPacketDraft.setLastRunTime(dataPacketInterface.getLastRunTime());
+            dataPacketDraft.setNextRunTime(dataPacketInterface.getNextRunTime());
+            dataPacketCopyDao.updateObject(new String[]{"lastRunTime","nextRunTime"},dataPacketDraft);
         }
-        log.debug("更新API执行信息，执行类型：{}，更新信息{}", runType, JSON.toJSONString(dataPacketInterface));
     }
 }
