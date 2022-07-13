@@ -72,7 +72,7 @@ public class HttpTaskController extends BaseController {
         this.bizmodelService = bizmodelService;
         dataPacketCachedMap = new CachedMap<>(
             this::getDataPacketOptStep,
-            CodeRepositoryCache.CACHE_FRESH_PERIOD_SECONDS
+            CodeRepositoryCache.CACHE_NEVER_EXPIRE
         );
     }
 
