@@ -41,9 +41,12 @@ public class OptflowSerialNumberOperation implements BizOperation {
         String lshField = BuiltInOperation.getJsonFieldString(bizOptJson, "lshField", "lsh");
         String ownCode = dataOptContext.getOsId();
         boolean isBaseDate = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("isBaseDate"), false);
-        Date codeBaseDate = new Date();
+        Date codeBaseDate = null;
         if (isBaseDate) {
             codeBaseDate = DatetimeOpt.castObjectToDate(bizOptJson.get("codeBaseDate"));
+        }
+        if(codeBaseDate == null){
+            codeBaseDate = DatetimeOpt.currentUtilDate();
         }
         long lsh = 0L;
         if (PRODUCE.equals(type)) {
