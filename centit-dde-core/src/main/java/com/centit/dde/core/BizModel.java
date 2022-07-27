@@ -240,8 +240,8 @@ public class BizModel implements  Serializable {
         }
 
         return dss.values().stream().filter(
-                ds -> ds.getDataSetName()
-                    .equals(relationPath)).findFirst()
+                ds -> relationPath
+                    .equals(ds.getDataSetName())).findFirst()
             .orElse(null);
     }
 }
