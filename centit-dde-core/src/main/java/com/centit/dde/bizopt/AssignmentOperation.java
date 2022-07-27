@@ -10,6 +10,7 @@ import com.centit.dde.utils.DatasetVariableTranslate;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.json.JSONOpt;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +41,8 @@ public class AssignmentOperation implements BizOperation {
         String formula = BuiltInOperation.getJsonFieldString(bizOptJson, "formula", ".");
 
         //计算赋值数据
-        Object sourceData = ".".equals(formula) ? dataSet.getData() : new DatasetVariableTranslate(dataSet).getVarValue(formula);
+        Object sourceData =(StringUtils.isBlank(formula) || ".".equals(formula) ) ?
+            dataSet.getData() : new DatasetVariableTranslate(dataSet).getVarValue(formula);
 
         // 对属性赋值
         if("property".equals(assignType)){
