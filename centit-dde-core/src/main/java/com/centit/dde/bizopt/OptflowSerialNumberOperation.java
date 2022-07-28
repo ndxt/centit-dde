@@ -14,6 +14,7 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
+import com.centit.support.json.JSONTransformer;
 
 import java.util.Date;
 import java.util.Map;
@@ -39,11 +40,15 @@ public class OptflowSerialNumberOperation implements BizOperation {
         String type = BuiltInOperation.getJsonFieldString(bizOptJson, "lshType", PRODUCE);
         String baseDateType = BuiltInOperation.getJsonFieldString(bizOptJson, "baseDateType", "Y");
         String lshField = BuiltInOperation.getJsonFieldString(bizOptJson, "lshField", "lsh");
-        String ownCode = dataOptContext.getOsId();
+        String owner=BuiltInOperation.getJsonFieldString(bizOptJson, "owner","");
+        if(!StringBaseOpt.isNvl(owner)){
+            owner=StringBaseOpt.castObjectToString(JSONTransformer.transformer(owner,new BizModelJSONTransform(bizModel)));
+        }
+        String ownCode = owner+dataOptContext.getOsId();
         boolean isBaseDate = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("isBaseDate"), false);
         Date codeBaseDate = null;
         if (isBaseDate) {
-            codeBaseDate = DatetimeOpt.castObjectToDate(bizOptJson.get("codeBaseDate"));
+            codeBaseDate = DatetimeOpt.castObjectToDate(JSONTransformer.transformer(bizOptJson.get("codeBaseDate"),new BizModelJSONTransform(bizModel)));
         }
         if(codeBaseDate == null){
             codeBaseDate = DatetimeOpt.currentUtilDate();
@@ -81,6 +86,7 @@ public class OptflowSerialNumberOperation implements BizOperation {
             }
         }
         Map<String, Object> data = CollectionsOpt.createHashMap(lshField, lsh);
+        data.put("owner",owner);
         bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(data));
         String template = bizOptJson.getString("template");
         if (!StringBaseOpt.isNvl(template)) {
