@@ -5,12 +5,15 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetReader;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.dao.DataPowerFilter;
+import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.product.adapter.api.ISourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.utils.DatabaseAccess;
+import com.centit.support.database.utils.PageDesc;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +32,7 @@ import java.util.Map;
  * 数据库连接信息 DatabaseInfo
  * 对应的表信息 SimpleTableInfo
  *
- * @author zhf
+ * @author codefan@sina.com
  */
 public class SqlDataSetReader implements DataSetReader {
     public static final Log log = LogFactory.getLog(SqlDataSetReader.class);
@@ -41,6 +44,15 @@ public class SqlDataSetReader implements DataSetReader {
 
     private String optId;
     private Map<String, Object> extendFilters;
+    private boolean paging;
+    //是否返回总数
+    private boolean hasCount;
+
+    //分页参数属性
+    //页码参数属性
+    private String pageNo;
+    //每页数量属性
+    private String pageSize;
 
     private DataScopePowerManager queryDataScopeFilter;
 
@@ -77,9 +89,30 @@ public class SqlDataSetReader implements DataSetReader {
             paramsMap.putAll(params);
         }
         paramsMap.putAll(qap.getParams());
-        JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, qap.getQuery(), paramsMap);
+
         DataSet dataSet = new DataSet();
-        dataSet.setData(jsonArray);
+        // 添加分页查询属性
+        if(paging){
+            int pn = NumberBaseOpt.castObjectToInteger(paramsMap.get(pageNo),1);
+            int ps = NumberBaseOpt.castObjectToInteger(paramsMap.get(pageSize),20);
+            PageDesc pageDesc = new PageDesc(pn, ps);
+            String pagingSql = QueryUtils.buildLimitQuerySQL(qap.getQuery(), pageDesc.getRowStart(), pageDesc.getPageSize(),
+                false, databaseInfo.getDBType());
+
+            JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn,pagingSql, paramsMap);
+            if(hasCount){
+                String sGetCountSql = QueryUtils.buildGetCountSQL(qap.getQuery());
+                Object obj = DatabaseAccess.getScalarObjectQuery(conn, sGetCountSql, params);
+                pageDesc.setTotalRows(NumberBaseOpt.castObjectToInteger(obj));
+                PageQueryResult<Object> result = PageQueryResult.createResult(jsonArray, pageDesc);
+                dataSet.setData(result);
+            } else {
+                dataSet.setData(jsonArray);
+            }
+        } else {
+            JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, qap.getQuery(), paramsMap);
+            dataSet.setData(jsonArray);
+        }
         return dataSet;
     }
 
@@ -113,5 +146,21 @@ public class SqlDataSetReader implements DataSetReader {
 
     public void setExtendFilters(Map<String, Object> extendFilters) {
         this.extendFilters = QueryUtils.pretreatParameters(extendFilters);
+    }
+
+    public void setPaging(boolean paging) {
+        this.paging = paging;
+    }
+
+    public void setHasCount(boolean hasCount) {
+        this.hasCount = hasCount;
+    }
+
+    public void setPageNo(String pageNo) {
+        this.pageNo = pageNo;
+    }
+
+    public void setPageSize(String pageSize) {
+        this.pageSize = pageSize;
     }
 }

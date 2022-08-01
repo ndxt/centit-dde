@@ -11,6 +11,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.support.algorithm.BooleanBaseOpt;
 
 import java.util.Map;
 
@@ -34,7 +35,9 @@ public class QuerySqlOperation implements BizOperation {
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", "");
         String condition = BuiltInOperation.getJsonFieldString(bizOptJson, "condition", "false");
         String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
+
         Map<String, Object> parames = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
+
         SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
             return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, "找不到对应的集成数据库：" + databaseCode);
@@ -51,7 +54,22 @@ public class QuerySqlOperation implements BizOperation {
                 sqlDsr.setExtendFilters(dataSet.getFirstRow());
             }
         }
+        //是否分页
+        sqlDsr.setPaging(BooleanBaseOpt.castObjectToBoolean(
+            BuiltInOperation.getJsonFieldString(bizOptJson, "paging", "false"), false));
+        //是否返回总数
+        sqlDsr.setHasCount(BooleanBaseOpt.castObjectToBoolean(
+            BuiltInOperation.getJsonFieldString(bizOptJson, "hasCount", "false"), false));
+
+        //分页参数属性
+        //页码参数属性
+        sqlDsr.setPageNo(BuiltInOperation.getJsonFieldString(bizOptJson, "pageNo", "pageNo"));
+        //每页数量属性
+        sqlDsr.setPageSize(
+            BuiltInOperation.getJsonFieldString(bizOptJson, "pageSize", "pageSize"));
+
         DataSet dataSet = sqlDsr.load(parames);
+
         bizModel.putDataSet(id, dataSet);
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }
