@@ -207,7 +207,6 @@ public class DataPacketDraftController extends BaseController {
         dataPacketDraft.setUpdateDate(dateFormat.parse(dateStr));
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
         dataPacketDraftService.updateDataPacket(dataPacketDraft);
-        HttpTaskController.evictCache(ConstantValue.RUN_TYPE_COPY+packetId);
     }
 
     @ApiOperation(value = "API网关发布")
@@ -224,7 +223,7 @@ public class DataPacketDraftController extends BaseController {
         String dateStr = simpleDateFormat.format(new Date());
         dataPacketDraft.setPublishDate(simpleDateFormat.parse(dateStr));
         dataPacketDraftService.publishDataPacket(dataPacketDraft);
-        HttpTaskController.evictCache(ConstantValue.RUN_TYPE_NORMAL+packetId);
+        HttpTaskController.evictCache(packetId);
     }
 
     @ApiOperation(value = "编辑API网关数据处理描述信息")
@@ -252,8 +251,7 @@ public class DataPacketDraftController extends BaseController {
         platformEnvironment.deleteOptDefAndRolepowerByOptCode(dataPacketDraft.getOptCode());
         dataPacketService.deleteDataPacket(packetId);
         dataPacketDraftService.deleteDataPacket(packetId);
-        HttpTaskController.evictCache(ConstantValue.RUN_TYPE_COPY+packetId);
-        HttpTaskController.evictCache(ConstantValue.RUN_TYPE_NORMAL+packetId);
+        HttpTaskController.evictCache(packetId);
     }
 
     @ApiOperation(value = "修改API可用状态(T:禁用，F:启用)")
@@ -271,10 +269,9 @@ public class DataPacketDraftController extends BaseController {
             DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
             if (dataPacket != null) {
                 dataPacketService.updateDisableStatus(packetId, disableType);
-                HttpTaskController.evictCache(ConstantValue.RUN_TYPE_NORMAL+packetId);
+                HttpTaskController.evictCache(packetId);
             }
             dataPacketDraftService.updateDisableStatus(packetId, disableType);
-            HttpTaskController.evictCache(ConstantValue.RUN_TYPE_COPY+packetId);
         } else {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "非法传参，参数必须为T或F,传入的参数为：" + disableType);
         }

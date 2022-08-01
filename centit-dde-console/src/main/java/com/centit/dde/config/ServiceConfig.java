@@ -53,9 +53,6 @@ public class ServiceConfig {
     @Value("${redis.default.host}")
     private String redisHost;
 
-    @Value("${redis.default.port}")
-    private int redisPort;
-
 
     /**
      * 这个bean必须要有
@@ -69,9 +66,7 @@ public class ServiceConfig {
 
     @Bean
     public JedisPool jedisPool() {
-        logger.info("------------------------redisPort-----------------------:" + redisPort);
-        JedisPool jedisPool = new JedisPool(redisHost, redisPort);
-        return jedisPool;
+        return new JedisPool(redisHost);
     }
 
     @Bean

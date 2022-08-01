@@ -76,20 +76,12 @@ public class HttpTaskController extends BaseController {
         );
     }
 
-    public static void evictCache(String dataPacketIdWithType) {
-        dataPacketCachedMap.evictIdentifiedCache(dataPacketIdWithType);
+    static void evictCache(String dataPacketId) {
+        dataPacketCachedMap.evictIdentifiedCache(dataPacketId);
     }
 
-    private DataPacketInterface getDataPacketOptStep(String dataPacketIdWithType) {
-        DataPacketInterface dataPacketInterface;
-        String runType = dataPacketIdWithType.substring(0, 1);
-        String dataPacketId = dataPacketIdWithType.substring(1);
-        if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)) {
-            dataPacketInterface = dataPacketService.getDataPacket(dataPacketId);
-        } else {
-            dataPacketInterface = dataPacketDraftService.getDataPacket(dataPacketId);
-        }
-        return dataPacketInterface;
+    private DataPacketInterface getDataPacketOptStep(String dataPacketId) {
+        return dataPacketService.getDataPacket(dataPacketId);
     }
 
     /**
@@ -179,7 +171,12 @@ public class HttpTaskController extends BaseController {
         /*   if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
             judgePower(packetId,runType);
         }*/
-        DataPacketInterface dataPacketInterface = dataPacketCachedMap.getCachedValue(runType + packetId);
+        DataPacketInterface dataPacketInterface;
+        if(ConstantValue.RUN_TYPE_COPY.equals(runType)){
+            dataPacketInterface=dataPacketDraftService.getDataPacket(packetId);
+        }else {
+            dataPacketInterface=dataPacketCachedMap.getCachedValue(packetId);
+        }
         if (dataPacketInterface == null) {
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "API接口：" + packetId + "不存在！");
         }
