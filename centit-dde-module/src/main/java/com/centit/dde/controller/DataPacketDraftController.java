@@ -130,7 +130,7 @@ public class DataPacketDraftController extends BaseController {
     @PostMapping("/metadata/api")
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
-    public List<DataPacketDraft> createMetaDataApi(@RequestBody MetaDataParameter metaDataOrHttpParams) {
+    public List<DataPacketDraft> createMetaDataApi(@RequestBody MetaDataParameter metaDataOrHttpParams) throws ParseException {
         DataPacketDraft dataPacket = new DataPacketDraft();
         dataPacket.setOsId(metaDataOrHttpParams.getOsId());
         LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacket.getOsId());
@@ -144,6 +144,10 @@ public class DataPacketDraftController extends BaseController {
             DataPacketDraft dataPacketDraft = createDataPacket(metaDataOrHttpParams, type);
             dataPacketDraft.setRecorder(loginUser);
             dataPacketDraftService.createDataPacket(dataPacketDraft);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String dateStr = simpleDateFormat.format(new Date());
+            dataPacketDraft.setPublishDate(simpleDateFormat.parse(dateStr));
+            dataPacketDraftService.publishDataPacket(dataPacketDraft);
             dataPacketDraftList.add(dataPacketDraft);
         }
         return dataPacketDraftList;
