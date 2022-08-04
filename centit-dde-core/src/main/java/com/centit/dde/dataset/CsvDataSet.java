@@ -86,7 +86,7 @@ public class CsvDataSet implements DataSetReader, DataSetWriter {
             List<CSVRecord> recordList = csvParser.getRecords();
             List<String> headers = null;
             if (firstRowAsHeader) {
-                if (recordList != null) {
+                if (recordList.size()>0) {
                     CSVRecord record = recordList.get(0);
                     headers = new ArrayList<>(record.size());
                     Iterator<String> iterator = record.iterator();
@@ -98,7 +98,10 @@ public class CsvDataSet implements DataSetReader, DataSetWriter {
                 headers = loadColumnNames(params);
             }
             csvFormat.withHeader(CollectionsOpt.listToArray(headers));
-            int headLen = headers.size();
+            int headLen = 0;
+            if(headers!=null){
+                headLen=headers.size();
+            }
             for (int k = 1; k < recordList.size(); k++) {
                 CSVRecord record = recordList.get(k);
                 int splitResultLength = record.size();
