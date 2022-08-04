@@ -48,6 +48,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-workflow-plugin</artifactId>
@@ -65,11 +66,13 @@
             <artifactId>centit-dde-dubbo-server-config</artifactId>
             <version>${centit.fileserver.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>fileserver-client</artifactId>
             <version>${centit.fileserver.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
@@ -79,19 +82,29 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
+
         <dependency>
             <groupId>net.sf.ucanaccess</groupId>
             <artifactId>ucanaccess</artifactId>
             <version>4.0.4</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
             <version>7.4.1.jre8</version>
+            <scope>runtime</scope>
         </dependency>
+
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-spring-context</artifactId>
+            <version>1.1.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.alibaba.nacos</groupId>
