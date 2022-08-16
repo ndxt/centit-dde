@@ -9,6 +9,7 @@ import com.centit.dde.services.DataPacketService;
 import com.centit.dde.services.DataPacketTemplateService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.LoginUserPermissionCheck;
+import com.centit.dde.vo.DataPacketCache;
 import com.centit.dde.vo.HttpParameter;
 import com.centit.dde.vo.MetaDataParameter;
 import com.centit.framework.common.ResponseData;
@@ -227,7 +228,7 @@ public class DataPacketDraftController extends BaseController {
         String dateStr = simpleDateFormat.format(new Date());
         dataPacketDraft.setPublishDate(simpleDateFormat.parse(dateStr));
         dataPacketDraftService.publishDataPacket(dataPacketDraft);
-        HttpTaskController.evictCache(packetId);
+        DataPacketCache.evictCache(packetId);
     }
 
     @ApiOperation(value = "编辑API网关数据处理描述信息")
@@ -255,7 +256,7 @@ public class DataPacketDraftController extends BaseController {
         platformEnvironment.deleteOptDefAndRolepowerByOptCode(dataPacketDraft.getOptCode());
         dataPacketService.deleteDataPacket(packetId);
         dataPacketDraftService.deleteDataPacket(packetId);
-        HttpTaskController.evictCache(packetId);
+        DataPacketCache.evictCache(packetId);
     }
 
     @ApiOperation(value = "修改API可用状态(T:禁用，F:启用)")
@@ -273,7 +274,7 @@ public class DataPacketDraftController extends BaseController {
             DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
             if (dataPacket != null) {
                 dataPacketService.updateDisableStatus(packetId, disableType);
-                HttpTaskController.evictCache(packetId);
+                DataPacketCache.evictCache(packetId);
             }
             dataPacketDraftService.updateDisableStatus(packetId, disableType);
         } else {
@@ -351,7 +352,9 @@ public class DataPacketDraftController extends BaseController {
             return ResponseData.makeErrorMessage("缺少参数，请检查请求参数是否正确！");
         }
         DataPacketDraft dataPacket = dataPacketDraftService.getDataPacket(copyPacketId);
-        if (dataPacket == null) return ResponseData.makeErrorMessage("复制的API接口不存在！");
+        if (dataPacket == null) {
+            return ResponseData.makeErrorMessage("复制的API接口不存在！");
+        }
         LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacket.getOsId());
         String packetId = UuidOpt.getUuidAsString32();
         dataPacket.setPacketId(packetId);

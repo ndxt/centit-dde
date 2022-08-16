@@ -12,6 +12,7 @@ import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.vo.DataPacketCache;
 import com.centit.dde.vo.FormulaParameter;
 import com.centit.dde.vo.UpdateOptIdParameter;
 import com.centit.fileserver.utils.UploadDownloadUtils;
@@ -63,21 +64,17 @@ public class HttpTaskController extends BaseController {
     private final DataPacketService dataPacketService;
     private final DataPacketDraftService dataPacketDraftService;
     private final BizModelService bizmodelService;
-    private static CachedMap<String, DataPacketInterface> dataPacketCachedMap;
+
 
     public HttpTaskController(DataPacketService dataPacketService, DataPacketDraftService dataPacketDraftService,
                               BizModelService bizmodelService) {
         this.dataPacketService = dataPacketService;
         this.dataPacketDraftService = dataPacketDraftService;
         this.bizmodelService = bizmodelService;
-        dataPacketCachedMap = new CachedMap<>(
+        DataPacketCache.dataPacketCachedMap = new CachedMap<>(
             this::getDataPacketOptStep,
             CodeRepositoryCache.CACHE_NEVER_EXPIRE
         );
-    }
-
-    static void evictCache(String dataPacketId) {
-        dataPacketCachedMap.evictIdentifiedCache(dataPacketId);
     }
 
     private DataPacketInterface getDataPacketOptStep(String dataPacketId) {
@@ -175,7 +172,7 @@ public class HttpTaskController extends BaseController {
         if(ConstantValue.RUN_TYPE_COPY.equals(runType)){
             dataPacketInterface=dataPacketDraftService.getDataPacket(packetId);
         }else {
-            dataPacketInterface=dataPacketCachedMap.getCachedValue(packetId);
+            dataPacketInterface=DataPacketCache.dataPacketCachedMap.getCachedValue(packetId);
         }
         if (dataPacketInterface == null) {
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "API接口：" + packetId + "不存在！");
