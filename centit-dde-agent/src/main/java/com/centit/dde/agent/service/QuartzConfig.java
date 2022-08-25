@@ -2,6 +2,8 @@ package com.centit.dde.agent.service;
 
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.model.adapter.OperationLogWriter;
+import com.centit.framework.security.model.CentitPasswordEncoder;
+import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +16,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 @Configuration
 public class QuartzConfig {
     private final PathConfig pathConfig;
+
 
     @Autowired
     public QuartzConfig(PathConfig pathConfig) {
@@ -36,5 +39,9 @@ public class QuartzConfig {
             = new TextOperationLogWriterImpl();
         textOperationLogWriter.setOptLogHomePath(pathConfig.getLogs());
         return textOperationLogWriter;
+    }
+    @Bean("passwordEncoder")
+    public StandardPasswordEncoderImpl passwordEncoder() {
+        return  new StandardPasswordEncoderImpl();
     }
 }

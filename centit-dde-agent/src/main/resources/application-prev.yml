@@ -35,13 +35,6 @@ email:
 framework:
   app:
     home: D:/Projects/RunData/dde
-  ip:
-    enable: true
-    topoptid: DDE
-    home: http://framework.platform-prev:8080/framework/system
-    auth-enable: false
-    usercode: admin
-    password: 000000
 
 
 

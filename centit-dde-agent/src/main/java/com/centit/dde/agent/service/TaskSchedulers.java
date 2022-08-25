@@ -3,8 +3,10 @@ package com.centit.dde.agent.service;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
+import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.quartz.QuartzJobUtils;
 import org.apache.commons.codec.binary.Hex;
@@ -41,10 +43,11 @@ public class TaskSchedulers {
     private static String staticTaskMd5= "";
     private static ConcurrentHashMap<String, Object> queryParams = new ConcurrentHashMap<>(2);
     @Autowired
-    public TaskSchedulers(DataPacketDao dataPacketDao, Scheduler scheduler, OperationLogWriter operationLogWriter, PathConfig pathConfig) {
+    public TaskSchedulers(DataPacketDao dataPacketDao, PlatformEnvironment environment, Scheduler scheduler, OperationLogWriter operationLogWriter, PathConfig pathConfig) {
         this.dataPacketDao = dataPacketDao;
         this.scheduler = scheduler;
         this.operationLogWriter = operationLogWriter;
+        CodeRepositoryCache.setPlatformEnvironment(environment);
         queryParams.put("taskType", ConstantValue.TASK_TYPE_AGENT);
         queryParams.put("isValid", "T");
         queryParams.put("isDisable", "F");
