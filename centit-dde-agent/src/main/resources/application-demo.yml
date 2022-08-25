@@ -31,6 +31,17 @@ email:
  serverEmail: no-reply@centit.com
  emailTo: zhf@centit.com
 
+ framework:
+   app:
+     home: D:/Projects/RunData/dde
+   ip:
+     enable: true
+     topoptid: DDE
+     home: http://192.168.134.250:31261/framework/system
+     auth-enable: false
+     usercode: admin
+     password: 000000
+
 
 
 
