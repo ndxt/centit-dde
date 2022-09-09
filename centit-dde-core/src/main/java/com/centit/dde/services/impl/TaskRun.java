@@ -16,6 +16,8 @@ import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.model.adapter.NotificationCenter;
+import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.model.basedata.IOsInfo;
 import com.centit.framework.model.basedata.NoticeMessage;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -38,10 +40,8 @@ public class TaskRun {
     private final DataPacketDraftDao dataPacketCopyDao;
     private final DataPacketDao dataPacketDao;
     private final BizOptFlow bizOptFlow;
-
-    @Autowired(required = false)
-    private NotificationCenter notificationCenter;
-
+    @Autowired
+    private PlatformEnvironment platformEnvironment;
     @Autowired
     public TaskRun(TaskLogDao taskLogDao, TaskDetailLogDao taskDetailLogDao,
                    DataPacketDraftDao dataPacketCopyDao, DataPacketDao dataPacketDao,
@@ -68,6 +68,10 @@ public class TaskRun {
         }
         try {
             optContext.setLogId(taskLog.getLogId());
+            IOsInfo osInfo=platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
+            if(osInfo!=null){
+               optContext.setTopUnit(osInfo.getTopUnit());
+            }
             DataOptResult runResult = runOptModule(dataPacketInterface, optContext);
             //更新API信息
             updateApiData(optContext.getRunType(), dataPacketInterface);
@@ -96,9 +100,6 @@ public class TaskRun {
         taskLog.setRunEndTime(new Date());
         taskLogDao.mergeObject(taskLog);
         saveDetail(ObjectException.extortExceptionMessage(e, 4), taskLog);
-        notificationCenter.sendMessage("system", "system",
-            NoticeMessage.create().operation("dde").method("run").subject("任务执行异常")
-                .content(dataPacketInterface.getPacketId() + ":" + dataPacketInterface.getPacketName()));
     }
 
     private void saveDetail(String info, TaskLog taskLog) {

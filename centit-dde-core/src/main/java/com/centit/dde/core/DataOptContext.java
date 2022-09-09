@@ -20,6 +20,7 @@ public class DataOptContext {
     private String osId;
     private String packetId;
     private Integer logLevel;
+    private String topUnit;
     /**
      * 调用参数
      * RequestBody/File

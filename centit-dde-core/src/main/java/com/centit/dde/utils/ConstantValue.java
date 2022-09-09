@@ -143,4 +143,6 @@ public class ConstantValue {
 
     public static final String HEADERS = "headers";
 
+    public static final String MSG_SEND="msgSend";
+
 }
