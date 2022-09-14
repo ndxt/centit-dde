@@ -102,7 +102,7 @@ public class SqlDataSetReader implements DataSetReader {
             JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn,pagingSql, paramsMap);
             if(hasCount){
                 String sGetCountSql = QueryUtils.buildGetCountSQL(qap.getQuery());
-                Object obj = DatabaseAccess.getScalarObjectQuery(conn, sGetCountSql, params);
+                Object obj = DatabaseAccess.getScalarObjectQuery(conn, sGetCountSql, paramsMap);
                 pageDesc.setTotalRows(NumberBaseOpt.castObjectToInteger(obj));
                 PageQueryResult<Object> result = PageQueryResult.createResult(jsonArray, pageDesc);
                 dataSet.setData(result);
