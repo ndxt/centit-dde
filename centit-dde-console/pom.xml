@@ -37,17 +37,6 @@
             <artifactId>DmJdbcDriver18</artifactId>
             <version>8.1.2.46</version>
         </dependency>
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-redis-plugin</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.data</groupId>
-                    <artifactId>spring-data-redis</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <dependency>
             <groupId>com.centit.product</groupId>
@@ -128,12 +117,6 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-session-redis</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>redis.clients</groupId>
-                    <artifactId>jedis</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- server runtime library -->

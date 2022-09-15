@@ -7,13 +7,14 @@ import com.centit.dde.core.DataOptResult;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.services.BizModelService;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.security.Md5Encoder;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.sync.RedisCommands;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
-import java.io.*;
 import java.util.Map;
 
 /**
@@ -22,7 +23,7 @@ import java.util.Map;
 @Service
 public class BizModelServiceImpl implements BizModelService {
     @Autowired(required = false)
-    private JedisPool jedisPool;
+    private RedisClient redisClient;
 
     @Autowired
     private TaskRun taskRun;
@@ -33,89 +34,73 @@ public class BizModelServiceImpl implements BizModelService {
             return taskRun.runTask(dataPacket, optContext);
         }
         String key = makeDataPacketBufId(dataPacket, optContext.getCallStackData());
-        Jedis redis = fetchJedisPool();
-        DataOptResult optResult = null;
-        Object bufData = fetchBizModelFromBuf(redis, key);
+        DataOptResult optResult;
+        Object bufData = fetchBizModelFromBuf(key);
         //第一次执行或者换成失效的时候执行
-        if (bufData==null){
+        if (bufData == null) {
             optResult = taskRun.runTask(dataPacket, optContext);
-            if( optResult.getResultType() == DataOptResult.RETURN_OPT_DATA ) {
-                setBizModelBuf(optResult.getResultObject(), dataPacket, redis, key);
+            if (optResult.getResultType() == DataOptResult.RETURN_OPT_DATA) {
+                setBizModelBuf(optResult.getResultObject(), dataPacket, key);
             }
         } else {
             optResult = new DataOptResult();
             optResult.setResultObject(bufData);
         }
-        redis.close();
         return optResult;
     }
 
     private boolean notNeedBuf(DataPacketInterface dataPacket) {
-        return jedisPool == null
+        return redisClient == null
             || dataPacket.getBufferFreshPeriodType() == null
             || dataPacket.getBufferFreshPeriodType() == ConstantValue.MINUS_ONE
             || dataPacket.getBufferFreshPeriod() == null
-            || dataPacket.getBufferFreshPeriod()<=0;
-            //|| dataPacket.getTaskType() != 1;
+            || dataPacket.getBufferFreshPeriod() <= 0;
+        //|| dataPacket.getTaskType() != 1;
     }
 
-    private Object fetchBizModelFromBuf( Jedis jedis, String key) {
-
-        Object object = null;
-
-        try {
-            byte[] byt = jedis.get(key.getBytes());
-            ByteArrayInputStream bis = new ByteArrayInputStream(byt);
-            ObjectInputStream ois = new ObjectInputStream(bis);
-            object = ois.readObject();
-            bis.close();
-            ois.close();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    private Object fetchBizModelFromBuf(String key) {
+        Object object;
+        StatefulRedisConnection<String, String> connection = redisClient.connect();
+        RedisCommands<String, String> commands = connection.sync();
+        object = commands.get(key);
+        connection.close();
         return object;
     }
 
     private String makeDataPacketBufId(DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
         //String dateString = DatetimeOpt.convertTimestampToString(dataPacket.getRecordDate());
         String params = JSON.toJSONString(paramsMap, SerializerFeature.MapSortField);
-        StringBuilder temp= new StringBuilder("packet:");
+        StringBuilder temp = new StringBuilder("packet:");
         temp.append(dataPacket.getPacketId())
             .append(":")
             .append(params);
-            //.append(dateString);
+        //.append(dateString);
         return Md5Encoder.encode(temp.toString());
     }
 
-    private Jedis fetchJedisPool() {
-         return jedisPool.getResource();
-    }
-
-    private void setBizModelBuf(Object returnData, DataPacketInterface dataPacket, Jedis jedis, String key) {
+    private void setBizModelBuf(Object returnData, DataPacketInterface dataPacket, String key) {
         if (notNeedBuf(dataPacket)) {
             return;
         }
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(returnData);
-            byte[] byt = bos.toByteArray();
-            jedis.set(key.getBytes(), byt);
-            int seconds = dataPacket.getBufferFreshPeriod();
-            int iPeriod = dataPacket.getBufferFreshPeriodType();
-            if (iPeriod == ConstantValue.ONE) {//按分
-                jedis.expire(key.getBytes(), seconds * 60);
-            } else if (iPeriod == ConstantValue.TWO) {//按时
-                jedis.expire(key.getBytes(),  seconds*3600);
-            } else if (iPeriod == ConstantValue.THREE) {//按天
-                int days = seconds * 24 * 3600;
-                jedis.expire(key.getBytes(), days);
-            }
-            bos.close();
-            oos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        StatefulRedisConnection<String, String> connection = redisClient.connect();
+        RedisCommands<String, String> commands = connection.sync();
+        commands.set(key, StringBaseOpt.objectToString(returnData));
+        int seconds = dataPacket.getBufferFreshPeriod();
+        int iPeriod = dataPacket.getBufferFreshPeriodType();
+        //按分
+        if (iPeriod == ConstantValue.ONE) {
+            commands.expire(key, seconds * 60);
         }
+        //按时
+        else if (iPeriod == ConstantValue.TWO) {
+            commands.expire(key, seconds * 3600);
+        }
+        //按天
+        else if (iPeriod == ConstantValue.THREE) {
+            int days = seconds * 24 * 3600;
+            commands.expire(key, days);
+        }
+        connection.close();
     }
 
 }
