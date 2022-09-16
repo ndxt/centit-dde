@@ -17,6 +17,7 @@ import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisURI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,9 @@ public class ServiceConfig {
     @Value("${redis.default.host}")
     private String redisHost;
 
+    @Value("${session.redis.port}")
+    private Integer port;
+
 
     /**
      * 这个bean必须要有
@@ -66,7 +70,8 @@ public class ServiceConfig {
 
     @Bean
     public RedisClient redisClient() {
-        return RedisClient.create(redisHost);
+        //return RedisClient.create(redisHost);
+        return RedisClient.create(RedisURI.create(redisHost, port));
     }
 
     @Bean
