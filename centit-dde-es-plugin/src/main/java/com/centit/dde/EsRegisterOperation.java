@@ -17,7 +17,7 @@ public class EsRegisterOperation {
     BizOptFlow bizOptFlow;
 
     @Autowired
-    Environment environment;
+    Environment env;
 
     @PostConstruct
     void registerOperation(){
@@ -30,11 +30,13 @@ public class EsRegisterOperation {
 
     private ESServerConfig esServerConfig() {
         ESServerConfig config = new ESServerConfig();
-        config.setServerHostIp(environment.getProperty("elasticsearch.server.ip"));
-        config.setServerHostPort(environment.getProperty("elasticsearch.server.port"));
-        config.setClusterName(environment.getProperty("elasticsearch.server.cluster"));
-        config.setOsId(environment.getProperty("elasticsearch.osId"));
-        config.setMinScore(NumberBaseOpt.parseFloat(environment.getProperty("elasticsearch.filter.minScore"), 0.5f));
+        config.setServerHostIp(env.getProperty("elasticsearch.server.ip"));
+        config.setServerHostPort(env.getProperty("elasticsearch.server.port"));
+        config.setClusterName(env.getProperty("elasticsearch.server.cluster"));
+        config.setOsId(env.getProperty("elasticsearch.osId"));
+        config.setUsername(env.getProperty("elasticsearch.server.username"));
+        config.setPassword(env.getProperty("elasticsearch.server.password"));
+        config.setMinScore(NumberBaseOpt.parseFloat(env.getProperty("elasticsearch.filter.minScore"), 0.5F));
         return config;
     }
 }
