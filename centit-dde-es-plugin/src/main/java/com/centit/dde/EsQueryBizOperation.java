@@ -64,7 +64,12 @@ public class EsQueryBizOperation implements BizOperation {
         }
         //Pair<Long, List<Map<String, Object>>> search = esSearcher.search(queryParam, keyword, pageNo,pageSize);
         QueryBuilder queryBuilder = queryBuilder(queryParam, keyword, indexFile, esSearcher, bizOptJson, transform);
-        Pair<Long, List<Map<String, Object>>> search = esSearcher.esSearch(queryBuilder,pageNo,pageSize);
+        String[] excludes = null;
+        if (!bizOptJson.getBoolean("returnAllField")){
+            //排除这个大字段，这个字段结果太长时会报错或者超时
+            excludes = new String[]{"content"};
+        }
+        Pair<Long, List<Map<String, Object>>> search = esSearcher.esSearch(queryBuilder,null,excludes,pageNo,pageSize);
         PageDesc pageDesc = new PageDesc();
         pageDesc.setPageNo(pageNo);
         pageDesc.setPageSize(pageSize);
