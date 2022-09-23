@@ -56,8 +56,8 @@ public class EsWriteBizOperation implements BizOperation {
     private ResponseData fileDocumentOperation(BizModel bizModel, JSONObject bizOptJson,DataOptContext dataOptContext,
                                                ESIndexer esIndexer,String operationType) throws Exception{
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
-        Object documentId = transform.attainExpressionValue(bizOptJson.getString("documentId"));
-        if (documentId == null) return ResponseData.makeErrorMessage("文档主键不能为空！");
+        String documentId = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("documentId")));
+        if (StringUtils.isBlank(documentId)) return ResponseData.makeErrorMessage("文档主键不能为空！");
 
         if (!"delete".equals(operationType)){
             String dataSetId = bizOptJson.getString("source");
@@ -75,7 +75,7 @@ public class EsWriteBizOperation implements BizOperation {
                 result = esIndexer.saveNewDocument(fileDocumentBuild(bizModel, bizOptJson, dataOptContext,transform));
                 break;
             case "delete":
-                result= esIndexer.deleteDocument(StringBaseOpt.castObjectToString(documentId));
+                result= esIndexer.deleteDocument(documentId);
                 break;
             case "update":
                 result = esIndexer.updateDocument(fileDocumentBuild(bizModel, bizOptJson, dataOptContext,transform));
