@@ -13,6 +13,7 @@ import com.centit.dde.po.*;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.model.adapter.PlatformEnvironment;
@@ -67,6 +68,7 @@ public class TaskRun {
         }
         try {
             optContext.setLogId(taskLog.getLogId());
+            CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
             IOsInfo osInfo=platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
             if(osInfo!=null){
                optContext.setTopUnit(osInfo.getTopUnit());
