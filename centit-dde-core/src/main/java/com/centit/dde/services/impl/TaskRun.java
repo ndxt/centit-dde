@@ -55,6 +55,7 @@ public class TaskRun {
 
     public void agentRunTask(String dataPacketId) {
         DataPacket dataPacket = dataPacketDao.getObjectById(dataPacketId);
+        CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
         runTask(dataPacket, new DataOptContext());
     }
 
@@ -68,7 +69,6 @@ public class TaskRun {
         }
         try {
             optContext.setLogId(taskLog.getLogId());
-            CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
             IOsInfo osInfo=platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
             if(osInfo!=null){
                optContext.setTopUnit(osInfo.getTopUnit());
