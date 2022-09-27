@@ -43,14 +43,14 @@ public class TaskSchedulers {
     private static String staticTaskMd5= "";
     private static ConcurrentHashMap<String, Object> queryParams = new ConcurrentHashMap<>(2);
     @Autowired
-    public TaskSchedulers(DataPacketDao dataPacketDao,  Scheduler scheduler, OperationLogWriter operationLogWriter, PathConfig pathConfig) {
+    public TaskSchedulers(DataPacketDao dataPacketDao,PlatformEnvironment environment,  Scheduler scheduler, OperationLogWriter operationLogWriter, PathConfig pathConfig) {
         this.dataPacketDao = dataPacketDao;
         this.scheduler = scheduler;
         this.operationLogWriter = operationLogWriter;
-//        CodeRepositoryCache.setPlatformEnvironment(environment);
+        CodeRepositoryCache.setPlatformEnvironment(environment);
         queryParams.put("taskType", ConstantValue.TASK_TYPE_AGENT);
-        queryParams.put("isValid", "T");
-        queryParams.put("isDisable", "f");
+        queryParams.put("isValid", true);
+        queryParams.put("isDisable", false);
         if (pathConfig.getOptId() != null && pathConfig.getOptId().length > 0) {
             queryParams.put("optId_in", pathConfig.getOptId());
         }

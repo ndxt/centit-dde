@@ -55,7 +55,7 @@ public class TaskRun {
 
     public void agentRunTask(String dataPacketId) {
         DataPacket dataPacket = dataPacketDao.getObjectById(dataPacketId);
-        CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
+//        CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
         runTask(dataPacket, new DataOptContext());
     }
 
