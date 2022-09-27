@@ -2,6 +2,7 @@ package com.centit.dde.config;
 
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.config.InitialWebRuntimeEnvironment;
+import com.centit.framework.core.controller.MvcConfigUtil;
 import com.centit.framework.model.adapter.MessageSender;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
@@ -36,8 +37,7 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
     @Override
     public void onApplicationEvent(@Nullable ContextRefreshedEvent event)
     {
-        InitialWebRuntimeEnvironment.configFastjson();
-
+        MvcConfigUtil.fastjsonGlobalConfig();
         if(innerMessageManager!=null) {
             notificationCenter.registerMessageSender("innerMsg", innerMessageManager);
         }
