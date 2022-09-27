@@ -177,10 +177,10 @@ public class HttpTaskController extends BaseController {
         if (dataPacketInterface == null) {
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "API接口：" + packetId + "不存在！");
         }
-        if (ConstantValue.TASK_TYPE_TIME.equals(dataPacketInterface.getTaskType()) || ConstantValue.TASK_TYPE_MSG.equals(dataPacketInterface.getTaskType())) {
-            throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "定时任务或消息触发不支持请求，该类型任务会自动触发！");
+        if (ConstantValue.TASK_TYPE_MSG.equals(dataPacketInterface.getTaskType())) {
+            throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "消息触发不支持请求，该类型任务会自动触发！");
         }
-        if (!taskType.equals(dataPacketInterface.getTaskType())) {
+        if (!taskType.equals(dataPacketInterface.getTaskType()) && !ConstantValue.TASK_TYPE_TIME.equals(dataPacketInterface.getTaskType())) {
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "任务类型和请求方式不匹配，请保持一致！");
         }
         if (dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()) {
