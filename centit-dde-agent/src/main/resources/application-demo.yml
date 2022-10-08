@@ -7,10 +7,10 @@ spring:
     name: DDE
   datasource:
     type: org.apache.commons.dbcp2.BasicDataSource
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.137.51:31426/locodedata?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.134.250:30308/locodedata?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
-    password: root
+    password: iIl1o0O
     dbcp2:
       max-wait-millis: 10000
       max-idle: 15

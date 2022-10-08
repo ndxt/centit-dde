@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataOptResult;
-import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.services.BizModelService;
 import com.centit.dde.services.DataPacketDraftService;
@@ -244,7 +243,7 @@ public class HttpTaskController extends BaseController {
     @PostMapping(value = "/testformula")
     @ApiOperation(value = "测试表达式", notes =
         "可用表达式  \n" +
-            "表达式:toJson(string),名称:转json,示例:formula:toJson(name);json:{name:\\{sex:'man'}}  \n" +
+            "表达式:toObject(string),名称:转json,示例:formula:toObject(name);json:{name:\\{sex:'man'}}  \n" +
             "表达式:uuid(),名称:获取uuid,示例:formula:uuid()  \n" +
             "表达式:random(len),名称:获取随机数,示例:formula:random(6)  \n" +
             "表达式:encode(rawPassword),名称:对字符串加密,示例:formula:encode(name)  \n" +

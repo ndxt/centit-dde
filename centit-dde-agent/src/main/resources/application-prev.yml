@@ -8,9 +8,9 @@ spring:
   datasource:
     type: org.apache.commons.dbcp2.BasicDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.134.250:31343/locodedata?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+    url: jdbc:mysql://192.168.134.250:32514/locodedata?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
-    password: root
+    password: 9r2zvGZb
     dbcp2:
       max-wait-millis: 10000
       max-idle: 15
