@@ -177,7 +177,7 @@ public abstract class DBBatchUtils {
                             }
                         }
                     }
-                } else{
+                } else if (insertStmt != null){
                     DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), object);
                     insert++;
                     insertStmt.addBatch();
