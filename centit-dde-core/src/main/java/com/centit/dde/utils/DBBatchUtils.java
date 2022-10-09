@@ -130,9 +130,20 @@ public abstract class DBBatchUtils {
         LeftRightPair<String, List<String>> checkSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
         int n = 0, insert = 0, update = 0;
         boolean exists = false;
-        try (PreparedStatement checkStmt = conn.prepareStatement(checkSqlPair.getLeft());
-             PreparedStatement insertStmt = conn.prepareStatement(insertSqlPair.getLeft());
-             PreparedStatement updateStmt = conn.prepareStatement(updateSqlPair.getLeft())) {
+        PreparedStatement insertStmt = null;
+        PreparedStatement updateStmt = null;
+        try (PreparedStatement checkStmt = conn.prepareStatement(checkSqlPair.getLeft())) {
+            if (StringUtils.isNotBlank(insertSqlPair.getLeft())){
+                insertStmt = conn.prepareStatement(insertSqlPair.getLeft());
+            }
+
+            if (StringUtils.isNotBlank(updateSqlPair.getLeft())){
+                updateStmt = conn.prepareStatement(updateSqlPair.getLeft());
+            }
+
+            if (insertStmt == null && updateStmt == null){
+                throw new SQLException("sql语句不能为空！");
+            }
 
             int rowCount = objects.size();
             int rowIndex = 0;
@@ -154,7 +165,7 @@ public abstract class DBBatchUtils {
                     e.printStackTrace();
                 }
                 n++;
-                if (exists) {
+                if (exists && updateStmt != null) {
                     DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), object);
                     if (StringUtils.isNotBlank(updateSqlPair.getLeft())) {
                         update++;
@@ -164,7 +175,7 @@ public abstract class DBBatchUtils {
                             updateStmt.clearBatch();
                         }
                     }
-                } else {
+                } else if (insertStmt != null){
                     DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), object);
                     insert++;
                     insertStmt.addBatch();
@@ -174,15 +185,34 @@ public abstract class DBBatchUtils {
                     }
                 }
             }
-            updateStmt.executeBatch();
-            updateStmt.clearBatch();
-            insertStmt.executeBatch();
-            insertStmt.clearBatch();
+            if (updateStmt != null){
+                updateStmt.executeBatch();
+                updateStmt.clearBatch();
+            }
+            if (insertStmt != null){
+                insertStmt.executeBatch();
+                insertStmt.clearBatch();
+            }
         } catch (SQLException e) {
             if (exists) {
                 throw DatabaseAccess.createAccessException(updateSqlPair.getLeft(), e);
             } else {
                 throw DatabaseAccess.createAccessException(insertSqlPair.getLeft(), e);
+            }
+        }finally {
+            if (updateStmt != null){
+                try {
+                    updateStmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (insertStmt != null){
+                try {
+                    insertStmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return n;
