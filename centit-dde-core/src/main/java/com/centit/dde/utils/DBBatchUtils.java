@@ -165,17 +165,19 @@ public abstract class DBBatchUtils {
                     e.printStackTrace();
                 }
                 n++;
-                if (exists && updateStmt != null) {
-                    DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), object);
-                    if (StringUtils.isNotBlank(updateSqlPair.getLeft())) {
-                        update++;
-                        updateStmt.addBatch();
-                        if (update % INT_BATCH_NUM == 0) {
-                            updateStmt.executeBatch();
-                            updateStmt.clearBatch();
+                if (exists) {
+                    if(updateStmt != null ){
+                        DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), object);
+                        if (StringUtils.isNotBlank(updateSqlPair.getLeft())) {
+                            update++;
+                            updateStmt.addBatch();
+                            if (update % INT_BATCH_NUM == 0) {
+                                updateStmt.executeBatch();
+                                updateStmt.clearBatch();
+                            }
                         }
                     }
-                } else if (insertStmt != null){
+                } else{
                     DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), object);
                     insert++;
                     insertStmt.addBatch();
