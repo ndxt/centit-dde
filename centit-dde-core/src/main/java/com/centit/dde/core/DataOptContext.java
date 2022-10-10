@@ -35,7 +35,7 @@ public class DataOptContext {
 
     //String runType = StringBaseOpt.castObjectToString(bizModel.getStackData(ConstantValue.RUN_TYPE_TAG));
     public String getRunType() {
-        return ConstantValue.RUN_TYPE_COPY.equals(runType) ? runType : ConstantValue.RUN_TYPE_NORMAL;
+        return ConstantValue.RUN_TYPE_DEBUG.equals(runType) ? runType : ConstantValue.RUN_TYPE_NORMAL;
     }
 
     public void setStackData(String key, Object value) {

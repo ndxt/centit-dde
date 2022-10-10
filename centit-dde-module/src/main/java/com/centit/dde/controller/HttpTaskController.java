@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataOptResult;
+import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.services.BizModelService;
 import com.centit.dde.services.DataPacketDraftService;
@@ -34,6 +35,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,7 +78,7 @@ public class HttpTaskController extends BaseController {
         );
     }
 
-    private DataPacketInterface getDataPacketOptStep(String dataPacketId) {
+    private DataPacket getDataPacketOptStep(String dataPacketId) {
         return dataPacketService.getDataPacket(dataPacketId);
     }
 
@@ -88,28 +90,28 @@ public class HttpTaskController extends BaseController {
     @ApiOperation(value = "草稿：立即执行任务GET")
     public void runGetDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                         HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, ConstantValue.TASK_TYPE_GET, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_DEBUG, ConstantValue.TASK_TYPE_GET, request, response);
     }
 
     @PostMapping(value = "/draft/{packetId}")
     @ApiOperation(value = "草稿：立即执行任务POST")
     public void runPostDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                          HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, ConstantValue.TASK_TYPE_POST, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_DEBUG, ConstantValue.TASK_TYPE_POST, request, response);
     }
 
     @PutMapping(value = "/draft/{packetId}")
     @ApiOperation(value = "草稿：立即执行任务PUT")
     public void runPutDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                         HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, ConstantValue.TASK_TYPE_PUT, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_DEBUG, ConstantValue.TASK_TYPE_PUT, request, response);
     }
 
     @DeleteMapping(value = "/draft/{packetId}")
     @ApiOperation(value = "草稿：立即执行任务DELETE")
     public void runDelDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                         HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_COPY, ConstantValue.TASK_TYPE_DELETE, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_DEBUG, ConstantValue.TASK_TYPE_DELETE, request, response);
     }
 
 
@@ -146,7 +148,7 @@ public class HttpTaskController extends BaseController {
     }
 
     private void judgePower(@PathVariable String packetId, String runType) {
-        if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
+        if (ConstantValue.RUN_TYPE_DEBUG.equals(runType)) {
             String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
             if (StringBaseOpt.isNvl(loginUser)) {
                 loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
@@ -163,13 +165,10 @@ public class HttpTaskController extends BaseController {
 
     private void returnObject(String packetId, String runType, String taskType,
                               HttpServletRequest request, HttpServletResponse response) throws IOException {
-        //暂时先把登录验证关闭掉
-        /*   if (ConstantValue.RUN_TYPE_COPY.equals(runType)){
-            judgePower(packetId,runType);
-        }*/
+        judgePower(packetId,runType);
         DataPacketInterface dataPacketInterface;
-        if(ConstantValue.RUN_TYPE_COPY.equals(runType)){
-            dataPacketInterface=dataPacketDraftService.getDataPacket(packetId);
+        if(ConstantValue.RUN_TYPE_DEBUG.equals(runType)){
+            dataPacketInterface=dataPacketService.getDataPacket(packetId);
         }else {
             dataPacketInterface=DataPacketCache.dataPacketCachedMap.getCachedValue(packetId);
         }
@@ -218,7 +217,6 @@ public class HttpTaskController extends BaseController {
         }
         dataOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, params);
         dataOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, WebOptUtils.getCurrentUserDetails(request));
-
         DataOptResult result = bizmodelService.runBizModel(dataPacketInterface, dataOptContext);
 
         if (result.getResultType() == DataOptResult.RETURN_FILE_STREAM) {

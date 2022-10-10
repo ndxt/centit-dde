@@ -1,10 +1,11 @@
 package com.centit.dde.vo;
 
+import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.support.common.CachedMap;
 
 public abstract class DataPacketCache {
-    public static CachedMap<String, DataPacketInterface> dataPacketCachedMap;
+    public static CachedMap<String, DataPacket> dataPacketCachedMap;
     public static void evictCache(String dataPacketId) {
         dataPacketCachedMap.evictIdentifiedCache(dataPacketId);
     }

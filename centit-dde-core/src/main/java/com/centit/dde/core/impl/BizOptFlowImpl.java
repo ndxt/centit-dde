@@ -524,7 +524,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         String packetId = stepJson.getString("packetName");
         Integer logLevel = dataOptContext.getLogLevel();
         DataPacketInterface dataPacketInterface;
-        if (ConstantValue.RUN_TYPE_COPY.equals(dataOptContext.getRunType())) {
+        if (ConstantValue.RUN_TYPE_DEBUG.equals(dataOptContext.getRunType())) {
             DataPacketDraft dataPacketDraft = dataPacketCopyDao.getObjectWithReferences(packetId);
             //设置子api流程的日志级别和父api流程一样，方便查看日志信息
             dataPacketDraft.setLogLevel(logLevel);

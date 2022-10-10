@@ -13,7 +13,6 @@ import com.centit.dde.po.*;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
-import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.model.adapter.PlatformEnvironment;
@@ -69,7 +68,12 @@ public class TaskRun {
         }
         try {
             optContext.setLogId(taskLog.getLogId());
-            IOsInfo osInfo=platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
+            IOsInfo osInfo;
+            try {
+                osInfo = platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
+            } catch (Exception e){
+                osInfo=null;
+            }
             if(osInfo!=null){
                optContext.setTopUnit(osInfo.getTopUnit());
             }
@@ -117,7 +121,7 @@ public class TaskRun {
     private TaskLog buildLogInfo(String runType, DataPacketInterface dataPacketInterface) {
         TaskLog taskLog = new TaskLog();
         taskLog.setRunBeginTime(new Date());
-        taskLog.setApiType(ConstantValue.RUN_TYPE_COPY.equals(runType) ? 0 : 1);
+        taskLog.setApiType(ConstantValue.RUN_TYPE_DEBUG.equals(runType) ? 0 : 1);
         if (dataPacketInterface != null) {
             if (!StringBaseOpt.isNvl(dataPacketInterface.getTaskType()) && ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())) {
                 taskLog.setRunner("定时任务");
@@ -152,7 +156,7 @@ public class TaskRun {
         }else {
             dataPacketInterface.setNextRunTime(null);
         }
-        if (ConstantValue.RUN_TYPE_COPY.equals(runType)) {
+        if (ConstantValue.RUN_TYPE_DEBUG.equals(runType)) {
             dataPacketCopyDao.updateObject(new String[]{"lastRunTime"}, (DataPacketDraft) dataPacketInterface);
         } else {
             dataPacketDao.updateObject(new String[]{"lastRunTime","nextRunTime"},(DataPacket) dataPacketInterface);

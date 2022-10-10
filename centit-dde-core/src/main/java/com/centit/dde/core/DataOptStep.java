@@ -15,6 +15,12 @@ public class DataOptStep {
     private JSONObject currentStep;
     private int stepNo;
 
+    public DataOptStep(Map<String, JSONObject> nodeMap, Map<String, List<JSONObject>> linkMap) {
+        stepNo = 0;
+        this.nodeMap.putAll(nodeMap);
+        this.linkMap.putAll(linkMap);
+    }
+
     public DataOptStep(JSONObject dataOptJson) {
         stepNo = 0;
         mapData(dataOptJson);
@@ -119,6 +125,7 @@ public class DataOptStep {
                 getNextStep(currentStep.getString("id")));
         }
     }
+
     public JSONObject getNextStep(String id) {
         List<JSONObject> links = getNextLinks(id);
         if (links == null || links.size() != 1) {
@@ -126,9 +133,11 @@ public class DataOptStep {
         }
         return getOptStep(links.get(0).getString("targetId"));
     }
-    private JSONObject getEmptyObject(){
-        return  new JSONObject();
+
+    private JSONObject getEmptyObject() {
+        return new JSONObject();
     }
+
     public boolean isEndStep() {
         return currentStep.isEmpty();
     }
@@ -140,6 +149,14 @@ public class DataOptStep {
 
     public int getStepNo() {
         return stepNo;
+    }
+
+    public Map<String, JSONObject> getNodeMap() {
+        return this.nodeMap;
+    }
+
+    public Map<String, List<JSONObject>> getLinkMap() {
+        return this.linkMap;
     }
 }
 

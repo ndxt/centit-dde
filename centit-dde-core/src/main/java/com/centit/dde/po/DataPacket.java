@@ -13,6 +13,8 @@ import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.Setter;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -160,13 +162,17 @@ public class DataPacket implements Serializable, DataPacketInterface {
 
     @Transient
     @JSONField(serialize = false)
-    private DataOptStep dataOptStep;
+    private DataOptStep innerDataOptStep;
 
     public void setDataOptDescJson(JSONObject dataOptDescJson){
         this.dataOptDescJson=dataOptDescJson;
         if(dataOptDescJson!=null) {
-            dataOptStep = new DataOptStep(dataOptDescJson);
+            innerDataOptStep = new DataOptStep(dataOptDescJson);
         }
+    }
+    @Override
+    public DataOptStep getDataOptStep(){
+        return new DataOptStep(innerDataOptStep.getNodeMap(),innerDataOptStep.getLinkMap());
     }
 
     public List<DataPacketParam> getPacketParams() {
