@@ -22,17 +22,18 @@ import java.io.FileNotFoundException;
 public class PersistenceDBOperation implements BizOperation {
     private static String WRITER_ERROR_TAG = "__rmdb_writer_result";
     private static String WRITER_ERROR_MSG = "__rmdb_writer_result_msg";
-    private String exportPath;
     private static final String WRITER_INDICATE_APPEND = "append";
     private static final String WRITER_INDICATE_MERGE = "merge";
     private static final String WRITER_INDICATE_UPDATE = "update";
+
     private SourceInfoDao sourceInfoDao;
     private MetaDataService metaDataService;
+    //private String exportPath;
 
-    public PersistenceDBOperation(String exportPath,
+    public PersistenceDBOperation(//String exportPath,
                                   SourceInfoDao sourceInfoDao,
                                   MetaDataService metaDataService) {
-        this.exportPath = exportPath;
+        //this.exportPath = exportPath;
         this.sourceInfoDao = sourceInfoDao;
         this.metaDataService = metaDataService;
     }

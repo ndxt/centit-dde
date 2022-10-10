@@ -123,7 +123,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("http", new HttpServiceOperation(sourceInfoDao));
         allOperations.put("clear", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runClear(bizModel, bizOptJson));
         allOperations.put("js", new InnerJSOperation());
-        allOperations.put("persistence", new PersistenceDBOperation(path, sourceInfoDao, metaDataService));
+        allOperations.put("persistence", new PersistenceDBOperation(/*path,*/ sourceInfoDao, metaDataService));
         allOperations.put("database", new QuerySqlOperation(sourceInfoDao, queryDataScopeFilter));
         allOperations.put("excel", new ReadExcelOperation());
         allOperations.put("csv", new ReadCsvOperation());

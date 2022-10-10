@@ -24,8 +24,8 @@ import java.util.Map;
  */
 public class OptflowSerialNumberOperation implements BizOperation {
     private OptFlowNoInfoManager optFlowNoInfoManager;
-    private final String PRODUCE = "A";
-    private final String PREVIEW = "B";
+    private static final String PRODUCE = "A";
+    private static final String PREVIEW = "B";
 
     public OptflowSerialNumberOperation(OptFlowNoInfoManager optFlowNoInfoManager) {
         this.optFlowNoInfoManager = optFlowNoInfoManager;
