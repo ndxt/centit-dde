@@ -2,7 +2,6 @@ package com.centit.dde.agent.service;
 
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.model.adapter.OperationLogWriter;
-import com.centit.framework.security.model.CentitPasswordEncoder;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
