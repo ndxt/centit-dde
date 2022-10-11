@@ -102,7 +102,7 @@ public class BizModelJSONTransform
         String dataSetName, valuePath;
         int pointIndex = labelName.indexOf('.');
         int pointIndex2 = labelName.indexOf('[');
-        if (pointIndex2 > 0 && pointIndex2 < pointIndex) { // [
+        if (pointIndex2 > 0 && (pointIndex<0 || pointIndex2 < pointIndex)) { // [
             dataSetName = labelName.substring(0, pointIndex2);
             valuePath = labelName.substring(pointIndex2);
         } else if (pointIndex > 0) { // .
