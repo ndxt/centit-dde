@@ -53,6 +53,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     public static final String RETURN_RESULT_ORIGIN = "4";
     public static final String RETURN_RESULT_ERROR = "5";
     public static final String RETURN_RESULT_FILE = "6";
+    public static final String RETURN_RESULT_INNERDATA = "7";
 
     @Value("${os.file.base.dir:./file_home/export}")
     private String path;
@@ -310,7 +311,14 @@ public class BizOptFlowImpl implements BizOptFlow {
             bizModel.getOptResult().setResultType(DataOptResult.RETURN_CODE_AND_MESSAGE);
             return;
         }
-
+        if (RETURN_RESULT_INNERDATA.equals(type)) {
+            bizModel.getOptResult().setResultType(DataOptResult.RETURN_DATA_AS_RAW);
+            Map<String, Object> returnData = new HashMap<>();
+            returnData.put("bizData",bizModel.getBizData());
+            returnData.put("stackData",bizModel.getStackData());
+            bizModel.getOptResult().setResultObject(returnData);
+            return;
+        }
         Map<String, DataSet> bizData = bizModel.getBizData();
         if (bizData != null) {
             Map<String, Object> returnData = new HashMap<>();
