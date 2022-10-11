@@ -38,7 +38,7 @@ public class DocReportOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String filePath = bizOptJson.getString("fileId");
-        String fileName = Pretreatment.mapTemplateString(BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()), bizModel)
+        String fileName = Pretreatment.mapTemplateStringAsFormula(BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()), bizModel)
             + ".pdf";
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName");
         ByteArrayInputStream in = generateWord(bizModel, filePath, params);
