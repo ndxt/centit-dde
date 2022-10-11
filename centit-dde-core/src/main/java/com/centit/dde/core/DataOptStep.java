@@ -139,6 +139,9 @@ public class DataOptStep {
     }
 
     public boolean isEndStep() {
+        if(currentStep==null){
+            return true;
+        }
         return currentStep.isEmpty();
     }
 

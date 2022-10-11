@@ -164,10 +164,10 @@ public class HttpTaskController extends BaseController {
 
     private void returnObject(String packetId, String runType, String taskType,
                               HttpServletRequest request, HttpServletResponse response) throws IOException {
-        judgePower(packetId,runType);
+//        judgePower(packetId,runType);
         DataPacketInterface dataPacketInterface;
         if(ConstantValue.RUN_TYPE_DEBUG.equals(runType)){
-            dataPacketInterface=dataPacketService.getDataPacket(packetId);
+            dataPacketInterface=dataPacketDraftService.getDataPacket(packetId);
         }else {
             dataPacketInterface=DataPacketCache.dataPacketCachedMap.getCachedValue(packetId);
         }
