@@ -3,7 +3,6 @@ package com.centit.dde;
 import com.centit.dde.bizopt.MailBizOperation;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.utils.ConstantValue;
-import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import org.springframework.stereotype.Component;
 

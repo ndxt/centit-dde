@@ -1,7 +1,6 @@
 package com.centit.dde.config;
 
 import com.centit.framework.components.OperationLogCenter;
-import com.centit.framework.config.InitialWebRuntimeEnvironment;
 import com.centit.framework.core.controller.MvcConfigUtil;
 import com.centit.framework.model.adapter.MessageSender;
 import com.centit.framework.model.adapter.NotificationCenter;
