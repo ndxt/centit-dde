@@ -167,7 +167,7 @@ public class HttpTaskController extends BaseController {
         judgePower(packetId,runType);
         DataPacketInterface dataPacketInterface;
         if(ConstantValue.RUN_TYPE_DEBUG.equals(runType)){
-            dataPacketInterface=dataPacketService.getDataPacket(packetId);
+            dataPacketInterface=dataPacketDraftService.getDataPacket(packetId);
         }else {
             dataPacketInterface=DataPacketCache.dataPacketCachedMap.getCachedValue(packetId);
         }

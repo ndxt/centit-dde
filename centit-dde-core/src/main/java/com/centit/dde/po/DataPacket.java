@@ -170,6 +170,9 @@ public class DataPacket implements Serializable, DataPacketInterface {
     }
     @Override
     public DataOptStep getDataOptStep(){
+        if(innerDataOptStep==null){
+            return null;
+        }
         return new DataOptStep(innerDataOptStep.getNodeMap(),innerDataOptStep.getLinkMap());
     }
 
