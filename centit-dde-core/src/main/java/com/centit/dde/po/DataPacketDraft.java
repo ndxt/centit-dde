@@ -165,15 +165,21 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
 
     @Transient
     @JSONField(serialize = false)
-    private DataOptStep dataOptStep;
+    private DataOptStep innerDataOptStep;
 
     public void setDataOptDescJson(JSONObject dataOptDescJson){
         this.dataOptDescJson=dataOptDescJson;
         if(dataOptDescJson!=null) {
-            dataOptStep = new DataOptStep(dataOptDescJson);
+            innerDataOptStep = new DataOptStep(dataOptDescJson);
         }
     }
-
+    @Override
+    public DataOptStep getDataOptStep(){
+        if(innerDataOptStep==null){
+            return null;
+        }
+        return new DataOptStep(innerDataOptStep.getNodeMap(),innerDataOptStep.getLinkMap());
+    }
     public List<DataPacketParamDraft> getPacketParams() {
         if (packetParams == null) {
             packetParams = new ArrayList<>(2);
