@@ -192,7 +192,7 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
     @Override
     public List<DataPacketDraft> listDataPacket(Map<String, Object> params, PageDesc pageDesc) {
-        return dataPacketCopyDao.listObjectsByProperties(params, pageDesc);
+        return dataPacketCopyDao.listObjects(params, pageDesc);
     }
 
     @Override
