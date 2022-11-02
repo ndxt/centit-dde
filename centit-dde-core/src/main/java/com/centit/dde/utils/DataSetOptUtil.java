@@ -1,11 +1,14 @@
 package com.centit.dde.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
+import com.centit.dde.qrcode.QrCodeGenWrapper;
+import com.centit.dde.qrcode.config.QrCodeConfig;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
@@ -20,6 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.StatUtils;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
@@ -80,6 +88,49 @@ public abstract class DataSetOptUtil {
                 return ((Map<?, ?>) o).size();
             }
             return "";
+        });
+        extendFuncs.put("qrCode", (a) -> {
+            Object o = Arrays.stream(a).toArray()[0];
+            if (o instanceof Map) {
+                JSONObject codeParams= JSON.parseObject(StringBaseOpt.castObjectToString(o), JSONObject.class);
+                String qrCodeName = codeParams.getString("qrCodeName");
+                QrCodeConfig qrCodeConfig = QrCodeGenWrapper.createQrCodeConfig()
+                    .setMsg(StringBaseOpt.castObjectToString(codeParams.get("msg")))
+                    .setQrHeight(codeParams.getInteger("height"))
+                    .setQrWidth(codeParams.getInteger("width"))
+                    //白边预留值  取值 0-4  0最小
+                    .setPadding(codeParams.getInteger("padding"))
+                    .setTopText(codeParams.getString("topText"))
+                    .setTopTextFontSize(codeParams.getInteger("topTextFontSize"))
+                    .setTopTextFontType(codeParams.getString("topTextFontType"))
+                    .setDownText(codeParams.getString("downText"))
+                    .setDownTextFontSize(codeParams.getInteger("downTextFontSize"))
+                    .setDownTextFontType(codeParams.getString("downTextFontType"))
+                    //二维码中心logo图片
+                    .setLogo(codeParams.getString("logImageUrl"))
+                    .build();
+                try {
+                    BufferedImage bufferedImage = QrCodeGenWrapper.asBufferedImage(qrCodeConfig);
+                    ByteArrayOutputStream bs = new ByteArrayOutputStream();
+                    ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(bs);
+                    ImageIO.write(bufferedImage, "JPG", imageOutputStream);
+                    InputStream inputStream = new ByteArrayInputStream(bs.toByteArray());
+                    FileDataSet objectToDataSet = new FileDataSet();
+                    String codeName = System.currentTimeMillis()+".jpg";
+                    if (StringUtils.isNotBlank(qrCodeName)){
+                        if (qrCodeName.endsWith(".jpg")){
+                            codeName = qrCodeName;
+                        }else {
+                            codeName =   qrCodeName+".jpg";
+                        }
+                    }
+                    objectToDataSet.setFileContent(codeName, inputStream.available(), inputStream);
+                    return objectToDataSet;
+                } catch (Exception e) {
+                    return "生成二维码异常！";
+                }
+            }
+            return "参数必须是MAP类型！";
         });
     }
 
@@ -310,8 +361,8 @@ public abstract class DataSetOptUtil {
      * @return 返回数据集
      */
     public static DataSet statDataset(DataSet inData,
-                                       List<String> groupByFields,
-                                       List<Triple<String, String, String>> statDesc) {
+                                      List<String> groupByFields,
+                                      List<Triple<String, String, String>> statDesc) {
         if (inData == null) {//|| groupByFields == null
             return inData;
         }

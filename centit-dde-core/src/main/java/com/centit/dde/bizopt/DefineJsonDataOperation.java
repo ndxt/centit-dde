@@ -6,6 +6,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.json.JSONTransformer;
@@ -24,7 +25,11 @@ public class DefineJsonDataOperation implements BizOperation {
             //jsonValue = !jsonValue.startsWith("{") && jsonValue.startsWith("\"")? jsonValue.replace("\"",""): jsonValue;
             Object data =
                 JSONTransformer.transformer( jsonValue.startsWith("{") ? JSON.parse(jsonValue) : jsonValue, new BizModelJSONTransform(bizModel));
-            bizModel.putDataSet(targetDsName,new DataSet(data));
+            if (data instanceof FileDataSet){
+                bizModel.putDataSet(targetDsName,(FileDataSet)data);
+            }else {
+                bizModel.putDataSet(targetDsName,new DataSet(data));
+            }
         }else {
             return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")+"：表达式不能为空！");
         }

@@ -106,6 +106,18 @@
             <version>5.0</version>
         </dependency>-->
 
+        <!-- 二维码依赖开始-->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+        <!-- 二维码依赖结束-->
     </dependencies>
 
 </project>
