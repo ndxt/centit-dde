@@ -5,6 +5,7 @@ import com.google.zxing.common.BitMatrix;
 import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -38,7 +39,7 @@ public class MatrixToImageUtil {
         if(StringUtils.isNotBlank(qrCodeConfig.getTopText()) || StringUtils.isNotBlank(qrCodeConfig.getDownText())){
             qrCode = addTextInfo(qrCode,qrCodeConfig);
         }
-        // 若二维码的实际宽高和预期的宽高不一致, 则缩放
+     /*   // 若二维码的实际宽高和预期的宽高不一致, 则缩放
         int realQrCodeWidth = qrCodeConfig.getQrWidth();
         int realQrCodeHeight = qrCodeConfig.getQrHeight();
         if (qrCodeWidth != realQrCodeWidth || qrCodeHeight != realQrCodeHeight) {
@@ -46,7 +47,7 @@ public class MatrixToImageUtil {
             tmp.getGraphics().drawImage(
                 qrCode.getScaledInstance(realQrCodeWidth, realQrCodeHeight,Image.SCALE_SMOOTH),0, 0, null);
             qrCode = tmp;
-        }
+        }*/
         return qrCode;
     }
     /**
@@ -54,42 +55,64 @@ public class MatrixToImageUtil {
      * @param source 二维码
      */
     public static BufferedImage addTextInfo(BufferedImage source,QrCodeConfig qrCodeConfig) {
-        int newQrWidth = source.getWidth();
-        int newHeight = source.getHeight();
+        Graphics2D graphics = (Graphics2D)source.getGraphics();
         String topText = qrCodeConfig.getTopText();
         String downText = qrCodeConfig.getDownText();
-        if(StringUtils.isNotBlank(topText) || StringUtils.isNotBlank(downText)){
-            newQrWidth += 30;
-            newHeight += 30;
+
+        double topTextHeight = 0.0;
+        double topTextWidth = 0.0;
+
+        double downTextWidth = 0.0;
+        double downTextHeight = 0.0;
+
+        Font topTextFont = null;
+        Font downTextFont = null;
+
+        if(StringUtils.isNotBlank(topText)) {
+            topTextFont = new Font(qrCodeConfig.getTopTextFontType(), Font.BOLD, qrCodeConfig.getTopTextFontSize());
+            graphics.setFont(topTextFont);
+            Rectangle2D stringBounds = topTextFont.getStringBounds(topText, graphics.getFontRenderContext());
+            topTextHeight = stringBounds.getHeight();
+            topTextWidth = stringBounds.getWidth();
         }
+
+        if(StringUtils.isNotBlank(downText)) {
+            downTextFont = new Font(qrCodeConfig.getDownTextFontType(), Font.BOLD, qrCodeConfig.getDownTextFontSize());
+            graphics.setFont(downTextFont);
+            Rectangle2D downTextStringBounds = downTextFont.getStringBounds(downText, graphics.getFontRenderContext());
+            downTextWidth = downTextStringBounds.getWidth();
+            downTextHeight = downTextStringBounds.getHeight();
+        }
+        double offSetHeight  = topTextHeight > 0 && downTextHeight > 0  ? (topTextHeight + downTextHeight) * 2 : (topTextHeight + downTextHeight) * 4;
+        int newHeight = (int) (source.getHeight() + offSetHeight);
+        int newQrWidth = newHeight;
+
         //在内存创建图片缓冲区  这里设置画板的宽高和类型
-        BufferedImage outImage = new BufferedImage(newQrWidth,newHeight, BufferedImage.TYPE_INT_RGB);
+        BufferedImage outImage = new BufferedImage(newHeight,newHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D graph = outImage.createGraphics();
         //开启文字抗锯齿
         graph.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         // 画文字到新的面板
-        graph.setBackground(Color.white);
-        graph.setColor(Color.black);
+        graph.setBackground(Color.BLUE);
+        graph.setColor(Color.white);
         graph.clearRect(0, 0, newQrWidth,newHeight);
-        // 在画布上画上二维码  X轴Y轴，宽度高度
-        graph.drawImage(source, (newQrWidth-source.getWidth())/2, (newHeight-source.getHeight())/2, source.getWidth(), source.getHeight(), null);
+
         if(StringUtils.isNotBlank(topText)){
-            // 字体、字型、字号
-            graph.setFont(new Font(qrCodeConfig.getTopTextFontType(), Font.BOLD, qrCodeConfig.getTopTextFontSize()));
-            int topTextWidth = graph.getFontMetrics().stringWidth(topText);
+            graph.setFont(topTextFont);
             //drawString(文字信息、x轴、y轴)方法根据参数设置文字的坐标轴 ，根据需要来进行调整
-            int x = (newQrWidth-topTextWidth)/2;
-            int y = (newQrWidth - source.getHeight())/2;
+            float x = (float) (newQrWidth - topTextWidth) / 2;
+            float y = (float) topTextHeight;
             graph.drawString(topText,x,y);
         }
+
         if(StringUtils.isNotBlank(downText)){
-            // 字体、字型、字号
-            graph.setFont(new Font(qrCodeConfig.getDownTextFontType(), Font.BOLD, qrCodeConfig.getDownTextFontSize()));
-            int downTextWidth = graph.getFontMetrics().stringWidth(downText);
-            int x = (newQrWidth - downTextWidth)/2;
-            int y = source.getHeight()+25;
+            graph.setFont(downTextFont);
+            int x = (int) (newQrWidth - downTextWidth) / 2;
+            int y = (int) (newHeight -  downTextHeight);
             graph.drawString(downText,x,y);
         }
+        // 在画布上画上二维码  X轴Y轴，宽度高度
+        graph.drawImage(source, (newQrWidth - source.getWidth()) / 2, (newHeight - source.getHeight()) / 2, source.getWidth(), source.getHeight(), null);
         graph.dispose();
         outImage.flush();
         return outImage;

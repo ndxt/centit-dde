@@ -8,6 +8,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -46,12 +47,12 @@ public class QrCodeConfig {
     /**
      * 顶部部字体类型
      */
-    private String topTextFontType = "雅黑";
+    private String topTextFontType;
 
     /**
      * 底部部字体类型
      */
-    private String downTextFontType = "雅黑";
+    private String downTextFontType;
 
     /**
      * 二维码中间的logo
@@ -94,7 +95,7 @@ public class QrCodeConfig {
         /**
          * 二维码顶部文字大小
          */
-        private Integer topTextFontSize = 12;
+        private Integer topTextFontSize = 8;
 
         /**
          * 二维码底部文字
@@ -104,7 +105,7 @@ public class QrCodeConfig {
         /**
          * 二维码底部文字大小
          */
-        private Integer downTextFontSize = 10;
+        private Integer downTextFontSize = 7;
 
         /**
          * 顶部部字体类型
@@ -174,7 +175,9 @@ public class QrCodeConfig {
         }
 
         public QrCodeConfigBuilder setTopTextFontType(String topTextFontType) {
-            this.topTextFontType = topTextFontType;
+            if(StringUtils.isNotBlank(topTextFontType)){
+                this.topTextFontType = topTextFontType;
+            }
             return this;
         }
 
@@ -183,7 +186,9 @@ public class QrCodeConfig {
         }
 
         public QrCodeConfigBuilder setDownTextFontType(String downTextFontType) {
-            this.downTextFontType = downTextFontType;
+            if(StringUtils.isNotBlank(topTextFontType)) {
+                this.downTextFontType = downTextFontType;
+            }
             return this;
         }
 
@@ -192,7 +197,9 @@ public class QrCodeConfig {
         }
 
         public QrCodeConfigBuilder setTopTextFontSize(Integer topTextFontSize) {
-            this.topTextFontSize = topTextFontSize;
+            if( topTextFontSize != null && topTextFontSize > 0){
+                this.topTextFontSize = topTextFontSize;
+            }
             return this;
         }
 
@@ -201,7 +208,9 @@ public class QrCodeConfig {
         }
 
         public QrCodeConfigBuilder setDownTextFontSize(Integer downTextFontSize) {
-            this.downTextFontSize = downTextFontSize;
+           if(downTextFontSize != null && downTextFontSize > 0){
+               this.downTextFontSize = downTextFontSize;
+           }
             return this;
         }
 
@@ -338,7 +347,7 @@ public class QrCodeConfig {
         }
 
         private QrCodeConfig create() {
-            this.validate();
+           // this.validate();
             QrCodeConfig qrCodeConfig = new QrCodeConfig();
             qrCodeConfig.setMsg(getMsg());
             qrCodeConfig.setQrHeight(getQrHeight());
@@ -378,12 +387,12 @@ public class QrCodeConfig {
         }
 
 
-        public BufferedImage asBufferedImage() throws IOException, WriterException {
+        public BufferedImage asBufferedImage() throws Exception {
             return QrCodeGenWrapper.asBufferedImage(create());
         }
 
 
-        public boolean asFile(String absFileName) throws IOException, WriterException {
+        public boolean asFile(String absFileName) throws Exception {
             return QrCodeGenWrapper.asFile(create(), absFileName);
         }
     }

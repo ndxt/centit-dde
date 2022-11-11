@@ -11,12 +11,19 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
+import com.lowagie.text.Document;
+import com.lowagie.text.Image;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.PdfWriter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -34,11 +41,10 @@ public class QrCodeGenWrapper {
      * @throws WriterException
      * @throws IOException
      */
-    public static BufferedImage asBufferedImage(QrCodeConfig qrCodeConfig) throws WriterException, IOException {
+    public static BufferedImage asBufferedImage(QrCodeConfig qrCodeConfig) throws Exception {
         BitMatrix bitMatrix = encode(qrCodeConfig);
         return MatrixToImageUtil.toBufferedImage(qrCodeConfig, bitMatrix);
     }
-
 
     /**
      * 将二维码写到指定目录下
@@ -48,7 +54,7 @@ public class QrCodeGenWrapper {
      * @throws WriterException
      * @throws IOException
      */
-    public static boolean asFile(QrCodeConfig qrCodeConfig, String absFileName) throws WriterException, IOException {
+    public static boolean asFile(QrCodeConfig qrCodeConfig, String absFileName) throws Exception {
         File file = FileUtil.createFile(absFileName);
         if (file == null) {
             throw new IllegalArgumentException("file not exists! absFile: " + absFileName);
@@ -60,6 +66,68 @@ public class QrCodeGenWrapper {
         return true;
     }
 
+    public static void imagesToPdf( List<Image> imageList,ByteArrayOutputStream byteArrayOutputStream){
+        Document document = new Document(PageSize.A4, 0, 0, 0, 0);
+        try{
+            PdfWriter.getInstance(document, byteArrayOutputStream);
+            document.open();
+
+            float a4Width = document.getPageSize().getWidth();
+            float a4Height = document.getPageSize().getHeight();
+            float imageWidth = imageList.get(0).getWidth();
+            float imageHeight = imageList.get(0).getHeight();
+
+            //每行能放几个二维码
+            int rowTotalCount = (int)(a4Width/imageWidth);
+            //一页a4一共能放几行
+            int totalRowCount = (int)(a4Height/imageHeight);
+
+            //每个二维码在x轴位置偏移倍数，
+            float qrCodeX = 0;
+
+            //记录这是当前行的第几个二维码
+            int columnCount = 0;
+
+            //记录当前页写到第几行了 默认第一行开始
+            int rowCount = 1;
+
+            for (int i = 0; i < imageList.size(); i++) {
+                Image image = imageList.get(i);
+                image.setAlignment(Image.MIDDLE);
+                float x  , y;
+                //当行的个数等于每行只能写入的总个数时进行换行
+                if( ++columnCount   > rowTotalCount){
+                    qrCodeX = 0;
+                    rowCount ++;
+                    columnCount = 1;
+                }
+                //超过一页时重新创建新的一页
+                if (rowCount > totalRowCount){
+                    document.setPageSize(new Rectangle(a4Width,a4Height));
+                    document.newPage();
+                    rowCount = 1;
+                    qrCodeX = 0;
+                    columnCount = 1;
+                }
+                //左边偏移量 始终保证二维码处于居中的位置
+                float offsetX = (a4Width - (imageWidth * rowTotalCount)) / rowTotalCount;
+                float offsetY = (a4Height - (imageHeight * totalRowCount)) / ( totalRowCount * 2 ) * rowCount;
+                if (columnCount > 1 ){
+                    offsetX += 6 * qrCodeX;
+                }
+                x = offsetX + imageWidth  * qrCodeX ++;
+                y = a4Height - (imageHeight * rowCount) - offsetY;
+
+                image.setAbsolutePosition( x , y );
+                document.add(image);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            document.close();
+        }
+    }
+
 
     /**
      * 对 zxing 的 QRCodeWriter 进行扩展, 解决白边过多的问题
@@ -67,7 +135,7 @@ public class QrCodeGenWrapper {
      * 源码参考 {@link com.google.zxing.qrcode.QRCodeWriter#encode(String, BarcodeFormat, int, int, Map)}
      */
     private static BitMatrix encode(QrCodeConfig qrCodeConfig) throws WriterException {
-        ErrorCorrectionLevel errorCorrectionLevel = ErrorCorrectionLevel.L;
+        ErrorCorrectionLevel errorCorrectionLevel = ErrorCorrectionLevel.Q;
         int quietZone = 1;
         if (qrCodeConfig.getHints() != null) {
             if (qrCodeConfig.getHints().containsKey(EncodeHintType.ERROR_CORRECTION)) {
