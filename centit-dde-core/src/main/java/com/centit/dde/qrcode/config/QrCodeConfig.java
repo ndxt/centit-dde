@@ -1,8 +1,6 @@
 package com.centit.dde.qrcode.config;
 
-import com.centit.dde.qrcode.QrCodeGenWrapper;
 import com.google.zxing.EncodeHintType;
-import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import lombok.Getter;
@@ -10,8 +8,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -378,23 +374,10 @@ public class QrCodeConfig {
             return qrCodeConfig;
         }
 
-        /**
-         * create qrcodeConfig
-         * @return
-         */
         public QrCodeConfig build() {
             return create();
         }
 
-
-        public BufferedImage asBufferedImage() throws Exception {
-            return QrCodeGenWrapper.asBufferedImage(create());
-        }
-
-
-        public boolean asFile(String absFileName) throws Exception {
-            return QrCodeGenWrapper.asFile(create(), absFileName);
-        }
     }
 }
 

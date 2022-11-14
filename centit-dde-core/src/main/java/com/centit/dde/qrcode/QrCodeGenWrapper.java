@@ -1,8 +1,13 @@
 package com.centit.dde.qrcode;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.qrcode.config.QrCodeConfig;
-import com.centit.dde.qrcode.utils.FileUtil;
+import com.centit.dde.qrcode.utils.ImageUtil;
 import com.centit.dde.qrcode.utils.MatrixToImageUtil;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -11,20 +16,18 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
-import com.lowagie.text.Document;
 import com.lowagie.text.Image;
-import com.lowagie.text.PageSize;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.PdfWriter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class QrCodeGenWrapper {
@@ -32,6 +35,141 @@ public class QrCodeGenWrapper {
 
     public static QrCodeConfig.QrCodeConfigBuilder createQrCodeConfig() {
         return new QrCodeConfig.QrCodeConfigBuilder();
+    }
+
+    public static Object createQrCode(Object qrCodeParams){
+        if (qrCodeParams instanceof Map) {
+            JSONObject codeParams = JSON.parseObject(StringBaseOpt.castObjectToString(qrCodeParams));
+            if (codeParams != null){
+                JSONObject qrParams = codeParams.getJSONObject("qrParams");
+                Object dataParams = codeParams.get("dataParams");
+                if (qrParams == null || dataParams == null){
+                    return "qrParams 和 dataParams 不能为空！";
+                }
+                //写入二维码数据的字段，多个逗号隔开  不传默认全部字段写入
+                String dataField = qrParams.getString("dataField");
+                List<String> fieldNames = new ArrayList<>();
+                if (StringUtils.isNotBlank(dataField)){
+                    fieldNames.addAll(Arrays.stream(dataField.split(",")).collect(Collectors.toList()));
+                }
+                List<Image> imageList = new ArrayList<>();
+                QrCodeConfig qrCodeConfig = createQrCodeConfig(qrParams);
+                if (dataParams instanceof Collection){
+                    JSONArray dataParamsArr = codeParams.getJSONArray("dataParams");
+                    Object topText = qrParams.get("topText");
+                    Object downText = qrParams.get("downText");
+                    for (int i = 0; i < dataParamsArr.size(); i++) {
+                        String tempTopText = "";
+                        String tempDownText = "";
+                        if (topText instanceof Collection){
+                            tempTopText = StringBaseOpt.castObjectToString(qrParams.getJSONArray("topText").get(i));
+                        }
+                        if (topText instanceof String){
+                            tempTopText =  StringBaseOpt.castObjectToString(topText);
+                        }
+                        if (downText instanceof Collection){
+                            tempDownText = StringBaseOpt.castObjectToString(qrParams.getJSONArray("downText").get(i));
+                        }
+                        if (downText instanceof String){
+                            tempDownText = StringBaseOpt.castObjectToString(downText);
+                        }
+                        qrCodeConfig.setTopText(tempTopText);
+                        qrCodeConfig.setDownText(tempDownText);
+                        Object o = dataParamsArr.get(i);
+                        if (o instanceof  Map){
+                            JSONObject jsonObject = JSON.parseObject(StringBaseOpt.castObjectToString(o));
+                            if (fieldNames.size() > 0){
+                                JSONObject context = new JSONObject();
+                                for (String fieldName : fieldNames) {
+                                    context.put(fieldName,jsonObject.get(fieldName));
+                                }
+                                qrCodeConfig.setMsg(context.toJSONString());
+                            }else {
+                                qrCodeConfig.setMsg(jsonObject.toJSONString());
+                            }
+                        }
+                        if (o instanceof String){
+                            qrCodeConfig.setMsg((String) o);
+                        }
+                        try( ByteArrayOutputStream outputStream = new ByteArrayOutputStream()){
+                            BufferedImage bufferedImage = QrCodeGenWrapper.asBufferedImage(qrCodeConfig);
+                            ImageIO.write(bufferedImage, "JPG", outputStream);
+                            Image image = Image.getInstance(outputStream.toByteArray());
+                            imageList.add(image);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                if (dataParams instanceof Map){
+                    JSONObject dataParamsMap = codeParams.getJSONObject("dataParams");
+                    Boolean qrCodeToPdf = qrParams.getBoolean("qrCodeToPdf");
+                    qrCodeConfig.setTopText(StringBaseOpt.castObjectToString(qrParams.get("topText")));
+                    qrCodeConfig.setDownText(StringBaseOpt.castObjectToString(qrParams.get("downText")));
+                    if (fieldNames.size() > 0){
+                        JSONObject context = new JSONObject();
+                        for (String fieldName : fieldNames) {
+                            context.put(fieldName,dataParamsMap.get(fieldName));
+                        }
+                        qrCodeConfig.setMsg(context.toJSONString());
+                    }else {
+                        qrCodeConfig.setMsg(dataParamsMap.toJSONString());
+                    }
+                    try( ByteArrayOutputStream outputStream = new ByteArrayOutputStream()){
+                        BufferedImage bufferedImage = QrCodeGenWrapper.asBufferedImage(qrCodeConfig);
+                        ImageIO.write(bufferedImage, "JPG", outputStream);
+                        //写入pdf
+                        if (qrCodeToPdf){
+                            imageList.add(Image.getInstance(outputStream.toByteArray()));
+                        }else {
+                            //直接返回二维码
+                            String fileName = codeParams.getString("fileName");
+                            String codeName = StringUtils.isNotBlank(fileName) ? fileName.endsWith(".jpg") ? fileName
+                                : fileName + ".jpg"
+                                : System.currentTimeMillis()+".jpg";
+                            FileDataSet dataSet = new FileDataSet();
+                            InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+                            dataSet.setFileContent(codeName, inputStream.available(), inputStream);
+                            return dataSet;
+                        }
+                    } catch (Exception e) {
+                        return "生成二维码异常！";
+                    }
+                }
+                if (imageList.size() > 0 ){
+                    try ( ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()){
+                        ImageUtil.imagesToPdf(imageList,byteArrayOutputStream);
+                        String fileName = codeParams.getString("fileName");
+                        String codeName = StringUtils.isNotBlank(fileName) ? fileName.endsWith(".pdf") ? fileName :  fileName + ".pdf"
+                            : System.currentTimeMillis()+".pdf";
+                        FileDataSet dataSet = new FileDataSet();
+                        InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                        dataSet.setFileContent(codeName, inputStream.available(), inputStream);
+                        return dataSet;
+                    } catch (Exception e) {
+                        return "写入PDF文件异常！";
+                    }
+                }
+            }
+        }
+        return  "未正确传入指定参数！";
+    }
+
+    //构建生成二维码参数
+    private static QrCodeConfig createQrCodeConfig(JSONObject codeParams){
+        return codeParams == null ?  QrCodeGenWrapper.createQrCodeConfig().build() :  QrCodeGenWrapper.createQrCodeConfig()
+            //.setMsg(StringBaseOpt.castObjectToString(writeQrCodeData))
+            .setQrHeight(codeParams.getInteger("height"))
+            .setQrWidth(codeParams.getInteger("width"))
+            .setPadding(codeParams.getInteger("padding"))
+            //.setTopText(topText)
+            .setTopTextFontSize(codeParams.getInteger("topTextFontSize"))
+            .setTopTextFontType(codeParams.getString("topTextFontType"))
+            //.setDownText(downText)
+            .setDownTextFontSize(codeParams.getInteger("downTextFontSize"))
+            .setDownTextFontType(codeParams.getString("downTextFontType"))
+            .setLogo(codeParams.getString("logImageUrl"))
+            .build();
     }
 
     /**
@@ -44,88 +182,6 @@ public class QrCodeGenWrapper {
     public static BufferedImage asBufferedImage(QrCodeConfig qrCodeConfig) throws Exception {
         BitMatrix bitMatrix = encode(qrCodeConfig);
         return MatrixToImageUtil.toBufferedImage(qrCodeConfig, bitMatrix);
-    }
-
-    /**
-     * 将二维码写到指定目录下
-     * @param qrCodeConfig 二维码配置信息
-     * @param absFileName  保存路径
-     * @return
-     * @throws WriterException
-     * @throws IOException
-     */
-    public static boolean asFile(QrCodeConfig qrCodeConfig, String absFileName) throws Exception {
-        File file = FileUtil.createFile(absFileName);
-        if (file == null) {
-            throw new IllegalArgumentException("file not exists! absFile: " + absFileName);
-        }
-        BufferedImage bufferedImage = asBufferedImage(qrCodeConfig);
-        if (!ImageIO.write(bufferedImage, qrCodeConfig.getPicType(), file)) {
-            throw new IOException("save qrcode image error!");
-        }
-        return true;
-    }
-
-    public static void imagesToPdf( List<Image> imageList,ByteArrayOutputStream byteArrayOutputStream){
-        Document document = new Document(PageSize.A4, 0, 0, 0, 0);
-        try{
-            PdfWriter.getInstance(document, byteArrayOutputStream);
-            document.open();
-
-            float a4Width = document.getPageSize().getWidth();
-            float a4Height = document.getPageSize().getHeight();
-            float imageWidth = imageList.get(0).getWidth();
-            float imageHeight = imageList.get(0).getHeight();
-
-            //每行能放几个二维码
-            int rowTotalCount = (int)(a4Width/imageWidth);
-            //一页a4一共能放几行
-            int totalRowCount = (int)(a4Height/imageHeight);
-
-            //每个二维码在x轴位置偏移倍数，
-            float qrCodeX = 0;
-
-            //记录这是当前行的第几个二维码
-            int columnCount = 0;
-
-            //记录当前页写到第几行了 默认第一行开始
-            int rowCount = 1;
-
-            for (int i = 0; i < imageList.size(); i++) {
-                Image image = imageList.get(i);
-                image.setAlignment(Image.MIDDLE);
-                float x  , y;
-                //当行的个数等于每行只能写入的总个数时进行换行
-                if( ++columnCount   > rowTotalCount){
-                    qrCodeX = 0;
-                    rowCount ++;
-                    columnCount = 1;
-                }
-                //超过一页时重新创建新的一页
-                if (rowCount > totalRowCount){
-                    document.setPageSize(new Rectangle(a4Width,a4Height));
-                    document.newPage();
-                    rowCount = 1;
-                    qrCodeX = 0;
-                    columnCount = 1;
-                }
-                //左边偏移量 始终保证二维码处于居中的位置
-                float offsetX = (a4Width - (imageWidth * rowTotalCount)) / rowTotalCount;
-                float offsetY = (a4Height - (imageHeight * totalRowCount)) / ( totalRowCount * 2 ) * rowCount;
-                if (columnCount > 1 ){
-                    offsetX += 6 * qrCodeX;
-                }
-                x = offsetX + imageWidth  * qrCodeX ++;
-                y = a4Height - (imageHeight * rowCount) - offsetY;
-
-                image.setAbsolutePosition( x , y );
-                document.add(image);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
-            document.close();
-        }
     }
 
 

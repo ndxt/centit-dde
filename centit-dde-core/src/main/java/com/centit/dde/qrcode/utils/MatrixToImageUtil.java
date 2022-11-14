@@ -39,15 +39,6 @@ public class MatrixToImageUtil {
         if(StringUtils.isNotBlank(qrCodeConfig.getTopText()) || StringUtils.isNotBlank(qrCodeConfig.getDownText())){
             qrCode = addTextInfo(qrCode,qrCodeConfig);
         }
-     /*   // 若二维码的实际宽高和预期的宽高不一致, 则缩放
-        int realQrCodeWidth = qrCodeConfig.getQrWidth();
-        int realQrCodeHeight = qrCodeConfig.getQrHeight();
-        if (qrCodeWidth != realQrCodeWidth || qrCodeHeight != realQrCodeHeight) {
-            BufferedImage tmp = new BufferedImage(realQrCodeWidth, realQrCodeHeight, BufferedImage.TYPE_INT_RGB);
-            tmp.getGraphics().drawImage(
-                qrCode.getScaledInstance(realQrCodeWidth, realQrCodeHeight,Image.SCALE_SMOOTH),0, 0, null);
-            qrCode = tmp;
-        }*/
         return qrCode;
     }
     /**
@@ -83,12 +74,14 @@ public class MatrixToImageUtil {
             downTextWidth = downTextStringBounds.getWidth();
             downTextHeight = downTextStringBounds.getHeight();
         }
-        double offSetHeight  = topTextHeight > 0 && downTextHeight > 0  ? (topTextHeight + downTextHeight) * 2 : (topTextHeight + downTextHeight) * 4;
+        double offSetHeight  = topTextHeight > 0 && downTextHeight > 0
+            ? (topTextHeight + downTextHeight) * 2
+            : (topTextHeight + downTextHeight) * 4;
         int newHeight = (int) (source.getHeight() + offSetHeight);
-        int newQrWidth = newHeight;
+        int newQrWidth = (int)(source.getWidth() + offSetHeight);
 
         //在内存创建图片缓冲区  这里设置画板的宽高和类型
-        BufferedImage outImage = new BufferedImage(newHeight,newHeight, BufferedImage.TYPE_INT_RGB);
+        BufferedImage outImage = new BufferedImage(newQrWidth,newHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D graph = outImage.createGraphics();
         //开启文字抗锯齿
         graph.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
