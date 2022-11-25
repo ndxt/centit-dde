@@ -154,6 +154,10 @@ public class DataPacket implements Serializable, DataPacketInterface {
     @NotBlank
     private String requestBodyType;
 
+    @ApiModelProperty(value = "降级等级")
+    @Column(name = "FALL_BACK_LEVEL")
+    private String fallBackLevel;
+
     @OneToMany(targetEntity = DataPacketParam.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
     private List<DataPacketParam> packetParams;
@@ -162,18 +166,19 @@ public class DataPacket implements Serializable, DataPacketInterface {
     @JSONField(serialize = false)
     private DataOptStep innerDataOptStep;
 
-    public void setDataOptDescJson(JSONObject dataOptDescJson){
-        this.dataOptDescJson=dataOptDescJson;
-        if(dataOptDescJson!=null) {
+    public void setDataOptDescJson(JSONObject dataOptDescJson) {
+        this.dataOptDescJson = dataOptDescJson;
+        if (dataOptDescJson != null) {
             innerDataOptStep = new DataOptStep(dataOptDescJson);
         }
     }
+
     @Override
-    public DataOptStep getDataOptStep(){
-        if(innerDataOptStep==null){
+    public DataOptStep getDataOptStep() {
+        if (innerDataOptStep == null) {
             return null;
         }
-        return new DataOptStep(innerDataOptStep.getNodeMap(),innerDataOptStep.getLinkMap());
+        return new DataOptStep(innerDataOptStep.getNodeMap(), innerDataOptStep.getLinkMap());
     }
 
     public List<DataPacketParam> getPacketParams() {
