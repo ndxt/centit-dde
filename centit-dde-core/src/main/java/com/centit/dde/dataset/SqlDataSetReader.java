@@ -96,7 +96,7 @@ public class SqlDataSetReader implements DataSetReader {
             int pn = NumberBaseOpt.castObjectToInteger(paramsMap.get(pageNo),1);
             int ps = NumberBaseOpt.castObjectToInteger(paramsMap.get(pageSize),20);
             PageDesc pageDesc = new PageDesc(pn, ps);
-            String pagingSql = QueryUtils.buildLimitQuerySQL(qap.getQuery(), pageDesc.getRowStart(), pageDesc.getPageSize(),
+            String pagingSql = pageDesc.getPageSize() < 0 ? qap.getQuery():QueryUtils.buildLimitQuerySQL(qap.getQuery(), pageDesc.getRowStart(), pageDesc.getPageSize(),
                 false, databaseInfo.getDBType());
 
             JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn,pagingSql, paramsMap);
