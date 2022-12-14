@@ -91,7 +91,7 @@ public class MetadataOperation implements BizOperation {
                 metaObjectService.deleteObjectWithChildren(tableId, parames, withChildrenDeep);
                 bizModel.putDataSet(id, new DataSet(1));
                 return BuiltInOperation.createResponseSuccessData(1);
-            case 4://查询
+            case 4://查询 这个已经迁移走了，但是为了兼容前面的遗留项目暂时不能删除，2023年6月删除
                 HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
                 String topUnit = WebOptUtils.getCurrentTopUnit(request);
                 List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, WebOptUtils.getCurrentUserCode(request), dataOptContext.getOptId(), "api");
@@ -124,7 +124,7 @@ public class MetadataOperation implements BizOperation {
                     bizModel.putDataSet(id, new DataSet(result));//返回带分页的数据
                 }
                 return BuiltInOperation.createResponseSuccessData(jsonArray.size());
-            case 5://查看
+            case 5://查看 这个已经迁移走了，但是为了兼容前面的遗留项目暂时不能删除，2023年6月删除
                 Map<String, Object> data = metaObjectService.getObjectWithChildren(tableId, parames, withChildrenDeep);
                 bizModel.putDataSet(id, new DataSet(data));
                 return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
@@ -144,7 +144,7 @@ public class MetadataOperation implements BizOperation {
                 bizModel.putDataSet(id, new DataSet(delCount));
                 return BuiltInOperation.createResponseSuccessData(delCount);
             }
-            case 11:
+            case 11: // 合并
                 int resultCount = metaObjectService.mergeObjectWithChildren(tableId, parames, withChildrenDeep);
                 bizModel.putDataSet(id, new DataSet(resultCount));
                 return BuiltInOperation.createResponseSuccessData(resultCount);
