@@ -93,7 +93,7 @@ public class SqlDataSetReader implements DataSetReader {
         // 添加分页查询属性
         if(paging){
             int pn = NumberBaseOpt.castObjectToInteger(paramsMap.get(pageNoField),1);
-            int ps = NumberBaseOpt.castObjectToInteger(paramsMap.get(pageSizeField),20);
+            int ps = NumberBaseOpt.castObjectToInteger(paramsMap.get(pageSizeField),-1);
             PageDesc pageDesc = new PageDesc(pn, ps);
 
             String pagingSql = ps < 1 ? qap.getQuery() :
