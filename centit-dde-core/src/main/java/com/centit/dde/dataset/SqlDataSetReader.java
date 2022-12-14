@@ -101,14 +101,19 @@ public class SqlDataSetReader implements DataSetReader {
                 false, databaseInfo.getDBType());
 
             JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, pagingSql, paramsMap);
-
+            int resSize = jsonArray == null ? 0 : jsonArray.size();
             if(hasCount){
-                if( ps > 0) {
+                // 分页，并且不是最后一页
+                if( ps > 0 && resSize == ps) {
                     String sGetCountSql = QueryUtils.buildGetCountSQL(qap.getQuery());
                     Object obj = DatabaseAccess.getScalarObjectQuery(conn, sGetCountSql, paramsMap);
                     pageDesc.setTotalRows(NumberBaseOpt.castObjectToInteger(obj));
-                } else if(jsonArray !=null){
-                    pageDesc.setTotalRows(jsonArray.size());
+                } else {
+                    if(ps > 0){ // 最后一页
+                        pageDesc.setTotalRows( (pn-1) * ps + resSize);
+                    } else { //错误的分页数据
+                        pageDesc.setTotalRows(resSize);
+                    }
                 }
                 PageQueryResult<Object> result = PageQueryResult.createResult(jsonArray, pageDesc);
                 dataSet.setData(result);
