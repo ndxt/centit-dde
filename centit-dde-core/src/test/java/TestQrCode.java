@@ -30,7 +30,7 @@ public class TestQrCode {
             .build();
         try {
             BufferedImage bufferedImage = QrCodeGenWrapper.asBufferedImage(qrCodeConfig);
-            QrCodeGenWrapper.asFile(qrCodeConfig,destPath);
+            //QrCodeGenWrapper.asFile(qrCodeConfig,destPath);
             ImageIO.write(bufferedImage, "JPG", new File(destPath));
             //System.out.println(QrCodeReaderWrapper.decode(logImgPath));
         } catch (Exception e) {
