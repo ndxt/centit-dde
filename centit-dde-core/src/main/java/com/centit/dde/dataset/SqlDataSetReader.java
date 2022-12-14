@@ -50,9 +50,9 @@ public class SqlDataSetReader implements DataSetReader {
 
     //分页参数属性
     //页码参数属性
-    private int pageNo;
+    private String pageNoField;
     //每页数量属性
-    private int pageSize;
+    private String pageSizeField;
 
     private DataScopePowerManager queryDataScopeFilter;
 
@@ -89,19 +89,27 @@ public class SqlDataSetReader implements DataSetReader {
             paramsMap.putAll(params);
         }
         paramsMap.putAll(qap.getParams());
-
         DataSet dataSet = new DataSet();
         // 添加分页查询属性
         if(paging){
-            PageDesc pageDesc = new PageDesc(pageNo, pageSize);
-            String pagingSql = pageDesc.getPageSize() < 0 ? qap.getQuery():QueryUtils.buildLimitQuerySQL(qap.getQuery(), pageDesc.getRowStart(), pageDesc.getPageSize(),
+            int pn = NumberBaseOpt.castObjectToInteger(paramsMap.get(pageNoField),1);
+            int ps = NumberBaseOpt.castObjectToInteger(paramsMap.get(pageSizeField),20);
+            PageDesc pageDesc = new PageDesc(pn, ps);
+
+            String pagingSql = ps < 1 ? qap.getQuery() :
+                QueryUtils.buildLimitQuerySQL(qap.getQuery(), pageDesc.getRowStart(), pageDesc.getPageSize(),
                 false, databaseInfo.getDBType());
 
-            JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn,pagingSql, paramsMap);
+            JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, pagingSql, paramsMap);
+
             if(hasCount){
-                String sGetCountSql = QueryUtils.buildGetCountSQL(qap.getQuery());
-                Object obj = DatabaseAccess.getScalarObjectQuery(conn, sGetCountSql, paramsMap);
-                pageDesc.setTotalRows(NumberBaseOpt.castObjectToInteger(obj));
+                if( ps > 0) {
+                    String sGetCountSql = QueryUtils.buildGetCountSQL(qap.getQuery());
+                    Object obj = DatabaseAccess.getScalarObjectQuery(conn, sGetCountSql, paramsMap);
+                    pageDesc.setTotalRows(NumberBaseOpt.castObjectToInteger(obj));
+                } else if(jsonArray !=null){
+                    pageDesc.setTotalRows(jsonArray.size());
+                }
                 PageQueryResult<Object> result = PageQueryResult.createResult(jsonArray, pageDesc);
                 dataSet.setData(result);
             } else {
@@ -111,7 +119,7 @@ public class SqlDataSetReader implements DataSetReader {
             JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, qap.getQuery(), paramsMap);
             if(hasCount){
                 PageQueryResult<Object> result = PageQueryResult.createResult(jsonArray,
-                    new PageDesc(1, -1,  jsonArray==null? 0: jsonArray.size()));
+                    new PageDesc(1, -1, jsonArray!=null ? jsonArray.size() : 0));
                 dataSet.setData(result);
             } else {
                 dataSet.setData(jsonArray);
@@ -160,11 +168,11 @@ public class SqlDataSetReader implements DataSetReader {
         this.hasCount = hasCount;
     }
 
-    public void setPageNo(int pageNo) {
-        this.pageNo = pageNo;
+    public void setPageNoField(String pageNo) {
+        this.pageNoField = pageNo;
     }
 
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
+    public void setPageSizeField(String pageSize) {
+        this.pageSizeField = pageSize;
     }
 }
