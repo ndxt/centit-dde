@@ -12,6 +12,7 @@ import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 
 import java.util.Map;
 
@@ -55,7 +56,13 @@ public class QuerySqlOperation implements BizOperation {
             }
         }
         //是否分页
-        sqlDsr.setPaging(BooleanBaseOpt.castObjectToBoolean(
+        int pageSize =
+            NumberBaseOpt.castObjectToInteger(
+                BuiltInOperation.getJsonFieldString(bizOptJson, "pageSize", "pageSize"), -1);
+        int pageNo =
+            NumberBaseOpt.castObjectToInteger(
+                BuiltInOperation.getJsonFieldString(bizOptJson, "pageNo", "pageNo"), 1);
+        sqlDsr.setPaging(pageSize>0 && BooleanBaseOpt.castObjectToBoolean(
             BuiltInOperation.getJsonFieldString(bizOptJson, "paging", "false"), false));
         //是否返回总数
         sqlDsr.setHasCount(BooleanBaseOpt.castObjectToBoolean(
@@ -63,10 +70,9 @@ public class QuerySqlOperation implements BizOperation {
 
         //分页参数属性
         //页码参数属性
-        sqlDsr.setPageNo(BuiltInOperation.getJsonFieldString(bizOptJson, "pageNo", "pageNo"));
+        sqlDsr.setPageNo(pageNo);
         //每页数量属性
-        sqlDsr.setPageSize(
-            BuiltInOperation.getJsonFieldString(bizOptJson, "pageSize", "pageSize"));
+        sqlDsr.setPageSize(pageSize);
 
         DataSet dataSet = sqlDsr.load(parames);
 

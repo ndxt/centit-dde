@@ -50,9 +50,9 @@ public class SqlDataSetReader implements DataSetReader {
 
     //分页参数属性
     //页码参数属性
-    private String pageNo;
+    private int pageNo;
     //每页数量属性
-    private String pageSize;
+    private int pageSize;
 
     private DataScopePowerManager queryDataScopeFilter;
 
@@ -93,9 +93,7 @@ public class SqlDataSetReader implements DataSetReader {
         DataSet dataSet = new DataSet();
         // 添加分页查询属性
         if(paging){
-            int pn = NumberBaseOpt.castObjectToInteger(paramsMap.get(pageNo),1);
-            int ps = NumberBaseOpt.castObjectToInteger(paramsMap.get(pageSize),20);
-            PageDesc pageDesc = new PageDesc(pn, ps);
+            PageDesc pageDesc = new PageDesc(pageNo, pageSize);
             String pagingSql = pageDesc.getPageSize() < 0 ? qap.getQuery():QueryUtils.buildLimitQuerySQL(qap.getQuery(), pageDesc.getRowStart(), pageDesc.getPageSize(),
                 false, databaseInfo.getDBType());
 
@@ -111,7 +109,13 @@ public class SqlDataSetReader implements DataSetReader {
             }
         } else {
             JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, qap.getQuery(), paramsMap);
-            dataSet.setData(jsonArray);
+            if(hasCount){
+                PageQueryResult<Object> result = PageQueryResult.createResult(jsonArray,
+                    new PageDesc(1, -1,  jsonArray==null? 0: jsonArray.size()));
+                dataSet.setData(result);
+            } else {
+                dataSet.setData(jsonArray);
+            }
         }
         return dataSet;
     }
@@ -156,11 +160,11 @@ public class SqlDataSetReader implements DataSetReader {
         this.hasCount = hasCount;
     }
 
-    public void setPageNo(String pageNo) {
+    public void setPageNo(int pageNo) {
         this.pageNo = pageNo;
     }
 
-    public void setPageSize(String pageSize) {
+    public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
     }
 }
