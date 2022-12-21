@@ -137,6 +137,9 @@ public class DataSet implements DataSetReader, Serializable {
         if (this.data instanceof Collection) {
             return ((Collection<?>) this.data).size();
         }
+        if (this.data instanceof Map) {
+            return ((Map) this.data).size();
+        }
         return 1;
     }
 

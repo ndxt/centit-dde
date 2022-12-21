@@ -70,19 +70,21 @@ public class AssignmentOperation implements BizOperation {
                 targetDataSet.setData(jsonList);
             }
         } else if("append".equals(assignType)){ // 追加
+            List<Map<String, Object>> objList = new ArrayList<>();
             if( targetDataSet.getSize() < 1){
                 targetDataSet.setData(CollectionsOpt.createList(sourceData));
             } else {
-                List<Map<String, Object>> objList = targetDataSet.getDataAsList();
-                if(sourceData instanceof Collection){
-                    for(Object obj : (Collection<?>) sourceData) {
-                        objList.add(CollectionsOpt.objectToMap(obj));
-                    }
-                }else {
-                    objList.add(CollectionsOpt.objectToMap(sourceData));
-                }
-                targetDataSet.setData(objList);
+                objList=new ArrayList<>(targetDataSet.getDataAsList());
+
             }
+            if(sourceData instanceof Collection){
+                for(Object obj : (Collection<?>) sourceData) {
+                    objList.add(CollectionsOpt.objectToMap(obj));
+                }
+            }else {
+                objList.add(CollectionsOpt.objectToMap(sourceData));
+            }
+            targetDataSet.setData(objList);
         } else if("merge".equals(assignType)){ // 追加
             if( targetDataSet.getSize() < 1){
                 targetDataSet.setData(sourceData);
