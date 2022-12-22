@@ -555,6 +555,10 @@ public class BizOptFlowImpl implements BizOptFlow {
         moduleOptContext.setOptId(dataOptContext.getOptId());
         moduleOptContext.setNeedRollback(dataOptContext.getNeedRollback());
         moduleOptContext.setStackData(ConstantValue.MODULE_CALL_TAG, queryParams);
+        //添加调用环境的上下文
+        moduleOptContext.setStackData(ConstantValue.SESSION_DATA_TAG,
+                     bizModel.getDataSet(ConstantValue.SESSION_DATA_TAG));
+                     
         Object bizData = run(dataPacketInterface, moduleOptContext);
 
         if (bizData != null) {
