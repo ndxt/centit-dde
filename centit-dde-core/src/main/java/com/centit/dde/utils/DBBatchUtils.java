@@ -125,7 +125,7 @@ public abstract class DBBatchUtils {
                         stmt.clearBatch();
                     }
                 }
-                if(savedObjects.size()>0) {
+                if(rowIndex % INT_BATCH_NUM > 0) {
                     stmt.executeBatch();
                     ResultSet rs = stmt.getGeneratedKeys();
                     fetchObjectsId(savedObjects, rs, column);
@@ -150,8 +150,10 @@ public abstract class DBBatchUtils {
                         stmt.clearBatch();
                     }
                 }
-                stmt.executeBatch();
-                stmt.clearBatch();
+                if (rowIndex % INT_BATCH_NUM > 0) {
+                    stmt.executeBatch();
+                    stmt.clearBatch();
+                }
             } catch (SQLException e) {
                 throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
             }
@@ -326,18 +328,18 @@ public abstract class DBBatchUtils {
                 }
             }
 
-            if (updateStmt != null && update % INT_BATCH_NUM != 0){
-                updateStmt.executeBatch();
+            if (updateStmt != null && update % INT_BATCH_NUM > 0){
+                updateStmt.executeBatch();                
+                updateStmt.clearBatch();
+            }
+
+            if (insertStmt != null && insert % INT_BATCH_NUM > 0){
+                insertStmt.executeBatch();
                 if(needFetchId){
                     ResultSet idRs = insertStmt.getGeneratedKeys();
                     fetchObjectsId(savedObjects, idRs, column);
                     savedObjects.clear();
                 }
-                updateStmt.clearBatch();
-            }
-
-            if (insertStmt != null && insert % INT_BATCH_NUM != 0){
-                insertStmt.executeBatch();
                 insertStmt.clearBatch();
             }
         } catch (SQLException e) {
