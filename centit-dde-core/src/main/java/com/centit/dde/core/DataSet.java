@@ -38,6 +38,13 @@ public class DataSet implements DataSetReader, Serializable {
         this.data = data;
     }
 
+    public static DataSet toDataSet(Object data) {
+        if(data instanceof DataSet){
+            return (DataSet) data;
+        }
+        return new DataSet(data);
+    }
+
     public DataSet(String dataSetName, Object data) {
         this.data = data;
         this.dataSetName = dataSetName;

@@ -562,12 +562,13 @@ public class BizOptFlowImpl implements BizOptFlow {
         moduleOptContext.setStackData(ConstantValue.SESSION_DATA_TAG,
                      bizModel.getDataSet(ConstantValue.SESSION_DATA_TAG));
 
-        Object bizData = runInner(dataPacketInterface, moduleOptContext);
-        if (bizData != null) {
-            if (bizData instanceof ResponseData) {
-                bizModel.putDataSet(stepJson.getString("id"), new DataSet(((ResponseSingleData) bizData).getData()));
-            } else {
-                bizModel.putDataSet(stepJson.getString("id"), new DataSet(bizData));
+        DataOptResult result = runInner(dataPacketInterface, moduleOptContext);
+        if (result != null) {
+            /*if(result.hasErrors()){
+                throw new ObjectException(result.getLastError().getMessage());
+            }*/
+            if(result.getResultObject() != null) {
+                bizModel.putDataSet(stepJson.getString("id"), DataSet.toDataSet(result.getResultObject()));
             }
         }
     }
