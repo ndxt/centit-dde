@@ -4,6 +4,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetWriter;
 import com.centit.dde.utils.DBBatchUtils;
 import com.centit.product.adapter.api.ISourceInfo;
+import com.centit.product.adapter.po.MetaTable;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.metadata.TableInfo;
@@ -31,7 +32,7 @@ public class SqlDataSetWriter implements DataSetWriter {
     private static final Logger logger = LoggerFactory.getLogger(SqlDataSetWriter.class);
 
     private ISourceInfo dataSource;
-    private TableInfo tableInfo;
+    private MetaTable tableInfo;
     private Map fieldsMap;
     private int successNums;
     private int errorNums;
@@ -51,7 +52,7 @@ public class SqlDataSetWriter implements DataSetWriter {
      */
     private boolean saveAsWhole;
 
-    public SqlDataSetWriter(ISourceInfo dataSource, TableInfo tableInfo, String writeTag, String writeMsg) {
+    public SqlDataSetWriter(ISourceInfo dataSource, MetaTable tableInfo, String writeTag, String writeMsg) {
         this.saveAsWhole = true;
         this.connection = null;
         this.tableInfo = tableInfo;
@@ -99,11 +100,9 @@ public class SqlDataSetWriter implements DataSetWriter {
             info = "ok";
 
             for (Map<String, Object> row : dataSet.getDataAsList()) {
-                List<Map<String, Object>> list = new ArrayList<>();
-                list.add(row);
                 try {
-                    int iResult = DBBatchUtils.batchInsertObjects(connection,
-                        tableInfo, list, fieldsMap);
+                    int iResult = DBBatchUtils.insertObject(connection,
+                        tableInfo, row, fieldsMap);
                     connection.commit();
                     if (iResult > 0) {
                         dealResultMsg(row);

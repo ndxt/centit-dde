@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -8,12 +9,18 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.SqlDataSetWriter;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
+import com.centit.product.adapter.po.MetaTable;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.service.MetaDataService;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.metadata.TableInfo;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileNotFoundException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 /**
@@ -38,6 +45,27 @@ public class PersistenceDBOperation implements BizOperation {
         this.metaDataService = metaDataService;
     }
 
+    private static Map<String, String> fetchFieldMap(JSONArray json) {
+        if (json != null) {
+            LinkedHashMap<String, String> map = new LinkedHashMap<>();
+            for (Object o : json) {
+                JSONObject temp = (JSONObject) o;
+                String columnName = temp.getString("columnName");
+                String propertyName = temp.getString("propertyName");
+                if (StringUtils.isNotBlank(columnName) && StringUtils.isNotBlank(propertyName)) {
+                    map.put(columnName, propertyName);
+                } else {
+                    String primaryKey1 = temp.getString("primaryKey1");
+                    if (StringUtils.isNotBlank(primaryKey1) && StringUtils.isNotBlank(propertyName)) {
+                        map.put(propertyName, primaryKey1);
+                    }
+                }
+            }
+            return map;
+        }
+        return Collections.EMPTY_MAP;
+    }
+
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws FileNotFoundException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
@@ -60,7 +88,7 @@ public class PersistenceDBOperation implements BizOperation {
             return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
                 "数据源信息无效：" + sourDsName);
         }
-        TableInfo tableInfo = metaDataService.getMetaTableWithRelations(tableId);
+        MetaTable tableInfo = metaDataService.getMetaTableWithRelations(tableId);
         if (tableInfo == null) {
             return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
                 "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
@@ -70,7 +98,9 @@ public class PersistenceDBOperation implements BizOperation {
                 "没有配置交换字段");
         }
         SqlDataSetWriter dataSetWriter = new SqlDataSetWriter(databaseInfo, tableInfo,result,resultMsg);
-        dataSetWriter.setFieldsMap(BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "propertyName", "primaryKey1"));
+
+        dataSetWriter.setFieldsMap(PersistenceDBOperation.fetchFieldMap(bizOptJson.getJSONArray("config")));
+        // BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "propertyName", "primaryKey1"));
         String saveAsWhole = BuiltInOperation.getJsonFieldString(bizOptJson, "saveAsWhole", "false");
         //设置为true  作为整体提交
         dataSetWriter.setSaveAsWhole("false".equalsIgnoreCase(saveAsWhole));

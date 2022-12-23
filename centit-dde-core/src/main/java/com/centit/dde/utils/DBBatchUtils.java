@@ -1,5 +1,7 @@
 package com.centit.dde.utils;
 
+import com.centit.product.adapter.po.MetaColumn;
+import com.centit.product.adapter.po.MetaTable;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
@@ -14,10 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -38,8 +37,60 @@ public abstract class DBBatchUtils {
         return new ArrayList<>(fields);
     }
 
+    private static void fetchObjectsId(final List<Map<String, Object>> objects, ResultSet rs, MetaColumn column) throws SQLException {
+        if(rs==null) return;
+        int i = 0, l = objects.size();
+        while(rs.next() && i<l){
+            objects.get(i).put(column.getPropertyName(), rs.getObject(1));
+            i++;
+        }
+        rs.close();
+    }
+
+    public static int insertObject(final Connection conn,
+                                         final MetaTable tableInfo,
+                                         final Map<String, Object> object, Map fieldsMap) throws SQLException {
+        List<String> fields = new ArrayList<>();
+        if (fieldsMap == null) {
+            fields.addAll(object.keySet());
+        } else {
+            Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
+        }
+        String sql = GeneralJsonObjectDao.buildInsertSql(tableInfo, fields);
+        LeftRightPair<String, List<String>> sqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
+
+        QueryLogUtils.printSql(logger, sqlPair.getLeft(), sqlPair.getRight());
+
+        Map<String, Object> objectForSave =
+            prepareObjectForSave(tableInfo, fieldsMap != null ?
+                DataSetOptUtil.mapDataRow(object, 0, 1, fieldsMap.entrySet()) : object);
+        if(tableInfo.hasGeneratedKeys()){ //插入 并找回主键
+            MetaColumn column = tableInfo.fetchGeneratedKey();
+
+            try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft(), Statement.RETURN_GENERATED_KEYS)) {
+                DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), objectForSave);
+                stmt.executeUpdate();
+                ResultSet rs = stmt.getGeneratedKeys();
+                if(rs !=null && rs.next()) {
+                    object.put(column.getPropertyName(), rs.getObject(1));
+                    rs.close();
+                }
+            } catch (SQLException e) {
+                throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
+            }
+        } else { //插入
+            try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())) {
+                DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), objectForSave);
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
+            }
+        }
+        return 1;
+    }
+
     public static int batchInsertObjects(final Connection conn,
-                                         final TableInfo tableInfo,
+                                         final MetaTable tableInfo,
                                          final List<Map<String, Object>> objects, Map fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
         if (fieldsMap == null) {
@@ -50,65 +101,136 @@ public abstract class DBBatchUtils {
         String sql = GeneralJsonObjectDao.buildInsertSql(tableInfo, fields);
         LeftRightPair<String, List<String>> sqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
         int rowIndex = 0;
+        int rowCount = objects.size();
+
         QueryLogUtils.printSql(logger, sqlPair.getLeft(), sqlPair.getRight());
-        try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())) {
-            int rowCount = objects.size();
-            for (Map<String, Object> object : objects) {
-                if (fieldsMap != null) {
-                    object = DataSetOptUtil.mapDataRow(object, rowIndex, rowCount, fieldsMap.entrySet());
-                    prepareObjectForSave(tableInfo, object);
+
+        if(tableInfo.hasGeneratedKeys()){ //批量插入 并找回主键
+            MetaColumn column = tableInfo.fetchGeneratedKey();
+            try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft(), Statement.RETURN_GENERATED_KEYS)) {
+                List<Map<String, Object>> savedObjects = new ArrayList<>(INT_BATCH_NUM);
+                for (Map<String, Object> object : objects) {
+                    Map<String, Object> objectForSave =
+                        prepareObjectForSave(tableInfo, fieldsMap != null ?
+                            DataSetOptUtil.mapDataRow(object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
+                    savedObjects.add(object);
+                    DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), objectForSave);
+                    rowIndex++;
+                    stmt.addBatch();
+                    if (rowIndex % INT_BATCH_NUM == 0) {
+                        stmt.executeBatch();
+                        ResultSet rs = stmt.getGeneratedKeys();
+                        fetchObjectsId(savedObjects, rs, column);
+                        savedObjects.clear();
+                        stmt.clearBatch();
+                    }
                 }
-                DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object);
-                rowIndex++;
-                stmt.addBatch();
-                if (rowIndex % INT_BATCH_NUM == 0) {
+                if(savedObjects.size()>0) {
                     stmt.executeBatch();
+                    ResultSet rs = stmt.getGeneratedKeys();
+                    fetchObjectsId(savedObjects, rs, column);
+                    savedObjects.clear();
                     stmt.clearBatch();
                 }
+            } catch (SQLException e) {
+                throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
             }
-            stmt.executeBatch();
-            stmt.clearBatch();
-        } catch (SQLException e) {
-            throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
+        } else { //批量插入
+            try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())) {
+                for (Map<String, Object> object : objects) {
+                    Map<String, Object> objectForSave =
+                        prepareObjectForSave(tableInfo, fieldsMap != null ?
+                            DataSetOptUtil.mapDataRow(object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
+
+                    DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), objectForSave);
+                    rowIndex++;
+                    stmt.addBatch();
+                    if (rowIndex % INT_BATCH_NUM == 0) {
+                        stmt.executeBatch();
+                        stmt.clearBatch();
+                    }
+                }
+                stmt.executeBatch();
+                stmt.clearBatch();
+            } catch (SQLException e) {
+                throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
+            }
         }
         return rowIndex;
     }
 
-    public static int batchUpdateObjects(final Connection conn,
-                                         final TableInfo tableInfo,
-                                         //final Collection<String> fields,
-                                         final List<Map<String, Object>> objects, Map fieldsMap) throws SQLException {
-        // 这个要重写，需要重新拼写sql语句， 直接拼写为？参数的sql语句据
+    public static int mergeObject(final Connection conn,
+                                        final MetaTable tableInfo,
+                                        final Map<String, Object> object, Map fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
         if (fieldsMap == null) {
-            fields = achieveAllFields(objects);
+            fields.addAll(object.keySet());
         } else {
             Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
         }
-        String sql = GeneralJsonObjectDao.buildUpdateSql(tableInfo, fields) +
-            " where " + GeneralJsonObjectDao.buildFilterSqlByPkUseColumnName(tableInfo, null);
-        LeftRightPair<String, List<String>> sqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
-        int n = 0;
-        QueryLogUtils.printSql(logger, sqlPair.getLeft(), sqlPair.getRight());
-        try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())) {
-            int rowCount = objects.size();
-            int rowIndex = 0;
-            for (Map<String, Object> object : objects) {
-                if (fieldsMap != null) {
-                    object = DataSetOptUtil.mapDataRow(object, rowIndex, rowCount, fieldsMap.entrySet());
+        String sql = "select count(*) as checkExists from " + tableInfo.getTableName()
+            + " where " + GeneralJsonObjectDao.buildFilterSqlByPkUseColumnName(tableInfo, null);
+        LeftRightPair<String, List<String>> checkSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
+
+        try (PreparedStatement checkStmt = conn.prepareStatement(checkSqlPair.getLeft())) {
+            Map<String, Object> objectForSave =
+                prepareObjectForSave(tableInfo, fieldsMap != null ?
+                    DataSetOptUtil.mapDataRow(object, 0, 1, fieldsMap.entrySet()) : object);
+
+            DatabaseAccess.setQueryStmtParameters(checkStmt, checkSqlPair.getRight(), objectForSave);
+            ResultSet rs = checkStmt.executeQuery();
+            boolean exists = false;
+            try {
+                Object obj = DatabaseAccess.fetchScalarObject(DatabaseAccess.fetchResultSetToObjectsList(rs));
+                if (obj != null) {
+                    exists = NumberBaseOpt.castObjectToInteger(obj, 0) > 0;
                 }
-                rowIndex++;
-                DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), object);
-                n += stmt.executeUpdate();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
+
+            if (exists) {
+                sql = GeneralJsonObjectDao.buildUpdateSql(tableInfo, fields);
+                if (null != sql) {
+                    sql += " where " + GeneralJsonObjectDao.buildFilterSqlByPkUseColumnName(tableInfo, null);
+                    LeftRightPair<String, List<String>> updateSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
+                    try (PreparedStatement updateStmt = conn.prepareStatement(updateSqlPair.getLeft())) {
+                        DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), objectForSave);
+                        updateStmt.executeUpdate();
+                    }
+                } else {
+                    throw new SQLException("update 数据库字段为空，无法生成正确的sql语句！");
+                }
+            } else {
+                MetaColumn column = tableInfo.fetchGeneratedKey();
+                boolean needFetchId = tableInfo.hasGeneratedKeys() && column != null;
+                sql = GeneralJsonObjectDao.buildInsertSql(tableInfo, fields);
+                LeftRightPair<String, List<String>> insertSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
+
+                if (needFetchId) {
+                    try (PreparedStatement insertStmt = conn.prepareStatement(insertSqlPair.getLeft(), Statement.RETURN_GENERATED_KEYS)) {
+                        DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), objectForSave);
+                        insertStmt.executeUpdate();
+                        ResultSet idRs = insertStmt.getGeneratedKeys();
+                        if(idRs !=null && rs.next()) {
+                            object.put(column.getPropertyName(), idRs.getObject(1));
+                            idRs.close();
+                        }
+                    }
+                } else {
+                    try (PreparedStatement insertStmt = conn.prepareStatement(insertSqlPair.getLeft())) {
+                        DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), objectForSave);
+                        insertStmt.executeUpdate();
+                    }
+                }
+            }
         }
-        return n;
+        return 1;
     }
 
+
     public static int batchMergeObjects(final Connection conn,
-                                        final TableInfo tableInfo,
+                                        final MetaTable tableInfo,
                                         final List<Map<String, Object>> objects, Map fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
         if (fieldsMap == null) {
@@ -132,9 +254,16 @@ public abstract class DBBatchUtils {
         boolean exists = false;
         PreparedStatement insertStmt = null;
         PreparedStatement updateStmt = null;
+
+        MetaColumn column = tableInfo.fetchGeneratedKey();
+        boolean needFetchId = tableInfo.hasGeneratedKeys() && column!=null;
         try (PreparedStatement checkStmt = conn.prepareStatement(checkSqlPair.getLeft())) {
             if (StringUtils.isNotBlank(insertSqlPair.getLeft())){
-                insertStmt = conn.prepareStatement(insertSqlPair.getLeft());
+                if(needFetchId){
+                    insertStmt = conn.prepareStatement(insertSqlPair.getLeft(), Statement.RETURN_GENERATED_KEYS);
+                } else {
+                    insertStmt = conn.prepareStatement(insertSqlPair.getLeft());
+                }
             }
 
             if (StringUtils.isNotBlank(updateSqlPair.getLeft())){
@@ -144,16 +273,17 @@ public abstract class DBBatchUtils {
             if (insertStmt == null && updateStmt == null){
                 throw new SQLException("sql语句不能为空！");
             }
-
+            List<Map<String, Object>> savedObjects = new ArrayList<>(INT_BATCH_NUM);
             int rowCount = objects.size();
             int rowIndex = 0;
             for (Map<String, Object> object : objects) {
-                if (fieldsMap != null) {
-                    object = DataSetOptUtil.mapDataRow(object, rowIndex, rowCount, fieldsMap.entrySet());
-                    prepareObjectForSave(tableInfo, object);
-                }
+
+                Map<String, Object> objectForSave =
+                    prepareObjectForSave(tableInfo,fieldsMap != null?
+                        DataSetOptUtil.mapDataRow(object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
+
                 rowIndex++;
-                DatabaseAccess.setQueryStmtParameters(checkStmt, checkSqlPair.getRight(), object);
+                DatabaseAccess.setQueryStmtParameters(checkStmt, checkSqlPair.getRight(), objectForSave);
                 ResultSet rs = checkStmt.executeQuery();
                 exists = false;
                 try {
@@ -167,7 +297,7 @@ public abstract class DBBatchUtils {
                 n++;
                 if (exists) {
                     if(updateStmt != null ){
-                        DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), object);
+                        DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), objectForSave);
                         if (StringUtils.isNotBlank(updateSqlPair.getLeft())) {
                             update++;
                             updateStmt.addBatch();
@@ -178,20 +308,35 @@ public abstract class DBBatchUtils {
                         }
                     }
                 } else if (insertStmt != null){
-                    DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), object);
+                    DatabaseAccess.setQueryStmtParameters(insertStmt, insertSqlPair.getRight(), objectForSave);
+                    if(needFetchId){
+                        savedObjects.add(object);
+                    }
                     insert++;
                     insertStmt.addBatch();
                     if (insert % INT_BATCH_NUM == 0) {
                         insertStmt.executeBatch();
+                        if(needFetchId){
+                            ResultSet idRs = insertStmt.getGeneratedKeys();
+                            fetchObjectsId(savedObjects, idRs, column);
+                            savedObjects.clear();
+                        }
                         insertStmt.clearBatch();
                     }
                 }
             }
-            if (updateStmt != null){
+
+            if (updateStmt != null && update % INT_BATCH_NUM != 0){
                 updateStmt.executeBatch();
+                if(needFetchId){
+                    ResultSet idRs = insertStmt.getGeneratedKeys();
+                    fetchObjectsId(savedObjects, idRs, column);
+                    savedObjects.clear();
+                }
                 updateStmt.clearBatch();
             }
-            if (insertStmt != null){
+
+            if (insertStmt != null && insert % INT_BATCH_NUM != 0){
                 insertStmt.executeBatch();
                 insertStmt.clearBatch();
             }
@@ -220,8 +365,7 @@ public abstract class DBBatchUtils {
         return n;
     }
 
-
-    private static void prepareObjectForSave(TableInfo tableInfo, Map<String, Object> object) {
+    private static Map<String, Object> prepareObjectForSave(TableInfo tableInfo, Map<String, Object> object) {
         for (TableField col : tableInfo.getColumns()) {
             Object fieldValue = object.get(col.getPropertyName());
             if (fieldValue != null) {
@@ -263,5 +407,6 @@ public abstract class DBBatchUtils {
                 }
             }
         }
+        return object;
     }
 }
