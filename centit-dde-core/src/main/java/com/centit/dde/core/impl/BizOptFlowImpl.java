@@ -164,27 +164,30 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(key, opt);
     }
 
-    @Override
-    public DataOptResult run(DataPacketInterface dataPacket, DataOptContext dataOptContext) throws Exception {
+    private DataOptResult runInner(DataPacketInterface dataPacket, DataOptContext dataOptContext) throws Exception {
         //LOGID name
         BizModel bizModel = new BizModel(dataOptContext.getLogId());
-
         bizModel.setCallStackData(dataOptContext.getCallStackData());
         DataOptStep dataOptStep = dataPacket.getDataOptStep();
-
         dataOptContext.setNeedRollback(dataPacket.getNeedRollback());
         dataOptContext.setOptId(dataPacket.getOptId());
         dataOptContext.setLogLevel(dataPacket.getLogLevel());
         dataOptContext.setPacketId(dataPacket.getPacketId());
         dataOptContext.setOsId(dataPacket.getOsId());
+        runModule(bizModel, dataOptStep, dataOptContext);
+        return bizModel.getOptResult();
+    }
+
+    @Override
+    public DataOptResult run(DataPacketInterface dataPacket, DataOptContext dataOptContext) throws Exception {
         try {
-            runModule(bizModel, dataOptStep, dataOptContext);
+            DataOptResult result = runInner(dataPacket, dataOptContext);
             AbstractSourceConnectThreadHolder.commitAndRelease();
+            return result;
         } catch (Exception exception) {
             AbstractSourceConnectThreadHolder.rollbackAndRelease();
             throw exception;
         }
-        return bizModel.getOptResult();
     }
 
     private void runModule(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) throws Exception {
@@ -558,9 +561,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         //添加调用环境的上下文
         moduleOptContext.setStackData(ConstantValue.SESSION_DATA_TAG,
                      bizModel.getDataSet(ConstantValue.SESSION_DATA_TAG));
-                     
-        Object bizData = run(dataPacketInterface, moduleOptContext);
 
+        Object bizData = runInner(dataPacketInterface, moduleOptContext);
         if (bizData != null) {
             if (bizData instanceof ResponseData) {
                 bizModel.putDataSet(stepJson.getString("id"), new DataSet(((ResponseSingleData) bizData).getData()));
