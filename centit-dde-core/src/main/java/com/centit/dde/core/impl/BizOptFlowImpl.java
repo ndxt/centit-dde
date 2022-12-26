@@ -521,15 +521,14 @@ public class BizOptFlowImpl implements BizOptFlow {
         Map<String, Object> queryParams = CollectionsOpt.cloneHashMap(
             CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
 
-        queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue"));
+        Map<String, String> callParams = 
+            BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue");
+
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
-        for (Map.Entry<String, Object> ent : queryParams.entrySet()){
-            Object originObj = ent.getValue();
-            if(originObj instanceof String) {
-                Object calculateValue = VariableFormula.calculate((String) originObj, transform);
-                if (calculateValue != null) {
-                    ent.setValue(calculateValue);
-                }
+       
+        for (Map.Entry<String, String> ent : callParams.entrySet()){       
+                Object calculateValue = VariableFormula.calculate(ent.getValue(), transform);
+                callParams.put(ent.getKey, calculateValue);
             }
         }
 
