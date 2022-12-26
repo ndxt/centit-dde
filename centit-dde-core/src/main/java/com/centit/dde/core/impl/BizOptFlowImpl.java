@@ -531,9 +531,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
        
         for (Map.Entry<String, String> ent : callParams.entrySet()){       
-                Object calculateValue = VariableFormula.calculate(ent.getValue(), transform);
-                queryParams.put(ent.getKey, calculateValue);
-            }
+            Object calculateValue = VariableFormula.calculate(ent.getValue(), transform);
+            queryParams.put(ent.getKey, calculateValue);
         }
 
         String packetId = stepJson.getString("packetName");
