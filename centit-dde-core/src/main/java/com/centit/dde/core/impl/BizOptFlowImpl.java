@@ -520,6 +520,10 @@ public class BizOptFlowImpl implements BizOptFlow {
 
         Map<String, Object> queryParams = CollectionsOpt.cloneHashMap(
             CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
+        
+        if(queryParams==null){
+            queryParams = new HashMap<>(8);
+        }
 
         Map<String, String> callParams = 
             BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue");
