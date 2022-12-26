@@ -35,7 +35,11 @@ public class DataSet implements DataSetReader, Serializable {
 
     public DataSet(Object data) {
         this.dataSetName = DataSet.SINGLE_DATA_SET_DEFAULT_NAME;
-        this.data = data;
+        if(data instanceof DataSet){
+            this.data = ((DataSet) data).getData();
+        } else {
+            this.data = data;
+        }
     }
 
     public static DataSet toDataSet(Object data) {
@@ -46,7 +50,11 @@ public class DataSet implements DataSetReader, Serializable {
     }
 
     public DataSet(String dataSetName, Object data) {
-        this.data = data;
+        if(data instanceof DataSet){
+            this.data = ((DataSet) data).getData();
+        } else {
+            this.data = data;
+        }
         this.dataSetName = dataSetName;
     }
 
