@@ -228,7 +228,7 @@ public class BizModel implements  Serializable {
             if(ConstantValue.LAST_ERROR_TAG.equals(dataSetName)){
                 return new DataSet(optResult.getLastError());
             }
-            return new DataSet(getStackData(dataSetName));
+            return DataSet.toDataSet(getStackData(dataSetName));
         }
 
         Map<String, DataSet> dss = getBizData();

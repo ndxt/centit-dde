@@ -567,7 +567,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         moduleOptContext.setStackData(ConstantValue.MODULE_CALL_TAG, queryParams);
         //添加调用环境的上下文
         moduleOptContext.setStackData(ConstantValue.SESSION_DATA_TAG,
-                     bizModel.getDataSet(ConstantValue.SESSION_DATA_TAG));
+                     bizModel.getStackData(ConstantValue.SESSION_DATA_TAG));
 
         DataOptResult result = runInner(dataPacketInterface, moduleOptContext);
         if (result != null) {
