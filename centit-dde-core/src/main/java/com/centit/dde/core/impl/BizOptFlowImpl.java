@@ -218,13 +218,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             // 先将第一个api的请求数据暂存起来，等模块调度结束后需要恢复回去，
             // 这样做的目的是为了解决另第二个api的参数不能影响到第一个api的参数 参数的作用域不同
             Map<String, Object> stackData = bizModel.dumpStackData();
-
-            DataOptResult result = moduleSchedule(bizModel, dataOptStep, dataOptContext);
-            if(result.hasErrors()){
-                bizModel.getOptResult().addLastStepResult(
-                    stepJson.getString("id"), result.getLastError());
-            }
-
+            moduleSchedule(bizModel, dataOptStep, dataOptContext);
             bizModel.restoreStackData(stackData);
         } else if (ConstantValue.CYCLE.equals(stepType)) {
             //当节点为“结束循环”时，将对应的循环节点信息set到json中
@@ -520,7 +514,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     /**
      * 模块调度
      */
-    private DataOptResult moduleSchedule(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) throws Exception {
+    private void moduleSchedule(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) throws Exception {
         String taskLog = dataOptContext.getLogId();
         JSONObject stepJson = dataOptStep.getCurrentStep().getJSONObject("properties");
 
@@ -572,7 +566,11 @@ public class BizOptFlowImpl implements BizOptFlow {
         DataOptResult result = runInner(dataPacketInterface, moduleOptContext);
         if (result != null) {
             bizModel.putDataSet(stepJson.getString("id"), DataSet.toDataSet(result.getResultData()));
+            if(result.hasErrors()){
+                bizModel.getOptResult().addLastStepResult(
+                    stepJson.getString("id"), result.getLastError());
+            }
         }
-        return result;
+
     }
 }
