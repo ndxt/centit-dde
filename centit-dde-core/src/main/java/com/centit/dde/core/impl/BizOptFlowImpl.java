@@ -532,7 +532,7 @@ public class BizOptFlowImpl implements BizOptFlow {
        
         for (Map.Entry<String, String> ent : callParams.entrySet()){       
                 Object calculateValue = VariableFormula.calculate(ent.getValue(), transform);
-                callParams.put(ent.getKey, calculateValue);
+                queryParams.put(ent.getKey, calculateValue);
             }
         }
 
