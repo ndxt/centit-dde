@@ -114,6 +114,21 @@ public class DataOptResult implements ToResponseData, Serializable {
         return errorMsg.toString();
     }
 
+    public Object getResultData() {
+        if(resultType == RETURN_CODE_AND_MESSAGE){
+            int errorCode = lastError.getCode();
+            if(errorCode == 0 && hasErrors()){
+                errorCode = ResponseData.ERROR_OPERATION;
+            }
+            return ResponseData.makeErrorMessageWithData( lastError.getData(),
+                errorCode,
+                getErrorMessage()
+            );
+        } else {
+            return resultObject;
+        }
+    }
+
     @Override
     public ResponseData toResponseData() {
         if(resultType == RETURN_CODE_AND_MESSAGE){

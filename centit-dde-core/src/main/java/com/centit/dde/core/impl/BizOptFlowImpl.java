@@ -219,7 +219,11 @@ public class BizOptFlowImpl implements BizOptFlow {
             // 这样做的目的是为了解决另第二个api的参数不能影响到第一个api的参数 参数的作用域不同
             Map<String, Object> stackData = bizModel.dumpStackData();
 
-            moduleSchedule(bizModel, dataOptStep, dataOptContext);
+            DataOptResult result = moduleSchedule(bizModel, dataOptStep, dataOptContext);
+            if(result.hasErrors()){
+                bizModel.getOptResult().addLastStepResult(
+                    stepJson.getString("id"), result.getLastError());
+            }
 
             bizModel.restoreStackData(stackData);
         } else if (ConstantValue.CYCLE.equals(stepType)) {
@@ -516,7 +520,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     /**
      * 模块调度
      */
-    private void moduleSchedule(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) throws Exception {
+    private DataOptResult moduleSchedule(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) throws Exception {
         String taskLog = dataOptContext.getLogId();
         JSONObject stepJson = dataOptStep.getCurrentStep().getJSONObject("properties");
 
@@ -524,14 +528,17 @@ public class BizOptFlowImpl implements BizOptFlow {
             CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
 
         queryParams.putAll(BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue"));
-        queryParams.entrySet().forEach(entry -> {
-            String key = entry.getKey();
-            Object calculateValue = VariableFormula.calculate(String.valueOf(queryParams.get(key)),
-                new BizModelJSONTransform(bizModel));
-            if (calculateValue != null) {
-                queryParams.put(key, calculateValue);
+        BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
+        for (Map.Entry<String, Object> ent : queryParams.entrySet()){
+            Object originObj = ent.getValue();
+            if(originObj instanceof String) {
+                Object calculateValue = VariableFormula.calculate((String) originObj, transform);
+                if (calculateValue != null) {
+                    ent.setValue(calculateValue);
+                }
             }
-        });
+        }
+
         String packetId = stepJson.getString("packetName");
         Integer logLevel = dataOptContext.getLogLevel();
         DataPacketInterface dataPacketInterface;
@@ -568,8 +575,9 @@ public class BizOptFlowImpl implements BizOptFlow {
                 throw new ObjectException(result.getLastError().getMessage());
             }*/
             if(result.getResultObject() != null) {
-                bizModel.putDataSet(stepJson.getString("id"), DataSet.toDataSet(result.getResultObject()));
+                bizModel.putDataSet(stepJson.getString("id"), DataSet.toDataSet(result.getResultData()));
             }
         }
+        return result;
     }
 }
