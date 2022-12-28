@@ -28,6 +28,7 @@ import com.centit.product.oa.service.OptFlowNoInfoManager;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
+import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -304,7 +305,8 @@ public class BizOptFlowImpl implements BizOptFlow {
             DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
             ResponseSingleData response = new ResponseSingleData();
             response.setCode(NumberBaseOpt.castObjectToInteger(code, 1));
-            response.setMessage(message);
+            String reMessage = StringBaseOpt.objectToString(JSONTransformer.transformer(message, new BizModelJSONTransform(bizModel)));
+            response.setMessage(StringUtils.isNotBlank(reMessage)?reMessage:message);
             if (dataSet != null) {
                 response.setData(dataSet.getData());
             }
