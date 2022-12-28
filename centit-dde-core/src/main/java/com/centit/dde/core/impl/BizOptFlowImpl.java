@@ -263,14 +263,19 @@ public class BizOptFlowImpl implements BizOptFlow {
         stepJson = stepJson.getJSONObject("properties");
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", RETURN_RESULT_ALL_DATASET);
         String dataSetId;
-        if (bizModel != null && bizModel.getOptResult().hasErrors() || RETURN_RESULT_STATE.equals(type)) {
+        //仅仅返回状态
+        if (!bizModel.getOptResult().hasErrors() && RETURN_RESULT_STATE.equals(type)) {
+            bizModel.getOptResult().setResultObject(ResponseData.makeSuccessResponse());
             bizModel.getOptResult().setResultType(DataOptResult.RETURN_CODE_AND_MESSAGE);
             return;//bizModel.getOptResult().getLastError();
         }
+
         if (RETURN_RESULT_DATASET.equals(type) || RETURN_RESULT_ORIGIN.equals(type)) {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
             DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
             if (dataSet == null) {
+                bizModel.getOptResult().setResultObject(ResponseData.makeErrorMessage(
+                    ResponseData.ERROR_OPERATION, "获取数据集："+ dataSetId +"出错！" ));
                 bizModel.getOptResult().setResultType(DataOptResult.RETURN_CODE_AND_MESSAGE);
             } else {
                 bizModel.getOptResult().setResultObject(dataSet.getData());
@@ -290,7 +295,9 @@ public class BizOptFlowImpl implements BizOptFlow {
                 }
             }
             return;
-        } else if (RETURN_RESULT_FILE.equals(type)) {
+        }
+
+        if (RETURN_RESULT_FILE.equals(type)) {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
             DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
             FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, stepJson);
@@ -305,15 +312,17 @@ public class BizOptFlowImpl implements BizOptFlow {
             DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
             ResponseSingleData response = new ResponseSingleData();
             response.setCode(NumberBaseOpt.castObjectToInteger(code, 1));
-            String reMessage = StringBaseOpt.objectToString(JSONTransformer.transformer(message, new BizModelJSONTransform(bizModel)));
-            response.setMessage(StringUtils.isNotBlank(reMessage)?reMessage:message);
+            String reMessage = StringBaseOpt.objectToString(
+                    JSONTransformer.transformer(message, new BizModelJSONTransform(bizModel)));
+            response.setMessage(StringUtils.isNotBlank(reMessage) ? reMessage : message);
             if (dataSet != null) {
                 response.setData(dataSet.getData());
             }
-            bizModel.getOptResult().addLastStepResult("return", response);
+            bizModel.getOptResult().setResultObject(response);// .addLastStepResult("return", response);
             bizModel.getOptResult().setResultType(DataOptResult.RETURN_CODE_AND_MESSAGE);
             return;
         }
+        //返回内部数据，用于调试
         if (RETURN_RESULT_INNERDATA.equals(type)) {
             bizModel.getOptResult().setResultType(DataOptResult.RETURN_DATA_AS_RAW);
             Map<String, Object> returnData = new HashMap<>();
@@ -322,6 +331,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             bizModel.getOptResult().setResultObject(returnData);
             return;
         }
+
         Map<String, DataSet> bizData = bizModel.getBizData();
         if (bizData != null) {
             Map<String, Object> returnData = new HashMap<>();
