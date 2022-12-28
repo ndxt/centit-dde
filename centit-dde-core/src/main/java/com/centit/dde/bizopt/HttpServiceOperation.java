@@ -138,7 +138,7 @@ public class HttpServiceOperation implements BizOperation {
     //计算请求参数列表中的参数
     private Map<String, Object> getRequestParams(JSONObject bizOptJson) {
         //请求参数列表
-        Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlvalue");
+        Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlValue");
         Map<String, Object> mapObject = new HashMap<>();
         if (params != null) {
             for (Map.Entry<String, String> map : params.entrySet()) {
