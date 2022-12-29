@@ -279,10 +279,10 @@ public class BizOptFlowImpl implements BizOptFlow {
                 bizModel.getOptResult().setResultType(DataOptResult.RETURN_CODE_AND_MESSAGE);
             } else {
                 bizModel.getOptResult().setResultObject(dataSet.getData());
+                //这段代码是为了兼容以前的文件类型返回值，后面应该不需要了
                 if (RETURN_RESULT_DATASET.equals(type)) {
                     Map<String, Object> mapFirstRow = dataSet.getFirstRow();
-                    boolean isFile = mapFirstRow != null;
-                    if (isFile) {
+                    if (!mapFirstRow.isEmpty()) {
                         Object fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
                         if (fileData instanceof OutputStream || fileData instanceof InputStream) {
                             bizModel.getOptResult().setResultFile(mapFirstRow);

@@ -46,7 +46,7 @@ public abstract class BizOptUtils {
             } else {
                 return new DataSet(objectMap);
             }
-        } else if(obj instanceof Collection){
+        }/* else if(obj instanceof Collection){
             Collection<Object> objs = (Collection<Object>)obj;
             List<Map<String, Object>> data = new ArrayList<>(objs.size());
             for(Object object : objs){
@@ -60,7 +60,7 @@ public abstract class BizOptUtils {
             DataSet dataSet = new DataSet();
             dataSet.setData(data);
             return dataSet;
-        } else {
+        }*/ else {
             return new DataSet(obj);
         }
     }

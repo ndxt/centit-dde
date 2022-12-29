@@ -16,7 +16,7 @@ public class DataSet implements DataSetReader, Serializable {
     private static final long serialVersionUID = 1L;
 
     public static String SINGLE_DATA_SET_DEFAULT_NAME = "default";
-    public static String SINGLE_DATA_FIELD_NAME = "scalar";
+    public static String SINGLE_DATA_FIELD_NAME = "data";
 
     /**
      * 返回 DataSet 的名称
