@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * @author zhf
@@ -61,7 +60,7 @@ public class TaskRun {
 
     public DataOptResult runTask(DataPacketInterface dataPacketInterface, DataOptContext optContext) {
         TaskLog taskLog = buildLogInfo(optContext.getRunType(), dataPacketInterface);
-        if ((ConstantValue.LOGLEVEL_CHECK_INFO & dataPacketInterface.getLogLevel()) != 0) {
+        if (ConstantValue.LOGLEVEL_CHECK_ERROR != dataPacketInterface.getLogLevel()) {
             //保存日志基本信息
             taskLogDao.saveNewObject(taskLog);
         }
@@ -80,7 +79,7 @@ public class TaskRun {
             DataOptResult runResult = runOptModule(dataPacketInterface, optContext);
             //更新API信息
             updateApiData(optContext.getRunType(), dataPacketInterface);
-            if ((ConstantValue.LOGLEVEL_CHECK_INFO & dataPacketInterface.getLogLevel()) != 0) {
+            if (ConstantValue.LOGLEVEL_CHECK_ERROR != dataPacketInterface.getLogLevel()) {
                 updateLog(taskLog);
             }
             return runResult;
@@ -114,6 +113,7 @@ public class TaskRun {
         detailLog.setLogId(taskLog.getLogId());
         detailLog.setLogType("error");
         detailLog.setLogInfo(info);
+        detailLog.setStepNo(taskLog.getStepNo());
         detailLog.setRunEndTime(new Date());
         taskDetailLogDao.saveNewObject(detailLog);
     }

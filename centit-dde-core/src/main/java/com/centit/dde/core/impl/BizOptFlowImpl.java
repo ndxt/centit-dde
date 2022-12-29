@@ -457,19 +457,20 @@ public class BizOptFlowImpl implements BizOptFlow {
         JSONObject bizOptJson = dataOptStep.getCurrentStep().getJSONObject("properties");
         try {
             BizOperation opt = allOperations.get(bizOptJson.getString("type"));
+
             ResponseData responseData = opt.runOpt(bizModel, bizOptJson, dataOptContext);
-            //dataOptContext.setReturnResult(responseData);
-            bizModel.getOptResult().addLastStepResult(bizOptJson.getString("id"), responseData);
-            if (responseData.getCode() != ResponseData.RESULT_OK) {
+            /*if (responseData.getCode() != ResponseData.RESULT_OK) {
                 throw new ObjectException(responseData, responseData.getCode(), responseData.getMessage());
-            }
-            Map<String, Object> jsonObject = CollectionsOpt.objectToMap(responseData.getData());
+            }*/
             if ( (ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
-                detailLog.setSuccessPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("success")));
-                detailLog.setErrorPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("error")));
+                Map<String, Object> jsonObject = CollectionsOpt.objectToMap(responseData.getData());
+                detailLog.setSuccessPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("success"), 0));
+                detailLog.setErrorPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("error"), 0));
                 DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("id"));
                 if(dataSet !=null) {
                     detailLog.setLogInfo(dataSet.toJSONString());
+                } else {
+                    detailLog.setLogInfo(responseData.toJSONString());
                 }
                 detailLog.setRunEndTime(new Date());
                 taskDetailLogDao.saveNewObject(detailLog);
