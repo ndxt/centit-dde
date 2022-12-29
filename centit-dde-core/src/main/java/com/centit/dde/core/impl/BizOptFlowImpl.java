@@ -250,7 +250,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         dataOptStep.setNextStep();
         if (ConstantValue.TRUE.equals(dataOptContext.getNeedRollback())) {
             //如果API不能允许报错，报错就中断
-            if (bizModel.getOptResult().getLastError().getCode() == ResponseData.ERROR_OPERATION) {
+            if (bizModel.getOptResult().hasErrors()){// bizModel.getOptResult().getLastError().getCode() == ResponseData.ERROR_OPERATION) {
                 returnResult(bizModel, dataOptStep);
                 dataOptStep.setEndStep();
                 AbstractSourceConnectThreadHolder.rollbackAndRelease();
