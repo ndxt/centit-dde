@@ -27,20 +27,39 @@ public class ObjectCompareOperation implements BizOperation {
             return ResponseData.makeErrorMessage("数据对比组件只能对比单个记录的差异，源和目标数据集都只能有一条记录（DataSet.getSize()==1）。");
         }
         Map<String,Object> oldObject = oldDataSet.getFirstRow();
+        boolean oldIsEmpty = oldObject.isEmpty();
         Map<String,Object> newObject = newDataSet.getFirstRow();
 
         List<JSONObject> compareResult = new ArrayList<>();
-        newObject.forEach((newKey,newValue)->{
+        newObject.forEach((newKey, newValue)->{
             //新对象中的字段在旧对象中不存在
-            Object oldValue = oldObject.get(newKey);
-            if(GeneralAlgorithm.compareTwoObject(oldValue, newValue)!=0){
+            if(oldIsEmpty) {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("fieldName",newKey);
-                jsonObject.put("oldValue",oldValue);
                 jsonObject.put("newValue",newValue);
-                compareResult.add(jsonObject);
+            } else {
+                Object oldValue = oldObject.get(newKey);
+                if(GeneralAlgorithm.compareTwoObject(oldValue, newValue)!=0){
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("fieldName",newKey);
+                    jsonObject.put("oldValue",oldValue);
+                    jsonObject.put("newValue",newValue);
+                    compareResult.add(jsonObject);
+                }
             }
         });
+
+        if(!oldIsEmpty) {
+            oldObject.forEach((oldKey, oldValue) -> {
+                if (!newObject.containsKey(oldKey)) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("fieldName", oldKey);
+                    jsonObject.put("oldValue", oldValue);
+                    compareResult.add(jsonObject);
+                }
+            });
+        }
+
         bizModel.putDataSet(id, new DataSet(compareResult));
         return BuiltInOperation.createResponseSuccessData(compareResult.size());
     }
