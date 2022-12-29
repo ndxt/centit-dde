@@ -883,9 +883,10 @@ public abstract class DataSetOptUtil {
             Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
             parames = new HashMap<>(16);
             if (mapString != null) {
+                BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
                 for (Map.Entry<String, String> map : mapString.entrySet()) {
                     if (!StringBaseOpt.isNvl(map.getValue())) {
-                        parames.put(map.getKey(),  VariableFormula.calculate(map.getValue(), new BizModelJSONTransform(bizModel)));
+                        parames.put(map.getKey(), transform.attainExpressionValue(map.getValue()));
                     }
                 }
             }
