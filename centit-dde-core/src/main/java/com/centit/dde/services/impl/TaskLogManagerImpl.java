@@ -46,7 +46,7 @@ public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog, Long, Tas
 
     @Override
     public void createTaskLog(TaskLog taskLog) {
-        this.taskLogDao.saveNewObject(taskLog);
+        this.taskLogDao.saveNewLog(taskLog);
         this.taskLogDao.saveObjectReferences(taskLog);
     }
 

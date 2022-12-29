@@ -75,12 +75,14 @@ public class TaskLog implements java.io.Serializable {
     @ApiModelProperty(value = "API类别，是草稿还是正式运行的日志，0草稿，1正式")
     private Integer apiType;
 
+    boolean hasSaved;
     /**
      * 临时记录 执行步骤
      */
     private int stepNo;
 
     public TaskLog(){
+        this.hasSaved = false;
         this.stepNo = 0;
     }
 

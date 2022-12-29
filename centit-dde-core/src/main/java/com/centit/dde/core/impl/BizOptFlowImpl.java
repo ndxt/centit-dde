@@ -251,7 +251,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (ConstantValue.TRUE.equals(dataOptContext.getNeedRollback())) {
             //如果API不能允许报错，报错就中断
             if (bizModel.getOptResult().hasErrors()){// bizModel.getOptResult().getLastError().getCode() == ResponseData.ERROR_OPERATION) {
-                returnResult(bizModel, dataOptStep);
+                //报错 不能返回数据 returnResult(bizModel, dataOptStep);
+                bizModel.getOptResult().setResultType(DataOptResult.RETURN_CODE_AND_MESSAGE);
+                //bizModel.getOptResult().setResultObject(bizModel.getOptResult().getLastError());
                 dataOptStep.setEndStep();
                 AbstractSourceConnectThreadHolder.rollbackAndRelease();
             }
@@ -274,9 +276,11 @@ public class BizOptFlowImpl implements BizOptFlow {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
             DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
             if (dataSet == null) {
-                bizModel.getOptResult().setResultObject(ResponseData.makeErrorMessage(
+                bizModel.getOptResult().addLastStepResult(
+                    BuiltInOperation.getJsonFieldString(stepJson, "id", "endNode"), ResponseData.makeErrorMessage(
                     ResponseData.ERROR_OPERATION, "获取数据集："+ dataSetId +"出错！" ));
                 bizModel.getOptResult().setResultType(DataOptResult.RETURN_CODE_AND_MESSAGE);
+                //添加错误日志
             } else {
                 bizModel.getOptResult().setResultObject(dataSet.getData());
                 //这段代码是为了兼容以前的文件类型返回值，后面应该不需要了
@@ -476,15 +480,15 @@ public class BizOptFlowImpl implements BizOptFlow {
                 taskDetailLogDao.saveNewObject(detailLog);
             }
         } catch (Exception e) {
-            if (ConstantValue.LOGLEVEL_TYPE_ERROR == logLevel) {
+            //if (ConstantValue.LOGLEVEL_TYPE_ERROR == logLevel) {
                 TaskLog taskLog = dataOptContext.getTaskLog();
                 //主日志只记录一次
-                if (taskLog != null && StringUtils.isEmpty(taskLog.getLogId())) {
+                if (/*taskLog != null &&*/ ! taskLog.isHasSaved()) {
                     taskLog.setRunEndTime(new Date());
                     taskLog.setOtherMessage(e.getMessage());
-                    taskLogDao.saveNewObject(taskLog);
+                    taskLogDao.saveNewLog(taskLog);
                 }
-            }
+            //}
 
             String errMsg = ObjectException.extortExceptionMessage(e);
             ResponseData responseData = ResponseData.makeErrorMessageWithData(errMsg, ResponseData.ERROR_OPERATION,

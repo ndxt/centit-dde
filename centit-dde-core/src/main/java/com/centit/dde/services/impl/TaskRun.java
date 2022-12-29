@@ -62,10 +62,10 @@ public class TaskRun {
         TaskLog taskLog = buildLogInfo(optContext.getRunType(), dataPacketInterface);
         if (ConstantValue.LOGLEVEL_CHECK_ERROR != dataPacketInterface.getLogLevel()) {
             //保存日志基本信息
-            taskLogDao.saveNewObject(taskLog);
+            taskLogDao.saveNewLog(taskLog);
         }
-
         optContext.setTaskLog(taskLog);
+
         try {
             IOsInfo osInfo;
             try {

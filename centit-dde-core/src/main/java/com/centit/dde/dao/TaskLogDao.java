@@ -39,5 +39,9 @@ public class TaskLogDao extends BaseDaoImpl<TaskLog, Long> {
         return filterField;
     }
 
+    public void saveNewLog(TaskLog log){
+        this.saveNewObject(log);
+        log.setHasSaved(true);
+    }
 
 }
