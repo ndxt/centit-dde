@@ -120,6 +120,7 @@ public class DataOptResult implements ToResponseData, Serializable {
                 return resultObject;
             }
         }
+
         if(hasErrors()){
             if(stepResult.size()<2){
                 return lastError;
@@ -132,9 +133,13 @@ public class DataOptResult implements ToResponseData, Serializable {
                 errorCode,
                 getStepMessage()
             );
-        } else {
-            return resultObject;
         }
+
+        if(resultType == RETURN_CODE_AND_MESSAGE) {
+            return ResponseData.makeResponseData(resultObject);
+        }
+
+        return resultObject;
     }
 
     @Override
