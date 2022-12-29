@@ -21,6 +21,7 @@ import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
+import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
@@ -77,7 +78,7 @@ public class HttpServiceOperation implements BizOperation {
         }
         httpExecutorContext.headers(headers);
         //获取请求参数
-        Map<String, Object> requestParams = getRequestParams(bizOptJson);
+        Map<String, Object> requestParams = getRequestParams(bizOptJson,bizModel);
         //添加url中的参数
         requestParams.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
         //请求方式
@@ -136,14 +137,14 @@ public class HttpServiceOperation implements BizOperation {
     }
 
     //计算请求参数列表中的参数
-    private Map<String, Object> getRequestParams(JSONObject bizOptJson) {
+    private Map<String, Object> getRequestParams(JSONObject bizOptJson,BizModel bizModel) {
         //请求参数列表
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlValue");
         Map<String, Object> mapObject = new HashMap<>();
         if (params != null) {
             for (Map.Entry<String, String> map : params.entrySet()) {
                 if (!StringBaseOpt.isNvl(map.getValue())) {
-                    mapObject.put(map.getKey(), map.getValue());
+                    mapObject.put(map.getKey(), VariableFormula.calculate(map.getValue(),new BizModelJSONTransform(bizModel)));
                 }
             }
         }
