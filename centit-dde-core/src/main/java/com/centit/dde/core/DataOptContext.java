@@ -12,7 +12,7 @@ import java.util.Map;
 @Data
 public class DataOptContext {
     private String runType;
-    private String logId;
+
     private String needRollback;
     private TaskLog taskLog;
     private String optId;
@@ -28,7 +28,19 @@ public class DataOptContext {
      */
     private Map<String, Object> callStackData;
 
+    public String getLogId() {
+        if (taskLog==null){
+            return null;
+        }
+        return this.taskLog.getLogId();
+    }
 
+    public int getOptStepNo() {
+        if (taskLog==null){
+            taskLog = new TaskLog();
+        }
+        return this.taskLog.getStepNo();
+    }
     public DataOptContext() {
         this.callStackData = new HashMap<>(8);
     }
