@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
@@ -134,7 +133,7 @@ public abstract class BuiltInOperation {
 
     public static ResponseData runRequestFile(BizModel bizModel, JSONObject bizOptJson) throws IOException {
         InputStream inputStream = (InputStream) bizModel.getStackData(ConstantValue.REQUEST_FILE_TAG);
-        DataSet destDs = BizOptUtils.castObjectToDataSet(CollectionsOpt.createHashMap("fileName", "",
+        DataSet destDs = DataSet.toDataSet(CollectionsOpt.createHashMap("fileName", "",
             "fileSize", inputStream.available(), "fileContent", inputStream));
         bizModel.putDataSet(bizOptJson.getString("id"), destDs);
         return createResponseSuccessData(destDs.getSize());
@@ -344,7 +343,7 @@ public abstract class BuiltInOperation {
 
     public static ResponseData runStaticData(BizModel bizModel, JSONObject bizOptJson) {
         JSONArray ja = bizOptJson.getJSONArray("data");
-        DataSet destDS = BizOptUtils.castObjectToDataSet(ja);
+        DataSet destDS = DataSet.toDataSet(ja);
         bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDS);
         return createResponseSuccessData(destDS.getSize());
     }

@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
-import com.centit.dde.utils.BizOptUtils;
+import com.centit.dde.core.DataSet;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.extend.JSRuntimeContext;
 import org.apache.commons.lang3.StringUtils;
@@ -24,8 +24,7 @@ public class InnerJSOperation implements BizOperation {
         }
         int count = 0;
         Object object = jsRuntimeContext.callJsFunc("runOpt",bizModel);
-        bizModel.putDataSet(targetDsName,
-            BizOptUtils.castObjectToDataSet(object));
+        bizModel.putDataSet(targetDsName, DataSet.toDataSet(object));
         if (object != null) {
             count = bizModel.fetchDataSetByName(targetDsName).getSize();
         }

@@ -1,6 +1,7 @@
 package com.centit.dde.core;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.support.algorithm.CollectionsOpt;
 
@@ -45,6 +46,13 @@ public class DataSet implements DataSetReader, Serializable {
     public static DataSet toDataSet(Object data) {
         if(data instanceof DataSet){
             return (DataSet) data;
+        }
+        if(data instanceof Map){
+            Map<String, Object> objectMap = (Map<String, Object>)data;
+            if( objectMap.containsKey("dataSetName") && objectMap.containsKey("data")){
+                JSONObject jobj = (JSONObject)JSON.toJSON(data);
+                return JSON.toJavaObject(jobj, DataSet.class);
+            }
         }
         return new DataSet(data);
     }
