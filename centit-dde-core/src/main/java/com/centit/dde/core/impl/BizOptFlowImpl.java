@@ -481,7 +481,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 //主日志只记录一次
                 if (taskLog != null && StringUtils.isEmpty(taskLog.getLogId())) {
                     taskLog.setRunEndTime(new Date());
-                    taskLog.setOtherMessage("error");
+                    taskLog.setOtherMessage(e.getMessage());
                     taskLogDao.saveNewObject(taskLog);
                 }
             }

@@ -84,7 +84,7 @@ public class TaskRun {
             }
             return runResult;
         } catch (Exception e) {
-            dealException(taskLog, dataPacketInterface, e);
+            dealException(taskLog, e);
             //创建一个错误的返回结果
             return DataOptResult.createExceptionResult(ResponseData.makeErrorMessageWithData(
                 taskLog, ResponseData.ERROR_OPERATION, ObjectException.extortExceptionMessage(e)));
@@ -99,11 +99,11 @@ public class TaskRun {
         return bizOptFlow.run(dataPacketInterface, dataOptContext);
     }
 
-    private void dealException(TaskLog taskLog, DataPacketInterface dataPacketInterface, Exception e) {
-        taskLog.setOtherMessage("error");
+    private void dealException(TaskLog taskLog, Exception e) {
+        taskLog.setOtherMessage(e.getMessage());
         taskLog.setRunEndTime(new Date());
         taskLogDao.mergeObject(taskLog);
-        saveDetail(ObjectException.extortExceptionMessage(e, 4), taskLog);
+        saveDetail(ObjectException.extortExceptionMessage(e), taskLog);
     }
 
     private void saveDetail(String info, TaskLog taskLog) {
@@ -141,7 +141,7 @@ public class TaskRun {
         taskLog.setRunEndTime(new Date());
         String sql = "SELECT count(*) as count FROM d_task_detail_log WHERE log_id=? and log_info not like ? ";
         int count = NumberBaseOpt.castObjectToInteger(DatabaseOptUtils.getScalarObjectQuery(taskDetailLogDao, sql, new Object[]{taskLog.getLogId(), "ok"}));
-        String message = count > 0 ? "error" : "ok";
+        String message = count > 0 ? "节点中有 "+count+" 个执行错误。" : "ok";
         taskLog.setOtherMessage(message);
         taskLogDao.updateObject(taskLog);
         log.debug("更新API执行日志，日志信息：{}", JSON.toJSONString(taskLog));
