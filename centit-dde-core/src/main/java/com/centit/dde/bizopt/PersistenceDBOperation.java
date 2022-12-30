@@ -13,6 +13,7 @@ import com.centit.product.adapter.po.MetaTable;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.service.MetaDataService;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileNotFoundException;
@@ -99,9 +100,10 @@ public class PersistenceDBOperation implements BizOperation {
 
         dataSetWriter.setFieldsMap(PersistenceDBOperation.fetchFieldMap(bizOptJson.getJSONArray("config")));
         // BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "propertyName", "primaryKey1"));
-        String saveAsWhole = BuiltInOperation.getJsonFieldString(bizOptJson, "saveAsWhole", "false");
+        //页面上逐条提交对应的属性名为 saveAsWhole ^_^
+        String commitEachRow = BuiltInOperation.getJsonFieldString(bizOptJson, "saveAsWhole", "false");
         //设置为true  作为整体提交
-        dataSetWriter.setSaveAsWhole("false".equalsIgnoreCase(saveAsWhole));
+        dataSetWriter.setSaveAsWhole(!BooleanBaseOpt.castObjectToBoolean(commitEachRow, false));
         switch (writerType) {
             case WRITER_INDICATE_APPEND:
                 dataSetWriter.append(dataSet);
