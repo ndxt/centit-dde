@@ -67,6 +67,8 @@ public class QuerySqlOperation implements BizOperation {
         //每页数量属性
         sqlDsr.setPageSizeField(BuiltInOperation.getJsonFieldString(bizOptJson, "pageSize", "pageSize"));
 
+        sqlDsr.setReturnFirstRowAsObject(BooleanBaseOpt.castObjectToBoolean(
+            BuiltInOperation.getJsonFieldString(bizOptJson, "returnAsObject", "false"), false));
         DataSet dataSet = sqlDsr.load(parames);
 
         bizModel.putDataSet(id, dataSet);

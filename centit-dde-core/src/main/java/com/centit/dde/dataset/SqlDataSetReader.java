@@ -48,6 +48,10 @@ public class SqlDataSetReader implements DataSetReader {
     //是否返回总数
     private boolean hasCount;
 
+    /**
+     以对象形式返回首行;
+     */
+    private boolean returnFirstRowAsObject;
     //分页参数属性
     //页码参数属性
     private String pageNoField;
@@ -127,10 +131,22 @@ public class SqlDataSetReader implements DataSetReader {
                     new PageDesc(1, -1, jsonArray!=null ? jsonArray.size() : 0));
                 dataSet.setData(result);
             } else {
-                dataSet.setData(jsonArray);
+                if(this.returnFirstRowAsObject){
+                    if(jsonArray!=null && jsonArray.size()>0) {
+                        dataSet.setData(jsonArray.get(0));
+                    }
+                } else {
+                    dataSet.setData(jsonArray);
+                }
             }
         }
         return dataSet;
+    }
+
+    public SqlDataSetReader(){
+        returnFirstRowAsObject = false;
+        paging = false;
+        hasCount = false;
     }
 
     private void buildExtendsSql() {
@@ -149,6 +165,9 @@ public class SqlDataSetReader implements DataSetReader {
         this.sqlSen = sqlSen;
     }
 
+    public void setReturnFirstRowAsObject(boolean returnAsObject){
+        this.returnFirstRowAsObject = returnAsObject;
+    }
     public void setQueryDataScopeFilter(DataScopePowerManager queryDataScopeFilter) {
         this.queryDataScopeFilter = queryDataScopeFilter;
     }
