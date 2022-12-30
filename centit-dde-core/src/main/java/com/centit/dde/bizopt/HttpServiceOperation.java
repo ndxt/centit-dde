@@ -141,9 +141,10 @@ public class HttpServiceOperation implements BizOperation {
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlValue");
         Map<String, Object> mapObject = new HashMap<>();
         if (params != null) {
+            BizModelJSONTransform jsonTransform=new BizModelJSONTransform(bizModel);
             for (Map.Entry<String, String> map : params.entrySet()) {
                 if (!StringBaseOpt.isNvl(map.getValue())) {
-                    mapObject.put(map.getKey(), VariableFormula.calculate(map.getValue(),new BizModelJSONTransform(bizModel)));
+                    mapObject.put(map.getKey(), VariableFormula.calculate(map.getValue(),jsonTransform.attainExpressionValue(map.getValue())));
                 }
             }
         }
