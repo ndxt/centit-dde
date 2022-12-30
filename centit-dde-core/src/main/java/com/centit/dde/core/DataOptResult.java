@@ -103,7 +103,7 @@ public class DataOptResult implements ToResponseData, Serializable {
         return lastError != null; // stepResult.size() > 0;
     }
 
-    public String getStepMessage(){
+    public String getErrorMessage(){
         StringBuilder errorMsg = new StringBuilder(200);
         for(LeftRightPair<String, ResponseData> pair : stepResult){
             //if(ResponseData.RESULT_OK != pair.getRight().getCode()) {
@@ -130,7 +130,7 @@ public class DataOptResult implements ToResponseData, Serializable {
             }
             return ResponseData.makeErrorMessageWithData( lastError.getData(),
                 errorCode,
-                getStepMessage()
+                getErrorMessage()
             );
         }
 
