@@ -1,6 +1,7 @@
 package com.centit.dde.dataset;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetReader;
 import com.centit.framework.common.WebOptUtils;
@@ -125,19 +126,12 @@ public class SqlDataSetReader implements DataSetReader {
                 dataSet.setData(jsonArray);
             }
         } else {
-            JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, qap.getQuery(), paramsMap);
-            if(hasCount){
-                PageQueryResult<Object> result = PageQueryResult.createResult(jsonArray,
-                    new PageDesc(1, -1, jsonArray!=null ? jsonArray.size() : 0));
-                dataSet.setData(result);
+            if(this.returnFirstRowAsObject){
+                JSONObject jsonObject = DatabaseAccess.getObjectAsJSON(conn, qap.getQuery(), paramsMap);
+                dataSet.setData(jsonObject);
             } else {
-                if(this.returnFirstRowAsObject){
-                    if(jsonArray!=null && jsonArray.size()>0) {
-                        dataSet.setData(jsonArray.get(0));
-                    }
-                } else {
-                    dataSet.setData(jsonArray);
-                }
+                JSONArray jsonArray = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, qap.getQuery(), paramsMap);
+                dataSet.setData(jsonArray);
             }
         }
         return dataSet;
