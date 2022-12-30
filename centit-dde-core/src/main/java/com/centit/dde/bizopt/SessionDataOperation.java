@@ -19,7 +19,7 @@ public class SessionDataOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");
         JSONArray config = bizOptJson.getJSONArray("config");
-        CentitUserDetails currentUserDetails = (CentitUserDetails)bizModel.fetchDataSetByName(ConstantValue.SESSION_DATA_TAG);
+        CentitUserDetails currentUserDetails = (CentitUserDetails)bizModel.getDataSet(ConstantValue.SESSION_DATA_TAG);
         // 这个本来就不应该有 userPin
         if(currentUserDetails != null && currentUserDetails.getUserInfo() != null) {
             currentUserDetails.getUserInfo().remove("userPin");

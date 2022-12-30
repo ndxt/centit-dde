@@ -29,7 +29,7 @@ public class WriteJsonFileOperation implements BizOperation {
             StringBaseOpt.castObjectToString(Pretreatment.mapTemplateStringAsFormula(
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))):
             DatetimeOpt.currentTimeWithSecond();
-        Object data = bizModel.fetchDataSetByName(sourDsName).getData();
+        Object data = bizModel.getDataSet(sourDsName).getData();
         String object = JSON.toJSONString(data);
         ByteArrayInputStream inputStream = new ByteArrayInputStream(object.getBytes());
 

@@ -140,7 +140,7 @@ public abstract class BuiltInOperation {
     }
 
     public static ResponseData runRequestBody(BizModel bizModel, JSONObject bizOptJson) {
-        DataSet destDs = bizModel.fetchDataSetByName(ConstantValue.REQUEST_BODY_TAG);
+        DataSet destDs = bizModel.getDataSet(ConstantValue.REQUEST_BODY_TAG);
         if (destDs != null) {
             bizModel.putDataSet(bizOptJson.getString("id"), destDs);
             return createResponseSuccessData(destDs.getSize());
@@ -152,7 +152,7 @@ public abstract class BuiltInOperation {
         String sourDsName = getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
         Map<String, String> mapInfo = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
-        DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
         DataSet destDs = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
         bizModel.putDataSet(targetDsName, destDs);
         return createResponseSuccessData(destDs.getSize());
@@ -163,7 +163,7 @@ public abstract class BuiltInOperation {
         Map<String, String> mapInfo = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
         int count = 0;
         if (mapInfo != null) {
-            DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+            DataSet dataSet = bizModel.getDataSet(sourDsName);
             if (dataSet != null) {
                 count = dataSet.getSize();
                 DataSetOptUtil.appendDeriveField(dataSet, mapInfo.entrySet());
@@ -180,7 +180,7 @@ public abstract class BuiltInOperation {
 
         int count = 0;
         if (formula != null) {
-            DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+            DataSet dataSet = bizModel.getDataSet(sourDsName);
             if (dataSet != null) {
                 DataSet destDs = DataSetOptUtil.filterDateSet(dataSet, formula);
                 count = destDs.getSize();
@@ -203,7 +203,7 @@ public abstract class BuiltInOperation {
 
         int count = 0;
         if (statDesc != null) {
-            DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+            DataSet dataSet = bizModel.getDataSet(sourDsName);
             DataSet destDs = DataSetOptUtil.statDataset(dataSet, groupFields, statDesc);
             count = destDs.getSize();
             bizModel.putDataSet(targetDsName, destDs);
@@ -223,7 +223,7 @@ public abstract class BuiltInOperation {
         int count = 0;
         Map<String, String> analyse = jsonArrayToMap(bizOptJson.getJSONArray("configfield"), "columnName", "expression");
         if (analyse != null) {
-            DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+            DataSet dataSet = bizModel.getDataSet(sourDsName);
             if (dataSet != null) {
                 DataSet destDs = DataSetOptUtil.analyseDataset(dataSet,
                     groupFields, orderFields, ((Map) analyse).entrySet());
@@ -250,7 +250,7 @@ public abstract class BuiltInOperation {
         //统计类型
         int statisticalType = NumberBaseOpt.castObjectToInteger(bizOptJson.getIntValue("statisticalType"), 0);
         int count = 0;
-        DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet != null) {
             DataSet destDs = DataSetOptUtil.crossTabulation(dataSet, rows, cols, isOldField, concatStr, statisticalType);
             count = destDs.getSize();
@@ -274,7 +274,7 @@ public abstract class BuiltInOperation {
                 }
                 return fieldName;
             }, true);
-        DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
+        DataSet dataSet = bizModel.getDataSet(sour1DsName);
         DataSetOptUtil.sortDataSetByFields(dataSet, orderByFields);
         return createResponseSuccessData(dataSet.getSize());
     }
@@ -283,7 +283,7 @@ public abstract class BuiltInOperation {
         String sour1DsName = getJsonFieldString(bizOptJson, "source", null);
         String parentExpress = getJsonFieldString(bizOptJson, "parentExpress", null);
         String childExpress = getJsonFieldString(bizOptJson, "childExpress", null);
-        DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
+        DataSet dataSet = bizModel.getDataSet(sour1DsName);
         DataSetOptUtil.sortDataSetAsTree(dataSet, parentExpress, childExpress);
         return createResponseSuccessData(dataSet.getSize());
     }
@@ -294,7 +294,7 @@ public abstract class BuiltInOperation {
         String parentExpress = getJsonFieldString(bizOptJson, "parentExpress", null);
         String childExpress = getJsonFieldString(bizOptJson, "childExpress", null);
         String childrenFiled = getJsonFieldString(bizOptJson, "childrenFiled", "children");
-        DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
+        DataSet dataSet = bizModel.getDataSet(sour1DsName);
         DataSet destDs = DataSetOptUtil.toTreeDataSet(dataSet, parentExpress, childExpress, childrenFiled);
         bizModel.putDataSet(targetDsName, destDs);
         return createResponseSuccessData(destDs.getSize());
@@ -320,8 +320,8 @@ public abstract class BuiltInOperation {
         String join = getJsonFieldString(bizOptJson, "operation", "join");
         Map<String, String> map = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("configfield"), "primaryKey1", "primaryKey2");
         if (map != null) {
-            DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
-            DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
+            DataSet dataSet = bizModel.getDataSet(sour1DsName);
+            DataSet dataSet2 = bizModel.getDataSet(sour2DsName);
             DataSet destDs = DataSetOptUtil.joinTwoDataSet(dataSet, dataSet2, new ArrayList<>(map.entrySet()), join);
             if (destDs != null) {
                 bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
@@ -334,8 +334,8 @@ public abstract class BuiltInOperation {
     public static ResponseData runUnion(BizModel bizModel, JSONObject bizOptJson) {
         String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
         String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
-        DataSet dataSet = bizModel.fetchDataSetByName(sour1DsName);
-        DataSet dataSet2 = bizModel.fetchDataSetByName(sour2DsName);
+        DataSet dataSet = bizModel.getDataSet(sour1DsName);
+        DataSet dataSet2 = bizModel.getDataSet(sour2DsName);
         DataSet destDs = DataSetOptUtil.unionTwoDataSet(dataSet, dataSet2);
         bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
         return createResponseSuccessData(destDs.getSize());

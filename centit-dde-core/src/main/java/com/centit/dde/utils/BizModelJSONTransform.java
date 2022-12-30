@@ -17,12 +17,12 @@ import java.util.List;
  */
 public class BizModelJSONTransform
     implements VariableTranslate, JSONTransformDataSupport {
-    private BizModel data;
+    private BizModel bizModel;
     private int stackLength;
     private List<Object> stack;
 
     public BizModelJSONTransform(BizModel obj) {
-        this.data = obj;
+        this.bizModel = obj;
         this.stackLength = 0;
         this.stack = new ArrayList<>(10);
     }
@@ -96,7 +96,7 @@ public class BizModelJSONTransform
 
     private Object fetchRootData(String labelName) {
         if (StringUtils.isBlank(labelName)) {
-            return this.data;
+            return this.bizModel;
         }
 
         String dataSetName, valuePath;
@@ -113,7 +113,7 @@ public class BizModelJSONTransform
             valuePath = null;
         }
 
-        DataSet currentDateSet = this.data.fetchDataSetByName(dataSetName);
+        DataSet currentDateSet = this.bizModel.getDataSet(dataSetName);
         if (currentDateSet != null) {
             if (StringUtils.isBlank(valuePath)) {
                 return currentDateSet.getData();
@@ -127,7 +127,7 @@ public class BizModelJSONTransform
         }
 
         if (ConstantValue.MODEL_NAME.equals(dataSetName)) {
-            return this.data.getModelName();
+            return this.bizModel.getModelName();
         }
         return "";
     }

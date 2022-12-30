@@ -30,7 +30,7 @@ public class EncryptOperation  implements BizOperation {
             BooleanBaseOpt.castObjectToBoolean(
                 BuiltInOperation.getJsonFieldString(bizOptJson, "base64", "true"), true);
 
-        DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet==null){
             return BuiltInOperation.createResponseData(0, 1,
                 ResponseData.ERROR_OPERATION, "加密计算异常，请指定数据集！");

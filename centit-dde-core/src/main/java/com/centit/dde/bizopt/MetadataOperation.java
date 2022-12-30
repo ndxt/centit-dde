@@ -74,7 +74,7 @@ public class MetadataOperation implements BizOperation {
         } else {
             //数据集参数
             String source = bizOptJson.getString("source");
-            DataSet dataSet = bizModel.fetchDataSetByName(StringUtils.isBlank(source)?ConstantValue.REQUEST_PARAMS_TAG:source);
+            DataSet dataSet = bizModel.getDataSet(StringUtils.isBlank(source)?ConstantValue.REQUEST_PARAMS_TAG:source);
             parames = dataSet.getFirstRow(); //数据集
         }
         Integer withChildrenDeep = NumberBaseOpt.castObjectToInteger(bizOptJson.getInteger("withChildrenDeep"),1);
@@ -134,7 +134,7 @@ public class MetadataOperation implements BizOperation {
                 if("customSource".equals(paramsType) || StringUtils.isBlank(source)){
                     throw new ObjectException("批量删除时不能设置为自定义参数形式");
                 }
-                DataSet dataSet = bizModel.fetchDataSetByName(source);
+                DataSet dataSet = bizModel.getDataSet(source);
                 List<Map<String, Object>> delParames = dataSet.getDataAsList();
                 int delCount =0;
                 for (Map parame : delParames) {

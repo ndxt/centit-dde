@@ -35,7 +35,7 @@ public class FileDownloadOperation implements BizOperation {
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         String fileId = BuiltInOperation.getJsonFieldString(bizOptJson, "fileId", "");
         String fileName = BuiltInOperation.getJsonFieldString(bizOptJson, ConstantValue.FILE_NAME, "");
-        DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null) {
             return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
                 bizOptJson.getString("SetsName") + "：文件下载失败，请选择数据集！");

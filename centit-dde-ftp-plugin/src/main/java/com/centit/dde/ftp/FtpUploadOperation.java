@@ -22,7 +22,7 @@ public class FtpUploadOperation extends FtpOperation {
         String ftpServiceId = BuiltInOperation.getJsonFieldString(bizOptJson, "ftpService", null);
 
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
-        DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
         String path = BuiltInOperation.getJsonFieldString(bizOptJson, "filePath", "/");
 
         FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);

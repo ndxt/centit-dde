@@ -62,17 +62,13 @@ public class BizModel implements  Serializable {
         if(bizData == null || bizData.isEmpty()) {
             return 0;
         }
-        DataSet mainData = fetchDataSetByName(modelName);
+        DataSet mainData = getDataSet(modelName);
         if(mainData== null){
             return 0;
         }
         return mainData.getSize();
     }
 
-    @JSONField(deserialize = false, serialize = false)
-    public DataSet getDataSet(String relationPath){
-        return fetchDataSetByName(relationPath);
-    }
 
     public void removeDataSet(String relationPath) {
         if (bizData != null){
@@ -203,7 +199,8 @@ public class BizModel implements  Serializable {
         return createSingleDataSetModel(BizModel.DEFAULT_MODEL_NAME, dataSet);
     }
 
-    public DataSet fetchDataSetByName(String relationPath){
+    @JSONField(deserialize = false, serialize = false)
+    public DataSet getDataSet(String relationPath){
 
         if(StringUtils.isBlank(relationPath)){
             return null;

@@ -38,7 +38,7 @@ public class ReadExcelOperation implements BizOperation {
             sheetName = Pretreatment.mapTemplateStringAsFormula(sheetName, modelTrasform);
         }
 
-        DataSet dataSet = bizModel.fetchDataSetByName(source);
+        DataSet dataSet = bizModel.getDataSet(source);
         FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
         InputStream inputStream = fileInfo.getFileInputStream();
 

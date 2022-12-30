@@ -24,7 +24,7 @@ public class ReadJsonFileOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
         FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
         InputStream inputStream = fileInfo.getFileInputStream();
         if (inputStream != null) {

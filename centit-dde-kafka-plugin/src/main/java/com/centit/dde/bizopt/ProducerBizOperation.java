@@ -49,7 +49,7 @@ public class ProducerBizOperation implements BizOperation {
         //是否异步发送
         Boolean isAsyn = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getBoolean("isAsyn"),false);
 
-        DataSet dataSet = bizModel.fetchDataSetByName(source);
+        DataSet dataSet = bizModel.getDataSet(source);
         ProducerRecord<String, String> record = new ProducerRecord<>(topic, partition, key, StringBaseOpt.castObjectToString(dataSet.getData()));
         AtomicReference<String> resut= new AtomicReference<>("");
         String id = bizOptJson.getString("id");

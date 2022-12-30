@@ -26,7 +26,7 @@ public class InnerJSOperation implements BizOperation {
         Object object = jsRuntimeContext.callJsFunc("runOpt",bizModel);
         bizModel.putDataSet(targetDsName, DataSet.toDataSet(object));
         if (object != null) {
-            count = bizModel.fetchDataSetByName(targetDsName).getSize();
+            count = bizModel.getDataSet(targetDsName).getSize();
         }
         return BuiltInOperation.createResponseSuccessData(count);
     }

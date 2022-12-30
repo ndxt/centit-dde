@@ -82,7 +82,7 @@ public class PersistenceDBOperation implements BizOperation {
             return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
                 "数据库信息无效：" + databaseCode);
         }
-        DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null) {
             return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
                 "数据源信息无效：" + sourDsName);

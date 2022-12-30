@@ -905,7 +905,7 @@ public abstract class DataSetOptUtil {
         } else {
             //数据集参数
             String source = bizOptJson.getString("source");
-            DataSet dataSet = bizModel.fetchDataSetByName(StringUtils.isBlank(source)?ConstantValue.REQUEST_PARAMS_TAG:source);
+            DataSet dataSet = bizModel.getDataSet(StringUtils.isBlank(source)?ConstantValue.REQUEST_PARAMS_TAG:source);
             parames = dataSet.getFirstRow(); //数据集
         }
         return parames;

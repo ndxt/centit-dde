@@ -28,7 +28,7 @@ public class FileUploadOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
 
-        DataSet dataSet = bizModel.fetchDataSetByName(sourDsName);
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null) {
             return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
                 "文件上传失败，请选择数据集！");

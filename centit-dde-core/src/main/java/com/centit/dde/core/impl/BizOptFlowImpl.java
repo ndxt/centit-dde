@@ -272,7 +272,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
         if (RETURN_RESULT_DATASET.equals(type) || RETURN_RESULT_ORIGIN.equals(type)) {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
-            DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
+            DataSet dataSet = bizModel.getDataSet(dataSetId);
             if (dataSet == null) {
                 bizModel.getOptResult().addStepError(
                     BuiltInOperation.getJsonFieldString(stepJson, "id", "endNode"), ResponseData.makeErrorMessage(
@@ -302,7 +302,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
         if (RETURN_RESULT_FILE.equals(type)) {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
-            DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
+            DataSet dataSet = bizModel.getDataSet(dataSetId);
             FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, stepJson);
             bizModel.getOptResult().setResultFile(fileInfo.getFirstRow());
             return;
@@ -312,7 +312,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             String code = stepJson.getString("code");
             String message = stepJson.getString("message");
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
-            DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
+            DataSet dataSet = bizModel.getDataSet(dataSetId);
             ResponseSingleData response = new ResponseSingleData();
             response.setCode(NumberBaseOpt.castObjectToInteger(code, 1));
             String reMessage = StringBaseOpt.objectToString(

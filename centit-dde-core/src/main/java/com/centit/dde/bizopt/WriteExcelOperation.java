@@ -45,7 +45,7 @@ public class WriteExcelOperation implements BizOperation {
             DatetimeOpt.currentTimeWithSecond();
         //模板文件id
         String templateFileId = bizOptJson.getString("templateFileId");
-        DataSet dataSet = bizModel.fetchDataSetByName(source);
+        DataSet dataSet = bizModel.getDataSet(source);
         //根据模板生成
         if (StringUtils.isNotBlank(templateFileId)) {
             //从第几行开始插入

@@ -27,8 +27,8 @@ public class AssignmentOperation implements BizOperation {
         //数据来源
         String sourceDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", null);
 
-        DataSet targetDataSet = bizModel.fetchDataSetByName(targetDsName);
-        DataSet dataSet = bizModel.fetchDataSetByName(sourceDsName);
+        DataSet targetDataSet = bizModel.getDataSet(targetDsName);
+        DataSet dataSet = bizModel.getDataSet(sourceDsName);
         if(dataSet == null  || targetDataSet == null){
             return BuiltInOperation.createResponseData(0,1, ResponseData.ERROR_USER_CONFIG,
                 "配置信息出错，找不到对应的数据集："+targetDsName+"，"+sourceDsName+"。");

@@ -20,7 +20,6 @@ import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
-import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
@@ -168,7 +167,7 @@ public class HttpServiceOperation implements BizOperation {
 
     private InputStream getRequestFile(JSONObject bizOptJson, BizModel bizModel) {
         String source = bizOptJson.getString("source");
-        DataSet dataSet = bizModel.fetchDataSetByName(source);
+        DataSet dataSet = bizModel.getDataSet(source);
         FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
         InputStream inputStream = fileInfo.getFileInputStream();
         return inputStream;
