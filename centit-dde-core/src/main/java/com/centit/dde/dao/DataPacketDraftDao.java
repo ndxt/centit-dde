@@ -16,7 +16,7 @@ public class DataPacketDraftDao extends BaseDaoImpl<DataPacketDraft, String> {
     @Override
     public Map<String, String> getFilterField() {
         Map<String, String> filterField = new HashMap<>();
-        filterField.put("packetName","(packet_name=:packetName or packet_id=:packetName)");
+        filterField.put("(like)packetName", "(packet_name like :packetName or packet_id like :packetName)");
         filterField.put("osId", CodeBook.EQUAL_HQL_ID);
         filterField.put("optId",CodeBook.EQUAL_HQL_ID);
         filterField.put("isDisable",CodeBook.EQUAL_HQL_ID);
