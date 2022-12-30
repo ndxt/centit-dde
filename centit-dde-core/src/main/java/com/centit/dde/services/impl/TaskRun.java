@@ -72,7 +72,8 @@ public class TaskRun {
             DataOptResult runResult = runOptModule(dataPacketInterface, optContext);
             //更新API信息
             updateApiData(optContext.getRunType(), dataPacketInterface);
-
+            taskLog.setOtherMessage("ok！");
+            taskLog.setRunEndTime(new Date());
             return runResult;
         } catch (Exception e) { // 未知异常，一般是泡不到这儿的
             dealException(taskLog, optContext, e);
