@@ -8,7 +8,6 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.OFDConvertVo;
 import com.centit.fileserver.common.FileStore;
-import com.centit.fileserver.po.FileInfo;
 import com.centit.framework.common.ResponseData;
 import com.suwell.ofd.custom.agent.HTTPAgent;
 import org.apache.commons.lang3.StringUtils;

@@ -5,10 +5,11 @@ import com.centit.dde.bizopt.*;
 import com.centit.dde.core.*;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.DataPacketDraftDao;
-import com.centit.dde.dao.TaskDetailLogDao;
-import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.dataset.FileDataSet;
-import com.centit.dde.po.*;
+import com.centit.dde.po.DataPacket;
+import com.centit.dde.po.DataPacketDraft;
+import com.centit.dde.po.DataPacketInterface;
+import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.CloneUtils;
 import com.centit.dde.utils.ConstantValue;
@@ -62,18 +63,11 @@ public class BizOptFlowImpl implements BizOptFlow {
     @Autowired
     private SourceInfoDao sourceInfoDao;
 
-
     @Autowired
     private MetaDataService metaDataService;
 
     @Autowired
-    private TaskDetailLogDao taskDetailLogDao;
-
-    @Autowired
     private DataPacketDraftDao dataPacketCopyDao;
-
-    @Autowired
-    private TaskLogDao taskLogDao;
 
     @Autowired
     private DataPacketDao dataPacketDao;
@@ -206,7 +200,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         String stepType = stepJson.getString("type");
         if (ConstantValue.RESULTS.equals(stepType)) {
             //bizModel.getOptResult().setResultObject(returnResult(bizModel, dataOptStep));
-            returnResult(bizModel, dataOptStep);
+            returnResult(bizModel, dataOptStep, dataOptContext);
             dataOptStep.setEndStep();
             return;
         }
@@ -247,7 +241,11 @@ public class BizOptFlowImpl implements BizOptFlow {
             dataOptStep.setEndStep();
             return;
         }
+
         dataOptStep.setNextStep();
+        dataOptContext.plusStepNo();
+        //stepNo ++
+
         if (ConstantValue.TRUE.equals(dataOptContext.getNeedRollback())) {
             //如果API不能允许报错，报错就中断
             if (bizModel.getOptResult().hasErrors()){// bizModel.getOptResult().getLastError().getCode() == ResponseData.ERROR_OPERATION) {
@@ -260,7 +258,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
     }
 
-    private void returnResult(BizModel bizModel, DataOptStep dataOptStep) {
+    private void returnResult(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) {
         JSONObject stepJson = dataOptStep.getCurrentStep();
         stepJson = stepJson.getJSONObject("properties");
         String type = BuiltInOperation.getJsonFieldString(stepJson, "resultOptions", RETURN_RESULT_ALL_DATASET);
@@ -276,11 +274,12 @@ public class BizOptFlowImpl implements BizOptFlow {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
             DataSet dataSet = bizModel.fetchDataSetByName(dataSetId);
             if (dataSet == null) {
-                bizModel.getOptResult().addLastStepResult(
+                bizModel.getOptResult().addStepError(
                     BuiltInOperation.getJsonFieldString(stepJson, "id", "endNode"), ResponseData.makeErrorMessage(
                     ResponseData.ERROR_OPERATION, "获取数据集："+ dataSetId +"出错！" ));
-                bizModel.getOptResult().setResultType(DataOptResult.RETURN_CODE_AND_MESSAGE);
                 //添加错误日志
+                TaskDetailLog detailLog = creaetLogDetail(dataOptStep, dataOptContext);
+                detailLog.setLogInfo("获取数据集："+ dataSetId +"出错！");
             } else {
                 bizModel.getOptResult().setResultObject(dataSet.getData());
                 //这段代码是为了兼容以前的文件类型返回值，后面应该不需要了
@@ -455,8 +454,8 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     private void runOneStepOpt(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) {
         int logLevel = dataOptContext.getLogLevel();
+        Date runBeginTime = new Date();// 获取当期时间
 
-        TaskDetailLog detailLog = creaetLogDetail(dataOptStep, dataOptContext, "正确执行，没有返回数据!");
 
         JSONObject bizOptJson = dataOptStep.getCurrentStep().getJSONObject("properties");
         try {
@@ -467,6 +466,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 throw new ObjectException(responseData, responseData.getCode(), responseData.getMessage());
             }*/
             if ( (ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
+                TaskDetailLog detailLog = creaetLogDetail(dataOptStep, dataOptContext);
                 Map<String, Object> jsonObject = CollectionsOpt.objectToMap(responseData.getData());
                 detailLog.setSuccessPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("success"), 0));
                 detailLog.setErrorPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("error"), 0));
@@ -476,35 +476,23 @@ public class BizOptFlowImpl implements BizOptFlow {
                 } else {
                     detailLog.setLogInfo(responseData.toJSONString());
                 }
-                detailLog.setRunEndTime(new Date());
-                taskDetailLogDao.saveNewObject(detailLog);
+                detailLog.setRunBeginTime(runBeginTime);
             }
         } catch (Exception e) {
-            //if (ConstantValue.LOGLEVEL_TYPE_ERROR == logLevel) {
-                TaskLog taskLog = dataOptContext.getTaskLog();
-                //主日志只记录一次
-                if (/*taskLog != null &&*/ ! taskLog.isHasSaved()) {
-                    taskLog.setRunEndTime(new Date());
-                    taskLog.setOtherMessage(e.getMessage());
-                    taskLogDao.saveNewLog(taskLog);
-                }
-            //}
-
+            TaskDetailLog detailLog = creaetLogDetail(dataOptStep, dataOptContext);
             String errMsg = ObjectException.extortExceptionMessage(e);
+            detailLog.setLogInfo(errMsg);
+            detailLog.setRunBeginTime(runBeginTime);
+
             ResponseData responseData = ResponseData.makeErrorMessageWithData(errMsg, ResponseData.ERROR_OPERATION,
                 e.getMessage());
-            bizModel.getOptResult().addLastStepResult(bizOptJson.getString("id"), responseData);
-            detailLog.setLogInfo(errMsg);
-            detailLog.setRunEndTime(new Date());
-            taskDetailLogDao.saveNewObject(detailLog);
+            bizModel.getOptResult().addStepError(bizOptJson.getString("id"), responseData);
         }
     }
 
-    private TaskDetailLog creaetLogDetail(DataOptStep dataOptStep, DataOptContext dataOptContext, String logInfo) {
+    private TaskDetailLog creaetLogDetail(DataOptStep dataOptStep, DataOptContext dataOptContext) {
         TaskDetailLog detailLog = new TaskDetailLog();
-        if (dataOptContext.getLogId() == null) {
-            return detailLog;
-        }
+
         JSONObject bizOptJson = dataOptStep.getCurrentStep();
         bizOptJson = bizOptJson.getJSONObject("properties");
         String sOptType = bizOptJson.getString("type");
@@ -514,15 +502,12 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
         String logType = sOptType + ":" + processName;
         detailLog.setRunBeginTime(new Date());
-        detailLog.setLogId(dataOptContext.getLogId());
-        detailLog.setSuccessPieces(0);
-        detailLog.setErrorPieces(0);
         detailLog.setLogType(logType);
-        detailLog.setStepNo(dataOptContext.getOptStepNo());
-        detailLog.setLogInfo(logInfo);
+        detailLog.setStepNo(dataOptContext.getStepNo());
         detailLog.setRunEndTime(new Date());
         detailLog.setTaskId(
             StringBaseOpt.fillZeroForString(StringBaseOpt.castObjectToString(dataOptStep.getStepNo(), "0"), 6));
+        dataOptContext.getTaskLog().addDetailLog(detailLog);
         return detailLog;
     }
 
@@ -584,7 +569,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (result != null) {
             bizModel.putDataSet(stepJson.getString("id"), DataSet.toDataSet(result.getResultData()));
             if(result.hasErrors()){
-                bizModel.getOptResult().addLastStepResult(
+                bizModel.getOptResult().addStepError(
                     stepJson.getString("id"), result.getLastError());
             }
         }

@@ -41,7 +41,7 @@ public class DataOptResult implements ToResponseData, Serializable {
         stepResult = new ArrayList<>(16);
     }
 
-    public void addLastStepResult(String sKey, ResponseData objValue) {
+    public void addStepError(String sKey, ResponseData objValue) {
         stepResult.add(new LeftRightPair<>(sKey, objValue));
         if(ResponseData.RESULT_OK != objValue.getCode()) {
             lastError = objValue;
@@ -154,7 +154,7 @@ public class DataOptResult implements ToResponseData, Serializable {
     public static DataOptResult createExceptionResult(ResponseData objValue){
         DataOptResult result = new DataOptResult();
         result.resultType = DataOptResult.RETURN_CODE_AND_MESSAGE;
-        result.addLastStepResult("exception", objValue);
+        result.addStepError("exception", objValue);
         return result;
     }
 }

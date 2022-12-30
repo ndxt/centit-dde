@@ -6,12 +6,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -75,18 +74,29 @@ public class TaskLog implements java.io.Serializable {
     @ApiModelProperty(value = "API类别，是草稿还是正式运行的日志，0草稿，1正式")
     private Integer apiType;
 
-    boolean hasSaved;
+
+    @OneToMany(targetEntity = TaskDetailLog.class)
+    @JoinColumn(name = "log_id", referencedColumnName = "log_id")
+    private List<TaskDetailLog> detailLogs;
+
+
+    public void addDetailLog(TaskDetailLog detailLog) {
+        if (this.detailLogs == null) {
+            this.detailLogs = new ArrayList<>();
+        }
+        this.detailLogs.add(detailLog);
+    }
     /**
      * 临时记录 执行步骤
      */
     private int stepNo;
 
     public TaskLog(){
-        this.hasSaved = false;
         this.stepNo = 0;
     }
 
-    public int getStepNo(){
-        return ++ stepNo;
+    public void plusStepNo(){
+        this.stepNo = this.stepNo + 1;
     }
+
 }

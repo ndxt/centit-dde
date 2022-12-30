@@ -12,7 +12,6 @@ import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.support.algorithm.BooleanBaseOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
 
 import java.util.Map;
 

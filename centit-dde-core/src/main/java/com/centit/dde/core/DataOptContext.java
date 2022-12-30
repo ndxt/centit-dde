@@ -35,11 +35,17 @@ public class DataOptContext {
         return this.taskLog.getLogId();
     }
 
-    public int getOptStepNo() {
+    public int getStepNo() {
         if (taskLog==null){
             taskLog = new TaskLog();
         }
         return this.taskLog.getStepNo();
+    }
+    public void plusStepNo() {
+        if (taskLog==null){
+            taskLog = new TaskLog();
+        }
+        this.taskLog.plusStepNo();
     }
     public DataOptContext() {
         this.callStackData = new HashMap<>(8);

@@ -13,8 +13,6 @@ import com.centit.product.adapter.po.MetaTable;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.service.MetaDataService;
-import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.database.metadata.TableInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileNotFoundException;

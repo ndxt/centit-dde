@@ -67,5 +67,8 @@ public class TaskDetailLog implements java.io.Serializable {
     @ApiModelProperty(value = "失败条数")
     private Integer errorPieces;
 
-
+    public TaskDetailLog (){
+        successPieces = 0;
+        errorPieces = 0;
+    }
 }

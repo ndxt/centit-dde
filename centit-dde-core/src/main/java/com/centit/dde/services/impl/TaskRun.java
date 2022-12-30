@@ -1,25 +1,20 @@
 package com.centit.dde.services.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataOptResult;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.dao.DataPacketDraftDao;
-import com.centit.dde.dao.TaskDetailLogDao;
-import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.po.*;
+import com.centit.dde.services.TaskLogManager;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.filter.RequestThreadLocal;
-import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOsInfo;
-import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.CronExpression;
@@ -34,19 +29,20 @@ import java.util.Date;
 @Service
 @Slf4j
 public class TaskRun {
-    private final TaskLogDao taskLogDao;
-    private final TaskDetailLogDao taskDetailLogDao;
+
+    private final TaskLogManager taskLogManager;
+
     private final DataPacketDraftDao dataPacketCopyDao;
     private final DataPacketDao dataPacketDao;
     private final BizOptFlow bizOptFlow;
     @Autowired
     private PlatformEnvironment platformEnvironment;
+
     @Autowired
-    public TaskRun(TaskLogDao taskLogDao, TaskDetailLogDao taskDetailLogDao,
+    public TaskRun(TaskLogManager taskLogManager,
                    DataPacketDraftDao dataPacketCopyDao, DataPacketDao dataPacketDao,
                    BizOptFlow bizOptFlow) {
-        this.taskLogDao = taskLogDao;
-        this.taskDetailLogDao = taskDetailLogDao;
+        this.taskLogManager = taskLogManager;
         this.dataPacketCopyDao = dataPacketCopyDao;
         this.dataPacketDao = dataPacketDao;
         this.bizOptFlow = bizOptFlow;
@@ -60,10 +56,7 @@ public class TaskRun {
 
     public DataOptResult runTask(DataPacketInterface dataPacketInterface, DataOptContext optContext) {
         TaskLog taskLog = buildLogInfo(optContext.getRunType(), dataPacketInterface);
-        if (ConstantValue.LOGLEVEL_CHECK_ERROR != dataPacketInterface.getLogLevel()) {
-            //保存日志基本信息
-            taskLogDao.saveNewLog(taskLog);
-        }
+
         optContext.setTaskLog(taskLog);
 
         try {
@@ -79,15 +72,15 @@ public class TaskRun {
             DataOptResult runResult = runOptModule(dataPacketInterface, optContext);
             //更新API信息
             updateApiData(optContext.getRunType(), dataPacketInterface);
-            if (ConstantValue.LOGLEVEL_CHECK_ERROR != dataPacketInterface.getLogLevel()) {
-                updateLog(taskLog);
-            }
+
             return runResult;
-        } catch (Exception e) {
-            dealException(taskLog, e);
+        } catch (Exception e) { // 未知异常，一般是泡不到这儿的
+            dealException(taskLog, optContext, e);
             //创建一个错误的返回结果
             return DataOptResult.createExceptionResult(ResponseData.makeErrorMessageWithData(
                 taskLog, ResponseData.ERROR_OPERATION, ObjectException.extortExceptionMessage(e)));
+        } finally { // 写入日志
+            taskLogManager.saveTaskLog(taskLog, dataPacketInterface.getLogLevel());
         }
     }
 
@@ -99,23 +92,20 @@ public class TaskRun {
         return bizOptFlow.run(dataPacketInterface, dataOptContext);
     }
 
-    private void dealException(TaskLog taskLog, Exception e) {
+    private void dealException(TaskLog taskLog, DataOptContext optContext, Exception e) {
         taskLog.setOtherMessage(e.getMessage());
         taskLog.setRunEndTime(new Date());
-        taskLogDao.mergeObject(taskLog);
-        saveDetail(ObjectException.extortExceptionMessage(e), taskLog);
-    }
 
-    private void saveDetail(String info, TaskLog taskLog) {
         TaskDetailLog detailLog = new TaskDetailLog();
         detailLog.setRunBeginTime(new Date());
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
         detailLog.setLogType("error");
-        detailLog.setLogInfo(info);
-        detailLog.setStepNo(taskLog.getStepNo());
+        detailLog.setLogInfo(ObjectException.extortExceptionMessage(e));
+        optContext.plusStepNo();
+        detailLog.setStepNo(optContext.getStepNo());
         detailLog.setRunEndTime(new Date());
-        taskDetailLogDao.saveNewObject(detailLog);
+        taskLog.addDetailLog(detailLog);
     }
 
     private TaskLog buildLogInfo(String runType, DataPacketInterface dataPacketInterface) {
@@ -129,7 +119,7 @@ public class TaskRun {
                 taskLog.setRunner(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
             }
         }
-        taskLog.setLogId(UuidOpt.getUuidAsString32());
+        //taskLog.setLogId(UuidOpt.getUuidAsString32());
         taskLog.setOptId(dataPacketInterface.getOptId());
         taskLog.setApplicationId(dataPacketInterface.getOsId());
         taskLog.setRunType(dataPacketInterface.getPacketName());
@@ -137,15 +127,6 @@ public class TaskRun {
         return taskLog;
     }
 
-    private void updateLog(TaskLog taskLog) {
-        taskLog.setRunEndTime(new Date());
-        String sql = "SELECT count(*) as count FROM d_task_detail_log WHERE log_id=? and log_info not like ? ";
-        int count = NumberBaseOpt.castObjectToInteger(DatabaseOptUtils.getScalarObjectQuery(taskDetailLogDao, sql, new Object[]{taskLog.getLogId(), "ok"}));
-        String message = count > 0 ? "节点中有 "+count+" 个执行错误。" : "ok";
-        taskLog.setOtherMessage(message);
-        taskLogDao.updateObject(taskLog);
-        log.debug("更新API执行日志，日志信息：{}", JSON.toJSONString(taskLog));
-    }
 
     private void updateApiData(String runType, DataPacketInterface dataPacketInterface) throws Exception {
         dataPacketInterface.setLastRunTime(new Date());
