@@ -44,4 +44,6 @@ public interface TaskLogManager{
     Map<String,Object> getLogStatisticsInfo(StatisticsParameter parameter);
 
     int deleteTaskLog(DelTaskLogParameter delTaskLogParameter);
+
+    void saveTaskLog(TaskLog taskLog, int logLevel);
 }

@@ -39,5 +39,4 @@ public class TaskLogDao extends BaseDaoImpl<TaskLog, Long> {
         return filterField;
     }
 
-
 }

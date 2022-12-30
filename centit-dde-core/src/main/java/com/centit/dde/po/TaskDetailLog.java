@@ -7,10 +7,7 @@ import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
@@ -53,6 +50,11 @@ public class TaskDetailLog implements java.io.Serializable {
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.IFNULL, value = "today()")
     private Date runEndTime;
 
+    @OrderBy
+    @Column(name="step_no")
+    @ApiModelProperty(value = "执行步骤序号")
+    private Integer stepNo;
+
     @Column(name="log_info")
     @ApiModelProperty(value = "任务明细描述")
     private String logInfo;
@@ -65,5 +67,8 @@ public class TaskDetailLog implements java.io.Serializable {
     @ApiModelProperty(value = "失败条数")
     private Integer errorPieces;
 
-
+    public TaskDetailLog (){
+        successPieces = 0;
+        errorPieces = 0;
+    }
 }

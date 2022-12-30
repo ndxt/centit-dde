@@ -5,7 +5,6 @@ import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
@@ -39,7 +38,7 @@ public class FtpDownloadOperation extends FtpOperation {
             disConnectFtp(ftpClient);
         }
         // outs.close();
-        DataSet objectToDataSet = BizOptUtils.castObjectToDataSet(
+        DataSet objectToDataSet = DataSet.toDataSet(
             CollectionsOpt.createHashMap(ConstantValue.FILE_NAME, fileName,
                 ConstantValue.FILE_SIZE, outs.size(),
                 ConstantValue.FILE_CONTENT ,outs));

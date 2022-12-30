@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.TaskLogManager;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.dde.vo.StatisticsParameter;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
@@ -46,6 +47,16 @@ public class TaskLogManagerImpl extends BaseEntityManagerImpl<TaskLog, Long, Tas
 
     @Override
     public void createTaskLog(TaskLog taskLog) {
+        this.taskLogDao.saveNewObject(taskLog);
+        this.taskLogDao.saveObjectReferences(taskLog);
+    }
+
+    @Override
+    public void saveTaskLog(TaskLog taskLog, int logLevel){
+        int detailLogsCount = taskLog.getDetailLogs() == null ? 0 : taskLog.getDetailLogs().size();
+        if(logLevel == ConstantValue.LOGLEVEL_CHECK_ERROR && detailLogsCount == 0){
+            return;
+        }
         this.taskLogDao.saveNewObject(taskLog);
         this.taskLogDao.saveObjectReferences(taskLog);
     }

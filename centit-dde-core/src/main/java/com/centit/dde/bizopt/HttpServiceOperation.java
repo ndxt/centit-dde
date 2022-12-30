@@ -8,7 +8,6 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
-import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.appclient.HttpReceiveJSON;
@@ -111,13 +110,13 @@ public class HttpServiceOperation implements BizOperation {
                 }
                 break;
             case "delete":
-                DataSet dataSet = BizOptUtils.castObjectToDataSet(HttpExecutor.simpleDelete(httpExecutorContext, requestServerAddress, requestParams));
+                DataSet dataSet = DataSet.toDataSet(HttpExecutor.simpleDelete(httpExecutorContext, requestServerAddress, requestParams));
                 return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
             default:
                 return BuiltInOperation.createResponseData(0, 1, 500, "无效请求！");
         }
         if (receiveJson != null) {
-            DataSet dataSet = BizOptUtils.castObjectToDataSet(receiveJson.getData());
+            DataSet dataSet = DataSet.toDataSet(receiveJson.getData());
             String id = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
             bizModel.putDataSet(id, dataSet);
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());

@@ -7,7 +7,6 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.OFDConvertVo;
-import com.centit.fileserver.common.FileInfo;
 import com.centit.fileserver.common.FileStore;
 import com.centit.framework.common.ResponseData;
 import com.suwell.ofd.custom.agent.HTTPAgent;
@@ -51,13 +50,13 @@ public class OFDConvertBizOperation implements BizOperation {
                 continue;
             }
             int pos = fileId.lastIndexOf('.');
-            String fileType;
+            String fileType ="dat";
             if (pos >= 0) {
                 fileType = fileId.substring(pos + 1);
-            } else {
+            } /*else {
                 FileInfo fileInfo = fileStore.getFileInfo(fileId);
                 fileType = fileInfo.getFileType();
-            }
+            }*/
             String fileName = System.currentTimeMillis() + "." + fileType;
             String path = file.getParent();
             file.renameTo(new File(path + File.separator + fileName));

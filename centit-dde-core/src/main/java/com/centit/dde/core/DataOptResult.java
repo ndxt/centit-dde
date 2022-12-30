@@ -31,21 +31,20 @@ public class DataOptResult implements ToResponseData, Serializable {
      */
     private int resultType;
 
-
     private ResponseData lastError;
 
-    private List<LeftRightPair<String, ResponseData>> errorStepResult;
+    private List<LeftRightPair<String, ResponseData>> stepResult;
     private Object resultObject;
 
     public DataOptResult(){
         resultType = RETURN_OPT_DATA;
-        errorStepResult = new ArrayList<>(16);
+        stepResult = new ArrayList<>(16);
     }
 
-    public void addLastStepResult(String sKey, ResponseData objValue) {
-        lastError = objValue;
+    public void addStepError(String sKey, ResponseData objValue) {
+        stepResult.add(new LeftRightPair<>(sKey, objValue));
         if(ResponseData.RESULT_OK != objValue.getCode()) {
-            errorStepResult.add(new LeftRightPair<>(sKey, objValue));
+            lastError = objValue;
         }
     }
 
@@ -101,12 +100,12 @@ public class DataOptResult implements ToResponseData, Serializable {
     }
 
     public boolean hasErrors(){
-        return errorStepResult.size()>0;
+        return lastError != null; // stepResult.size() > 0;
     }
 
     public String getErrorMessage(){
         StringBuilder errorMsg = new StringBuilder(200);
-        for(LeftRightPair<String, ResponseData> pair : errorStepResult){
+        for(LeftRightPair<String, ResponseData> pair : stepResult){
             //if(ResponseData.RESULT_OK != pair.getRight().getCode()) {
                 errorMsg.append(pair.getLeft()).append(":").append(pair.getRight().getMessage());
             //}
@@ -115,40 +114,47 @@ public class DataOptResult implements ToResponseData, Serializable {
     }
 
     public Object getResultData() {
-        if(resultType == RETURN_CODE_AND_MESSAGE){
+        if(resultType == RETURN_CODE_AND_MESSAGE) {
+            if(resultObject instanceof ResponseData) {
+                return resultObject;
+            }
+        }
+
+        if(hasErrors()){
+            if(stepResult.size()<2){
+                return lastError;
+            }
             int errorCode = lastError.getCode();
-            if(errorCode == 0 && hasErrors()){
+            if(errorCode == 0){
                 errorCode = ResponseData.ERROR_OPERATION;
             }
             return ResponseData.makeErrorMessageWithData( lastError.getData(),
                 errorCode,
                 getErrorMessage()
             );
-        } else {
-            return resultObject;
         }
+
+        if(resultType == RETURN_CODE_AND_MESSAGE) {
+            return ResponseData.makeResponseData(resultObject);
+        }
+
+        return resultObject;
     }
 
     @Override
     public ResponseData toResponseData() {
-        if(resultType == RETURN_CODE_AND_MESSAGE){
-            int errorCode = lastError.getCode();
-            if(errorCode == 0 && hasErrors()){
-                errorCode = ResponseData.ERROR_OPERATION;
-            }
-            return ResponseData.makeErrorMessageWithData( lastError.getData(),
-                errorCode,
-                getErrorMessage()
-            );
+        Object obj = getResultData();
+        if(obj instanceof ResponseData) {
+            return (ResponseData) obj;
         } else {
-            return ResponseData.makeResponseData(this.resultObject);
+            return ResponseData.makeResponseData(obj);
         }
     }
 
     public static DataOptResult createExceptionResult(ResponseData objValue){
         DataOptResult result = new DataOptResult();
         result.resultType = DataOptResult.RETURN_CODE_AND_MESSAGE;
-        result.addLastStepResult("exception", objValue);
+        result.addStepError("exception", objValue);
         return result;
     }
 }

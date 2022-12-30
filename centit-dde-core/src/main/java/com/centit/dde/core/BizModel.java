@@ -53,8 +53,10 @@ public class BizModel implements  Serializable {
     public DataOptResult getOptResult() {
         return optResult;
     }
-    public Map getStackData(){ return this.stackData;}
 
+    public Map getStackData(){
+        return this.stackData;
+    }
 
     public int modelSize(){
         if(bizData == null || bizData.isEmpty()) {
