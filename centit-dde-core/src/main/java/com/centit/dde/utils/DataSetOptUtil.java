@@ -157,14 +157,22 @@ public abstract class DataSetOptUtil {
      * @param formulaMap 字段映射关系， value为计算表达式
      */
     public static void appendDeriveField(DataSet inData, Collection<Map.Entry<String, String>> formulaMap) {
-        List<Map<String, Object>> data = inData.getDataAsList();
-        int rowCount = data.size();
-        int rowIndex = 0;
-        for (Map<String, Object> obj : data) {
-            obj.putAll(mapDataRow(obj, rowIndex, rowCount, formulaMap));
-            rowIndex++;
+        if(DataSet.DATA_SET_TYPE_TABLE.equals(inData.getDataSetType())) {
+            List<Map<String, Object>> data = inData.getDataAsList();
+            int rowCount = data.size();
+            int rowIndex = 0;
+            for (Map<String, Object> obj : data) {
+                obj.putAll(mapDataRow(obj, rowIndex, rowCount, formulaMap));
+                rowIndex++;
+            }
+            inData.setData(data);
+        } else {
+            if(inData.getSize() == 0){
+                return;
+            }
+            Map<String, Object> firstRow = inData.getFirstRow();
+            inData.setData(mapDataRow(firstRow, 0, 1, formulaMap));
         }
-        inData.setData(data);
     }
 
     /**

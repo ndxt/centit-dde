@@ -19,6 +19,8 @@ public class DataSet implements DataSetReader, Serializable {
     public static String SINGLE_DATA_SET_DEFAULT_NAME = "default";
     public static String SINGLE_DATA_FIELD_NAME = "data";
 
+    public static String DATA_SET_TYPE_TABLE = "T";
+
     /**
      * 返回 DataSet 的名称
      */
@@ -88,7 +90,7 @@ public class DataSet implements DataSetReader, Serializable {
         }
         if (this.data instanceof Collection) {
             //Collection<?> objects = ((Collection<?>)this.data);
-            return "T"; //二维表 T(table)
+            return DATA_SET_TYPE_TABLE; //二维表 T(table)
         }
         if (this.data instanceof Map) {
             return "R"; // 单个数据记录 R(row)
@@ -97,7 +99,7 @@ public class DataSet implements DataSetReader, Serializable {
         Class<?> clazz = this.data.getClass();
         if (clazz.isArray() && !(this.data instanceof byte[])
             && !(this.data instanceof char[])) {
-            return "T";
+            return DATA_SET_TYPE_TABLE;
         }
         return "S"; //标量数据 S(scalar)
     }
@@ -160,9 +162,13 @@ public class DataSet implements DataSetReader, Serializable {
         if (this.data instanceof Collection) {
             return ((Collection<?>) this.data).size();
         }
-        if (this.data instanceof Map) {
-            return ((Map) this.data).size();
+
+        Class<?> clazz = this.data.getClass();
+        if (clazz.isArray() && !(this.data instanceof byte[])
+            && !(this.data instanceof char[])) {
+            return Array.getLength(this.data);
         }
+
         return 1;
     }
 
