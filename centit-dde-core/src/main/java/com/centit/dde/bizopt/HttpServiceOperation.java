@@ -144,7 +144,7 @@ public class HttpServiceOperation implements BizOperation {
             BizModelJSONTransform jsonTransform=new BizModelJSONTransform(bizModel);
             for (Map.Entry<String, String> map : params.entrySet()) {
                 if (!StringBaseOpt.isNvl(map.getValue())) {
-                    mapObject.put(map.getKey(), VariableFormula.calculate(map.getValue(),jsonTransform.attainExpressionValue(map.getValue())));
+                    mapObject.put(map.getKey(), jsonTransform.attainExpressionValue(map.getValue()));
                 }
             }
         }

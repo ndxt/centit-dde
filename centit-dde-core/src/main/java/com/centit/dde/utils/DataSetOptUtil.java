@@ -171,7 +171,8 @@ public abstract class DataSetOptUtil {
                 return;
             }
             Map<String, Object> firstRow = inData.getFirstRow();
-            inData.setData(mapDataRow(firstRow, 0, 1, formulaMap));
+            firstRow.putAll(mapDataRow(firstRow, 0, 1, formulaMap));
+            inData.setData(firstRow);
         }
     }
 
