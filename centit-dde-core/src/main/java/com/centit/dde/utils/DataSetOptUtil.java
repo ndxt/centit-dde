@@ -139,15 +139,23 @@ public abstract class DataSetOptUtil {
      * @return 新的数据集
      */
     public static DataSet mapDateSetByFormula(DataSet inData, Collection<Map.Entry<String, String>> formulaMap) {
-        List<Map<String, Object>> data = inData.getDataAsList();
-        List<Map<String, Object>> newData = new ArrayList<>(data.size());
-        int rowCount = data.size();
-        int rowIndex = 0;
-        for (Map<String, Object> obj : data) {
-            newData.add(mapDataRow(obj, rowIndex, rowCount, formulaMap));
-            rowIndex++;
+        if(DataSet.DATA_SET_TYPE_TABLE.equals(inData.getDataSetType())) {
+            List<Map<String, Object>> data = inData.getDataAsList();
+            List<Map<String, Object>> newData = new ArrayList<>(data.size());
+            int rowCount = data.size();
+            int rowIndex = 0;
+            for (Map<String, Object> obj : data) {
+                newData.add(mapDataRow(obj, rowIndex, rowCount, formulaMap));
+                rowIndex++;
+            }
+            return new DataSet(newData);
+        } else {
+            if(inData.getSize() == 0){
+                return new DataSet(null);
+            }
+            Map<String, Object> firstRow = inData.getFirstRow();
+            return new DataSet(mapDataRow(firstRow, 0, 1, formulaMap));
         }
-        return new DataSet(newData);
     }
 
     /**
