@@ -3,6 +3,7 @@ package com.centit.dde.core;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
@@ -225,7 +226,11 @@ public class BizModel implements  Serializable {
 
         if(dataSetName.startsWith(ConstantValue.DOUBLE_UNDERLINE)){
             if(ConstantValue.LAST_ERROR_TAG.equals(dataSetName)){
-                return new DataSet(optResult.getLastError());
+                if(optResult.hasErrors()) {
+                    return new DataSet(optResult.getLastError());
+                } else {
+                    return new DataSet(ResponseData.successResponse);
+                }
             }
             return DataSet.toDataSet(getStackData(dataSetName));
         }
