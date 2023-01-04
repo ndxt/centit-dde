@@ -519,22 +519,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
         JSONObject stepJson = dataOptStep.getCurrentStep().getJSONObject("properties");
 
-        Map<String, Object> queryParams = CollectionsOpt.cloneHashMap(
-            CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
-
-        if(queryParams==null){
-            queryParams = new HashMap<>(8);
-        }
-
-        Map<String, String> callParams =
-            BuiltInOperation.jsonArrayToMap(stepJson.getJSONArray("config"), "paramName", "paramDefaultValue");
-
-        BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
-
-        for (Map.Entry<String, String> ent : callParams.entrySet()){
-            Object calculateValue = VariableFormula.calculate(ent.getValue(), transform);
-            queryParams.put(ent.getKey(), calculateValue);
-        }
+        Object callParams = DataSetOptUtil.getCallModuleParams(bizModel, stepJson, ConstantValue.REQUEST_PARAMS_TAG);
 
         String packetId = stepJson.getString("packetName");
         Integer logLevel = dataOptContext.getLogLevel();
@@ -560,7 +545,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         moduleOptContext.setTaskLog(dataOptContext.getTaskLog());
         moduleOptContext.setOptId(dataOptContext.getOptId());
         moduleOptContext.setNeedRollback(dataOptContext.getNeedRollback());
-        moduleOptContext.setStackData(ConstantValue.MODULE_CALL_TAG, queryParams);
+        moduleOptContext.setStackData(ConstantValue.MODULE_CALL_TAG, callParams);
+        //添加原始调用参数
+        moduleOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
         //添加调用环境的上下文
         moduleOptContext.setStackData(ConstantValue.SESSION_DATA_TAG,
                      bizModel.getStackData(ConstantValue.SESSION_DATA_TAG));

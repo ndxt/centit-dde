@@ -893,7 +893,7 @@ public abstract class DataSetOptUtil {
     public static Map<String, Object> getDataSetParames(BizModel bizModel, JSONObject bizOptJson){
         //参数类型
         String paramsType = bizOptJson.getString("sourceType");
-        if (paramsType == null) return new HashMap<>();
+        //if (paramsType == null) return new HashMap<>();
         Map<String, Object> parames;
         // 自定义参数类型
         if("customSource".equals(paramsType)){
@@ -918,4 +918,29 @@ public abstract class DataSetOptUtil {
         }
         return parames;
     }
+
+    public static Object getCallModuleParams(BizModel bizModel, JSONObject bizOptJson, String defaultDataSet){
+        //参数类型
+        String paramsType = bizOptJson.getString("sourceType");
+        if("customSource".equals(paramsType)){
+            Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
+            Map<String, Object> parames = new HashMap<>(16);
+            //if (mapString != null) {
+            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
+            for (Map.Entry<String, String> map : mapString.entrySet()) {
+                if (!StringBaseOpt.isNvl(map.getValue())) {
+                    parames.put(map.getKey(), transform.attainExpressionValue(map.getValue()));
+                }
+            }
+            //}
+            Map<String, Object> urlParams = CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
+            return CollectionsOpt.unionTwoMap(parames, urlParams);
+        } else {
+            //数据集参数
+            String source = bizOptJson.getString("source");
+            DataSet dataSet = bizModel.getDataSet( StringUtils.isBlank(source)? defaultDataSet :source);
+            return dataSet.getData(); //数据集
+        }
+    }
+
 }
