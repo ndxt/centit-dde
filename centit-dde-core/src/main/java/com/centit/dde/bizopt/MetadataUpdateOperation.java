@@ -37,9 +37,11 @@ public class MetadataUpdateOperation implements BizOperation {
                 return BuiltInOperation.createResponseSuccessData(count);
             case 2://修改
                 int upcount= metaObjectService.updateObjectWithChildren(tableId, parames, withChildrenDeep);
+                bizModel.putDataSet(id, new DataSet(parames));
                 return BuiltInOperation.createResponseSuccessData(upcount);
             case 3://删除
                 metaObjectService.deleteObjectWithChildren(tableId, parames, withChildrenDeep);
+                bizModel.putDataSet(id, new DataSet(parames));
                 return BuiltInOperation.createResponseSuccessData(1);
             case 4://合并
                 int resultCount = metaObjectService.mergeObjectWithChildren(tableId, parames, withChildrenDeep);
