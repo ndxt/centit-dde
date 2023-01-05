@@ -108,8 +108,10 @@ public class MetadataOperation implements BizOperation {
                 if (filters != null) {
                     MetaTable table = metaDataCache.getTableInfo(tableId);
                     DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
-                        WebOptUtils.getCurrentUserInfo(request), topUnit, WebOptUtils.getCurrentUnitCode(request));
+                        WebOptUtils.getCurrentUserDetails(request));
+
                     dataPowerFilter.addSourceData(parames);
+
                     Map<String, String> tableAlias = new HashMap<>(3);
                     tableAlias.put(table.getTableName(), "");
                     QueryAndNamedParams qap = dataPowerFilter.translateQueryFilter(tableAlias, filters);

@@ -83,7 +83,7 @@ public class SqlDataSetReader implements DataSetReader {
                 List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, userCode, optId, "api");
                 if (filters != null) {
                     DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
-                        WebOptUtils.getCurrentUserInfo(request), topUnit, WebOptUtils.getCurrentUnitCode(request));
+                        WebOptUtils.getCurrentUserDetails(request));
                     dataPowerFilter.addSourceData(params);
                     qap = dataPowerFilter.translateQuery(sqlSen, filters);
                 }
