@@ -85,7 +85,7 @@ public class AssignmentOperation implements BizOperation {
                 objList.add(CollectionsOpt.objectToMap(sourceData));
             }
             targetDataSet.setData(objList);
-        } else if("merge".equals(assignType)){ // 追加
+        } else if("merge".equals(assignType)){ // 合并属性
             if( targetDataSet.getSize() < 1){
                 targetDataSet.setData(sourceData);
             } else if( targetDataSet.getSize() == 1){
@@ -103,6 +103,7 @@ public class AssignmentOperation implements BizOperation {
         } else { // 对目标对象赋值 assign || property == '.'
             targetDataSet.setData(sourceData);
         }
+
         return BuiltInOperation.createResponseSuccessData(targetDataSet.getSize());
     }
 }
