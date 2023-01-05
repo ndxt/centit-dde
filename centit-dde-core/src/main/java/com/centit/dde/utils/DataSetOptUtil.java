@@ -46,7 +46,7 @@ public abstract class DataSetOptUtil {
                         stringBuilder.append(regex);
                     }
                     String value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), StringBaseOpt.castObjectToString(string));
-                    value = !value.equals(string) ? value : CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), StringBaseOpt.castObjectToString(string));
+                    value = value!=null && !value.equals(string) ? value : CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), StringBaseOpt.castObjectToString(string));
                     if (a.length > 2 && StringUtils.isNotBlank(StringBaseOpt.castObjectToString(a[2]))) {
                         IDataDictionary dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]),
                             StringBaseOpt.castObjectToString(string),
