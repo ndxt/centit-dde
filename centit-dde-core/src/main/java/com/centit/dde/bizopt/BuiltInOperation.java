@@ -225,7 +225,7 @@ public abstract class BuiltInOperation {
         if (analyse != null) {
             DataSet dataSet = bizModel.getDataSet(sourDsName);
             if (dataSet != null) {
-                DataSet destDs = DataSetOptUtil.analyseDataset(dataSet,
+                DataSet destDs = DataSetOptUtil.analyseDataset(bizModel, dataSet,
                     groupFields, orderFields, ((Map) analyse).entrySet());
                 count = destDs.getSize();
                 bizModel.putDataSet(targetDsName, destDs);

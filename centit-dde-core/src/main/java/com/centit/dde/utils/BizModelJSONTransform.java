@@ -94,7 +94,7 @@ public class BizModelJSONTransform
         }
     }
 
-    private Object fetchRootData(String labelName) {
+    protected Object fetchRootData(String labelName) {
         if (StringUtils.isBlank(labelName)) {
             return this.bizModel;
         }

@@ -1,5 +1,6 @@
 package com.centit.dde.utils;
 
+import com.centit.dde.core.BizModel;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringRegularOpt;
@@ -23,8 +24,10 @@ public class DataRowGroupVariableTranslate
     private int length;
     private int currentPos;
 
-    public DataRowGroupVariableTranslate(List<Map<String, Object>> dataSet) {
+    private BizModelJSONTransform bizModelJSONTransform;
+    public DataRowGroupVariableTranslate(BizModel bizModel, List<Map<String, Object>> dataSet) {
         this.dataSet = dataSet;
+        this.bizModelJSONTransform = new BizModelJSONTransform(bizModel);
     }
 
      /**
@@ -54,6 +57,10 @@ public class DataRowGroupVariableTranslate
             return this.length;
         }
 
+        if (varName.startsWith(ConstantValue.ROOT_NODE_TAG)) {
+            return this.bizModelJSONTransform.fetchRootData(varName.substring(1));
+        }
+
         if(dataSet ==null) {
             return null;
         }
@@ -80,6 +87,7 @@ public class DataRowGroupVariableTranslate
             }
         }
         return ReflectionOpt.attainExpressionValue(dataSet.get(currentPos), varName);
+
     }
 
     public void setDataSet(List<Map<String, Object>> varObj) {

@@ -441,7 +441,7 @@ public abstract class DataSetOptUtil {
      * @param refDesc       引用说明; 新字段名， 引用表达式
      * @return 返回数据集
      */
-    public static DataSet analyseDataset(DataSet inData,
+    public static DataSet analyseDataset(BizModel bizModel, DataSet inData,
                                          List<String> groupByFields,
                                          List<String> orderByFields,
                                          Collection<Map.Entry<String, String>> refDesc) {
@@ -452,7 +452,7 @@ public abstract class DataSetOptUtil {
         Map<String, Object> preRow = null;
         int n = data.size();
         int prePos = 0;
-        DataRowGroupVariableTranslate dvt = new DataRowGroupVariableTranslate(data);
+        DataRowGroupVariableTranslate dvt = new DataRowGroupVariableTranslate(bizModel, data);
         List<Map<String, Object>> newData = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             Map<String, Object> row = data.get(i);
