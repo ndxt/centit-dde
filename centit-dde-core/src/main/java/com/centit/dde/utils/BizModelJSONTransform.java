@@ -129,7 +129,7 @@ public class BizModelJSONTransform
         if (ConstantValue.MODEL_NAME.equals(dataSetName)) {
             return this.bizModel.getModelName();
         }
-        return "";
+        return null;
     }
 
 }

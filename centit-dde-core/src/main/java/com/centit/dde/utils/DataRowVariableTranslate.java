@@ -4,26 +4,25 @@ import com.centit.dde.core.BizModel;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.compiler.VariableTranslate;
 
-import java.util.ArrayList;
-
 /**
  * @author codefan@sina.com
  */
 public class DataRowVariableTranslate
-    extends BizModelJSONTransform {
+    implements VariableTranslate {
 
     public static final String ROW_INDEX_LABEL = "__row_index";
     public static final String ROW_COUNT_LABEL = "__row_count";
 
     private final int rowInd;
     private final int rowCount;
-
+    private Object rowData;
+    private BizModelJSONTransform bizModelJSONTransform;
 
     public DataRowVariableTranslate(BizModel bizModel, Object data, int rowInd, int rowCount) {
-        super(bizModel);
         this.rowInd = rowInd;
         this.rowCount = rowCount;
-        pushStackValue(data);
+        this.rowData = data;
+        this.bizModelJSONTransform = new BizModelJSONTransform(bizModel);
     }
 
 
@@ -45,7 +44,14 @@ public class DataRowVariableTranslate
         if(ROW_COUNT_LABEL.equals(varName)){
             return this.rowCount;
         }
-        return super.getVarValue(varName);
+
+        if (varName.startsWith(ConstantValue.ROOT_NODE_TAG)) {
+            return this.bizModelJSONTransform.fetchRootData(varName.substring(1));
+        }
+
+        if (this.rowData == null)
+            return null;
+        return ReflectionOpt.attainExpressionValue(this.rowData, varName);
     }
 }
 
