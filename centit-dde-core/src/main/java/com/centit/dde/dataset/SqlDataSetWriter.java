@@ -1,5 +1,6 @@
 package com.centit.dde.dataset;
 
+import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetWriter;
 import com.centit.dde.utils.DBBatchUtils;
@@ -39,6 +40,8 @@ public class SqlDataSetWriter implements DataSetWriter {
     private String writeTag;
     private String writeMsg;
 
+    private BizModel bizModel;
+
     public void setFieldsMap(Map fieldsMap) {
         this.fieldsMap = fieldsMap;
     }
@@ -51,7 +54,9 @@ public class SqlDataSetWriter implements DataSetWriter {
      */
     private boolean saveAsWhole;
 
-    public SqlDataSetWriter(ISourceInfo dataSource, MetaTable tableInfo, String writeTag, String writeMsg) {
+    public SqlDataSetWriter(final BizModel bizModel, ISourceInfo dataSource, MetaTable tableInfo,
+                            String writeTag, String writeMsg) {
+        this.bizModel = bizModel;
         this.saveAsWhole = true;
         this.connection = null;
         this.tableInfo = tableInfo;
@@ -80,7 +85,7 @@ public class SqlDataSetWriter implements DataSetWriter {
         }
         if (this.saveAsWhole) {
             try {
-                DBBatchUtils.batchInsertObjects(connection,
+                DBBatchUtils.batchInsertObjects(bizModel, connection,
                     tableInfo, dataSet.getDataAsList(), fieldsMap);
                 successNums = 0;
                 errorNums = 0;
@@ -100,7 +105,7 @@ public class SqlDataSetWriter implements DataSetWriter {
 
             for (Map<String, Object> row : dataSet.getDataAsList()) {
                 try {
-                    int iResult = DBBatchUtils.insertObject(connection,
+                    int iResult = DBBatchUtils.insertObject(bizModel, connection,
                         tableInfo, row, fieldsMap);
                     connection.commit();
                     if (iResult > 0) {
@@ -136,7 +141,7 @@ public class SqlDataSetWriter implements DataSetWriter {
         }
         if (this.saveAsWhole) {
             try {
-                DBBatchUtils.batchMergeObjects(connection,
+                DBBatchUtils.batchMergeObjects(bizModel, connection,
                     tableInfo, dataSet.getDataAsList(), fieldsMap);
                 successNums = 0;
                 errorNums = 0;
@@ -156,7 +161,7 @@ public class SqlDataSetWriter implements DataSetWriter {
                 List<Map<String, Object>> list = new ArrayList<>();
                 list.add(row);
                 try {
-                    int iResult = DBBatchUtils.batchMergeObjects(connection,
+                    int iResult = DBBatchUtils.batchMergeObjects(bizModel, connection,
                         tableInfo, list, fieldsMap);
                     connection.commit();
                     if (iResult > 0) {

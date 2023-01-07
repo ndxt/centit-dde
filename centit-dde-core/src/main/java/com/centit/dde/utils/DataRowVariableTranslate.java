@@ -1,27 +1,32 @@
 package com.centit.dde.utils;
 
+import com.centit.dde.core.BizModel;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.compiler.VariableTranslate;
+
+import java.util.ArrayList;
 
 /**
  * @author codefan@sina.com
  */
 public class DataRowVariableTranslate
-    implements VariableTranslate {
+    extends BizModelJSONTransform {
 
     public static final String ROW_INDEX_LABEL = "__row_index";
     public static final String ROW_COUNT_LABEL = "__row_count";
 
-    private final Object rowData;
     private final int rowInd;
     private final int rowCount;
 
 
-    public DataRowVariableTranslate(Object data, int rowInd, int rowCount) {
-        this.rowData = data;
+    public DataRowVariableTranslate(BizModel bizModel, Object data, int rowInd, int rowCount) {
+        super(bizModel);
         this.rowInd = rowInd;
         this.rowCount = rowCount;
+        pushStackValue(data);
     }
+
+
 
      /**
       * 默认返回业务模型对象的属性值 , request 队形的参数
@@ -40,10 +45,7 @@ public class DataRowVariableTranslate
         if(ROW_COUNT_LABEL.equals(varName)){
             return this.rowCount;
         }
-        if (this.rowData == null)
-            return null;
-        return ReflectionOpt.attainExpressionValue
-            (this.rowData, varName);
+        return super.getVarValue(varName);
     }
 }
 

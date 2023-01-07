@@ -96,7 +96,7 @@ public class PersistenceDBOperation implements BizOperation {
             return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
                 "没有配置交换字段");
         }
-        SqlDataSetWriter dataSetWriter = new SqlDataSetWriter(databaseInfo, tableInfo,result,resultMsg);
+        SqlDataSetWriter dataSetWriter = new SqlDataSetWriter(bizModel, databaseInfo, tableInfo, result, resultMsg);
 
         dataSetWriter.setFieldsMap(PersistenceDBOperation.fetchFieldMap(bizOptJson.getJSONArray("config")));
         // BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "propertyName", "primaryKey1"));

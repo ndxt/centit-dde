@@ -115,14 +115,14 @@ public abstract class DataSetOptUtil {
      * @param formulaMap 字段映射关系
      * @return 新的数据集
      */
-    static Map<String, Object> mapDataRow(Map<String, Object> inRow, int rowInd, int rowCount,
+    static Map<String, Object> mapDataRow(BizModel bizModel, Map<String, Object> inRow, int rowInd, int rowCount,
                                           Collection<Map.Entry<String, String>> formulaMap) {
         if (formulaMap == null) {
             return inRow;
         }
         VariableFormula formula = new VariableFormula();
         formula.setExtendFuncMap(extendFuncs);
-        formula.setTrans(new DataRowVariableTranslate(inRow, rowInd, rowCount));
+        formula.setTrans(new DataRowVariableTranslate(bizModel, inRow, rowInd, rowCount));
         Map<String, Object> newRow = new LinkedHashMap<>(formulaMap.size());
         for (Map.Entry<String, String> ent : formulaMap) {
             formula.setFormula(ent.getValue());
@@ -138,14 +138,14 @@ public abstract class DataSetOptUtil {
      * @param formulaMap 字段映射关系， value为计算表达式
      * @return 新的数据集
      */
-    public static DataSet mapDateSetByFormula(DataSet inData, Collection<Map.Entry<String, String>> formulaMap) {
+    public static DataSet mapDateSetByFormula(BizModel bizModel, DataSet inData, Collection<Map.Entry<String, String>> formulaMap) {
         if(DataSet.DATA_SET_TYPE_TABLE.equals(inData.getDataSetType())) {
             List<Map<String, Object>> data = inData.getDataAsList();
             List<Map<String, Object>> newData = new ArrayList<>(data.size());
             int rowCount = data.size();
             int rowIndex = 0;
             for (Map<String, Object> obj : data) {
-                newData.add(mapDataRow(obj, rowIndex, rowCount, formulaMap));
+                newData.add(mapDataRow(bizModel, obj, rowIndex, rowCount, formulaMap));
                 rowIndex++;
             }
             return new DataSet(newData);
@@ -154,7 +154,7 @@ public abstract class DataSetOptUtil {
                 return new DataSet(null);
             }
             Map<String, Object> firstRow = inData.getFirstRow();
-            return new DataSet(mapDataRow(firstRow, 0, 1, formulaMap));
+            return new DataSet(mapDataRow(bizModel, firstRow, 0, 1, formulaMap));
         }
     }
 
@@ -164,13 +164,13 @@ public abstract class DataSetOptUtil {
      * @param inData     原始数据集
      * @param formulaMap 字段映射关系， value为计算表达式
      */
-    public static void appendDeriveField(DataSet inData, Collection<Map.Entry<String, String>> formulaMap) {
+    public static void appendDeriveField(BizModel bizModel, DataSet inData, Collection<Map.Entry<String, String>> formulaMap) {
         if(DataSet.DATA_SET_TYPE_TABLE.equals(inData.getDataSetType())) {
             List<Map<String, Object>> data = inData.getDataAsList();
             int rowCount = data.size();
             int rowIndex = 0;
             for (Map<String, Object> obj : data) {
-                obj.putAll(mapDataRow(obj, rowIndex, rowCount, formulaMap));
+                obj.putAll(mapDataRow(bizModel, obj, rowIndex, rowCount, formulaMap));
                 rowIndex++;
             }
             inData.setData(data);
@@ -179,7 +179,7 @@ public abstract class DataSetOptUtil {
                 return;
             }
             Map<String, Object> firstRow = inData.getFirstRow();
-            firstRow.putAll(mapDataRow(firstRow, 0, 1, formulaMap));
+            firstRow.putAll(mapDataRow(bizModel, firstRow, 0, 1, formulaMap));
             inData.setData(firstRow);
         }
     }
@@ -191,7 +191,7 @@ public abstract class DataSetOptUtil {
      * @param formulas 逻辑表达式
      * @return 新的数据集
      */
-    public static DataSet filterDateSet(DataSet inData, List<String> formulas) {
+    public static DataSet filterDateSet(BizModel bizModel, DataSet inData, List<String> formulas) {
         List<Map<String, Object>> data = inData.getDataAsList();
         int rowCount = data.size();
         int rowIndex = 0;
@@ -200,7 +200,8 @@ public abstract class DataSetOptUtil {
             boolean canAdd = true;
             for (String formula : formulas) {
                 if (!BooleanBaseOpt.castObjectToBoolean(
-                    VariableFormula.calculate(formula, new DataRowVariableTranslate(obj,rowIndex, rowCount), extendFuncs), false)) {
+                    VariableFormula.calculate(formula,
+                        new DataRowVariableTranslate(bizModel, obj, rowIndex, rowCount), extendFuncs), false)) {
                     canAdd = false;
                     break;
                 }

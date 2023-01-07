@@ -13,8 +13,9 @@ public class ConstantValue {
     public static final String DATA_COPY ="1";
 
     static final String MODEL_NAME = "modelName";
-    static final String BACKSLASH = "/";
+    static final String ROOT_NODE_TAG = "/";
     static final String SPOT = ".";
+
     static final String DOUBLE_SPOT = "..";
     public static final String ELSE = "else";
     public static final String FALSE = "F";

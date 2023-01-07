@@ -69,7 +69,7 @@ public class BizModelJSONTransform
 
     @Override
     public Object getVarValue(String labelName) {
-        if (labelName.startsWith(ConstantValue.BACKSLASH)) {
+        if (labelName.startsWith(ConstantValue.ROOT_NODE_TAG)) {
             return fetchRootData(labelName.substring(1));
         } else if (labelName.startsWith(ConstantValue.DOUBLE_SPOT)) {
             return ReflectionOpt.attainExpressionValue(

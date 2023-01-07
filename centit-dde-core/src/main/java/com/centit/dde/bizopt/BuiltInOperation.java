@@ -153,7 +153,7 @@ public abstract class BuiltInOperation {
         String targetDsName = getJsonFieldString(bizOptJson, "id", sourDsName);
         Map<String, String> mapInfo = jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
         DataSet dataSet = bizModel.getDataSet(sourDsName);
-        DataSet destDs = DataSetOptUtil.mapDateSetByFormula(dataSet, mapInfo.entrySet());
+        DataSet destDs = DataSetOptUtil.mapDateSetByFormula(bizModel, dataSet, mapInfo.entrySet());
         bizModel.putDataSet(targetDsName, destDs);
         return createResponseSuccessData(destDs.getSize());
     }
@@ -166,7 +166,7 @@ public abstract class BuiltInOperation {
             DataSet dataSet = bizModel.getDataSet(sourDsName);
             if (dataSet != null) {
                 count = dataSet.getSize();
-                DataSetOptUtil.appendDeriveField(dataSet, mapInfo.entrySet());
+                DataSetOptUtil.appendDeriveField(bizModel, dataSet, mapInfo.entrySet());
             }
         }
         return createResponseSuccessData(count);
@@ -182,7 +182,7 @@ public abstract class BuiltInOperation {
         if (formula != null) {
             DataSet dataSet = bizModel.getDataSet(sourDsName);
             if (dataSet != null) {
-                DataSet destDs = DataSetOptUtil.filterDateSet(dataSet, formula);
+                DataSet destDs = DataSetOptUtil.filterDateSet(bizModel, dataSet, formula);
                 count = destDs.getSize();
                 bizModel.putDataSet(targetDsName, destDs);
             }

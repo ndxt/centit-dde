@@ -134,7 +134,7 @@ public class EsWriteBizOperation implements BizOperation {
             int rowCount = dataAsList.size();
             List<Object> addResult = new ArrayList<>();
             for(Map<String, Object> documentInfo : dataAsList) {
-                formula.setTrans(new DataRowVariableTranslate(documentInfo, rowInd++, rowCount));
+                formula.setTrans(new DataRowVariableTranslate(bizModel, documentInfo, rowInd++, rowCount));
                 switch (operationType) {
                     case "add":
                         addResult.add(esIndexer.saveNewDocument(objectDocumentBuild(formula, documentInfo, bizOptJson, dataOptContext)));
