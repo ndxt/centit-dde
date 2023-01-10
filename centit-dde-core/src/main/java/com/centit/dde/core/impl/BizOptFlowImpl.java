@@ -130,6 +130,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("unit", new UnitFilterOperation());
         allOperations.put("user", new UserFilterOperation());
 
+        allOperations.put("redisRead", new RedisReadOperation(sourceInfoDao));
+        allOperations.put("redisWrite", new RedisWriteOperation(sourceInfoDao));
+
         allOperations.put(ConstantValue.ENCRYPT, new EncryptOperation());
         allOperations.put(ConstantValue.DECIPHER, new DecipherOperation());
         allOperations.put(ConstantValue.GENERATE_CSV, new WriteCsvOperation());
