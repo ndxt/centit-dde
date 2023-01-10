@@ -41,7 +41,6 @@ public class MetadataQueryOperation implements BizOperation {
         this.metaDataCache=metaDataCache;
     }
 
-
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");
@@ -90,6 +89,7 @@ public class MetadataQueryOperation implements BizOperation {
                 bizModel.putDataSet(id, dataSet);
                 return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
-        return ResponseData.makeErrorMessage("未知查询类型！");
+        return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
+            "配置信息不正确，未知查询类型！");
     }
 }
