@@ -39,10 +39,10 @@ public abstract class BuiltInOperation {
         return targetDsName;
     }
 
-    public static ResponseData createResponseSuccessData(int count) {
+    public static ResponseData createResponseSuccessData(int success) {
         JSONObject map = new JSONObject();
         map.put("info", "ok");
-        map.put("success", count);
+        map.put("success", success);
         map.put("error", 0);
         return ResponseSingleData.makeResponseData(map);
     }

@@ -134,6 +134,7 @@ public class ConstantValue {
     public static final String MODULE_CALL_TAG = "__module_params";
     public static final String LAST_ERROR_TAG = "__last_error";
 
+    public static final String LAST_RETURN_TAG = "__last_return";
     public static final int STOP_WFINST=1;
     public static final int SUSPEND_WFINST=2;
     public static final int ACTIVE_WFINST=3;

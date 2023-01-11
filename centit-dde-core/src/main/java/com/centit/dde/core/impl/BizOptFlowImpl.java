@@ -277,7 +277,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
             DataSet dataSet = bizModel.getDataSet(dataSetId);
             if (dataSet == null) {
-                bizModel.getOptResult().addStepError(
+                bizModel.getOptResult().setStepResponse(
                     BuiltInOperation.getJsonFieldString(stepJson, "id", "endNode"), ResponseData.makeErrorMessage(
                     ResponseData.ERROR_OPERATION, "获取数据集："+ dataSetId +"出错！" ));
                 //添加错误日志
@@ -481,6 +481,9 @@ public class BizOptFlowImpl implements BizOptFlow {
                 }
                 detailLog.setRunBeginTime(runBeginTime);
             }
+            //正确返回也要设置运行结果
+            bizModel.getOptResult().setStepResponse(bizOptJson.getString("id"), responseData);
+
         } catch (Exception e) {
             TaskDetailLog detailLog = creaetLogDetail(dataOptStep, dataOptContext);
             String errMsg = ObjectException.extortExceptionMessage(e);
@@ -489,7 +492,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
             ResponseData responseData = ResponseData.makeErrorMessageWithData(errMsg, ResponseData.ERROR_OPERATION,
                 e.getMessage());
-            bizModel.getOptResult().addStepError(bizOptJson.getString("id"), responseData);
+            bizModel.getOptResult().setStepResponse(bizOptJson.getString("id"), responseData);
         }
     }
 
@@ -556,13 +559,14 @@ public class BizOptFlowImpl implements BizOptFlow {
                      bizModel.getStackData(ConstantValue.SESSION_DATA_TAG));
 
         DataOptResult result = runInner(dataPacketInterface, moduleOptContext);
-        if (result != null) {
-            bizModel.putDataSet(stepJson.getString("id"), DataSet.toDataSet(result.getResultData()));
-            if(result.hasErrors()){
-                bizModel.getOptResult().addStepError(
-                    stepJson.getString("id"), result.getLastError());
-            }
-        }
 
+        bizModel.putDataSet(stepJson.getString("id"), DataSet.toDataSet(result.getResultData()));
+        if(result.hasErrors()){
+            bizModel.getOptResult().setStepResponse(
+                stepJson.getString("id"), result.makeErrorResponse());
+        } else {
+            bizModel.getOptResult().setStepResponse(
+                stepJson.getString("id"), BuiltInOperation.createResponseSuccessData(1));
+        }
     }
 }

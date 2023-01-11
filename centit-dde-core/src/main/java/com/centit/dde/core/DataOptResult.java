@@ -31,25 +31,33 @@ public class DataOptResult implements ToResponseData, Serializable {
      */
     private int resultType;
 
-    private ResponseData lastError;
+    private ResponseData lastResponse;
 
-    private List<LeftRightPair<String, ResponseData>> stepResult;
+    private List<LeftRightPair<String, ResponseData>> errorList;
     private Object resultObject;
 
     public DataOptResult(){
         resultType = RETURN_OPT_DATA;
-        stepResult = new ArrayList<>(16);
+        errorList = new ArrayList<>(16);
     }
 
-    public void addStepError(String sKey, ResponseData objValue) {
-        stepResult.add(new LeftRightPair<>(sKey, objValue));
+    public void setStepResponse(String sKey, ResponseData objValue) {
+        lastResponse = objValue;
         if(ResponseData.RESULT_OK != objValue.getCode()) {
-            lastError = objValue;
+            errorList.add(new LeftRightPair<>(sKey, objValue));
         }
     }
 
     public ResponseData getLastError() {
-        return lastError;
+        int errorCount = errorList.size();
+        if(errorCount>0){
+            return errorList.get(errorCount-1).getRight();
+        }
+        return null;
+    }
+
+    public ResponseData getLastReturn() {
+        return lastResponse;
     }
 
     public int getResultType() {
@@ -100,17 +108,29 @@ public class DataOptResult implements ToResponseData, Serializable {
     }
 
     public boolean hasErrors(){
-        return lastError != null; // stepResult.size() > 0;
+        return errorList.size() > 0;
     }
 
-    public String getErrorMessage(){
+    public ResponseData makeErrorResponse(){
+        int errorCount = errorList.size();
+        if(errorCount==1){
+            return errorList.get(0).getRight();
+        }
+        int errorCode = errorList.get(errorCount-1).getRight().getCode();
+        if(errorCode == 0){
+            errorCode = ResponseData.ERROR_OPERATION;
+        }
+
         StringBuilder errorMsg = new StringBuilder(200);
-        for(LeftRightPair<String, ResponseData> pair : stepResult){
+        for(LeftRightPair<String, ResponseData> pair : errorList){
             //if(ResponseData.RESULT_OK != pair.getRight().getCode()) {
                 errorMsg.append(pair.getLeft()).append(":").append(pair.getRight().getMessage());
             //}
         }
-        return errorMsg.toString();
+        return ResponseData.makeErrorMessageWithData(errorList,
+            errorCode,
+            errorMsg.toString()
+        );
     }
 
     public Object getResultData() {
@@ -121,17 +141,7 @@ public class DataOptResult implements ToResponseData, Serializable {
         }
 
         if(hasErrors()){
-            if(stepResult.size()<2){
-                return lastError;
-            }
-            int errorCode = lastError.getCode();
-            if(errorCode == 0){
-                errorCode = ResponseData.ERROR_OPERATION;
-            }
-            return ResponseData.makeErrorMessageWithData( lastError.getData(),
-                errorCode,
-                getErrorMessage()
-            );
+            return makeErrorResponse();
         }
 
         if(resultType == RETURN_CODE_AND_MESSAGE) {
@@ -154,7 +164,7 @@ public class DataOptResult implements ToResponseData, Serializable {
     public static DataOptResult createExceptionResult(ResponseData objValue){
         DataOptResult result = new DataOptResult();
         result.resultType = DataOptResult.RETURN_CODE_AND_MESSAGE;
-        result.addStepError("exception", objValue);
+        result.setStepResponse("exception", objValue);
         return result;
     }
 }

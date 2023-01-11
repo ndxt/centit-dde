@@ -232,6 +232,11 @@ public class BizModel implements  Serializable {
                     return new DataSet(ResponseData.successResponse);
                 }
             }
+
+            if(ConstantValue.LAST_RETURN_TAG.equals(dataSetName)){
+                return new DataSet(optResult.getLastReturn());
+            }
+
             return DataSet.toDataSet(getStackData(dataSetName));
         }
 
