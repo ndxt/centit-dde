@@ -158,11 +158,9 @@ public class SqlDataSetWriter implements DataSetWriter {
             errorNums = 0;
             info = "ok";
             for (Map<String, Object> row : dataSet.getDataAsList()) {
-                List<Map<String, Object>> list = new ArrayList<>();
-                list.add(row);
                 try {
-                    int iResult = DBBatchUtils.batchMergeObjects(bizModel, connection,
-                        tableInfo, list, fieldsMap);
+                    int iResult = DBBatchUtils.mergeObject(bizModel, connection,
+                        tableInfo, row, fieldsMap);
                     connection.commit();
                     if (iResult > 0) {
                         dealResultMsg(row);
