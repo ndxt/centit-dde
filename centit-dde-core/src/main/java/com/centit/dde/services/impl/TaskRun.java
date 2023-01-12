@@ -73,7 +73,7 @@ public class TaskRun {
             //更新API信息
             updateApiData(optContext.getRunType(), dataPacketInterface);
             if(runResult.hasErrors()){
-                taskLog.setOtherMessage( runResult.getErrorMessage());
+                taskLog.setOtherMessage(runResult.makeErrorResponse().getMessage());
             } else {
                 taskLog.setOtherMessage("ok！");
             }
