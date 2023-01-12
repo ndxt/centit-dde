@@ -55,7 +55,7 @@ public class TaskRun {
     }
 
     public DataOptResult runTask(DataPacketInterface dataPacketInterface, DataOptContext optContext) {
-        TaskLog taskLog = buildLogInfo(optContext.getRunType(), dataPacketInterface);
+        TaskLog taskLog = buildLogInfo(optContext, dataPacketInterface);
 
         optContext.setTaskLog(taskLog);
 
@@ -113,15 +113,16 @@ public class TaskRun {
         taskLog.addDetailLog(detailLog);
     }
 
-    private TaskLog buildLogInfo(String runType, DataPacketInterface dataPacketInterface) {
+    private TaskLog buildLogInfo(DataOptContext context, DataPacketInterface dataPacketInterface) {
         TaskLog taskLog = new TaskLog();
         taskLog.setRunBeginTime(new Date());
-        taskLog.setApiType(ConstantValue.RUN_TYPE_DEBUG.equals(runType) ? 0 : 1);
+        taskLog.setApiType(ConstantValue.RUN_TYPE_DEBUG.equals(context.getRunType()) ? 0 : 1);
         if (dataPacketInterface != null) {
             if (!StringBaseOpt.isNvl(dataPacketInterface.getTaskType()) && ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())) {
                 taskLog.setRunner("定时任务");
             } else {
-                taskLog.setRunner(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
+                taskLog.setRunner(context.getCurrentUserCode());
+                //taskLog.setRunner(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
             }
         }
         //taskLog.setLogId(UuidOpt.getUuidAsString32());

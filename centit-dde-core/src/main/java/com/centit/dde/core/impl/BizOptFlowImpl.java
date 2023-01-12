@@ -459,7 +459,6 @@ public class BizOptFlowImpl implements BizOptFlow {
         int logLevel = dataOptContext.getLogLevel();
         Date runBeginTime = new Date();// 获取当期时间
 
-
         JSONObject bizOptJson = dataOptStep.getCurrentStep().getJSONObject("properties");
         try {
             BizOperation opt = allOperations.get(bizOptJson.getString("type"));
