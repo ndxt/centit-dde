@@ -21,8 +21,8 @@ public class OptLogOperation implements BizOperation {
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
         String newValue = bizOptJson.getString("newValue");
         Object newObj = StringUtils.isBlank(newValue)? null : transform.attainExpressionValue(newValue);
-        String oldValue = bizOptJson.getString("newValue");
-        Object oldObj = StringUtils.isBlank(newValue)? null : transform.attainExpressionValue(newValue);
+        String oldValue = bizOptJson.getString("oldValue");
+        Object oldObj = StringUtils.isBlank(oldValue)? null : transform.attainExpressionValue(oldValue);
         CentitUserDetails userDetails = dataOptContext.getCurrentUserDetail();
 
         String logLevel = BuiltInOperation.getJsonFieldString(bizOptJson, "logLevel", "0");
