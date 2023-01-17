@@ -2,6 +2,7 @@ package com.centit.dde;
 
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.search.service.ESServerConfig;
 import com.centit.support.algorithm.NumberBaseOpt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,18 @@ public class EsRegisterOperation {
     @Autowired
     Environment env;
 
+    @Autowired
+    private SourceInfoDao sourceInfoDao;
+
     @PostConstruct
     void registerOperation(){
         ESServerConfig esServerConfig = esServerConfig();
         //注册查询操作类
-        bizOptFlow.registerOperation(ConstantValue.ELASTICSEARCH_QUERY,new EsQueryBizOperation(esServerConfig));
+        bizOptFlow.registerOperation(ConstantValue.ELASTICSEARCH_QUERY,
+            new EsQueryBizOperation(esServerConfig, sourceInfoDao));
         //注册插入操作类
-        bizOptFlow.registerOperation(ConstantValue.ELASTICSEARCH_WRITE,new EsWriteBizOperation(esServerConfig));
+        bizOptFlow.registerOperation(ConstantValue.ELASTICSEARCH_WRITE,
+            new EsWriteBizOperation(esServerConfig, sourceInfoDao));
     }
 
     private ESServerConfig esServerConfig() {

@@ -10,6 +10,8 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataRowVariableTranslate;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
+import com.centit.product.adapter.po.SourceInfo;
+import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.search.document.FileDocument;
 import com.centit.search.document.ObjectDocument;
 import com.centit.search.service.ESServerConfig;
@@ -30,8 +32,10 @@ public class EsWriteBizOperation implements BizOperation {
 
     private final ESServerConfig esServerConfig;
 
-    public EsWriteBizOperation(ESServerConfig esServerConfig) {
+    private  SourceInfoDao sourceInfoDao;
+    public EsWriteBizOperation(ESServerConfig esServerConfig, SourceInfoDao sourceInfoDao) {
         this.esServerConfig = esServerConfig;
+        this.sourceInfoDao = sourceInfoDao;
     }
 
 
@@ -43,14 +47,42 @@ public class EsWriteBizOperation implements BizOperation {
             return ResponseData.makeErrorMessage("请选择操作类型！");
         }
 
-        boolean indexFile = "indexFile".equals(bizOptJson.get("indexType"));
-        ESIndexer esIndexer = indexFile ?
-            IndexerSearcherFactory.obtainIndexer(esServerConfig, FileDocument.class)
-            :IndexerSearcherFactory.obtainIndexer(esServerConfig, ObjectDocument.class);
+        String  indexType  = bizOptJson.getString("indexType");
+        if("custom".equals(indexType)){
+            return customDocOperation(bizModel, bizOptJson, dataOptContext, operationType);
+        } else {
+            boolean indexFile = "indexFile".equals(bizOptJson.get("indexType"));
+            ESIndexer esIndexer = indexFile ?
+                IndexerSearcherFactory.obtainIndexer(esServerConfig, FileDocument.class)
+                : IndexerSearcherFactory.obtainIndexer(esServerConfig, ObjectDocument.class);
 
-        return indexFile?
-            fileDocumentOperation(bizModel,bizOptJson,dataOptContext,esIndexer,operationType)
-            : objectDocumentOperation(bizModel,bizOptJson,dataOptContext,esIndexer,operationType);
+            return indexFile ?
+                fileDocumentOperation(bizModel, bizOptJson, dataOptContext, esIndexer, operationType)
+                : objectDocumentOperation(bizModel, bizOptJson, dataOptContext, esIndexer, operationType);
+        }
+    }
+
+    private ResponseData customDocOperation(BizModel bizModel, JSONObject bizOptJson,
+                                            DataOptContext dataOptContext, String operationType) throws Exception{
+        String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "esDatabase", null);
+        SourceInfo esInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+
+        String indexName = BuiltInOperation.getJsonFieldString(bizOptJson, "indexName", null);
+
+        String dataSetId = bizOptJson.getString("source");
+        if (StringUtils.isBlank(dataSetId)) return ResponseData.makeErrorMessage("文档内容不能为空！");
+
+        DataSet dataSet = bizModel.getDataSet(dataSetId);
+        if (dataSet == null ) return ResponseData.makeErrorMessage("选择的文档内容不存在！");
+        String primaryKeyName = bizOptJson.getString("primaryKey");
+        for(Map<String, Object> objectMap : dataSet.getDataAsList()){
+            Object id = objectMap.get(primaryKeyName);
+
+
+        }
+
+
+        return ResponseData.makeResponseData(1);
     }
     //es 文件文档操作
     private ResponseData fileDocumentOperation(BizModel bizModel, JSONObject bizOptJson,DataOptContext dataOptContext,
@@ -111,7 +143,7 @@ public class EsWriteBizOperation implements BizOperation {
 
     //es 对象文档操作
     private ResponseData objectDocumentOperation(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext,
-                                                 ESIndexer esIndexer,String operationType){
+                                                 ESIndexer esIndexer, String operationType){
         String dataSetId = bizOptJson.getString("source");
         if (StringUtils.isBlank(dataSetId)) return ResponseData.makeErrorMessage("参数来源不能为空！");
 

@@ -9,6 +9,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.dao.PageQueryResult;
+import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.search.document.FileDocument;
 import com.centit.search.document.ObjectDocument;
 import com.centit.search.service.ESServerConfig;
@@ -32,9 +33,10 @@ import java.util.Map;
 
 public class EsQueryBizOperation implements BizOperation {
     private final ESServerConfig esServerConfig;
-
-    public EsQueryBizOperation(ESServerConfig esServerConfig) {
+    private  SourceInfoDao sourceInfoDao;
+    public EsQueryBizOperation(ESServerConfig esServerConfig, SourceInfoDao sourceInfoDao) {
         this.esServerConfig = esServerConfig;
+        this.sourceInfoDao = sourceInfoDao;
     }
 
     @Override
@@ -80,8 +82,8 @@ public class EsQueryBizOperation implements BizOperation {
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }
 
-    private QueryBuilder queryBuilder(Map<String,Object> queryParam, String keyword,Boolean indexFile,
-                                      ESSearcher esSearcher,JSONObject bizOptJson,BizModelJSONTransform transform){
+    private QueryBuilder queryBuilder(Map<String,Object> queryParam, String keyword, Boolean indexFile,
+                                      ESSearcher esSearcher, JSONObject bizOptJson, BizModelJSONTransform transform){
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (queryParam != null){
             for (Map.Entry<String, Object> entry : queryParam.entrySet()) {
