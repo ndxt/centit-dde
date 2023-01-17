@@ -54,6 +54,6 @@ public class MailBizOperation implements BizOperation {
             bizModel.putDataSet(id, new DataSet(responseData));
             return responseData;
         }
-        return null;
+        return ResponseData.makeErrorMessage(500, "IM 发送没有实现");
     }
 }
