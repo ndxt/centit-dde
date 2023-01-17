@@ -52,7 +52,7 @@ public abstract class DBBatchUtils {
                                    final MetaTable tableInfo,
                                    final Map<String, Object> object, Map fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
-        if (fieldsMap == null) {
+        if (fieldsMap == null || fieldsMap.size()==0) {
             fields.addAll(object.keySet());
         } else {
             Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
@@ -63,7 +63,7 @@ public abstract class DBBatchUtils {
         QueryLogUtils.printSql(logger, sqlPair.getLeft(), sqlPair.getRight());
 
         Map<String, Object> objectForSave =
-            prepareObjectForSave(tableInfo, fieldsMap != null ?
+            prepareObjectForSave(tableInfo, fieldsMap != null  && fieldsMap.size()>0?
                 DataSetOptUtil.mapDataRow(bizModel, object, 0, 1, fieldsMap.entrySet()) : object);
         if(tableInfo.hasGeneratedKeys()){ //插入 并找回主键
             MetaColumn column = tableInfo.fetchGeneratedKey();
@@ -94,7 +94,7 @@ public abstract class DBBatchUtils {
                                          final MetaTable tableInfo,
                                          final List<Map<String, Object>> objects, Map fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
-        if (fieldsMap == null) {
+        if (fieldsMap == null || fieldsMap.size()==0) {
             fields = achieveAllFields(objects);
         } else {
             Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
@@ -112,7 +112,7 @@ public abstract class DBBatchUtils {
                 List<Map<String, Object>> savedObjects = new ArrayList<>(INT_BATCH_NUM);
                 for (Map<String, Object> object : objects) {
                     Map<String, Object> objectForSave =
-                        prepareObjectForSave(tableInfo, fieldsMap != null ?
+                        prepareObjectForSave(tableInfo, fieldsMap != null  && fieldsMap.size()>0?
                             DataSetOptUtil.mapDataRow(bizModel, object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
                     savedObjects.add(object);
                     DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), objectForSave);
@@ -140,7 +140,7 @@ public abstract class DBBatchUtils {
             try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())) {
                 for (Map<String, Object> object : objects) {
                     Map<String, Object> objectForSave =
-                        prepareObjectForSave(tableInfo, fieldsMap != null ?
+                        prepareObjectForSave(tableInfo, fieldsMap != null  && fieldsMap.size()>0?
                             DataSetOptUtil.mapDataRow(bizModel, object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
 
                     DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), objectForSave);
@@ -166,7 +166,7 @@ public abstract class DBBatchUtils {
                                         final MetaTable tableInfo,
                                         final Map<String, Object> object, Map fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
-        if (fieldsMap == null) {
+        if (fieldsMap == null || fieldsMap.size()==0) {
             fields.addAll(object.keySet());
         } else {
             Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
@@ -177,7 +177,7 @@ public abstract class DBBatchUtils {
 
         try (PreparedStatement checkStmt = conn.prepareStatement(checkSqlPair.getLeft())) {
             Map<String, Object> objectForSave =
-                prepareObjectForSave(tableInfo, fieldsMap != null ?
+                prepareObjectForSave(tableInfo, fieldsMap != null && fieldsMap.size()>0?
                     DataSetOptUtil.mapDataRow(bizModel, object, 0, 1, fieldsMap.entrySet()) : object);
 
             DatabaseAccess.setQueryStmtParameters(checkStmt, checkSqlPair.getRight(), objectForSave);
@@ -237,7 +237,7 @@ public abstract class DBBatchUtils {
                                         final List<Map<String, Object>> objects,
                                         Map fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
-        if (fieldsMap == null) {
+        if (fieldsMap == null || fieldsMap.size()==0) {
             fields = achieveAllFields(objects);
         } else {
             Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
@@ -283,7 +283,7 @@ public abstract class DBBatchUtils {
             for (Map<String, Object> object : objects) {
 
                 Map<String, Object> objectForSave =
-                    prepareObjectForSave(tableInfo,fieldsMap != null?
+                    prepareObjectForSave(tableInfo,fieldsMap != null && fieldsMap.size()>0?
                         DataSetOptUtil.mapDataRow(bizModel, object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
 
                 rowIndex++;
