@@ -12,6 +12,7 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.search.document.FileDocument;
 import com.centit.search.document.ObjectDocument;
 import com.centit.search.service.ESServerConfig;
@@ -22,6 +23,7 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.client.RestHighLevelClient;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,6 +77,10 @@ public class EsWriteBizOperation implements BizOperation {
         DataSet dataSet = bizModel.getDataSet(dataSetId);
         if (dataSet == null ) return ResponseData.makeErrorMessage("选择的文档内容不存在！");
         String primaryKeyName = bizOptJson.getString("primaryKey");
+
+
+        RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
+
         for(Map<String, Object> objectMap : dataSet.getDataAsList()){
             Object id = objectMap.get(primaryKeyName);
 
