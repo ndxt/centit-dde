@@ -52,7 +52,7 @@ public abstract class DBBatchUtils {
                                    final MetaTable tableInfo,
                                    final Map<String, Object> object, Map fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
-        if (fieldsMap == null) {
+        if (fieldsMap == null || fieldsMap.size()==0) {
             fields.addAll(object.keySet());
         } else {
             Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
@@ -94,7 +94,7 @@ public abstract class DBBatchUtils {
                                          final MetaTable tableInfo,
                                          final List<Map<String, Object>> objects, Map fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
-        if (fieldsMap == null) {
+        if (fieldsMap == null || fieldsMap.size()==0) {
             fields = achieveAllFields(objects);
         } else {
             Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
@@ -166,7 +166,7 @@ public abstract class DBBatchUtils {
                                         final MetaTable tableInfo,
                                         final Map<String, Object> object, Map fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
-        if (fieldsMap == null) {
+        if (fieldsMap == null || fieldsMap.size()==0) {
             fields.addAll(object.keySet());
         } else {
             Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
@@ -237,7 +237,7 @@ public abstract class DBBatchUtils {
                                         final List<Map<String, Object>> objects,
                                         Map fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
-        if (fieldsMap == null) {
+        if (fieldsMap == null || fieldsMap.size()==0) {
             fields = achieveAllFields(objects);
         } else {
             Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
