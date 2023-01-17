@@ -100,6 +100,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         //allOperations.put(ConstantValue.SCHEDULER, (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runStart(bizModel1, bizOptJson1));//模块调度
         allOperations.put("start", (bizModel, bizOptJson, dataOptContext)-> BuiltInOperation.runStart());
 
+        allOperations.put(ConstantValue.SESSION_DATA, new SessionDataOperation());
         allOperations.put("postData", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runRequestBody(bizModel, bizOptJson));
         allOperations.put("postFile", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runRequestFile(bizModel, bizOptJson));
 
@@ -148,8 +149,6 @@ public class BizOptFlowImpl implements BizOptFlow {
             new MetadataQueryOperation(metaObjectService, queryDataScopeFilter, metaDataCache));
         allOperations.put(ConstantValue.METADATA_OPERATION_UPDATE, new MetadataUpdateOperation(metaObjectService));
         allOperations.put(ConstantValue.COMPARE_SOURCE, new ObjectCompareOperation());
-
-        allOperations.put(ConstantValue.SESSION_DATA, new SessionDataOperation());
 
         allOperations.put(ConstantValue.COMMIT_TRANSACTION, new TransactionCommitOperation(sourceInfoDao));
         allOperations.put(ConstantValue.INTERSECT_DATASET, new IntersectDataSetOperation());

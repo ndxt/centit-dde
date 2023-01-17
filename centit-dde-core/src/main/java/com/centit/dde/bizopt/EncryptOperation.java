@@ -33,9 +33,15 @@ public class EncryptOperation  implements BizOperation {
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         //AES / SM4
         String algorithm = BuiltInOperation.getJsonFieldString(bizOptJson, "algorithm", "AES");
-        String password = BuiltInOperation.getJsonFieldString(bizOptJson, "password", "change it");
-        BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
-        password = StringBaseOpt.castObjectToString(transform.attainExpressionValue(password), password);
+        String password = BuiltInOperation.getJsonFieldString(bizOptJson, "password", "");
+
+        if(StringUtils.isBlank(password)){
+            password = AESSecurityUtils.AES_DEFAULT_KEY;
+        } else {
+            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
+            password = StringBaseOpt.castObjectToString(transform.attainExpressionValue(password), password);
+        }
+
         Boolean base64 =
             BooleanBaseOpt.castObjectToBoolean(
                 BuiltInOperation.getJsonFieldString(bizOptJson, "base64", "true"), true);
