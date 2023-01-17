@@ -63,7 +63,7 @@ public abstract class DBBatchUtils {
         QueryLogUtils.printSql(logger, sqlPair.getLeft(), sqlPair.getRight());
 
         Map<String, Object> objectForSave =
-            prepareObjectForSave(tableInfo, fieldsMap != null ?
+            prepareObjectForSave(tableInfo, fieldsMap != null  && fieldsMap.size()>0?
                 DataSetOptUtil.mapDataRow(bizModel, object, 0, 1, fieldsMap.entrySet()) : object);
         if(tableInfo.hasGeneratedKeys()){ //插入 并找回主键
             MetaColumn column = tableInfo.fetchGeneratedKey();
@@ -112,7 +112,7 @@ public abstract class DBBatchUtils {
                 List<Map<String, Object>> savedObjects = new ArrayList<>(INT_BATCH_NUM);
                 for (Map<String, Object> object : objects) {
                     Map<String, Object> objectForSave =
-                        prepareObjectForSave(tableInfo, fieldsMap != null ?
+                        prepareObjectForSave(tableInfo, fieldsMap != null  && fieldsMap.size()>0?
                             DataSetOptUtil.mapDataRow(bizModel, object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
                     savedObjects.add(object);
                     DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), objectForSave);
@@ -140,7 +140,7 @@ public abstract class DBBatchUtils {
             try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())) {
                 for (Map<String, Object> object : objects) {
                     Map<String, Object> objectForSave =
-                        prepareObjectForSave(tableInfo, fieldsMap != null ?
+                        prepareObjectForSave(tableInfo, fieldsMap != null  && fieldsMap.size()>0?
                             DataSetOptUtil.mapDataRow(bizModel, object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
 
                     DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), objectForSave);
@@ -177,7 +177,7 @@ public abstract class DBBatchUtils {
 
         try (PreparedStatement checkStmt = conn.prepareStatement(checkSqlPair.getLeft())) {
             Map<String, Object> objectForSave =
-                prepareObjectForSave(tableInfo, fieldsMap != null ?
+                prepareObjectForSave(tableInfo, fieldsMap != null && fieldsMap.size()>0?
                     DataSetOptUtil.mapDataRow(bizModel, object, 0, 1, fieldsMap.entrySet()) : object);
 
             DatabaseAccess.setQueryStmtParameters(checkStmt, checkSqlPair.getRight(), objectForSave);
@@ -283,7 +283,7 @@ public abstract class DBBatchUtils {
             for (Map<String, Object> object : objects) {
 
                 Map<String, Object> objectForSave =
-                    prepareObjectForSave(tableInfo,fieldsMap != null?
+                    prepareObjectForSave(tableInfo,fieldsMap != null && fieldsMap.size()>0?
                         DataSetOptUtil.mapDataRow(bizModel, object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
 
                 rowIndex++;
