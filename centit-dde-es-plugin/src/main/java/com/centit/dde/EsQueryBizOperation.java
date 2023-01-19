@@ -19,9 +19,11 @@ import com.centit.search.document.ObjectDocument;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
+import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.action.search.SearchRequest;
@@ -43,10 +45,7 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EsQueryBizOperation implements BizOperation {
     private final ESServerConfig esServerConfig;
@@ -154,8 +153,9 @@ public class EsQueryBizOperation implements BizOperation {
         if (StringUtils.isBlank(indexName)) {
             return ResponseData.makeErrorMessage("请指定索引名称！");
         }
+        BizModelJSONTransform bizModelJSONTransform = new BizModelJSONTransform(bizModel);
 
-        Object queryWord = transform.attainExpressionValue(bizOptJson.getString("queryParameter"));
+        Object queryWord =JSONTransformer.transformer(bizOptJson.getString("queryParameter"), bizModelJSONTransform);
         if (queryWord == null) {
             return ResponseData.makeErrorMessage("查询关键词不能为空！");
         }
@@ -166,7 +166,7 @@ public class EsQueryBizOperation implements BizOperation {
         if (filterList != null){
             for (int i = 0; i < filterList.size(); i++) {
                 JSONObject filterInfo = filterList.getJSONObject(i);
-                Object filterValue = transform.attainExpressionValue(filterInfo.getString("filterValue"));
+                Object filterValue = JSONTransformer.transformer(filterInfo.getString("filterValue"), bizModelJSONTransform);
                 if (filterValue != null) {
                     String columnName = filterInfo.getString("filterColumnName");
                     timeProcessing(columnName,filterValue,boolQueryBuilder);
@@ -327,7 +327,6 @@ public class EsQueryBizOperation implements BizOperation {
         return jsonObject;
     }
 
-    //时间字段处理
     private void timeProcessing(String field, Object filterValue,BoolQueryBuilder boolQueryBuilder){
         String fieldSuffix = field.substring(field.length() - 3).toLowerCase();
         String fieldName = field;
@@ -348,9 +347,15 @@ public class EsQueryBizOperation implements BizOperation {
                 boolQueryBuilder.must(QueryBuilders.rangeQuery(fieldName).lte(filterValue));
                 break;
             default:
-                TermQueryBuilder termQuery = QueryBuilders.termQuery(fieldName, filterValue);
-                boolQueryBuilder.must(termQuery);
-                break;
+                if (filterValue.getClass().isArray()){
+                    List<Object> value = CollectionsOpt.arrayToList((Object[]) filterValue);
+                    TermsQueryBuilder termsQuery = QueryBuilders.termsQuery(fieldName, value);
+                    boolQueryBuilder.must(termsQuery);
+                }else {
+                    TermQueryBuilder termQuery = QueryBuilders.termQuery(fieldName, filterValue);
+                    boolQueryBuilder.must(termQuery);
+                }
         }
     }
+    //时间字段处理
 }
