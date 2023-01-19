@@ -12,6 +12,7 @@ import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.basedata.IDataDictionary;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
+import com.centit.search.utils.TikaTextExtractor;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.JavaBeanMetaData;
 import com.centit.support.compiler.VariableFormula;
@@ -81,6 +82,15 @@ public abstract class DataSetOptUtil {
                 return ((Map<?, ?>) o).size();
             }
             return "";
+        });
+        extendFuncs.put("fileToText", (a) -> {
+            Object file = Arrays.stream(a).toArray()[0];
+            try {
+                return  TikaTextExtractor.extractInputStreamText(FileIOOpt.castObjectToInputStream(file));
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "文件转换文本失败！";
+            }
         });
         /*
         a = {
