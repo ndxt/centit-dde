@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class OptLogOperation implements BizOperation {
 
-
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String logType = bizOptJson.getString("logType");
