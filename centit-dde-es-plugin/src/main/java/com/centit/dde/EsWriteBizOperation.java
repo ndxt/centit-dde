@@ -23,8 +23,20 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.bulk.BulkItemResponse;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.xcontent.XContentType;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -64,45 +76,40 @@ public class EsWriteBizOperation implements BizOperation {
         }
     }
 
+    /**
+     *自定义文档操作
+     */
     private ResponseData customDocOperation(BizModel bizModel, JSONObject bizOptJson,
                                             DataOptContext dataOptContext, String operationType) throws Exception{
-        String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "esDatabase", null);
+        String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
+
         SourceInfo esInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
 
         String indexName = BuiltInOperation.getJsonFieldString(bizOptJson, "indexName", null);
+        if (StringUtils.isBlank(indexName)) return ResponseData.makeErrorMessage("请指定索引名称！");
 
-        String dataSetId = bizOptJson.getString("source");
-        if (StringUtils.isBlank(dataSetId)) return ResponseData.makeErrorMessage("文档内容不能为空！");
+        DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
+        if (dataSet == null ) return ResponseData.makeErrorMessage("文档内容不能为空！");
 
-        DataSet dataSet = bizModel.getDataSet(dataSetId);
-        if (dataSet == null ) return ResponseData.makeErrorMessage("选择的文档内容不存在！");
         String primaryKeyName = bizOptJson.getString("primaryKey");
-
+        if (StringUtils.isBlank(primaryKeyName)) return ResponseData.makeErrorMessage("请指定文档主键字段名称！");
 
         RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
 
-        for(Map<String, Object> objectMap : dataSet.getDataAsList()){
-            Object id = objectMap.get(primaryKeyName);
-
-
-        }
-
-
-        return ResponseData.makeResponseData(1);
+        return batchSaveDocuments(esClient,dataSet.getDataAsList(),indexName,primaryKeyName,operationType);
     }
+
     //es 文件文档操作
     private ResponseData fileDocumentOperation(BizModel bizModel, JSONObject bizOptJson,DataOptContext dataOptContext,
                                                ESIndexer esIndexer,String operationType) throws Exception{
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
+
         String documentId = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("documentId")));
         if (StringUtils.isBlank(documentId)) return ResponseData.makeErrorMessage("文档主键不能为空！");
 
         if (!"delete".equals(operationType)){
-            String dataSetId = bizOptJson.getString("source");
-            if (StringUtils.isBlank(dataSetId)) return ResponseData.makeErrorMessage("文档内容不能为空！");
-
-            DataSet dataSet = bizModel.getDataSet(dataSetId);
-            if (dataSet == null ) return ResponseData.makeErrorMessage("选择的文档内容不存在！");
+            DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
+            if (dataSet == null ) return ResponseData.makeErrorMessage("文档内容不能为空！");
 
             Object optTag = transform.attainExpressionValue(bizOptJson.getString("optTag"));
             if (optTag == null) return ResponseData.makeErrorMessage("业务主键不能为空！");
@@ -150,11 +157,9 @@ public class EsWriteBizOperation implements BizOperation {
     //es 对象文档操作
     private ResponseData objectDocumentOperation(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext,
                                                  ESIndexer esIndexer, String operationType){
-        String dataSetId = bizOptJson.getString("source");
-        if (StringUtils.isBlank(dataSetId)) return ResponseData.makeErrorMessage("参数来源不能为空！");
 
-        DataSet dataSet = bizModel.getDataSet(dataSetId);
-        if (dataSet == null ) return ResponseData.makeErrorMessage("选择的参数来源不存在！");
+        DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
+        if (dataSet == null ) return ResponseData.makeErrorMessage("文档内容不能为空！");
 
         String optTag = bizOptJson.getString("optTag");
         if (StringUtils.isBlank(optTag)) return ResponseData.makeErrorMessage("业务主键不能为空！");
@@ -201,5 +206,76 @@ public class EsWriteBizOperation implements BizOperation {
         objInfo.setTitle(StringBaseOpt.castObjectToString(title));
         objInfo.setCreateTime(new Date());
         return objInfo;
+    }
+
+
+    /**
+     * 批量插入或者更新   es存在就更新，不存在就插入
+     */
+    private  ResponseData batchSaveDocuments(RestHighLevelClient restHighLevelClient, List<Map<String, Object>> jsonDatas,
+                                             String indexName,String primaryKeyName,String operationType) throws IOException {
+        BulkRequest requestBulk = new BulkRequest(indexName);
+        for (Map<String, Object> jsonData : jsonDatas) {
+
+            String documentId = StringBaseOpt.castObjectToString(jsonData.get(primaryKeyName));
+
+            if (StringUtils.isBlank(documentId)) return  ResponseData.makeErrorMessage("指定的文档主键字段不存在！");
+
+            switch (operationType) {
+                case "add":
+                    IndexRequest addRequest = new IndexRequest().source(jsonData, XContentType.JSON);
+                    addRequest.id(documentId);
+                    requestBulk.add(addRequest);
+                    break;
+                case "update":
+                    UpdateRequest updateRequest= new UpdateRequest(indexName,documentId);
+                    updateRequest.doc(jsonData, XContentType.JSON);
+                    requestBulk.add(updateRequest);
+                    break;
+                default: //合并
+                    if (documentIdExist(restHighLevelClient, indexName,documentId)){
+                        UpdateRequest mergeUpdateRequest= new UpdateRequest(indexName,documentId);
+                        mergeUpdateRequest.doc(jsonData, XContentType.JSON);
+                        requestBulk.add(mergeUpdateRequest);
+                    }else {
+                        IndexRequest mergeIndexReq = new IndexRequest().source(jsonData, XContentType.JSON);
+                        mergeIndexReq.id(documentId);
+                        requestBulk.add(mergeIndexReq);
+                    }
+            }
+        }
+        int updateCount=0;
+        int addCount=0;
+        int faildCount=0;
+        BulkResponse bulkResponse = restHighLevelClient.bulk(requestBulk, RequestOptions.DEFAULT);
+        //成功返回
+        JSONObject result = new JSONObject();
+        JSONObject faildData = new JSONObject();
+        for(BulkItemResponse bulkItemResponse : bulkResponse){
+            DocWriteResponse itemResponse = bulkItemResponse.getResponse();
+            if (itemResponse instanceof IndexResponse){
+                addCount++;
+            }
+            if (itemResponse instanceof UpdateResponse){
+                updateCount++;
+            }
+            if(bulkItemResponse.isFailed()){
+                faildCount++;
+                faildData.put(bulkItemResponse.getId(),bulkItemResponse.getFailureMessage());
+            }
+        }
+        result.put("addCount",addCount);
+        result.put("updateCount",updateCount);
+        result.put("faildCount",faildCount);
+        if (faildCount>0){
+            result.put("errorData",faildData);
+        }
+        return ResponseData.makeResponseData(result);
+    }
+
+    //判断文档id是否已经存在
+    public static boolean documentIdExist(RestHighLevelClient restHighLevelClient,String indexName,String documentId) throws IOException {
+        GetRequest request = new GetRequest(indexName).id(documentId);
+        return restHighLevelClient.exists(request, RequestOptions.DEFAULT);
     }
 }
