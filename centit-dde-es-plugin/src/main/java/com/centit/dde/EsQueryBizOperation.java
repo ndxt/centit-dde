@@ -155,11 +155,6 @@ public class EsQueryBizOperation implements BizOperation {
         }
         BizModelJSONTransform bizModelJSONTransform = new BizModelJSONTransform(bizModel);
 
-        Object queryWord =JSONTransformer.transformer(bizOptJson.getString("queryParameter"), bizModelJSONTransform);
-        if (queryWord == null) {
-            return ResponseData.makeErrorMessage("查询关键词不能为空！");
-        }
-
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         //过滤条件 filterColumnName  filterValue
         JSONArray filterList = bizOptJson.getJSONArray("filterList");
@@ -183,15 +178,22 @@ public class EsQueryBizOperation implements BizOperation {
                 queryColumnList[i] = queryColumns.getJSONObject(i).getString("queryColumnName");
             }
         }
-        //添加查询关键字
-        MultiMatchQueryBuilder multiMatchQueryBuilder = queryColumnList != null && queryColumnList.length > 0 ?
-            QueryBuilders.multiMatchQuery(queryWord,queryColumnList) :QueryBuilders.multiMatchQuery(queryWord);
-        //最小匹配度 百分比
-        int minimumShouldMatch = bizOptJson.getIntValue("minimumShouldMath");
-        if (minimumShouldMatch>0){
-            multiMatchQueryBuilder.minimumShouldMatch(minimumShouldMatch+"%");
+
+        Object queryWord =JSONTransformer.transformer(bizOptJson.getString("queryParameter"), bizModelJSONTransform);
+        if (queryWord != null){
+            //添加查询关键字
+            MultiMatchQueryBuilder multiMatchQueryBuilder = queryColumnList != null && queryColumnList.length > 0 ?
+                QueryBuilders.multiMatchQuery(queryWord,queryColumnList) :QueryBuilders.multiMatchQuery(queryWord);
+            //最小匹配度 百分比
+            int minimumShouldMatch = bizOptJson.getIntValue("minimumShouldMath");
+            if (minimumShouldMatch>0){
+                multiMatchQueryBuilder.minimumShouldMatch(minimumShouldMatch+"%");
+            }
+            boolQueryBuilder.must(multiMatchQueryBuilder);
+        }else {
+            MatchAllQueryBuilder matchAllQueryBuilder = QueryBuilders.matchAllQuery();
+            boolQueryBuilder.must(matchAllQueryBuilder);
         }
-        boolQueryBuilder.must(multiMatchQueryBuilder);
 
         SearchRequest searchRequest = new SearchRequest(indexName);
         //封装分页  排序信息
@@ -200,13 +202,15 @@ public class EsQueryBizOperation implements BizOperation {
         JSONArray sortColumns = bizOptJson.getJSONArray("sortColumns");
         //设置排序字段
         List<SortBuilder<?>> sorts = new ArrayList<>();
-        for (int i = 0; i < sortColumns.size(); i++) {
-            JSONObject sortField = sortColumns.getJSONObject(i);
-            String sortColumnName = sortField.getString("sortColumnName");
-            Object sortValue = transform.attainExpressionValue(sortField.getString("sortValue"));
-            if (StringUtils.isNotBlank(sortColumnName) && sortValue != null) {
-                FieldSortBuilder order = SortBuilders.fieldSort(sortColumnName).order("DESC".equals(sortValue) ? SortOrder.DESC : SortOrder.ASC);
-                sorts.add(order);
+        if (sortColumns != null){
+            for (int i = 0; i < sortColumns.size(); i++) {
+                JSONObject sortField = sortColumns.getJSONObject(i);
+                String sortColumnName = sortField.getString("sortColumnName");
+                Object sortValue = transform.attainExpressionValue(sortField.getString("sortValue"));
+                if (StringUtils.isNotBlank(sortColumnName) && sortValue != null) {
+                    FieldSortBuilder order = SortBuilders.fieldSort(sortColumnName).order("DESC".equals(sortValue) ? SortOrder.DESC : SortOrder.ASC);
+                    sorts.add(order);
+                }
             }
         }
         searchSourceBuilder.sort(sorts);
