@@ -133,7 +133,8 @@ public class BizOptFlowImpl implements BizOptFlow {
 
         allOperations.put("redisRead", new RedisReadOperation(sourceInfoDao));
         allOperations.put("redisWrite", new RedisWriteOperation(sourceInfoDao));
-        allOperations.put("optLog", new OptLogOperation());
+        allOperations.put("logWrite", new OptLogOperation());
+        allOperations.put("logRead", new OptLogQueryOperation());
 
         allOperations.put(ConstantValue.ENCRYPT, new EncryptOperation());
         allOperations.put(ConstantValue.DECIPHER, new DecipherOperation());
