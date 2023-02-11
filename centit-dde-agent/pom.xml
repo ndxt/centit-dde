@@ -11,7 +11,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.product</groupId>
-    <version>5.2-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
     <artifactId>centit-dde-agent</artifactId>
 
     <properties>
@@ -24,7 +24,7 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-module</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.3-SNAPSHOT</version>
         </dependency>
 
         <dependency>

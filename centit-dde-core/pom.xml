@@ -5,7 +5,7 @@
     <parent>
         <artifactId>centit-dde3</artifactId>
         <groupId>com.centit.product</groupId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -72,26 +72,23 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>message-sender-utils</artifactId>
-            <version>${centit.oa.modules.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>optflow-serial-number</artifactId>
-            <version>${centit.oa.modules.version}</version>
+            <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>database-metadata</artifactId>
-            <version>${metadata.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>fileserver-adapter</artifactId>
-            <version>${centit.fileserver.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -124,7 +121,6 @@
             <artifactId>itextpdf</artifactId>
             <version>5.5.13.3</version>
         </dependency>
-
 
     </dependencies>
 

@@ -6,12 +6,12 @@
     <parent>
         <groupId>com.centit.framework</groupId>
         <artifactId>framework-snapshot-dependencies</artifactId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.3-SNAPSHOT</version>
     </parent>
 
 	<groupId>com.centit.product</groupId>
 	<artifactId>centit-dde3</artifactId>
-	<version>5.2-SNAPSHOT</version>
+	<version>5.3-SNAPSHOT</version>
     <modules>
         <!--<module>centit-dde-datamoving</module>-->
         <module>centit-dde-agent</module>
@@ -35,10 +35,10 @@
 
     <properties>
         <cxf.version>2.7.3</cxf.version>
-        <metadata.version>5.2-SNAPSHOT</metadata.version>
-        <centit.dde.version>5.2-SNAPSHOT</centit.dde.version>
-        <centit.fileserver.version>5.2-SNAPSHOT</centit.fileserver.version>
-        <centit.workflow.version>5.2-SNAPSHOT</centit.workflow.version>
+        <metadata.version>5.3-SNAPSHOT</metadata.version>
+        <centit.dde.version>5.3-SNAPSHOT</centit.dde.version>
+        <centit.fileserver.version>5.3-SNAPSHOT</centit.fileserver.version>
+        <centit.workflow.version>5.3-SNAPSHOT</centit.workflow.version>
     </properties>
 
 

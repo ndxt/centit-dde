@@ -10,6 +10,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.basedata.NoticeMessage;
 import com.centit.msgpusher.plugins.EMailMsgPusher;
 import com.centit.msgpusher.plugins.IUserEmailSupport;
+import com.centit.msgpusher.plugins.SystemUserEmailSupport;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -46,8 +47,7 @@ public class MailBizOperation implements BizOperation {
             messageManager.setEmailServerHostUser(sourceInfo.getUsername());
             messageManager.setEmailServerHostPwd(AESSecurityUtils.decryptParameterString(sourceInfo.getPassword()));
             messageManager.setTopUnit(dataOptContext.getTopUnit());
-            messageManager.setUserEmailSupport(new IUserEmailSupport() {
-            });
+            messageManager.setUserEmailSupport(new SystemUserEmailSupport());
             ResponseData responseData= messageManager.sendMessage("system", optUsers,
                 NoticeMessage.create().operation(dataOptContext.getOsId()).method(dataOptContext.getOptId()).subject(subject)
                     .content(content));

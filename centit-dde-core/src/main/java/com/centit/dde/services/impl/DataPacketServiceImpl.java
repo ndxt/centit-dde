@@ -69,7 +69,7 @@ public class DataPacketServiceImpl implements DataPacketService {
     @Override
     public List<Map<String, String>> listDataPacket(String optId) {
         optId = getOptIdWithCommon(optId);
-        List<DataPacket> dataPacketList = dataPacketDao.listObjects(CollectionsOpt.createHashMap("optids", optId));
+        List<DataPacket> dataPacketList = dataPacketDao.listObjectsByProperties(CollectionsOpt.createHashMap("optids", optId));
         List<Map<String, String>> mapList = new ArrayList<>();
         for (DataPacket dataPacket : dataPacketList) {
             Map<String, String> map = new HashMap<>(1);
