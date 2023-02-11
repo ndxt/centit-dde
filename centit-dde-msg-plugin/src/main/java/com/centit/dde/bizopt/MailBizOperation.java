@@ -44,8 +44,8 @@ public class MailBizOperation implements BizOperation {
         if (SEND_TYPE_MAIL.equals(sendType)) {
             EMailMsgPusher messageManager = new EMailMsgPusher();
             messageManager.setEmailServerHost(sourceInfo.getDatabaseUrl());
-            messageManager.setEmailServerHostUser(sourceInfo.getUsername());
-            messageManager.setEmailServerHostPwd(AESSecurityUtils.decryptParameterString(sourceInfo.getPassword()));
+            messageManager.setEmailServerUser(sourceInfo.getUsername());
+            messageManager.setEmailServerPwd(AESSecurityUtils.decryptParameterString(sourceInfo.getPassword()));
             messageManager.setTopUnit(dataOptContext.getTopUnit());
             messageManager.setUserEmailSupport(new SystemUserEmailSupport());
             ResponseData responseData= messageManager.sendMessage("system", optUsers,
