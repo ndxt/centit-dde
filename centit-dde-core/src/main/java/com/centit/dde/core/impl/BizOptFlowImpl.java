@@ -19,6 +19,7 @@ import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
 import com.centit.framework.core.service.DataScopePowerManager;
+import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.service.DataCheckRuleService;
 import com.centit.product.metadata.service.MetaDataCache;
@@ -36,6 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
@@ -86,6 +88,11 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @Autowired(required = false)
     private FileInfoOpt fileInfoOpt;
+
+    @Autowired
+    @NotNull
+    private OperationLogWriter operationLogWriter;
+
     @Autowired
     private OptFlowNoInfoManager optFlowNoInfoManager;
 
@@ -134,7 +141,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("redisRead", new RedisReadOperation(sourceInfoDao));
         allOperations.put("redisWrite", new RedisWriteOperation(sourceInfoDao));
         allOperations.put("logWrite", new OptLogOperation());
-        allOperations.put("logRead", new OptLogQueryOperation());
+        allOperations.put("logRead", new OptLogQueryOperation(operationLogWriter));
 
         allOperations.put(ConstantValue.ENCRYPT, new EncryptOperation());
         allOperations.put(ConstantValue.DECIPHER, new DecipherOperation());

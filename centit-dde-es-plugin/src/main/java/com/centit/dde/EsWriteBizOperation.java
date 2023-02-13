@@ -57,41 +57,45 @@ public class EsWriteBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         //操作类型  增  删  改  合并
         String operationType = bizOptJson.getString("operationType");
-        if (StringUtils.isBlank(operationType)){
-            return ResponseData.makeErrorMessage("请选择操作类型！");
-        }
+
+        if (StringUtils.isBlank(operationType)) return ResponseData.makeErrorMessage("请选择操作类型！");
 
         String  indexType  = bizOptJson.getString("indexType");
+
         if("custom".equals(indexType)){
-            return customDocOperation(bizModel, bizOptJson, dataOptContext, operationType);
+            return customDocOperation(bizModel, bizOptJson, operationType);
         } else {
             boolean indexFile = "indexFile".equals(bizOptJson.get("indexType"));
+
             ESIndexer esIndexer = indexFile ?
-                IndexerSearcherFactory.obtainIndexer(esServerConfig, FileDocument.class)
-                : IndexerSearcherFactory.obtainIndexer(esServerConfig, ObjectDocument.class);
+                IndexerSearcherFactory.obtainIndexer(esServerConfig, FileDocument.class) :
+                IndexerSearcherFactory.obtainIndexer(esServerConfig, ObjectDocument.class);
 
             return indexFile ?
-                fileDocumentOperation(bizModel, bizOptJson, dataOptContext, esIndexer, operationType)
-                : objectDocumentOperation(bizModel, bizOptJson, dataOptContext, esIndexer, operationType);
+                fileDocumentOperation(bizModel, bizOptJson, dataOptContext, esIndexer, operationType) :
+                objectDocumentOperation(bizModel, bizOptJson, dataOptContext, esIndexer, operationType);
         }
     }
 
     /**
      *自定义文档操作
      */
-    private ResponseData customDocOperation(BizModel bizModel, JSONObject bizOptJson,
-                                            DataOptContext dataOptContext, String operationType) throws Exception{
+    private ResponseData customDocOperation(BizModel bizModel, JSONObject bizOptJson,String operationType) throws Exception{
+
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
 
         SourceInfo esInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
 
         String indexName = BuiltInOperation.getJsonFieldString(bizOptJson, "indexName", null);
+
         if (StringUtils.isBlank(indexName)) return ResponseData.makeErrorMessage("请指定索引名称！");
 
         DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
+
         if (dataSet == null ) return ResponseData.makeErrorMessage("文档内容不能为空！");
 
         String primaryKeyName = bizOptJson.getString("primaryKey");
+
         if (StringUtils.isBlank(primaryKeyName)) return ResponseData.makeErrorMessage("请指定文档主键字段名称！");
 
         RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
@@ -105,13 +109,16 @@ public class EsWriteBizOperation implements BizOperation {
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
 
         String documentId = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("documentId")));
+
         if (StringUtils.isBlank(documentId)) return ResponseData.makeErrorMessage("文档主键不能为空！");
 
         if (!"delete".equals(operationType)){
             DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
+
             if (dataSet == null ) return ResponseData.makeErrorMessage("文档内容不能为空！");
 
             Object optTag = transform.attainExpressionValue(bizOptJson.getString("optTag"));
+
             if (optTag == null) return ResponseData.makeErrorMessage("业务主键不能为空！");
         }
         Object result;
@@ -159,16 +166,21 @@ public class EsWriteBizOperation implements BizOperation {
                                                  ESIndexer esIndexer, String operationType){
 
         DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
+
         if (dataSet == null ) return ResponseData.makeErrorMessage("文档内容不能为空！");
 
         String optTag = bizOptJson.getString("optTag");
+
         if (StringUtils.isBlank(optTag)) return ResponseData.makeErrorMessage("业务主键不能为空！");
 
         if("delete".equals(operationType)){
             Object documentId = JSONTransformer.transformer(
                 BuiltInOperation.getJsonFieldString(bizOptJson, "documentId", null), new BizModelJSONTransform(bizModel));
+
             if (documentId == null ) return ResponseData.makeErrorMessage("文档主键不能为空！");
+
             boolean b = esIndexer.deleteDocument(StringBaseOpt.castObjectToString(documentId));
+
             return ResponseData.makeResponseData(b);
         }else {
             VariableFormula formula = new VariableFormula();
