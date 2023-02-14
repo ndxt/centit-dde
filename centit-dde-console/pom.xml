@@ -43,6 +43,12 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-es-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
        <!-- <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-ofd-plugin</artifactId>
