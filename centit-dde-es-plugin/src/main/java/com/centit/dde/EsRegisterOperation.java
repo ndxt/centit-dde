@@ -30,7 +30,4 @@ public class EsRegisterOperation {
         bizOptFlow.registerOperation(ConstantValue.ELASTICSEARCH_WRITE,
             new EsWriteBizOperation(esServerConfig, sourceInfoDao));
     }
-
-/*
-    }*/
 }
