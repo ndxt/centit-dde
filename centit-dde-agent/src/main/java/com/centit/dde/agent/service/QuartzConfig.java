@@ -39,6 +39,7 @@ public class QuartzConfig {
         textOperationLogWriter.setOptLogHomePath(pathConfig.getLogs());
         return textOperationLogWriter;
     }
+
     @Bean("passwordEncoder")
     public StandardPasswordEncoderImpl passwordEncoder() {
         return  new StandardPasswordEncoderImpl();

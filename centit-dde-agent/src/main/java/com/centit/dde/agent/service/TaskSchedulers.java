@@ -37,17 +37,24 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 @Service
 public class TaskSchedulers {
+
     private final DataPacketDao dataPacketDao;
     private final Scheduler scheduler;
     private final OperationLogWriter operationLogWriter;
     private static String staticTaskMd5= "";
     private static ConcurrentHashMap<String, Object> queryParams = new ConcurrentHashMap<>(2);
+
+    //@Autowired
+    //private DBPlatformEnvironment dbPlatformEnvironment;
+
     @Autowired
-    public TaskSchedulers(DataPacketDao dataPacketDao,PlatformEnvironment environment,  Scheduler scheduler, OperationLogWriter operationLogWriter, PathConfig pathConfig) {
+    public TaskSchedulers(@Autowired DataPacketDao dataPacketDao,@Autowired  PlatformEnvironment dbPlatformEnvironment,
+                          @Autowired Scheduler scheduler, @Autowired OperationLogWriter operationLogWriter,
+                          @Autowired PathConfig pathConfig) {
         this.dataPacketDao = dataPacketDao;
         this.scheduler = scheduler;
         this.operationLogWriter = operationLogWriter;
-        CodeRepositoryCache.setPlatformEnvironment(environment);
+        CodeRepositoryCache.setPlatformEnvironment(dbPlatformEnvironment);
         queryParams.put("taskType", ConstantValue.TASK_TYPE_AGENT);
         queryParams.put("isValid", true);
         queryParams.put("isDisable", false);
@@ -55,7 +62,6 @@ public class TaskSchedulers {
             queryParams.put("optId_in", pathConfig.getOptId());
         }
     }
-
 
     private void refreshTask() throws SchedulerException {
         List<DataPacket> list =  new CopyOnWriteArrayList<>(dataPacketDao.listObjectsByProperties(queryParams));

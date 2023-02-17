@@ -1,7 +1,7 @@
 server:
   port: 10089
   servlet:
-   contextPath: /dde
+    contextPath: /dde
 spring:
   application:
     name: DDE
@@ -23,17 +23,18 @@ centit:
   logs: D:/Projects/RunData/dde/log
   optId: ''
 logging.path: D:/Projects/RunData/dde/log
-email:
- hostName: mail.centit.com
- smtpPort: 25
- userName: alertmail@centit.com
- userPassword: 131511.cn
- serverEmail: no-reply@centit.com
- emailTo: zhf@centit.com
 
- framework:
-   app:
-     home: D:/Projects/RunData/dde
+email:
+  hostName: mail.centit.com
+  smtpPort: 25
+  userName: alertmail@centit.com
+  userPassword: 131511.cn
+  serverEmail: no-reply@centit.com
+  emailTo: zhf@centit.com
+
+framework:
+  app:
+    home: D:/Projects/RunData/dde
 
 
 
