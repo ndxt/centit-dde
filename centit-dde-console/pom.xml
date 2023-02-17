@@ -22,12 +22,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-es-plugin</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.shentong</groupId>
             <artifactId>shentongjdbc</artifactId>
             <version>4.0</version>
@@ -46,6 +40,12 @@
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-msg-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-es-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
 

@@ -16,12 +16,15 @@ import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
+import com.centit.search.service.ESServerConfig;
+import com.centit.support.algorithm.NumberBaseOpt;
 import io.lettuce.core.RedisClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -53,6 +56,9 @@ public class ServiceConfig {
     @Value("${redis.default.host}")
     private String redisHost;
 
+    @Autowired
+    Environment env;
+
     /**
      * 这个bean必须要有
      *
@@ -74,6 +80,20 @@ public class ServiceConfig {
         notificationCenter.initDummyMsgSenders();
         ///notificationCenter.registerMessageSender("innerMsg",innerMessageManager);
         return notificationCenter;
+    }
+
+    /*es 配置信息*/
+    @Bean
+    public ESServerConfig esServerConfig() {
+        ESServerConfig config = new ESServerConfig();
+        config.setServerHostIp(env.getProperty("elasticsearch.server.ip"));
+        config.setServerHostPort(env.getProperty("elasticsearch.server.port"));
+        config.setClusterName(env.getProperty("elasticsearch.server.cluster"));
+        config.setOsId(env.getProperty("elasticsearch.osId"));
+        config.setUsername(env.getProperty("elasticsearch.server.username"));
+        config.setPassword(env.getProperty("elasticsearch.server.password"));
+        config.setMinScore(NumberBaseOpt.parseFloat(env.getProperty("elasticsearch.filter.minScore"), 0.5F));
+        return config;
     }
 
     @Bean
