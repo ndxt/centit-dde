@@ -16,7 +16,7 @@
     <artifactId>centit-dde-datamoving</artifactId>
 
     <properties>
-        <centit.dde.version>5.2-SNAPSHOT</centit.dde.version>
+        <centit.dde.version>5.3-SNAPSHOT</centit.dde.version>
     </properties>
 
     <dependencies>

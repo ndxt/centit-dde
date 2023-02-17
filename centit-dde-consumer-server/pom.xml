@@ -16,8 +16,8 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <centit.dde.version>5.2-SNAPSHOT</centit.dde.version>
-        <common.module.version>5.2-SNAPSHOT</common.module.version>
+        <centit.dde.version>5.3-SNAPSHOT</centit.dde.version>
+        <common.module.version>5.3-SNAPSHOT</common.module.version>
     </properties>
     <dependencies>
         <dependency>
