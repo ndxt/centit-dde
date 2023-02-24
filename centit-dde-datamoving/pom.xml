@@ -37,7 +37,7 @@
         </dependency>
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>centit-persistence-core</artifactId>
+            <artifactId>centit-persistence-jdbc</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
