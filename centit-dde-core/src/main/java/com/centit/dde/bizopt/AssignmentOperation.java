@@ -55,10 +55,15 @@ public class AssignmentOperation implements BizOperation {
                 JSONOpt.appendData(jsonObject, property, sourceData);
                 targetDataSet.setData(jsonObject);
             } else if(targetDataSet.getSize() == 1){
+                //尽量不改变原来的数据对象
                 Map<String, Object> objMap = targetDataSet.getFirstRow();
-                JSONObject jsonObject = (JSONObject)JSON.toJSON(objMap);
-                JSONOpt.appendData(jsonObject, property, sourceData);
-                targetDataSet.setData(jsonObject);
+                if(objMap instanceof JSONObject){
+                    JSONOpt.appendData((JSONObject)objMap, property, sourceData);
+                } else {
+                    objMap.put(property, sourceData);
+                }
+                targetDataSet.setData(objMap);
+
             } else {
                 List<Map<String, Object>> objList = targetDataSet.getDataAsList();
                 List<JSONObject> jsonList = new ArrayList<>(objList.size() +1);
@@ -89,8 +94,11 @@ public class AssignmentOperation implements BizOperation {
             if( targetDataSet.getSize() < 1){
                 targetDataSet.setData(sourceData);
             } else if( targetDataSet.getSize() == 1){
-                targetDataSet.setData(CollectionsOpt.unionTwoMap(
-                     CollectionsOpt.objectToMap(sourceData), targetDataSet.getFirstRow()));
+                Map<String, Object> objMap = targetDataSet.getFirstRow();
+                objMap.putAll(CollectionsOpt.objectToMap(sourceData));
+                //尽量不改变原来的数据对象
+                targetDataSet.setData(objMap);
+
             } else  {
                 List<Map<String, Object>> objList = targetDataSet.getDataAsList();
                 List<Map<String, Object>> jsonList = new ArrayList<>(objList.size() +1);

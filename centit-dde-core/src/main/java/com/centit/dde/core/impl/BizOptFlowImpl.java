@@ -11,7 +11,6 @@ import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.po.DataPacketInterface;
 import com.centit.dde.po.TaskDetailLog;
 import com.centit.dde.utils.BizModelJSONTransform;
-import com.centit.dde.utils.CloneUtils;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.dde.vo.CycleVo;
@@ -424,13 +423,14 @@ public class BizOptFlowImpl implements BizOptFlow {
                     break;
                 }
                 Object value = ((Iterator<Object>) iter).next();
-                if (ConstantValue.DATA_COPY.equals(cycleVo.getAssignType())) {
+                //TODO 这个地方有问题
+                //if (ConstantValue.DATA_COPY.equals(cycleVo.getAssignType())) {
                     //clone 复制对象数据
-                    bizModel.putDataSet(cycleVo.getId(), CloneUtils.clone(new DataSet(value)));
-                } else {
+                    //bizModel.putDataSet(cycleVo.getId(), new DataSet(value));
+                //} else {
                     //引用对象数据
                     bizModel.putDataSet(cycleVo.getId(), new DataSet(value));
-                }
+                //}
             }
             //设置下个节点信息
             dataOptStep.setCurrentStep(startNode);
