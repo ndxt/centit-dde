@@ -36,6 +36,9 @@ public class TaskDetailLog implements java.io.Serializable {
     @ApiModelProperty(value = "日志ID")
     private String logId;
 
+    @Column(name="opt_node_id")
+    @ApiModelProperty(value = "操作节点id", required = true)
+    private String optNodeId;
     @Column(name="log_type")
     @ApiModelProperty(value = "日志类别", required = true)
     private String logType;

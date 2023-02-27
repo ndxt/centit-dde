@@ -288,7 +288,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                     BuiltInOperation.getJsonFieldString(stepJson, "id", "endNode"), ResponseData.makeErrorMessage(
                     ResponseData.ERROR_OPERATION, "获取数据集："+ dataSetId +"出错！" ));
                 //添加错误日志
-                TaskDetailLog detailLog = creaetLogDetail(dataOptStep, dataOptContext);
+                TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
                 detailLog.setLogInfo("获取数据集："+ dataSetId +"出错！");
             } else {
                 bizModel.getOptResult().setResultObject(dataSet.getData());
@@ -476,7 +476,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 throw new ObjectException(responseData, responseData.getCode(), responseData.getMessage());
             }*/
             if ( (ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
-                TaskDetailLog detailLog = creaetLogDetail(dataOptStep, dataOptContext);
+                TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
                 Map<String, Object> jsonObject = CollectionsOpt.objectToMap(responseData.getData());
                 detailLog.setSuccessPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("success"), 0));
                 detailLog.setErrorPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("error"), 0));
@@ -492,7 +492,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             bizModel.getOptResult().setStepResponse(bizOptJson.getString("id"), responseData);
 
         } catch (Exception e) {
-            TaskDetailLog detailLog = creaetLogDetail(dataOptStep, dataOptContext);
+            TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
             String errMsg = ObjectException.extortExceptionMessage(e);
             detailLog.setLogInfo(errMsg);
             detailLog.setRunBeginTime(runBeginTime);
@@ -503,7 +503,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
     }
 
-    private TaskDetailLog creaetLogDetail(DataOptStep dataOptStep, DataOptContext dataOptContext) {
+    private TaskDetailLog createLogDetail(DataOptStep dataOptStep, DataOptContext dataOptContext) {
         TaskDetailLog detailLog = new TaskDetailLog();
 
         JSONObject bizOptJson = dataOptStep.getCurrentStep();
@@ -515,6 +515,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
         String logType = sOptType + ":" + processName;
         detailLog.setRunBeginTime(new Date());
+        detailLog.setOptNodeId(bizOptJson.getString("id"));
         detailLog.setLogType(logType);
         detailLog.setStepNo(dataOptContext.getStepNo());
         detailLog.setRunEndTime(new Date());

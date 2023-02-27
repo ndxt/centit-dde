@@ -105,6 +105,7 @@ public class TaskRun {
         detailLog.setRunBeginTime(new Date());
         detailLog.setTaskId(taskLog.getTaskId());
         detailLog.setLogId(taskLog.getLogId());
+        detailLog.setOptNodeId("api");
         detailLog.setLogType("error");
         detailLog.setLogInfo(ObjectException.extortExceptionMessage(e));
         optContext.plusStepNo();
