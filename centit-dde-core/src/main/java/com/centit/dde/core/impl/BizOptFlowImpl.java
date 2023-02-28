@@ -231,9 +231,10 @@ public class BizOptFlowImpl implements BizOptFlow {
         } else {
             runOneStepOpt(bizModel, dataOptStep, dataOptContext);
         }
+
         //断点调试，指定节点数据返回
-        String debugId = StringBaseOpt.castObjectToString(dataOptContext.getDebugId());
-        if (StringUtils.isNotBlank(debugId) && debugId.equals(stepJson.getString("id"))) {
+        String debugId = dataOptContext.getDebugId();
+        if (StringUtils.equals(debugId, stepJson.getString("id"))) {
             dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions", "1");
             String source = stepJson.getString("source");
             //设置返回节点  内部方法会通过这个source 来判断返回具体的某个节点 这个只能重置为当前ID 下面再重置回去

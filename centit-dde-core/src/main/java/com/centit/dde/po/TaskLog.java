@@ -71,7 +71,7 @@ public class TaskLog implements java.io.Serializable {
     private String successPieces;
 
     @Column(name="api_type")
-    @ApiModelProperty(value = "API类别，是草稿还是正式运行的日志，0草稿，1正式")
+    @ApiModelProperty(value = "API类别，是草稿还是正式运行的日志，0 草稿，1 正式")
     private Integer apiType;
 
 

@@ -10,13 +10,12 @@ import com.centit.dde.po.*;
 import com.centit.dde.services.TaskLogManager;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.common.WebOptUtils;
-import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOsInfo;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,7 +84,10 @@ public class TaskRun {
             return DataOptResult.createExceptionResult(ResponseData.makeErrorMessageWithData(
                 taskLog, ResponseData.ERROR_OPERATION, ObjectException.extortExceptionMessage(e)));
         } finally { // 写入日志
-            taskLogManager.saveTaskLog(taskLog, dataPacketInterface.getLogLevel());
+            //如果是 debug 并且是断点（debugId不为空）状态不写入日志
+            if(StringUtils.equals(optContext.getRunType(),ConstantValue.RUN_TYPE_NORMAL)
+                || StringUtils.isBlank(optContext.getDebugId()))
+                taskLogManager.saveTaskLog(taskLog, dataPacketInterface.getLogLevel());
         }
     }
 
@@ -117,7 +119,15 @@ public class TaskRun {
     private TaskLog buildLogInfo(DataOptContext context, DataPacketInterface dataPacketInterface) {
         TaskLog taskLog = new TaskLog();
         taskLog.setRunBeginTime(new Date());
-        taskLog.setApiType(ConstantValue.RUN_TYPE_DEBUG.equals(context.getRunType()) ? 0 : 1);
+        if(ConstantValue.RUN_TYPE_DEBUG.equals(context.getRunType())) {
+            // 运行的是草稿
+            taskLog.setApiType(0);
+            // debug 状态将日志模式强制设置为 debug
+            dataPacketInterface.setLogLevel(ConstantValue.LOGLEVEL_CHECK_DEBUG);
+        } else {
+            taskLog.setApiType(1);
+        }
+
         if (dataPacketInterface != null) {
             if (!StringBaseOpt.isNvl(dataPacketInterface.getTaskType()) && ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())) {
                 taskLog.setRunner("定时任务");

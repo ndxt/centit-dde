@@ -177,7 +177,8 @@ public class HttpTaskController extends BaseController {
         if (ConstantValue.TASK_TYPE_MSG.equals(dataPacketInterface.getTaskType())) {
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "消息触发不支持请求，该类型任务会自动触发！");
         }
-        if (!taskType.equals(dataPacketInterface.getTaskType()) && !ConstantValue.TASK_TYPE_TIME.equals(dataPacketInterface.getTaskType())) {
+        if (!taskType.equals(dataPacketInterface.getTaskType()) &&
+            !ConstantValue.TASK_TYPE_TIME.equals(dataPacketInterface.getTaskType())) {
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "任务类型和请求方式不匹配，请保持一致！");
         }
         if (dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()) {
@@ -189,7 +190,9 @@ public class HttpTaskController extends BaseController {
         //保存内部逻辑变量，有些时候需要将某些值传递到其它标签节点，这时候需要用到它
         DataOptContext dataOptContext = new DataOptContext();
         dataOptContext.setRunType(runType);
+
         dataOptContext.setDebugId((String) params.getOrDefault("debugId", ""));
+
         if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
             if (StringUtils.contains(request.getHeader("Content-Type"), "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
