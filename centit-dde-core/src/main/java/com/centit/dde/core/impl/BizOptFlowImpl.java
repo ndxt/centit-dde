@@ -211,6 +211,11 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (ConstantValue.RESULTS.equals(stepType)) {
             //bizModel.getOptResult().setResultObject(returnResult(bizModel, dataOptStep));
             returnResult(bizModel, dataOptStep, dataOptContext);
+            //debug 时把返回结果也记录到日志中
+            if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & dataOptContext.getLogLevel()) != 0) {
+                TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
+                detailLog.setLogInfo(bizModel.getOptResult().toResponseData().toJSONString());
+            }
             dataOptStep.setEndStep();
             return;
         }
@@ -476,7 +481,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             /*if (responseData.getCode() != ResponseData.RESULT_OK) {
                 throw new ObjectException(responseData, responseData.getCode(), responseData.getMessage());
             }*/
-            if ( (ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
+            if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
                 TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
                 Map<String, Object> jsonObject = CollectionsOpt.objectToMap(responseData.getData());
                 detailLog.setSuccessPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("success"), 0));
