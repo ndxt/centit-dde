@@ -4,6 +4,7 @@ package com.centit.dde.config;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.support.security.AESSecurityUtils;
+import com.centit.support.security.SecurityOptUtils;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,7 +72,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         if (StringUtils.isBlank(databaseUrl)) {
             return null;
         }
-        String password = sourceInfo.getPassword();
+
         JSONObject extProps = sourceInfo.getExtProps();
         String[] split = databaseUrl.split(",");
         String[] ipAndPortArr;
@@ -83,10 +84,8 @@ public class RedisConfig extends CachingConfigurerSupport {
         int redisTimeout = extProps.getIntValue("redisTimeout") > 0 ? extProps.getIntValue("redisTimeout") : 20 * 1000;
         int shutdownTimeOut = extProps.getIntValue("shutdownTimeOut") > 0 ? extProps.getIntValue("shutdownTimeOut") : 1000;
         LettuceConnectionFactory lettuceConnectionFactory = null;
-        //密码解密
-        if (StringUtils.isNotBlank(password)) {
-            password = AESSecurityUtils.decryptBase64String(password.substring(password.indexOf(":") + 1), SourceInfo.DESKEY);
-        }
+
+        String password = sourceInfo.getClearPassword();
         //redis客户端配置
         LettuceClientConfiguration lettuceClientConfiguration = LettucePoolingClientConfiguration.builder()
             .commandTimeout(Duration.ofMillis(redisTimeout))

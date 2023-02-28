@@ -20,7 +20,7 @@
         <!--<module>centit-dde-console</module>-->
         <module>centit-dde-es-plugin</module>
         <module>centit-dde-redis-plugin</module>
-        <module>centit-dde-webservices-plugin</module>
+        <!--<module>centit-dde-webservices-plugin</module>-->
         <module>centit-dde-workflow-plugin</module>
         <module>centit-dde-kafka-plugin</module>
         <!--<module>centit-dde-consumer-server</module>-->
