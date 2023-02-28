@@ -1,6 +1,7 @@
 package com.centit.dde.agent;
 
 import com.centit.dde.agent.service.ContextUtils;
+import com.centit.support.json.JSONOpt;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -21,6 +22,7 @@ public class AgentApplication {
      * @param args 为 任务分组号
      */
     public static void main(String[] args) {
+        JSONOpt.fastjsonGlobalConfig();
         ConfigurableApplicationContext context = SpringApplication.run(AgentApplication.class, args);
         ContextUtils.setApplicationContext(context);
     }
