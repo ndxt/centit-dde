@@ -1,6 +1,6 @@
 package com.centit.dde.dataset;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetReader;
 import com.centit.dde.core.DataSetWriter;

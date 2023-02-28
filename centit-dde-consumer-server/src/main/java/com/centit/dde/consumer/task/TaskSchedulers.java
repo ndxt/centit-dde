@@ -1,8 +1,8 @@
 package com.centit.dde.consumer.task;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;

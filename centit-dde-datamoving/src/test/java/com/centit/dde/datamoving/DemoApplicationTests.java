@@ -1,7 +1,7 @@
 package com.centit.dde.datamoving;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.support.database.utils.DatabaseAccess;
 import org.springframework.boot.SpringApplication;

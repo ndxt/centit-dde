@@ -1,6 +1,6 @@
 package com.centit.dde.services;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.vo.ColumnSchema;
 
 import java.io.IOException;

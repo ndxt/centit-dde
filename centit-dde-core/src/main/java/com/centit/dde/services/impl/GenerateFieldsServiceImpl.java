@@ -1,7 +1,7 @@
 package com.centit.dde.services.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.JSONDataSet;

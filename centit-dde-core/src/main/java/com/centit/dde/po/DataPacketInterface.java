@@ -1,6 +1,6 @@
 package com.centit.dde.po;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.DataOptStep;
 
 import java.util.Date;

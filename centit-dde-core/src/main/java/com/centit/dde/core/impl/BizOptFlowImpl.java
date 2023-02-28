@@ -1,6 +1,6 @@
 package com.centit.dde.core.impl;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.bizopt.*;
 import com.centit.dde.core.*;
 import com.centit.dde.dao.DataPacketDao;

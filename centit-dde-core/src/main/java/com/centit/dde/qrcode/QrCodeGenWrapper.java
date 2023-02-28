@@ -1,8 +1,8 @@
 package com.centit.dde.qrcode;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.qrcode.config.QrCodeConfig;
 import com.centit.dde.qrcode.utils.ImageUtil;

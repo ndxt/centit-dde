@@ -1,7 +1,8 @@
 package com.centit.dde.services.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSON;
+
+import com.alibaba.fastjson2.JSONWriter;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataOptResult;
 import com.centit.dde.po.DataPacketInterface;
@@ -69,7 +70,7 @@ public class BizModelServiceImpl implements BizModelService {
 
     private String makeDataPacketBufId(DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
         //String dateString = DatetimeOpt.convertTimestampToString(dataPacket.getRecordDate());
-        String params = JSON.toJSONString(paramsMap, SerializerFeature.MapSortField);
+        String params = JSON.toJSONString(paramsMap, JSONWriter.Feature.MapSortField);
         StringBuilder temp = new StringBuilder("packet:");
         temp.append(dataPacket.getPacketId())
             .append(":")

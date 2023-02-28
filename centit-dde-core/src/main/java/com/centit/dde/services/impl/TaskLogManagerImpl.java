@@ -1,6 +1,6 @@
 package com.centit.dde.services.impl;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.dao.TaskLogDao;
 import com.centit.dde.po.TaskLog;
 import com.centit.dde.services.TaskLogManager;

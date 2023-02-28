@@ -1,7 +1,7 @@
 package com.centit.dde.controller;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.po.DataPacketDraft;
 import com.centit.dde.services.DataPacketDraftService;

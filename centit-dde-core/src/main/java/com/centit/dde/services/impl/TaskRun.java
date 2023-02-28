@@ -1,6 +1,6 @@
 package com.centit.dde.services.impl;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataOptResult;

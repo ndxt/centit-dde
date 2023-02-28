@@ -1,6 +1,6 @@
 package com.centit.dde.controller;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.services.GenerateFieldsService;
 import com.centit.dde.vo.ColumnSchema;
 import com.centit.framework.core.controller.BaseController;
