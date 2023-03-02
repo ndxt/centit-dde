@@ -9,6 +9,6 @@ public abstract class DataPacketCache {
         dataPacketCachedMap.evictIdentifiedCache(dataPacketId);
     }
     public static void evictCache() {
-        dataPacketCachedMap.evictCahce();
+        dataPacketCachedMap.evictCache();
     }
 }
