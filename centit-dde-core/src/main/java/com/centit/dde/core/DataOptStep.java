@@ -104,12 +104,13 @@ public class DataOptStep {
                             setCurrentStep(nextNode);
                             return;
                         } else {
-                            cascade--;
+                            brachNode.push(new LeftRightPair<>(nId, cascade-1));;
                         }
                     } else if (ConstantValue.CYCLE.equals(stepType)) {
-                        cascade++;
+                        brachNode.push(new LeftRightPair<>(nId, cascade+1));;
+                    } else {
+                        brachNode.push(new LeftRightPair<>(nId, cascade));
                     }
-                    brachNode.push(new LeftRightPair<>(nId,cascade));
                 }
             }
             if (brachNode.isEmpty()) {
