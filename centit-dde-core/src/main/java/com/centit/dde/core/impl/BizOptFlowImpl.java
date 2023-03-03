@@ -438,7 +438,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                     bizModel.putDataSet(cycleVo.getId(), new DataSet(value));
                 //}
             }
-            //设置下个节点信息
+            //新的一轮循环，设置起始节点
             dataOptStep.setCurrentStep(startNode);
             boolean endCycle = false;
             while (true) {
@@ -449,12 +449,12 @@ public class BizOptFlowImpl implements BizOptFlow {
                 JSONObject step = dataOptStep.getCurrentStep();
                 String stepType = step.getString("type");
                 if (ConstantValue.CYCLE_FINISH.equals(stepType)) {
-                    break;
+                    break; // break 内循环 继续循环
                 }
                 if (ConstantValue.CYCLE_JUMP_OUT.equals(stepType)) {
                     String breakType = step.getString("endType");
                     endCycle = ConstantValue.CYCLE_JUMP_BREAK.equals(breakType);
-                    break;
+                    break; // break 内循环 继续循环
                 }
                 //执行节点操作，并设置该节点的下个节点信息
                 runStep(bizModel, dataOptStep, dataOptContext);
@@ -462,6 +462,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             if (endCycle) {
                 break;
             }
+            //获取下一个迭代数据，继续循环
             if (ConstantValue.CYCLE_TYPE_RANGE.equals(cycleVo.getCycleType()) && iter instanceof Integer) {
                 iter = (Integer) iter + cycleVo.getRangeStep();
             }

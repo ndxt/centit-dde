@@ -3,7 +3,11 @@ package com.centit.dde.core;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.support.common.LeftRightPair;
+import org.apache.commons.collections4.ArrayStack;
 
+
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.*;
 
 /**
@@ -79,7 +83,8 @@ public class DataOptStep {
 
     public void seekToCycleEnd(String id) {
         HashSet<String> hasAddedNode = new HashSet<>();
-        ArrayDeque<String> brachNode = new ArrayDeque<>();
+        ArrayDeque<LeftRightPair<String, Integer>> brachNode = new ArrayDeque<>();
+        hasAddedNode.add(id);
         String curId = id;
         int cascade = 0;
         while (true) {
@@ -104,13 +109,15 @@ public class DataOptStep {
                     } else if (ConstantValue.CYCLE.equals(stepType)) {
                         cascade++;
                     }
-                    brachNode.push(nId);
+                    brachNode.push(new LeftRightPair<>(nId,cascade));
                 }
             }
             if (brachNode.isEmpty()) {
                 break;
             }
-            curId = brachNode.pop();
+            LeftRightPair<String, Integer> branch = brachNode.pop();
+            curId = branch.getLeft();
+            cascade = branch.getRight();
         }
         setEndStep();
     }
