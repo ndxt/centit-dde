@@ -12,6 +12,7 @@ import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.basedata.IDataDictionary;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
+import com.centit.framework.system.po.DataDictionary;
 import com.centit.search.utils.TikaTextExtractor;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.JavaBeanMetaData;
@@ -52,7 +53,7 @@ public abstract class DataSetOptUtil {
                         IDataDictionary dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]),
                             StringBaseOpt.castObjectToString(string),
                             WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest()));
-                        JavaBeanMetaData metaData = JavaBeanMetaData.createBeanMetaDataFromType(IDataDictionary.class);
+                        JavaBeanMetaData metaData = JavaBeanMetaData.createBeanMetaDataFromType(DataDictionary.class);
                         if (dataPiece != null) {
                             value = StringBaseOpt.castObjectToString(metaData.getObjectFieldValue(dataPiece, StringBaseOpt.castObjectToString(a[2])));
                         }
@@ -61,7 +62,7 @@ public abstract class DataSetOptUtil {
                 }
                 return stringBuilder.toString();
             } else {
-                return a;
+                return null;
             }
         });
         extendFuncs.put("dictTrans", (a) -> {
@@ -70,7 +71,7 @@ public abstract class DataSetOptUtil {
                     StringBaseOpt.castObjectToString(a[0]),
                     StringBaseOpt.castObjectToString(a[1]));
             } else {
-                return a;
+                return null;
             }
         });
         extendFuncs.put("size", (a) -> {
@@ -86,7 +87,7 @@ public abstract class DataSetOptUtil {
         extendFuncs.put("fileToText", (a) -> {
             Object file = Arrays.stream(a).toArray()[0];
             try {
-                return  TikaTextExtractor.extractInputStreamText(FileIOOpt.castObjectToInputStream(file));
+                return TikaTextExtractor.extractInputStreamText(FileIOOpt.castObjectToInputStream(file));
             } catch (Exception e) {
                 e.printStackTrace();
                 return "文件转换文本失败！";
