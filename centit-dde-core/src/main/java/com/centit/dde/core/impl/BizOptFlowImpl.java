@@ -31,6 +31,8 @@ import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -49,6 +51,7 @@ import java.util.*;
 @Service
 public class BizOptFlowImpl implements BizOptFlow {
 
+    protected static final Logger logger = LoggerFactory.getLogger(BizOptFlowImpl.class);
     public static final String RETURN_RESULT_ALL_DATASET = "1";
     public static final String RETURN_RESULT_STATE = "2";
     public static final String RETURN_RESULT_DATASET = "3";
@@ -370,6 +373,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         stepJson = stepJson.getJSONObject("properties");
         String stepId = stepJson.getString("id");
         List<JSONObject> linksJson = dataOptStep.getNextLinks(stepId);
+        if(linksJson==null){
+            logger.error("当前分支节点("+stepId+")没有后续节点，请检查对应的业务逻辑图。");
+        }
         for (JSONObject jsonObject : linksJson) {
             if (!ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
                 String expression = jsonObject.getString("expression");
@@ -388,6 +394,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 return;
             }
         }
+        logger.error("当前分支节点("+stepId+")的" + linksJson.size() + "个分支中没有符合业务逻辑的分支、也没有else分支。");
         dataOptStep.setEndStep();
     }
 
@@ -414,6 +421,8 @@ public class BizOptFlowImpl implements BizOptFlow {
                 }
             }
         }
+        JSONObject cycleEndNode = null;
+
         while (iter != null) {
             //rang循环
             if (ConstantValue.CYCLE_TYPE_RANGE.equals(cycleVo.getCycleType()) && iter instanceof Integer) {
@@ -449,9 +458,12 @@ public class BizOptFlowImpl implements BizOptFlow {
                 JSONObject step = dataOptStep.getCurrentStep();
                 String stepType = step.getString("type");
                 if (ConstantValue.CYCLE_FINISH.equals(stepType)) {
-                    break; // break 内循环 继续循环
+                    // 这儿记录循环结束节点
+                    cycleEndNode = step;
+                    break; // 一个循环结束（内循环）， 继续下一个循环
                 }
                 if (ConstantValue.CYCLE_JUMP_OUT.equals(stepType)) {
+                    // break or continue
                     String breakType = step.getString("endType");
                     endCycle = ConstantValue.CYCLE_JUMP_BREAK.equals(breakType);
                     break; // break 内循环 继续循环
@@ -459,7 +471,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 //执行节点操作，并设置该节点的下个节点信息
                 runStep(bizModel, dataOptStep, dataOptContext);
             }
-            if (endCycle) {
+            if (endCycle) { // break;
                 break;
             }
             //获取下一个迭代数据，继续循环
@@ -467,7 +479,11 @@ public class BizOptFlowImpl implements BizOptFlow {
                 iter = (Integer) iter + cycleVo.getRangeStep();
             }
         }
-        dataOptStep.seekToCycleEnd(cycleVo.getId());
+        if(cycleEndNode !=null) {
+            dataOptStep.setCurrentStep(cycleEndNode);
+        } else {
+            dataOptStep.seekToCycleEnd(cycleVo.getId());
+        }
     }
 
     private void runOneStepOpt(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) {

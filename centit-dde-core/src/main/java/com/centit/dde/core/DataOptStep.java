@@ -3,8 +3,11 @@ package com.centit.dde.core;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.dde.utils.DBBatchUtils;
 import com.centit.support.common.LeftRightPair;
 import org.apache.commons.collections4.ArrayStack;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -14,6 +17,9 @@ import java.util.*;
  * @author zhf
  */
 public class DataOptStep {
+
+    protected static final Logger logger = LoggerFactory.getLogger(DataOptStep.class);
+
     private Map<String, JSONObject> nodeMap = new HashMap<>(50);
     private Map<String, List<JSONObject>> linkMap = new HashMap<>(100);
     private JSONObject currentStep;
@@ -73,7 +79,7 @@ public class DataOptStep {
     }
 
     public void setEndStep() {
-        this.currentStep = getEmptyObject();
+        this.currentStep = createEmptyObject();
         stepNo++;
     }
 
@@ -137,12 +143,13 @@ public class DataOptStep {
     public JSONObject getNextStep(String id) {
         List<JSONObject> links = getNextLinks(id);
         if (links == null || links.size() != 1) {
-            return getEmptyObject();
+            logger.error("当前节点("+ id +")没有有效的后续节点或者有多个后续节点。" );
+            return createEmptyObject();
         }
         return getOptStep(links.get(0).getString("targetId"));
     }
 
-    private JSONObject getEmptyObject() {
+    private JSONObject createEmptyObject() {
         return new JSONObject();
     }
 
