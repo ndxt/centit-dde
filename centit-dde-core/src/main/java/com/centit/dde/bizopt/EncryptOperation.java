@@ -10,12 +10,10 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.security.utils.SM4Util;
 import com.centit.support.algorithm.BooleanBaseOpt;
-import com.centit.support.algorithm.ByteBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.security.AESSecurityUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
-
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;

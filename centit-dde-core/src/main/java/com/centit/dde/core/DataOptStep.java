@@ -3,14 +3,10 @@ package com.centit.dde.core;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.utils.ConstantValue;
-import com.centit.dde.utils.DBBatchUtils;
 import com.centit.support.common.LeftRightPair;
-import org.apache.commons.collections4.ArrayStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.*;
 
 /**

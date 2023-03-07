@@ -9,7 +9,6 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.basedata.NoticeMessage;
 import com.centit.msgpusher.plugins.EMailMsgPusher;
-import com.centit.msgpusher.plugins.IUserEmailSupport;
 import com.centit.msgpusher.plugins.SystemUserEmailSupport;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
