@@ -510,7 +510,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                     if(callData!=null){
                         detailLog.setLogInfo(JSON.toJSONString(callData));
                     } else {
-                        detailLog.setLogInfo(JSON.toJSONString(dataOptContext));
+                        detailLog.setLogInfo(JSON.toJSONString(dataOptContext.getCallStackData()));
                     }
                 } else if("append".equals(optType)){
                     DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
