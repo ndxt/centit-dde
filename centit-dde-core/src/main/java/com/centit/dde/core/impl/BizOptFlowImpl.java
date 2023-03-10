@@ -1,5 +1,6 @@
 package com.centit.dde.core.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.bizopt.*;
 import com.centit.dde.core.*;
@@ -492,7 +493,8 @@ public class BizOptFlowImpl implements BizOptFlow {
 
         JSONObject bizOptJson = dataOptStep.getCurrentStep().getJSONObject("properties");
         try {
-            BizOperation opt = allOperations.get(bizOptJson.getString("type"));
+            String optType = bizOptJson.getString("type");
+            BizOperation opt = allOperations.get(optType);
 
             ResponseData responseData = opt.runOpt(bizModel, bizOptJson, dataOptContext);
             /*if (responseData.getCode() != ResponseData.RESULT_OK) {
@@ -503,11 +505,23 @@ public class BizOptFlowImpl implements BizOptFlow {
                 Map<String, Object> jsonObject = CollectionsOpt.objectToMap(responseData.getData());
                 detailLog.setSuccessPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("success"), 0));
                 detailLog.setErrorPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("error"), 0));
-                DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("id"));
-                if(dataSet !=null) {
+                if("start".equals(optType)){
+                    Object callData = dataOptContext.getStackData(ConstantValue.MODULE_CALL_TAG);
+                    if(callData!=null){
+                        detailLog.setLogInfo(JSON.toJSONString(callData));
+                    } else {
+                        detailLog.setLogInfo(JSON.toJSONString(dataOptContext));
+                    }
+                } else if("append".equals(optType)){
+                    DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
                     detailLog.setLogInfo(dataSet.toJSONString());
-                } else {
-                    detailLog.setLogInfo(responseData.toJSONString());
+                } else{
+                    DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("id"));
+                    if (dataSet != null) {
+                        detailLog.setLogInfo(dataSet.toJSONString());
+                    } else {
+                        detailLog.setLogInfo(responseData.toJSONString());
+                    }
                 }
                 detailLog.setRunBeginTime(runBeginTime);
             }
