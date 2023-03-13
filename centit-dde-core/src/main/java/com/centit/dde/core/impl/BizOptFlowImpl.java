@@ -159,7 +159,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             new MetadataOperation(metaObjectService, queryDataScopeFilter, metaDataCache));
         allOperations.put(ConstantValue.METADATA_OPERATION_QUERY,
             new MetadataQueryOperation(metaObjectService, queryDataScopeFilter, metaDataCache));
-        allOperations.put(ConstantValue.METADATA_OPERATION_UPDATE, new MetadataUpdateOperation(metaObjectService));
+        allOperations.put(ConstantValue.METADATA_OPERATION_UPDATE, new MetadataUpdateOperation(metaObjectService, queryDataScopeFilter));
         allOperations.put(ConstantValue.COMPARE_SOURCE, new ObjectCompareOperation());
 
         allOperations.put(ConstantValue.COMMIT_TRANSACTION, new TransactionCommitOperation(sourceInfoDao));

@@ -53,7 +53,9 @@ public class MetadataQueryOperation implements BizOperation {
                 HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
                 String currentUserCode = WebOptUtils.getCurrentUserCode(request);
                 String topUnit = WebOptUtils.getCurrentTopUnit(request);
-                List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,currentUserCode, dataOptContext.getOptId(), "api");
+                List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,
+                    currentUserCode, dataOptContext.getOptId(), "api");
+
                 String extFilter = null;
                 PageDesc pageDesc = new PageDesc();
                 if (parames.get("pageNo") != null){
@@ -73,6 +75,7 @@ public class MetadataQueryOperation implements BizOperation {
                     parames.putAll(qap.getParams());
                     extFilter = qap.getQuery();
                 }
+
                 JSONArray  jsonArray =metaObjectService.pageQueryObjects(tableId, extFilter, parames,null, pageDesc);
                 Boolean isReturnPageInfo = bizOptJson.getBoolean("isReturnPageInfo");
                 if (isReturnPageInfo){

@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -7,9 +8,17 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.core.dao.DataPowerFilter;
+import com.centit.framework.core.service.DataScopePowerManager;
+import com.centit.framework.filter.RequestThreadLocal;
+import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.common.ObjectException;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,18 +27,36 @@ import java.util.Map;
 public class MetadataUpdateOperation implements BizOperation {
     private  MetaObjectService metaObjectService;
 
+    private DataScopePowerManager queryDataScopeFilter;
 
-    public MetadataUpdateOperation(MetaObjectService metaObjectService) {
+    public MetadataUpdateOperation(MetaObjectService metaObjectService, DataScopePowerManager queryDataScopeFilter) {
         this.metaObjectService = metaObjectService;
+        this.queryDataScopeFilter=queryDataScopeFilter;
     }
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");
         Integer updateType = bizOptJson.getInteger("updateType");
-        Map<String, Object> parames = DataSetOptUtil.getDataSetParames(bizModel,bizOptJson);
+        Map<String, Object> parames = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
         String tableId = bizOptJson.getString("tableId");
         Integer withChildrenDeep = NumberBaseOpt.castObjectToInteger(bizOptJson.getInteger("withChildrenDeep"),1);
+
+        HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
+        String currentUserCode = WebOptUtils.getCurrentUserCode(request);
+        String topUnit = WebOptUtils.getCurrentTopUnit(request);
+        List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,
+            currentUserCode, dataOptContext.getOptId(), "api");
+        if(filters!=null && filters.size()>0) {
+            DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
+                WebOptUtils.getCurrentUserDetails(request));
+
+            if (!dataPowerFilter.checkObject(parames, filters)) {
+                throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR,
+                    "数据范围权限校验不通过，用户："+currentUserCode+"，校验条件"+ JSON.toJSONString(filters)+"。");
+            }
+        }
+
         switch (updateType){
             case 1://新建
                 int count = metaObjectService.saveObjectWithChildren(tableId, parames, withChildrenDeep);
