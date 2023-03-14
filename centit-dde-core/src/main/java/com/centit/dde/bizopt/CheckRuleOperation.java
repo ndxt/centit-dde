@@ -11,7 +11,6 @@ import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.DataCheckRule;
 import com.centit.product.metadata.service.DataCheckRuleService;
 import com.centit.product.metadata.utils.DataCheckResult;
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
@@ -66,6 +65,7 @@ public class CheckRuleOperation implements BizOperation {
 
         DataCheckResult result = DataCheckResult.create();
         for(Map<String, Object> dataInfo : dataSet.getDataAsList()){
+            if(dataInfo == null) continue;
             for (Object ruleInfo : rulesJson) {
                 JSONObject  dataCheckRuleInfo = (JSONObject)ruleInfo;
                 //组装校验参数
@@ -92,14 +92,12 @@ public class CheckRuleOperation implements BizOperation {
                 paramMap.put(DataCheckRule.CHECK_VALUE_TAG,checkFieldValue);
 
                 DataCheckResult dataCheckResult = result.checkData(dataInfo, dataCheckRule, paramMap, isReturnCheckMsg, true);
-                if (dataInfo instanceof Map){
-                    Map<String, Object> map = CollectionsOpt.objectToMap(dataInfo);
-                    if (isReturnCheckResult){
-                        map.put(checkRuleResultField, dataCheckResult.getResult());
-                    }
-                    if (isReturnCheckMsg){
-                        map.put(checkRuleResultMsgField,dataCheckResult.getErrorMessage());
-                    }
+                //Map<String, Object> map = CollectionsOpt.objectToMap(dataInfo);
+                if (isReturnCheckResult){
+                    dataInfo.put(checkRuleResultField, dataCheckResult.getResult());
+                }
+                if (isReturnCheckMsg){
+                    dataInfo.put(checkRuleResultMsgField,dataCheckResult.getErrorMessage());
                 }
             }
             //清除上个对象的校验结果信息
