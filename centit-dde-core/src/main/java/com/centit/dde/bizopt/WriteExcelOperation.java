@@ -114,8 +114,8 @@ public class WriteExcelOperation implements BizOperation {
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
         //获取表达式信息
-        String[] titles = mapInfoDesc.keySet().toArray(new String[mapInfoDesc.size()]);
-        String[] fields = mapInfoDesc.values().toArray(new String[mapInfoDesc.size()]);
+        String[] titles = mapInfoDesc.keySet().toArray(new String[0]);
+        String[] fields = mapInfoDesc.values().toArray(new String[0]);
 
         InputStream inputStream = ExcelExportUtil.generateExcelStream(sheetName, dataAsList, titles, fields);
         FileDataSet objectToDataSet = new FileDataSet(fileName, inputStream.available(), inputStream);
