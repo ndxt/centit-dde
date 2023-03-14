@@ -81,13 +81,13 @@ public class BizModel implements  Serializable {
         if (this.bizData == null) {
             this.bizData = new HashMap<>(6);
         }
-        ((DataSet)dataSet).setDataSetName(relationPath);
-        getBizData().put(relationPath, dataSet);
+        dataSet.setDataSetName(relationPath);
+        this.bizData.put(relationPath, dataSet);
     }
 
     public JSONObject toJsonObject() {
         JSONObject dataObject = new JSONObject();
-        if (bizData != null) {
+        if (this.bizData != null) {
             for (Map.Entry<String, DataSet> map : bizData.entrySet()) {
                 dataObject.put(map.getKey(),map.getValue()==null?null:map.getValue().getData());
             }
@@ -103,7 +103,7 @@ public class BizModel implements  Serializable {
      */
     public JSONObject toJsonObject(boolean singleRowAsObject) {
         JSONObject dataObject = new JSONObject();
-        if (bizData != null) {
+        if (this.bizData != null) {
             for (Map.Entry<String, DataSet> map : bizData.entrySet()) {
                 DataSet dataSet=map.getValue();
                 if (dataSet.getSize() == 1 && singleRowAsObject) {
@@ -113,8 +113,8 @@ public class BizModel implements  Serializable {
                 }
             }
         }
-        if (stackData != null && !stackData.isEmpty()) {
-            dataObject.put("stackData", stackData);
+        if (this.stackData != null && !this.stackData.isEmpty()) {
+            dataObject.put("stackData", this.stackData);
         }
         dataObject.put("modelName", this.getModelName());
         return dataObject;
@@ -122,8 +122,8 @@ public class BizModel implements  Serializable {
 
     public JSONObject toJsonObject(String[] singleRowDataSets) {
         JSONObject dataObject = new JSONObject();
-        if (bizData != null) {
-            for (DataSet dataSet : bizData.values()) {
+        if (this.bizData != null) {
+            for (DataSet dataSet : this.bizData.values()) {
                 if (StringUtils.equalsAny(dataSet.getDataSetName(), singleRowDataSets)) {
                     dataObject.put(dataSet.getDataSetName(), dataSet.getFirstRow());
                 } else  {
@@ -132,18 +132,18 @@ public class BizModel implements  Serializable {
             }
         }
         dataObject.put("modelName", this.getModelName());
-        if (stackData != null && !stackData.isEmpty()) {
-            dataObject.put("stackData", stackData);
+        if (this.stackData != null && !this.stackData.isEmpty()) {
+            dataObject.put("stackData", this.stackData);
         }
         return dataObject;
     }
 
     public String getModelName() {
-        return modelName;
+        return this.modelName;
     }
 
     public Object getStackData(String key) {
-        Object object=stackData.get(key);
+        Object object=this.stackData.get(key);
         if(object==null){
             return new HashMap<>(0);
         }else{
@@ -173,7 +173,7 @@ public class BizModel implements  Serializable {
         }
         for(Map.Entry<String, Object> ent : callStack.entrySet()){
             if(ent.getKey().startsWith(ConstantValue.DOUBLE_UNDERLINE)){
-                stackData.put(ent.getKey(), ent.getValue());
+                this.stackData.put(ent.getKey(), ent.getValue());
             }
         }
     }
@@ -182,9 +182,14 @@ public class BizModel implements  Serializable {
     }
 
     public Map<String, DataSet> getBizData() {
-        return bizData;
+        return this.bizData;
     }
 
+    public void clearBizData(){
+        if(this.bizData != null) {
+            this.bizData.clear();
+        }
+    }
     public void setBizData(Map<String, DataSet> bizData) {
         this.bizData = bizData;
     }
@@ -240,17 +245,16 @@ public class BizModel implements  Serializable {
             return DataSet.toDataSet(getStackData(dataSetName));
         }
 
-        Map<String, DataSet> dss = getBizData();
-        if(dss == null) {
+        if(this.bizData == null) {
             return null;
         }
 
-        DataSet data = dss.get(dataSetName);
+        DataSet data = this.bizData.get(dataSetName);
         if(data !=null ){
             return data;
         }
 
-        return dss.values().stream().filter(
+        return this.bizData.values().stream().filter(
                 ds -> relationPath
                     .equals(ds.getDataSetName())).findFirst()
             .orElse(null);

@@ -309,7 +309,7 @@ public abstract class BuiltInOperation {
             bizModel.putDataSet(s, null);
         }
         if (sets.size() == 0) {
-            bizModel.getBizData().clear();
+            bizModel.clearBizData();
         }
         return createResponseSuccessData(0);
     }

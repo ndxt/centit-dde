@@ -72,6 +72,12 @@ public class FileDataSet extends DataSet {
         ((Map<String, Object>)this.data).put(ConstantValue.FILE_CONTENT, fileData);
     }
 
+    public void setFileData(Object fileData){
+        if(this.data == null || !(this.data instanceof Map)){
+            this.data = new HashMap<>(20);
+        }
+        ((Map<String, Object>)this.data).put(ConstantValue.FILE_CONTENT, fileData);
+    }
     @JSONField(serialize = false)
     public String getFileName(){
         if(this.data==null){
