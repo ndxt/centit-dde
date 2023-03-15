@@ -265,16 +265,14 @@ public class BizOptFlowImpl implements BizOptFlow {
         dataOptStep.setNextStep();
         dataOptContext.plusStepNo();
         //stepNo ++
-
-        if (ConstantValue.TRUE.equals(dataOptContext.getNeedRollback())) {
-            //如果API不能允许报错，报错就中断
-            if (bizModel.getOptResult().hasErrors()){// bizModel.getOptResult().getLastError().getCode() == ResponseData.ERROR_OPERATION) {
-                //报错 不能返回数据 returnResult(bizModel, dataOptStep);
-                bizModel.getOptResult().setResultType(DataOptResult.RETURN_CODE_AND_MESSAGE);
-                //bizModel.getOptResult().setResultObject(bizModel.getOptResult().getLastError());
-                dataOptStep.setEndStep();
-                AbstractSourceConnectThreadHolder.rollbackAndRelease();
-            }
+        //如果API不能允许报错，报错就中断
+        if (ConstantValue.TRUE.equals(dataOptContext.getNeedRollback()) && bizModel.getOptResult().hasErrors()){
+            // bizModel.getOptResult().getLastError().getCode() == ResponseData.ERROR_OPERATION) {
+            //报错 不能返回数据 returnResult(bizModel, dataOptStep);
+            bizModel.getOptResult().setResultType(DataOptResult.RETURN_CODE_AND_MESSAGE);
+            //bizModel.getOptResult().setResultObject(bizModel.getOptResult().getLastError());
+            dataOptStep.setEndStep();
+            AbstractSourceConnectThreadHolder.rollbackAndRelease();
         }
     }
 
@@ -515,7 +513,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 } else if("append".equals(optType) || ConstantValue.ASSIGNMENT.equals(optType)){
                     DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
                     detailLog.setLogInfo(dataSet.toJSONString());
-                } else{
+                } else {
                     DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("id"));
                     if (dataSet != null) {
                         detailLog.setLogInfo(dataSet.toJSONString());
@@ -556,8 +554,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         detailLog.setLogType(logType);
         detailLog.setStepNo(dataOptContext.getStepNo());
         detailLog.setRunEndTime(new Date());
-        detailLog.setTaskId(
-            StringBaseOpt.fillZeroForString(StringBaseOpt.castObjectToString(dataOptStep.getStepNo(), "0"), 6));
+        detailLog.setTaskId(dataOptContext.getPacketId());
         dataOptContext.getTaskLog().addDetailLog(detailLog);
         return detailLog;
     }
