@@ -42,7 +42,7 @@ public class AssignmentOperation implements BizOperation {
 
         //计算赋值数据
         Object sourceData =(StringUtils.isBlank(formula) || ".".equals(formula) ) ?
-            dataSet.getData() : new DatasetVariableTranslate(dataSet).getVarValue(formula);
+            dataSet.getData() : new DatasetVariableTranslate(dataSet).attainExpressionValue(formula);
 
         // 对属性赋值
         if("property".equals(assignType)){
