@@ -65,7 +65,7 @@ public class WriteExcelOperation implements BizOperation {
             Integer beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
             Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
 
-            ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true);
+            ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, -1);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             xssfWorkbook.write(byteArrayOutputStream);
@@ -100,7 +100,7 @@ public class WriteExcelOperation implements BizOperation {
 
             Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
 
-            ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true);
+            ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, -1);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             xssfWorkbook.write(byteArrayOutputStream);
