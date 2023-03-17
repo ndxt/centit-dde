@@ -51,10 +51,10 @@ public class WriteExcelOperation implements BizOperation {
         if(StringUtils.isBlank(sheetName)){
             sheetName = "Sheet1";
         }
-        /**optType（生成方式） ： createNew ， createByTemplate ， appendData ；*/
-        String optType = bizOptJson.getString("optType");
+        /**fileType（生成方式） ： none ， excel ， append ；*/
+        String optType = bizOptJson.getString("fileType");
         int mergeColCell = NumberBaseOpt.castObjectToInteger(bizOptJson.getString("mergeColCell"), -1);
-        if("appendData".equals(optType)){
+        if("append".equals(optType)){
             String fileDataSetName = bizOptJson.getString("fileDataSet");
             DataSet dataSet2 = bizModel.getDataSet(fileDataSetName);
             if(!(dataSet2 instanceof FileDataSet)){
