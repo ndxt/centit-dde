@@ -12,6 +12,7 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.report.ExcelExportUtil;
@@ -52,6 +53,7 @@ public class WriteExcelOperation implements BizOperation {
         }
         /**optType（生成方式） ： createNew ， createByTemplate ， appendData ；*/
         String optType = bizOptJson.getString("optType");
+        int mergeColCell = NumberBaseOpt.castObjectToInteger(bizOptJson.getString("mergeColCell"), -1);
         if("appendData".equals(optType)){
             String fileDataSetName = bizOptJson.getString("fileDataSet");
             DataSet dataSet2 = bizModel.getDataSet(fileDataSetName);
@@ -65,7 +67,7 @@ public class WriteExcelOperation implements BizOperation {
             Integer beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
             Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
 
-            ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, -1);
+            ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             xssfWorkbook.write(byteArrayOutputStream);
@@ -100,7 +102,7 @@ public class WriteExcelOperation implements BizOperation {
 
             Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
 
-            ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, -1);
+            ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             xssfWorkbook.write(byteArrayOutputStream);
