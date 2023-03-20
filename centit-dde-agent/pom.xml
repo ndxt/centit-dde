@@ -17,6 +17,7 @@
     <properties>
         <centit.dde.version>5.3-SNAPSHOT</centit.dde.version>
         <common.module.version>5.3-SNAPSHOT</common.module.version>
+        <elasticsearch.version>7.17.9</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -54,7 +55,7 @@
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-core</artifactId>
-            <version>${centit.dde.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
