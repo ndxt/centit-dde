@@ -72,7 +72,7 @@ public class EsQueryBizOperation implements BizOperation {
         String indexType = bizOptJson.getString("indexType");
 
         if("custom".equals(indexType)){
-            return customQueryOperation(bizModel,bizOptJson,transform,pageNo,pageSize);
+            return customQueryOperation(bizModel, bizOptJson, transform, pageNo, pageSize);
         } else {
             Map<String,Object> queryParam = new HashMap<>(6);
 
@@ -190,7 +190,7 @@ public class EsQueryBizOperation implements BizOperation {
         if (queryWord != null){
             //添加查询关键字
             MultiMatchQueryBuilder multiMatchQueryBuilder = queryColumnList != null && queryColumnList.length > 0 ?
-                QueryBuilders.multiMatchQuery(queryWord,queryColumnList) :
+                QueryBuilders.multiMatchQuery(queryWord, queryColumnList) :
                 QueryBuilders.multiMatchQuery(queryWord);
             //最小匹配度 百分比
             int minimumShouldMatch = bizOptJson.getIntValue("minimumShouldMath");
