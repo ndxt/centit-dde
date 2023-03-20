@@ -100,11 +100,11 @@ public class EsWriteBizOperation implements BizOperation {
 
         RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
 
-        return batchSaveDocuments(esClient,dataSet.getDataAsList(),indexName,primaryKeyName,operationType);
+        return batchSaveDocuments(esClient, dataSet.getDataAsList(), indexName, primaryKeyName, operationType);
     }
 
     //es 文件文档操作
-    private ResponseData fileDocumentOperation(BizModel bizModel, JSONObject bizOptJson,DataOptContext dataOptContext,
+    private ResponseData fileDocumentOperation(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext,
                                                ESIndexer esIndexer,String operationType) throws Exception{
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
 
@@ -124,7 +124,7 @@ public class EsWriteBizOperation implements BizOperation {
         Object result;
         switch (operationType){
             case "add":
-                result = esIndexer.saveNewDocument(fileDocumentBuild(bizModel, bizOptJson, dataOptContext,transform));
+                result = esIndexer.saveNewDocument(fileDocumentBuild(bizModel, bizOptJson, dataOptContext, transform));
                 break;
             case "delete":
                 result= esIndexer.deleteDocument(documentId);
@@ -139,7 +139,8 @@ public class EsWriteBizOperation implements BizOperation {
         return ResponseData.makeResponseData(result);
     }
     //构建文件文档信息
-    private FileDocument fileDocumentBuild(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext,BizModelJSONTransform modelTrasform) throws Exception{
+    private FileDocument fileDocumentBuild(BizModel bizModel, JSONObject bizOptJson,
+                                           DataOptContext dataOptContext, BizModelJSONTransform modelTrasform) throws Exception{
         DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
         FileDocument fileInfo = new FileDocument();
         fileInfo.setOptId(dataOptContext.getOptId());

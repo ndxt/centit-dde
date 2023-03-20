@@ -19,6 +19,7 @@ import com.centit.search.document.ObjectDocument;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
@@ -170,18 +171,22 @@ public class EsQueryBizOperation implements BizOperation {
 
                 if (filterValue != null) {
                     String columnName = filterInfo.getString("filterColumnName");
-                    timeProcessing(columnName,StringBaseOpt.castObjectToString(filterValue),boolQueryBuilder);
+                    timeProcessing(columnName, StringBaseOpt.castObjectToString(filterValue), boolQueryBuilder);
                 }
             }
         }
-
+        List<String> excludeFields = new ArrayList<>();
         //前端页面加个高级选项，选项里面加指定的查询列 查询列默认高亮显示 是个数组 queryColumnName
         JSONArray queryColumns = bizOptJson.getJSONArray("queryColumns");
         String[] queryColumnList = null;
         if (queryColumns != null){
             queryColumnList = new String[queryColumns.size()];
             for (int i = 0; i < queryColumns.size(); i++) {
-                queryColumnList[i] = queryColumns.getJSONObject(i).getString("queryColumnName");
+                JSONObject fieldObj = queryColumns.getJSONObject(i);
+                queryColumnList[i] =fieldObj.getString("queryColumnName");
+                String returnValue = fieldObj.getString("returnValue");
+                if(StringUtils.isNotBlank(returnValue) && ! BooleanBaseOpt.castObjectToBoolean(returnValue, true))
+                    excludeFields.add(queryColumnList[i]);
             }
         }
 
@@ -222,10 +227,13 @@ public class EsQueryBizOperation implements BizOperation {
                 }
             }
         }
+
         searchSourceBuilder.sort(sorts);
         searchSourceBuilder.from((pageNo - 1) * pageSize);
         searchSourceBuilder.size(pageSize);
-
+        if(excludeFields.size()>0){
+            searchSourceBuilder.fetchSource(null, excludeFields.toArray(new String[excludeFields.size()]));
+        }
         //设置查询超时时间 1分钟
         //searchSourceBuilder.timeout(new TimeValue(60*1000, TimeUnit.SECONDS));
         //查全部数据(如果不写或者写false当总记录数超过10000时会返回总数10000,配置为true就会返回真实条数)
@@ -254,7 +262,10 @@ public class EsQueryBizOperation implements BizOperation {
         }
         searchSourceBuilder.highlighter(highlightBuilder);
         searchSourceBuilder.query(boolQueryBuilder);
+
+
         searchRequest.source(searchSourceBuilder);
+
 
         RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
         SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
