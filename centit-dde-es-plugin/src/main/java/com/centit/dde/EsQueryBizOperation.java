@@ -185,7 +185,8 @@ public class EsQueryBizOperation implements BizOperation {
                 JSONObject fieldObj = queryColumns.getJSONObject(i);
                 queryColumnList[i] =fieldObj.getString("queryColumnName");
                 String returnValue = fieldObj.getString("returnValue");
-                if(StringUtils.isNotBlank(returnValue) && ! BooleanBaseOpt.castObjectToBoolean(returnValue, true))
+                //先全部不返回，用于测试
+                if(!BooleanBaseOpt.castObjectToBoolean(returnValue, false))
                     excludeFields.add(queryColumnList[i]);
             }
         }
@@ -262,10 +263,7 @@ public class EsQueryBizOperation implements BizOperation {
         }
         searchSourceBuilder.highlighter(highlightBuilder);
         searchSourceBuilder.query(boolQueryBuilder);
-
-
         searchRequest.source(searchSourceBuilder);
-
 
         RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
         SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
