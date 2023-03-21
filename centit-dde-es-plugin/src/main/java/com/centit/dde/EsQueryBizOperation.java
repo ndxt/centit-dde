@@ -186,8 +186,8 @@ public class EsQueryBizOperation implements BizOperation {
                 queryColumnList[i] =fieldObj.getString("queryColumnName");
                 String returnValue = fieldObj.getString("returnValue");
                 //先全部不返回，用于测试
-                if(!BooleanBaseOpt.castObjectToBoolean(returnValue, false))
-                    excludeFields.add(queryColumnList[i]);
+                //if(!BooleanBaseOpt.castObjectToBoolean(returnValue, true))
+                   // excludeFields.add(queryColumnList[i]);
             }
         }
 
