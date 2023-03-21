@@ -257,9 +257,9 @@ public class EsQueryBizOperation implements BizOperation {
             highlightBuilder.requireFieldMatch(true);
             //下面这两项,如果你要高亮如文字内容等有很多字的字段,必须配置,不然会导致高亮不全,文章内容缺失等
             //最大高亮分片数
-            highlightBuilder.fragmentSize(800000);
+            highlightBuilder.fragmentSize(250);
             //从第一个分片获取高亮片段
-            highlightBuilder.numOfFragments(0);
+            highlightBuilder.numOfFragments(5);
         }
         searchSourceBuilder.highlighter(highlightBuilder);
         searchSourceBuilder.query(boolQueryBuilder);
@@ -270,7 +270,7 @@ public class EsQueryBizOperation implements BizOperation {
 
         JSONObject returnData = new JSONObject();
         if (searchSourceBuilder.highlighter() != null && searchSourceBuilder.highlighter().fields().size() > 0) {
-            returnData.put("data", returnHighlightResult(searchResponse, queryColumnList, true));
+            returnData.put("data", returnHighlightResult(searchResponse, true));
         } else {
             returnData.put("data", resultPart(searchResponse, true));
         }
@@ -281,14 +281,13 @@ public class EsQueryBizOperation implements BizOperation {
         return ResponseData.makeResponseData(returnData.getJSONArray("data").size());
     }
 
-    /**
+    /*
      * 返回高亮结果（需要高亮是返回）
      *
      * @param searchResponse
-     * @param queryColumnList
      * @return
      */
-    private static JSONArray returnHighlightResult(SearchResponse searchResponse,  String[] queryColumnList, Boolean explain) {
+    private static JSONArray returnHighlightResult(SearchResponse searchResponse, Boolean explain) {
         JSONArray jsonArray = new JSONArray();
 
         for (SearchHit hit : searchResponse.getHits()) {
@@ -298,17 +297,16 @@ public class EsQueryBizOperation implements BizOperation {
             if (explain) jsonObject.put("explain_info", hit.getExplanation());
             //解析高亮字段
             Map<String, HighlightField> highlightFields = hit.getHighlightFields();
-
-            for (String fieldName : queryColumnList) {
-                HighlightField field = highlightFields.get(fieldName);
+            for (Map.Entry<String, HighlightField> ent : highlightFields.entrySet()) {
+                HighlightField field = ent.getValue();
                 if (field != null) {
                     Text[] fragments = field.fragments();
-                    String n_field = "";
+                    StringBuilder sb = new StringBuilder();
                     for (Text fragment : fragments) {
-                        n_field += fragment;
+                        sb.append(fragment.string().trim());
                     }
                     //高亮标题覆盖原标题
-                    jsonObject.put(fieldName, n_field);
+                    jsonObject.put(ent.getKey(), sb.toString());
                 }
             }
             jsonArray.add(jsonObject);
