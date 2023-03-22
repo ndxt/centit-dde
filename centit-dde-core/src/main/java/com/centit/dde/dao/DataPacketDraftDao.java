@@ -21,7 +21,7 @@ public class DataPacketDraftDao extends BaseDaoImpl<DataPacketDraft, String> {
         filterField.put("optId",CodeBook.EQUAL_HQL_ID);
         filterField.put("isDisable",CodeBook.EQUAL_HQL_ID);
         filterField.put("taskType",CodeBook.EQUAL_HQL_ID);
-        filterField.put("packetId",CodeBook.LIKE_HQL_ID);
+        filterField.put("(like)packetId",CodeBook.LIKE_HQL_ID);
         return filterField;
     }
 

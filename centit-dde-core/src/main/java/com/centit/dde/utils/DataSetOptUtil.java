@@ -901,6 +901,13 @@ public abstract class DataSetOptUtil {
         return FileIOOpt.castObjectToInputStream(data);
     }
 
+    public static InputStream getInputStreamFormDataSet(DataSet dataSet){
+        if(dataSet instanceof FileDataSet){
+            return ((FileDataSet)dataSet).getFileInputStream();
+        }
+        return getInputStreamFormFile(dataSet.getFirstRow());
+    }
+
     //获取数据集参数或者自定义参数
     public static Map<String, Object> getDataSetParames(BizModel bizModel, JSONObject bizOptJson){
         //参数类型

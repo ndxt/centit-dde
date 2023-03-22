@@ -19,6 +19,8 @@ import com.centit.search.document.ObjectDocument;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
+import com.centit.search.service.Searcher;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
@@ -57,34 +59,25 @@ public class EsQueryBizOperation implements BizOperation {
 
     public EsQueryBizOperation(ESServerConfig esServerConfig, SourceInfoDao sourceInfoDao) {
         this.esServerConfig = esServerConfig;
-
         this.sourceInfoDao = sourceInfoDao;
     }
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext)throws Exception{
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
-
         int pageNo  = NumberBaseOpt.castObjectToInteger(transform.attainExpressionValue(bizOptJson.getString("pageNo")),1);
-
         int pageSize = NumberBaseOpt.castObjectToInteger(transform.attainExpressionValue(bizOptJson.getString("pageSize")),20);
-
         String indexType = bizOptJson.getString("indexType");
-
         if("custom".equals(indexType)){
-            return customQueryOperation(bizModel,bizOptJson,transform,pageNo,pageSize);
+            return customQueryOperation(bizModel, bizOptJson, transform, pageNo, pageSize);
         } else {
             Map<String,Object> queryParam = new HashMap<>(6);
-
             queryParam.put("osId",dataOptContext.getOsId());
-
             if (!bizOptJson.getBoolean("queryAll")){
                 Object optTag = transform.attainExpressionValue(bizOptJson.getString("optTag"));
                 if (optTag != null ) queryParam.put("optTag", optTag);
-
                 Object unitCode = transform.attainExpressionValue(bizOptJson.getString("unitCode"));
                 if (unitCode != null ) queryParam.put("unitCode", unitCode);
-
                 Object userCode = transform.attainExpressionValue(bizOptJson.getString("userCode"));
                 if (userCode != null )  queryParam.put("userCode",userCode);
             }
@@ -94,12 +87,8 @@ public class EsQueryBizOperation implements BizOperation {
                 IndexerSearcherFactory.obtainSearcher(esServerConfig, ObjectDocument.class);
 
             String keyword = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("queryParameter")));
-
             QueryBuilder queryBuilder = queryBuilder(queryParam, keyword, indexFile, esSearcher, bizOptJson, transform);
-
-            String[] excludes = bizOptJson.getBoolean("returnAllField") ? null : new String[]{"content"};
-
-            Pair<Long, List<Map<String, Object>>> search = esSearcher.esSearch(queryBuilder, null, excludes, pageNo, pageSize);
+            Pair<Long, List<Map<String, Object>>> search = esSearcher.esSearch(queryBuilder, null, null, pageNo, pageSize);
 
             PageDesc pageDesc = new PageDesc();
             pageDesc.setPageNo(pageNo);
@@ -150,57 +139,52 @@ public class EsQueryBizOperation implements BizOperation {
     private ResponseData customQueryOperation(BizModel bizModel,JSONObject bizOptJson,BizModelJSONTransform transform,
                                               Integer pageNo,Integer pageSize ) throws Exception {
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
-
         SourceInfo esInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
-
         String indexName = BuiltInOperation.getJsonFieldString(bizOptJson, "indexName", null);
-
         if (StringUtils.isBlank(indexName)) return ResponseData.makeErrorMessage("请指定索引名称！");
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-
         //过滤条件 filterColumnName  filterValue
         JSONArray filterList = bizOptJson.getJSONArray("filterList");
-
         if (filterList != null){
             for (int i = 0; i < filterList.size(); i++) {
                 JSONObject filterInfo = filterList.getJSONObject(i);
-
                 Object filterValue = JSONTransformer.transformer(filterInfo.getString("filterValue"), transform);
-
                 if (filterValue != null) {
                     String columnName = filterInfo.getString("filterColumnName");
-                    timeProcessing(columnName,StringBaseOpt.castObjectToString(filterValue),boolQueryBuilder);
+                    makeFilterCondition(columnName, StringBaseOpt.castObjectToString(filterValue), boolQueryBuilder);
                 }
             }
         }
-
+        List<String> highLightFields = new ArrayList<>();
         //前端页面加个高级选项，选项里面加指定的查询列 查询列默认高亮显示 是个数组 queryColumnName
         JSONArray queryColumns = bizOptJson.getJSONArray("queryColumns");
         String[] queryColumnList = null;
         if (queryColumns != null){
             queryColumnList = new String[queryColumns.size()];
             for (int i = 0; i < queryColumns.size(); i++) {
-                queryColumnList[i] = queryColumns.getJSONObject(i).getString("queryColumnName");
+                JSONObject fieldObj = queryColumns.getJSONObject(i);
+                queryColumnList[i] =fieldObj.getString("queryColumnName");
+                String isHighLight = fieldObj.getString("isHighLight");
+                //先全部不返回，用于测试
+                if(BooleanBaseOpt.castObjectToBoolean(isHighLight, true)) {
+                    highLightFields.add(queryColumnList[i]);
+                }
             }
         }
 
         Object queryWord =JSONTransformer.transformer(bizOptJson.getString("queryParameter"), transform);
-
         if (queryWord != null){
             //添加查询关键字
             MultiMatchQueryBuilder multiMatchQueryBuilder = queryColumnList != null && queryColumnList.length > 0 ?
-                QueryBuilders.multiMatchQuery(queryWord,queryColumnList) :
+                QueryBuilders.multiMatchQuery(queryWord, queryColumnList) :
                 QueryBuilders.multiMatchQuery(queryWord);
             //最小匹配度 百分比
             int minimumShouldMatch = bizOptJson.getIntValue("minimumShouldMath");
-
             if (minimumShouldMatch>0) multiMatchQueryBuilder.minimumShouldMatch(minimumShouldMatch+"%");
-
             boolQueryBuilder.must(multiMatchQueryBuilder);
         }else {
             MatchAllQueryBuilder matchAllQueryBuilder = QueryBuilders.matchAllQuery();
-
             boolQueryBuilder.must(matchAllQueryBuilder);
         }
 
@@ -222,6 +206,7 @@ public class EsQueryBizOperation implements BizOperation {
                 }
             }
         }
+
         searchSourceBuilder.sort(sorts);
         searchSourceBuilder.from((pageNo - 1) * pageSize);
         searchSourceBuilder.size(pageSize);
@@ -235,22 +220,20 @@ public class EsQueryBizOperation implements BizOperation {
         //设置高亮显示字段
         //高亮
         HighlightBuilder highlightBuilder = new HighlightBuilder();
-        if (queryColumnList!= null && queryColumnList.length > 0) {
+        if (highLightFields.size() > 0) {
             //设置高亮字段
-            for (int i = 0; i < queryColumnList.length; i++) {
-                highlightBuilder.field(queryColumnList[i]);
+            for (String hlf : highLightFields) {
+                highlightBuilder.field(hlf);
             }
-        }
-        String color = StringBaseOpt.castObjectToString(bizOptJson.getString("color"),"red");
-        if (highlightBuilder.fields().size() > 0) {
+            String color = StringBaseOpt.castObjectToString(bizOptJson.getString("color"),"red");
             highlightBuilder.preTags("<span style='color:"+color+"'>").postTags("</span>");
             highlightBuilder.highlighterType("unified");
             highlightBuilder.requireFieldMatch(true);
             //下面这两项,如果你要高亮如文字内容等有很多字的字段,必须配置,不然会导致高亮不全,文章内容缺失等
             //最大高亮分片数
-            highlightBuilder.fragmentSize(800000);
+            highlightBuilder.fragmentSize(Searcher.SEARCH_FRAGMENT_SIZE);
             //从第一个分片获取高亮片段
-            highlightBuilder.numOfFragments(0);
+            highlightBuilder.numOfFragments(Searcher.SEARCH_FRAGMENT_NUM);
         }
         searchSourceBuilder.highlighter(highlightBuilder);
         searchSourceBuilder.query(boolQueryBuilder);
@@ -258,10 +241,9 @@ public class EsQueryBizOperation implements BizOperation {
 
         RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
         SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
-
         JSONObject returnData = new JSONObject();
         if (searchSourceBuilder.highlighter() != null && searchSourceBuilder.highlighter().fields().size() > 0) {
-            returnData.put("data", returnHighlightResult(searchResponse, queryColumnList, true));
+            returnData.put("data", returnHighlightResult(searchResponse, true));
         } else {
             returnData.put("data", resultPart(searchResponse, true));
         }
@@ -272,34 +254,29 @@ public class EsQueryBizOperation implements BizOperation {
         return ResponseData.makeResponseData(returnData.getJSONArray("data").size());
     }
 
-    /**
+    /*
      * 返回高亮结果（需要高亮是返回）
      *
      * @param searchResponse
-     * @param queryColumnList
      * @return
      */
-    private static JSONArray returnHighlightResult(SearchResponse searchResponse,  String[] queryColumnList, Boolean explain) {
+    private static JSONArray returnHighlightResult(SearchResponse searchResponse, Boolean explain) {
         JSONArray jsonArray = new JSONArray();
-
         for (SearchHit hit : searchResponse.getHits()) {
-
             JSONObject jsonObject = JSON.parseObject(hit.getSourceAsString());
-
             if (explain) jsonObject.put("explain_info", hit.getExplanation());
             //解析高亮字段
             Map<String, HighlightField> highlightFields = hit.getHighlightFields();
-
-            for (String fieldName : queryColumnList) {
-                HighlightField field = highlightFields.get(fieldName);
+            for (Map.Entry<String, HighlightField> ent : highlightFields.entrySet()) {
+                HighlightField field = ent.getValue();
                 if (field != null) {
                     Text[] fragments = field.fragments();
-                    String n_field = "";
+                    StringBuilder sb = new StringBuilder();
                     for (Text fragment : fragments) {
-                        n_field += fragment;
+                        sb.append(fragment.string().trim());
                     }
                     //高亮标题覆盖原标题
-                    jsonObject.put(fieldName, n_field);
+                    jsonObject.put(ent.getKey(), sb.toString());
                 }
             }
             jsonArray.add(jsonObject);
@@ -346,16 +323,12 @@ public class EsQueryBizOperation implements BizOperation {
         return jsonObject;
     }
 
-    private void timeProcessing(String field, String filterValue,BoolQueryBuilder boolQueryBuilder){
-
+    private void makeFilterCondition(String field, String filterValue,BoolQueryBuilder boolQueryBuilder){
         String fieldSuffix = "";
-
         if(field.endsWith("_gt") || field.endsWith("_ge") || field.endsWith("_lt") || field.endsWith("_le") ){
             field =  field.substring(0,field.length() - 4);
-
             fieldSuffix = field.substring(field.length() - 3).toLowerCase();
         }
-
         switch (fieldSuffix) {
             case "_gt":
                 boolQueryBuilder.must(QueryBuilders.rangeQuery(field).gt(filterValue));

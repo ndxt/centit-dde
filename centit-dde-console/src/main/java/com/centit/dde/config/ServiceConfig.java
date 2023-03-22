@@ -17,8 +17,10 @@ import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.search.service.ESServerConfig;
+import com.centit.search.utils.ImagePdfTextExtractor;
 import com.centit.support.algorithm.NumberBaseOpt;
 import io.lettuce.core.RedisClient;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +84,27 @@ public class ServiceConfig {
         return notificationCenter;
     }
 
+    @Bean
+    public ImagePdfTextExtractor.OcrServerHost ocrServerHost() {
+        ImagePdfTextExtractor.OcrServerHost ocrServer = ImagePdfTextExtractor.fetchDefaultOrrServer();
+        String stemp = env.getProperty("ocr.server.author.url");
+        if(StringUtils.isNotBlank(stemp)){
+            ocrServer.setAuthorUrl(stemp);
+        }
+        stemp = env.getProperty("ocr.server.recognition.url");
+        if(StringUtils.isNotBlank(stemp)){
+            ocrServer.setOrcUrl(stemp);
+        }
+        stemp = env.getProperty("ocr.server.author.username");
+        if(StringUtils.isNotBlank(stemp)){
+            ocrServer.setUserName(stemp);
+        }
+        stemp = env.getProperty("ocr.server.author.password");
+        if(StringUtils.isNotBlank(stemp)){
+            ocrServer.setPassword(stemp);
+        }
+        return ocrServer;
+    }
     /*es 配置信息*/
     @Bean
     public ESServerConfig esServerConfig() {

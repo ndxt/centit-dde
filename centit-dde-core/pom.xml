@@ -72,7 +72,6 @@
             <scope>provided</scope>
         </dependency>
 
-
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>optflow-serial-number</artifactId>
@@ -106,22 +105,10 @@
         <!-- 二维码依赖开始-->
         <dependency>
             <groupId>com.google.zxing</groupId>
-            <artifactId>core</artifactId>
-            <version>3.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
-            <version>3.4.0</version>
+            <version>3.5.1</version>
         </dependency>
         <!-- 二维码依赖结束-->
-        <!--pdf依赖-->
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>itextpdf</artifactId>
-            <version>5.5.13.3</version>
-        </dependency>
-
     </dependencies>
 
 </project>
