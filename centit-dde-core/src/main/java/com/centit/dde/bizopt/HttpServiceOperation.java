@@ -25,6 +25,7 @@ import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.network.UrlOptUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.entity.ContentType;
 
 import javax.servlet.http.HttpSession;
 import java.io.InputStream;
@@ -40,7 +41,6 @@ public class HttpServiceOperation implements BizOperation {
     public HttpServiceOperation(SourceInfoDao sourceInfoDao) {
         this.sourceInfoDao = sourceInfoDao;
     }
-
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
@@ -86,10 +86,15 @@ public class HttpServiceOperation implements BizOperation {
             case "post":
                 String requestType = BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
                 if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)) {
-                    InputStream requestFile = getRequestFile(bizOptJson, bizModel);
-                    if (requestFile != null) {
+                    String source = bizOptJson.getString("source");
+                    DataSet dataSet = bizModel.getDataSet(source);
+                    FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
+                    InputStream fileIS = fileInfo.getFileInputStream();
+
+                    if (fileIS != null) {
                         receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
-                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestFile));
+                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), fileIS,
+                            "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()));
                     }
                 } else {
                     Object requestBody = getRequestBody(bizOptJson, bizModel);
@@ -164,12 +169,4 @@ public class HttpServiceOperation implements BizOperation {
         return requestBody;
     }
 
-
-    private InputStream getRequestFile(JSONObject bizOptJson, BizModel bizModel) {
-        String source = bizOptJson.getString("source");
-        DataSet dataSet = bizModel.getDataSet(source);
-        FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
-        InputStream inputStream = fileInfo.getFileInputStream();
-        return inputStream;
-    }
 }
