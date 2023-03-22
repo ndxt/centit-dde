@@ -19,6 +19,7 @@ import com.centit.search.document.ObjectDocument;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
+import com.centit.search.service.Searcher;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -98,9 +99,7 @@ public class EsQueryBizOperation implements BizOperation {
 
             QueryBuilder queryBuilder = queryBuilder(queryParam, keyword, indexFile, esSearcher, bizOptJson, transform);
 
-            String[] excludes = bizOptJson.getBoolean("returnAllField") ? null : new String[]{"content"};
-
-            Pair<Long, List<Map<String, Object>>> search = esSearcher.esSearch(queryBuilder, null, excludes, pageNo, pageSize);
+            Pair<Long, List<Map<String, Object>>> search = esSearcher.esSearch(queryBuilder, null, null, pageNo, pageSize);
 
             PageDesc pageDesc = new PageDesc();
             pageDesc.setPageNo(pageNo);
@@ -257,9 +256,9 @@ public class EsQueryBizOperation implements BizOperation {
             highlightBuilder.requireFieldMatch(true);
             //下面这两项,如果你要高亮如文字内容等有很多字的字段,必须配置,不然会导致高亮不全,文章内容缺失等
             //最大高亮分片数
-            highlightBuilder.fragmentSize(250);
+            highlightBuilder.fragmentSize(Searcher.SEARCH_FRAGMENT_SIZE);
             //从第一个分片获取高亮片段
-            highlightBuilder.numOfFragments(5);
+            highlightBuilder.numOfFragments(Searcher.SEARCH_FRAGMENT_NUM);
         }
         searchSourceBuilder.highlighter(highlightBuilder);
         searchSourceBuilder.query(boolQueryBuilder);

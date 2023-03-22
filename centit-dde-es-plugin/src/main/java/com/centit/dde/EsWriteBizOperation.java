@@ -105,7 +105,7 @@ public class EsWriteBizOperation implements BizOperation {
 
     //es 文件文档操作
     private ResponseData fileDocumentOperation(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext,
-                                               ESIndexer esIndexer,String operationType) throws Exception{
+                                               ESIndexer esIndexer, String operationType) throws Exception{
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
 
         String documentId = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("documentId")));
@@ -148,7 +148,9 @@ public class EsWriteBizOperation implements BizOperation {
         fileInfo.setOptMethod("index");
         fileInfo.setUserCode(dataOptContext.getCurrentUserCode());
         fileInfo.setUnitCode(dataOptContext.getCurrentUnitCode());
-        fileInfo.setContent(TikaTextExtractor.extractInputStreamText(DataSetOptUtil.getInputStreamFormFile(dataSet.getFirstRow())));
+        // 获取文件文本，这边需要添加 图片pdf文件的获取方式
+        fileInfo.setContent(
+            TikaTextExtractor.extractInputStreamText(DataSetOptUtil.getInputStreamFormDataSet(dataSet)));
         fileInfo.setFileId(StringBaseOpt.castObjectToString(modelTrasform.attainExpressionValue(bizOptJson.getString("documentId"))));
         fileInfo.setFileName(StringBaseOpt.castObjectToString(modelTrasform.attainExpressionValue(bizOptJson.getString("fileName"))));
         fileInfo.setFileSummary(StringBaseOpt.castObjectToString(modelTrasform.attainExpressionValue(bizOptJson.getString("fileSummary"))));
