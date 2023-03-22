@@ -174,7 +174,7 @@ public class EsQueryBizOperation implements BizOperation {
                 }
             }
         }
-        List<String> excludeFields = new ArrayList<>();
+        List<String> highLightFields = new ArrayList<>();
         //前端页面加个高级选项，选项里面加指定的查询列 查询列默认高亮显示 是个数组 queryColumnName
         JSONArray queryColumns = bizOptJson.getJSONArray("queryColumns");
         String[] queryColumnList = null;
@@ -183,10 +183,11 @@ public class EsQueryBizOperation implements BizOperation {
             for (int i = 0; i < queryColumns.size(); i++) {
                 JSONObject fieldObj = queryColumns.getJSONObject(i);
                 queryColumnList[i] =fieldObj.getString("queryColumnName");
-                //String returnValue = fieldObj.getString("returnValue");
+                String returnValue = fieldObj.getString("returnValue");
                 //先全部不返回，用于测试
-                //if(!BooleanBaseOpt.castObjectToBoolean(returnValue, true))
-                   // excludeFields.add(queryColumnList[i]);
+                if(BooleanBaseOpt.castObjectToBoolean(returnValue, true)) {
+                    highLightFields.add(queryColumnList[i]);
+                }
             }
         }
 
@@ -199,13 +200,10 @@ public class EsQueryBizOperation implements BizOperation {
                 QueryBuilders.multiMatchQuery(queryWord);
             //最小匹配度 百分比
             int minimumShouldMatch = bizOptJson.getIntValue("minimumShouldMath");
-
             if (minimumShouldMatch>0) multiMatchQueryBuilder.minimumShouldMatch(minimumShouldMatch+"%");
-
             boolQueryBuilder.must(multiMatchQueryBuilder);
         }else {
             MatchAllQueryBuilder matchAllQueryBuilder = QueryBuilders.matchAllQuery();
-
             boolQueryBuilder.must(matchAllQueryBuilder);
         }
 
@@ -231,9 +229,7 @@ public class EsQueryBizOperation implements BizOperation {
         searchSourceBuilder.sort(sorts);
         searchSourceBuilder.from((pageNo - 1) * pageSize);
         searchSourceBuilder.size(pageSize);
-        if(excludeFields.size()>0){
-            searchSourceBuilder.fetchSource(null, excludeFields.toArray(new String[excludeFields.size()]));
-        }
+
         //设置查询超时时间 1分钟
         //searchSourceBuilder.timeout(new TimeValue(60*1000, TimeUnit.SECONDS));
         //查全部数据(如果不写或者写false当总记录数超过10000时会返回总数10000,配置为true就会返回真实条数)
@@ -243,14 +239,12 @@ public class EsQueryBizOperation implements BizOperation {
         //设置高亮显示字段
         //高亮
         HighlightBuilder highlightBuilder = new HighlightBuilder();
-        if (queryColumnList!= null && queryColumnList.length > 0) {
+        if (highLightFields.size() > 0) {
             //设置高亮字段
-            for (int i = 0; i < queryColumnList.length; i++) {
-                highlightBuilder.field(queryColumnList[i]);
+            for (String hlf : highLightFields) {
+                highlightBuilder.field(hlf);
             }
-        }
-        String color = StringBaseOpt.castObjectToString(bizOptJson.getString("color"),"red");
-        if (highlightBuilder.fields().size() > 0) {
+            String color = StringBaseOpt.castObjectToString(bizOptJson.getString("color"),"red");
             highlightBuilder.preTags("<span style='color:"+color+"'>").postTags("</span>");
             highlightBuilder.highlighterType("unified");
             highlightBuilder.requireFieldMatch(true);
