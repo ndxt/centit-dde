@@ -150,27 +150,20 @@ public class EsQueryBizOperation implements BizOperation {
     private ResponseData customQueryOperation(BizModel bizModel,JSONObject bizOptJson,BizModelJSONTransform transform,
                                               Integer pageNo,Integer pageSize ) throws Exception {
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
-
         SourceInfo esInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
-
         String indexName = BuiltInOperation.getJsonFieldString(bizOptJson, "indexName", null);
-
         if (StringUtils.isBlank(indexName)) return ResponseData.makeErrorMessage("请指定索引名称！");
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-
         //过滤条件 filterColumnName  filterValue
         JSONArray filterList = bizOptJson.getJSONArray("filterList");
-
         if (filterList != null){
             for (int i = 0; i < filterList.size(); i++) {
                 JSONObject filterInfo = filterList.getJSONObject(i);
-
                 Object filterValue = JSONTransformer.transformer(filterInfo.getString("filterValue"), transform);
-
                 if (filterValue != null) {
                     String columnName = filterInfo.getString("filterColumnName");
-                    timeProcessing(columnName, StringBaseOpt.castObjectToString(filterValue), boolQueryBuilder);
+                    makeFilterCondition(columnName, StringBaseOpt.castObjectToString(filterValue), boolQueryBuilder);
                 }
             }
         }
@@ -192,7 +185,6 @@ public class EsQueryBizOperation implements BizOperation {
         }
 
         Object queryWord =JSONTransformer.transformer(bizOptJson.getString("queryParameter"), transform);
-
         if (queryWord != null){
             //添加查询关键字
             MultiMatchQueryBuilder multiMatchQueryBuilder = queryColumnList != null && queryColumnList.length > 0 ?
@@ -260,7 +252,6 @@ public class EsQueryBizOperation implements BizOperation {
 
         RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
         SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
-
         JSONObject returnData = new JSONObject();
         if (searchSourceBuilder.highlighter() != null && searchSourceBuilder.highlighter().fields().size() > 0) {
             returnData.put("data", returnHighlightResult(searchResponse, true));
@@ -282,11 +273,8 @@ public class EsQueryBizOperation implements BizOperation {
      */
     private static JSONArray returnHighlightResult(SearchResponse searchResponse, Boolean explain) {
         JSONArray jsonArray = new JSONArray();
-
         for (SearchHit hit : searchResponse.getHits()) {
-
             JSONObject jsonObject = JSON.parseObject(hit.getSourceAsString());
-
             if (explain) jsonObject.put("explain_info", hit.getExplanation());
             //解析高亮字段
             Map<String, HighlightField> highlightFields = hit.getHighlightFields();
@@ -346,16 +334,12 @@ public class EsQueryBizOperation implements BizOperation {
         return jsonObject;
     }
 
-    private void timeProcessing(String field, String filterValue,BoolQueryBuilder boolQueryBuilder){
-
+    private void makeFilterCondition(String field, String filterValue,BoolQueryBuilder boolQueryBuilder){
         String fieldSuffix = "";
-
         if(field.endsWith("_gt") || field.endsWith("_ge") || field.endsWith("_lt") || field.endsWith("_le") ){
             field =  field.substring(0,field.length() - 4);
-
             fieldSuffix = field.substring(field.length() - 3).toLowerCase();
         }
-
         switch (fieldSuffix) {
             case "_gt":
                 boolQueryBuilder.must(QueryBuilders.rangeQuery(field).gt(filterValue));

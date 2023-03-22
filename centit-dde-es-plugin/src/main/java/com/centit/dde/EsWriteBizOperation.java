@@ -18,6 +18,7 @@ import com.centit.search.document.ObjectDocument;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Impl.ESIndexer;
 import com.centit.search.service.IndexerSearcherFactory;
+import com.centit.search.utils.ImagePdfTextExtractor;
 import com.centit.search.utils.TikaTextExtractor;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
@@ -37,6 +38,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.xcontent.XContentType;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,11 +47,12 @@ import java.util.Map;
 public class EsWriteBizOperation implements BizOperation {
 
     private final ESServerConfig esServerConfig;
-
+    private final ImagePdfTextExtractor.OcrServerHost ocrServerHost;
     private  SourceInfoDao sourceInfoDao;
-    public EsWriteBizOperation(ESServerConfig esServerConfig, SourceInfoDao sourceInfoDao) {
+    public EsWriteBizOperation(ESServerConfig esServerConfig, SourceInfoDao sourceInfoDao, ImagePdfTextExtractor.OcrServerHost ocrServerHost) {
         this.esServerConfig = esServerConfig;
         this.sourceInfoDao = sourceInfoDao;
+        this.ocrServerHost = ocrServerHost;
     }
 
 
@@ -57,11 +60,8 @@ public class EsWriteBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         //操作类型  增  删  改  合并
         String operationType = bizOptJson.getString("operationType");
-
         if (StringUtils.isBlank(operationType)) return ResponseData.makeErrorMessage("请选择操作类型！");
-
         String  indexType  = bizOptJson.getString("indexType");
-
         if("custom".equals(indexType)){
             return customDocOperation(bizModel, bizOptJson, operationType);
         } else {
@@ -107,18 +107,12 @@ public class EsWriteBizOperation implements BizOperation {
     private ResponseData fileDocumentOperation(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext,
                                                ESIndexer esIndexer, String operationType) throws Exception{
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
-
         String documentId = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("documentId")));
-
         if (StringUtils.isBlank(documentId)) return ResponseData.makeErrorMessage("文档主键不能为空！");
-
         if (!"delete".equals(operationType)){
             DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
-
             if (dataSet == null ) return ResponseData.makeErrorMessage("文档内容不能为空！");
-
             Object optTag = transform.attainExpressionValue(bizOptJson.getString("optTag"));
-
             if (optTag == null) return ResponseData.makeErrorMessage("业务主键不能为空！");
         }
         Object result;
@@ -149,8 +143,19 @@ public class EsWriteBizOperation implements BizOperation {
         fileInfo.setUserCode(dataOptContext.getCurrentUserCode());
         fileInfo.setUnitCode(dataOptContext.getCurrentUnitCode());
         // 获取文件文本，这边需要添加 图片pdf文件的获取方式
-        fileInfo.setContent(
-            TikaTextExtractor.extractInputStreamText(DataSetOptUtil.getInputStreamFormDataSet(dataSet)));
+        // ocrServerHost
+        InputStream fileInputStream = DataSetOptUtil.getInputStreamFormDataSet(dataSet);
+        if(fileInputStream!=null) {
+            String fileType = bizOptJson.getString("fileType");
+            if ("jpg".equals(fileType)) {
+                fileInfo.setContent(ImagePdfTextExtractor.imageToText(fileInputStream, ocrServerHost));
+            } else if ("imagePdf".equals(fileType)) {
+                fileInfo.setContent(ImagePdfTextExtractor.imagePdfToText(fileInputStream, ocrServerHost));
+            } else {
+                fileInfo.setContent(TikaTextExtractor.extractInputStreamText(fileInputStream));
+            }
+        }
+
         fileInfo.setFileId(StringBaseOpt.castObjectToString(modelTrasform.attainExpressionValue(bizOptJson.getString("documentId"))));
         fileInfo.setFileName(StringBaseOpt.castObjectToString(modelTrasform.attainExpressionValue(bizOptJson.getString("fileName"))));
         fileInfo.setFileSummary(StringBaseOpt.castObjectToString(modelTrasform.attainExpressionValue(bizOptJson.getString("fileSummary"))));
