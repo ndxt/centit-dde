@@ -41,8 +41,10 @@ public class AssignmentOperation implements BizOperation {
         String formula = BuiltInOperation.getJsonFieldString(bizOptJson, "formula", ".");
 
         //计算赋值数据
-        Object sourceData =(StringUtils.isBlank(formula) || ".".equals(formula) ) ?
-            dataSet.getData() : new DatasetVariableTranslate(dataSet).attainExpressionValue(formula);
+        Object sourceData =(StringUtils.isBlank(formula) || ".".equals(formula) ) ? dataSet.getData() :
+            (formula.startsWith("@")?
+                new DatasetVariableTranslate(dataSet).mapTemplateString(formula.substring(1)):
+                new DatasetVariableTranslate(dataSet).attainExpressionValue(formula));
 
         // 对属性赋值
         if("property".equals(assignType)){
