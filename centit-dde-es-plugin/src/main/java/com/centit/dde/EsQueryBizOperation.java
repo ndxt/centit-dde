@@ -59,34 +59,25 @@ public class EsQueryBizOperation implements BizOperation {
 
     public EsQueryBizOperation(ESServerConfig esServerConfig, SourceInfoDao sourceInfoDao) {
         this.esServerConfig = esServerConfig;
-
         this.sourceInfoDao = sourceInfoDao;
     }
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext)throws Exception{
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
-
         int pageNo  = NumberBaseOpt.castObjectToInteger(transform.attainExpressionValue(bizOptJson.getString("pageNo")),1);
-
         int pageSize = NumberBaseOpt.castObjectToInteger(transform.attainExpressionValue(bizOptJson.getString("pageSize")),20);
-
         String indexType = bizOptJson.getString("indexType");
-
         if("custom".equals(indexType)){
             return customQueryOperation(bizModel, bizOptJson, transform, pageNo, pageSize);
         } else {
             Map<String,Object> queryParam = new HashMap<>(6);
-
             queryParam.put("osId",dataOptContext.getOsId());
-
             if (!bizOptJson.getBoolean("queryAll")){
                 Object optTag = transform.attainExpressionValue(bizOptJson.getString("optTag"));
                 if (optTag != null ) queryParam.put("optTag", optTag);
-
                 Object unitCode = transform.attainExpressionValue(bizOptJson.getString("unitCode"));
                 if (unitCode != null ) queryParam.put("unitCode", unitCode);
-
                 Object userCode = transform.attainExpressionValue(bizOptJson.getString("userCode"));
                 if (userCode != null )  queryParam.put("userCode",userCode);
             }
@@ -96,9 +87,7 @@ public class EsQueryBizOperation implements BizOperation {
                 IndexerSearcherFactory.obtainSearcher(esServerConfig, ObjectDocument.class);
 
             String keyword = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("queryParameter")));
-
             QueryBuilder queryBuilder = queryBuilder(queryParam, keyword, indexFile, esSearcher, bizOptJson, transform);
-
             Pair<Long, List<Map<String, Object>>> search = esSearcher.esSearch(queryBuilder, null, null, pageNo, pageSize);
 
             PageDesc pageDesc = new PageDesc();
@@ -176,9 +165,9 @@ public class EsQueryBizOperation implements BizOperation {
             for (int i = 0; i < queryColumns.size(); i++) {
                 JSONObject fieldObj = queryColumns.getJSONObject(i);
                 queryColumnList[i] =fieldObj.getString("queryColumnName");
-                String returnValue = fieldObj.getString("returnValue");
+                String isHighLight = fieldObj.getString("isHighLight");
                 //先全部不返回，用于测试
-                if(BooleanBaseOpt.castObjectToBoolean(returnValue, true)) {
+                if(BooleanBaseOpt.castObjectToBoolean(isHighLight, true)) {
                     highLightFields.add(queryColumnList[i]);
                 }
             }

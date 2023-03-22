@@ -81,25 +81,15 @@ public class EsWriteBizOperation implements BizOperation {
      *自定义文档操作
      */
     private ResponseData customDocOperation(BizModel bizModel, JSONObject bizOptJson,String operationType) throws Exception{
-
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
-
         SourceInfo esInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
-
         String indexName = BuiltInOperation.getJsonFieldString(bizOptJson, "indexName", null);
-
         if (StringUtils.isBlank(indexName)) return ResponseData.makeErrorMessage("请指定索引名称！");
-
         DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
-
         if (dataSet == null ) return ResponseData.makeErrorMessage("文档内容不能为空！");
-
         String primaryKeyName = bizOptJson.getString("primaryKey");
-
         if (StringUtils.isBlank(primaryKeyName)) return ResponseData.makeErrorMessage("请指定文档主键字段名称！");
-
         RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
-
         return batchSaveDocuments(esClient, dataSet.getDataAsList(), indexName, primaryKeyName, operationType);
     }
 

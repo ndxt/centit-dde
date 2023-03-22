@@ -17,13 +17,10 @@ public class EsRegisterOperation {
     BizOptFlow bizOptFlow;
     @Autowired
     ESServerConfig esServerConfig;
-
     @Autowired
     ImagePdfTextExtractor.OcrServerHost ocrServerHost;
-
     @Autowired
     private SourceInfoDao sourceInfoDao;
-
     @PostConstruct
     void registerOperation(){
         //注册查询操作类
