@@ -18,6 +18,7 @@ import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -56,10 +57,17 @@ public class RunSqlOperation implements BizOperation {
             }
             Map<String, Object> params = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
             QueryAndNamedParams qap = QueryUtils.translateQuery(sql, params);
+            Map<String, Object> paramsMap = new HashMap<>(params == null ? 0 : params.size() + 6);
+            if (params != null) {
+                paramsMap.putAll(params);
+                paramsMap.putAll(qap.getParams());
+                qap.setParams(paramsMap);
+            }
+
             QueryAndParams q = QueryAndParams.createFromQueryAndNamedParams(qap);
-            bizModel.putDataSet(bizOptJson.getString("id"),new DataSet(qap));
             Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfoDao.getDatabaseInfoById((databaseCode)));
             count = DatabaseAccess.doExecuteSql(conn, q.getQuery(), q.getParams());
+            bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(qap));
         }
         return BuiltInOperation.createResponseSuccessData(count);
     }
