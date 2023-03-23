@@ -24,7 +24,8 @@ public class DefineJsonDataOperation implements BizOperation {
         if (StringUtils.isNotEmpty(jsonValue)){
             //jsonValue = !jsonValue.startsWith("{") && jsonValue.startsWith("\"")? jsonValue.replace("\"",""): jsonValue;
             Object data =
-                JSONTransformer.transformer( jsonValue.startsWith("{") ? JSON.parse(jsonValue) : jsonValue, new BizModelJSONTransform(bizModel));
+                JSONTransformer.transformer(jsonValue.startsWith("{") || jsonValue.startsWith("[") ?
+                     JSON.parse(jsonValue) : jsonValue, new BizModelJSONTransform(bizModel));
             if (data instanceof FileDataSet){
                 bizModel.putDataSet(targetDsName,(FileDataSet)data);
             }else {
