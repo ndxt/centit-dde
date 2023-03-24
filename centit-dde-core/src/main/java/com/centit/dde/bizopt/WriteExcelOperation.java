@@ -1,7 +1,5 @@
 package com.centit.dde.bizopt;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -17,6 +15,7 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.report.ExcelExportUtil;
 import com.centit.support.report.ExcelImportUtil;
+import com.centit.support.report.ExcelReportUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -24,7 +23,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +49,7 @@ public class WriteExcelOperation implements BizOperation {
         if(StringUtils.isBlank(sheetName)){
             sheetName = "Sheet1";
         }
-        /**fileType（生成方式） ： none ， excel ， append ；*/
+        /**fileType（生成方式） ： none,append, excel, jxls；*/
         String optType = bizOptJson.getString("fileType");
         int mergeColCell = NumberBaseOpt.castObjectToInteger(bizOptJson.getString("mergeColCell"), -1);
         if("append".equals(optType)){
@@ -86,33 +84,33 @@ public class WriteExcelOperation implements BizOperation {
         //模板文件id
         String templateFileId = bizOptJson.getString("templateFileId");
         //根据模板生成
-        if (StringUtils.isNotBlank(templateFileId)) {
-            //从第几行开始插入
-            Integer beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
-            //指定写入第几个sheet中
-
+        if (StringUtils.endsWithAny(optType,"jxls","excel") && StringUtils.isNotBlank(templateFileId)) {
             InputStream inputStream = fileInfoOpt.loadFileStream(templateFileId);
             if (inputStream == null) {
                 return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
                     bizOptJson.getString("SetsName") + "：Excel模板不存在，请先上传模板！");
             }
-
-            XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
-            XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
-
-            Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
-
-            ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
-
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            xssfWorkbook.write(byteArrayOutputStream);
+            if("jxls".equals(optType)){
+                ExcelReportUtil.exportExcel(inputStream, byteArrayOutputStream, dataSet.getFirstRow());
+            } else {
+                //从第几行开始插入
+                Integer beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
+                //指定写入第几个sheet中
+                XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
+                XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
+
+                Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
+                ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
+                xssfWorkbook.write(byteArrayOutputStream);
+                xssfWorkbook.close();
+            }
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
 
             FileDataSet objectToDataSet = new FileDataSet(fileName, byteArrayOutputStream.size(), byteArrayInputStream);
-
             bizModel.putDataSet(id, objectToDataSet);
             byteArrayOutputStream.close();
-            xssfWorkbook.close();
+
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
         //获取表达式信息
