@@ -79,7 +79,7 @@ public class DataPacketController extends BaseController {
         @ApiImplicitParam(
             name = "logLevel", type = "path", value = "日志等级"),
         @ApiImplicitParam(name = "moduleId", type="body", value="模块id", dataTypeClass = String.class)})
-    @PutMapping(value = "/chgModuleLevel/{logLevel}")
+    @PutMapping(value = "/chgOptLogLevel/{logLevel}")
     @WrapUpResponseBody
     public void chgModuleLogLevel(@PathVariable String logLevel, @RequestBody String moduleId) {
         int lv = DataPacket.mapLogLevel(logLevel);
@@ -94,7 +94,7 @@ public class DataPacketController extends BaseController {
         @ApiImplicitParam(
             name = "logLevel", type = "path", value = "日志等级"),
         @ApiImplicitParam(name = "osId", type="body", value="应用id，OS_ID", dataTypeClass = String.class)})
-    @PutMapping(value = "/chgModuleLevel/{logLevel}")
+    @PutMapping(value = "/chgOSLogLevel/{logLevel}")
     @WrapUpResponseBody
     public void chgOSLogLevel(@PathVariable String logLevel, @RequestBody String osId) {
         int lv = DataPacket.mapLogLevel(logLevel);
