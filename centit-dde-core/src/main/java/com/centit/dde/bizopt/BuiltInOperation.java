@@ -73,30 +73,23 @@ public abstract class BuiltInOperation {
 
     public static Map<String, Object> makeCalcParam(Object ud) {
         Map<String, Object> dpf = new HashMap<>(10);
-        if (ud == null) {
+        if (!(ud instanceof CentitUserDetails)) {
             return dpf;
         }
-        JSONObject userInfo = null;
-        CentitUserDetails userDetails = null;
-        String userCode = null;
-        String topUnit = null;
-        if (ud instanceof CentitUserDetails) {
-            userDetails = (CentitUserDetails) ud;
-            userInfo = userDetails.getUserInfo();
-            userCode = userDetails.getUserCode();
-            topUnit = userDetails.getTopUnitCode();
-        }
+        CentitUserDetails userDetails = (CentitUserDetails)ud;
+        JSONObject userInfo = userDetails.getUserInfo();
+        String userCode =  userDetails.getUserCode();
+        String topUnit = userDetails.getTopUnitCode();
         //当前用户信息
         dpf.put("currentUser", userInfo);
-        if (userDetails != null) {
-            dpf.put("currentStation", userDetails.getCurrentStation());
-            //当前用户主机构信息
-            dpf.put("primaryUnit", CodeRepositoryUtil
-                .getUnitInfoByCode(userDetails.getUserInfo().getString("topUnit"),
-                    userDetails.getUserInfo().getString("primaryUnit")));
-            //当前用户的角色信息
-            dpf.put("userRoles", userDetails.getUserRoles());
-        }
+        dpf.put("currentStation", userDetails.getCurrentStation());
+        //当前用户主机构信息
+        dpf.put("primaryUnit", CodeRepositoryUtil
+            .getUnitInfoByCode(userDetails.getUserInfo().getString("topUnit"),
+                userDetails.getUserInfo().getString("primaryUnit")));
+        //当前用户的角色信息
+        dpf.put("userRoles", userDetails.getUserRoles());
+
         //当前用户所有机构关联关系信息
         if (StringUtils.isNotBlank(userCode)) {
             List<? extends IUserUnit> userUnits = CodeRepositoryUtil

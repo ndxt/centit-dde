@@ -13,11 +13,12 @@ import com.centit.framework.components.SysUserFilterEngine;
 import com.centit.framework.components.impl.UserUnitMapTranslate;
 import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.compiler.Pretreatment;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -25,20 +26,27 @@ import java.util.Set;
  * @author zhf
  */
 public class UserFilterOperation implements BizOperation {
+    static HashMap<String, Set<String>> createFilterParam(String key, String value){
+        HashMap<String, Set<String>> param = new HashMap<>();
+        param.put(key, CollectionsOpt.createHashSet(value));
+        return param;
+    }
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
-        Object centitUserDetails = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
-        if (!(centitUserDetails instanceof CentitUserDetails)) {
+        Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
+        if (!(userObj instanceof CentitUserDetails)) {
             return ResponseData.makeErrorMessage("用户没有登录！");
         }
-        String userFilter = StringBaseOpt.castObjectToString(
-            Pretreatment.mapTemplateStringAsFormula(bizOptJson.getString("userFilter"), new BizModelJSONTransform(bizModel))
-        );
+        CentitUserDetails centitUserDetails = (CentitUserDetails) userObj;
+        String userFilter = Pretreatment.mapTemplateStringAsFormula(bizOptJson.getString("userFilter"),
+            new BizModelJSONTransform(bizModel));
+
         Set<String> users = SysUserFilterEngine.calcSystemOperators(
             StringEscapeUtils.unescapeHtml4(userFilter),
-            null, null, null,
+            createFilterParam("C",centitUserDetails.getCurrentUnitCode()),
+            createFilterParam("C",centitUserDetails.getUserCode()),null,
             new UserUnitMapTranslate(BuiltInOperation.makeCalcParam(centitUserDetails)));
-        List<IUserInfo> retUsers = CodeRepositoryUtil.getUserInfosByCodes(((CentitUserDetails) centitUserDetails).getTopUnitCode(), users);
+        List<IUserInfo> retUsers = CodeRepositoryUtil.getUserInfosByCodes(centitUserDetails.getTopUnitCode(), users);
         List<IUserInfo> lsUserInfo = new ArrayList<>(retUsers.size() + 1);
         for (IUserInfo ui : retUsers) {
             if ("T".equals(ui.getIsValid())) {

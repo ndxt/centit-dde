@@ -14,7 +14,6 @@ import com.centit.framework.components.impl.UserUnitMapTranslate;
 import com.centit.framework.model.basedata.IUnitInfo;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -28,19 +27,23 @@ import java.util.Set;
 public class UnitFilterOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext){
-        Object centitUserDetails = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
-        if(!(centitUserDetails instanceof CentitUserDetails)){
+        Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
+        if (!(userObj instanceof CentitUserDetails)) {
             return ResponseData.makeErrorMessage("用户没有登录！");
         }
-        String unitFilter= StringBaseOpt.castObjectToString(
-            Pretreatment.mapTemplateStringAsFormula(bizOptJson.getString("unitFilter"),new BizModelJSONTransform(bizModel))
-        );
+        CentitUserDetails centitUserDetails = (CentitUserDetails) userObj;
+
+        String unitFilter=
+            Pretreatment.mapTemplateStringAsFormula(bizOptJson.getString("unitFilter"),
+                new BizModelJSONTransform(bizModel));
+
         Set<String> units = SysUnitFilterEngine.calcSystemUnitsByExp(
-            StringEscapeUtils.unescapeHtml4(unitFilter), null,
+            StringEscapeUtils.unescapeHtml4(unitFilter),
+            UserFilterOperation.createFilterParam("C",centitUserDetails.getCurrentUnitCode()),
             new UserUnitMapTranslate(BuiltInOperation.makeCalcParam(centitUserDetails))
         );
 
-        List<IUnitInfo> retUntis = CodeRepositoryUtil.getUnitInfosByCodes(((CentitUserDetails)centitUserDetails).getTopUnitCode(), units);
+        List<IUnitInfo> retUntis = CodeRepositoryUtil.getUnitInfosByCodes(centitUserDetails.getTopUnitCode(), units);
         CollectionsOpt.sortAsTree(retUntis,
             ( p,  c) -> StringUtils.equals(p.getUnitCode(),c.getParentUnit()) );
         bizModel.putDataSet(bizOptJson.getString("id"),new DataSet(retUntis));
