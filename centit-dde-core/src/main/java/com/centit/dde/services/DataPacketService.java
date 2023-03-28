@@ -1,6 +1,8 @@
 package com.centit.dde.services;
 
 import com.centit.dde.po.DataPacket;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.PageDesc;
 
 import java.util.List;
@@ -32,6 +34,11 @@ public interface DataPacketService {
 
     void batchDeleteByPacketIds(String[] packetIds);
 
+    void updatePackedLogLevel(int logLevel, String ... packetIds);
+
+    void updateModuleLogLevel(int logLevel, String moduleId);
+
+    void updateApplicationLogLevel(int logLevel, String osId);
     //清空回收站
     int clearTrashStand(String osId);
 }

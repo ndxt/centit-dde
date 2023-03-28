@@ -1,17 +1,20 @@
 package com.centit.dde.controller;
 
+import com.alibaba.fastjson2.JSON;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -54,4 +57,50 @@ public class DataPacketController extends BaseController {
     }
 
 
+    @ApiOperation(value = "更改api日志模式")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+            name = "logLevel", type = "path", value = "日志等级"),
+        @ApiImplicitParam(name = "packetIds", type="body", value="接口id或者id数组", dataTypeClass = String.class)})
+    @PutMapping(value = "/chgLogLevel/{logLevel}")
+    @WrapUpResponseBody
+    public void chgLogLevel(@PathVariable String logLevel, @RequestBody String packetIds) {
+        int lv = DataPacket.mapLogLevel(logLevel);
+        if(lv<1){
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "日志等级参数不正确！");
+        }
+        Object apiIds = JSON.parse(packetIds);
+        String[] apis = StringBaseOpt.objectToStringArray(apiIds);
+        dataPacketService.updatePackedLogLevel(lv, apis);
+    }
+
+    @ApiOperation(value = "更改模块所有api日志模式")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+            name = "logLevel", type = "path", value = "日志等级"),
+        @ApiImplicitParam(name = "moduleId", type="body", value="模块id", dataTypeClass = String.class)})
+    @PutMapping(value = "/chgModuleLevel/{logLevel}")
+    @WrapUpResponseBody
+    public void chgModuleLogLevel(@PathVariable String logLevel, @RequestBody String moduleId) {
+        int lv = DataPacket.mapLogLevel(logLevel);
+        if(lv<1){
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "日志等级参数不正确！");
+        }
+        dataPacketService.updateModuleLogLevel(lv, moduleId);
+    }
+
+    @ApiOperation(value = "更改应用所有api日志模式")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+            name = "logLevel", type = "path", value = "日志等级"),
+        @ApiImplicitParam(name = "osId", type="body", value="应用id，OS_ID", dataTypeClass = String.class)})
+    @PutMapping(value = "/chgModuleLevel/{logLevel}")
+    @WrapUpResponseBody
+    public void chgOSLogLevel(@PathVariable String logLevel, @RequestBody String osId) {
+        int lv = DataPacket.mapLogLevel(logLevel);
+        if(lv<1){
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "日志等级参数不正确！");
+        }
+        dataPacketService.updateApplicationLogLevel(lv, osId);
+    }
 }

@@ -3,6 +3,7 @@ package com.centit.dde.po;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.centit.dde.core.DataOptStep;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.core.dao.DictionaryMap;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -13,6 +14,7 @@ import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -211,6 +213,21 @@ public class DataPacket implements Serializable, DataPacketInterface {
             }
         }
         return params;
+    }
+
+    //日志记录级别，1=ERROR,3=INFO,7=DEBUG"
+    public static int mapLogLevel(String logLevel){
+        if(StringUtils.equalsAny(logLevel,"1","2","3","4","5","6","7"))
+            return Integer.valueOf(logLevel);
+
+        if("ERROR".equalsIgnoreCase(logLevel))
+            return ConstantValue.LOGLEVEL_TYPE_ERROR;
+        if("INFO".equalsIgnoreCase(logLevel))
+            return ConstantValue.LOGLEVEL_TYPE_INFO;
+        if("DEBUG".equalsIgnoreCase(logLevel))
+            return ConstantValue.LOGLEVEL_TYPE_DEBUG;
+
+        return -1;
     }
 
 }

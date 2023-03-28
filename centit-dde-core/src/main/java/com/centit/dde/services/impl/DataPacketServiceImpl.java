@@ -128,7 +128,7 @@ public class DataPacketServiceImpl implements DataPacketService {
     @Override
     public void batchDeleteByPacketIds(String[] packetIds) {
         String delSql ="DELETE FROM q_data_packet WHERE PACKET_ID = ? ";
-        dataPacketDao.getJdbcTemplate().batchUpdate(delSql,new BatchPreparedStatementSetter(){
+        dataPacketDao.getJdbcTemplate().batchUpdate(delSql, new BatchPreparedStatementSetter(){
             public void setValues(PreparedStatement ps, int i)
                 throws SQLException {
                 ps.setString(1, packetIds[i]);
@@ -137,6 +137,33 @@ public class DataPacketServiceImpl implements DataPacketService {
                 return packetIds.length;
             }
         });
+    }
+
+    /**
+     * @Column(name = "log_level")
+     *     @ApiModelProperty(value = "日志记录级别，1=ERROR,3=INFO,7=DEBUG")
+     * @param logLevel
+     * @param packetIds
+     */
+    @Override
+    public void updatePackedLogLevel(int logLevel, String ... packetIds){
+        String sql ="UPDATE q_data_packet SET log_level= :logLevel WHERE PACKET_ID in (:apis) ";
+        DatabaseOptUtils.doExecuteNamedSql(dataPacketDao, sql, CollectionsOpt.createHashMap(
+            "logLevel", logLevel,
+            "apis", packetIds
+        ));
+    }
+
+    @Override
+    public void updateModuleLogLevel(int logLevel, String moduleId){
+        String sql ="UPDATE q_data_packet SET log_level = ? WHERE opt_id = ?";
+        DatabaseOptUtils.doExecuteSql(dataPacketDao, sql, new Object[]{logLevel, moduleId});
+    }
+
+    @Override
+    public void updateApplicationLogLevel(int logLevel, String osId){
+        String sql ="UPDATE q_data_packet SET log_level= ? WHERE os_id = ?";
+        DatabaseOptUtils.doExecuteSql(dataPacketDao, sql, new Object[]{logLevel, osId});
     }
 
     @Override
