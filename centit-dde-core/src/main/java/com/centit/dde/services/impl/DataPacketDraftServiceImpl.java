@@ -148,7 +148,7 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
     }
 
     @Override
-    public void updateDisableStatus(String packetId,String disable) {
+    public void updateDisableStatus(String packetId, String disable) {
         String sql ="UPDATE q_data_packet_draft SET IS_DISABLE=? WHERE PACKET_ID = ? ";
        dataPacketCopyDao.getJdbcTemplate().update(sql, new Object[]{disable,packetId});
     }
