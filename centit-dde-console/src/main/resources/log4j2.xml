@@ -24,7 +24,10 @@
     </Appenders>
 
      <Loggers>
-         <Root level="info">
+        <Logger name="com.centit.framework.core.controller.BaseController" level="debug" additivity="false">
+             <AppenderRef ref="Console"/>
+        </Logger>
+        <Root level="info">
             <AppenderRef ref="Console" />
             <AppenderRef ref="running-log" />
         </Root>
