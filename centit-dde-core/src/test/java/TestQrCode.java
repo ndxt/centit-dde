@@ -1,5 +1,5 @@
-import com.centit.dde.qrcode.QrCodeGenWrapper;
-import com.centit.dde.qrcode.config.QrCodeConfig;
+import com.centit.support.image.QrCodeConfig;
+import com.centit.support.image.QrCodeGenerator;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -13,10 +13,10 @@ public class TestQrCode {
         // 嵌入二维码的图片路径
         String logImgPath = "https://cloud.centit.com/locode/api/fileserver/fileserver/download/preview/0a8ac34c2349402b91fab132e39ac3fb?accessToken=0b2a1e59-e0a2-49a7-b085-69d9c34ca3b8";
         // 简单的生成
-        QrCodeConfig qrCodeConfig = QrCodeGenWrapper.createQrCodeConfig()
-            .setMsg(context)
-            .setQrHeight(300)
-            .setQrWidth(300)
+        QrCodeConfig qrCodeConfig = new QrCodeConfig();
+        qrCodeConfig.setMsg(context);
+        qrCodeConfig.setQrHeight(300);
+        qrCodeConfig.setQrWidth(300);
             //白边预留值  取值 0-4  0最小
             //.setPadding(0)
             //.setTopText("测试二维码")
@@ -27,9 +27,8 @@ public class TestQrCode {
             //.setDownTextFontType("宋体")
             //二维码中心logo图片
             //.setLogo(logImgPath)
-            .build();
         try {
-            BufferedImage bufferedImage = QrCodeGenWrapper.asBufferedImage(qrCodeConfig);
+            BufferedImage bufferedImage = QrCodeGenerator.asBufferedImage(qrCodeConfig);
             //QrCodeGenWrapper.asFile(qrCodeConfig,destPath);
             ImageIO.write(bufferedImage, "JPG", new File(destPath));
             //System.out.println(QrCodeReaderWrapper.decode(logImgPath));
