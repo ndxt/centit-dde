@@ -75,7 +75,7 @@ public abstract class DataSetOptUtil {
             }
         });
         extendFuncs.put("size", (a) -> {
-            Object o = Arrays.stream(a).toArray()[0];
+            Object o = a[0];
             if (o instanceof Collection) {
                 return ((Collection<?>) o).size();
             }
@@ -85,7 +85,7 @@ public abstract class DataSetOptUtil {
             return "";
         });
         extendFuncs.put("fileToText", (a) -> {
-            Object file = Arrays.stream(a).toArray()[0];
+            Object file = a[0];
             try {
                 return TikaTextExtractor.extractInputStreamText(FileIOOpt.castObjectToInputStream(file));
             } catch (Exception e) {
@@ -114,7 +114,7 @@ public abstract class DataSetOptUtil {
         }
          */
         extendFuncs.put("qrCode", (a) -> {
-            Object qrCodeParams = Arrays.stream(a).toArray()[0];
+            Object qrCodeParams = a[0];
             return QrCodeGenWrapper.createQrCode(qrCodeParams);
         });
     }

@@ -30,6 +30,7 @@ import com.centit.product.oa.service.OptFlowNoInfoManager;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
+import com.centit.support.file.FileIOOpt;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
@@ -166,6 +168,15 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.INTERSECT_DATASET, new IntersectDataSetOperation());
         allOperations.put(ConstantValue.MINUS_DATASET, new MinusDataSetOperation());
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentOperation());
+        //--------添加 文件获取函数，用于 excel中的图片加载
+        DataSetOptUtil.extendFuncs.put("loadFile", (a) -> {
+                try {
+                    InputStream is = fileInfoOpt.loadFileStream(StringBaseOpt.castObjectToString(a[0]));
+                    return FileIOOpt.readBytesFromInputStream(is);
+                } catch (IOException e) {
+                    return null;
+                }
+            });
     }
 
     @Override
