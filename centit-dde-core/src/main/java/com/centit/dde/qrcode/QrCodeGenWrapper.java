@@ -26,7 +26,6 @@ import java.util.Map;
 
 @Slf4j
 public class QrCodeGenWrapper {
-    private static final int QUIET_ZONE_SIZE = 4;
 
     protected static final Logger logger = LoggerFactory.getLogger(QrCodeGenWrapper.class);
 
