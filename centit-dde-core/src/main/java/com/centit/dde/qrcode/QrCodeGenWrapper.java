@@ -2,8 +2,9 @@ package com.centit.dde.qrcode;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.dataset.FileDataSet;
-import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.compiler.ObjectTranslate;
+import com.centit.support.compiler.VariableFormula;
 import com.centit.support.image.ImageOpt;
 import com.centit.support.image.QrCodeConfig;
 import com.centit.support.image.QrCodeGenerator;
@@ -41,21 +42,24 @@ public class QrCodeGenWrapper {
 
         if(dataParams instanceof Collection){
             List<BufferedImage> imageList = new ArrayList<>();
-            String fileName = qrParams.getString("fileName");
+
             String dataField = qrParams.getString("dataField");
             String topTextField = qrParams.getString("topTextField");
             String downTextField = qrParams.getString("downTextField");
 
             for(Object obj : (Collection<?>)dataParams){
                 String msg=null;
+                VariableFormula formula = new VariableFormula();
+                formula.setTrans(new ObjectTranslate(obj));
+
                 if(StringUtils.isNotBlank(dataField)){
-                    msg = StringBaseOpt.castObjectToString(ReflectionOpt.attainExpressionValue(obj, dataField));
+                    msg = StringBaseOpt.castObjectToString(formula.calcFormula(dataField));
                 }
                 if(StringUtils.isBlank(msg)) {
                     msg = StringBaseOpt.castObjectToString(obj);
                 }
-                qrCodeConfig.setTopText(StringBaseOpt.castObjectToString(ReflectionOpt.attainExpressionValue(obj, topTextField)));
-                qrCodeConfig.setDownText(StringBaseOpt.castObjectToString(ReflectionOpt.attainExpressionValue(obj, downTextField)));
+                qrCodeConfig.setTopText(StringBaseOpt.castObjectToString(formula.calcFormula(topTextField)));
+                qrCodeConfig.setDownText(StringBaseOpt.castObjectToString(formula.calcFormula(downTextField)));
                 qrCodeConfig.setMsg(msg);
                 try {
                     BufferedImage bufferedImage = QrCodeGenerator.asBufferedImage(qrCodeConfig);
@@ -65,7 +69,7 @@ public class QrCodeGenWrapper {
                 }
 
             }
-
+            String fileName = qrParams.getString("fileName");
             try ( ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                 ImagesToPdf.bufferedImagesToA4SizePdf(imageList, byteArrayOutputStream);
                 fileName = StringUtils.isNotBlank(fileName) ? ( fileName.endsWith(".pdf") ? fileName : fileName + ".pdf")
