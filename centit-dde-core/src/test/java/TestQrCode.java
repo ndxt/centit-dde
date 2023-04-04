@@ -28,7 +28,7 @@ public class TestQrCode {
             //二维码中心logo图片
             //.setLogo(logImgPath)
         try {
-            BufferedImage bufferedImage = QrCodeGenerator.asBufferedImage(qrCodeConfig);
+            BufferedImage bufferedImage = QrCodeGenerator.createQRImage(qrCodeConfig);
             //QrCodeGenWrapper.asFile(qrCodeConfig,destPath);
             ImageIO.write(bufferedImage, "JPG", new File(destPath));
             //System.out.println(QrCodeReaderWrapper.decode(logImgPath));
