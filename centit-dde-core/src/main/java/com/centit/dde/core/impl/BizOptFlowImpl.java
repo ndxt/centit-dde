@@ -316,7 +316,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                     Map<String, Object> mapFirstRow = dataSet.getFirstRow();
                     if (!mapFirstRow.isEmpty()) {
                         Object fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
-                        if (fileData instanceof OutputStream || fileData instanceof InputStream) {
+                        if (fileData instanceof OutputStream || fileData instanceof InputStream || fileData instanceof byte[]) {
                             bizModel.getOptResult().setResultFile(mapFirstRow);
                             return;
                         }
