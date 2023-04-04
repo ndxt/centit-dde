@@ -10,7 +10,6 @@ import com.centit.support.image.QrCodeConfig;
 import com.centit.support.image.QrCodeGenerator;
 import com.centit.support.office.ImagesToPdf;
 import com.google.zxing.WriterException;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
 public class QrCodeGenWrapper {
 
     protected static final Logger logger = LoggerFactory.getLogger(QrCodeGenWrapper.class);
