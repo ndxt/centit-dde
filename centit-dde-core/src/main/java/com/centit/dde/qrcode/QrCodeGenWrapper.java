@@ -28,12 +28,23 @@ public class QrCodeGenWrapper {
 
     protected static final Logger logger = LoggerFactory.getLogger(QrCodeGenWrapper.class);
 
-    public static Object createQrCode(Object qrCodeParams)  {
-        if(!(qrCodeParams instanceof Map)){
+    public static Object createQrCode(Object[] objParams)  {
+        if(objParams==null || objParams.length==0 || objParams[0]==null){
             return  "未正确传入指定参数！";
         }
-        JSONObject codeParams = JSONObject.from(qrCodeParams);
+        // 如果第一个参数就是一个普通的字符串，直接返回
+        Object qrCodeParams = objParams[0];
+        if(!(qrCodeParams instanceof Map)){
+            try {
+                BufferedImage bufferedImage = QrCodeGenerator.createQRImage(StringBaseOpt.castObjectToString(qrCodeParams));
+                return ImageOpt.imageToByteArray(bufferedImage);
+            }catch (IOException | WriterException e){
+                logger.error(e.getMessage());
+                return null;
+            }
+        }
 
+        JSONObject codeParams = JSONObject.from(qrCodeParams);
         JSONObject qrParams = codeParams.getJSONObject("qrParams");
         QrCodeConfig qrCodeConfig = loadQrCodeConfig(qrParams);
         Object dataParams = codeParams.get("dataParams");
@@ -60,7 +71,7 @@ public class QrCodeGenWrapper {
                 qrCodeConfig.setDownText(StringBaseOpt.castObjectToString(formula.calcFormula(downTextField)));
                 qrCodeConfig.setMsg(msg);
                 try {
-                    BufferedImage bufferedImage = QrCodeGenerator.asBufferedImage(qrCodeConfig);
+                    BufferedImage bufferedImage = QrCodeGenerator.createQRImage(qrCodeConfig);
                     imageList.add(bufferedImage);
                 }catch (IOException | WriterException e){
                     logger.error(e.getMessage());
@@ -86,8 +97,19 @@ public class QrCodeGenWrapper {
                 qrCodeConfig.setTopText(qrParams.getString("topText"));
                 qrCodeConfig.setDownText(qrParams.getString("downText"));
                 qrCodeConfig.setMsg(StringBaseOpt.castObjectToString(dataParams));
-                BufferedImage bufferedImage = QrCodeGenerator.asBufferedImage(qrCodeConfig);
-                return ImageOpt.imageToByteArray(bufferedImage);
+                BufferedImage bufferedImage = QrCodeGenerator.createQRImage(qrCodeConfig);
+                String returnType = qrParams.getString("returnType");
+                if(StringUtils.equalsAnyIgnoreCase(returnType, "image", "file")){
+                    String fileName = qrParams.getString("fileName");
+                    fileName = StringUtils.isNotBlank(fileName) ? ( fileName.endsWith(".jpg") ? fileName : fileName + ".jpg")
+                        : System.currentTimeMillis() + ".jpg";
+                    FileDataSet dataSet = new FileDataSet();
+                    InputStream inputStream = ImageOpt.imageToInputStream(bufferedImage);
+                    dataSet.setFileContent(fileName, inputStream.available(), inputStream);
+                    return dataSet;
+                } else {
+                    return ImageOpt.imageToByteArray(bufferedImage);
+                }
             }catch (IOException | WriterException e){
                 logger.error(e.getMessage());
                 return null;

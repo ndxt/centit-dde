@@ -113,10 +113,7 @@ public abstract class DataSetOptUtil {
            "dataParams":"集合或者对象([{},{},...] 或 ["","","",...] 或 {})"
         }
          */
-        extendFuncs.put("qrCode", (a) -> {
-            Object qrCodeParams = a[0];
-            return QrCodeGenWrapper.createQrCode(qrCodeParams);
-        });
+        extendFuncs.put("qrCode", (a) ->  QrCodeGenWrapper.createQrCode(a) );
     }
 
     /**
