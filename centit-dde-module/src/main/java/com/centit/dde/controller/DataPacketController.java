@@ -65,7 +65,7 @@ public class DataPacketController extends BaseController {
     @ApiOperation(value = "更改api日志模式")
     @ApiImplicitParam(
         name = "jsonObject",
-        value = "更改api日志级别参数：{logLevel:[\"logLevel\"], packetIds:[\"packetId\"],osId:\"osId\"};"
+        value = "更改api日志级别参数：{logLevel:\"logLevel\", packetIds:[\"packetId\"],osId:\"osId\"};"
     )
     @PutMapping(value = "/chgLogLevel")
     @WrapUpResponseBody
@@ -86,7 +86,7 @@ public class DataPacketController extends BaseController {
     @ApiOperation(value = "更改应用所有api日志模式")
     @ApiImplicitParam(
         name = "jsonObject",
-        value = "更改应用所有日志级别参数：{logLevel:[\"logLevel\"], osId:\"osId\"}"
+        value = "更改应用所有日志级别参数：{logLevel:\"logLevel\", osId:\"osId\"}"
     )
     @PutMapping(value = "/chgOSLogLevel")
     @WrapUpResponseBody
