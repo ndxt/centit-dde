@@ -82,7 +82,11 @@ public abstract class DataSetOptUtil {
             if (o instanceof Map) {
                 return ((Map<?, ?>) o).size();
             }
-            return "";
+            if (o instanceof Object[]) {
+                Object[] objs = (Object[]) o;
+                return objs.length;
+            }
+            return o==null? 0 : 1;
         });
         extendFuncs.put("fileToText", (a) -> {
             Object file = a[0];
