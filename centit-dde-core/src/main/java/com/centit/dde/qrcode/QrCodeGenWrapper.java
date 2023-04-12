@@ -24,6 +24,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 这个在 二维码组件上线后删除掉，并且重构 水厂项目中的两个接口
+ */
 public class QrCodeGenWrapper {
 
     protected static final Logger logger = LoggerFactory.getLogger(QrCodeGenWrapper.class);
@@ -132,7 +135,7 @@ public class QrCodeGenWrapper {
             //.setDownText(downText)
         config.setDownTextFontSize(codeParams.getInteger("downTextFontSize"));
         config.setDownTextFontType(codeParams.getString("downTextFontType"));
-        config.setLogo(codeParams.getString("logImageUrl"));
+        config.setLogoImageUrl(codeParams.getString("logImageUrl"));
         return config;
     }
 

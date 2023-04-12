@@ -7,6 +7,8 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.dde.utils.DatasetVariableTranslate;
+import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -21,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,6 +34,13 @@ import java.util.*;
 public class QrCodeOperation  implements BizOperation {
 
     protected static final Logger logger = LoggerFactory.getLogger(QrCodeOperation.class);
+
+    private FileInfoOpt fileInfoOpt;
+
+    public QrCodeOperation(FileInfoOpt fileInfoOpt) {
+        this.fileInfoOpt = fileInfoOpt;
+    }
+
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
@@ -70,7 +80,8 @@ public class QrCodeOperation  implements BizOperation {
                 BufferedImage bufferedImage = QrCodeGenerator.createQRImage(qrCodeConfig);
                 imageList.add(bufferedImage);
                 if("single".equals(createType)){
-                    String qrCodeFileName = StringUtils.isNotBlank(fileName) ? ( fileName.endsWith(".jpg") ? fileName : fileName + ".jpg")
+                    String qrCodeFileName = StringBaseOpt.castObjectToString(formula.calcFormula(fileName));
+                    qrCodeFileName = StringUtils.isNotBlank(qrCodeFileName) ? ( qrCodeFileName.endsWith(".jpg") ? qrCodeFileName : qrCodeFileName + ".jpg")
                         : System.currentTimeMillis() + ".jpg";
                     InputStream inputStream = ImageOpt.imageToInputStream(bufferedImage);
                     Map<String, Object> mapData = new HashMap<>();
@@ -83,36 +94,48 @@ public class QrCodeOperation  implements BizOperation {
                 logger.error(e.getMessage());
             }
         }
-        // 合并时每行几个二维码
-        int	qrEachRow = NumberBaseOpt.castObjectToInteger(bizOptJson.get("qrEachRow"), 2);
 
         if("single".equals(createType)){ // 每条记录一个二维码
             DataSet objectToDataSet = resultData.size()==1 ? new DataSet(resultData.get(0)) : new DataSet(resultData);
             bizModel.putDataSet(id, objectToDataSet);
             return BuiltInOperation.createResponseSuccessData(resultData.size());
         } else if("pdf".equals(createType)){ // 图片合并为 pdf
-                try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-                    ImagesToPdf.bufferedImagesToA4SizePdf(imageList, byteArrayOutputStream);
-                    String pdfFileName = StringUtils.isNotBlank(fileName) ? ( fileName.endsWith(".pdf") ? fileName : fileName + ".pdf")
-                        : System.currentTimeMillis() + ".pdf";
-                    FileDataSet fileDataSet = new FileDataSet();
-                    InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-                    fileDataSet.setFileContent(pdfFileName, inputStream.available(), inputStream);
-                    bizModel.putDataSet(id, fileDataSet);
-                    return BuiltInOperation.createResponseSuccessData(1);
-                } catch (IOException e) {
-                    logger.error(e.getMessage());
-                    return BuiltInOperation.createResponseSuccessData(0);
-                }
+            DatasetVariableTranslate datasetTranslate = new DatasetVariableTranslate(dataSet);
+            fileName = StringBaseOpt.castObjectToString(datasetTranslate.attainExpressionValue(fileName), fileName);
+
+            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                ImagesToPdf.bufferedImagesToA4SizePdf(imageList, byteArrayOutputStream);
+                String pdfFileName = StringUtils.isNotBlank(fileName) ? ( fileName.endsWith(".pdf") ? fileName : fileName + ".pdf")
+                    : System.currentTimeMillis() + ".pdf";
+                FileDataSet fileDataSet = new FileDataSet();
+                InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                fileDataSet.setFileContent(pdfFileName, inputStream.available(), inputStream);
+                bizModel.putDataSet(id, fileDataSet);
+                return BuiltInOperation.createResponseSuccessData(1);
+            } catch (IOException e) {
+                logger.error(e.getMessage());
+                return BuiltInOperation.createResponseSuccessData(0);
+            }
         } else { // 图片合并为一个 大的 jpg
+            DatasetVariableTranslate datasetTranslate = new DatasetVariableTranslate(dataSet);
+            fileName = StringBaseOpt.castObjectToString(datasetTranslate.attainExpressionValue(fileName), fileName);
+            // 合并时每行几个二维码
+            int	qrEachRow = NumberBaseOpt.castObjectToInteger(bizOptJson.get("qrEachRow"), 2);
+            int whiteSpace = qrCodeConfig.getPadding()>0 ? qrCodeConfig.getPadding() * 5 : 10;
+            BufferedImage mergeIamge = ImageOpt.mergeImages(imageList, qrEachRow, whiteSpace);
+            String qrCodeFileName = StringUtils.isNotBlank(fileName) ? ( fileName.endsWith(".jpg") ? fileName : fileName + ".jpg")
+                : System.currentTimeMillis() + ".jpg";
 
+            FileDataSet fileDataSet = new FileDataSet();
+            InputStream inputStream = ImageOpt.imageToInputStream(mergeIamge);
+            fileDataSet.setFileContent(qrCodeFileName, inputStream.available(), inputStream);
+            bizModel.putDataSet(id, fileDataSet);
+            return BuiltInOperation.createResponseSuccessData(1);
         }
-
-        return BuiltInOperation.createResponseSuccessData(0);
     }
 
     //构建生成二维码参数
-    private static QrCodeConfig loadQrCodeConfig(JSONObject codeParams){
+    private QrCodeConfig loadQrCodeConfig(JSONObject codeParams){
         QrCodeConfig config = new QrCodeConfig();
 
         int	height = NumberBaseOpt.castObjectToInteger(codeParams.get("height"), 200);
@@ -125,7 +148,19 @@ public class QrCodeOperation  implements BizOperation {
         //.setDownText(downText)
         config.setDownTextFontSize(codeParams.getInteger("downTextFontSize"));
         config.setDownTextFontType(codeParams.getString("downTextFontType"));
-        config.setLogo(codeParams.getString("logoImage"));
+        String fileId = codeParams.getString("logoImage");
+        if(StringUtils.isNotBlank(fileId)){
+            try {
+                InputStream inputStream = fileInfoOpt.loadFileStream(fileId);
+                if (inputStream != null) {
+                    BufferedImage logoImage = ImageIO.read(inputStream);
+                    config.setLogoImage(logoImage);
+                }
+            } catch (IOException e) {
+                logger.error(e.getMessage());
+            }
+        }
+
         return config;
     }
 
