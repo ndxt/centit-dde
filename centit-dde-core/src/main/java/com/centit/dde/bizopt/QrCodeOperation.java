@@ -24,12 +24,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.List;
 
 public class QrCodeOperation  implements BizOperation {
 
@@ -148,6 +150,12 @@ public class QrCodeOperation  implements BizOperation {
         //.setDownText(downText)
         config.setDownTextFontSize(codeParams.getInteger("downTextFontSize"));
         config.setDownTextFontType(codeParams.getString("downTextFontType"));
+        config.setOffColor(ImageOpt.castObjectToColor(codeParams.get("offColor"), Color.white).getRGB());
+        config.setOnColor(ImageOpt.castObjectToColor(codeParams.get("onColor"), Color.black).getRGB());
+
+        config.setTextColor(ImageOpt.castObjectToColor(codeParams.get("textColor"), Color.black));
+        config.setFrameColor(ImageOpt.castObjectToColor(codeParams.get("frameColor"), Color.white));
+
         String fileId = codeParams.getString("logoImage");
         if(StringUtils.isNotBlank(fileId)){
             try {
