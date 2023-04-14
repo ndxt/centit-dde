@@ -16,7 +16,10 @@ import com.centit.framework.system.po.DataDictionary;
 import com.centit.search.utils.TikaTextExtractor;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.JavaBeanMetaData;
+import com.centit.support.compiler.ObjectTranslate;
+import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
+import com.centit.support.compiler.VariableTranslate;
 import com.centit.support.file.FileIOOpt;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -964,4 +967,19 @@ public abstract class DataSetOptUtil {
         }
     }
 
+    public static Object fetchFieldValue(Object data, String fieldFormula){
+        if(StringUtils.isBlank(fieldFormula)){
+            return null;
+        }
+        if (fieldFormula.startsWith("@")){
+            return Pretreatment.mapTemplateStringAsFormula(fieldFormula.substring(1),
+                data, null, true);
+        }
+        VariableTranslate translate = data instanceof VariableTranslate ? (VariableTranslate) data : new ObjectTranslate(data);
+        VariableFormula variableFormula = new VariableFormula();
+        variableFormula.setExtendFuncMap(DataSetOptUtil.extendFuncs);
+        variableFormula.setTrans(translate);
+        variableFormula.setFormula(fieldFormula);
+        return variableFormula.calcFormula();
+    }
 }

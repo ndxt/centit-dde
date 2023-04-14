@@ -6,6 +6,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.dde.utils.DatasetVariableTranslate;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -42,9 +43,7 @@ public class AssignmentOperation implements BizOperation {
 
         //计算赋值数据
         Object sourceData =(StringUtils.isBlank(formula) || ".".equals(formula) ) ? dataSet.getData() :
-            (formula.startsWith("@")?
-                new DatasetVariableTranslate(dataSet).mapTemplateString(formula.substring(1)):
-                new DatasetVariableTranslate(dataSet).attainExpressionValue(formula));
+            DataSetOptUtil.fetchFieldValue(dataSet.getData(), formula);
 
         // 对属性赋值
         if("property".equals(assignType)){
