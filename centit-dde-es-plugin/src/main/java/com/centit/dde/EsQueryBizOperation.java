@@ -9,6 +9,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.product.adapter.po.SourceInfo;
@@ -65,8 +66,9 @@ public class EsQueryBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext)throws Exception{
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
-        int pageNo  = NumberBaseOpt.castObjectToInteger(transform.attainExpressionValue(bizOptJson.getString("pageNo")),1);
-        int pageSize = NumberBaseOpt.castObjectToInteger(transform.attainExpressionValue(bizOptJson.getString("pageSize")),20);
+
+        int pageNo  = NumberBaseOpt.castObjectToInteger(DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("pageNo")),1);
+        int pageSize = NumberBaseOpt.castObjectToInteger(DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("pageSize")),20);
         String indexType = bizOptJson.getString("indexType");
         if("custom".equals(indexType)){
             return customQueryOperation(bizModel, bizOptJson, transform, pageNo, pageSize);
@@ -74,11 +76,11 @@ public class EsQueryBizOperation implements BizOperation {
             Map<String,Object> queryParam = new HashMap<>(6);
             queryParam.put("osId",dataOptContext.getOsId());
             if (!bizOptJson.getBoolean("queryAll")){
-                Object optTag = transform.attainExpressionValue(bizOptJson.getString("optTag"));
+                Object optTag = DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("optTag"));
                 if (optTag != null ) queryParam.put("optTag", optTag);
-                Object unitCode = transform.attainExpressionValue(bizOptJson.getString("unitCode"));
+                Object unitCode = DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("unitCode"));
                 if (unitCode != null ) queryParam.put("unitCode", unitCode);
-                Object userCode = transform.attainExpressionValue(bizOptJson.getString("userCode"));
+                Object userCode = DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("userCode"));
                 if (userCode != null )  queryParam.put("userCode",userCode);
             }
             boolean indexFile = "indexFile".equals(indexType);
@@ -86,7 +88,7 @@ public class EsQueryBizOperation implements BizOperation {
                 IndexerSearcherFactory.obtainSearcher(esServerConfig, FileDocument.class) :
                 IndexerSearcherFactory.obtainSearcher(esServerConfig, ObjectDocument.class);
 
-            String keyword = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("queryParameter")));
+            String keyword = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("queryParameter")));
             QueryBuilder queryBuilder = queryBuilder(queryParam, keyword, indexFile, esSearcher, bizOptJson, transform);
             Pair<Long, List<Map<String, Object>>> search = esSearcher.esSearch(queryBuilder, null, null, pageNo, pageSize);
 
@@ -122,10 +124,10 @@ public class EsQueryBizOperation implements BizOperation {
 
             if (bizOptJson.getBoolean("custom")){
 
-                String analyzer = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("analyzer")));
+                String analyzer = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("analyzer")));
 
                 String minimumShouldMatch = StringBaseOpt.castObjectToString(
-                    transform.attainExpressionValue(bizOptJson.getString("minimumShouldMatch")));
+                    DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("minimumShouldMatch")));
 
                 if (StringUtils.isNotBlank(analyzer)) multiMatchQueryBuilder.analyzer(analyzer);
 
@@ -136,8 +138,8 @@ public class EsQueryBizOperation implements BizOperation {
         return boolQueryBuilder;
     }
 
-    private ResponseData customQueryOperation(BizModel bizModel,JSONObject bizOptJson,BizModelJSONTransform transform,
-                                              Integer pageNo,Integer pageSize ) throws Exception {
+    private ResponseData customQueryOperation(BizModel bizModel, JSONObject bizOptJson, BizModelJSONTransform transform,
+                                              Integer pageNo, Integer pageSize ) throws Exception {
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
         SourceInfo esInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         String indexName = BuiltInOperation.getJsonFieldString(bizOptJson, "indexName", null);
@@ -199,7 +201,7 @@ public class EsQueryBizOperation implements BizOperation {
             for (int i = 0; i < sortColumns.size(); i++) {
                 JSONObject sortField = sortColumns.getJSONObject(i);
                 String sortColumnName = sortField.getString("sortColumnName");
-                Object sortValue = transform.attainExpressionValue(sortField.getString("sortValue"));
+                Object sortValue = DataSetOptUtil.fetchFieldValue(transform, sortField.getString("sortValue"));
                 if (StringUtils.isNotBlank(sortColumnName) && sortValue != null) {
                     FieldSortBuilder order = SortBuilders.fieldSort(sortColumnName).order("DESC".equals(sortValue) ? SortOrder.DESC : SortOrder.ASC);
                     sorts.add(order);
@@ -307,7 +309,8 @@ public class EsQueryBizOperation implements BizOperation {
         return resultArrays;
     }
 
-    private static JSONObject pageInfo(String indexName, int pageNo,int pageSize,QueryBuilder queryBuilder, RestHighLevelClient restHighLevelClient) throws IOException {
+    private static JSONObject pageInfo(String indexName, int pageNo,int pageSize,QueryBuilder queryBuilder,
+                                       RestHighLevelClient restHighLevelClient) throws IOException {
         CountRequest countRequest = new CountRequest(indexName);
         SearchSourceBuilder countSearchSourceBuilder = new SearchSourceBuilder();
         countSearchSourceBuilder.query(queryBuilder);

@@ -7,6 +7,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
@@ -36,8 +37,8 @@ public class RedisWriteOperation implements BizOperation {
 
         String redisKey = BuiltInOperation.getJsonFieldString(bizOptJson, "redisKey", "");
 
-        BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
-        redisKey = StringBaseOpt.castObjectToString(transform.attainExpressionValue(redisKey), redisKey);
+        redisKey = StringBaseOpt.castObjectToString(
+            DataSetOptUtil.fetchFieldValue(new BizModelJSONTransform(bizModel), redisKey), redisKey);
 
         int expireTime = NumberBaseOpt.castObjectToInteger(
             BuiltInOperation.getJsonFieldString(bizOptJson, "expireTime", "30"), 30);

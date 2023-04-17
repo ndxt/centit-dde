@@ -6,6 +6,8 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.producer.KafkaProducerConfig;
+import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
@@ -44,8 +46,10 @@ public class ProducerBizOperation implements BizOperation {
         KafkaProducer  producer = KafkaProducerConfig.getKafkaProducer(sourceInfo);
         //指定发送分区
         Integer partition = NumberBaseOpt.castObjectToInteger(bizOptJson.getInteger("partition"));
-        //指定发送key
+        //指定发送key , 这个key可以接收 变量
         String key = bizOptJson.getString("key");
+        key = StringBaseOpt.castObjectToString(
+             DataSetOptUtil.fetchFieldValue(new BizModelJSONTransform(bizModel) ,bizOptJson.getString("key")), key);
         //是否异步发送
         Boolean isAsyn = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getBoolean("isAsyn"),false);
 

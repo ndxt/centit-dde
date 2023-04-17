@@ -7,6 +7,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.security.utils.SM4Util;
 import com.centit.support.algorithm.BooleanBaseOpt;
@@ -35,7 +36,8 @@ public class DecipherOperation implements BizOperation {
             password = AESSecurityUtils.AES_DEFAULT_KEY;
         } else {
             BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
-            password = StringBaseOpt.castObjectToString(transform.attainExpressionValue(password), password);
+            password = StringBaseOpt.castObjectToString(
+                DataSetOptUtil.fetchFieldValue(transform, password), password);
         }
         Boolean base64 =
             BooleanBaseOpt.castObjectToBoolean(

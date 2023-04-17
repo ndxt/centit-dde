@@ -878,7 +878,7 @@ public abstract class DataSetOptUtil {
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
         String fileName;
         if(StringUtils.isNotBlank(fileNameDesc)){
-            fileName = new DatasetVariableTranslate(dataSet).mapTemplateString(fileNameDesc);
+            fileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(dataSet.getData(), fileNameDesc));
         } else {
             fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
         }
