@@ -971,6 +971,11 @@ public abstract class DataSetOptUtil {
         if(StringUtils.isBlank(fieldFormula)){
             return null;
         }
+
+        if(StringUtils.equalsAny(".",ConstantValue.ROOT_NODE_TAG, VariableTranslate.THE_DATA_SELF_LABEL)){
+            return data;
+        }
+
         if (fieldFormula.startsWith("@")){
             return Pretreatment.mapTemplateStringAsFormula(fieldFormula.substring(1),
                 data, null, true);
