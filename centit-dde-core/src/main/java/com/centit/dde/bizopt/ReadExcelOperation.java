@@ -78,19 +78,25 @@ public class ReadExcelOperation implements BizOperation {
         } else {
             Map<String, String> headers = CollectionsOpt.mapCollectionToMap(bizOptJson.getJSONArray("headers"),
                 (a) -> ((JSONObject) a).getString("columnName"),  (a) -> ((JSONObject) a).getString("fieldName"));
-            Map<Integer, String> headDesc = ExcelImportUtil.mapColumnIndex(headers);
             List<Map<String, Object>> datas;
-            if(useMergeCell) {
+            if(headers ==null || headers.size()==0){
                 datas = StringUtils.isNotBlank(sheetName) ?
-                    ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(inputStream, sheetName, headDesc, beginRow, endRow) :
-                    ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(inputStream, 0, headDesc, beginRow, endRow);
-            } else  {
-                datas = StringUtils.isNotBlank(sheetName) ?
-                    ExcelImportUtil.loadMapFromExcelSheet(inputStream, sheetName, headDesc, beginRow, endRow) :
-                    ExcelImportUtil.loadMapFromExcelSheet(inputStream, 0, headDesc, beginRow, endRow);
-            }
+                    ExcelImportUtil.loadMapFromExcelSheetUseIndexAsKey(inputStream, sheetName, beginRow, endRow, useMergeCell) :
+                    ExcelImportUtil.loadMapFromExcelSheetUseIndexAsKey(inputStream, 0, beginRow, endRow, useMergeCell);
+            } else {
+                Map<Integer, String> headDesc = ExcelImportUtil.mapColumnIndex(headers);
 
-            DataSet simpleDataSet= new DataSet(datas);
+                if (useMergeCell) {
+                    datas = StringUtils.isNotBlank(sheetName) ?
+                        ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(inputStream, sheetName, headDesc, beginRow, endRow) :
+                        ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(inputStream, 0, headDesc, beginRow, endRow);
+                } else {
+                    datas = StringUtils.isNotBlank(sheetName) ?
+                        ExcelImportUtil.loadMapFromExcelSheet(inputStream, sheetName, headDesc, beginRow, endRow) :
+                        ExcelImportUtil.loadMapFromExcelSheet(inputStream, 0, headDesc, beginRow, endRow);
+                }
+            }
+            DataSet simpleDataSet = new DataSet(datas);
             bizModel.putDataSet(id, simpleDataSet);
             return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
         }
