@@ -76,6 +76,9 @@ public abstract class DataSetOptUtil {
                             dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
                             if(dataPiece!=null) value = dataPiece.getDataDesc();
                             break;
+                        case "dataCode":
+                            value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str);
+                            break;
                         case "dataValue":
                             value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str);
                             break;
