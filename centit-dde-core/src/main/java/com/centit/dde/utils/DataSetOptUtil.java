@@ -42,32 +42,72 @@ public abstract class DataSetOptUtil {
         extendFuncs.put("uuid", (a) -> UuidOpt.getUuidAsString32());
         extendFuncs.put("encode", (a) -> new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
         extendFuncs.put("dict", (a) -> {
+            String topUnit = WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest());
+            String lang = WebOptUtils.getCurrentLang(RequestThreadLocal.getLocalThreadWrapperRequest());
             if (a != null && a.length > 1) {
                 String regex = ",";
                 String[] strings = StringBaseOpt.objectToString(a[1]).split(regex);
                 StringBuilder stringBuilder = new StringBuilder();
-                for (String string : strings) {
+                String dictField = "auto";
+                if(a.length > 2 ) {
+                    dictField = StringBaseOpt.castObjectToString(a[2]);
+                    if(StringUtils.isBlank(dictField)){
+                        dictField = "auto";
+                    }
+                }
+                IDataDictionary dataPiece;
+                for (String tempStr : strings) {
+                    String str = tempStr.trim();
+                    String value = null;
+                    switch (dictField){
+                        case "dataTag":
+                            dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
+                            if(dataPiece!=null) value = dataPiece.getDataTag();
+                            break;
+                        case "extraCode":
+                            dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
+                            if(dataPiece!=null) value = dataPiece.getExtraCode();
+                            break;
+                        case "extraCode2":
+                            dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
+                            if(dataPiece!=null) value = dataPiece.getExtraCode2();
+                            break;
+                        case "dataDesc":
+                            dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
+                            if(dataPiece!=null) value = dataPiece.getDataDesc();
+                            break;
+                        case "dataValue":
+                            value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str);
+                            break;
+                        case "auto":
+                            dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
+                            if(dataPiece!=null)
+                                value = dataPiece.getLocalDataValue(lang);
+                            else
+                                value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str);
+                            break;
+                        case "localDataValue":
+                        default:
+                            dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
+                            if(dataPiece!=null) value = dataPiece.getLocalDataValue(lang);
+                            break;
+
+                    }
                     if (stringBuilder.length() > 0) {
                         stringBuilder.append(regex);
                     }
-                    String value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), StringBaseOpt.castObjectToString(string));
-                    value = value!=null && !value.equals(string) ? value : CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), StringBaseOpt.castObjectToString(string));
-                    if (a.length > 2 && StringUtils.isNotBlank(StringBaseOpt.castObjectToString(a[2]))) {
-                        IDataDictionary dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]),
-                            StringBaseOpt.castObjectToString(string),
-                            WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest()));
-                        JavaBeanMetaData metaData = JavaBeanMetaData.createBeanMetaDataFromType(DataDictionary.class);
-                        if (dataPiece != null) {
-                            value = StringBaseOpt.castObjectToString(metaData.getObjectFieldValue(dataPiece, StringBaseOpt.castObjectToString(a[2])));
-                        }
-                    }
-                    stringBuilder.append(value);
+                    if(StringUtils.isBlank(value))
+                        stringBuilder.append(str);
+                    else
+                        stringBuilder.append(value);
                 }
                 return stringBuilder.toString();
+
             } else {
                 return null;
             }
         });
+
         extendFuncs.put("dictTrans", (a) -> {
             if (a != null && a.length > 1) {
                 return CodeRepositoryUtil.transExpression(
