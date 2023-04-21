@@ -94,8 +94,8 @@ public abstract class DataSetOptUtil {
                             dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
                             if(dataPiece!=null) value = dataPiece.getLocalDataValue(lang);
                             break;
-
                     }
+
                     if (stringBuilder.length() > 0) {
                         stringBuilder.append(regex);
                     }
