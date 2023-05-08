@@ -6,7 +6,6 @@ import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
-import com.centit.dde.qrcode.QrCodeGenWrapper;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
@@ -145,27 +144,6 @@ public abstract class DataSetOptUtil {
                 return "文件转换文本失败！";
             }
         });
-        /*
-        a = {
-           "qrParams":{
-                "fileName":"生成的二维码名称或者PDF名称（后缀可加可不加）"
-                "height": "二维码高度",
-                "width": "二维码宽度",
-                "padding": "白边预留值（0-4）0最小",
-                "logImageUrl": "二维码正中心logo图片路径",
-                "topText": "二维码顶部文字",
-                "topTextFontSize": "顶部文字字体大小",
-                "topTextFontType": "字体类型（微软雅黑，雅黑，宋体。。。）",
-                "downText": "二维码底部文字",
-                "downTextFontSize": "底部文字字体大小",
-                "downTextFontType": "字体类型（微软雅黑，雅黑，宋体。。。）",
-                "dataField":"字段名称，多个逗号隔开,不填默认全部字段写入（根据字段名从dataParams取值写入二维码中）",
-                "qrCodeToPdf":"是否将二维码写入PDF中（true（写入）和false），该值只有单个数据的时候有效，批量的数据默认直接写入PDF"
-           },
-           "dataParams":"集合或者对象([{},{},...] 或 ["","","",...] 或 {})"
-        }
-         */
-        extendFuncs.put("qrCode", (a) ->  QrCodeGenWrapper.createQrCode(a) );
     }
 
     /**
