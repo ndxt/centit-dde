@@ -86,7 +86,7 @@ public abstract class DataSetOptUtil {
 
                         case "auto":
                             value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang);
-                            if(StringUtils.isBlank(value))
+                            if(StringUtils.isBlank(value) || StringUtils.equals(str, value))
                                 value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str);
                             break;
 
