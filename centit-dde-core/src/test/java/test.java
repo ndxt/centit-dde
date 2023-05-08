@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class test {
     public static void main(String[] args) {
+
         ArrayDeque<Integer> intDeque = new ArrayDeque<>();
         intDeque.push(1);
         intDeque.push(2);

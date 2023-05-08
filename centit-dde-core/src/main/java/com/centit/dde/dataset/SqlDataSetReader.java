@@ -75,7 +75,7 @@ public class SqlDataSetReader implements DataSetReader {
         }
         Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(databaseInfo);
         HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
-        QueryAndNamedParams qap = QueryUtils.translateQuery(sqlSen, params);
+        QueryAndNamedParams qap = null;
         if (request != null) {
             String topUnit = WebOptUtils.getCurrentTopUnit(request);
             String userCode = WebOptUtils.getCurrentUserCode(request);
@@ -89,6 +89,11 @@ public class SqlDataSetReader implements DataSetReader {
                 }
             }
         }
+
+        if(qap==null){
+            qap = QueryUtils.translateQuery(sqlSen, params);
+        }
+
         Map<String, Object> paramsMap = new HashMap<>(params == null ? 0 : params.size() + 6);
         if (params != null) {
             paramsMap.putAll(params);
