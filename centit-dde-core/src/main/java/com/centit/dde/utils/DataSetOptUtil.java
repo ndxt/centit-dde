@@ -65,35 +65,36 @@ public abstract class DataSetOptUtil {
                             dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
                             if(dataPiece!=null) value = dataPiece.getDataTag();
                             break;
+
                         case "extraCode":
                             dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
                             if(dataPiece!=null) value = dataPiece.getExtraCode();
                             break;
+
                         case "extraCode2":
                             dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
                             if(dataPiece!=null) value = dataPiece.getExtraCode2();
                             break;
+
                         case "dataDesc":
                             dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
                             if(dataPiece!=null) value = dataPiece.getDataDesc();
                             break;
+
                         case "dataCode":
                             value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str);
                             break;
-                        case "dataValue":
-                            value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str);
-                            break;
+
                         case "auto":
-                            dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
-                            if(dataPiece!=null)
-                                value = dataPiece.getLocalDataValue(lang);
-                            else
+                            value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang);
+                            if(StringUtils.isBlank(value))
                                 value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str);
                             break;
+
+                        case "dataValue":
                         case "localDataValue":
                         default:
-                            dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
-                            if(dataPiece!=null) value = dataPiece.getLocalDataValue(lang);
+                            value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang);
                             break;
                     }
 
