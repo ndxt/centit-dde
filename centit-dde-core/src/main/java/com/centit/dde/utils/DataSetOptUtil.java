@@ -44,7 +44,10 @@ public abstract class DataSetOptUtil {
             String lang = WebOptUtils.getCurrentLang(RequestThreadLocal.getLocalThreadWrapperRequest());
             if (a != null && a.length > 1) {
                 String regex = ",";
-                String[] strings = StringBaseOpt.objectToString(a[1]).split(regex);
+                String strData = StringBaseOpt.objectToString(a[1]);
+                if(StringUtils.isBlank(strData))
+                    return null;
+                String[] strings = strData.split(regex);
                 StringBuilder stringBuilder = new StringBuilder();
                 String dictField = "auto";
                 if(a.length > 2 ) {
