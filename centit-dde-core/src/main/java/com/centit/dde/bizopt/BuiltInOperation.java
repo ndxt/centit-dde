@@ -293,20 +293,6 @@ public abstract class BuiltInOperation {
         return createResponseSuccessData(destDs.getSize());
     }
 
-
-    public static ResponseData runClear(BizModel bizModel, JSONObject bizOptJson) {
-        List<String> sets = CollectionsOpt.mapCollectionToList(bizOptJson.getJSONArray("config"),
-            (a) -> ((JSONObject) a).getString("paramValidateRegex"), true);
-
-        for (String s : sets) {
-            bizModel.putDataSet(s, null);
-        }
-        if (sets.size() == 0) {
-            bizModel.clearBizData();
-        }
-        return createResponseSuccessData(0);
-    }
-
     public static ResponseData runJoin(BizModel bizModel, JSONObject bizOptJson) {
         String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
         String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
