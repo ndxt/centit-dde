@@ -33,20 +33,27 @@ public class UserFilterOperation implements BizOperation {
     }
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
+        String topUnit = bizModel.fetchTopUnit();
         Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
-        if (!(userObj instanceof CentitUserDetails)) {
-            return ResponseData.makeErrorMessage("用户没有登录！");
-        }
-        CentitUserDetails centitUserDetails = (CentitUserDetails) userObj;
         String userFilter = Pretreatment.mapTemplateStringAsFormula(bizOptJson.getString("userFilter"),
             new BizModelJSONTransform(bizModel));
 
-        Set<String> users = SysUserFilterEngine.calcSystemOperators(
-            StringEscapeUtils.unescapeHtml4(userFilter),
-            createFilterParam("C",centitUserDetails.getCurrentUnitCode()),
-            createFilterParam("C",centitUserDetails.getUserCode()),null,
-            new UserUnitMapTranslate(BuiltInOperation.makeCalcParam(centitUserDetails)));
-        List<IUserInfo> retUsers = CodeRepositoryUtil.getUserInfosByCodes(centitUserDetails.getTopUnitCode(), users);
+        Set<String> users ;
+        if (userObj instanceof CentitUserDetails) {
+            CentitUserDetails centitUserDetails = (CentitUserDetails) userObj;
+            users = SysUserFilterEngine.calcSystemOperators(
+                StringEscapeUtils.unescapeHtml4(userFilter), topUnit,
+                createFilterParam("C", centitUserDetails.getCurrentUnitCode()),
+                createFilterParam("C", centitUserDetails.getUserCode()), null,
+                new UserUnitMapTranslate(BuiltInOperation.makeCalcParam(centitUserDetails)));
+        } else {
+            users = SysUserFilterEngine.calcSystemOperators(
+                StringEscapeUtils.unescapeHtml4(userFilter), topUnit,
+                null, null, null,
+                new UserUnitMapTranslate() );
+        }
+
+        List<IUserInfo> retUsers = CodeRepositoryUtil.getUserInfosByCodes(bizModel.fetchTopUnit(), users);
         List<IUserInfo> lsUserInfo = new ArrayList<>(retUsers.size() + 1);
         for (IUserInfo ui : retUsers) {
             if ("T".equals(ui.getIsValid())) {

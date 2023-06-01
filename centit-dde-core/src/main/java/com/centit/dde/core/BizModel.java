@@ -4,6 +4,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.model.basedata.IOsInfo;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +19,6 @@ import java.util.Map;
  */
 public class BizModel implements  Serializable {
     private static final long serialVersionUID = 1L;
-
 
     public static BizModel EMPTY_BIZ_MODEL
         = new BizModel("EMPTY_BIZ_MODEL");
@@ -44,6 +45,19 @@ public class BizModel implements  Serializable {
     private Map<String, DataSet> bizData;
 
     private DataOptResult optResult;
+
+    public String fetchTopUnit(){
+        Object appObj = this.getStackData(ConstantValue.APPLICATION_INFO_TAG);
+        if (appObj instanceof IOsInfo) {
+            return ((IOsInfo)appObj).getTopUnit();
+        }
+
+        Object userObj = this.getStackData(ConstantValue.SESSION_DATA_TAG);
+        if (userObj instanceof CentitUserDetails) {
+            return ((CentitUserDetails)userObj).getTopUnitCode();
+        }
+        return null;
+    }
 
     public BizModel(String modelName) {
         this.modelName = modelName;

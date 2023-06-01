@@ -50,7 +50,10 @@ public class TaskRun {
     public void agentRunTask(String dataPacketId) {
         DataPacket dataPacket = dataPacketDao.getObjectById(dataPacketId);
 //        CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
-        runTask(dataPacket, new DataOptContext());
+        DataOptContext optContext = new DataOptContext();
+        IOsInfo osInfo = platformEnvironment.getOsInfo(dataPacket.getOsId());
+        optContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
+        runTask(dataPacket, optContext);
     }
 
     public DataOptResult runTask(DataPacketInterface dataPacketInterface, DataOptContext optContext) {

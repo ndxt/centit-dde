@@ -8,6 +8,8 @@ import com.centit.dde.dao.DataPacketDao;
 import com.centit.dde.po.DataPacket;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.model.basedata.IOsInfo;
 import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import org.apache.commons.codec.binary.Hex;
@@ -53,8 +55,11 @@ public class TaskSchedulers {
     @Autowired
     ConsumerPoolConfig consumerPoolConfig;
 
+    @Autowired
+    private PlatformEnvironment platformEnvironment;
+
     private final static  Logger logger = LoggerFactory.getLogger(TaskSchedulers.class);
-    private   ExecutorService threadPool = Executors.newCachedThreadPool();
+    private ExecutorService threadPool = Executors.newCachedThreadPool();
        /* new ThreadPoolExecutor(
             consumerPoolConfig.getCorePoolSize(),
             consumerPoolConfig.getMaximumPoolSize(),
@@ -65,6 +70,7 @@ public class TaskSchedulers {
             new ThreadPoolExecutor.AbortPolicy());*/
     private final DataPacketDao dataPacketDao;
     private final SourceInfoDao sourceInfoDao;
+
     private static ConcurrentHashMap<String, Object> queryParams = new ConcurrentHashMap<>(2);
     private static ConcurrentHashMap<String, String> packetMD5 = new ConcurrentHashMap<>(20);
 
@@ -162,7 +168,7 @@ public class TaskSchedulers {
             while (packetMD5.containsKey(dataPacket.getPacketId()) && packetMD5.get(dataPacket.getPacketId()).equals(dataPacketMD5(dataPacket))){
                 ConsumerRecords<String, String> msgList = consumer.poll(Duration.ofMillis(1000));
                 for (ConsumerRecord<String, String> record : msgList) {
-                    try{
+                    try {
                         logger.debug(String.format("任务名：%s,topic:%s,key:%s,value:%s,offset:%s，分区：%s",
                             dataPacket.getPacketName(),
                             record.topic(),
@@ -174,8 +180,13 @@ public class TaskSchedulers {
                         String value = record.value();
                         //开始处理任务逻辑
                         TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
-                        DataOptContext dataOptContext=new DataOptContext();
-                        dataOptContext.setStackData(ConstantValue.MESSAGE_QUEUE_TAG,JSON.parseObject(value));
+                        DataOptContext dataOptContext = new DataOptContext();
+                        if (platformEnvironment != null){
+                            IOsInfo osInfo = platformEnvironment.getOsInfo(dataPacket.getOsId());
+                            dataOptContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
+                        }
+
+                        dataOptContext.setStackData(ConstantValue.MESSAGE_QUEUE_TAG, JSON.parseObject(value));
                         taskRun.runTask(dataPacket, dataOptContext);
                         try {
                             consumer.commitAsync();//异步提交

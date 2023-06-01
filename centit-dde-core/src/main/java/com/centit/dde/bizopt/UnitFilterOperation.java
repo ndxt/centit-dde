@@ -27,23 +27,29 @@ import java.util.Set;
 public class UnitFilterOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext){
-        Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
-        if (!(userObj instanceof CentitUserDetails)) {
-            return ResponseData.makeErrorMessage("用户没有登录！");
-        }
-        CentitUserDetails centitUserDetails = (CentitUserDetails) userObj;
-
+        String topUnit = bizModel.fetchTopUnit();
         String unitFilter=
             Pretreatment.mapTemplateStringAsFormula(bizOptJson.getString("unitFilter"),
                 new BizModelJSONTransform(bizModel));
 
-        Set<String> units = SysUnitFilterEngine.calcSystemUnitsByExp(
-            StringEscapeUtils.unescapeHtml4(unitFilter),
-            UserFilterOperation.createFilterParam("C",centitUserDetails.getCurrentUnitCode()),
-            new UserUnitMapTranslate(BuiltInOperation.makeCalcParam(centitUserDetails))
-        );
+        Set<String> units;
+        Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
+        if (userObj instanceof CentitUserDetails) {
+            CentitUserDetails centitUserDetails = (CentitUserDetails) userObj;
+            units = SysUnitFilterEngine.calcSystemUnitsByExp(
+                StringEscapeUtils.unescapeHtml4(unitFilter), topUnit,
+                UserFilterOperation.createFilterParam("C", centitUserDetails.getCurrentUnitCode()),
+                new UserUnitMapTranslate(BuiltInOperation.makeCalcParam(centitUserDetails))
+            );
+        } else {
+            units = SysUnitFilterEngine.calcSystemUnitsByExp(
+                StringEscapeUtils.unescapeHtml4(unitFilter), topUnit,
+                null,
+                new UserUnitMapTranslate()
+            );
+        }
 
-        List<IUnitInfo> retUntis = CodeRepositoryUtil.getUnitInfosByCodes(centitUserDetails.getTopUnitCode(), units);
+        List<IUnitInfo> retUntis = CodeRepositoryUtil.getUnitInfosByCodes(topUnit, units);
         CollectionsOpt.sortAsTree(retUntis,
             ( p,  c) -> StringUtils.equals(p.getUnitCode(),c.getParentUnit()) );
         bizModel.putDataSet(bizOptJson.getString("id"),new DataSet(retUntis));

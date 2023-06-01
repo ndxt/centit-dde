@@ -83,11 +83,11 @@ public class DataPacket implements Serializable, DataPacketInterface {
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date updateDate;
 
-    @ApiModelProperty(value = "业务模块代码")
+    @ApiModelProperty(value = "业务应用（系统）代码")
     @Column(name = "os_id")
     private String osId;
 
-    @ApiModelProperty(value = "所属业务")
+    @ApiModelProperty(value = "所属业务模块")
     @Column(name = "opt_id")
     private String optId;
 
