@@ -83,6 +83,9 @@ public class EsWriteBizOperation implements BizOperation {
      */
     private ResponseData customDocOperation(BizModel bizModel, JSONObject bizOptJson,String operationType) throws Exception{
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
+        if (StringUtils.isBlank(databaseCode))
+            return ResponseData.makeErrorMessage("请指定ES数据库！");
+
         SourceInfo esInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         String indexName = BuiltInOperation.getJsonFieldString(bizOptJson, "indexName", null);
         if (StringUtils.isBlank(indexName)) return ResponseData.makeErrorMessage("请指定索引名称！");
@@ -91,6 +94,8 @@ public class EsWriteBizOperation implements BizOperation {
         if("delete".equals(operationType)){
             BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
             String documentId = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("documentId")));
+            if (StringUtils.isBlank(documentId))
+                return ResponseData.makeErrorMessage("文档主键不能为空！");
             return deleteCustomDocument(esClient, indexName, documentId);
         }
         DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
@@ -103,9 +108,12 @@ public class EsWriteBizOperation implements BizOperation {
     private ResponseData fileDocumentOperation(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext,
                                                ESIndexer esIndexer, String operationType) throws Exception{
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
-        String documentId = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("documentId")));
-        if (StringUtils.isBlank(documentId)) return ResponseData.makeErrorMessage("文档主键不能为空！");
-        if (!"delete".equals(operationType)){
+
+        String documentId=null;
+        if ("delete".equals(operationType)) {
+            documentId = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("documentId")));
+            if (StringUtils.isBlank(documentId)) return ResponseData.makeErrorMessage("文档主键不能为空！");
+        } else {
             DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
             if (dataSet == null ) return ResponseData.makeErrorMessage("文档内容不能为空！");
             Object optTag = transform.attainExpressionValue(bizOptJson.getString("optTag"));
