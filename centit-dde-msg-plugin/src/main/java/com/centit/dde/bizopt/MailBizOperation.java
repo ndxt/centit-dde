@@ -15,7 +15,7 @@ import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
-import com.centit.support.security.AESSecurityUtils;
+import com.centit.support.security.SecurityOptUtils;
 
 import java.util.Set;
 
@@ -44,7 +44,7 @@ public class MailBizOperation implements BizOperation {
             EMailMsgPusher messageManager = new EMailMsgPusher();
             messageManager.setEmailServerHost(sourceInfo.getDatabaseUrl());
             messageManager.setEmailServerUser(sourceInfo.getUsername());
-            messageManager.setEmailServerPwd(AESSecurityUtils.decryptParameterString(sourceInfo.getPassword()));
+            messageManager.setEmailServerPwd(SecurityOptUtils.decodeSecurityString(sourceInfo.getPassword()));
             messageManager.setTopUnit(dataOptContext.getTopUnit());
             messageManager.setUserEmailSupport(new SystemUserEmailSupport());
             ResponseData responseData= messageManager.sendMessage("system", optUsers,
