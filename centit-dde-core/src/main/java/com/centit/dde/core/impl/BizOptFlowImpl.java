@@ -513,8 +513,14 @@ public class BizOptFlowImpl implements BizOptFlow {
             if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
                 TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
                 Map<String, Object> jsonObject = CollectionsOpt.objectToMap(responseData.getData());
-                detailLog.setSuccessPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("success"), 0));
-                detailLog.setErrorPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("error"), 0));
+                if(jsonObject==null){
+                    detailLog.setSuccessPieces(0);
+                    detailLog.setErrorPieces(0);
+                } else {
+                    detailLog.setSuccessPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("success"), 0));
+                    detailLog.setErrorPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("error"), 0));
+                }
+
                 if("start".equals(optType)){
                     Object callData = dataOptContext.getStackData(ConstantValue.MODULE_CALL_TAG);
                     if(callData!=null){

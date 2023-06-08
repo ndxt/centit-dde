@@ -170,7 +170,7 @@ public class EsWriteBizOperation implements BizOperation {
         if(keywords != null) {
             fileInfo.setKeywords(StringBaseOpt.castObjectToString(keywords).split(" "));
         }
-        return  fileInfo;
+        return fileInfo;
     }
 
 
@@ -251,7 +251,8 @@ public class EsWriteBizOperation implements BizOperation {
         for (Map<String, Object> jsonData : jsonDatas) {
             String documentId = StringBaseOpt.castObjectToString(jsonData.get(primaryKeyName));
             if (StringUtils.isBlank(documentId))
-                return  ResponseData.makeErrorMessage("指定的文档主键字段不存在！");
+                return BuiltInOperation.createResponseData(0, jsonDatas.size(),
+                    ResponseData.ERROR_USER_CONFIG,"指定的文档主键字段不存在！");
 
             switch (operationType) {
                 case "add":
@@ -296,6 +297,8 @@ public class EsWriteBizOperation implements BizOperation {
                 faildData.put(bulkItemResponse.getId(),bulkItemResponse.getFailureMessage());
             }
         }
+        result.put("success", addCount + updateCount);
+        result.put("error", faildCount);
         result.put("addCount",addCount);
         result.put("updateCount",updateCount);
         result.put("faildCount",faildCount);
