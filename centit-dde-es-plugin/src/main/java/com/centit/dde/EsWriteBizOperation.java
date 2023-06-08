@@ -28,6 +28,8 @@ import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
@@ -85,11 +87,16 @@ public class EsWriteBizOperation implements BizOperation {
         SourceInfo esInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         String indexName = BuiltInOperation.getJsonFieldString(bizOptJson, "indexName", null);
         if (StringUtils.isBlank(indexName)) return ResponseData.makeErrorMessage("请指定索引名称！");
+        String primaryKeyName = bizOptJson.getString("primaryKey");
+        RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
+        if("delete".equals(operationType)){
+            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
+            String documentId = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("documentId")));
+            return deleteCustomDocument(esClient, indexName, documentId);
+        }
         DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
         if (dataSet == null ) return ResponseData.makeErrorMessage("文档内容不能为空！");
-        String primaryKeyName = bizOptJson.getString("primaryKey");
         if (StringUtils.isBlank(primaryKeyName)) return ResponseData.makeErrorMessage("请指定文档主键字段名称！");
-        RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
         return batchSaveDocuments(esClient, dataSet.getDataAsList(), indexName, primaryKeyName, operationType);
     }
 
@@ -159,6 +166,7 @@ public class EsWriteBizOperation implements BizOperation {
         return  fileInfo;
     }
 
+
     //es 对象文档操作
     private ResponseData objectDocumentOperation(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext,
                                                  ESIndexer esIndexer, String operationType){
@@ -218,6 +226,13 @@ public class EsWriteBizOperation implements BizOperation {
         return objInfo;
     }
 
+    private ResponseData deleteCustomDocument(RestHighLevelClient restHighLevelClient,
+                                              String indexName, String documentId) throws IOException {
+        DeleteRequest deleteRequest = new DeleteRequest(indexName);
+        deleteRequest.id(documentId);
+        /*DeleteResponse deleteResponse = */restHighLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
+        return BuiltInOperation.createResponseSuccessData(1);
+    }
 
     /**
      * 批量插入或者更新   es存在就更新，不存在就插入
@@ -225,11 +240,11 @@ public class EsWriteBizOperation implements BizOperation {
     private  ResponseData batchSaveDocuments(RestHighLevelClient restHighLevelClient, List<Map<String, Object>> jsonDatas,
                                              String indexName,String primaryKeyName,String operationType) throws IOException {
         BulkRequest requestBulk = new BulkRequest(indexName);
+
         for (Map<String, Object> jsonData : jsonDatas) {
-
             String documentId = StringBaseOpt.castObjectToString(jsonData.get(primaryKeyName));
-
-            if (StringUtils.isBlank(documentId)) return  ResponseData.makeErrorMessage("指定的文档主键字段不存在！");
+            if (StringUtils.isBlank(documentId))
+                return  ResponseData.makeErrorMessage("指定的文档主键字段不存在！");
 
             switch (operationType) {
                 case "add":
