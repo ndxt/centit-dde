@@ -33,8 +33,12 @@
             <artifactId>spring-boot-starter</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>logback-classic</artifactId>
                     <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
                 </exclusion>
                 <exclusion>
                     <artifactId>log4j-to-slf4j</artifactId>
