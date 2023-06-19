@@ -22,7 +22,11 @@ centit:
   dataMovingPath: D:\centit-dde-datamoving-3.1-SNAPSHOT.jar
   logs: D:/Projects/RunData/dde/log
   optId: ''
-logging.path: D:/Projects/RunData/dde/log
+
+logging:
+  path: D:/Projects/RunData/dde/log
+  level:
+    org.springframework.boot.autoconfigure: error
 
 email:
   hostName: mail.centit.com
