@@ -48,7 +48,7 @@ public class RunTaskJob extends AbstractQuartzJob {
             Boolean isRunning = runningTask.put(dataPacket.getPacketId(), true);
             if (isRunning != null && isRunning) {
                 logger.info("任务：" + dataPacket.getPacketId() + "仍在执行中忽略这个执行周期");
-                return false;
+                return true;
             }
             try {
                 TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
