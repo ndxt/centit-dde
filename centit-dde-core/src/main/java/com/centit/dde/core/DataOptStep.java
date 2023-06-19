@@ -138,8 +138,12 @@ public class DataOptStep {
 
     public JSONObject getNextStep(String id) {
         List<JSONObject> links = getNextLinks(id);
-        if (links == null || links.size() != 1) {
-            logger.error("当前节点("+ id +")没有有效的后续节点或者有多个后续节点。" );
+        if (links == null || links.size() == 0) {
+            logger.error("当前节点("+ id +")没有有效的后续节点。" );
+            return createEmptyObject();
+        }
+        if (links.size() > 1) {
+            logger.error("当前节点("+ id +")有多个后续节点。" );
             return createEmptyObject();
         }
         return getOptStep(links.get(0).getString("targetId"));
