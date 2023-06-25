@@ -54,7 +54,12 @@
             <artifactId>centit-dde-ofd-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>-->
-
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.5</version>
+            <scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-dubbo-server-config</artifactId>
