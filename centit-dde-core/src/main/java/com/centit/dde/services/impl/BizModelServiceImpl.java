@@ -59,12 +59,12 @@ public class BizModelServiceImpl implements BizModelService {
     }
 
     private Object fetchBizModelFromBuf(String key) {
-        Object object;
+        String strObj;
         StatefulRedisConnection<String, String> connection = redisClient.connect();
         RedisCommands<String, String> commands = connection.sync();
-        object = commands.get(key);
+        strObj = commands.get(key);
         connection.close();
-        return object;
+        return JSON.parse(strObj);
     }
 
     private String makeDataPacketBufId(DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
