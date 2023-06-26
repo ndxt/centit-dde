@@ -148,6 +148,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("logWrite", new OptLogOperation());
         allOperations.put("logRead", new OptLogQueryOperation(operationLogWriter));
         allOperations.put("qrCode", new QrCodeOperation(fileInfoOpt));
+        allOperations.put("dictionary", new DataDictionaryOperation());
 
         allOperations.put(ConstantValue.ENCRYPT, new EncryptOperation());
         allOperations.put(ConstantValue.DECIPHER, new DecipherOperation());
