@@ -506,7 +506,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         try {
             String optType = bizOptJson.getString("type");
             BizOperation opt = allOperations.get(optType);
-
+            if(opt==null){
+                throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "组件："+optType+ " 不存在请和开发人员联系！");
+            }
             ResponseData responseData = opt.runOpt(bizModel, bizOptJson, dataOptContext);
             /*if (responseData.getCode() != ResponseData.RESULT_OK) {
                 throw new ObjectException(responseData, responseData.getCode(), responseData.getMessage());
