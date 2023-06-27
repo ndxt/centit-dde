@@ -81,13 +81,13 @@ public abstract class DataSetOptUtil {
                             break;
 
                         case "dataCode":
-                            value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str);
+                            value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang);
                             break;
 
                         case "auto":
                             value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang);
                             if(StringUtils.isBlank(value) || StringUtils.equals(str, value))
-                                value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str);
+                                value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang);
                             break;
 
                         case "dataValue":
