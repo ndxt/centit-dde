@@ -149,6 +149,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("logRead", new OptLogQueryOperation(operationLogWriter));
         allOperations.put("qrCode", new QrCodeOperation(fileInfoOpt));
         allOperations.put("dictionary", new DataDictionaryOperation());
+        allOperations.put("desensitize", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runDesensitize(bizModel, bizOptJson));
 
         allOperations.put(ConstantValue.ENCRYPT, new EncryptOperation());
         allOperations.put(ConstantValue.DECIPHER, new DecipherOperation());
@@ -531,7 +532,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                     } else {
                         detailLog.setLogInfo(JSON.toJSONString(dataOptContext.getCallStackData()));
                     }
-                } else if("append".equals(optType) || ConstantValue.ASSIGNMENT.equals(optType)){
+                } else if("append".equals(optType) || ConstantValue.ASSIGNMENT.equals(optType) || "desensitize".equals(optType)){
                     DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
                     detailLog.setLogInfo(dataSet.toJSONString());
                 } else {

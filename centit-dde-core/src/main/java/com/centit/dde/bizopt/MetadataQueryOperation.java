@@ -16,11 +16,14 @@ import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.product.adapter.po.MetaTable;
 import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaObjectService;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.database.utils.QueryAndNamedParams;
+import com.centit.support.security.DesensitizeOptUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +50,10 @@ public class MetadataQueryOperation implements BizOperation {
         String tableId = bizOptJson.getString("tableId");
         Map<String, Object> parames = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
         Integer queryType = bizOptJson.getInteger("queryType");
+        boolean desensitize = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("desensitize"), false);
         Integer withChildrenDeep = NumberBaseOpt.castObjectToInteger(bizOptJson.getInteger("withChildrenDeep"),1);
         switch (queryType){
-            case 1://查询
+            case 1://查询列表
                 HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
                 String currentUserCode = WebOptUtils.getCurrentUserCode(request);
                 String topUnit = WebOptUtils.getCurrentTopUnit(request);
@@ -76,7 +80,12 @@ public class MetadataQueryOperation implements BizOperation {
                     extFilter = qap.getQuery();
                 }
 
-                JSONArray  jsonArray =metaObjectService.pageQueryObjects(tableId, extFilter, parames,null, pageDesc);
+                JSONArray jsonArray = metaObjectService.pageQueryObjects(tableId, extFilter, parames,null, pageDesc);
+                // 脱敏操作
+                if(desensitize){
+                    MetaTable table = metaDataCache.getTableInfo(tableId);
+                    DesensitizeOptUtils.desensitize(jsonArray, table.fetchDesensitizeOpt());
+                }
                 Boolean isReturnPageInfo = bizOptJson.getBoolean("isReturnPageInfo");
                 if (isReturnPageInfo){
                     PageQueryResult<Object>  result = PageQueryResult.createResult(jsonArray, pageDesc);
@@ -86,8 +95,13 @@ public class MetadataQueryOperation implements BizOperation {
                     bizModel.putDataSet(id, new DataSet(jsonArray));
                 }
                 return BuiltInOperation.createResponseSuccessData(jsonArray.size());
-            case 2://查看
+            case 2://查看对象，返回一个记录
                 Map<String, Object> data = metaObjectService.getObjectWithChildren(tableId, parames, withChildrenDeep);
+                // 脱敏操作
+                if(desensitize){
+                    MetaTable table = metaDataCache.getTableInfo(tableId);
+                    data = DesensitizeOptUtils.desensitize(data, table.fetchDesensitizeOpt());
+                }
                 DataSet dataSet = new DataSet(data);
                 bizModel.putDataSet(id, dataSet);
                 return BuiltInOperation.createResponseSuccessData(dataSet.getSize());

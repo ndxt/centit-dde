@@ -15,6 +15,7 @@ import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.security.DesensitizeOptUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
@@ -160,6 +161,26 @@ public abstract class BuiltInOperation {
             if (dataSet != null) {
                 count = dataSet.getSize();
                 DataSetOptUtil.appendDeriveField(bizModel, dataSet, mapInfo.entrySet());
+            }
+        }
+        return createResponseSuccessData(count);
+    }
+
+    public static ResponseData runDesensitize(BizModel bizModel, JSONObject bizOptJson) {
+        String sourDsName = bizOptJson.getString("source");
+        Map<String, String> mapInfo = jsonArrayToMap(bizOptJson.getJSONArray("fieldOptList"), "columnName", "desensitizeOpt");
+        int count = 0;
+        if (mapInfo != null) {
+            DataSet dataSet = bizModel.getDataSet(sourDsName);
+            if (dataSet != null) {
+                count = dataSet.getSize();
+                Object data = dataSet.getData();
+                if(data instanceof Collection){
+                    DesensitizeOptUtils.desensitize((Collection<Object>) data, DesensitizeOptUtils.mapDesensitizeOpt(mapInfo));
+                } else {
+                    Map<String, Object> mapData = DesensitizeOptUtils.desensitize(dataSet.getFirstRow(), DesensitizeOptUtils.mapDesensitizeOpt(mapInfo));
+                    dataSet.setData(mapData);
+                }
             }
         }
         return createResponseSuccessData(count);
