@@ -1,8 +1,8 @@
 package com.centit.dde.ftp;
 
 import com.centit.dde.core.BizOperation;
-import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;

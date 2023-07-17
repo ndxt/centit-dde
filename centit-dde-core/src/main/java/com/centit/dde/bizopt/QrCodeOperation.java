@@ -8,13 +8,10 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
-import com.centit.dde.utils.DatasetVariableTranslate;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.compiler.ObjectTranslate;
-import com.centit.support.compiler.VariableFormula;
 import com.centit.support.image.ImageOpt;
 import com.centit.support.image.QrCodeConfig;
 import com.centit.support.image.QrCodeGenerator;
@@ -31,8 +28,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class QrCodeOperation  implements BizOperation {
 

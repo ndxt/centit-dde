@@ -1,8 +1,8 @@
 package com.centit.dde.utils;
 
 import com.centit.dde.core.BizModel;
-import com.centit.product.adapter.po.MetaColumn;
-import com.centit.product.adapter.po.MetaTable;
+import com.centit.product.metadata.po.MetaColumn;
+import com.centit.product.metadata.po.MetaTable;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;

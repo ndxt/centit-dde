@@ -1,7 +1,7 @@
 package com.centit.dde.consumer;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.centit.product.adapter.po.SourceInfo;
+import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.security.AESSecurityUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

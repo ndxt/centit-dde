@@ -9,8 +9,8 @@ import com.centit.dde.dataset.SqlDataSetReader;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.service.DataScopePowerManager;
-import com.centit.product.adapter.po.SourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.algorithm.BooleanBaseOpt;
 
 import java.util.Map;

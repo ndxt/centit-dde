@@ -13,7 +13,7 @@ import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.filter.RequestThreadLocal;
-import com.centit.product.adapter.po.MetaTable;
+import com.centit.product.metadata.po.MetaTable;
 import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.BooleanBaseOpt;
@@ -23,7 +23,6 @@ import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.security.DesensitizeOptUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

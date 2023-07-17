@@ -26,15 +26,15 @@ public class WorkFlowRegisterOperation {
     @PostConstruct
     void registerOperation(){
         //注册查询操作类
-        bizOptFlow.registerOperation(ConstantValue.CREATE_WORKFLOW,new CreateWorkFlowBizOperation(flowEngine));
+        bizOptFlow.registerOperation(ConstantValue.CREATE_WORKFLOW, new CreateWorkFlowBizOperation(flowEngine));
         //注册插入操作类
-        bizOptFlow.registerOperation(ConstantValue.SUBMIT_WORKFLOW,new SubmitWorkFlowBizOperation(flowEngine));
+        bizOptFlow.registerOperation(ConstantValue.SUBMIT_WORKFLOW, new SubmitWorkFlowBizOperation(flowEngine));
         //注册删除节点
-        bizOptFlow.registerOperation(ConstantValue.DELETE_WORKFLOW,new DeleteWorkFlowBizOperation(flowManager));
-        bizOptFlow.registerOperation(ConstantValue.MANAGER_WORKFLOW,new ManagerWorkFlowBizOperation(flowManager));
+        bizOptFlow.registerOperation(ConstantValue.DELETE_WORKFLOW, new DeleteWorkFlowBizOperation(flowManager));
+        bizOptFlow.registerOperation(ConstantValue.MANAGER_WORKFLOW, new ManagerWorkFlowBizOperation(flowManager));
         //注册查询待办节点
-        bizOptFlow.registerOperation(ConstantValue.USER_TASK_WORKFLOW,new WorkFlowUserTaskBizOperation(flowEngine));
+        bizOptFlow.registerOperation(ConstantValue.USER_TASK_WORKFLOW, new WorkFlowUserTaskBizOperation(flowEngine));
 
-        bizOptFlow.registerOperation(ConstantValue.INST_NODES_WORKFLOW,new WorkFlowInstNodesBizOperation(flowManager));
+        bizOptFlow.registerOperation(ConstantValue.INST_NODES_WORKFLOW, new WorkFlowInstNodesBizOperation(flowManager));
     }
 }
