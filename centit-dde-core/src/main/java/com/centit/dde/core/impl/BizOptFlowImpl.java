@@ -71,7 +71,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     private MetaDataService metaDataService;
 
     @Autowired
-    private DataPacketDraftDao dataPacketCopyDao;
+    private DataPacketDraftDao dataPacketDraftDao;
 
     @Autowired
     private DataPacketDao dataPacketDao;
@@ -592,7 +592,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         Integer logLevel = dataOptContext.getLogLevel();
         DataPacketInterface dataPacketInterface;
         if (ConstantValue.RUN_TYPE_DEBUG.equals(dataOptContext.getRunType())) {
-            DataPacketDraft dataPacketDraft = dataPacketCopyDao.getObjectWithReferences(packetId);
+            DataPacketDraft dataPacketDraft = dataPacketDraftDao.getObjectWithReferences(packetId);
             //设置子api流程的日志级别和父api流程一样，方便查看日志信息
             dataPacketDraft.setLogLevel(logLevel);
             dataPacketInterface = dataPacketDraft;

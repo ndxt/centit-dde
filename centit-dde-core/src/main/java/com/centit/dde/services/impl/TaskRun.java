@@ -31,7 +31,7 @@ public class TaskRun {
 
     private final TaskLogManager taskLogManager;
 
-    private final DataPacketDraftDao dataPacketCopyDao;
+    private final DataPacketDraftDao dataPacketDraftDao;
     private final DataPacketDao dataPacketDao;
     private final BizOptFlow bizOptFlow;
     @Autowired
@@ -42,7 +42,7 @@ public class TaskRun {
                    DataPacketDraftDao dataPacketCopyDao, DataPacketDao dataPacketDao,
                    BizOptFlow bizOptFlow) {
         this.taskLogManager = taskLogManager;
-        this.dataPacketCopyDao = dataPacketCopyDao;
+        this.dataPacketDraftDao = dataPacketCopyDao;
         this.dataPacketDao = dataPacketDao;
         this.bizOptFlow = bizOptFlow;
     }
@@ -159,14 +159,14 @@ public class TaskRun {
             dataPacketInterface.setNextRunTime(null);
         }
         if (ConstantValue.RUN_TYPE_DEBUG.equals(runType)) {
-            dataPacketCopyDao.updateObject(new String[]{"lastRunTime"}, (DataPacketDraft) dataPacketInterface);
+            dataPacketDraftDao.updateObject(new String[]{"lastRunTime"}, (DataPacketDraft) dataPacketInterface);
         } else {
             dataPacketDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, (DataPacket) dataPacketInterface);
             DataPacketDraft dataPacketDraft=new DataPacketDraft();
             dataPacketDraft.setPacketId(dataPacketInterface.getPacketId());
             dataPacketDraft.setLastRunTime(dataPacketInterface.getLastRunTime());
             dataPacketDraft.setNextRunTime(dataPacketInterface.getNextRunTime());
-            dataPacketCopyDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, dataPacketDraft);
+            dataPacketDraftDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, dataPacketDraft);
         }
     }
 }
