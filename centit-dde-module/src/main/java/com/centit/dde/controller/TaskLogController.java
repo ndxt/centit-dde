@@ -1,7 +1,7 @@
 package com.centit.dde.controller;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.centit.dde.po.TaskLog;
+import com.centit.dde.adapter.po.TaskLog;
 import com.centit.dde.services.TaskDetailLogManager;
 import com.centit.dde.services.TaskLogManager;
 import com.centit.dde.vo.DelTaskLogParameter;

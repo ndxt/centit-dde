@@ -1,7 +1,7 @@
 package com.centit.dde;
 
+import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.BizOptFlow;
-import com.centit.dde.utils.ConstantValue;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.utils.ImagePdfTextExtractor;

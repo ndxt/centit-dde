@@ -1,6 +1,6 @@
 package com.centit.dde.core;
 
-import com.centit.dde.po.DataPacketInterface;
+import com.centit.dde.adapter.po.DataPacketInterface;
 
 /**
  * 业务流

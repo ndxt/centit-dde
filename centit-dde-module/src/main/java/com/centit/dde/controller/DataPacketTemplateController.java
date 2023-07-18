@@ -1,6 +1,6 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.po.DataPacketTemplate;
+import com.centit.dde.adapter.po.DataPacketTemplate;
 import com.centit.dde.services.DataPacketTemplateService;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;

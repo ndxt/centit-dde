@@ -1,4 +1,4 @@
-package com.centit.dde.po;
+package com.centit.dde.adapter.po;
 
 import com.alibaba.fastjson2.annotation.JSONField;
 import io.swagger.annotations.ApiModel;

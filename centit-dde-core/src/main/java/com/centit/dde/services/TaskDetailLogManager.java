@@ -1,7 +1,7 @@
 package com.centit.dde.services;
 
 
-import com.centit.dde.po.TaskDetailLog;
+import com.centit.dde.adapter.po.TaskDetailLog;
 import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.support.database.utils.PageDesc;
 

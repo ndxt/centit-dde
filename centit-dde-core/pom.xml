@@ -11,12 +11,32 @@
 
     <artifactId>centit-dde-core</artifactId>
     <dependencies>
-        <!-- server runtime library -->
+
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-dubbo-adapter</artifactId>
+            <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>optflow-serial-number</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>database-metadata</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>fileserver-adapter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-persistence-jdbc</artifactId>
@@ -72,30 +92,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- server runtime library -->
         <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>optflow-serial-number</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
-
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>database-metadata</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>fileserver-adapter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-dubbo-adapter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!--<dependency>
             <groupId>net.sourceforge.pinyin4j</groupId>
             <artifactId>pinyin4j</artifactId>

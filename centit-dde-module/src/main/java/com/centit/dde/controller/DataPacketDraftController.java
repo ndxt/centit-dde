@@ -2,12 +2,12 @@ package com.centit.dde.controller;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.centit.dde.po.DataPacket;
-import com.centit.dde.po.DataPacketDraft;
+import com.centit.dde.adapter.po.DataPacket;
+import com.centit.dde.adapter.po.DataPacketDraft;
+import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.services.DataPacketTemplateService;
-import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.LoginUserPermissionCheck;
 import com.centit.dde.vo.DataPacketCache;
 import com.centit.dde.vo.HttpParameter;

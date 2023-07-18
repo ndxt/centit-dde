@@ -1,7 +1,7 @@
 package com.centit.dde.ftp;
 
+import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.BizOptFlow;
-import com.centit.dde.utils.ConstantValue;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

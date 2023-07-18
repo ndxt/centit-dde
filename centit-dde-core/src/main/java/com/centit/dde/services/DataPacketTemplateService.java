@@ -1,7 +1,7 @@
 package com.centit.dde.services;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.centit.dde.po.DataPacketTemplate;
+import com.centit.dde.adapter.po.DataPacketTemplate;
 import com.centit.support.database.utils.PageDesc;
 
 import java.util.List;

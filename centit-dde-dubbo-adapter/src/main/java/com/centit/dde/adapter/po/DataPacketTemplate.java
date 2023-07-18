@@ -1,4 +1,4 @@
-package com.centit.dde.po;
+package com.centit.dde.adapter.po;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.database.orm.GeneratorCondition;

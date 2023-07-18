@@ -24,6 +24,8 @@
         <module>centit-dde-dubbo-client-config</module>
         <module>centit-dde-ftp-plugin</module>
         <module>centit-dde-msg-plugin</module>
+        <module>centit-dde-rmdb</module>
+        <module>centit-dde-json</module>
     </modules>
     <name>com.centit.product:centit-dde</name>
 	<packaging>pom</packaging>

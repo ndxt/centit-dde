@@ -1,4 +1,4 @@
-package com.centit.dde.utils;
+package com.centit.dde.adapter.utils;
 
 /**
  * @author zhf
@@ -12,11 +12,11 @@ public class ConstantValue {
 
     public static final String DATA_COPY ="1";
 
-    static final String MODEL_NAME = "modelName";
-    static final String ROOT_NODE_TAG = "/";
-    static final String SPOT = ".";
+    public static final String MODEL_NAME = "modelName";
+    public static final String ROOT_NODE_TAG = "/";
+    public static final String SPOT = ".";
 
-    static final String DOUBLE_SPOT = "..";
+    public static final String DOUBLE_SPOT = "..";
     public static final String ELSE = "else";
     public static final String FALSE = "F";
     public static final String TRUE = "T";

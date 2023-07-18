@@ -1,11 +1,9 @@
 package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.centit.dde.dao.DataPacketTemplateDao;
-import com.centit.dde.po.DataPacketTemplate;
+import com.centit.dde.adapter.dao.DataPacketTemplateDao;
+import com.centit.dde.adapter.po.DataPacketTemplate;
 import com.centit.dde.services.DataPacketTemplateService;
-import com.centit.framework.jdbc.dao.DatabaseOptUtils;
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,10 +30,7 @@ public class DataPacketTemplateServiceImpl implements DataPacketTemplateService 
 
     @Override
     public void updateDataPacketTemplateContent(String id, String content) {
-        DatabaseOptUtils.batchUpdateObject(dataPacketTemplateDao, DataPacketTemplate.class,
-            CollectionsOpt.createHashMap("content", content),
-            CollectionsOpt.createHashMap("id", id)
-        );
+        dataPacketTemplateDao.updateDataPacketTemplateContent(id, content);
     }
 
     @Override
@@ -45,8 +40,7 @@ public class DataPacketTemplateServiceImpl implements DataPacketTemplateService 
 
     @Override
     public JSONObject getDataPacketTemplateByType(Integer type) {
-        String sql = "SELECT * FROM q_data_packet_template WHERE is_valid = 0  and template_type = ? ";
-        return DatabaseOptUtils.getObjectBySqlAsJson(dataPacketTemplateDao, sql,new Object[]{type});
+        return dataPacketTemplateDao.getDataPacketTemplateByType(type);
     }
 
     @Override

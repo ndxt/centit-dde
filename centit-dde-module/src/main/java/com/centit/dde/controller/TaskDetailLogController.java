@@ -1,6 +1,6 @@
 package com.centit.dde.controller;
 
-import com.centit.dde.po.TaskDetailLog;
+import com.centit.dde.adapter.po.TaskDetailLog;
 import com.centit.dde.services.TaskDetailLogManager;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;

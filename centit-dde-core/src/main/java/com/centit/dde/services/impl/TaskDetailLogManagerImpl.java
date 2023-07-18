@@ -1,11 +1,10 @@
 package com.centit.dde.services.impl;
 
-import com.centit.dde.dao.TaskDetailLogDao;
-import com.centit.dde.po.TaskDetailLog;
+import com.centit.dde.adapter.dao.TaskDetailLogDao;
+import com.centit.dde.adapter.po.TaskDetailLog;
 import com.centit.dde.services.TaskDetailLogManager;
 import com.centit.dde.vo.DelTaskLogParameter;
-import com.centit.framework.jdbc.dao.DatabaseOptUtils;
-import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,15 +18,10 @@ import java.util.Map;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class TaskDetailLogManagerImpl extends BaseEntityManagerImpl<TaskDetailLog, Long, TaskDetailLogDao> implements TaskDetailLogManager {
-
-    private final TaskDetailLogDao taskDetailLogDao;
+public class TaskDetailLogManagerImpl implements TaskDetailLogManager {
 
     @Autowired
-    public TaskDetailLogManagerImpl(TaskDetailLogDao taskDetailLogDao) {
-        this.taskDetailLogDao = taskDetailLogDao;
-    }
-
+    protected TaskDetailLogDao taskDetailLogDao;
 
     @Override
     public TaskDetailLog getTaskDetailLog(String logDetailId) {
@@ -58,11 +52,9 @@ public class TaskDetailLogManagerImpl extends BaseEntityManagerImpl<TaskDetailLo
 
     @Override
     public int delTaskDetailLog(DelTaskLogParameter delTaskLogParameter) {
-        StringBuilder sqlDetail=new StringBuilder("delete from d_task_detail_log  where task_id=? AND DATE(run_begin_time) <= ? ");
-        if (!delTaskLogParameter.getIsError()){
-            sqlDetail.append(" AND log_info = 'ok'  ");
-        }
-        return DatabaseOptUtils.doExecuteSql(taskDetailLogDao,sqlDetail.toString(),new Object[]{delTaskLogParameter.getPacketId(),delTaskLogParameter.getRunBeginTime()});
+        return taskDetailLogDao.delTaskDetailLog(delTaskLogParameter.getPacketId(),
+            DatetimeOpt.smartPraseDate(delTaskLogParameter.getRunBeginTime()),
+            delTaskLogParameter.getIsError());
     }
 }
 

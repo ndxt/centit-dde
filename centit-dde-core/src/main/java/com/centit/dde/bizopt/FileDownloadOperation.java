@@ -1,12 +1,12 @@
 package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
-import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DatasetVariableTranslate;
 import com.centit.fileserver.common.FileBaseInfo;
 import com.centit.fileserver.common.FileInfoOpt;

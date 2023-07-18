@@ -1,6 +1,6 @@
 package com.centit.dde.vo;
 
-import com.centit.dde.po.DataPacket;
+import com.centit.dde.adapter.po.DataPacket;
 import com.centit.support.common.CachedMap;
 
 public abstract class DataPacketCache {

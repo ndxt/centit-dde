@@ -1,6 +1,6 @@
 package com.centit.dde.agent.service;
 
-import com.centit.dde.po.DataPacket;
+import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.support.quartz.AbstractQuartzJob;
 import org.quartz.JobDataMap;

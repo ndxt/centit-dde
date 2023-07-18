@@ -1,8 +1,8 @@
 package com.centit.dde;
 
+import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.bizopt.*;
 import com.centit.dde.core.BizOptFlow;
-import com.centit.dde.utils.ConstantValue;
 import com.centit.workflow.service.FlowEngine;
 import com.centit.workflow.service.FlowManager;
 import org.springframework.beans.factory.annotation.Autowired;

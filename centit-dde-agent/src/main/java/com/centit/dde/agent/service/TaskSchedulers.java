@@ -1,8 +1,8 @@
 package com.centit.dde.agent.service;
 
-import com.centit.dde.dao.DataPacketDao;
-import com.centit.dde.po.DataPacket;
-import com.centit.dde.utils.ConstantValue;
+import com.centit.dde.adapter.dao.DataPacketDao;
+import com.centit.dde.adapter.po.DataPacket;
+import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;

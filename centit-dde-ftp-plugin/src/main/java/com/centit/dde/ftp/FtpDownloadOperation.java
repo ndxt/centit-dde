@@ -1,11 +1,11 @@
 package com.centit.dde.ftp;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.support.algorithm.CollectionsOpt;

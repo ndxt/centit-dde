@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-module</artifactId>
+            <artifactId>centit-dde-dubbo-adapter</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

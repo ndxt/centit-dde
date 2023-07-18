@@ -1,27 +1,22 @@
 package com.centit.dde.services.impl;
 
-import com.centit.dde.dao.DataPacketDraftDao;
-import com.centit.dde.po.DataPacket;
-import com.centit.dde.po.DataPacketDraft;
-import com.centit.dde.po.DataPacketParam;
+import com.centit.dde.adapter.dao.DataPacketDao;
+import com.centit.dde.adapter.dao.DataPacketDraftDao;
+import com.centit.dde.adapter.po.DataPacket;
+import com.centit.dde.adapter.po.DataPacketDraft;
+import com.centit.dde.adapter.po.DataPacketParam;
 import com.centit.dde.services.DataPacketDraftService;
-import com.centit.dde.services.DataPacketService;
-import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOptMethod;
 import com.centit.framework.system.po.OptMethod;
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +29,10 @@ import java.util.Map;
 public class DataPacketDraftServiceImpl implements DataPacketDraftService {
     private final static String OPTMETHOD_OPTTYPE_API = "A";
     @Autowired
-    private DataPacketDraftDao dataPacketCopyDao;
+    private DataPacketDraftDao dataPacketDraftDao;
 
     @Autowired
-    private DataPacketService dataPacketService;
+    private DataPacketDao dataPacketDao;
 
     @Autowired(required = false)
     private PlatformEnvironment platformEnvironment;
@@ -52,8 +47,8 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
             dataPacketCopy.setPacketId(UuidOpt.getUuidAsString32());
         }
         //dataPacketCopy.setOptCode(creatApiOptMethod(dataPacketCopy));
-        dataPacketCopyDao.saveNewObject(dataPacketCopy);
-        dataPacketCopyDao.saveObjectReferences(dataPacketCopy);
+        dataPacketDraftDao.saveNewObject(dataPacketCopy);
+        dataPacketDraftDao.saveObjectReferences(dataPacketCopy);
     }
 
     private String mergeApiOptMethod(DataPacketDraft dataPacket) {
@@ -104,16 +99,16 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
     @Override
     public void updateDataPacket(DataPacketDraft dataPacketCopy) {
-        dataPacketCopyDao.updateObject(dataPacketCopy);
-        dataPacketCopyDao.saveObjectReferences(dataPacketCopy);
+        dataPacketDraftDao.updateObject(dataPacketCopy);
+        dataPacketDraftDao.saveObjectReferences(dataPacketCopy);
     }
 
 
     @Override
     public void publishDataPacket(DataPacketDraft dataPacketCopy) {
         String optCode = mergeApiOptMethod(dataPacketCopy);
-        String sql = "update q_data_packet_draft SET publish_date=? ,opt_code=?  WHERE  PACKET_ID=? ";
-        dataPacketCopyDao.getJdbcTemplate().update(sql, new Object[]{dataPacketCopy.getPublishDate(),optCode, dataPacketCopy.getPacketId()});
+        dataPacketDraftDao.publishDataPacket(optCode, dataPacketCopy);
+
         DataPacket dataPacket = new DataPacket();
         BeanUtils.copyProperties(dataPacketCopy, dataPacket);
         dataPacket.setOptCode(dataPacketCopy.getPacketId());
@@ -126,78 +121,50 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
            });
         }
         dataPacket.setPacketParams(dataPacketParamList);
-        dataPacketService.publishDataPacket(dataPacket);
+        dataPacketDao.publishDataPacket(dataPacket);
     }
 
     @Override
     public int[] batchUpdateOptIdByApiId(String optId,List<String> apiIds) {
-        String sql="UPDATE q_data_packet_draft SET OPT_ID=? ,IS_DISABLE='F' WHERE PACKET_ID = ? ";
-        int[] dataPacket = dataPacketCopyDao.getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setString(1, optId);
-                ps.setString(2, apiIds.get(i));
-            }
-
-            @Override
-            public int getBatchSize() {
-                return apiIds.size();
-            }
-        });
-        return dataPacket;
+          return dataPacketDraftDao.batchUpdateOptIdByApiId(optId, apiIds);
     }
 
     @Override
     public void updateDisableStatus(String packetId, String disable) {
-        String sql ="UPDATE q_data_packet_draft SET IS_DISABLE=? WHERE PACKET_ID = ? ";
-       dataPacketCopyDao.getJdbcTemplate().update(sql, new Object[]{disable,packetId});
+       dataPacketDraftDao.updateDisableStatus(packetId, disable);
     }
 
     @Override
     public void batchDeleteByPacketIds(String[] packetIds) {
-        String delSql ="DELETE FROM q_data_packet_draft WHERE PACKET_ID = ? ";
-        dataPacketCopyDao.getJdbcTemplate().batchUpdate(delSql,new BatchPreparedStatementSetter(){
-            public void setValues(PreparedStatement ps, int i)
-                throws SQLException {
-                ps.setString(1, packetIds[i]);
-            }
-            public int getBatchSize() {
-                return packetIds.length;
-            }
-        });
+        dataPacketDraftDao.batchDeleteByPacketIds(packetIds);
     }
 
     @Override
     public int clearTrashStand(String osId) {
-        String delSql ="DELETE FROM q_data_packet_draft WHERE IS_DISABLE = 'T' AND  OS_ID=? ";
-        int delCount = DatabaseOptUtils.doExecuteSql(dataPacketCopyDao, delSql, new Object[]{osId});
-        return  delCount;
+        return  dataPacketDraftDao.clearTrashStand(osId);
     }
 
     @Override
     public void updateDataPacketOptJson(String packetId, String dataPacketOptJson) {
-        DatabaseOptUtils.batchUpdateObject(dataPacketCopyDao, DataPacketDraft.class,
-            CollectionsOpt.createHashMap("dataOptDescJson", dataPacketOptJson),
-            CollectionsOpt.createHashMap("packetId", packetId)
-        );
+        dataPacketDraftDao.updateDataPacketOptJson(packetId, dataPacketOptJson);
     }
 
 
     @Override
     public void deleteDataPacket(String packetId) {
-        DataPacketDraft dataPacketCopy = dataPacketCopyDao.getObjectWithReferences(packetId);
-        dataPacketCopyDao.deleteObjectById(packetId);
-        dataPacketCopyDao.deleteObjectReferences(dataPacketCopy);
+        DataPacketDraft dataPacketCopy = dataPacketDraftDao.getObjectWithReferences(packetId);
+        dataPacketDraftDao.deleteObjectById(packetId);
+        dataPacketDraftDao.deleteObjectReferences(dataPacketCopy);
     }
 
     @Override
     public List<DataPacketDraft> listDataPacket(Map<String, Object> params, PageDesc pageDesc) {
-        return dataPacketCopyDao.listObjectsByProperties(params, pageDesc);
+        return dataPacketDraftDao.listObjectsByProperties(params, pageDesc);
     }
 
     @Override
     public DataPacketDraft getDataPacket(String packetId) {
-        return dataPacketCopyDao.getObjectWithReferences(packetId);
+        return dataPacketDraftDao.getObjectWithReferences(packetId);
     }
 
 }

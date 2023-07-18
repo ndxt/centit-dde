@@ -1,14 +1,14 @@
 package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.centit.dde.adapter.dao.DataPacketDao;
+import com.centit.dde.adapter.dao.DataPacketDraftDao;
+import com.centit.dde.adapter.po.*;
+import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataOptResult;
-import com.centit.dde.dao.DataPacketDao;
-import com.centit.dde.dao.DataPacketDraftDao;
-import com.centit.dde.po.*;
 import com.centit.dde.services.TaskLogManager;
-import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOsInfo;
@@ -161,12 +161,12 @@ public class TaskRun {
         if (ConstantValue.RUN_TYPE_DEBUG.equals(runType)) {
             dataPacketCopyDao.updateObject(new String[]{"lastRunTime"}, (DataPacketDraft) dataPacketInterface);
         } else {
-            dataPacketDao.updateObject(new String[]{"lastRunTime","nextRunTime"},(DataPacket) dataPacketInterface);
+            dataPacketDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, (DataPacket) dataPacketInterface);
             DataPacketDraft dataPacketDraft=new DataPacketDraft();
             dataPacketDraft.setPacketId(dataPacketInterface.getPacketId());
             dataPacketDraft.setLastRunTime(dataPacketInterface.getLastRunTime());
             dataPacketDraft.setNextRunTime(dataPacketInterface.getNextRunTime());
-            dataPacketCopyDao.updateObject(new String[]{"lastRunTime","nextRunTime"},dataPacketDraft);
+            dataPacketCopyDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, dataPacketDraft);
         }
     }
 }

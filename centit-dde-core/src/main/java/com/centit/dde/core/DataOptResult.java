@@ -1,6 +1,6 @@
 package com.centit.dde.core;
 
-import com.centit.dde.utils.ConstantValue;
+import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ToResponseData;

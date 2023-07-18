@@ -1,6 +1,6 @@
 package com.centit.dde.services;
 
-import com.centit.dde.po.DataPacketDraft;
+import com.centit.dde.adapter.po.DataPacketDraft;
 import com.centit.support.database.utils.PageDesc;
 
 import java.util.List;

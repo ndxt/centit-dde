@@ -1,6 +1,6 @@
 package com.centit.dde.datamoving;
 
-import com.centit.dde.po.DataPacket;
+import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.fileserver.common.FileStore;

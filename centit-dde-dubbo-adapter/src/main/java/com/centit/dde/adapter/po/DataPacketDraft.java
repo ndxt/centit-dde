@@ -1,9 +1,7 @@
-package com.centit.dde.po;
+package com.centit.dde.adapter.po;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
-import com.centit.dde.core.DataOptStep;
-import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.core.dao.DictionaryMap;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -14,7 +12,6 @@ import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -27,8 +24,8 @@ import java.util.*;
 @ApiModel
 @Data
 @Entity
-@Table(name = "q_data_packet")
-public class DataPacket implements Serializable, DataPacketInterface {
+@Table(name = "q_data_packet_draft")
+public class DataPacketDraft implements Serializable, DataPacketInterface {
     private static final long serialVersionUID = 1;
 
     @ApiModelProperty(value = "数据处理ID", hidden = true)
@@ -65,7 +62,7 @@ public class DataPacket implements Serializable, DataPacketInterface {
     private Integer bufferFreshPeriod;
 
     @Column(name = "buffer_fresh_period_type")
-    @ApiModelProperty(value = "缓存单位, 1:分 2:时 3:日  -1:不缓存")
+    @ApiModelProperty(value = "缓存单位, 1:分 2:时 3:日 -1:不缓存")
     private Integer bufferFreshPeriodType;
 
     @Column(name = "recorder")
@@ -80,15 +77,17 @@ public class DataPacket implements Serializable, DataPacketInterface {
 
     @Column(name = "update_date")
     @ApiModelProperty(value = "修改时间", hidden = true)
-    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
+    //@ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE, condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date updateDate;
 
-    @ApiModelProperty(value = "业务应用（系统）代码")
+    @ApiModelProperty(value = "业务模块代码", required = true)
     @Column(name = "os_id")
+    @NotBlank(message = "osId字段不能为空")
     private String osId;
 
-    @ApiModelProperty(value = "所属业务模块")
+    @ApiModelProperty(value = "所属模块", required = true)
     @Column(name = "opt_id")
+    @NotBlank(message = "optId字段不能为空")
     private String optId;
 
     @Column(name = "task_type")
@@ -116,11 +115,6 @@ public class DataPacket implements Serializable, DataPacketInterface {
     @ApiModelProperty(value = "是否回滚并结束")
     private String needRollback;
 
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "return_result")
-    @ApiModelProperty(value = "桩数据", required = true)
-    private JSONObject returnResult;
-
     @Column(name = "publish_date")
     @ApiModelProperty(value = "发布时间")
     private Date publishDate;
@@ -133,10 +127,15 @@ public class DataPacket implements Serializable, DataPacketInterface {
     @ApiModelProperty(value = "f_optdef表主键")
     private String optCode;
 
-    @Column(name = "source_id")
-    @ApiModelProperty(value = "模板来源")
-    @JSONField(serialize = false)
-    private String sourceId;
+    @Column(name = "template_type")
+    @ApiModelProperty(value = "模板(操作)类型：1：新建 2：修改 3：删除 4：查询 5：查看 6：创建流程 7：提交流程 8：http调用")
+    private Integer templateType;
+    /**
+     * template_type  metadata_table_id  这2个字段都是给前端做判断使用的，dde本身不需要这2个字段
+     */
+    @Column(name = "metadata_table_id")
+    @ApiModelProperty(value = "通过元数据模板生成接口时会选择一个表，这个存选择的表ID")
+    private String metadataTableId;
 
     @Column(name = "log_level")
     @ApiModelProperty(value = "日志记录级别，1=ERROR,3=INFO,7=DEBUG")
@@ -152,7 +151,7 @@ public class DataPacket implements Serializable, DataPacketInterface {
     private JSONObject schemaProps;
 
     @Column(name = "request_body_type")
-    @ApiModelProperty(value = "api请求体数据类型  O:对象，F:文件")
+    @ApiModelProperty(value = "api数据类型  O:对象，F:文件")
     @NotBlank
     private String requestBodyType;
 
@@ -160,9 +159,12 @@ public class DataPacket implements Serializable, DataPacketInterface {
     @Column(name = "FALL_BACK_LEVEL")
     private String fallBackLevel;
 
-    @OneToMany(targetEntity = DataPacketParam.class)
+    @OneToMany(targetEntity = DataPacketParamDraft.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
-    private List<DataPacketParam> packetParams;
+    private List<DataPacketParamDraft> packetParams;
+
+    @ApiModelProperty(hidden = true)
+    private Object optMethod;
 
     @Transient
     @JSONField(serialize = false)
@@ -183,7 +185,7 @@ public class DataPacket implements Serializable, DataPacketInterface {
         return new DataOptStep(innerDataOptStep.getNodeMap(), innerDataOptStep.getLinkMap());
     }
 
-    public List<DataPacketParam> getPacketParams() {
+    public List<DataPacketParamDraft> getPacketParams() {
         if (packetParams == null) {
             packetParams = new ArrayList<>(2);
         }
@@ -197,7 +199,7 @@ public class DataPacket implements Serializable, DataPacketInterface {
         if (packetParams == null) {
             return params;
         }
-        for (DataPacketParam packetParam : packetParams) {
+        for (DataPacketParamDraft packetParam : packetParams) {
             if (packetParam.getParamType() != null) {
                 switch (packetParam.getParamType()) {
                     case "N":
@@ -213,21 +215,6 @@ public class DataPacket implements Serializable, DataPacketInterface {
             }
         }
         return params;
-    }
-
-    //日志记录级别，1=ERROR,3=INFO,7=DEBUG"
-    public static int mapLogLevel(String logLevel){
-        if(StringUtils.equalsAny(logLevel,"1","2","3","4","5","6","7"))
-            return Integer.valueOf(logLevel);
-
-        if("ERROR".equalsIgnoreCase(logLevel))
-            return ConstantValue.LOGLEVEL_TYPE_ERROR;
-        if("INFO".equalsIgnoreCase(logLevel))
-            return ConstantValue.LOGLEVEL_TYPE_INFO;
-        if("DEBUG".equalsIgnoreCase(logLevel))
-            return ConstantValue.LOGLEVEL_TYPE_DEBUG;
-
-        return -1;
     }
 
 }
