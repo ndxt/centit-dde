@@ -19,6 +19,11 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-core</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-dubbo-adapter</artifactId>
             <version>${project.version}</version>
@@ -28,5 +33,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
+
     </dependencies>
 </project>

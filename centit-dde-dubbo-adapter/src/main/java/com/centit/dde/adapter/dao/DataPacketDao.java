@@ -24,7 +24,7 @@ public interface DataPacketDao {
 
     int deleteObjectById(Object dataPacket);
 
-    DataPacket getObjectById(Object id);
+    DataPacket getObjectById(Object packetId);
 
     void publishDataPacket(DataPacket dataPacket);
 

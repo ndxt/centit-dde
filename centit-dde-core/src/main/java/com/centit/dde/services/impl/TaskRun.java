@@ -88,7 +88,7 @@ public class TaskRun {
                 taskLog, ResponseData.ERROR_OPERATION, ObjectException.extortExceptionMessage(e)));
         } finally { // 写入日志
             //如果是 debug 并且是断点（debugId不为空）状态不写入日志
-            if(StringUtils.equals(optContext.getRunType(),ConstantValue.RUN_TYPE_NORMAL)
+            if(StringUtils.equals(optContext.getRunType(), ConstantValue.RUN_TYPE_NORMAL)
                 || StringUtils.isBlank(optContext.getDebugId()))
                 taskLogManager.saveTaskLog(taskLog, dataPacketInterface.getLogLevel());
         }
