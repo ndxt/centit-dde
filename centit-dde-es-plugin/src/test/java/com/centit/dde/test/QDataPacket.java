@@ -1,6 +1,5 @@
 package com.centit.dde.test;
 
-import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 import java.util.Date;
@@ -33,7 +32,7 @@ public class QDataPacket{
     private String packetDesc;
 
     private String Recorder;
-    @JSONField(format="yyyy-MM-dd HH:mm:ss")
+
     private Date recordDate;
 
     private String hasDataOpt;
@@ -49,9 +48,8 @@ public class QDataPacket{
 
     private String taskCron;
 
-    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date lastRunTime;
-    @JSONField(format="yyyy-MM-dd HH:mm:ss")
+
     private Date nextRunTime;
 
     private String isValid;
@@ -65,13 +63,12 @@ public class QDataPacket{
     private String returnResult;
 
     private String ownGroup;
-    @JSONField(format="yyyy-MM-dd HH:mm:ss")
+
     private Date updateDate;
 
     /**
      * 发布时间
      */
-    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date publishDate;
 
     private String needRollback;
