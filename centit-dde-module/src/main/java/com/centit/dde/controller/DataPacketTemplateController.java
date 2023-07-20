@@ -5,7 +5,6 @@ import com.centit.dde.services.DataPacketTemplateService;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
-import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
@@ -13,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -26,10 +26,10 @@ public class DataPacketTemplateController extends BaseController {
     @ApiOperation(value = "新增API模板")
     @PutMapping
     @WrapUpResponseBody
-    public DataPacketTemplate createDataPacketTemplate(@RequestBody DataPacketTemplate dataPacketTemplate){
-        String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+    public DataPacketTemplate createDataPacketTemplate(@RequestBody DataPacketTemplate dataPacketTemplate, HttpServletRequest request){
+        String loginUser = WebOptUtils.getCurrentUserCode(request);
         if (StringBaseOpt.isNvl(loginUser)) {
-            loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
+            loginUser = WebOptUtils.getRequestFirstOneParameter(request, "userCode");
         }
         dataPacketTemplate.setCreateUser(loginUser);
         dataPacketTemplateService.createDataPacketTemplate(dataPacketTemplate);

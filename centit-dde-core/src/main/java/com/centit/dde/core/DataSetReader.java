@@ -11,5 +11,5 @@ public interface DataSetReader {
      * @param params 模块的自定义参数
      * @return  dataSet 数据集
      */
-    DataSet load(Map<String, Object> params) throws Exception;
+    DataSet load(Map<String, Object> params, DataOptContext dataOptContext) throws Exception;
 }

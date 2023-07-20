@@ -28,7 +28,7 @@ public class ReadCsvOperation implements BizOperation {
         if (inputStream != null) {
             CsvDataSet csvDataSet = new CsvDataSet();
             csvDataSet.setInputStream(inputStream);
-            DataSet simpleDataSet = csvDataSet.load(bizOptJson);
+            DataSet simpleDataSet = csvDataSet.load(bizOptJson, dataOptContext);
             bizModel.putDataSet(targetDsName, simpleDataSet);
             return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
         } else {

@@ -2,6 +2,7 @@ package com.centit.dde.dataset;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
+import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetReader;
 import com.centit.dde.core.DataSetWriter;
@@ -30,7 +31,7 @@ public class JSONDataSet implements DataSetReader, DataSetWriter {
      * @return dataSet 数据集
      */
     @Override
-    public DataSet load(Map<String, Object> params) throws Exception{
+    public DataSet load(Map<String, Object> params, DataOptContext dataOptContext) throws Exception{
         if (params != null && BooleanBaseOpt.castObjectToBoolean(
             params.get("isJSONArray"), false)) {
             JSONArray json = JSON.parseArray(FileIOOpt.readStringFromFile(filePath));

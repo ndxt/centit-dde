@@ -69,7 +69,7 @@ public class QuerySqlOperation implements BizOperation {
 
         sqlDsr.setReturnFirstRowAsObject(BooleanBaseOpt.castObjectToBoolean(
             BuiltInOperation.getJsonFieldString(bizOptJson, "returnAsObject", "false"), false));
-        DataSet dataSet = sqlDsr.load(parames);
+        DataSet dataSet = sqlDsr.load(parames, dataOptContext);
 
         bizModel.putDataSet(id, dataSet);
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());

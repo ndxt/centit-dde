@@ -67,7 +67,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        DataSet dataSet = csvDataSet.load(null);
+        DataSet dataSet = csvDataSet.load(null, null);
         JSONArray result = new JSONArray();
         for (int i = 0; i < dataSet.getDataAsList().size(); i++) {
             if (i >= 20) {
@@ -88,7 +88,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        DataSet dataSet = jsonDataSet.load(null);
+        DataSet dataSet = jsonDataSet.load(null, null);
         JSONArray result = new JSONArray();
         for (int i = 0; i < dataSet.getDataAsList().size(); i++) {
             if (i >= 20) {

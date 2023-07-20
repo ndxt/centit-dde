@@ -64,6 +64,7 @@ public class HttpServiceOperation implements BizOperation {
 
         //构建请求头数据
         Map<String, String> headers = new HashMap<>();
+
         if (RequestThreadLocal.getLocalThreadWrapperRequest() != null) {
             HttpSession session = RequestThreadLocal.getLocalThreadWrapperRequest().getSession();
             headers.put(WebOptUtils.SESSION_ID_TOKEN, session == null ? null : session.getId());

@@ -9,11 +9,10 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.core.service.DataScopePowerManager;
-import com.centit.framework.filter.RequestThreadLocal;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.product.metadata.po.MetaTable;
 import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaObjectService;
@@ -26,7 +25,6 @@ import com.centit.support.database.utils.PageDesc;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,31 +90,35 @@ public class MetadataOperation implements BizOperation {
                 bizModel.putDataSet(id, new DataSet(1));
                 return BuiltInOperation.createResponseSuccessData(1);
             case 4://查询 这个已经迁移走了，但是为了兼容前面的遗留项目暂时不能删除，2023年6月删除
-                HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
-                String topUnit = WebOptUtils.getCurrentTopUnit(request);
-                List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, WebOptUtils.getCurrentUserCode(request), dataOptContext.getOptId(), "api");
+                CentitUserDetails userDetails = dataOptContext.getCurrentUserDetail();
                 String extFilter = null;
+                if(userDetails!=null) {
+                    String topUnit = userDetails.getTopUnitCode();
+                    List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,
+                        userDetails.getUserCode(), dataOptContext.getOptId(), "api");
+
+                    if (filters != null) {
+                        MetaTable table = metaDataCache.getTableInfo(tableId);
+                        DataPowerFilter dataPowerFilter =
+                            queryDataScopeFilter.createUserDataPowerFilter(userDetails);
+
+                        dataPowerFilter.addSourceData(parames);
+
+                        Map<String, String> tableAlias = new HashMap<>(3);
+                        tableAlias.put(table.getTableName(), "");
+                        QueryAndNamedParams qap = dataPowerFilter.translateQueryFilter(tableAlias, filters);
+                        parames.putAll(qap.getParams());
+                        extFilter = qap.getQuery();
+                    }
+                }
                 PageDesc pageDesc = new PageDesc();
-                if (parames.get("pageNo")!=null){
+                if (parames.get("pageNo") != null) {
                     pageDesc.setPageNo(NumberBaseOpt.castObjectToInteger(parames.get("pageNo")));
                     parames.remove("pageNo");
                 }
-                if ( parames.get("pageSize")!=null){
+                if (parames.get("pageSize") != null) {
                     pageDesc.setPageSize(NumberBaseOpt.castObjectToInteger(parames.get("pageSize")));
                     parames.remove("pageSize");
-                }
-                if (filters != null) {
-                    MetaTable table = metaDataCache.getTableInfo(tableId);
-                    DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
-                        WebOptUtils.getCurrentUserDetails(request));
-
-                    dataPowerFilter.addSourceData(parames);
-
-                    Map<String, String> tableAlias = new HashMap<>(3);
-                    tableAlias.put(table.getTableName(), "");
-                    QueryAndNamedParams qap = dataPowerFilter.translateQueryFilter(tableAlias, filters);
-                    parames.putAll(qap.getParams());
-                    extFilter = qap.getQuery();
                 }
                 JSONArray  jsonArray =metaObjectService.pageQueryObjects(tableId, extFilter, parames,null, pageDesc);
                 PageQueryResult<Object>  result = PageQueryResult.createResult(jsonArray, pageDesc);

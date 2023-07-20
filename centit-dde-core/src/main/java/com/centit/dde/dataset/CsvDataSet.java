@@ -2,6 +2,7 @@ package com.centit.dde.dataset;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.utils.ConstantValue;
+import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetReader;
 import com.centit.dde.core.DataSetWriter;
@@ -38,7 +39,7 @@ public class CsvDataSet implements DataSetReader, DataSetWriter {
     }
 
     @Override
-    public DataSet load(Map<String, Object> params) throws Exception {
+    public DataSet load(Map<String, Object> params, DataOptContext dataOptContext) throws Exception {
         List<Map<String, Object>> list = readCsvFile(params);
         DataSet dataSet = new DataSet();
         dataSet.setData(list);

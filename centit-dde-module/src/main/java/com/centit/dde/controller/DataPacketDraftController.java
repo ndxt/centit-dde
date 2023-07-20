@@ -18,7 +18,6 @@ import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
-import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.operationlog.RecordOperationLog;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -70,7 +69,7 @@ public class DataPacketDraftController extends BaseController {
     @PostMapping
     @WrapUpResponseBody
     public DataPacketDraft createDataPacket(@RequestBody DataPacketDraft dataPacketDraft, HttpServletRequest request) {
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
         dataPacketDraft.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
         dataPacketDraft.setLogLevel(ConstantValue.LOGLEVEL_TYPE_ERROR);
@@ -82,13 +81,13 @@ public class DataPacketDraftController extends BaseController {
     @PostMapping("/http-type")
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
-    public DataPacketDraft createHttpTypeApi(@RequestBody HttpParameter httpParames) {
+    public DataPacketDraft createHttpTypeApi(@RequestBody HttpParameter httpParames, HttpServletRequest request) {
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setOsId(httpParames.getOsId());
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
-        String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
+        String loginUser = WebOptUtils.getCurrentUserCode(request);
         if (StringBaseOpt.isNvl(loginUser)) {
-            loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
+            loginUser = WebOptUtils.getRequestFirstOneParameter(request, "userCode");
         }
         dataPacketDraft.setRecorder(loginUser);
         JSONObject dataPacketTemplate = dataPacketTemplateService.getDataPacketTemplateByType(8);
@@ -131,13 +130,14 @@ public class DataPacketDraftController extends BaseController {
     @PostMapping("/metadata/api")
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
-    public List<DataPacketDraft> createMetaDataApi(@RequestBody MetaDataParameter metaDataOrHttpParams) throws ParseException {
+    public List<DataPacketDraft> createMetaDataApi(@RequestBody MetaDataParameter metaDataOrHttpParams,
+                                                   HttpServletRequest request) throws ParseException {
         DataPacketDraft dataPacket = new DataPacketDraft();
         dataPacket.setOsId(metaDataOrHttpParams.getOsId());
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacket.getOsId());
-        String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacket.getOsId(), request);
+        String loginUser = WebOptUtils.getCurrentUserCode(request);
         if (StringBaseOpt.isNvl(loginUser)) {
-            loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
+            loginUser = WebOptUtils.getRequestFirstOneParameter(request, "userCode");
         }
         List<DataPacketDraft> dataPacketDraftList = new ArrayList<>();
         Integer[] createType = metaDataOrHttpParams.getCreateType();
@@ -201,11 +201,12 @@ public class DataPacketDraftController extends BaseController {
     @RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}更新api",
         tag = "{arg0}", newValue = "无")
     @WrapUpResponseBody
-    public void updateDataPacket(@PathVariable String packetId, @RequestBody DataPacketDraft dataPacketDraft) throws ParseException {
+    public void updateDataPacket(@PathVariable String packetId,
+                                 @RequestBody DataPacketDraft dataPacketDraft, HttpServletRequest request) throws ParseException {
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
         dataPacketDraft.setPacketId(packetId);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateStr = dateFormat.format(new Date());
@@ -218,12 +219,12 @@ public class DataPacketDraftController extends BaseController {
     @PutMapping(value = "publish/{packetId}")
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
-    public void publishDataPacket(@PathVariable String packetId) throws ParseException {
+    public void publishDataPacket(@PathVariable String packetId, HttpServletRequest request) throws ParseException {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "发布数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateStr = simpleDateFormat.format(new Date());
         dataPacketDraft.setPublishDate(simpleDateFormat.parse(dateStr));
@@ -234,12 +235,13 @@ public class DataPacketDraftController extends BaseController {
     @ApiOperation(value = "编辑API网关数据处理描述信息")
     @PutMapping(value = "/opt/{packetId}")
     @WrapUpResponseBody
-    public void updateDataPacketOpt(@PathVariable String packetId, @RequestBody String dataOptDescJson) {
+    public void updateDataPacketOpt(@PathVariable String packetId,
+                                    @RequestBody String dataOptDescJson, HttpServletRequest request) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
         dataPacketDraftService.updateDataPacketOptJson(packetId, dataOptDescJson);
     }
 
@@ -247,12 +249,12 @@ public class DataPacketDraftController extends BaseController {
     @DeleteMapping(value = "/{packetId}")
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
-    public void deleteDataPacket(@PathVariable String packetId) {
+    public void deleteDataPacket(@PathVariable String packetId, HttpServletRequest request) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "删除数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
         platformEnvironment.deleteOptDefAndRolepowerByOptCode(dataPacketDraft.getOptCode());
         dataPacketService.deleteDataPacket(packetId);
         dataPacketDraftService.deleteDataPacket(packetId);
@@ -263,12 +265,12 @@ public class DataPacketDraftController extends BaseController {
     @PutMapping(value = "/{packetId}/{disableType}")
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
-    public void updateDisableStatus(@PathVariable String packetId, @PathVariable String disableType) {
+    public void updateDisableStatus(@PathVariable String packetId, @PathVariable String disableType, HttpServletRequest request) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
         //启用  disableType 必须等于T 或者 F
         if ("F".equals(disableType) || "T".equals(disableType)) {
             DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
@@ -323,10 +325,10 @@ public class DataPacketDraftController extends BaseController {
         value = "批量删除-参数：{packetIds:[\"packetId\"],osId:\"osId\"};清空回收站-参数：{osId:\"osId\"}"
     )
     @WrapUpResponseBody
-    public void batchDeleteByPacketIds(@RequestBody JSONObject jsonObject) {
+    public void batchDeleteByPacketIds(@RequestBody JSONObject jsonObject, HttpServletRequest request) {
         JSONArray packetIds = jsonObject.getJSONArray("packetIds");
         String osId = jsonObject.getString("osId");
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, osId);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, osId, request);
         if (packetIds != null && packetIds.size() > 0) {
             String[] ids = packetIds.toArray(new String[packetIds.size()]);
             dataPacketDraftService.batchDeleteByPacketIds(ids);
@@ -344,7 +346,7 @@ public class DataPacketDraftController extends BaseController {
         value = "API复制接口-参数：{\"packetId\":\"\",\"packetName\":\"\",\"optId\":\"\"}"
     )
     @WrapUpResponseBody
-    public ResponseData ApiCopy(@RequestBody JSONObject jsonObject) {
+    public ResponseData ApiCopy(@RequestBody JSONObject jsonObject, HttpServletRequest request) {
         String copyPacketId = jsonObject.getString("packetId");
         String packetName = jsonObject.getString("packetName");
         String optId = jsonObject.getString("optId");
@@ -355,7 +357,7 @@ public class DataPacketDraftController extends BaseController {
         if (dataPacket == null) {
             return ResponseData.makeErrorMessage("复制的API接口不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacket.getOsId());
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacket.getOsId(), request);
         String packetId = UuidOpt.getUuidAsString32();
         dataPacket.setPacketId(packetId);
         dataPacket.setPacketName(packetName);

@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.LoginUserPermissionCheck;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
@@ -49,8 +50,8 @@ public class DataPacketController extends BaseController {
     @ApiOperation(value = "工作流查询API网关")
     @GetMapping(value = "/workflow/{optId}")
     @WrapUpResponseBody
-    public List<Map<String,String>> listDataPacket(@PathVariable String optId) {
-        return dataPacketService.listDataPacket(optId);
+    public List<Map<String,String>> listDataPacket(@PathVariable String optId, HttpServletRequest request) {
+        return dataPacketService.listDataPacket(optId, WebOptUtils.getCurrentTopUnit(request));
     }
 
 
@@ -69,10 +70,10 @@ public class DataPacketController extends BaseController {
     )
     @PutMapping(value = "/chgLogLevel")
     @WrapUpResponseBody
-    public void chgLogLevel(@RequestBody JSONObject jsonObject) {
+    public void chgLogLevel(@RequestBody JSONObject jsonObject, HttpServletRequest request) {
         JSONArray packetIds = jsonObject.getJSONArray("packetIds");
         String osId = jsonObject.getString("osId");
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, osId);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, osId, request);
         String logLevel = jsonObject.getString("logLevel");
         int lv = DataPacket.mapLogLevel(logLevel);
         if(lv<1){
@@ -90,10 +91,10 @@ public class DataPacketController extends BaseController {
     )
     @PutMapping(value = "/chgOSLogLevel")
     @WrapUpResponseBody
-    public void chgOSLogLevel(@RequestBody JSONObject jsonObject) {
+    public void chgOSLogLevel(@RequestBody JSONObject jsonObject, HttpServletRequest request) {
         String osId = jsonObject.getString("osId");
         String logLevel = jsonObject.getString("logLevel");
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, osId);
+        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, osId, request);
         int lv = DataPacket.mapLogLevel(logLevel);
         if(lv<1){
             throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "日志等级参数不正确！");

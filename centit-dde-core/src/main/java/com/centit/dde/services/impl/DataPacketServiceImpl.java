@@ -3,9 +3,7 @@ package com.centit.dde.services.impl;
 import com.centit.dde.adapter.dao.DataPacketDao;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
-import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
-import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.basedata.IOptInfo;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -61,8 +59,8 @@ public class DataPacketServiceImpl implements DataPacketService {
     }
 
     @Override
-    public List<Map<String, String>> listDataPacket(String optId) {
-        optId = getOptIdWithCommon(optId);
+    public List<Map<String, String>> listDataPacket(String optId, String topUnit) {
+        optId = getOptIdWithCommon(optId, topUnit);
         List<DataPacket> dataPacketList = dataPacketDao.listObjectsByProperties(CollectionsOpt.createHashMap("optids", optId));
         List<Map<String, String>> mapList = new ArrayList<>();
         for (DataPacket dataPacket : dataPacketList) {
@@ -73,8 +71,7 @@ public class DataPacketServiceImpl implements DataPacketService {
         return mapList;
     }
 
-    private String getOptIdWithCommon(String optId) {
-        String topUnit = WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest());
+    private String getOptIdWithCommon(String optId, String topUnit) {
         IOptInfo commonOptInfo = CodeRepositoryUtil.getCommonOptId(topUnit, optId);
         if (commonOptInfo != null) {
             String commonOptId = commonOptInfo.getOptId();

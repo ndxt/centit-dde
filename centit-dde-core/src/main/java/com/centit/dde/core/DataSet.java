@@ -208,7 +208,7 @@ public class DataSet implements DataSetReader, Serializable {
      * @return dataSet 数据集
      */
     @Override
-    public DataSet load(Map<String, Object> params) {
+    public DataSet load(Map<String, Object> params, DataOptContext dataOptContext) {
         return this;
     }
 

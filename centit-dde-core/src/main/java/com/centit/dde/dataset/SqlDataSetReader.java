@@ -2,13 +2,13 @@ package com.centit.dde.dataset;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetReader;
-import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.core.service.DataScopePowerManager;
-import com.centit.framework.filter.RequestThreadLocal;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.product.metadata.api.ISourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
@@ -68,22 +67,21 @@ public class SqlDataSetReader implements DataSetReader {
      * @return dataSet 数据集
      */
     @Override
-    public DataSet load(final Map<String, Object> params) throws Exception {
+    public DataSet load(final Map<String, Object> params, DataOptContext dataOptContext) throws Exception {
         buildExtendsSql();
         if (extendFilters!=null){
             params.putAll(extendFilters);
         }
         Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(databaseInfo);
-        HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
+        CentitUserDetails currentUserDetails = dataOptContext.getCurrentUserDetail();
         QueryAndNamedParams qap = null;
-        if (request != null) {
-            String topUnit = WebOptUtils.getCurrentTopUnit(request);
-            String userCode = WebOptUtils.getCurrentUserCode(request);
+        if (currentUserDetails != null) {
+            String topUnit = currentUserDetails.getTopUnitCode();
+            String userCode = currentUserDetails.getUserCode();
             if (StringUtils.isNotBlank(userCode)) {
                 List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, userCode, optId, "api");
                 if (filters != null) {
-                    DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(
-                        WebOptUtils.getCurrentUserDetails(request));
+                    DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(currentUserDetails);
                     dataPowerFilter.addSourceData(params);
                     qap = dataPowerFilter.translateQuery(sqlSen, filters);
                 }

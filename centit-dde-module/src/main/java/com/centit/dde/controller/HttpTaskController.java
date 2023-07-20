@@ -22,7 +22,6 @@ import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
-import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -146,12 +145,8 @@ public class HttpTaskController extends BaseController {
         returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_DELETE, request, response);
     }
 
-    private void judgePower(@PathVariable String packetId, String runType) {
+    private void judgePower(@PathVariable String packetId, String loginUser, String runType) {
         if (ConstantValue.RUN_TYPE_DEBUG.equals(runType)) {
-            String loginUser = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
-            if (StringBaseOpt.isNvl(loginUser)) {
-                loginUser = WebOptUtils.getRequestFirstOneParameter(RequestThreadLocal.getLocalThreadWrapperRequest(), "userCode");
-            }
             if (StringBaseOpt.isNvl(loginUser)) {
                 throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "您未登录！");
             }

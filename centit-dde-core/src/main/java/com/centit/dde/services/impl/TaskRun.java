@@ -136,7 +136,6 @@ public class TaskRun {
                 taskLog.setRunner("定时任务");
             } else {
                 taskLog.setRunner(context.getCurrentUserCode());
-                //taskLog.setRunner(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
             }
         }
         //taskLog.setLogId(UuidOpt.getUuidAsString32());
