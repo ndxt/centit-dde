@@ -56,7 +56,7 @@ public class OptLogQueryOperation implements BizOperation {
         String osId = dataOptContext.getOsId();
         filterMap.put("osId",osId);
 
-        String topUnit = dataOptContext.getCurrentUserDetail().getTopUnitCode();
+        String topUnit = dataOptContext.getTopUnit();
         filterMap.put("topUnit",topUnit);
 
         if (optTag != null ) filterMap.put("optTag",optTag);

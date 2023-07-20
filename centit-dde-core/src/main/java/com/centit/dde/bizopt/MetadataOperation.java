@@ -93,7 +93,7 @@ public class MetadataOperation implements BizOperation {
                 CentitUserDetails userDetails = dataOptContext.getCurrentUserDetail();
                 String extFilter = null;
                 if(userDetails!=null) {
-                    String topUnit = userDetails.getTopUnitCode();
+                    String topUnit = dataOptContext.getTopUnit();
                     List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,
                         userDetails.getUserCode(), dataOptContext.getOptId(), "api");
 

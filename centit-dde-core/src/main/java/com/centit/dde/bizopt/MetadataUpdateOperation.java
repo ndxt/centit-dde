@@ -43,8 +43,7 @@ public class MetadataUpdateOperation implements BizOperation {
 
         if(currentUserDetails!=null) {
             String currentUserCode = currentUserDetails.getUserCode();
-            String topUnit = currentUserDetails.getTopUnitCode();
-
+            String topUnit = dataOptContext.getTopUnit();
             List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,
                 currentUserCode, dataOptContext.getOptId(), "api");
             if (filters != null && filters.size() > 0) {

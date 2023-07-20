@@ -39,7 +39,7 @@ public class OptLogOperation implements BizOperation {
         OperationLog optLog = OperationLog.create().application(dataOptContext.getOsId())
             .level(logLevel)
             .operation(dataOptContext.getOptId())
-            .topUnit(userDetails.getTopUnitCode())
+            .topUnit(dataOptContext.getTopUnit())
             .unit(userDetails.getCurrentUnitCode())
             .user(userDetails.getUserCode())
             .loginIp(userDetails.getLoginIp())

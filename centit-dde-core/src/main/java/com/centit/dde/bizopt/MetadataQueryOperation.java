@@ -55,7 +55,7 @@ public class MetadataQueryOperation implements BizOperation {
                 String extFilter = null;
                 if(userDetails!=null) {
                     String currentUserCode = userDetails.getUserCode();
-                    String topUnit = userDetails.getTopUnitCode();
+                    String topUnit = dataOptContext.getTopUnit();
                     List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,
                         currentUserCode, dataOptContext.getOptId(), "api");
 
