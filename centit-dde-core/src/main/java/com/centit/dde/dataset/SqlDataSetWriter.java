@@ -8,7 +8,6 @@ import com.centit.product.metadata.api.ISourceInfo;
 import com.centit.product.metadata.po.MetaTable;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.common.ObjectException;
-import com.centit.support.database.utils.PersistenceException;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +66,7 @@ public class SqlDataSetWriter implements DataSetWriter {
         try {
             connection = AbstractSourceConnectThreadHolder.fetchConnect(dataSource);
         } catch (Exception e) {
-            throw new ObjectException(PersistenceException.DATABASE_OPERATE_EXCEPTION, e);
+            throw new ObjectException(ObjectException.DATABASE_OPERATE_EXCEPTION, e);
         }
     }
 
