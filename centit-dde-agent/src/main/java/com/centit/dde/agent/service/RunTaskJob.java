@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 //@DisallowConcurrentExecution
 public class RunTaskJob extends AbstractQuartzJob {
-    private static ConcurrentHashMap<String, Boolean> runningTask = new ConcurrentHashMap<>(128);
+    private static final ConcurrentHashMap<String, Boolean> runningTask = new ConcurrentHashMap<>(128);
 
     public RunTaskJob() {
     }
