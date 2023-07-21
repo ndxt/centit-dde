@@ -23,6 +23,8 @@ import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.model.basedata.IOsInfo;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.CachedMap;
@@ -213,7 +215,12 @@ public class HttpTaskController extends BaseController {
             }
         }
         dataOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, params);
-        dataOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, WebOptUtils.getCurrentUserDetails(request));
+        CentitUserDetails userDetails = WebOptUtils.getCurrentUserDetails(request);
+        dataOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, userDetails);
+        IOsInfo osInfo = platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
+        dataOptContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
+        dataOptContext.setTopUnit(userDetails.getTopUnitCode());
+
         DataOptResult result = bizmodelService.runBizModel(dataPacketInterface, dataOptContext);
 
         if (result.getResultType() == DataOptResult.RETURN_FILE_STREAM) {

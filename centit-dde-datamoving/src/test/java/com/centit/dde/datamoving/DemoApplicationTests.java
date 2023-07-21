@@ -3,7 +3,7 @@ package com.centit.dde.datamoving;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.services.impl.TaskRun;
-import com.centit.support.database.utils.DatabaseAccess;
+import com.centit.support.database.utils.FieldType;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -28,10 +28,10 @@ public class DemoApplicationTests {
         jsObject.put("target","test");
         jsObject.put("operation","map");
         JSONObject jsonObject2 = new JSONObject();
-        jsonObject2.put("PACKET_ID", "strcat("+ DatabaseAccess.mapColumnNameToField("PACKET_ID")+",\'test\')");
-        jsonObject2.put("Owner_Type",DatabaseAccess.mapColumnNameToField("Owner_Type"));
-        jsonObject2.put("Owner_Code",DatabaseAccess.mapColumnNameToField("Owner_Code"));
-        jsonObject2.put("HAS_DATA_OPT",DatabaseAccess.mapColumnNameToField("HAS_DATA_OPT"));
+        jsonObject2.put("PACKET_ID", "strcat("+ FieldType.mapPropName("PACKET_ID")+",\'test\')");
+        jsonObject2.put("Owner_Type", FieldType.mapPropName("Owner_Type"));
+        jsonObject2.put("Owner_Code", FieldType.mapPropName("Owner_Code"));
+        jsonObject2.put("HAS_DATA_OPT", FieldType.mapPropName("HAS_DATA_OPT"));
         jsObject.put("fieldsMap",jsonObject2);
         jsObject.put("operation","filter");
         jsObject.put("filter","ownerType='D'");

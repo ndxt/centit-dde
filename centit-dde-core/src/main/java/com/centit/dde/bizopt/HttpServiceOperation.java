@@ -27,6 +27,7 @@ import com.centit.support.network.UrlOptUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -64,11 +65,12 @@ public class HttpServiceOperation implements BizOperation {
 
         //构建请求头数据
         Map<String, String> headers = new HashMap<>();
-
-        if (RequestThreadLocal.getLocalThreadWrapperRequest() != null) {
-            HttpSession session = RequestThreadLocal.getLocalThreadWrapperRequest().getSession();
+        HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
+        if (request != null) {
+            HttpSession session =request.getSession();
             headers.put(WebOptUtils.SESSION_ID_TOKEN, session == null ? null : session.getId());
         }
+
         HttpExecutorContext httpExecutorContext = getHttpClientContext(sourceInfo);
         if (sourceInfo.getExtProps() != null) {
             Map<String, String> extProps = CollectionsOpt.objectMapToStringMap(sourceInfo.getExtProps());

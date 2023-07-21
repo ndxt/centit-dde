@@ -1,10 +1,17 @@
 package com.centit.dde.datamoving;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.DataPacket;
+import com.centit.dde.adapter.utils.ConstantValue;
+import com.centit.dde.core.DataOptContext;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.fileserver.common.FileStore;
 import com.centit.fileserver.utils.OsFileStore;
+import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.model.basedata.IOsInfo;
+import com.centit.framework.security.model.JsonCentitUserDetails;
+import com.centit.framework.system.po.UserInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -40,7 +47,22 @@ public class DataMovingApplication {
         TaskRun taskRun = context.getBean(TaskRun.class);
         DataPacketService dataPacketService = context.getBean(DataPacketService.class);
         DataPacket dataPacket = dataPacketService.getDataPacket(args[0]);
-        taskRun.runTask(dataPacket, null);
+
+        PlatformEnvironment platformEnvironment = context.getBean(PlatformEnvironment.class);
+        DataOptContext optContext = new DataOptContext();
+        IOsInfo osInfo = platformEnvironment.getOsInfo(dataPacket.getOsId());
+        optContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
+        optContext.setTopUnit(osInfo.getTopUnit());
+        JsonCentitUserDetails userDetails = new JsonCentitUserDetails();
+        userDetails.setTopUnitCode(osInfo.getTopUnit());
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserCode("taskAgent");
+        userInfo.setUserName("定时任务");
+        userInfo.setTopUnit(osInfo.getTopUnit());
+        userInfo.setPrimaryUnit(osInfo.getTopUnit());
+        userDetails.setUserInfo(JSONObject.from(userInfo));
+        optContext.setStackData(ConstantValue.SESSION_DATA_TAG, userDetails);
+        taskRun.runTask(dataPacket, optContext);
         int exitCode = SpringApplication.exit(context, () -> 0);
         System.exit(exitCode);
     }

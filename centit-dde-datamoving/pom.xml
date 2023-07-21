@@ -20,6 +20,31 @@
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>database-metadata-rmdb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-rmdb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-core</artifactId>
+            <version>${centit.dde.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.centit.support</groupId>
+                    <artifactId>centit-es-client</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -80,17 +105,7 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-core</artifactId>
-            <version>${centit.dde.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.centit.support</groupId>
-                    <artifactId>centit-es-client</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+
     </dependencies>
 
     <build>

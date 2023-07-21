@@ -12,6 +12,8 @@ import com.centit.dde.services.TaskLogManager;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOsInfo;
+import com.centit.framework.security.model.JsonCentitUserDetails;
+import com.centit.framework.system.po.UserInfo;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import lombok.extern.slf4j.Slf4j;
@@ -53,24 +55,23 @@ public class TaskRun {
         DataOptContext optContext = new DataOptContext();
         IOsInfo osInfo = platformEnvironment.getOsInfo(dataPacket.getOsId());
         optContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
+        optContext.setTopUnit(osInfo.getTopUnit());
+        JsonCentitUserDetails userDetails = new JsonCentitUserDetails();
+        userDetails.setTopUnitCode(osInfo.getTopUnit());
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserCode("taskAgent");
+        userInfo.setUserName("定时任务");
+        userInfo.setTopUnit(osInfo.getTopUnit());
+        userInfo.setPrimaryUnit(osInfo.getTopUnit());
+        userDetails.setUserInfo(JSONObject.from(userInfo));
+        optContext.setStackData(ConstantValue.SESSION_DATA_TAG, userDetails);
         runTask(dataPacket, optContext);
     }
 
     public DataOptResult runTask(DataPacketInterface dataPacketInterface, DataOptContext optContext) {
         TaskLog taskLog = buildLogInfo(optContext, dataPacketInterface);
-
         optContext.setTaskLog(taskLog);
-
         try {
-            IOsInfo osInfo;
-            try {
-                osInfo = platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
-            } catch (Exception e){
-                osInfo=null;
-            }
-            if(osInfo!=null){
-               optContext.setTopUnit(osInfo.getTopUnit());
-            }
             DataOptResult runResult = runOptModule(dataPacketInterface, optContext);
             //更新API信息
             updateApiData(optContext.getRunType(), dataPacketInterface);
