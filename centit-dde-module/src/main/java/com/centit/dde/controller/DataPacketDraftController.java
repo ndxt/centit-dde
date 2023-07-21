@@ -52,6 +52,14 @@ public class DataPacketDraftController extends BaseController {
 
     private final DataPacketDraftService dataPacketDraftService;
 
+    /**
+     * 使用注解RecordOperationLog保存日志时必须提供optId属性
+     * @return 当前接口的id
+     */
+    public String getOptId (){
+        return "apiDesgin";
+    }
+
     @Autowired
     private DataPacketTemplateService dataPacketTemplateService;
 
