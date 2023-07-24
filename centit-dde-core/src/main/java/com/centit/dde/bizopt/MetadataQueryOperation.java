@@ -20,6 +20,7 @@ import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.security.DesensitizeOptUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +57,12 @@ public class MetadataQueryOperation implements BizOperation {
                 if(userDetails!=null) {
                     String currentUserCode = userDetails.getUserCode();
                     String topUnit = dataOptContext.getTopUnit();
+                    if(StringUtils.isBlank(topUnit)) {
+                        topUnit = bizModel.fetchTopUnit();
+                        if (StringUtils.isBlank(topUnit)) {
+                            topUnit = userDetails.getTopUnitCode();
+                        }
+                    }
                     List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,
                         currentUserCode, dataOptContext.getOptId(), "api");
 

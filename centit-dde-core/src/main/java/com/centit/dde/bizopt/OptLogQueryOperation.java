@@ -13,6 +13,7 @@ import com.centit.framework.model.basedata.OperationLog;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +57,10 @@ public class OptLogQueryOperation implements BizOperation {
         String osId = dataOptContext.getOsId();
         filterMap.put("osId",osId);
 
-        String topUnit = dataOptContext.getTopUnit();
+        String topUnit = bizModel.fetchTopUnit(); //  dataOptContext.getTopUnit();
+        if(StringUtils.isBlank(topUnit)){
+            topUnit = bizModel.fetchTopUnit();
+        }
         filterMap.put("topUnit",topUnit);
 
         if (optTag != null ) filterMap.put("optTag",optTag);

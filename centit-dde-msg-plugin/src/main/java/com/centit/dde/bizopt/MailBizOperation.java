@@ -16,6 +16,7 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
 import com.centit.support.security.SecurityOptUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
 
@@ -45,7 +46,11 @@ public class MailBizOperation implements BizOperation {
             messageManager.setEmailServerHost(sourceInfo.getDatabaseUrl());
             messageManager.setEmailServerUser(sourceInfo.getUsername());
             messageManager.setEmailServerPwd(SecurityOptUtils.decodeSecurityString(sourceInfo.getPassword()));
-            messageManager.setTopUnit(dataOptContext.getTopUnit());
+            String topUnit = dataOptContext.getTopUnit();
+            if(StringUtils.isBlank(topUnit)){
+                topUnit = bizModel.fetchTopUnit();
+            }
+            messageManager.setTopUnit(topUnit);
             messageManager.setUserEmailSupport(new SystemUserEmailSupport());
             ResponseData responseData= messageManager.sendMessage("system", optUsers,
                 NoticeMessage.create().operation(dataOptContext.getOsId()).method(dataOptContext.getOptId()).subject(subject)

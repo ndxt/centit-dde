@@ -77,6 +77,9 @@ public class SqlDataSetReader implements DataSetReader {
         QueryAndNamedParams qap = null;
         if (currentUserDetails != null) {
             String topUnit = dataOptContext.getTopUnit();
+            if(StringUtils.isBlank(topUnit)){
+                topUnit = currentUserDetails.getTopUnitCode();
+            }
             String userCode = currentUserDetails.getUserCode();
             if (StringUtils.isNotBlank(userCode)) {
                 List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, userCode, optId, "api");

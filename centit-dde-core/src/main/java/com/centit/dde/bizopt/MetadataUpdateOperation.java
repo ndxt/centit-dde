@@ -14,6 +14,7 @@ import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.common.ObjectException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,12 @@ public class MetadataUpdateOperation implements BizOperation {
         if(currentUserDetails!=null) {
             String currentUserCode = currentUserDetails.getUserCode();
             String topUnit = dataOptContext.getTopUnit();
+            if(StringUtils.isBlank(topUnit)) {
+                topUnit = bizModel.fetchTopUnit();
+                if (StringUtils.isBlank(topUnit)) {
+                    topUnit = currentUserDetails.getTopUnitCode();
+                }
+            }
             List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,
                 currentUserCode, dataOptContext.getOptId(), "api");
             if (filters != null && filters.size() > 0) {

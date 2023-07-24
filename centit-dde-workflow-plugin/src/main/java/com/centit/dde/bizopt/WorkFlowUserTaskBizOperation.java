@@ -57,7 +57,12 @@ public class WorkFlowUserTaskBizOperation implements BizOperation {
         String userCode = StringBaseOpt.castObjectToString(queryParam.get("userCode"));
         ResponseData responseData;
         Integer taskType = bizOptJson.getInteger("taskType");
-        queryParam.put("topUnit",dataOptContext.getTopUnit());
+
+        String topUnit = dataOptContext.getTopUnit();
+        if(StringUtils.isBlank(topUnit)){
+            topUnit = bizModel.fetchTopUnit();
+        }
+        queryParam.put("topUnit", topUnit);
         switch (taskType) {
             //静态待办
             case 1:
