@@ -214,15 +214,17 @@ public class HttpTaskController extends BaseController {
                 }
             }
         }
+
         dataOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, params);
-        CentitUserDetails userDetails = WebOptUtils.getCurrentUserDetails(request);
-        dataOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, userDetails);
         IOsInfo osInfo = platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
         dataOptContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
-        dataOptContext.setTopUnit(userDetails.getTopUnitCode());
+        CentitUserDetails userDetails = WebOptUtils.getCurrentUserDetails(request);
+        if(userDetails!=null) {
+            dataOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, userDetails);
+            dataOptContext.setTopUnit(userDetails.getTopUnitCode());
+        }
 
         DataOptResult result = bizmodelService.runBizModel(dataPacketInterface, dataOptContext);
-
         if (result.getResultType() == DataOptResult.RETURN_FILE_STREAM) {
             String fileName = result.getReturnFilename();
             InputStream in = result.getReturnFileStream();
