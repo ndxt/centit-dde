@@ -56,7 +56,7 @@ public class TaskRun {
         IOsInfo osInfo = platformEnvironment.getOsInfo(dataPacket.getOsId());
         optContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
         optContext.setTopUnit(osInfo.getTopUnit());
-        /*JsonCentitUserDetails userDetails = new JsonCentitUserDetails();
+        JsonCentitUserDetails userDetails = new JsonCentitUserDetails();
         userDetails.setTopUnitCode(osInfo.getTopUnit());
         UserInfo userInfo = new UserInfo();
         userInfo.setUserCode("taskAgent");
@@ -64,7 +64,7 @@ public class TaskRun {
         userInfo.setTopUnit(osInfo.getTopUnit());
         userInfo.setPrimaryUnit(osInfo.getTopUnit());
         userDetails.setUserInfo(JSONObject.from(userInfo));
-        optContext.setStackData(ConstantValue.SESSION_DATA_TAG, userDetails);*/
+        optContext.setStackData(ConstantValue.SESSION_DATA_TAG, userDetails);
         runTask(dataPacket, optContext);
     }
 
