@@ -1,13 +1,10 @@
 package com.centit.dde.agent;
 
 import com.centit.dde.agent.service.ContextUtils;
-import com.centit.framework.core.service.DataScopePowerManager;
-import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
 import com.centit.support.json.JSONOpt;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -29,8 +26,5 @@ public class AgentApplication {
         ConfigurableApplicationContext context = SpringApplication.run(AgentApplication.class, args);
         ContextUtils.setApplicationContext(context);
     }
-    @Bean
-    public DataScopePowerManager queryDataScopeFilter() {
-        return new DataScopePowerManagerImpl();
-    }
+
 }

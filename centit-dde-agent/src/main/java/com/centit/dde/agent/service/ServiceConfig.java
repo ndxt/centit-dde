@@ -1,6 +1,8 @@
 package com.centit.dde.agent.service;
 
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
+import com.centit.framework.core.service.DataScopePowerManager;
+import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import org.quartz.Scheduler;
@@ -13,12 +15,12 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
  * @author zhf
  */
 @Configuration
-public class QuartzConfig {
+public class ServiceConfig {
     private final PathConfig pathConfig;
 
 
     @Autowired
-    public QuartzConfig(PathConfig pathConfig) {
+    public ServiceConfig(PathConfig pathConfig) {
         this.pathConfig = pathConfig;
     }
 
@@ -43,5 +45,10 @@ public class QuartzConfig {
     @Bean("passwordEncoder")
     public StandardPasswordEncoderImpl passwordEncoder() {
         return  new StandardPasswordEncoderImpl();
+    }
+
+    @Bean
+    public DataScopePowerManager queryDataScopeFilter() {
+        return new DataScopePowerManagerImpl();
     }
 }
