@@ -26,8 +26,6 @@ public class DataRowVariableTranslate
         this.bizModelJSONTransform = new BizModelJSONTransform(bizModel);
     }
 
-
-
      /**
       * 默认返回业务模型对象的属性值 , request 队形的参数
       *变量名 -》变量值的转变

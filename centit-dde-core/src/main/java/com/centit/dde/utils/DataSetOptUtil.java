@@ -42,6 +42,7 @@ public abstract class DataSetOptUtil {
         extendFuncs.put("dict", (a) -> {
             String topUnit = WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest());
             String lang = WebOptUtils.getCurrentLang(RequestThreadLocal.getLocalThreadWrapperRequest());
+
             if (a != null && a.length > 1) {
                 String regex = ",";
                 String strData = StringBaseOpt.objectToString(a[1]);
