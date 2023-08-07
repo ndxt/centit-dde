@@ -136,6 +136,7 @@
             <artifactId>centit-ip-app-base-config</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-session-redis</artifactId>

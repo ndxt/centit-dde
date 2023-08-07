@@ -45,7 +45,6 @@ public class WebInitializer implements WebApplicationInitializer {
         druidWebStatFilter.addMappingForUrlPatterns(null, true,"/*");
         druidWebStatFilter.setInitParameter("exclusions","*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*");
 
-
         WebConfig.registerRequestContextListener(servletContext);
         WebConfig.registerSingleSignOutHttpSessionListener(servletContext);
         WebConfig.registerCharacterEncodingFilter(servletContext, servletUrlPatterns);
@@ -54,6 +53,5 @@ public class WebInitializer implements WebApplicationInitializer {
         WebConfig.registerRequestThreadLocalFilter(servletContext);
         WebConfig.registerSpringSecurityFilter(servletContext, servletUrlPatterns);
     }
-
 
 }
