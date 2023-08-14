@@ -91,13 +91,21 @@
             <artifactId>centit-dde-rmdb</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-workflow-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.dm</groupId>
             <artifactId>dmjdbc7</artifactId>
