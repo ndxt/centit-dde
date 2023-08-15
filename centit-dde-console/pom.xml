@@ -131,11 +131,6 @@
             <artifactId>centit-ip-dubbo-client-config</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-app-base-config</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>com.centit.framework</groupId>
