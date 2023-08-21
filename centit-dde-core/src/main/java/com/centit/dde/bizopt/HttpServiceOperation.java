@@ -79,9 +79,9 @@ public class HttpServiceOperation implements BizOperation {
         }
         httpExecutorContext.headers(headers);
         //获取请求参数
-        Map<String, Object> requestParams = getRequestParams(bizOptJson,bizModel);
-        //添加url中的参数
-        requestParams.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
+        Map<String, Object> requestParams = getRequestParams(bizOptJson, bizModel);
+        // 添加url中的参数 __request_params
+        // requestParams.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
         //请求方式
         String requestMode = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post");
         HttpReceiveJSON receiveJson = null;
