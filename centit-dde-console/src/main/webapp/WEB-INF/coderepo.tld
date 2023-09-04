@@ -48,7 +48,7 @@
         <description>get all vaild unit under an unitcode with the same unittype or 'A'</description>
         <name>SUBUNITS</name>
         <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
-        <function-signature>List&lt;com.centit.framework.model.basedata.IUnitInfo&gt;
+        <function-signature>List&lt;com.centit.framework.model.basedata.UnitInfo&gt;
             getSortedSubUnits(java.lang.String,java.lang.String)
         </function-signature>
     </function>
@@ -56,14 +56,14 @@
         <description>get all vaild unit under an unitcode include unvalid</description>
         <name>ALLUNITS</name>
         <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
-        <function-signature>Map&lt;java.lang.String,com.centit.framework.model.basedata.IUnitInfo&gt; getAllUnits(java.lang.String)
+        <function-signature>Map&lt;java.lang.String,com.centit.framework.model.basedata.UnitInfo&gt; getAllUnits(java.lang.String)
         </function-signature>
     </function>
     <function>
         <description>get all vaild unit under an unitcode recurse</description>
         <name>RECURSEUNITS</name>
         <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
-        <function-signature>Map&lt;java.lang.String,com.centit.framework.model.basedata.IUnitInfo&gt;
+        <function-signature>Map&lt;java.lang.String,com.centit.framework.model.basedata.UnitInfo&gt;
             getUnitMapBuyParaentRecurse(java.lang.String)
         </function-signature>
     </function>
@@ -71,7 +71,7 @@
         <description>get one dictionary's item by catalogcode</description>
         <name>DICTIONARY</name>
         <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
-        <function-signature>List&lt;com.centit.framework.model.basedata.IDataDictionary&gt; getDictionary(java.lang.String)
+        <function-signature>List&lt;com.centit.framework.model.basedata.DataDictionary&gt; getDictionary(java.lang.String)
         </function-signature>
     </function>
     <function>
@@ -84,47 +84,47 @@
         <description>get one dictionary's item by catalogcode ingore state eq 'D'</description>
         <name>DICTIONARY_D</name>
         <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
-        <function-signature>List&lt;com.centit.framework.model.basedata.IDataDictionary&gt; getDictionaryIgnoreD(java.lang.String)
+        <function-signature>List&lt;com.centit.framework.model.basedata.DataDictionary&gt; getDictionaryIgnoreD(java.lang.String)
         </function-signature>
     </function>
     <function>
         <description>get all user of one unit include not valid</description>
         <name>UNITUSER</name>
         <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
-        <function-signature>List&lt;com.centit.framework.model.basedata.IUserInfo&gt; getSortedUnitUsers(java.lang.String)
+        <function-signature>List&lt;com.centit.framework.model.basedata.UserInfo&gt; getSortedUnitUsers(java.lang.String)
         </function-signature>
     </function>
     <function>
         <description>get all user of one unit include not valid</description>
         <name>ALLUSER</name>
         <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
-        <function-signature>List&lt;com.centit.framework.model.basedata.IUserInfo&gt; getAllUsers(java.lang.String)</function-signature>
+        <function-signature>List&lt;com.centit.framework.model.basedata.UserInfo&gt; getAllUsers(java.lang.String)</function-signature>
     </function>
     <function>
         <description>get all vaild unit list</description>
         <name>UNITSLIST</name>
         <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
-        <function-signature>List&lt;java.lang.String,com.centit.framework.model.basedata.IUnitInfo&gt; getUnitList(java.lang.String)
+        <function-signature>List&lt;java.lang.String,com.centit.framework.model.basedata.UnitInfo&gt; getUnitList(java.lang.String)
         </function-signature>
     </function>
     <function>
         <description>get all optinfo by opttype</description>
         <name>OPTINFO</name>
         <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
-        <function-signature>List&lt;com.centit.framework.model.basedata.IOptInfo&gt; getOptinfoList(java.lang.String)</function-signature>
+        <function-signature>List&lt;com.centit.framework.model.basedata.OptInfo&gt; getOptinfoList(java.lang.String)</function-signature>
     </function>
     <function>
         <description>get all optdef by optid</description>
         <name>OPTDEF</name>
         <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
-        <function-signature>List&lt;com.centit.framework.model.basedata.IOptMethod&gt; getOptMethodByOptID(java.lang.String)
+        <function-signature>List&lt;com.centit.framework.model.basedata.OptMethod&gt; getOptMethodByOptID(java.lang.String)
         </function-signature>
     </function>
     <function>
         <description>get roleinfo list by prefix</description>
         <name>ROLEINFO</name>
         <function-class>com.centit.framework.components.CodeRepositoryUtil</function-class>
-        <function-signature>List&lt;com.centit.framework.model.basedata.IRoleInfo&gt; getRoleinfoList(java.lang.String)
+        <function-signature>List&lt;com.centit.framework.model.basedata.RoleInfo&gt; getRoleinfoList(java.lang.String)
         </function-signature>
     </function>
 

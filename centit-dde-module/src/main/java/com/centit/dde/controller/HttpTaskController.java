@@ -23,8 +23,8 @@ import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.model.basedata.IOsInfo;
-import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.model.basedata.OsInfo;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.CachedMap;
@@ -216,7 +216,7 @@ public class HttpTaskController extends BaseController {
         }
 
         dataOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, params);
-        IOsInfo osInfo = platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
+        OsInfo osInfo = platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
         dataOptContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
         CentitUserDetails userDetails = WebOptUtils.getCurrentUserDetails(request);
         if(userDetails!=null) {

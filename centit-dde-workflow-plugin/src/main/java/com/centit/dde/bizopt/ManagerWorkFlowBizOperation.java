@@ -7,7 +7,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.service.FlowManager;

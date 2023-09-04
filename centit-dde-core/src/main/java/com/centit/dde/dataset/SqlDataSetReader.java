@@ -8,7 +8,7 @@ import com.centit.dde.core.DataSetReader;
 import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.core.service.DataScopePowerManager;
-import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.product.metadata.api.ISourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.algorithm.NumberBaseOpt;

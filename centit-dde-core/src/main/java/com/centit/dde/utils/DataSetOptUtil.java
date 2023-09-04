@@ -10,8 +10,8 @@ import com.centit.dde.dataset.FileDataSet;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
-import com.centit.framework.model.basedata.IDataDictionary;
-import com.centit.framework.security.model.StandardPasswordEncoderImpl;
+import com.centit.framework.model.basedata.DataDictionary;
+import com.centit.framework.security.StandardPasswordEncoderImpl;
 import com.centit.search.utils.TikaTextExtractor;
 import com.centit.support.algorithm.*;
 import com.centit.support.compiler.ObjectTranslate;
@@ -57,7 +57,7 @@ public abstract class DataSetOptUtil {
                         dictField = "auto";
                     }
                 }
-                IDataDictionary dataPiece;
+                DataDictionary dataPiece;
                 for (String tempStr : strings) {
                     String str = tempStr.trim();
                     String value = null;

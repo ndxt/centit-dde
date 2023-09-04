@@ -7,7 +7,7 @@ import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.model.adapter.UserUnitFilterCalcContextFactory;
-import com.centit.framework.security.model.StandardPasswordEncoderImpl;
+import com.centit.framework.security.StandardPasswordEncoderImpl;
 import com.centit.workflow.service.impl.SystemUserUnitCalcContextFactoryImpl;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;

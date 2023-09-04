@@ -4,8 +4,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.model.basedata.IOsInfo;
-import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.model.basedata.OsInfo;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
@@ -48,8 +48,8 @@ public class BizModel implements  Serializable {
 
     public String fetchTopUnit(){
         Object appObj = this.getStackData(ConstantValue.APPLICATION_INFO_TAG);
-        if (appObj instanceof IOsInfo) {
-            return ((IOsInfo)appObj).getTopUnit();
+        if (appObj instanceof OsInfo) {
+            return ((OsInfo)appObj).getTopUnit();
         }
 
         Object userObj = this.getStackData(ConstantValue.SESSION_DATA_TAG);

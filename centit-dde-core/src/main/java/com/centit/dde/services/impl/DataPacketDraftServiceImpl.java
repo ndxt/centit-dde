@@ -7,8 +7,8 @@ import com.centit.dde.adapter.po.DataPacketDraft;
 import com.centit.dde.adapter.po.DataPacketParam;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.model.basedata.IOptMethod;
-import com.centit.framework.system.po.OptMethod;
+import com.centit.framework.model.basedata.OptMethod;
+import com.centit.framework.model.basedata.OptMethod;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.database.utils.PageDesc;
@@ -54,7 +54,7 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
     private String mergeApiOptMethod(DataPacketDraft dataPacket) {
         OptMethod result = assemblyOptMethodGet(dataPacket);
         if (platformEnvironment != null && result != null) {
-            IOptMethod iOptMethod = platformEnvironment.mergeOptMethod(result);
+            OptMethod iOptMethod = platformEnvironment.mergeOptMethod(result);
             return iOptMethod==null?null:iOptMethod.getOptCode();
         }
         return null;

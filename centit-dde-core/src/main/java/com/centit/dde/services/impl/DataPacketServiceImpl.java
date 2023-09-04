@@ -4,7 +4,7 @@ import com.centit.dde.adapter.dao.DataPacketDao;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
 import com.centit.framework.components.CodeRepositoryUtil;
-import com.centit.framework.model.basedata.IOptInfo;
+import com.centit.framework.model.basedata.OptInfo;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
@@ -72,7 +72,7 @@ public class DataPacketServiceImpl implements DataPacketService {
     }
 
     private String getOptIdWithCommon(String optId, String topUnit) {
-        IOptInfo commonOptInfo = CodeRepositoryUtil.getCommonOptId(topUnit, optId);
+        OptInfo commonOptInfo = CodeRepositoryUtil.getCommonOptId(topUnit, optId);
         if (commonOptInfo != null) {
             String commonOptId = commonOptInfo.getOptId();
             return StringBaseOpt.concat(optId, ",", commonOptId);

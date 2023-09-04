@@ -2,7 +2,7 @@ package com.centit.dde.core;
 
 import com.centit.dde.adapter.po.TaskLog;
 import com.centit.dde.adapter.utils.ConstantValue;
-import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.common.ObjectException;
 import lombok.Data;
 

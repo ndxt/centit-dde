@@ -11,8 +11,8 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.components.SysUserFilterEngine;
 import com.centit.framework.components.impl.UserUnitMapTranslate;
-import com.centit.framework.model.basedata.IUserInfo;
-import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.model.basedata.UserInfo;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.compiler.Pretreatment;
 import org.apache.commons.text.StringEscapeUtils;
@@ -53,9 +53,9 @@ public class UserFilterOperation implements BizOperation {
                 new UserUnitMapTranslate() );
         }
 
-        List<IUserInfo> retUsers = CodeRepositoryUtil.getUserInfosByCodes(bizModel.fetchTopUnit(), users);
-        List<IUserInfo> lsUserInfo = new ArrayList<>(retUsers.size() + 1);
-        for (IUserInfo ui : retUsers) {
+        List<UserInfo> retUsers = CodeRepositoryUtil.getUserInfosByCodes(bizModel.fetchTopUnit(), users);
+        List<UserInfo> lsUserInfo = new ArrayList<>(retUsers.size() + 1);
+        for (UserInfo ui : retUsers) {
             if ("T".equals(ui.getIsValid())) {
                 lsUserInfo.add(ui);
             }

@@ -11,12 +11,12 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.product</groupId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
     <artifactId>centit-dde-agent</artifactId>
 
     <properties>
-        <centit.dde.version>5.3-SNAPSHOT</centit.dde.version>
-        <common.module.version>5.3-SNAPSHOT</common.module.version>
+        <centit.dde.version>5.4-SNAPSHOT</centit.dde.version>
+        <common.module.version>5.4-SNAPSHOT</common.module.version>
         <elasticsearch.version>7.17.9</elasticsearch.version>
     </properties>
 
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-module</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.logging.log4j</groupId>

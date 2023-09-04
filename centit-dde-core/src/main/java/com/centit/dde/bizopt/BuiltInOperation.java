@@ -9,8 +9,9 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
 import com.centit.framework.components.CodeRepositoryUtil;
-import com.centit.framework.model.basedata.IUserUnit;
-import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.model.basedata.UserInfo;
+import com.centit.framework.model.basedata.UserUnit;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -78,7 +79,7 @@ public abstract class BuiltInOperation {
             return dpf;
         }
         CentitUserDetails userDetails = (CentitUserDetails)ud;
-        JSONObject userInfo = userDetails.getUserInfo();
+        UserInfo userInfo = userDetails.getUserInfo();
         String userCode =  userDetails.getUserCode();
         String topUnit = userDetails.getTopUnitCode();
         //当前用户信息
@@ -86,28 +87,28 @@ public abstract class BuiltInOperation {
         dpf.put("currentStation", userDetails.getCurrentStation());
         //当前用户主机构信息
         dpf.put("primaryUnit", CodeRepositoryUtil
-            .getUnitInfoByCode(userDetails.getUserInfo().getString("topUnit"),
-                userDetails.getUserInfo().getString("primaryUnit")));
+            .getUnitInfoByCode(userDetails.getUserInfo().getTopUnit(),
+                userDetails.getUserInfo().getPrimaryUnit()));
         //当前用户的角色信息
         dpf.put("userRoles", userDetails.getUserRoles());
 
         //当前用户所有机构关联关系信息
         if (StringUtils.isNotBlank(userCode)) {
-            List<? extends IUserUnit> userUnits = CodeRepositoryUtil
+            List<UserUnit> userUnits = CodeRepositoryUtil
                 .listUserUnits(topUnit, userCode);
             if (userUnits != null) {
                 dpf.put("userUnits", userUnits);
-                Map<String, List<IUserUnit>> rankUnits = new HashMap<>(5);
-                Map<String, List<IUserUnit>> stationUnits = new HashMap<>(5);
-                for (IUserUnit uu : userUnits) {
-                    List<IUserUnit> rankUnit = rankUnits.get(uu.getUserRank());
+                Map<String, List<UserUnit>> rankUnits = new HashMap<>(5);
+                Map<String, List<UserUnit>> stationUnits = new HashMap<>(5);
+                for (UserUnit uu : userUnits) {
+                    List<UserUnit> rankUnit = rankUnits.get(uu.getUserRank());
                     if (rankUnit == null) {
                         rankUnit = new ArrayList<>(4);
                     }
                     rankUnit.add(uu);
                     rankUnits.put(uu.getUserRank(), rankUnit);
 
-                    List<IUserUnit> stationUnit = stationUnits.get(uu.getUserStation());
+                    List<UserUnit> stationUnit = stationUnits.get(uu.getUserStation());
                     if (stationUnit == null) {
                         stationUnit = new ArrayList<>(4);
                     }

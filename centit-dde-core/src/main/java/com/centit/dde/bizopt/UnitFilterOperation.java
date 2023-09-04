@@ -11,8 +11,8 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.components.SysUnitFilterEngine;
 import com.centit.framework.components.impl.UserUnitMapTranslate;
-import com.centit.framework.model.basedata.IUnitInfo;
-import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.model.basedata.UnitInfo;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.compiler.Pretreatment;
 import org.apache.commons.lang3.StringUtils;
@@ -49,7 +49,7 @@ public class UnitFilterOperation implements BizOperation {
             );
         }
 
-        List<IUnitInfo> retUntis = CodeRepositoryUtil.getUnitInfosByCodes(topUnit, units);
+        List<UnitInfo> retUntis = CodeRepositoryUtil.getUnitInfosByCodes(topUnit, units);
         CollectionsOpt.sortAsTree(retUntis,
             ( p,  c) -> StringUtils.equals(p.getUnitCode(),c.getParentUnit()) );
         bizModel.putDataSet(bizOptJson.getString("id"),new DataSet(retUntis));

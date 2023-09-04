@@ -9,7 +9,7 @@ import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.model.basedata.IOsInfo;
+import com.centit.framework.model.basedata.OsInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
 import org.apache.commons.codec.binary.Hex;
@@ -182,7 +182,7 @@ public class TaskSchedulers {
                         TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
                         DataOptContext dataOptContext = new DataOptContext();
                         if (platformEnvironment != null){
-                            IOsInfo osInfo = platformEnvironment.getOsInfo(dataPacket.getOsId());
+                            OsInfo osInfo = platformEnvironment.getOsInfo(dataPacket.getOsId());
                             dataOptContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
                         }
 

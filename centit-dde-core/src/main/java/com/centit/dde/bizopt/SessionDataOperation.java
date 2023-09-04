@@ -8,7 +8,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.ReflectionOpt;
 
 import java.util.HashMap;
@@ -19,11 +19,12 @@ public class SessionDataOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");
         JSONArray config = bizOptJson.getJSONArray("config");
-        CentitUserDetails currentUserDetails = (CentitUserDetails)bizModel.getDataSet(ConstantValue.SESSION_DATA_TAG);
+        CentitUserDetails currentUserDetails = (CentitUserDetails)
+            bizModel.getDataSet(ConstantValue.SESSION_DATA_TAG).getData();
         // 这个本来就不应该有 userPin
-        if(currentUserDetails != null && currentUserDetails.getUserInfo() != null) {
-            currentUserDetails.getUserInfo().remove("userPin");
-        }
+        //if(currentUserDetails != null && currentUserDetails.getUserInfo() != null) {
+        //    currentUserDetails.getUserInfo().remove("userPin");
+        //}
 
         if (config == null || config.size() == 0){
             bizModel.putDataSet(id, new DataSet(currentUserDetails));

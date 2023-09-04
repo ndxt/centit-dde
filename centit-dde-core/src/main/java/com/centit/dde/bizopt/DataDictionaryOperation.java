@@ -7,7 +7,7 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.components.CodeRepositoryUtil;
-import com.centit.framework.model.basedata.IDataDictionary;
+import com.centit.framework.model.basedata.DataDictionary;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -28,15 +28,15 @@ public class DataDictionaryOperation implements BizOperation {
         String startCode = bizOptJson.getString("startCode");
         int levels = NumberBaseOpt.castObjectToInteger(bizOptJson.get("levels"), -1);
 
-        List<? extends IDataDictionary> dicts = CodeRepositoryUtil.getDictionary(catalog);
+        List<DataDictionary> dicts = CodeRepositoryUtil.getDictionary(catalog);
         if(asTree) {
             if(StringUtils.isNotBlank(startCode)){
-                TreeNode<? extends IDataDictionary> treeNode =
+                TreeNode<DataDictionary> treeNode =
                     CollectionsOpt.fetchTreeBranch( dicts, (b) -> StringUtils.equals(startCode , b.getDataCode()) ,
                     (p, c) -> StringUtils.equals(p.getDataCode(), c.getExtraCode()), levels);
                 bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(treeNode.toJSONObject()));
             } else {
-                List<? extends TreeNode<? extends IDataDictionary>> dataAsTree = CollectionsOpt.storedAsTree(dicts,
+                List<? extends TreeNode<DataDictionary>> dataAsTree = CollectionsOpt.storedAsTree(dicts,
                     (p, c) -> StringUtils.equals(p.getDataCode(), c.getExtraCode()));
                 bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(TreeNode.toJSONArray(dataAsTree)));
             }
