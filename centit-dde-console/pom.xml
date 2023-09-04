@@ -127,6 +127,18 @@
         </dependency>
 
         <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-workflow-dubbo-client-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>fileserver-dubbo-client-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-session-redis</artifactId>
         </dependency>
@@ -146,11 +158,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>centit-workflow-dubbo-client-config</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>rmdb-opt-log</artifactId>

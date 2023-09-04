@@ -1,14 +1,9 @@
 package com.centit.dde.config;
 
-
 import com.alibaba.nacos.api.annotation.NacosProperties;
 import com.alibaba.nacos.spring.context.annotation.config.EnableNacosConfig;
 import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySource;
 import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySources;
-import com.centit.fileserver.client.FileClient;
-import com.centit.fileserver.client.FileClientImpl;
-import com.centit.fileserver.client.FileInfoOptClient;
-import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.config.SpringSecurityDaoConfig;
 import com.centit.framework.core.service.DataScopePowerManager;
@@ -29,7 +24,6 @@ import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
 
 /**
  * @author zhf
@@ -124,27 +118,4 @@ public class ServiceConfig {
         return new DataScopePowerManagerImpl();
     }
 
-
-//    @Bean
-//    @Lazy(value = false)
-//    public OperationLogWriter operationLogWriter() {
-//        TextOperationLogWriterImpl operationLog = new TextOperationLogWriterImpl();
-//        operationLog.setOptLogHomePath(appHome + "/logs");
-//        operationLog.init();
-//        return operationLog;
-//    }
-
-    @Bean
-    public FileClient fileClient() {
-        FileClientImpl fileClient = new FileClientImpl();
-        fileClient.init(fileserver, fileserver, "u0000000", "000000", fileserver);
-        return fileClient;
-    }
-
-    @Bean
-    public FileInfoOpt fileInfoOpt(@Autowired FileClient fileClient) {
-        FileInfoOptClient fileStoreBean = new FileInfoOptClient();
-        fileStoreBean.setFileClient(fileClient);
-        return fileStoreBean;
-    }
 }
