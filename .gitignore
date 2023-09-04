@@ -4,5 +4,7 @@ target
 *.iml
 web/
 .settings/*
+.vscode
 D:
 /D:
+
