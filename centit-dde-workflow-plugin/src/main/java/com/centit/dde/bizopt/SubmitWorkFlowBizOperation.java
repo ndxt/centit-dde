@@ -33,26 +33,26 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
         String id = bizOptJson.getString("id");
-        String nodeInstId = bizOptJson.getString("nodeInstId");
-        String unitCode = bizOptJson.getString("unitCode");
-        String userCode = bizOptJson.getString("userCode");
-        if (StringUtils.isBlank(nodeInstId)) {
+        String nodeInstIdDesc = bizOptJson.getString("nodeInstId");
+        String unitCodeDesc = bizOptJson.getString("unitCode");
+        String userCodeDesc = bizOptJson.getString("userCode");
+        if (StringUtils.isBlank(nodeInstIdDesc)) {
             return ResponseData.makeErrorMessage(500, "nodeInstId不能为空！");
         }
-        if (StringUtils.isBlank(unitCode)) {
+        if (StringUtils.isBlank(unitCodeDesc)) {
             return ResponseData.makeErrorMessage(500, "unitCode不能为空！");
         }
-        if (StringUtils.isBlank(userCode)) {
+        if (StringUtils.isBlank(userCodeDesc)) {
             return ResponseData.makeErrorMessage(500, "userCode不能为空！");
         }
         SubmitOptOptions submitOptOptions = SubmitOptOptions.create();
         BizModelJSONTransform bizModelJSONTransform = new BizModelJSONTransform(bizModel);
-        String nodeInstIdFormula = StringBaseOpt.castObjectToString(JSONTransformer.transformer(nodeInstId, bizModelJSONTransform));
-        String unitCodeFormula = StringBaseOpt.castObjectToString(JSONTransformer.transformer(unitCode, bizModelJSONTransform));
-        String userCodeFormula = StringBaseOpt.castObjectToString(JSONTransformer.transformer(userCode, bizModelJSONTransform));
-        submitOptOptions.setNodeInstId(nodeInstIdFormula);
-        submitOptOptions.setUnitCode(unitCodeFormula);
-        submitOptOptions.setUserCode(userCodeFormula);
+        String nodeInstId = StringBaseOpt.castObjectToString(JSONTransformer.transformer(nodeInstIdDesc, bizModelJSONTransform));
+        String unitCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(unitCodeDesc, bizModelJSONTransform));
+        String userCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(userCodeDesc, bizModelJSONTransform));
+        submitOptOptions.setNodeInstId(nodeInstId);
+        submitOptOptions.setUnitCode(unitCode);
+        submitOptOptions.setUserCode(userCode);
         //根据表达式获取流程变量信息
         //根据表达式    获取流程变量信息(非必填参数)
         JSONArray flowVariables = bizOptJson.getJSONArray("flowVariables");
