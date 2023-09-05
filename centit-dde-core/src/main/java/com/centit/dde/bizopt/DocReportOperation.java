@@ -38,13 +38,12 @@ public class DocReportOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
-        String filePath = bizOptJson.getString("fileId");
+        String fileId = bizOptJson.getString("fileId");
         String fileName = Pretreatment.mapTemplateString(
             BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()),
             new BizModelJSONTransform(bizModel)) + ".pdf";
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName");
-        ByteArrayInputStream in = generateWord(bizModel, filePath, params);
-
+        ByteArrayInputStream in = generateWord(bizModel, fileId, params);
         FileDataSet dataSet =new FileDataSet(fileName,
             -1, word2Pdf(in));
 
@@ -100,11 +99,11 @@ public class DocReportOperation implements BizOperation {
         }
     }
 
-    private ByteArrayInputStream generateWord(BizModel dataModel, String filePath, Map<String, String> params) throws Exception {
+    private ByteArrayInputStream generateWord(BizModel dataModel, String fileId, Map<String, String> params) throws Exception {
         JSONObject docData = dataModel.toJsonObject(false);
         // 准备图片元数据
         FieldsMetadata metadata = getFieldsMetadata(params, docData);
-        try (InputStream in = new FileInputStream(fileInfoOpt.getFile(filePath))) {
+        try (InputStream in = new FileInputStream(fileInfoOpt.getFile(fileId))) {
             // 1) Load ODT file and set Velocity template engine and cache it to the registry
             IXDocReport report = XDocReportRegistry.getRegistry().loadReport(in, TemplateEngineKind.Freemarker, false);
             // 2) Create Java model context
