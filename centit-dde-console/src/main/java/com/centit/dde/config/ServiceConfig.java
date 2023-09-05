@@ -4,6 +4,9 @@ import com.alibaba.nacos.api.annotation.NacosProperties;
 import com.alibaba.nacos.spring.context.annotation.config.EnableNacosConfig;
 import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySource;
 import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySources;
+import com.centit.fileserver.client.FileClientImpl;
+import com.centit.fileserver.client.FileInfoOptClient;
+import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.config.SpringSecurityDaoConfig;
 import com.centit.framework.core.service.DataScopePowerManager;
@@ -116,6 +119,15 @@ public class ServiceConfig {
     @Bean
     public DataScopePowerManager queryDataScopeFilter() {
         return new DataScopePowerManagerImpl();
+    }
+
+    @Bean
+    public FileInfoOpt fileInfoOpt() {
+        FileClientImpl fileClient = new FileClientImpl();
+        fileClient.init(fileserver, fileserver, "u0000000", "000000", fileserver);
+        FileInfoOptClient fileStoreBean = new FileInfoOptClient();
+        fileStoreBean.setFileClient(fileClient);
+        return fileStoreBean;
     }
 
 }
