@@ -20,6 +20,8 @@ import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.operationlog.RecordOperationLog;
+import com.centit.product.oa.team.utils.ResourceBaseController;
+import com.centit.product.oa.team.utils.ResourceLock;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
@@ -47,7 +49,7 @@ import java.util.Map;
 @Api(value = "未发布API网关接口管理", tags = "未发布API网关接口管理")
 @RestController
 @RequestMapping(value = "packetDraft")
-public class DataPacketDraftController extends BaseController {
+public class DataPacketDraftController extends ResourceBaseController {
 
 
     private final DataPacketDraftService dataPacketDraftService;
@@ -245,6 +247,9 @@ public class DataPacketDraftController extends BaseController {
     @WrapUpResponseBody
     public void updateDataPacketOpt(@PathVariable String packetId,
                                     @RequestBody String dataOptDescJson, HttpServletRequest request) {
+        //检查资源
+        ResourceLock.lockResource(packetId, WebOptUtils.getCurrentUserCode(request));
+
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
