@@ -2,6 +2,7 @@ package com.centit.dde.agent.service;
 
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.services.impl.TaskRun;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.quartz.AbstractQuartzJob;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -36,7 +37,7 @@ public class RunTaskJob extends AbstractQuartzJob {
         DataPacket dataPacket = (DataPacket) paramMap.get("taskExchange");
 
         PathConfig pathConfig = ContextUtils.getBean(PathConfig.class);
-        boolean userMoving = "true".equalsIgnoreCase(pathConfig.getUseDataMoving());
+        boolean userMoving = BooleanBaseOpt.castObjectToBoolean(pathConfig.getUseDataMoving(), false);
 
         if (userMoving) {
             try {
