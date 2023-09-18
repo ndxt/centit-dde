@@ -17,6 +17,7 @@ import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.security.DesensitizeOptUtils;
@@ -110,7 +111,7 @@ public class MetadataQueryOperation implements BizOperation {
                 bizModel.putDataSet(id, dataSet);
                 return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
-        return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
+        return BuiltInOperation.createResponseData(0, 1, ObjectException.DATA_VALIDATE_ERROR,
             "配置信息不正确，未知查询类型！");
     }
 }

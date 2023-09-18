@@ -18,9 +18,11 @@ import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.compiler.VariableTranslate;
+import com.centit.support.database.utils.QueryUtils;
 import com.centit.support.file.FileIOOpt;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.StatUtils;
 
@@ -961,8 +963,25 @@ public abstract class DataSetOptUtil {
         } else {
             //数据集参数
             String source = bizOptJson.getString("source");
-            DataSet dataSet = bizModel.getDataSet(StringUtils.isBlank(source)?ConstantValue.REQUEST_PARAMS_TAG:source);
-            parames = dataSet.getFirstRow(); //数据集
+            if(StringUtils.isBlank(source)){
+                parames = CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)); //数据集
+            } else {
+                DataSet dataSet = bizModel.getDataSet(StringUtils.isBlank(source) ? ConstantValue.REQUEST_PARAMS_TAG : source);
+                parames = new HashMap<>();
+                for (Map.Entry<String, Object> ent : dataSet.getFirstRow().entrySet()) {
+                    Object paramValue = ent.getValue();
+                    String pretreatmentSql = ent.getKey();
+
+                    ImmutableTriple<String, String, String> paramDesc = QueryUtils.parseParameter(pretreatmentSql);
+                    String pretreatment = paramDesc.getRight();
+                    String valueName = StringUtils.isBlank(paramDesc.getMiddle()) ? paramDesc.getLeft() : paramDesc.getMiddle();
+
+                    if(StringUtils.isNotBlank(pretreatment)){
+                        paramValue = QueryUtils.pretreatParameter(pretreatment, paramValue);
+                    }
+                    parames.put(valueName, paramValue);
+                }
+            }
         }
         return parames;
     }
