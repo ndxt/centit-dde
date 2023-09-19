@@ -72,10 +72,21 @@ public class HttpServiceOperation implements BizOperation {
         }
 
         HttpExecutorContext httpExecutorContext = getHttpClientContext(sourceInfo);
+
         if (sourceInfo.getExtProps() != null) {
             Map<String, String> extProps = CollectionsOpt.objectMapToStringMap(sourceInfo.getExtProps());
-            headers.putAll(extProps);
-            headers.remove("SSL");
+            for(Map.Entry<String, String> ent : extProps.entrySet()) {
+                if(StringUtils.equalsAnyIgnoreCase(ent.getKey(),
+                    "Content-Type", "Accept", "Accept-Encoding", "Accept-Language", "Connection",
+                    "Host", "User-Agent", "Cache-Control", "Date", "Pragma",
+                    "Trailer", "Transfer-Encoding", "Via", "Referer", "Cookie")) {
+                    headers.put(ent.getKey(), ent.getValue());
+                }
+            }
+        }
+        Map<String, Object> localHeaders = getRequestParams(bizOptJson, bizModel, "headList", "headName", "headValue");
+        if(localHeaders != null && localHeaders.size()>0){
+            headers.putAll(CollectionsOpt.objectMapToStringMap(localHeaders));
         }
         httpExecutorContext.headers(headers);
         //获取请求参数
@@ -142,10 +153,9 @@ public class HttpServiceOperation implements BizOperation {
         return HttpExecutorContext.create();
     }
 
-    //计算请求参数列表中的参数
-    private Map<String, Object> getRequestParams(JSONObject bizOptJson,BizModel bizModel) {
+    private Map<String, Object> getRequestParams(JSONObject bizOptJson,BizModel bizModel, String parameterName, String key, String value) {
         //请求参数列表
-        Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "urlname", "urlValue");
+        Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray(parameterName), key, value);
         Map<String, Object> mapObject = new HashMap<>();
         if (params != null) {
             BizModelJSONTransform jsonTransform=new BizModelJSONTransform(bizModel);
@@ -156,6 +166,10 @@ public class HttpServiceOperation implements BizOperation {
             }
         }
         return mapObject;
+    }
+    //计算请求参数列表中的参数
+    private Map<String, Object> getRequestParams(JSONObject bizOptJson,BizModel bizModel) {
+        return getRequestParams(bizOptJson, bizModel, "parameterList", "urlname", "urlValue");
     }
 
     private Object getRequestBody(JSONObject bizOptJson, BizModel bizModel) {
