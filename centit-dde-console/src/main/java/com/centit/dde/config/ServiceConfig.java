@@ -84,21 +84,24 @@ public class ServiceConfig {
     @Bean
     public ImagePdfTextExtractor.OcrServerHost ocrServerHost() {
         ImagePdfTextExtractor.OcrServerHost ocrServer = ImagePdfTextExtractor.fetchDefaultOrrServer();
-        String stemp = env.getProperty("ocr.server.author.url");
-        if(StringUtils.isNotBlank(stemp)){
-            ocrServer.setAuthorUrl(stemp);
-        }
-        stemp = env.getProperty("ocr.server.recognition.url");
-        if(StringUtils.isNotBlank(stemp)){
-            ocrServer.setOrcUrl(stemp);
-        }
-        stemp = env.getProperty("ocr.server.author.username");
-        if(StringUtils.isNotBlank(stemp)){
-            ocrServer.setUserName(stemp);
-        }
-        stemp = env.getProperty("ocr.server.author.password");
-        if(StringUtils.isNotBlank(stemp)){
-            ocrServer.setPassword(stemp);
+        String ocrServerHost = env.getProperty("ocr.server.url");
+        if(StringUtils.isNotBlank(ocrServerHost)) {
+            String stemp = env.getProperty("ocr.server.auth.api");
+            if (StringUtils.isNotBlank(stemp)) {
+                ocrServer.setAuthorUrl(ocrServerHost + stemp);
+            }
+            stemp = env.getProperty("ocr.server.ocr.api");
+            if (StringUtils.isNotBlank(stemp)) {
+                ocrServer.setOrcUrl(ocrServerHost + stemp);
+            }
+            stemp = env.getProperty("ocr.server.auth.username");
+            if (StringUtils.isNotBlank(stemp)) {
+                ocrServer.setUserName(stemp);
+            }
+            stemp = env.getProperty("ocr.server.auth.password");
+            if (StringUtils.isNotBlank(stemp)) {
+                ocrServer.setPassword(stemp);
+            }
         }
         return ocrServer;
     }
