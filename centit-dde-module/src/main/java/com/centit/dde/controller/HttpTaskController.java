@@ -216,6 +216,12 @@ public class HttpTaskController extends BaseController {
         }
 
         dataOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, params);
+
+        Map<String, String> cookies = WebOptUtils.fetchRequestCookies(request);
+        if(cookies!=null){
+            dataOptContext.setStackData(ConstantValue.REQUEST_COOKIES_TAG, cookies);
+        }
+        //request.getCookies().
         OsInfo osInfo = platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
         dataOptContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
         CentitUserDetails userDetails = WebOptUtils.getCurrentUserDetails(request);
