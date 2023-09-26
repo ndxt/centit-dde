@@ -12,11 +12,10 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.appclient.HttpReceiveJSON;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.common.WebOptUtils;
-import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
@@ -27,8 +26,6 @@ import com.centit.support.network.UrlOptUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,11 +62,12 @@ public class HttpServiceOperation implements BizOperation {
 
         //构建请求头数据
         Map<String, String> headers = new HashMap<>();
+        /* 这个不能使用这个  x-auth-token ; 感觉不合理
         HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
         if (request != null) {
-            HttpSession session =request.getSession();
+            HttpSession session = request.getSession();
             headers.put(WebOptUtils.SESSION_ID_TOKEN, session == null ? null : session.getId());
-        }
+        }*/
 
         HttpExecutorContext httpExecutorContext = getHttpClientContext(sourceInfo);
 
@@ -84,13 +82,44 @@ public class HttpServiceOperation implements BizOperation {
                 }
             }
         }
+
+        boolean inheritHeader = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("inheritHeader"), false);
+        if(inheritHeader){
+            Map<String, String> parentHeaders = (Map<String, String>) dataOptContext.getStackData(ConstantValue.REQUEST_HEADERS_TAG);
+            if(parentHeaders!=null)
+                headers.putAll(parentHeaders);
+        }
+
         Map<String, Object> localHeaders = getRequestParams(bizOptJson, bizModel, "headList", "headName", "headValue");
         if(localHeaders != null && localHeaders.size()>0){
             headers.putAll(CollectionsOpt.objectMapToStringMap(localHeaders));
         }
         httpExecutorContext.headers(headers);
+
+        //构建请求cookies
+        Map<String, String> cookies = new HashMap<>();
+        boolean inheritCookies = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("inheritCookie"), false);
+        if(inheritCookies){
+            Map<String, String> parentCookies = (Map<String, String>) dataOptContext.getStackData(ConstantValue.REQUEST_COOKIES_TAG);
+            if(parentCookies!=null)
+                cookies.putAll(parentCookies);
+        }
+
+        Map<String, Object> localCookiess = getRequestParams(bizOptJson, bizModel, "cookieList", "cookieName", "cookieValue");
+        if(localCookiess != null && localCookiess.size()>0){
+            cookies.putAll(CollectionsOpt.objectMapToStringMap(localCookiess));
+        }
+        httpExecutorContext.cookies(cookies);
+
         //获取请求参数
         Map<String, Object> requestParams = getRequestParams(bizOptJson, bizModel);
+        boolean inheritParams = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("inheritParameter"), false);
+        if(inheritParams){
+            requestParams = CollectionsOpt.unionTwoMap(requestParams, (Map<String, Object>)
+                    dataOptContext.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
+        }
+
+
         // 添加url中的参数 __request_params
         // requestParams.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
         //请求方式
@@ -153,7 +182,7 @@ public class HttpServiceOperation implements BizOperation {
         return HttpExecutorContext.create();
     }
 
-    private Map<String, Object> getRequestParams(JSONObject bizOptJson,BizModel bizModel, String parameterName, String key, String value) {
+    private Map<String, Object> getRequestParams(JSONObject bizOptJson, BizModel bizModel, String parameterName, String key, String value) {
         //请求参数列表
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray(parameterName), key, value);
         Map<String, Object> mapObject = new HashMap<>();

@@ -1,6 +1,5 @@
 package com.centit.dde.datamoving;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.DataOptContext;
@@ -10,8 +9,8 @@ import com.centit.fileserver.common.FileStore;
 import com.centit.fileserver.utils.OsFileStore;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OsInfo;
-import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.model.basedata.UserInfo;
+import com.centit.framework.model.security.CentitUserDetails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

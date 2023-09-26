@@ -221,6 +221,12 @@ public class HttpTaskController extends BaseController {
         if(cookies!=null){
             dataOptContext.setStackData(ConstantValue.REQUEST_COOKIES_TAG, cookies);
         }
+
+        Map<String, String> headers = WebOptUtils.fetchRequestHeaders(request);
+        if(cookies!=null){
+            dataOptContext.setStackData(ConstantValue.REQUEST_HEADERS_TAG, headers);
+        }
+
         //request.getCookies().
         OsInfo osInfo = platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
         dataOptContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);

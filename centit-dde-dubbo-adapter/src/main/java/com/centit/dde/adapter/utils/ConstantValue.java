@@ -130,7 +130,7 @@ public class ConstantValue {
     public static final String REQUEST_FILE_TAG = "__request_file";
     public static final String REQUEST_PARAMS_TAG = "__request_params";
     public static final String REQUEST_COOKIES_TAG = "__request_cookies";
-
+    public static final String REQUEST_HEADERS_TAG = "__request_headers";
     public static final String APPLICATION_INFO_TAG = "__application_info";
     public static final String SESSION_DATA_TAG = "__session_data";
     public static final String MESSAGE_QUEUE_TAG = "__queue_message";

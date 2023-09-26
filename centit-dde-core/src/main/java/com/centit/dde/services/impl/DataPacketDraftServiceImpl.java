@@ -8,7 +8,6 @@ import com.centit.dde.adapter.po.DataPacketParam;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OptMethod;
-import com.centit.framework.model.basedata.OptMethod;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.database.utils.PageDesc;
