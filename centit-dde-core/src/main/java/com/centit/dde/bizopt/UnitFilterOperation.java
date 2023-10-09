@@ -18,6 +18,7 @@ import com.centit.support.compiler.Pretreatment;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -50,6 +51,7 @@ public class UnitFilterOperation implements BizOperation {
         }
 
         List<UnitInfo> retUntis = CodeRepositoryUtil.getUnitInfosByCodes(topUnit, units);
+        retUntis.sort(Comparator.comparing(UnitInfo::getUnitOrder));
         CollectionsOpt.sortAsTree(retUntis,
             ( p,  c) -> StringUtils.equals(p.getUnitCode(),c.getParentUnit()) );
         bizModel.putDataSet(bizOptJson.getString("id"),new DataSet(retUntis));

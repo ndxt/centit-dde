@@ -17,10 +17,7 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.compiler.Pretreatment;
 import org.apache.commons.text.StringEscapeUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author zhf
@@ -60,6 +57,7 @@ public class UserFilterOperation implements BizOperation {
                 lsUserInfo.add(ui);
             }
         }
+        lsUserInfo.sort(Comparator.comparing(UserInfo::getUserOrder));
         bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(lsUserInfo));
         return BuiltInOperation.createResponseSuccessData(1);
     }
