@@ -91,7 +91,7 @@ public class DataPacket implements Serializable, DataPacketInterface {
     private String optId;
 
     @Column(name = "task_type")
-    @ApiModelProperty(value = "任务类型1：GET请求，2：表示定时任务,3：POST请求,4：表示消息触发5：PUT请求6：DELETE请求7：子模块", required = true)
+    @ApiModelProperty(value = "任务类型1：GET请求，2：表示定时任务,3：POST请求,4：消息触发 5：PUT请求 6：DELETE请求 7：子模块", required = true)
     @NotBlank
     private String taskType;
 

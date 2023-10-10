@@ -51,11 +51,11 @@ public class BizModelServiceImpl implements BizModelService {
 
     private boolean notNeedBuf(DataPacketInterface dataPacket) {
         return redisClient == null
+            //|| ! ConstantValue.TASK_TYPE_GET.equals(dataPacket.getTaskType())
             || dataPacket.getBufferFreshPeriodType() == null
             || dataPacket.getBufferFreshPeriodType() == ConstantValue.MINUS_ONE
             || dataPacket.getBufferFreshPeriod() == null
             || dataPacket.getBufferFreshPeriod() <= 0;
-        //|| dataPacket.getTaskType() != 1;
     }
 
     private Object fetchBizModelFromBuf(String key) {
