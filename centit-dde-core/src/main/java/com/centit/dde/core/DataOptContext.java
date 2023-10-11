@@ -41,11 +41,11 @@ public class DataOptContext {
         }
         return this.taskLog.getStepNo();
     }
-    public void plusStepNo() {
+    public int plusStepNo() {
         if (taskLog==null){
             taskLog = new TaskLog();
         }
-        this.taskLog.plusStepNo();
+        return this.taskLog.plusStepNo();
     }
     public DataOptContext() {
         this.callStackData = new HashMap<>(8);

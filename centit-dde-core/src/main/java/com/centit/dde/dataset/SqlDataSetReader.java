@@ -2,6 +2,9 @@ package com.centit.dde.dataset;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.centit.dde.adapter.po.TaskDetailLog;
+import com.centit.dde.adapter.po.TaskLog;
+import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetReader;
@@ -12,6 +15,7 @@ import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.product.metadata.api.ISourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.PageDesc;
@@ -22,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +98,21 @@ public class SqlDataSetReader implements DataSetReader {
 
         if(qap==null){
             qap = QueryUtils.translateQuery(sqlSen, params);
+        }
+        //debug模式下，添加日志，显示sql语句
+        if( ConstantValue.RUN_TYPE_DEBUG.equals(dataOptContext.getRunType()) ||
+            (ConstantValue.LOGLEVEL_CHECK_DEBUG & dataOptContext.getLogLevel()) != 0){
+            TaskLog taskLog = dataOptContext.getTaskLog();
+            TaskDetailLog detailLog = new TaskDetailLog();
+            detailLog.setRunBeginTime(new Date());
+            detailLog.setTaskId(taskLog.getTaskId());
+            detailLog.setLogId(taskLog.getLogId());
+            detailLog.setOptNodeId("sqlTrace");
+            detailLog.setLogType("info");
+            detailLog.setLogInfo(qap.toString());
+            detailLog.setStepNo(dataOptContext.getStepNo());
+            detailLog.setRunEndTime(new Date());
+            taskLog.addDetailLog(detailLog);
         }
 
         Map<String, Object> paramsMap = new HashMap<>(params == null ? 0 : params.size() + 6);

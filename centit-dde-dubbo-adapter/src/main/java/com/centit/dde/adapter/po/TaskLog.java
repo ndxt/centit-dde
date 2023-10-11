@@ -95,8 +95,9 @@ public class TaskLog implements java.io.Serializable {
         this.stepNo = 0;
     }
 
-    public void plusStepNo(){
+    public int plusStepNo(){
         this.stepNo = this.stepNo + 1;
+        return this.stepNo;
     }
 
 }
