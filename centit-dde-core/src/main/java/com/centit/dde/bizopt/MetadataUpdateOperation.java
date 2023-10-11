@@ -11,6 +11,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.model.security.CentitUserDetails;
+import com.centit.product.metadata.po.MetaTable;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.common.ObjectException;
@@ -53,10 +54,11 @@ public class MetadataUpdateOperation implements BizOperation {
             }
             List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,
                 currentUserCode, dataOptContext.getOptId(), "api");
+
             if (filters != null && filters.size() > 0) {
                 DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(currentUserDetails);
-
-                if (!dataPowerFilter.checkObject(objectMap, filters)) {
+                MetaTable tableInfo = metaObjectService.fetchTableInfo(tableId);
+                if (tableInfo !=null && !dataPowerFilter.checkObject(objectMap, tableInfo.getTableName(), filters)) {
                     throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR,
                         "数据范围权限校验不通过，用户：" + currentUserCode + "，校验条件" + JSON.toJSONString(filters) + "。");
                 }
