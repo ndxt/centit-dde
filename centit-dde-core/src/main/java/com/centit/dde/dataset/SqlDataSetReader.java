@@ -15,7 +15,6 @@ import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.product.metadata.api.ISourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.common.ObjectException;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.PageDesc;
