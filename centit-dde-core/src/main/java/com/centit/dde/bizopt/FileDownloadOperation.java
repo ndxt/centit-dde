@@ -13,6 +13,8 @@ import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.ZipCompressor;
+import com.centit.support.file.FileIOOpt;
+import com.centit.support.file.FileType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -20,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipOutputStream;
 
@@ -92,14 +95,19 @@ public class FileDownloadOperation implements BizOperation {
         } else {
             ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
             ZipOutputStream out = ZipCompressor.convertToZipOutputStream(outBuf);
+            Map<String, Integer> fileNameMap = new HashMap<>(fileIds.size()+4);
             for(String fid : fileIds) {
                 FileBaseInfo fileInfo = fileInfoOpt.getFileInfo(fid);
                 if(fileInfo!=null) {
                     InputStream inputStream = new FileInputStream(fileInfoOpt.getFile(fid));
-                    if(inputStream!=null) {
-                        ZipCompressor.compressFile(inputStream
-                            , fileInfo.getFileName(), out, "");
+                    String fn = fileInfo.getFileName();
+                    while(fileNameMap.containsKey(fn)){
+                        int copies = fileNameMap.get(fn)+1;
+                        fileNameMap.put(fn, copies);
+                        fn = FileType.truncateFileExtName(fn) +"("+copies+")." + FileType.getFileExtName(fn);
                     }
+                    fileNameMap.put(fn, 1);
+                    ZipCompressor.compressFile(inputStream, fn, out, "");
                 }
             }
             out.close();
