@@ -13,7 +13,6 @@ import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.ZipCompressor;
-import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileType;
 import org.apache.commons.lang3.StringUtils;
 

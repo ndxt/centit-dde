@@ -59,5 +59,5 @@ public interface DataPacketInterface {
 
     Boolean getIsDisable();
 
-    DataOptStep getDataOptStep();
+    DataOptStep attainDataOptStep();
 }
