@@ -287,6 +287,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
     }
 
+    // 返回节点
     private void returnResult(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) {
         JSONObject stepJson = dataOptStep.getCurrentStep();
         stepJson = stepJson.getJSONObject("properties");
@@ -330,7 +331,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
 
         if (RETURN_RESULT_FILE.equals(type)) {
-            dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
+            dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "fileDataSet", "");
             DataSet dataSet = bizModel.getDataSet(dataSetId);
             if(dataSet==null){
                 throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION, "找不到对应的文件数据集："+dataSetId+"！");
