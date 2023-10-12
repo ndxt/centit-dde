@@ -91,7 +91,6 @@ public class FileDownloadOperation implements BizOperation {
             }
             InputStream inputStream = new FileInputStream(fileInfoOpt.getFile(fileId));
             objectToDataSet.setFileContent(fileName, inputStream.available(), inputStream);
-            bizModel.putDataSet(targetDsName, objectToDataSet);
         } else {
             ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
             ZipOutputStream out = ZipCompressor.convertToZipOutputStream(outBuf);
@@ -113,6 +112,7 @@ public class FileDownloadOperation implements BizOperation {
             out.close();
             objectToDataSet.setFileContent(fileName, outBuf.size(), outBuf);
         }
+        bizModel.putDataSet(targetDsName, objectToDataSet);
         return BuiltInOperation.createResponseSuccessData(objectToDataSet.getSize());
     }
 }
