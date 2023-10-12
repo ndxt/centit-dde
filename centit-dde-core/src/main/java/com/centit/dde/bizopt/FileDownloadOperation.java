@@ -52,10 +52,22 @@ public class FileDownloadOperation implements BizOperation {
             Object idObj = new DatasetVariableTranslate(dataSet).attainExpressionValue(fileId);
             if(idObj instanceof Collection){
                 for(Object obj :(Collection<Object>) idObj){
-                    fileIds.add(StringBaseOpt.castObjectToString(obj));
+                    String fid = StringBaseOpt.castObjectToString(obj);
+                    if(StringUtils.isNotBlank(fid)) {
+                        fileIds.add(fid);
+                    }
                 }
             } else {
-                fileIds.add(fileId);
+                if(idObj!=null){
+                    String fid = StringBaseOpt.castObjectToString(idObj);
+                    if(StringUtils.isNotBlank(fid)) {
+                        fileIds.add(fid);
+                    } else {
+                        fileIds.add(fileId);
+                    }
+                } else {
+                    fileIds.add(fileId);
+                }
             }
         } else {
             fileIds.add(StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_ID)));
