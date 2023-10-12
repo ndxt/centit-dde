@@ -12,7 +12,10 @@ import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
@@ -165,6 +168,8 @@ public class DataPacket implements Serializable, DataPacketInterface {
 
     @Transient
     @JSONField(serialize = false, deserialize = false)
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
     private DataOptStep innerDataOptStep;
 
     public void setDataOptDescJson(JSONObject dataOptDescJson) {
