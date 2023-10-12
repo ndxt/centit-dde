@@ -8,6 +8,7 @@ import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
@@ -21,6 +22,7 @@ import fr.opensagres.xdocreport.document.registry.XDocReportRegistry;
 import fr.opensagres.xdocreport.template.IContext;
 import fr.opensagres.xdocreport.template.TemplateEngineKind;
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.util.Map;
@@ -39,13 +41,23 @@ public class DocReportOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String fileId = bizOptJson.getString("fileId");
+        boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), true);
+
         String fileName = Pretreatment.mapTemplateString(
             BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()),
-            new BizModelJSONTransform(bizModel)) + ".pdf";
+            new BizModelJSONTransform(bizModel));
+        if(transToPdf){
+            if(! StringUtils.endsWithIgnoreCase(fileName, ".pdf"))
+                fileName = fileName +".pdf";
+        } else {
+            if(! StringUtils.endsWithIgnoreCase(fileName, ".docx"))
+                fileName = fileName +".docx";
+        }
         Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName");
         ByteArrayInputStream in = generateWord(bizModel, fileId, params);
-        FileDataSet dataSet =new FileDataSet(fileName,
-            -1, word2Pdf(in));
+
+        FileDataSet dataSet = transToPdf? new FileDataSet(fileName,
+            -1, word2Pdf(in)) : new FileDataSet(fileName, -1, in);
 
         bizModel.putDataSet(sourDsName, dataSet);
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());

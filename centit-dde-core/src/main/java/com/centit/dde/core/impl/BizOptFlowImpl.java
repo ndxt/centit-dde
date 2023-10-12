@@ -529,8 +529,11 @@ public class BizOptFlowImpl implements BizOptFlow {
                     } else {
                         detailLog.setLogInfo(JSON.toJSONString(dataOptContext.getCallStackData()));
                     }
-                } else if("append".equals(optType) || ConstantValue.ASSIGNMENT.equals(optType) || "desensitize".equals(optType)){
+                } else if("append".equals(optType) || "desensitize".equals(optType)){
                     DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
+                    detailLog.setLogInfo(dataSet.toJSONString());
+                } else if(ConstantValue.ASSIGNMENT.equals(optType)){
+                    DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("target"));
                     detailLog.setLogInfo(dataSet.toJSONString());
                 } else {
                     DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("id"));
