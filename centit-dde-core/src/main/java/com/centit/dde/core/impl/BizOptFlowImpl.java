@@ -332,6 +332,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (RETURN_RESULT_FILE.equals(type)) {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
             DataSet dataSet = bizModel.getDataSet(dataSetId);
+            if(dataSet==null){
+                throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION, "找不到对应的文件数据集："+dataSetId+"！");
+            }
             FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, stepJson);
             bizModel.getOptResult().setResultFile(fileInfo.getFirstRow());
             return;
