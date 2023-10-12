@@ -12,11 +12,16 @@ import com.centit.fileserver.common.FileBaseInfo;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.ZipCompressor;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.zip.ZipOutputStream;
 
 /**
  * 文件下载节点
@@ -40,25 +45,54 @@ public class FileDownloadOperation implements BizOperation {
             return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
                 bizOptJson.getString("SetsName") + "：文件下载失败，请选择数据集！");
         }
+        ArrayList<String> fileIds = new ArrayList<>();
+
         Map<String, Object> mapFirstRow = dataSet.getFirstRow();
         if(StringUtils.isNotBlank(fileId)){
-            fileId = new DatasetVariableTranslate(dataSet).mapTemplateString(fileId);
+            Object idObj = new DatasetVariableTranslate(dataSet).attainExpressionValue(fileId);
+            if(idObj instanceof Collection){
+                for(Object obj :(Collection<Object>) idObj){
+                    fileIds.add(StringBaseOpt.castObjectToString(obj));
+                }
+            } else {
+                fileIds.add(fileId);
+            }
         } else {
-            fileId = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_ID));
+            fileIds.add(StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_ID)));
         }
-        InputStream inputStream = new FileInputStream(fileInfoOpt.getFile(fileId));
+
         if(StringUtils.isNotBlank(fileName)){
             fileName = new DatasetVariableTranslate(dataSet).mapTemplateString(fileName);
         } else {
             fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
         }
-        FileBaseInfo fileInfo = fileInfoOpt.getFileInfo(fileId);
-
         FileDataSet objectToDataSet = new FileDataSet();
-        objectToDataSet.setFileContent( fileName, inputStream.available(), inputStream);
-        objectToDataSet.setFileInfo(fileInfo);
-        bizModel.putDataSet(targetDsName, objectToDataSet);
-
+        if(fileIds.size()==1) {
+            FileBaseInfo fileInfo = fileInfoOpt.getFileInfo(fileId);
+            if(fileInfo!=null) {
+                if (StringUtils.isBlank(fileName))
+                    fileName = fileInfo.getFileName();
+                objectToDataSet.setFileInfo(fileInfo);
+            }
+            InputStream inputStream = new FileInputStream(fileInfoOpt.getFile(fileId));
+            objectToDataSet.setFileContent(fileName, inputStream.available(), inputStream);
+            bizModel.putDataSet(targetDsName, objectToDataSet);
+        } else {
+            ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
+            ZipOutputStream out = ZipCompressor.convertToZipOutputStream(outBuf);
+            for(String fid : fileIds) {
+                FileBaseInfo fileInfo = fileInfoOpt.getFileInfo(fid);
+                if(fileInfo!=null) {
+                    InputStream inputStream = new FileInputStream(fileInfoOpt.getFile(fid));
+                    if(inputStream!=null) {
+                        ZipCompressor.compressFile(inputStream
+                            , fileInfo.getFileName(), out, "");
+                    }
+                }
+            }
+            out.close();
+            objectToDataSet.setFileContent(fileName, outBuf.size(), outBuf);
+        }
         return BuiltInOperation.createResponseSuccessData(objectToDataSet.getSize());
     }
 }
