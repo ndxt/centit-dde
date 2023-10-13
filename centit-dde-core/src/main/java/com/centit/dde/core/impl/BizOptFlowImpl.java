@@ -419,19 +419,40 @@ public class BizOptFlowImpl implements BizOptFlow {
         //循环节点的下个节点信息
         JSONObject startNode = dataOptStep.getNextStep(cycleVo.getId());
         Object iter = null;
+        List<Object> expendTree;
         //提取出需要操作的数据
         if (ConstantValue.CYCLE_TYPE_RANGE.equals(cycleVo.getCycleType())) {
             iter = cycleVo.getRangeBegin();
-        } else {
+        }  else {
             DataSet refObject = bizModel.getDataSet(cycleVo.getSource());
+            Collection searchData =null;
             if (refObject != null) {
                 if (StringUtils.isNotBlank(cycleVo.getSubsetFieldName())) {
                     Object obj = ReflectionOpt.attainExpressionValue(refObject.getData(), cycleVo.getSubsetFieldName());
                     if (obj != null) {
-                        iter = CollectionsOpt.objectToList(obj).iterator();
+                        searchData = CollectionsOpt.objectToList(obj);
                     }
                 } else {
-                    iter = refObject.getDataAsList().iterator();
+                    searchData = refObject.getDataAsList();
+                }
+            }
+            //CYCLE_TYPE_TRAVERSE_TREE = traverseTree; breadthFirst｜depthFirst ；childrenField ：children
+            if(searchData!=null) {
+                if (ConstantValue.CYCLE_TYPE_TRAVERSE_TREE.equals(cycleVo.getCycleType())) {
+                    boolean breadthFirst = "breadthFirst".equals(stepJson.getString("traverseType"));
+                    String childrenField = stepJson.getString("childrenField");
+                    if(StringUtils.isBlank(childrenField)){
+                        iter = searchData.iterator();
+                    } else if(searchData.size()>0){
+                        if(breadthFirst){ //广度优先遍历
+                            expendTree = CollectionsOpt.breadthFirstTraverseForest(searchData, childrenField);
+                        } else { // 深度优先遍历
+                            expendTree = CollectionsOpt.depthFirstTraverseTree(searchData, childrenField);
+                        }
+                        iter = expendTree.iterator();
+                    }
+                } else {
+                    iter = searchData.iterator();
                 }
             }
         }
@@ -446,20 +467,13 @@ public class BizOptFlowImpl implements BizOptFlow {
                     break;
                 }
                 bizModel.putDataSet(cycleVo.getId(), new DataSet(iter));
-            } else {
-                //foreach循环
+            }  else {
+                //foreach循环 和 search tree
                 if (!((Iterator<Object>) iter).hasNext()) {
                     break;
                 }
                 Object value = ((Iterator<Object>) iter).next();
-                //TODO 这个地方有问题
-                //if (ConstantValue.DATA_COPY.equals(cycleVo.getAssignType())) {
-                    //clone 复制对象数据
-                    //bizModel.putDataSet(cycleVo.getId(), new DataSet(value));
-                //} else {
-                    //引用对象数据
-                    bizModel.putDataSet(cycleVo.getId(), new DataSet(value));
-                //}
+                bizModel.putDataSet(cycleVo.getId(), new DataSet(value));
             }
             //新的一轮循环，设置起始节点
             dataOptStep.setCurrentStep(startNode);
@@ -493,6 +507,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 iter = (Integer) iter + cycleVo.getRangeStep();
             }
         }
+
         if(cycleEndNode !=null) {
             dataOptStep.setCurrentStep(cycleEndNode);
         } else {

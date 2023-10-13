@@ -31,6 +31,7 @@ public class ConstantValue {
     public static final String RUN_TYPE_NORMAL = "N";
     public static final String RUN_TYPE_DEBUG = "D";
     public static final String CYCLE_TYPE_RANGE = "range";
+    public static final String CYCLE_TYPE_TRAVERSE_TREE = "traverseTree";
     public static final String CYCLE = "cycle";
     public static final String CYCLE_JUMP_OUT = "jumpCycle";
 
