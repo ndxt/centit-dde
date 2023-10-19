@@ -268,7 +268,7 @@ public class DataPacketDraftController extends ResourceBaseController {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "删除数据不存在！");
         }
         LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
-        platformEnvironment.deleteOptDefAndRolepowerByOptCode(dataPacketDraft.getOptCode());
+        platformEnvironment.deleteOptMethod(dataPacketDraft.getOptCode());
         dataPacketService.deleteDataPacket(packetId);
         dataPacketDraftService.deleteDataPacket(packetId);
         DataPacketCache.evictCache(packetId);
@@ -297,7 +297,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         }
         //删除权限数据
         if(dataPacketDraft.getOptCode()!=null) {
-            platformEnvironment.deleteOptDefAndRolepowerByOptCode(dataPacketDraft.getOptCode());
+            platformEnvironment.deleteOptMethod(dataPacketDraft.getOptCode());
         }
     }
 

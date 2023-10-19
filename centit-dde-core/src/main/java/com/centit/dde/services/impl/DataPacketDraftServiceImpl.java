@@ -68,6 +68,7 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         result.setOptMethod("api");
         result.setOptUrl("/dde/run/" + dataPacket.getPacketId());
         String taskType = dataPacket.getTaskType();
+        //任务类型1：GET请求，2：表示定时任务,3：POST请求,4：消息触发 5：PUT请求 6：DELETE请求 7：子模块
         switch (taskType){
             case "1":
                 taskType="R";
