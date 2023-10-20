@@ -8,15 +8,18 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.dao.DataPowerFilter;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.product.metadata.po.MetaTable;
 import com.centit.product.metadata.service.MetaObjectService;
+import com.centit.product.metadata.utils.SessionDataUtils;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,14 +67,16 @@ public class MetadataUpdateOperation implements BizOperation {
                 }
             }
         }
+
+        Map<String, Object> extParams = SessionDataUtils.createSessionDataMap(currentUserDetails);
         int updateCount = 1;
         switch (updateType){
             case 1://新建
-                updateCount = metaObjectService.saveObjectWithChildren(tableId, objectMap, withChildrenDeep);
+                updateCount = metaObjectService.saveObjectWithChildren(tableId, objectMap, extParams, withChildrenDeep);
                 bizModel.putDataSet(id, new DataSet(objectMap));
                 return BuiltInOperation.createResponseSuccessData(updateCount);
             case 2://修改
-                updateCount = metaObjectService.updateObjectWithChildren(tableId, objectMap, withChildrenDeep);
+                updateCount = metaObjectService.updateObjectWithChildren(tableId, objectMap, extParams, withChildrenDeep);
                 bizModel.putDataSet(id, new DataSet(objectMap));
                 return BuiltInOperation.createResponseSuccessData(updateCount);
             case 3://删除
@@ -79,7 +84,7 @@ public class MetadataUpdateOperation implements BizOperation {
                 bizModel.putDataSet(id, new DataSet(objectMap));
                 return BuiltInOperation.createResponseSuccessData(1);
             case 4://合并
-                updateCount = metaObjectService.mergeObjectWithChildren(tableId, objectMap, withChildrenDeep);
+                updateCount = metaObjectService.mergeObjectWithChildren(tableId, objectMap, extParams, withChildrenDeep);
                 bizModel.putDataSet(id, new DataSet(objectMap));
                 return BuiltInOperation.createResponseSuccessData(updateCount);
             case 5://逻辑删除
@@ -87,7 +92,7 @@ public class MetadataUpdateOperation implements BizOperation {
                 bizModel.putDataSet(id, new DataSet(objectMap));
                 return BuiltInOperation.createResponseSuccessData(1);
             case 6://带版本更新
-                updateCount = metaObjectService.updateObjectWithChildrenCheckVersion(tableId, objectMap, withChildrenDeep);
+                updateCount = metaObjectService.updateObjectWithChildrenCheckVersion(tableId, objectMap, extParams, withChildrenDeep);
                 bizModel.putDataSet(id, new DataSet(objectMap));
                 return BuiltInOperation.createResponseSuccessData(updateCount);
             default:
