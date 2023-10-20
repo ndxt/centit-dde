@@ -16,6 +16,7 @@ import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.product.metadata.po.MetaTable;
 import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.metadata.service.MetaObjectService;
+import com.centit.product.metadata.utils.SessionDataUtils;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -76,15 +77,18 @@ public class MetadataOperation implements BizOperation {
             parames = dataSet.getFirstRow(); //数据集
         }
         Integer withChildrenDeep = NumberBaseOpt.castObjectToInteger(bizOptJson.getInteger("withChildrenDeep"),1);
+
         switch (templateType){
             case 1://新建
                 metaObjectService.saveObjectWithChildren(tableId, parames, withChildrenDeep);
                 bizModel.putDataSet(id, new DataSet(parames));
                 return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
-            case 2://修改
-                int upcount= metaObjectService.updateObjectWithChildren(tableId, parames, withChildrenDeep);
-                bizModel.putDataSet(id, new DataSet(upcount));
-                return BuiltInOperation.createResponseSuccessData(upcount);
+            case 2: {//修改
+                    Map<String, Object> extParams = SessionDataUtils.createSessionDataMap(dataOptContext.getCurrentUserDetail());
+                    int upcount = metaObjectService.updateObjectWithChildren(tableId, parames, extParams, withChildrenDeep);
+                    bizModel.putDataSet(id, new DataSet(upcount));
+                    return BuiltInOperation.createResponseSuccessData(upcount);
+                }
             case 3://删除
                 metaObjectService.deleteObjectWithChildren(tableId, parames, withChildrenDeep);
                 bizModel.putDataSet(id, new DataSet(1));
@@ -154,10 +158,12 @@ public class MetadataOperation implements BizOperation {
                 bizModel.putDataSet(id, new DataSet(delCount));
                 return BuiltInOperation.createResponseSuccessData(delCount);
             }
-            case 11: // 合并
-                int resultCount = metaObjectService.mergeObjectWithChildren(tableId, parames, withChildrenDeep);
-                bizModel.putDataSet(id, new DataSet(resultCount));
-                return BuiltInOperation.createResponseSuccessData(resultCount);
+            case 11: {// 合并
+                    Map<String, Object> extParams = SessionDataUtils.createSessionDataMap(dataOptContext.getCurrentUserDetail());
+                    int resultCount = metaObjectService.mergeObjectWithChildren(tableId, parames, extParams, withChildrenDeep);
+                    bizModel.putDataSet(id, new DataSet(resultCount));
+                    return BuiltInOperation.createResponseSuccessData(resultCount);
+                }
         }
         return null;
     }
