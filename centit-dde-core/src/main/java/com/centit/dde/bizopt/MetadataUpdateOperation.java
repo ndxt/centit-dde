@@ -15,10 +15,12 @@ import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.product.metadata.po.MetaTable;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.product.metadata.utils.SessionDataUtils;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +42,17 @@ public class MetadataUpdateOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");
         Integer updateType = bizOptJson.getInteger("updateType");
-        Map<String, Object> objectMap = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
+        boolean isBatchOpt = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("batchOpt"), false);
+        List<Map<String, Object>> optData;
+
+        if(isBatchOpt){
+            optData = DataSetOptUtil.fetchDataSet(bizModel, bizOptJson);
+        } else {
+            Map<String, Object> objectMap = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
+            optData = new ArrayList<>(2);
+            optData.add(objectMap);
+        }
+
         String tableId = bizOptJson.getString("tableId");
         Integer withChildrenDeep = NumberBaseOpt.castObjectToInteger(bizOptJson.getInteger("withChildrenDeep"),1);
 
@@ -61,39 +73,55 @@ public class MetadataUpdateOperation implements BizOperation {
             if (filters != null && filters.size() > 0) {
                 DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(currentUserDetails);
                 MetaTable tableInfo = metaObjectService.fetchTableInfo(tableId);
-                if (tableInfo !=null && !dataPowerFilter.checkObject(objectMap, tableInfo.getTableName(), filters)) {
-                    throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR,
-                        "数据范围权限校验不通过，用户：" + currentUserCode + "，校验条件" + JSON.toJSONString(filters) + "。");
+                for(Map<String, Object> objectMap : optData) {
+                    if (tableInfo != null && !dataPowerFilter.checkObject(objectMap, tableInfo.getTableName(), filters)) {
+                        throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR,
+                            "数据范围权限校验不通过，用户：" + currentUserCode + "，校验条件" + JSON.toJSONString(filters) + "。");
+                    }
                 }
             }
         }
 
         Map<String, Object> extParams = SessionDataUtils.createSessionDataMap(currentUserDetails);
-        int updateCount = 1;
+        int updateCount = 0;
         switch (updateType){
             case 1://新建
-                updateCount = metaObjectService.saveObjectWithChildren(tableId, objectMap, extParams, withChildrenDeep);
-                bizModel.putDataSet(id, new DataSet(objectMap));
+                for(Map<String, Object> objectMap : optData) {
+                    updateCount += metaObjectService.saveObjectWithChildren(tableId, objectMap, extParams, withChildrenDeep);
+                    bizModel.putDataSet(id, new DataSet(objectMap));
+                }
                 return BuiltInOperation.createResponseSuccessData(updateCount);
             case 2://修改
-                updateCount = metaObjectService.updateObjectWithChildren(tableId, objectMap, extParams, withChildrenDeep);
-                bizModel.putDataSet(id, new DataSet(objectMap));
+                for(Map<String, Object> objectMap : optData) {
+                    updateCount += metaObjectService.updateObjectWithChildren(tableId, objectMap, extParams, withChildrenDeep);
+                    bizModel.putDataSet(id, new DataSet(objectMap));
+                }
                 return BuiltInOperation.createResponseSuccessData(updateCount);
             case 3://删除
-                metaObjectService.deleteObjectWithChildren(tableId, objectMap, withChildrenDeep);
-                bizModel.putDataSet(id, new DataSet(objectMap));
-                return BuiltInOperation.createResponseSuccessData(1);
+                for(Map<String, Object> objectMap : optData) {
+                    metaObjectService.deleteObjectWithChildren(tableId, objectMap, withChildrenDeep);
+                    bizModel.putDataSet(id, new DataSet(objectMap));
+                    updateCount++;
+                }
+                return BuiltInOperation.createResponseSuccessData(updateCount);
             case 4://合并
-                updateCount = metaObjectService.mergeObjectWithChildren(tableId, objectMap, extParams, withChildrenDeep);
-                bizModel.putDataSet(id, new DataSet(objectMap));
+                for(Map<String, Object> objectMap : optData) {
+                    updateCount += metaObjectService.mergeObjectWithChildren(tableId, objectMap, extParams, withChildrenDeep);
+                    bizModel.putDataSet(id, new DataSet(objectMap));
+                }
                 return BuiltInOperation.createResponseSuccessData(updateCount);
             case 5://逻辑删除
-                metaObjectService.softDeleteObjectWithChildren(tableId, objectMap, withChildrenDeep);
-                bizModel.putDataSet(id, new DataSet(objectMap));
-                return BuiltInOperation.createResponseSuccessData(1);
+                for(Map<String, Object> objectMap : optData) {
+                    metaObjectService.softDeleteObjectWithChildren(tableId, objectMap, withChildrenDeep);
+                    bizModel.putDataSet(id, new DataSet(objectMap));
+                    updateCount++;
+                }
+                return BuiltInOperation.createResponseSuccessData(updateCount);
             case 6://带版本更新
-                updateCount = metaObjectService.updateObjectWithChildrenCheckVersion(tableId, objectMap, extParams, withChildrenDeep);
-                bizModel.putDataSet(id, new DataSet(objectMap));
+                for(Map<String, Object> objectMap : optData) {
+                    updateCount += metaObjectService.updateObjectWithChildrenCheckVersion(tableId, objectMap, extParams, withChildrenDeep);
+                    bizModel.putDataSet(id, new DataSet(objectMap));
+                }
                 return BuiltInOperation.createResponseSuccessData(updateCount);
             default:
                 return ResponseData.makeErrorMessage("未知操作类型！");

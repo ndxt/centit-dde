@@ -938,8 +938,6 @@ public abstract class DataSetOptUtil {
         }
         return getInputStreamFormFile(dataSet.getFirstRow());
     }
-
-    //获取数据集参数或者自定义参数
     public static Map<String, Object> getDataSetParames(BizModel bizModel, JSONObject bizOptJson){
         //参数类型
         String paramsType = bizOptJson.getString("sourceType");
@@ -963,12 +961,10 @@ public abstract class DataSetOptUtil {
         } else {
             //数据集参数
             String source = bizOptJson.getString("source");
-            if(StringUtils.isBlank(source)){
-                parames = CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)); //数据集
-            } else {
-                DataSet dataSet = bizModel.getDataSet(StringUtils.isBlank(source) ? ConstantValue.REQUEST_PARAMS_TAG : source);
-                parames = new HashMap<>();
-                for (Map.Entry<String, Object> ent : dataSet.getFirstRow().entrySet()) {
+            if(StringUtils.isBlank(source) || ConstantValue.REQUEST_PARAMS_TAG.equals(source)){
+                Map<String, Object> requestParams = CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)); //数据集
+                parames = new HashMap<>(16);
+                for (Map.Entry<String, Object> ent : requestParams.entrySet()) {
                     Object paramValue = ent.getValue();
                     String pretreatmentSql = ent.getKey();
 
@@ -981,9 +977,20 @@ public abstract class DataSetOptUtil {
                     }
                     parames.put(valueName, paramValue);
                 }
+            } else {
+                DataSet dataSet = bizModel.getDataSet(source);
+                parames =  dataSet.getFirstRow();
             }
         }
         return parames;
+    }
+
+
+    //获取数据集参数或者自定义参数
+    public static List<Map<String, Object>> fetchDataSet(BizModel bizModel, JSONObject bizOptJson) {
+        String source = bizOptJson.getString("source");
+        DataSet dataSet = bizModel.getDataSet(StringUtils.isBlank(source) ? ConstantValue.REQUEST_PARAMS_TAG : source);
+        return dataSet.getDataAsList();
     }
 
     public static Object getCallModuleParams(BizModel bizModel, JSONObject bizOptJson, String defaultDataSet){
