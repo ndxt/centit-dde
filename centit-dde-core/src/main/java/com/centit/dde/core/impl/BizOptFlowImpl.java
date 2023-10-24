@@ -347,13 +347,18 @@ public class BizOptFlowImpl implements BizOptFlow {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
             DataSet dataSet = bizModel.getDataSet(dataSetId);
             ResponseSingleData response = new ResponseSingleData();
-            response.setCode(NumberBaseOpt.castObjectToInteger(code, 1));
+            response.setCode(NumberBaseOpt.castObjectToInteger(code, 500));
             String reMessage = StringBaseOpt.objectToString(
                     JSONTransformer.transformer(message, new BizModelJSONTransform(bizModel)));
             response.setMessage(StringUtils.isNotBlank(reMessage) ? reMessage : message);
             if (dataSet != null) {
                 response.setData(dataSet.getData());
             }
+
+            if(response.getCode() >= 400){
+                throw new ObjectException(response.getData(), response.getCode(), response.getMessage());
+            }
+
             bizModel.getOptResult().setResultObject(response);// .addLastStepResult("return", response);
             bizModel.getOptResult().setResultType(DataOptResult.RETURN_CODE_AND_MESSAGE);
             return;
@@ -645,17 +650,6 @@ public class BizOptFlowImpl implements BizOptFlow {
         DataOptResult result = runInner(dataPacketInterface, moduleOptContext);
 
         bizModel.putDataSet(stepJson.getString("id"), DataSet.toDataSet(result.getResultData()));
-
-        if(DataOptResult.RETURN_CODE_AND_MESSAGE == bizModel.getOptResult().getResultType()){
-            // 判断是否返回异常
-            Object resObj = bizModel.getOptResult().getResultData();
-            if(resObj instanceof ResponseData){
-                ResponseData responseData = (ResponseData)resObj;
-                if( responseData.getCode() >= 400){
-                    throw new ObjectException(responseData.getCode(), responseData.getMessage());
-                }
-            }
-        }
 
         if(result.hasErrors()){
             bizModel.getOptResult().setStepResponse(
