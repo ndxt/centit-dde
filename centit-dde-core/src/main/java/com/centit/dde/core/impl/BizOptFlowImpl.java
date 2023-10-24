@@ -645,6 +645,18 @@ public class BizOptFlowImpl implements BizOptFlow {
         DataOptResult result = runInner(dataPacketInterface, moduleOptContext);
 
         bizModel.putDataSet(stepJson.getString("id"), DataSet.toDataSet(result.getResultData()));
+
+        if(DataOptResult.RETURN_CODE_AND_MESSAGE == bizModel.getOptResult().getResultType()){
+            // 判断是否返回异常
+            Object resObj = bizModel.getOptResult().getResultData();
+            if(resObj instanceof ResponseData){
+                ResponseData responseData = (ResponseData)resObj;
+                if( responseData.getCode() >= 400){
+                    throw new ObjectException(responseData.getCode(), responseData.getMessage());
+                }
+            }
+        }
+
         if(result.hasErrors()){
             bizModel.getOptResult().setStepResponse(
                 stepJson.getString("id"), result.makeErrorResponse());
