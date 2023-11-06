@@ -956,8 +956,11 @@ public abstract class DataSetOptUtil {
                 }
             }
             //添加 url参数
-            Map<String, Object> urlParams = CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
-            parames = CollectionsOpt.unionTwoMap(parames, urlParams);
+            boolean appendRequest = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("appendRequest"), false);
+            if(appendRequest) {
+                Map<String, Object> urlParams = CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
+                parames = CollectionsOpt.unionTwoMap(parames, urlParams);
+            }
         } else {
             //数据集参数
             String source = bizOptJson.getString("source");
