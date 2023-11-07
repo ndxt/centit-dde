@@ -33,6 +33,9 @@ public class BizModelServiceImpl implements BizModelService {
         if (notNeedBuf(dataPacket)) {
             return taskRun.runTask(dataPacket, optContext);
         }
+        Map<String,Object> bufferStack=optContext.getCallStackData();
+        bufferStack.remove(ConstantValue.REQUEST_COOKIES_TAG);
+        bufferStack.remove(ConstantValue.REQUEST_HEADERS_TAG);
         String key = makeDataPacketBufId(dataPacket, optContext.getCallStackData());
         DataOptResult optResult;
         Object bufData = fetchBizModelFromBuf(key);
@@ -84,7 +87,7 @@ public class BizModelServiceImpl implements BizModelService {
         }
         StatefulRedisConnection<String, String> connection = redisClient.connect();
         RedisCommands<String, String> commands = connection.sync();
-        commands.set(key, StringBaseOpt.objectToString(returnData));
+        commands.set(key, JSON.toJSONString(returnData));
         int seconds = dataPacket.getBufferFreshPeriod();
         int iPeriod = dataPacket.getBufferFreshPeriodType();
         //按分
