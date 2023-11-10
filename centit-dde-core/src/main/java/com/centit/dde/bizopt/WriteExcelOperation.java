@@ -49,7 +49,10 @@ public class WriteExcelOperation implements BizOperation {
         if(StringUtils.isBlank(sheetName)){
             sheetName = "Sheet1";
         }
-        /**fileType（生成方式） ： none,append, excel, jxls；*/
+        //获取表达式信息
+        String[] titles = mapInfoDesc.keySet().toArray(new String[0]);
+        String[] fields = mapInfoDesc.values().toArray(new String[0]);
+        /**fileType（生成方式） ： none, append, excel, jxls；*/
         String optType = bizOptJson.getString("fileType");
         int mergeColCell = NumberBaseOpt.castObjectToInteger(bizOptJson.getString("mergeColCell"), -1);
         if("append".equals(optType)){
@@ -62,10 +65,9 @@ public class WriteExcelOperation implements BizOperation {
             FileDataSet fileDataSet = (FileDataSet)dataSet2;
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileDataSet.getFileInputStream());
             XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
-            Integer beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
-            Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
-
-            ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
+            //Integer beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
+           // Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
+            ExcelExportUtil.generateExcelSheet(sheet, dataAsList, titles, fields);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             xssfWorkbook.write(byteArrayOutputStream);
@@ -113,9 +115,6 @@ public class WriteExcelOperation implements BizOperation {
 
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
-        //获取表达式信息
-        String[] titles = mapInfoDesc.keySet().toArray(new String[0]);
-        String[] fields = mapInfoDesc.values().toArray(new String[0]);
 
         InputStream inputStream = ExcelExportUtil.generateExcelStream(sheetName, dataAsList, titles, fields);
         FileDataSet objectToDataSet = new FileDataSet(fileName, inputStream.available(), inputStream);
