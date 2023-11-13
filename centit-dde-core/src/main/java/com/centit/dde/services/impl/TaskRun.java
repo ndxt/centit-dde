@@ -85,8 +85,13 @@ public class TaskRun {
         } catch (Exception e) { // 未知异常，一般是泡不到这儿的
             dealException(taskLog, optContext, e);
             //创建一个错误的返回结果
+            if(e instanceof ObjectException){
+                ObjectException objex = (ObjectException) e;
+                return DataOptResult.createExceptionResult(ResponseData.makeErrorMessageWithData(
+                    objex.getObjectData(), objex.getExceptionCode(), objex.getMessage()));
+            }
             return DataOptResult.createExceptionResult(ResponseData.makeErrorMessageWithData(
-                taskLog, ResponseData.ERROR_OPERATION, ObjectException.extortExceptionMessage(e)));
+                null, ResponseData.ERROR_OPERATION, ObjectException.extortExceptionOriginMessage(e)));
         } finally { // 写入日志
             //如果是 debug 并且是断点（debugId不为空）状态不写入日志
             if(StringUtils.equals(optContext.getRunType(), ConstantValue.RUN_TYPE_NORMAL)
