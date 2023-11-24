@@ -334,6 +334,8 @@ public class BizOptFlowImpl implements BizOptFlow {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "fileDataSet", "");
             DataSet dataSet = bizModel.getDataSet(dataSetId);
             if(dataSet==null){
+                TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
+                detailLog.setLogInfo("获取数据集："+ dataSetId +"出错！");
                 throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION, "找不到对应的文件数据集："+dataSetId+"！");
             }
             FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, stepJson);
@@ -356,6 +358,10 @@ public class BizOptFlowImpl implements BizOptFlow {
             }
 
             if(response.getCode() >= 400){
+                if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & dataOptContext.getLogLevel()) != 0) {
+                    TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
+                    detailLog.setLogInfo(response.toJSONString());
+                }
                 throw new ObjectException(response.getData(), response.getCode(), response.getMessage());
             }
 
@@ -535,6 +541,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             /*if (responseData.getCode() != ResponseData.RESULT_OK) {
                 throw new ObjectException(responseData, responseData.getCode(), responseData.getMessage());
             }*/
+            // 记录日志
             if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
                 TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
                 Map<String, Object> jsonObject = CollectionsOpt.objectToMap(responseData.getData());
