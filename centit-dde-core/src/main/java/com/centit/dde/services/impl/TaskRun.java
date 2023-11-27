@@ -152,7 +152,6 @@ public class TaskRun {
         return taskLog;
     }
 
-
     private void updateApiData(String runType, DataPacketInterface dataPacketInterface) throws Exception {
         dataPacketInterface.setLastRunTime(new Date());
         if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())
@@ -160,18 +159,21 @@ public class TaskRun {
             && !StringBaseOpt.isNvl(dataPacketInterface.getTaskCron())) {
             CronExpression cronExpression = new CronExpression(dataPacketInterface.getTaskCron());
             dataPacketInterface.setNextRunTime(cronExpression.getNextValidTimeAfter(dataPacketInterface.getLastRunTime()));
+            dataPacketDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, (DataPacket) dataPacketInterface);
         }else {
             dataPacketInterface.setNextRunTime(null);
         }
-        if (ConstantValue.RUN_TYPE_DEBUG.equals(runType)) {
-            dataPacketDraftDao.updateObject(new String[]{"lastRunTime"}, (DataPacketDraft) dataPacketInterface);
-        } else {
+
+        /*if(ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType()) && dataPacketInterface.getIsValid()){
             dataPacketDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, (DataPacket) dataPacketInterface);
-            DataPacketDraft dataPacketDraft=new DataPacketDraft();
-            dataPacketDraft.setPacketId(dataPacketInterface.getPacketId());
-            dataPacketDraft.setLastRunTime(dataPacketInterface.getLastRunTime());
-            dataPacketDraft.setNextRunTime(dataPacketInterface.getNextRunTime());
-            dataPacketDraftDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, dataPacketDraft);
+            //DataPacketDraft dataPacketDraft= new DataPacketDraft();
+            //dataPacketDraft.setPacketId(dataPacketInterface.getPacketId());
+            //dataPacketDraft.setLastRunTime(dataPacketInterface.getLastRunTime());
+            //dataPacketDraft.setNextRunTime(dataPacketInterface.getNextRunTime());
+            //dataPacketDraftDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, dataPacketDraft);
+        } else */
+        if(ConstantValue.RUN_TYPE_DEBUG.equals(runType)) {
+            dataPacketDraftDao.updateObject(new String[]{"lastRunTime"}, (DataPacketDraft) dataPacketInterface);
         }
     }
 }
