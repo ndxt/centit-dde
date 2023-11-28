@@ -1,5 +1,6 @@
 package com.centit.dde.adapter.dao;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.adapter.po.DataPacketDraft;
 import com.centit.support.database.utils.PageDesc;
 
@@ -25,7 +26,9 @@ public interface DataPacketDraftDao {
 
     int deleteObjectById(Object packetId);
 
-    List<DataPacketDraft> listObjectsByProperties(Map<String, Object> params, PageDesc pageDesc);
+    JSONArray listDataPacketDraft(Map<String, Object> params, PageDesc pageDesc);
+
+    //List<DataPacketDraft> listObjectsByProperties(Map<String, Object> params, PageDesc pageDesc);
 
     int[] batchUpdateOptIdByApiId(String optId, List<String> apiIds);
 

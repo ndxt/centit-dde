@@ -1,11 +1,13 @@
 package com.centit.dde.dao.impl;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.adapter.dao.DataPacketDraftDao;
 import com.centit.dde.adapter.po.DataPacketDraft;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.database.utils.PageDesc;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Repository;
 
@@ -31,6 +33,24 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
         filterField.put("(like)packetId",CodeBook.LIKE_HQL_ID);
         return filterField;
     }
+
+    public JSONArray listDataPacketDraft(Map<String, Object> params, PageDesc pageDesc){
+        String sqlSen = "select a.packet_id, a.packet_name, a.packet_desc, a.owner_type, a.owner_code, " +
+            "a.recorder, a.record_date, a.update_date, a.os_id, a.opt_id, " +
+            "a.task_type, a.task_cron, a.is_valid, a.publish_date, a.opt_code," +
+            "a.log_level, a.is_disable, b.last_run_time, b.next_run_time " +
+            " from q_data_packet_draft a left join q_data_packet b on a.packet_id=b.packet_id" +
+            " where 1=1 [:(like)packetName | and (a.packet_name like :packetName or a.packet_id like :packetName) ]" +
+            " [:osId| and a.os_id=:osId]"+
+            " [:optId| and a.opt_id=:optId]"+
+            " [:isDisable| and a.is_disable=:isDisable]"+
+            " [:taskType| and a.task_type=:taskType]"+
+            " [:(like)packetId| and a.packet_id like :packetId]";
+
+        return DatabaseOptUtils.listObjectsByParamsDriverSqlAsJson(this,
+            sqlSen, params, pageDesc);
+    }
+
 
     @Override
     public void publishDataPacket(String optCode, DataPacketDraft dataPacketCopy) {

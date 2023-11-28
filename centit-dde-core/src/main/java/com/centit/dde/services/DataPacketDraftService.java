@@ -1,5 +1,6 @@
 package com.centit.dde.services;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.adapter.po.DataPacketDraft;
 import com.centit.support.database.utils.PageDesc;
 
@@ -19,7 +20,7 @@ public interface DataPacketDraftService {
 
     void deleteDataPacket(String packetId);
 
-    List<DataPacketDraft> listDataPacket(Map<String, Object> params, PageDesc pageDesc);
+    JSONArray listDataPacketForList(Map<String, Object> params, PageDesc pageDesc);
 
     DataPacketDraft getDataPacket(String packetId);
 

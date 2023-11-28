@@ -1,5 +1,6 @@
 package com.centit.dde.dao.json;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.adapter.dao.DataPacketDraftDao;
 import com.centit.dde.adapter.po.DataPacketDraft;
 import com.centit.support.common.ObjectException;
@@ -58,7 +59,7 @@ public class DataPacketDraftDaoImpl implements DataPacketDraftDao{
     }
 
     @Override
-    public List<DataPacketDraft> listObjectsByProperties(Map<String, Object> params, PageDesc pageDesc) {
+    public JSONArray listDataPacketDraft(Map<String, Object> params, PageDesc pageDesc) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
             "该方法在当前版本下没有实现，请联系研发人员!");
     }

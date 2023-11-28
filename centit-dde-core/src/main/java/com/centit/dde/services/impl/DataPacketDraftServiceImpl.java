@@ -1,5 +1,6 @@
 package com.centit.dde.services.impl;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.adapter.dao.DataPacketDao;
 import com.centit.dde.adapter.dao.DataPacketDraftDao;
 import com.centit.dde.adapter.po.DataPacket;
@@ -157,9 +158,14 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         dataPacketDraftDao.deleteObjectReferences(dataPacketCopy);
     }
 
-    @Override
+   /* @Override
     public List<DataPacketDraft> listDataPacket(Map<String, Object> params, PageDesc pageDesc) {
         return dataPacketDraftDao.listObjectsByProperties(params, pageDesc);
+    }*/
+
+    @Override
+    public JSONArray listDataPacketForList(Map<String, Object> params, PageDesc pageDesc){
+        return dataPacketDraftDao.listDataPacketDraft(params, pageDesc);
     }
 
     @Override

@@ -22,7 +22,6 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.operationlog.RecordOperationLog;
 import com.centit.product.oa.team.utils.ResourceBaseController;
 import com.centit.product.oa.team.utils.ResourceLock;
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
@@ -41,7 +40,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author zhf
@@ -301,20 +299,21 @@ public class DataPacketDraftController extends ResourceBaseController {
         }
     }
 
-
     @ApiOperation(value = "查询API网关")
     @GetMapping
     @WrapUpResponseBody
-    public PageQueryResult<Map<String, Object>> listDataPacket(HttpServletRequest request, PageDesc pageDesc) {
-        List<DataPacketDraft> list = dataPacketDraftService.listDataPacket(BaseController.collectRequestParameters(request), pageDesc);
-        List<Map<String, Object>> returnList = new ArrayList<>();
-        list.stream().forEach(dataPacketDraft -> {
-            String optId = dataPacketDraft.getOptId();
-            Map<String, Object> dataPacketInfo = CollectionsOpt.objectToMap(dataPacketDraft);
-            String optName = CodeRepositoryUtil.getValue("optId", optId);
-            dataPacketInfo.put("optName", optName);
-            returnList.add(dataPacketInfo);
-        });
+    public PageQueryResult<Object> listDataPacket(HttpServletRequest request, PageDesc pageDesc) {
+        JSONArray returnList = dataPacketDraftService.listDataPacketForList(BaseController.collectRequestParameters(request), pageDesc);
+        if(returnList!=null) {
+            for (Object obj : returnList) {
+                if(obj instanceof JSONObject){
+                    JSONObject jsonObject = (JSONObject)obj;
+                    String optId = jsonObject.getString("optId");
+                    String optName = CodeRepositoryUtil.getValue("optId", optId);
+                    jsonObject.put("optName", optName);
+                }
+            }
+        }
         return PageQueryResult.createResult(returnList, pageDesc);
     }
 

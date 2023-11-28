@@ -3,7 +3,10 @@ package com.centit.dde.services.impl;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.dao.DataPacketDao;
 import com.centit.dde.adapter.dao.DataPacketDraftDao;
-import com.centit.dde.adapter.po.*;
+import com.centit.dde.adapter.po.DataPacket;
+import com.centit.dde.adapter.po.DataPacketInterface;
+import com.centit.dde.adapter.po.TaskDetailLog;
+import com.centit.dde.adapter.po.TaskLog;
 import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.core.DataOptContext;
@@ -73,8 +76,8 @@ public class TaskRun {
         optContext.setTaskLog(taskLog);
         try {
             DataOptResult runResult = runOptModule(dataPacketInterface, optContext);
-            //更新API信息
-            updateApiData(optContext.getRunType(), dataPacketInterface);
+            //更新定时任务的API最后执行时间
+            updateApiData(dataPacketInterface);//optContext.getRunType(),
             if(runResult.hasErrors()){
                 taskLog.setOtherMessage(runResult.makeErrorResponse().getMessage());
             } else {
@@ -152,28 +155,19 @@ public class TaskRun {
         return taskLog;
     }
 
-    private void updateApiData(String runType, DataPacketInterface dataPacketInterface) throws Exception {
-        dataPacketInterface.setLastRunTime(new Date());
+    /**
+     * 定时任务记录 下次运行时间
+     * @param dataPacketInterface 任务信息
+     * @throws Exception Cron 表达式异常
+     */
+    private void updateApiData(DataPacketInterface dataPacketInterface) throws Exception {
         if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())
             && dataPacketInterface.getIsValid()
             && !StringBaseOpt.isNvl(dataPacketInterface.getTaskCron())) {
+            dataPacketInterface.setLastRunTime(new Date());
             CronExpression cronExpression = new CronExpression(dataPacketInterface.getTaskCron());
             dataPacketInterface.setNextRunTime(cronExpression.getNextValidTimeAfter(dataPacketInterface.getLastRunTime()));
             dataPacketDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, (DataPacket) dataPacketInterface);
-        }else {
-            dataPacketInterface.setNextRunTime(null);
-        }
-
-        /*if(ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType()) && dataPacketInterface.getIsValid()){
-            dataPacketDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, (DataPacket) dataPacketInterface);
-            //DataPacketDraft dataPacketDraft= new DataPacketDraft();
-            //dataPacketDraft.setPacketId(dataPacketInterface.getPacketId());
-            //dataPacketDraft.setLastRunTime(dataPacketInterface.getLastRunTime());
-            //dataPacketDraft.setNextRunTime(dataPacketInterface.getNextRunTime());
-            //dataPacketDraftDao.updateObject(new String[]{"lastRunTime","nextRunTime"}, dataPacketDraft);
-        } else */
-        if(ConstantValue.RUN_TYPE_DEBUG.equals(runType)) {
-            dataPacketDraftDao.updateObject(new String[]{"lastRunTime"}, (DataPacketDraft) dataPacketInterface);
         }
     }
 }

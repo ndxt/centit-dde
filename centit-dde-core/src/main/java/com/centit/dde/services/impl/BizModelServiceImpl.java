@@ -7,7 +7,6 @@ import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataOptResult;
 import com.centit.dde.services.BizModelService;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.security.Md5Encoder;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
