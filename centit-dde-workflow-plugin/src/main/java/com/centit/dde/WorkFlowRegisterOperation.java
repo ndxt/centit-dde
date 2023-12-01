@@ -31,7 +31,8 @@ public class WorkFlowRegisterOperation {
         bizOptFlow.registerOperation(ConstantValue.SUBMIT_WORKFLOW, new SubmitWorkFlowBizOperation(flowEngine));
         //注册删除节点
         bizOptFlow.registerOperation(ConstantValue.DELETE_WORKFLOW, new DeleteWorkFlowBizOperation(flowManager));
-        bizOptFlow.registerOperation(ConstantValue.MANAGER_WORKFLOW, new ManagerWorkFlowBizOperation(flowManager));
+
+        bizOptFlow.registerOperation(ConstantValue.MANAGER_WORKFLOW, new ManagerWorkFlowBizOperation(flowManager, flowEngine));
         //注册查询待办节点
         bizOptFlow.registerOperation(ConstantValue.USER_TASK_WORKFLOW, new WorkFlowUserTaskBizOperation(flowEngine));
 

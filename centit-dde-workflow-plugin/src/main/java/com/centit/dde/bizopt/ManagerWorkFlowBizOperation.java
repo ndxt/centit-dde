@@ -10,6 +10,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
+import com.centit.workflow.service.FlowEngine;
 import com.centit.workflow.service.FlowManager;
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,8 +20,10 @@ import org.apache.commons.lang3.StringUtils;
 public class ManagerWorkFlowBizOperation implements BizOperation {
 
     private FlowManager flowManager;
+    private FlowEngine flowEngine;
 
-    public ManagerWorkFlowBizOperation(FlowManager flowManager) {
+    public ManagerWorkFlowBizOperation(FlowManager flowManager, FlowEngine flowEngine) {
+        this.flowEngine = flowEngine;
         this.flowManager = flowManager;
     }
 
@@ -30,23 +33,47 @@ public class ManagerWorkFlowBizOperation implements BizOperation {
             JSONTransformer.transformer(
                 bizOptJson.getString("flowInstId"),
                 new BizModelJSONTransform(bizModel)));
+        String nodeInstId = StringBaseOpt.objectToString(
+            JSONTransformer.transformer(
+                bizOptJson.getString("nodeInstId"),
+                new BizModelJSONTransform(bizModel)));
+
         String userCode="";
         if (bizModel.getStackData(ConstantValue.SESSION_DATA_TAG) instanceof CentitUserDetails) {
             userCode = ((CentitUserDetails) bizModel.getStackData(ConstantValue.SESSION_DATA_TAG)).getUserCode();
         }
         Integer taskType = bizOptJson.getInteger("taskType");
-        if (StringUtils.isBlank(flowInstId)) {
-            return ResponseData.makeErrorMessage(500, "flowInstId不能为空！");
-        }
+
         switch (taskType) {
             case ConstantValue.STOP_WFINST:
+                if (StringUtils.isBlank(flowInstId)) {
+                    return ResponseData.makeErrorMessage(500, "flowInstId不能为空！");
+                }
                 flowManager.stopInstance(flowInstId, userCode, dataOptContext.getOptId());
                 break;
             case ConstantValue.SUSPEND_WFINST:
+                if (StringUtils.isBlank(flowInstId)) {
+                    return ResponseData.makeErrorMessage(500, "flowInstId不能为空！");
+                }
                 flowManager.suspendInstance(flowInstId, userCode, dataOptContext.getOptId());
                 break;
             case ConstantValue.ACTIVE_WFINST:
+                if (StringUtils.isBlank(flowInstId)) {
+                    return ResponseData.makeErrorMessage(500, "flowInstId不能为空！");
+                }
                 flowManager.activizeInstance(flowInstId, userCode, dataOptContext.getOptId());
+                break;
+            case ConstantValue.ROLLBACK_NODE:
+                if (StringUtils.isBlank(nodeInstId)) {
+                    return ResponseData.makeErrorMessage(500, "nodeInstId不能为空！");
+                }
+                flowEngine.rollBackNode(nodeInstId, userCode);
+                break;
+            case ConstantValue.RECLAIM_NODE:
+                if (StringUtils.isBlank(nodeInstId)) {
+                    return ResponseData.makeErrorMessage(500, "nodeInstId不能为空！");
+                }
+                flowEngine.reclaimNode(nodeInstId, userCode);
                 break;
             default:
                 break;

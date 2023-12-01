@@ -143,6 +143,10 @@ public class ConstantValue {
     public static final int SUSPEND_WFINST=2;
     public static final int ACTIVE_WFINST=3;
 
+    public static final int ROLLBACK_NODE=4;
+
+    public static final int RECLAIM_NODE=5;
+
     public static final String DOUBLE_UNDERLINE = "__";
     public static final String FILE_REQUEST_TYPE="file";
     public static final String HTTP_REQUEST_PREFIX="://";
