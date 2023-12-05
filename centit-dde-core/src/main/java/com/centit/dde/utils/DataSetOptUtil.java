@@ -909,6 +909,9 @@ public abstract class DataSetOptUtil {
         } else {
             fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
         }
+        if(StringUtils.isBlank(fileName)){
+            fileName = fileNameDesc;
+        }
         Object fileData;
         if(StringUtils.isNotBlank(fileContentDesc)){
             fileData = mapFirstRow.get(fileContentDesc);

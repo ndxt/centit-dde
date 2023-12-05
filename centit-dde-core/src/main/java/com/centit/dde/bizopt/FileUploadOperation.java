@@ -10,7 +10,7 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.fileserver.po.FileInfo;
 import com.centit.framework.common.ResponseData;
-import com.centit.support.algorithm.StringBaseOpt;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 文件上传节点
@@ -34,7 +34,7 @@ public class FileUploadOperation implements BizOperation {
                 "文件上传失败，请选择数据集！");
         }
         FileDataSet mapFileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
-        if(StringBaseOpt.isNvl(mapFileInfo.getFileName())){
+        if(StringUtils.isBlank(mapFileInfo.getFileName())){
             return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
                 sourDsName + "：文件上传失败，该数据集文件名称不能为空！");
         }

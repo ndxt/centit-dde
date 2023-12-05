@@ -7,17 +7,15 @@ import com.centit.workflow.service.FlowEngine;
 import com.centit.workflow.service.FlowManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-
 
 @Component
 public class WorkFlowRegisterOperation {
-    @Resource
+
+    @Autowired
     private BizOptFlow bizOptFlow;
 
-    @Resource
+    @Autowired
     private FlowEngine flowEngine;
 
     @Autowired
