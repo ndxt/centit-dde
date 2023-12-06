@@ -82,13 +82,13 @@ public class FileDownloadOperation implements BizOperation {
         }
         FileDataSet objectToDataSet = new FileDataSet();
         if(fileIds.size()==1) {
-            FileBaseInfo fileInfo = fileInfoOpt.getFileInfo(fileId);
+            FileBaseInfo fileInfo = fileInfoOpt.getFileInfo(fileIds.get(0));
             if(fileInfo!=null) {
                 if (StringUtils.isBlank(fileName))
                     fileName = fileInfo.getFileName();
                 objectToDataSet.setFileInfo(fileInfo);
             }
-            InputStream inputStream = new FileInputStream(fileInfoOpt.getFile(fileId));
+            InputStream inputStream = new FileInputStream(fileInfoOpt.getFile(fileIds.get(0)));
             objectToDataSet.setFileContent(fileName, inputStream.available(), inputStream);
         } else {
             ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
