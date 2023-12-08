@@ -112,7 +112,7 @@ public class TaskRun {
     }
 
     private void dealException(TaskLog taskLog, DataOptContext optContext, Exception e) {
-        taskLog.setOtherMessage(e.getMessage());
+        taskLog.setOtherMessage(ObjectException.extortExceptionOriginMessage(e));
         taskLog.setRunEndTime(new Date());
 
         TaskDetailLog detailLog = new TaskDetailLog();
