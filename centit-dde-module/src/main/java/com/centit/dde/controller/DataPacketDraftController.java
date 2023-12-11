@@ -21,6 +21,7 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.operationlog.RecordOperationLog;
 import com.centit.product.oa.team.utils.ResourceBaseController;
 import com.centit.product.oa.team.utils.ResourceLock;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
@@ -152,9 +153,7 @@ public class DataPacketDraftController extends ResourceBaseController {
             DataPacketDraft dataPacketDraft = createDataPacket(metaDataOrHttpParams, type);
             dataPacketDraft.setRecorder(loginUser);
             dataPacketDraftService.createDataPacket(dataPacketDraft);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String dateStr = simpleDateFormat.format(new Date());
-            dataPacketDraft.setPublishDate(simpleDateFormat.parse(dateStr));
+            dataPacketDraft.setPublishDate(DatetimeOpt.truncateToSecond(DatetimeOpt.currentUtilDate()));
             dataPacketDraftService.publishDataPacket(dataPacketDraft);
             dataPacketDraftList.add(dataPacketDraft);
         }
@@ -232,9 +231,7 @@ public class DataPacketDraftController extends ResourceBaseController {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "发布数据不存在！");
         }
         LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateStr = simpleDateFormat.format(new Date());
-        dataPacketDraft.setPublishDate(simpleDateFormat.parse(dateStr));
+        dataPacketDraft.setPublishDate(DatetimeOpt.truncateToSecond(DatetimeOpt.currentUtilDate()));
         dataPacketDraftService.publishDataPacket(dataPacketDraft);
     }
 

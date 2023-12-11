@@ -160,10 +160,12 @@ public class HttpTaskController extends BaseController {
             dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
         }else {
             DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
-            dataPacketInterface = dataPacketCachedMap.get(packetId);
-            if(dataPacketInterface == null || DatetimeOpt.compareTwoDate(dataPacket.getUpdateDate(), dataPacketInterface.getUpdateDate()) != 0){
+            DataPacket cachedPacket = dataPacketCachedMap.get(packetId);
+            if(cachedPacket == null || DatetimeOpt.compareTwoDate(dataPacket.getPublishDate(), cachedPacket.getPublishDate()) != 0){
                 dataPacketInterface = dataPacket;
                 dataPacketCachedMap.put(packetId, dataPacket);
+            } else {
+                dataPacketInterface = cachedPacket;
             }
         }
 
