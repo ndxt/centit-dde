@@ -156,10 +156,19 @@
             <scope>provided</scope>
         </dependency>
 
+        <!--es 日志实现包-->
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>rmdb-opt-log</artifactId>
+            <artifactId>elk-opt-log</artifactId>
+            <version>${project.version}</version>
         </dependency>
+
+        <!--   <dependency>
+               <groupId>com.centit.product</groupId>
+               <artifactId>rmdb-opt-log</artifactId>
+               <version>${project.version}</version>
+           </dependency>-->
+
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>

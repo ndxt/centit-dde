@@ -60,6 +60,7 @@ public class TaskDetailLog implements java.io.Serializable {
 
     @Column(name="log_info")
     @ApiModelProperty(value = "任务明细描述")
+    // @Basic(fetch = FetchType.LAZY)
     private String logInfo;
 
     @Column(name="success_pieces")

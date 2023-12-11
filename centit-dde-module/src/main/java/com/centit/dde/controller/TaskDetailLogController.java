@@ -1,5 +1,6 @@
 package com.centit.dde.controller;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.adapter.po.TaskDetailLog;
 import com.centit.dde.services.TaskDetailLogManager;
 import com.centit.framework.core.controller.BaseController;
@@ -61,10 +62,11 @@ public class TaskDetailLogController extends BaseController {
     @GetMapping
     @ApiOperation(value = "查询所有明细日志")
     @WrapUpResponseBody
-    public PageQueryResult<TaskDetailLog> listTaskDetailLog(PageDesc pageDesc,HttpServletRequest request){
+    public PageQueryResult<Object> listTaskDetailLog(PageDesc pageDesc,HttpServletRequest request){
         Map<String, Object> parameters = collectRequestParameters(request);
         List<TaskDetailLog> taskDetailLogs = taskDetailLogManager.listTaskDetailLog(parameters, pageDesc);
-        return PageQueryResult.createResult(taskDetailLogs,pageDesc);
+        JSONArray jsonArray = JSONArray.from(taskDetailLogs);
+        return PageQueryResult.createJSONArrayResult(jsonArray, pageDesc);
     }
 
     @GetMapping(value = "/{logDetailId}")
