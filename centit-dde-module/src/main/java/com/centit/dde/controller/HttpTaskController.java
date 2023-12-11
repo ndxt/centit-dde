@@ -26,6 +26,7 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OsInfo;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.CachedMap;
 import com.centit.support.common.ObjectException;
@@ -163,10 +164,13 @@ public class HttpTaskController extends BaseController {
                               HttpServletRequest request, HttpServletResponse response) throws IOException {
        // judgePower(packetId,runType);
         DataPacketInterface dataPacketInterface;
-        if(ConstantValue.RUN_TYPE_DEBUG.equals(runType)){
-            dataPacketInterface=dataPacketDraftService.getDataPacket(packetId);
-        }else {
-            dataPacketInterface=DataPacketCache.dataPacketCachedMap.getCachedValue(packetId);
+        dataPacketInterface=dataPacketDraftService.getDataPacket(packetId);
+        if(ConstantValue.RUN_TYPE_NORMAL.equals(runType)){
+            DataPacketInterface dataPacketInterfaceCache=DataPacketCache.dataPacketCachedMap.getCachedValue(packetId);
+            //更新日期相同取缓存
+            if(DatetimeOpt.compareTwoDate(dataPacketInterface.getUpdateDate(),dataPacketInterfaceCache.getUpdateDate())==0){
+                dataPacketInterface=dataPacketInterfaceCache;
+            }
         }
         if (dataPacketInterface == null) {
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "API接口：" + packetId + "不存在！");
