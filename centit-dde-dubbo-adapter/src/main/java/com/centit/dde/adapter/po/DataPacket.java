@@ -127,6 +127,7 @@ public class DataPacket implements Serializable, DataPacketInterface {
     @ApiModelProperty(value = "发布时间")
     private Date publishDate;
 
+    @Basic(fetch = FetchType.LAZY)
     @Column(name = "ext_props")
     @ApiModelProperty(value = "队列配置扩展信息，独有配置，公共的配置在资源管理页面添加")
     private JSONObject extProps;

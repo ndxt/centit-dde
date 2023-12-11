@@ -9,7 +9,6 @@ import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.services.DataPacketTemplateService;
 import com.centit.dde.utils.LoginUserPermissionCheck;
-import com.centit.dde.vo.DataPacketCache;
 import com.centit.dde.vo.HttpParameter;
 import com.centit.dde.vo.MetaDataParameter;
 import com.centit.framework.common.ResponseData;
@@ -237,7 +236,6 @@ public class DataPacketDraftController extends ResourceBaseController {
         String dateStr = simpleDateFormat.format(new Date());
         dataPacketDraft.setPublishDate(simpleDateFormat.parse(dateStr));
         dataPacketDraftService.publishDataPacket(dataPacketDraft);
-        DataPacketCache.evictCache(packetId);
     }
 
     @ApiOperation(value = "编辑API网关数据处理描述信息")
@@ -269,7 +267,6 @@ public class DataPacketDraftController extends ResourceBaseController {
         platformEnvironment.deleteOptMethod(dataPacketDraft.getOptCode());
         dataPacketService.deleteDataPacket(packetId);
         dataPacketDraftService.deleteDataPacket(packetId);
-        DataPacketCache.evictCache(packetId);
     }
 
     @ApiOperation(value = "修改API可用状态(T:禁用，F:启用)")
@@ -287,7 +284,6 @@ public class DataPacketDraftController extends ResourceBaseController {
             DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
             if (dataPacket != null) {
                 dataPacketService.updateDisableStatus(packetId, disableType);
-                DataPacketCache.evictCache(packetId);
             }
             dataPacketDraftService.updateDisableStatus(packetId, disableType);
         } else {

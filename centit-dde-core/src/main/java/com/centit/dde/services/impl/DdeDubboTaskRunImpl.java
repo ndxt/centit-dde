@@ -5,7 +5,6 @@ import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.services.DataPacketService;
-import com.centit.dde.vo.DataPacketCache;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OsInfo;
 import com.centit.support.common.ObjectException;
@@ -39,8 +38,4 @@ public class DdeDubboTaskRunImpl implements DdeDubboTaskRun {
         return taskRun.runTask(dataPacket, dataOptContext);
     }
 
-    @Override
-    public void refreshCache(String packetId) {
-        DataPacketCache.evictCache(packetId);
-    }
 }

@@ -23,8 +23,8 @@ public interface DataPacketInterface {
     Date getNextRunTime();
 
     Date getRecordDate();
-    Date getUpdateDate();
 
+    Date getUpdateDate();
     /**
      * 获取applicationId
      *

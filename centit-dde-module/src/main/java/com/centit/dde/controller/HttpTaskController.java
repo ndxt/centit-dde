@@ -12,7 +12,6 @@ import com.centit.dde.services.BizModelService;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.DataSetOptUtil;
-import com.centit.dde.vo.DataPacketCache;
 import com.centit.dde.vo.FormulaParameter;
 import com.centit.dde.vo.UpdateOptIdParameter;
 import com.centit.fileserver.utils.UploadDownloadUtils;
@@ -51,6 +50,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author zhf
@@ -67,20 +67,12 @@ public class HttpTaskController extends BaseController {
     private final DataPacketDraftService dataPacketDraftService;
     private final BizModelService bizmodelService;
 
-
+    public Map<String, DataPacket> dataPacketCachedMap = new ConcurrentHashMap<>(10000);
     public HttpTaskController(DataPacketService dataPacketService, DataPacketDraftService dataPacketDraftService,
                               BizModelService bizmodelService) {
         this.dataPacketService = dataPacketService;
         this.dataPacketDraftService = dataPacketDraftService;
         this.bizmodelService = bizmodelService;
-        DataPacketCache.dataPacketCachedMap = new CachedMap<>(
-            this::getDataPacketOptStep,
-            CodeRepositoryCache.CACHE_NEVER_EXPIRE
-        );
-    }
-
-    private DataPacket getDataPacketOptStep(String dataPacketId) {
-        return dataPacketService.getDataPacket(dataPacketId);
     }
 
     /**
@@ -162,16 +154,19 @@ public class HttpTaskController extends BaseController {
 
     private void returnObject(String packetId, String runType, String taskType,
                               HttpServletRequest request, HttpServletResponse response) throws IOException {
-       // judgePower(packetId,runType);
+        //judgePower(packetId,runType);
         DataPacketInterface dataPacketInterface;
-        dataPacketInterface=dataPacketDraftService.getDataPacket(packetId);
-        if(ConstantValue.RUN_TYPE_NORMAL.equals(runType)){
-            DataPacketInterface dataPacketInterfaceCache=DataPacketCache.dataPacketCachedMap.getCachedValue(packetId);
-            //更新日期相同取缓存
-            if(DatetimeOpt.compareTwoDate(dataPacketInterface.getUpdateDate(),dataPacketInterfaceCache.getUpdateDate())==0){
-                dataPacketInterface=dataPacketInterfaceCache;
+        if(ConstantValue.RUN_TYPE_DEBUG.equals(runType)){
+            dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
+        }else {
+            DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
+            dataPacketInterface = dataPacketCachedMap.get(packetId);
+            if(dataPacketInterface == null || DatetimeOpt.compareTwoDate(dataPacket.getUpdateDate(), dataPacketInterface.getUpdateDate()) != 0){
+                dataPacketInterface = dataPacket;
+                dataPacketCachedMap.put(packetId, dataPacket);
             }
         }
+
         if (dataPacketInterface == null) {
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "API接口：" + packetId + "不存在！");
         }
