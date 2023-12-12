@@ -65,9 +65,16 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-report-utils</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-workflow-core</artifactId>
+            <version>${centit.workflow.version}</version>
         </dependency>
 
         <dependency>
@@ -79,6 +86,11 @@
                     <artifactId>docx4j-JAXB-Internal</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
         </dependency>
 
         <dependency>
@@ -110,7 +122,7 @@
             <artifactId>javase</artifactId>
             <version>3.5.1</version>
         </dependency>
-        <!-- 二维码依赖结束-->
+
     </dependencies>
 
 </project>

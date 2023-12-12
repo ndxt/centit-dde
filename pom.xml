@@ -15,13 +15,10 @@
     <modules>
         <module>centit-dde-core</module>
         <module>centit-dde-module</module>
-        <module>centit-dde-es-plugin</module>
-        <module>centit-dde-workflow-plugin</module>
         <module>centit-dde-kafka-plugin</module>
         <module>centit-dde-dubbo-adapter</module>
         <module>centit-dde-dubbo-server-config</module>
         <module>centit-dde-dubbo-client-config</module>
-        <module>centit-dde-ftp-plugin</module>
         <module>centit-dde-msg-plugin</module>
         <module>centit-dde-rmdb</module>
         <module>centit-dde-json</module>

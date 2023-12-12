@@ -1,12 +1,12 @@
-package com.centit.dde.ftp;
+package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.utils.FtpOperation;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import org.apache.commons.net.ftp.FTPClient;

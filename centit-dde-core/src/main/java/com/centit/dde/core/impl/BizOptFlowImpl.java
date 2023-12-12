@@ -24,11 +24,15 @@ import com.centit.product.metadata.service.MetaDataService;
 import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.product.oa.service.OptFlowNoInfoManager;
+import com.centit.search.service.ESServerConfig;
+import com.centit.search.utils.ImagePdfTextExtractor;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.json.JSONTransformer;
+import com.centit.workflow.service.FlowEngine;
+import com.centit.workflow.service.FlowManager;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +101,18 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @Autowired
     private OptFlowNoInfoManager optFlowNoInfoManager;
+
+    @Autowired
+    private FlowEngine flowEngine;
+
+    @Autowired
+    private FlowManager flowManager;
+
+    @Autowired
+    ESServerConfig esServerConfig;
+
+    @Autowired
+    ImagePdfTextExtractor.OcrServerHost ocrServerHost;
 
     private Map<String, BizOperation> allOperations;
 
@@ -168,6 +184,33 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.INTERSECT_DATASET, new IntersectDataSetOperation());
         allOperations.put(ConstantValue.MINUS_DATASET, new MinusDataSetOperation());
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentOperation());
+
+
+        //注册查询操作类
+        allOperations.put(ConstantValue.CREATE_WORKFLOW, new CreateWorkFlowBizOperation(flowEngine));
+        //注册插入操作类
+        allOperations.put(ConstantValue.SUBMIT_WORKFLOW, new SubmitWorkFlowBizOperation(flowEngine));
+        //注册删除节点
+        allOperations.put(ConstantValue.DELETE_WORKFLOW, new DeleteWorkFlowBizOperation(flowManager));
+
+        allOperations.put(ConstantValue.MANAGER_WORKFLOW, new ManagerWorkFlowBizOperation(flowManager, flowEngine));
+        //注册查询待办节点
+        allOperations.put(ConstantValue.USER_TASK_WORKFLOW, new WorkFlowUserTaskBizOperation(flowEngine));
+
+        allOperations.put(ConstantValue.INST_NODES_WORKFLOW, new WorkFlowInstNodesBizOperation(flowManager));
+
+        //注册FTP下载组件
+        allOperations.put(ConstantValue.FTP_FILE_DOWNLOAD,new FtpDownloadOperation(sourceInfoDao));
+        //注册FTP上传组件
+        allOperations.put(ConstantValue.FTP_FILE_UPLOAD,new FtpUploadOperation(sourceInfoDao));
+
+        //注册查询操作类
+        allOperations.put(ConstantValue.ELASTICSEARCH_QUERY,
+            new EsQueryBizOperation(esServerConfig, sourceInfoDao));
+        //注册插入操作类
+        allOperations.put(ConstantValue.ELASTICSEARCH_WRITE,
+            new EsWriteBizOperation(esServerConfig, sourceInfoDao, ocrServerHost));
+
         //--------添加 文件获取函数，用于 excel中的图片加载
         DataSetOptUtil.extendFuncs.put("loadFile", (a) -> {
                 try {

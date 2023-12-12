@@ -1,4 +1,4 @@
-package com.centit.dde;
+package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.bizopt.BuiltInOperation;

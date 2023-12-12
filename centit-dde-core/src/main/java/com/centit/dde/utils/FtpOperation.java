@@ -1,4 +1,4 @@
-package com.centit.dde.ftp;
+package com.centit.dde.utils;
 
 import com.centit.dde.core.BizOperation;
 import com.centit.product.metadata.dao.SourceInfoDao;

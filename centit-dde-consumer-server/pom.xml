@@ -8,7 +8,7 @@
         <version>2.1.3.RELEASE</version>
         <relativePath/>
     </parent>
-    <groupId>com.centit.dde.consumer</groupId>
+    <groupId>com.centit.dde.kafka.consumer</groupId>
     <artifactId>centit-dde-consumer-server</artifactId>
     <version>5.4-SNAPSHOT</version>
     <name>centit-dde-consumer-server</name>
