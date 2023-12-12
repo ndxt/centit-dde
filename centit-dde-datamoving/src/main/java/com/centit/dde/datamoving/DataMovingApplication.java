@@ -1,6 +1,5 @@
 package com.centit.dde.datamoving;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.DataOptContext;
