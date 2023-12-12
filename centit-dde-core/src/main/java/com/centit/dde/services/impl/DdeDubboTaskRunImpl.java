@@ -38,4 +38,9 @@ public class DdeDubboTaskRunImpl implements DdeDubboTaskRun {
         return taskRun.runTask(dataPacket, dataOptContext);
     }
 
+    @Override
+    public void refreshCache(String packetId) {
+
+    }
+
 }
