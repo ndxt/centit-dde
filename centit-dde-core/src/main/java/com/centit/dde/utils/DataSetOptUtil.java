@@ -953,7 +953,7 @@ public abstract class DataSetOptUtil {
             if (mapString != null) {
                 BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
                 for (Map.Entry<String, String> map : mapString.entrySet()) {
-                    if (!StringBaseOpt.isNvl(map.getValue())) {
+                    if (StringUtils.isNotBlank(map.getValue())) {
                         parames.put(map.getKey(), transform.attainExpressionValue(map.getValue()));
                     }
                 }
@@ -1014,7 +1014,7 @@ public abstract class DataSetOptUtil {
             //if (mapString != null) {
             BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
             for (Map.Entry<String, String> map : mapString.entrySet()) {
-                if (!StringBaseOpt.isNvl(map.getValue())) {
+                if (StringUtils.isNotBlank(map.getValue())) {
                     parames.put(map.getKey(), transform.attainExpressionValue(map.getValue()));
                 }
             }

@@ -15,6 +15,7 @@ import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.Map;
@@ -34,14 +35,14 @@ public class OptflowSerialNumberOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
         String codeCode = bizOptJson.getString("codeCode");
-        if (StringBaseOpt.isNvl(codeCode)) {
+        if (StringUtils.isBlank(codeCode)) {
             return ResponseData.makeErrorMessage("类别代码没有填写！");
         }
         String type = BuiltInOperation.getJsonFieldString(bizOptJson, "lshType", PRODUCE);
         String baseDateType = BuiltInOperation.getJsonFieldString(bizOptJson, "baseDateType", "Y");
         String lshField = BuiltInOperation.getJsonFieldString(bizOptJson, "lshField", "lsh");
         String owner=BuiltInOperation.getJsonFieldString(bizOptJson, "owner","");
-        if(!StringBaseOpt.isNvl(owner)){
+        if(StringUtils.isNotBlank(owner)){
             owner=StringBaseOpt.castObjectToString(JSONTransformer.transformer(owner,new BizModelJSONTransform(bizModel)));
         }
         String ownCode = owner+dataOptContext.getOsId();
@@ -89,7 +90,7 @@ public class OptflowSerialNumberOperation implements BizOperation {
         data.put("owner",owner);
         bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(data));
         String template = bizOptJson.getString("template");
-        if (!StringBaseOpt.isNvl(template)) {
+        if (StringUtils.isNotBlank(template)) {
             Object calculate = VariableFormula.calculate(template, new BizModelJSONTransform(bizModel), DataSetOptUtil.extendFuncs);
             Map<String, Object> dataTemplate = CollectionsOpt.createHashMap(lshField, calculate);
             bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(dataTemplate));

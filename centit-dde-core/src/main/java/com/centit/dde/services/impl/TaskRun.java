@@ -17,7 +17,6 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OsInfo;
 import com.centit.framework.model.basedata.UserInfo;
 import com.centit.framework.model.security.CentitUserDetails;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -141,7 +140,7 @@ public class TaskRun {
         }
 
         if (dataPacketInterface != null) {
-            if (!StringBaseOpt.isNvl(dataPacketInterface.getTaskType()) && ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())) {
+            if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())) {
                 taskLog.setRunner("定时任务");
             } else {
                 taskLog.setRunner(context.getCurrentUserCode());
@@ -163,7 +162,7 @@ public class TaskRun {
     private void updateApiData(DataPacketInterface dataPacketInterface) throws Exception {
         if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())
            && dataPacketInterface instanceof DataPacket && dataPacketInterface.getIsValid()
-            && !StringBaseOpt.isNvl(dataPacketInterface.getTaskCron())) {
+            && StringUtils.isNotBlank(dataPacketInterface.getTaskCron())) {
             dataPacketInterface.setLastRunTime(new Date());
             CronExpression cronExpression = new CronExpression(dataPacketInterface.getTaskCron());
             dataPacketInterface.setNextRunTime(cronExpression.getNextValidTimeAfter(dataPacketInterface.getLastRunTime()));

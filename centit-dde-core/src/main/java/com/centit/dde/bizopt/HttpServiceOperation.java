@@ -17,7 +17,6 @@ import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.json.JSONTransformer;
 import com.centit.support.network.HttpExecutor;
@@ -189,7 +188,7 @@ public class HttpServiceOperation implements BizOperation {
         if (params != null) {
             BizModelJSONTransform jsonTransform=new BizModelJSONTransform(bizModel);
             for (Map.Entry<String, String> map : params.entrySet()) {
-                if (!StringBaseOpt.isNvl(map.getValue())) {
+                if (StringUtils.isNotBlank(map.getValue())) {
                     mapObject.put(map.getKey(), jsonTransform.attainExpressionValue(map.getValue()));
                 }
             }

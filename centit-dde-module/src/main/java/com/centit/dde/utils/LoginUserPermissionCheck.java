@@ -3,7 +3,6 @@ package com.centit.dde.utils;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,7 +15,7 @@ public class LoginUserPermissionCheck {
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "osId不能为空！");
         }
         String loginUser = WebOptUtils.getCurrentUserCode(request);
-        if (StringBaseOpt.isNvl(loginUser)) {
+        if (StringUtils.isBlank(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(request, "userCode");
         }
         if (StringUtils.isBlank(loginUser)){

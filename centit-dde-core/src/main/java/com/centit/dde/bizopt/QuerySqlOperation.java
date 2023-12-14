@@ -47,7 +47,7 @@ public class QuerySqlOperation implements BizOperation {
         sqlDsr.setSqlSen(sql);
         sqlDsr.setQueryDataScopeFilter(queryDataScopeFilter);
         sqlDsr.setOptId(dataOptContext.getOptId());
-        if ("true".equals(condition) ){//&& !StringBaseOpt.isNvl(conditionSet) && bizModel.getDataSet(conditionSet) != null) {
+        if ("true".equals(condition) ){//&& StringUtils.isNotBlank(conditionSet) && bizModel.getDataSet(conditionSet) != null) {
             String conditionSet = BuiltInOperation.getJsonFieldString(bizOptJson, "conditionSet", "");
             DataSet dataSet = bizModel.getDataSet(conditionSet);
             if(dataSet != null){

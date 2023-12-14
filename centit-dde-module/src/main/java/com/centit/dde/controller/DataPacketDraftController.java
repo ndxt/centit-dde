@@ -22,7 +22,6 @@ import com.centit.framework.operationlog.RecordOperationLog;
 import com.centit.product.oa.team.utils.ResourceBaseController;
 import com.centit.product.oa.team.utils.ResourceLock;
 import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
@@ -94,7 +93,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         dataPacketDraft.setOsId(httpParames.getOsId());
         LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
         String loginUser = WebOptUtils.getCurrentUserCode(request);
-        if (StringBaseOpt.isNvl(loginUser)) {
+        if (StringUtils.isBlank(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(request, "userCode");
         }
         dataPacketDraft.setRecorder(loginUser);
@@ -144,7 +143,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         dataPacket.setOsId(metaDataOrHttpParams.getOsId());
         LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacket.getOsId(), request);
         String loginUser = WebOptUtils.getCurrentUserCode(request);
-        if (StringBaseOpt.isNvl(loginUser)) {
+        if (StringUtils.isBlank(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(request, "userCode");
         }
         List<DataPacketDraft> dataPacketDraftList = new ArrayList<>();
@@ -338,7 +337,7 @@ public class DataPacketDraftController extends ResourceBaseController {
             String[] ids = packetIds.toArray(new String[packetIds.size()]);
             dataPacketDraftService.batchDeleteByPacketIds(ids);
             dataPacketService.batchDeleteByPacketIds(ids);
-        } else if (!StringBaseOpt.isNvl(osId)) {
+        } else if (StringUtils.isNotBlank(osId)) {
             dataPacketDraftService.clearTrashStand(osId);
             dataPacketService.clearTrashStand(osId);
         }

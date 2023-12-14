@@ -5,10 +5,10 @@ import com.centit.dde.services.DataPacketTemplateService;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +28,7 @@ public class DataPacketTemplateController extends BaseController {
     @WrapUpResponseBody
     public DataPacketTemplate createDataPacketTemplate(@RequestBody DataPacketTemplate dataPacketTemplate, HttpServletRequest request){
         String loginUser = WebOptUtils.getCurrentUserCode(request);
-        if (StringBaseOpt.isNvl(loginUser)) {
+        if (StringUtils.isBlank(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(request, "userCode");
         }
         dataPacketTemplate.setCreateUser(loginUser);

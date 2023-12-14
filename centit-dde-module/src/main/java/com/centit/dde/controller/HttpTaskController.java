@@ -140,7 +140,7 @@ public class HttpTaskController extends BaseController {
 
     private void judgePower(@PathVariable String packetId, String loginUser, String runType) {
         if (ConstantValue.RUN_TYPE_DEBUG.equals(runType)) {
-            if (StringBaseOpt.isNvl(loginUser)) {
+            if (StringUtils.isBlank(loginUser)) {
                 throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "您未登录！");
             }
             DataPacketInterface dataPacket = dataPacketDraftService.getDataPacket(packetId);

@@ -641,7 +641,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         bizOptJson = bizOptJson.getJSONObject("properties");
         String sOptType = bizOptJson.getString("type");
         String processName = bizOptJson.getString("processName");
-        if (StringBaseOpt.isNvl(processName)) {
+        if (StringUtils.isBlank(processName)) {
             processName = bizOptJson.getString("nodeName");
         }
         String logType = sOptType + ":" + processName;

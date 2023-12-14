@@ -9,9 +9,9 @@ import com.centit.dde.adapter.po.DataPacketParam;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OptMethod;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.database.utils.PageDesc;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,7 +43,7 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
     @Override
     public void createDataPacket(DataPacketDraft dataPacketCopy) {
-        if(StringBaseOpt.isNvl(dataPacketCopy.getPacketId())) {
+        if(StringUtils.isBlank(dataPacketCopy.getPacketId())) {
             dataPacketCopy.setPacketId(UuidOpt.getUuidAsString32());
         }
         //dataPacketCopy.setOptCode(creatApiOptMethod(dataPacketCopy));

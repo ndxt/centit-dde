@@ -19,7 +19,6 @@ import com.centit.product.metadata.service.MetaObjectService;
 import com.centit.product.metadata.utils.SessionDataUtils;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.database.utils.PageDesc;
@@ -62,7 +61,7 @@ public class MetadataOperation implements BizOperation {
             parames = new HashMap<>(16);
             if (mapString != null) {
                 for (Map.Entry<String, String> map : mapString.entrySet()) {
-                    if (!StringBaseOpt.isNvl(map.getValue())) {
+                    if (StringUtils.isNotBlank(map.getValue())) {
                         parames.put(map.getKey(),  VariableFormula.calculate(map.getValue(),new BizModelJSONTransform(bizModel)));
                     }
                 }

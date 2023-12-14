@@ -64,7 +64,7 @@ public abstract class BuiltInOperation {
             LinkedHashMap<String, String> map = new LinkedHashMap<>();
             for (Object o : json) {
                 JSONObject temp = (JSONObject) o;
-                if (!StringBaseOpt.isNvl(temp.getString(key))) {
+                if (StringUtils.isNotBlank(temp.getString(key))) {
                     map.put(temp.getString(key), temp.getString(value));
                 }
             }
