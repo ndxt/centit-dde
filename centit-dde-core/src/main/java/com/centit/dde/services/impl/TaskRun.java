@@ -162,7 +162,7 @@ public class TaskRun {
      */
     private void updateApiData(DataPacketInterface dataPacketInterface) throws Exception {
         if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())
-            && dataPacketInterface.getIsValid()
+           && dataPacketInterface instanceof DataPacket && dataPacketInterface.getIsValid()
             && !StringBaseOpt.isNvl(dataPacketInterface.getTaskCron())) {
             dataPacketInterface.setLastRunTime(new Date());
             CronExpression cronExpression = new CronExpression(dataPacketInterface.getTaskCron());
