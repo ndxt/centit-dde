@@ -45,7 +45,8 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
             " [:optId| and a.opt_id=:optId]"+
             " [:isDisable| and a.is_disable=:isDisable]"+
             " [:taskType| and a.task_type=:taskType]"+
-            " [:(like)packetId| and a.packet_id like :packetId]";
+            " [:(like)packetId| and a.packet_id like :packetId]"+
+            " order by a.update_date desc";
 
         return DatabaseOptUtils.listObjectsByParamsDriverSqlAsJson(this,
             sqlSen, params, pageDesc);
