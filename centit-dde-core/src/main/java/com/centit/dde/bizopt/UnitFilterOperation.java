@@ -11,6 +11,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.components.SysUnitFilterEngine;
 import com.centit.framework.components.impl.UserUnitMapTranslate;
+import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.UnitInfo;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -26,6 +27,12 @@ import java.util.Set;
  * @author zhf
  */
 public class UnitFilterOperation implements BizOperation {
+
+    private PlatformEnvironment platformEnvironment;
+
+    public UnitFilterOperation(PlatformEnvironment platformEnvironment){
+        this.platformEnvironment = platformEnvironment;
+    }
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext){
         String topUnit = bizModel.fetchTopUnit();
@@ -35,6 +42,9 @@ public class UnitFilterOperation implements BizOperation {
 
         Set<String> units;
         Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
+        //两种类别 机构表达式， 根据属性查询
+
+
         if (userObj instanceof CentitUserDetails) {
             CentitUserDetails centitUserDetails = (CentitUserDetails) userObj;
             units = SysUnitFilterEngine.calcSystemUnitsByExp(

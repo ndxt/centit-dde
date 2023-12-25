@@ -11,6 +11,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.components.SysUserFilterEngine;
 import com.centit.framework.components.impl.UserUnitMapTranslate;
+import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.UserInfo;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -23,6 +24,13 @@ import java.util.*;
  * @author zhf
  */
 public class UserFilterOperation implements BizOperation {
+
+    private PlatformEnvironment platformEnvironment;
+
+    public UserFilterOperation(PlatformEnvironment platformEnvironment){
+        this.platformEnvironment = platformEnvironment;
+    }
+
     static HashMap<String, Set<String>> createFilterParam(String key, String value){
         HashMap<String, Set<String>> param = new HashMap<>();
         param.put(key, CollectionsOpt.createHashSet(value));
@@ -31,7 +39,9 @@ public class UserFilterOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
         String topUnit = bizModel.fetchTopUnit();
+        //获取用户信息
         Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
+        //两种类别 用户表达式， 根据属性查询
         String userFilter = Pretreatment.mapTemplateStringAsFormula(bizOptJson.getString("userFilter"),
             new BizModelJSONTransform(bizModel));
 

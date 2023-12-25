@@ -17,6 +17,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.model.adapter.OperationLogWriter;
+import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.service.DataCheckRuleService;
 import com.centit.product.metadata.service.MetaDataCache;
@@ -109,6 +110,9 @@ public class BizOptFlowImpl implements BizOptFlow {
     private FlowManager flowManager;
 
     @Autowired
+    private PlatformEnvironment platformEnvironment;
+
+    @Autowired
     ESServerConfig esServerConfig;
 
     @Autowired
@@ -153,8 +157,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("sqlS", new RunSqlOperation(sourceInfoDao));
         allOperations.put("SSD", new DocReportOperation(fileInfoOpt));
         allOperations.put("optflow", new OptflowSerialNumberOperation(optFlowNoInfoManager));
-        allOperations.put("unit", new UnitFilterOperation());
-        allOperations.put("user", new UserFilterOperation());
+        allOperations.put("unit", new UnitFilterOperation(platformEnvironment));
+        allOperations.put("user", new UserFilterOperation(platformEnvironment));
 
         allOperations.put("redisRead", new RedisReadOperation(sourceInfoDao));
         allOperations.put("redisWrite", new RedisWriteOperation(sourceInfoDao));
