@@ -41,7 +41,8 @@ public class UserFilterOperation implements BizOperation {
         String topUnit = bizModel.fetchTopUnit();
         //获取用户信息
         Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
-        //两种类别 用户表达式， 根据属性查询
+        //两种类别 用户表达式， 根据属性查询 filterType： exact， properties， express
+
         String userFilter = Pretreatment.mapTemplateStringAsFormula(bizOptJson.getString("userFilter"),
             new BizModelJSONTransform(bizModel));
 

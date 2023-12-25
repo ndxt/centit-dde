@@ -42,7 +42,7 @@ public class UnitFilterOperation implements BizOperation {
 
         Set<String> units;
         Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
-        //两种类别 机构表达式， 根据属性查询
+        //两种类别 机构表达式， 根据属性查询 filterType： exact， properties， express
 
 
         if (userObj instanceof CentitUserDetails) {
