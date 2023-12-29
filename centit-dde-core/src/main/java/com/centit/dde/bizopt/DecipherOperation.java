@@ -2,6 +2,7 @@ package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
@@ -29,6 +30,7 @@ public class DecipherOperation implements BizOperation {
 
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
+        String cipherDataType = BuiltInOperation.getJsonFieldString(bizOptJson, "decipherData", "dataSet");
         //AES / SM4
         String algorithm = BuiltInOperation.getJsonFieldString(bizOptJson, "algorithm", "AES");
         String password = BuiltInOperation.getJsonFieldString(bizOptJson, "password", "");
@@ -41,7 +43,7 @@ public class DecipherOperation implements BizOperation {
         }
         Boolean base64 =
             BooleanBaseOpt.castObjectToBoolean(
-                BuiltInOperation.getJsonFieldString(bizOptJson, "base64", "true"), true);
+                BuiltInOperation.getJsonFieldString(bizOptJson, "base64", ""),  ! "file".equals(cipherDataType));
 
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null){
@@ -49,11 +51,13 @@ public class DecipherOperation implements BizOperation {
                 ResponseData.ERROR_OPERATION, "解密算法异常，请指定数据集！");
         }
 
-        String cipherDataType = BuiltInOperation.getJsonFieldString(bizOptJson, "fieldName", "");
+
         String fieldName = BuiltInOperation.getJsonFieldString(bizOptJson, "fieldName", "");
 
         /**
-         * 解密数据 cipherData ，整个数据集 dataSet， 某一个具体的字段 field ： fieldName ， cipherFieldName
+         * 解密数据 decipherData ，整个数据集 dataSet，
+         * 对文件加密 file
+         * 某一个具体的字段 field ： fieldName ， cipherFieldName
          */
         if("dataSet".equals(cipherDataType)) {
             Object cipherData;
@@ -84,6 +88,13 @@ public class DecipherOperation implements BizOperation {
             return BuiltInOperation.createResponseSuccessData(objectToDataSet.getSize());
         } else {
             String cipherField = BuiltInOperation.getJsonFieldString(bizOptJson, "cipherFieldName", "");
+            if("file".equals(cipherDataType)) {
+                //ConstantValue.FILE_CONTENT
+                if(StringUtils.isBlank(fieldName)){
+                    fieldName = ConstantValue.FILE_CONTENT;
+                }
+                cipherField = fieldName; //文件加密 不需要填写这个字段
+            }
             if (StringUtils.isBlank(fieldName) || StringUtils.isBlank(cipherField)) {
                 return BuiltInOperation.createResponseData(0, 1,
                     ResponseData.ERROR_OPERATION, "加密计算异常，请指定明文字段和者密文字段！");
@@ -109,8 +120,11 @@ public class DecipherOperation implements BizOperation {
                         //这个国密算法有很多策略，现在也搞不懂，随便搞一个
                         SM4Util.decryptEcbPadding(password.getBytes(StandardCharsets.UTF_8), cipherBytes) :
                         AESSecurityUtils.decrypt(cipherBytes, password);
-
-                    map.put(cipherField, JSON.parse(StringBaseOpt.castObjectToString(objectText)));// objectText);
+                    if("file".equals(cipherDataType)) {
+                        map.put(cipherField, objectText);// objectText);
+                    } else {
+                        map.put(cipherField, JSON.parse(StringBaseOpt.castObjectToString(objectText)));// objectText);
+                    }
                 }
             }
             DataSet objectToDataSet = dataSet.getSize() == 1? new DataSet(encryptData.get(0)) : new DataSet(encryptData);
