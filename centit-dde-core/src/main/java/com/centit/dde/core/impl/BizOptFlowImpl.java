@@ -115,7 +115,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     @Autowired
     ESServerConfig esServerConfig;
 
-    @Autowired
+    @Autowired(required = false)
     ImagePdfTextExtractor.OcrServerHost ocrServerHost;
 
     private Map<String, BizOperation> allOperations;

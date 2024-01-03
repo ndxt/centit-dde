@@ -203,7 +203,7 @@ public class HttpTaskController extends BaseController {
                     }
                 }
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, bodyMap);
-            }else { //"multipart/form-data
+            } else { //Content-Type = application/octet-stream
                 String fileName = request.getHeader("fileName");
                 if (fileName == null) {
                     String fileName2 = StringBaseOpt.castObjectToString(params.get("fileName"));
