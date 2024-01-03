@@ -193,7 +193,17 @@ public class HttpTaskController extends BaseController {
             if (StringUtils.contains(request.getHeader("Content-Type"), "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, JSON.parse(bodyString));
-            } else {
+            } else if(StringUtils.contains(request.getHeader("Content-Type"), "application/x-www-form-urlencoded")){
+                Map<String, Object> bodyMap = new HashMap<>(32);
+                for(Map.Entry<String, String[]> ent : request.getParameterMap().entrySet()){
+                    if(ent.getValue().length==1){
+                        bodyMap.put(ent.getKey(), ent.getValue()[0]);
+                    }else {
+                        bodyMap.put(ent.getKey(), ent.getValue());
+                    }
+                }
+                dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, bodyMap);
+            }else { //"multipart/form-data
                 String fileName = request.getHeader("fileName");
                 if (fileName == null) {
                     String fileName2 = StringBaseOpt.castObjectToString(params.get("fileName"));
