@@ -15,8 +15,10 @@ import com.centit.support.algorithm.ByteBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.security.AESSecurityUtils;
 import com.centit.support.security.SM4Util;
+import com.centit.support.security.SecurityOptUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -34,9 +36,8 @@ public class DecipherOperation implements BizOperation {
         //AES / SM4
         String algorithm = BuiltInOperation.getJsonFieldString(bizOptJson, "algorithm", "AES");
         String password = BuiltInOperation.getJsonFieldString(bizOptJson, "password", "");
-        if(StringUtils.isBlank(password)){
-            password = AESSecurityUtils.AES_DEFAULT_KEY;
-        } else {
+
+        if(StringUtils.isNotBlank(password)){
             BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
             password = StringBaseOpt.castObjectToString(
                 DataSetOptUtil.fetchFieldValue(transform, password), password);
@@ -77,10 +78,30 @@ public class DecipherOperation implements BizOperation {
             } else {
                 cipherBytes = ByteBaseOpt.castObjectToBytes(cipherData);
             }
-            byte[] objectText = "SM4".equalsIgnoreCase(algorithm) ?
-                //这个国密算法有很多策略，现在也搞不懂，随便搞一个
-                SM4Util.decryptEcbPadding(password.getBytes(StandardCharsets.UTF_8), cipherBytes) :
-                AESSecurityUtils.decrypt(cipherBytes, password);
+            byte[] objectText = null;
+
+            switch (algorithm){
+                case "SM4":
+                    objectText = SM4Util.decryptEcbPadding(password.getBytes(StandardCharsets.UTF_8),
+                        cipherBytes);
+                    break;
+                case "AES_CBC": {
+                    Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "AES");
+                    objectText = AESSecurityUtils.decryptAsCBCType(cipherBytes,
+                        keyAndIv.getKey(), keyAndIv.getValue());
+                }
+                break;
+                case "SM4_CBC": {
+                    Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "SM4");
+                    objectText = SM4Util.decryptAsCBCType(cipherBytes,
+                        keyAndIv.getKey(), keyAndIv.getValue());
+                }
+                break;
+                case "AES":
+                default:
+                    objectText = AESSecurityUtils.decrypt(cipherBytes, password);
+                    break;
+            }
             //整个数据集都是以json形式存储的
             String jsonString = new String(objectText);
             DataSet objectToDataSet = new DataSet(JSON.parse(jsonString));
@@ -116,10 +137,29 @@ public class DecipherOperation implements BizOperation {
                         cipherBytes = ByteBaseOpt.castObjectToBytes(mw);
                     }
 
-                    byte[] objectText = "SM4".equalsIgnoreCase(algorithm) ?
-                        //这个国密算法有很多策略，现在也搞不懂，随便搞一个
-                        SM4Util.decryptEcbPadding(password.getBytes(StandardCharsets.UTF_8), cipherBytes) :
-                        AESSecurityUtils.decrypt(cipherBytes, password);
+                    byte[] objectText = null;
+                    switch (algorithm){
+                        case "SM4":
+                            objectText = SM4Util.decryptEcbPadding(password.getBytes(StandardCharsets.UTF_8),
+                                cipherBytes);
+                            break;
+                        case "AES_CBC": {
+                            Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "AES");
+                            objectText = AESSecurityUtils.decryptAsCBCType(cipherBytes,
+                                keyAndIv.getKey(), keyAndIv.getValue());
+                        }
+                        break;
+                        case "SM4_CBC": {
+                            Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "SM4");
+                            objectText = SM4Util.decryptAsCBCType(cipherBytes,
+                                keyAndIv.getKey(), keyAndIv.getValue());
+                        }
+                        break;
+                        case "AES":
+                        default:
+                            objectText = AESSecurityUtils.decrypt(cipherBytes, password);
+                            break;
+                    }
                     if("file".equals(cipherDataType)) {
                         map.put(cipherField, objectText);// objectText);
                     } else {

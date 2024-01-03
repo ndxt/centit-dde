@@ -17,6 +17,7 @@ import com.centit.support.security.SM4Util;
 import com.centit.support.security.SecurityOptUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.Map;
  */
 public class EncryptOperation  implements BizOperation {
 
+
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
@@ -38,13 +40,11 @@ public class EncryptOperation  implements BizOperation {
          *  file 加密文件， 加密文件是不需要base64编码的
          */
         String encryptDataType = BuiltInOperation.getJsonFieldString(bizOptJson, "encryptData", "dataSet");
-        //AES / SM4
+        //AES(ECB) / AES_CBC (CBC)  / SM4(EBC) / SM4_CBC(CBC)
         String algorithm = BuiltInOperation.getJsonFieldString(bizOptJson, "algorithm", "AES");
         String password = BuiltInOperation.getJsonFieldString(bizOptJson, "password", "");
 
-        if(StringUtils.isBlank(password)){
-            password = SecurityOptUtils.GENERAL_DEFAULT_KEY;
-        } else {
+        if(StringUtils.isNotBlank(password)){
             BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
             password = StringBaseOpt.castObjectToString(
                 DataSetOptUtil.fetchFieldValue(transform, password), password);
@@ -60,12 +60,30 @@ public class EncryptOperation  implements BizOperation {
                 ResponseData.ERROR_OPERATION, "加密计算异常，请指定数据集！");
         }
         if("dataSet".equals(encryptDataType)) {
-            byte[] cipherText = "SM4".equalsIgnoreCase(algorithm) ?
-                //这个国密算法有很多策略，现在也搞不懂，随便搞一个
-                SM4Util.encryptEcbPadding(password.getBytes(StandardCharsets.UTF_8),
-                    dataSet.toJSONString().getBytes(StandardCharsets.UTF_8)) :
-                AESSecurityUtils.encrypt(dataSet.toJSONString().getBytes(StandardCharsets.UTF_8),
-                    password);
+            byte[] cipherText = null;
+            switch (algorithm){
+                case "SM4":
+                    cipherText = SM4Util.encryptEcbPadding(password.getBytes(StandardCharsets.UTF_8),
+                        dataSet.toJSONString().getBytes(StandardCharsets.UTF_8));
+                    break;
+                case "AES_CBC": {
+                    Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "AES");
+                    cipherText = AESSecurityUtils.encryptAsCBCType(dataSet.toJSONString().getBytes(StandardCharsets.UTF_8),
+                        keyAndIv.getKey(), keyAndIv.getValue());
+                    }
+                    break;
+                case "SM4_CBC": {
+                    Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "SM4");
+                    cipherText = SM4Util.encryptAsCBCType(dataSet.toJSONString().getBytes(StandardCharsets.UTF_8),
+                        keyAndIv.getKey(), keyAndIv.getValue());
+                    }
+                    break;
+                case "AES":
+                default:
+                    cipherText = AESSecurityUtils.encrypt(dataSet.toJSONString().getBytes(StandardCharsets.UTF_8),
+                        password);
+                    break;
+            }
 
             DataSet objectToDataSet = new DataSet(base64 ? new String(Base64.encodeBase64(cipherText)) : cipherText);
             bizModel.putDataSet(targetDsName, objectToDataSet);
@@ -95,12 +113,31 @@ public class EncryptOperation  implements BizOperation {
                 Object mw = map.get(fieldName);
 
                 if(mw!=null){
-                    byte[] cipherText = "SM4".equalsIgnoreCase(algorithm) ?
-                        //这个国密算法有很多策略，现在也搞不懂，随便搞一个
-                        SM4Util.encryptEcbPadding(password.getBytes(StandardCharsets.UTF_8),
-                            ByteBaseOpt.castObjectToBytes(mw) )://
-                            //ByteBaseOpt.castObjectToBytes(mw)) :
-                        AESSecurityUtils.encrypt(ByteBaseOpt.castObjectToBytes(mw), password);
+                    byte[] cipherText = null;
+
+                    switch (algorithm){
+                        case "SM4":
+                            cipherText = SM4Util.encryptEcbPadding(password.getBytes(StandardCharsets.UTF_8),
+                                ByteBaseOpt.castObjectToBytes(mw) );
+                            break;
+                        case "AES_CBC": {
+                            Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "AES");
+                            cipherText = AESSecurityUtils.encryptAsCBCType(ByteBaseOpt.castObjectToBytes(mw),
+                                keyAndIv.getKey(), keyAndIv.getValue());
+                        }
+                        break;
+                        case "SM4_CBC": {
+                            Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "SM4");
+                            cipherText = SM4Util.encryptAsCBCType(ByteBaseOpt.castObjectToBytes(mw),
+                                keyAndIv.getKey(), keyAndIv.getValue());
+                        }
+                        break;
+                        case "AES":
+                        default:
+                            cipherText = AESSecurityUtils.encrypt(ByteBaseOpt.castObjectToBytes(mw),
+                                password);
+                            break;
+                    }
                     if(base64)
                         map.put(encryptFieldName, new String(Base64.encodeBase64(cipherText)));
                     else
