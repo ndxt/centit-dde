@@ -626,13 +626,16 @@ public class BizOptFlowImpl implements BizOptFlow {
             //正确返回也要设置运行结果
             bizModel.getOptResult().setStepResponse(bizOptJson.getString("id"), responseData);
 
-        } catch (Exception e) {
+        } catch(Exception e ) {
             TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
             String errMsg = ObjectException.extortExceptionMessage(e);
             detailLog.setLogInfo(errMsg);
             detailLog.setRunBeginTime(runBeginTime);
-
-            ResponseData responseData = ResponseData.makeErrorMessageWithData(errMsg, ResponseData.ERROR_OPERATION,
+            int errorCode = ResponseData.ERROR_OPERATION;
+            if(e instanceof ObjectException){
+                errorCode = ((ObjectException)e).getExceptionCode();
+            }
+            ResponseData responseData = ResponseData.makeErrorMessageWithData(errMsg, errorCode,
                 e.getMessage());
             bizModel.getOptResult().setStepResponse(bizOptJson.getString("id"), responseData);
         }
