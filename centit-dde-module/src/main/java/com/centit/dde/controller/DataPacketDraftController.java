@@ -240,7 +240,7 @@ public class DataPacketDraftController extends ResourceBaseController {
     public void updateDataPacketOpt(@PathVariable String packetId,
                                     @RequestBody String dataOptDescJson, HttpServletRequest request) {
         //检查资源
-        ResourceLock.lockResource(packetId, WebOptUtils.getCurrentUserCode(request));
+        ResourceLock.lockResource(packetId, WebOptUtils.getCurrentUserCode(request), request);
 
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
         if (dataPacketDraft == null) {
