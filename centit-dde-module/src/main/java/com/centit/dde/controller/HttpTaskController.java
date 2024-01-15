@@ -32,18 +32,24 @@ import com.centit.support.compiler.VariableFormula;
 import com.centit.support.file.FileIOOpt;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -190,10 +196,11 @@ public class HttpTaskController extends BaseController {
         dataOptContext.setDebugId((String) params.getOrDefault("debugId", ""));
 
         if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
-            if (StringUtils.contains(request.getHeader("Content-Type"), "application/json")) {
-                String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(Charset.forName("utf-8")));
+            String contentType = request.getHeader("Content-Type");
+            if (StringUtils.contains(contentType, "application/json")) {
+                String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(StandardCharsets.UTF_8));
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, JSON.parse(bodyString));
-            } else if(StringUtils.contains(request.getHeader("Content-Type"), "application/x-www-form-urlencoded")){
+            } else if(StringUtils.contains(contentType, "application/x-www-form-urlencoded")){
                 Map<String, Object> bodyMap = new HashMap<>(32);
                 for(Map.Entry<String, String[]> ent : request.getParameterMap().entrySet()){
                     if(ent.getValue().length==1){
@@ -203,16 +210,21 @@ public class HttpTaskController extends BaseController {
                     }
                 }
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, bodyMap);
-            } else { //Content-Type = application/octet-stream
-                String fileName = request.getHeader("fileName");
-                if (fileName == null) {
-                    String fileName2 = StringBaseOpt.castObjectToString(params.get("fileName"));
-                    if (StringUtils.isBlank(fileName2)) {
-                        params.put("fileName", fileName);
-                    } else {
-                        fileName = fileName2;
+            }  else if(StringUtils.contains(contentType, "application/octet-stream")){
+                String fileName = request.getHeader("filename");
+                String fileName2 = StringBaseOpt.castObjectToString(params.get("fileName"));
+                if (StringUtils.isBlank(fileName)) {
+                    fileName = request.getHeader("fileName");
+                    if(StringUtils.isBlank(fileName)) {
+                        if (StringUtils.isNotBlank(fileName2)) {
+                            fileName = fileName2;
+                        }
                     }
                 }
+                if (StringUtils.isNotBlank(fileName) && StringUtils.isBlank(fileName2)) {
+                    params.put("fileName", fileName);
+                }
+
                 InputStream inputStream = UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight();
                 if (inputStream != null) {
                     dataOptContext.setStackData(ConstantValue.REQUEST_FILE_TAG,
@@ -221,6 +233,51 @@ public class HttpTaskController extends BaseController {
                             "fileSize", inputStream.available(),
                             "fileContent", inputStream));
                 }
+            } else if(StringUtils.contains(contentType, "text/plain")){
+                String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(StandardCharsets.UTF_8));
+                dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, bodyString);
+            } else if(StringUtils.contains(contentType, "multipart/form-data")){
+                MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+                MultipartHttpServletRequest multiRequest = resolver.resolveMultipart(request);
+                Map<String, MultipartFile> map = multiRequest.getFileMap();
+                Map<String, Object> bodyMap = new HashMap<>(32);
+                for (Map.Entry<String, MultipartFile> entry : map.entrySet()) {
+                    CommonsMultipartFile cMultipartFile = (CommonsMultipartFile) entry.getValue();
+                    FileItem fi = cMultipartFile.getFileItem();
+                    String fieldName = fi.getFieldName();
+                    String itemType = request.getHeader("Content-Type");
+                    if (itemType.contains("application/json")) {
+                        String bodyString = fi.getString();
+                        bodyMap.put(fieldName, JSON.parse(bodyString));
+                    } else if (itemType.contains("application/octet-stream")) {
+                        String filename = fi.getHeaders().getHeader("filename");
+                        if (StringUtils.isBlank(filename)) {
+                            filename = StringBaseOpt.castObjectToString(params.get("filename"));
+                            if (StringUtils.isBlank(filename)) {
+                                filename = StringBaseOpt.castObjectToString(params.get("fileName"));
+                            }
+                        }
+                        String fileName2 = StringBaseOpt.castObjectToString(params.get("fileName"));
+                        if (StringUtils.isNotBlank(filename) && StringUtils.isBlank(fileName2)) {
+                            params.put("fileName", filename);
+                        }
+                        InputStream inputStream = fi.getInputStream();
+                        if (inputStream != null) {
+                            dataOptContext.setStackData(ConstantValue.REQUEST_FILE_TAG,
+                                CollectionsOpt.createHashMap(
+                                    "fileName", filename,
+                                    "fileSize", inputStream.available(),
+                                    "fileContent", inputStream));
+                        }
+                    } else if (itemType.contains("text/plain")) {
+                        String bodyString = fi.getString();
+                        bodyMap.put(fieldName, bodyString);
+                    }
+
+                }
+                dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, bodyMap);
+            } else { //
+                throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT, "不支持的表单格式，Content-Type:" + contentType);
             }
         }
 
