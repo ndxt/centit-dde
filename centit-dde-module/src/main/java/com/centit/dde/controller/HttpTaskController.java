@@ -195,7 +195,8 @@ public class HttpTaskController extends BaseController {
 
         dataOptContext.setDebugId((String) params.getOrDefault("debugId", ""));
 
-        if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
+        if (taskType == ConstantValue.TASK_TYPE_POST || taskType == ConstantValue.TASK_TYPE_PUT ||
+            "POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
             String contentType = request.getHeader("Content-Type");
             if (StringUtils.contains(contentType, "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(StandardCharsets.UTF_8));
@@ -245,7 +246,7 @@ public class HttpTaskController extends BaseController {
                     CommonsMultipartFile cMultipartFile = (CommonsMultipartFile) entry.getValue();
                     FileItem fi = cMultipartFile.getFileItem();
                     String fieldName = fi.getFieldName();
-                    String itemType = request.getHeader("Content-Type");
+                    String itemType = fi.getHeaders().getHeader("Content-Type");
                     if (itemType.contains("application/json")) {
                         String bodyString = fi.getString();
                         bodyMap.put(fieldName, JSON.parse(bodyString));
