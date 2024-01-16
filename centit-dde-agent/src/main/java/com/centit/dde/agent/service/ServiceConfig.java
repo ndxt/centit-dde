@@ -42,13 +42,11 @@ public class ServiceConfig implements EnvironmentAware {
     }
 
     @Bean
-    public SchedulerFactoryBean schedulerFactoryBean() {
-        return new SchedulerFactoryBean();
-    }
-
-    @Bean
     public Scheduler scheduler() {
-        return schedulerFactoryBean().getScheduler();
+        SchedulerFactoryBean
+                schedulerFactoryBean = new SchedulerFactoryBean();
+        // schedulerFactoryBean.setQuartzProperties();
+        return schedulerFactoryBean.getScheduler();
     }
 
     @Bean

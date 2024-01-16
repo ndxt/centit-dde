@@ -3,10 +3,12 @@ package com.centit.dde.agent.service;
 import com.centit.dde.adapter.dao.DataPacketDao;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.adapter.utils.ConstantValue;
+
 import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.model.basedata.OperationLog;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.quartz.QuartzJobUtils;
 import org.apache.commons.codec.binary.Hex;
@@ -16,6 +18,8 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -38,14 +42,12 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Service
 public class TaskSchedulers {
 
+    protected static final Logger logger = LoggerFactory.getLogger(TaskSchedulers.class);
     private final DataPacketDao dataPacketDao;
     private final Scheduler scheduler;
     private final OperationLogWriter operationLogWriter;
     private static String staticTaskMd5= "";
     private static ConcurrentHashMap<String, Object> queryParams = new ConcurrentHashMap<>(2);
-
-    //@Autowired
-    //private DBPlatformEnvironment dbPlatformEnvironment;
 
     @Autowired
     public TaskSchedulers(@Autowired DataPacketDao dataPacketDao,@Autowired  PlatformEnvironment dbPlatformEnvironment,
@@ -63,12 +65,22 @@ public class TaskSchedulers {
         }
     }
 
-    private void refreshTask() throws SchedulerException {
+    private void refreshTask() {
         List<DataPacket> list =  new CopyOnWriteArrayList<>(dataPacketDao.listObjectsByProperties(queryParams));
         if (isEqualMd5(list)) {
             return;
         }
-        Set<TriggerKey> triggerKeys =  new CopyOnWriteArraySet<>(scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup()));
+        Set<TriggerKey> triggerKeys = null;
+        try {
+            triggerKeys = new CopyOnWriteArraySet<>(scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup()));
+        } catch (SchedulerException e){
+            logger.error("get trigger keys error", e);
+            OperationLogCenter.log(OperationLog.create().level(OperationLog.LEVEL_ERROR)
+                .operation("refreshTask").user("scheduler")
+                .method("getTriggerKeys").content("get trigger keys error"));
+            return;
+        }
+
         for (DataPacket dataPacket : list) {
             if (StringUtils.isBlank(dataPacket.getTaskCron())) {
                 continue;
@@ -77,18 +89,33 @@ public class TaskSchedulers {
             for (TriggerKey tKey : triggerKeys) {
                 if (tKey.getName().equals(dataPacket.getPacketId())) {
                     i++;
-                    CronTrigger quartzTrigger = (CronTrigger) scheduler.getTrigger(tKey);
-                    if (!(quartzTrigger.getCronExpression().equals(dataPacket.getTaskCron()))) {
-                        QuartzJobUtils.createOrReplaceCronJob(scheduler, dataPacket.getPacketId(), dataPacket.getOptId(), "task", dataPacket.getTaskCron(),
-                            CollectionsOpt.createHashMap("taskExchange", dataPacket));
-                        break;
+                    try {
+                        CronTrigger quartzTrigger = (CronTrigger) scheduler.getTrigger(tKey);
+                        if (!(quartzTrigger.getCronExpression().equals(dataPacket.getTaskCron()))) {
+                            QuartzJobUtils.createOrReplaceCronJob(scheduler, dataPacket.getPacketId(), dataPacket.getOptId(), "task", dataPacket.getTaskCron(),
+                                CollectionsOpt.createHashMap("taskExchange", dataPacket));
+                        }
+                    } catch (SchedulerException e){
+                        logger.error("replace CronJob " + dataPacket.getPacketId() + " error", e);
+                        OperationLogCenter.log(OperationLog.create().level(OperationLog.LEVEL_ERROR)
+                            .operation("refreshTask").user("scheduler")
+                            .method("replaceCronJob").content("get trigger keys error")
+                            .newObject(dataPacket));
                     }
                     break;
                 }
             }
             if (i == 0) {
-                QuartzJobUtils.createOrReplaceCronJob(scheduler, dataPacket.getPacketId(), dataPacket.getOptId(), "task", dataPacket.getTaskCron(),
-                    CollectionsOpt.createHashMap("taskExchange", dataPacket));
+                try {
+                    QuartzJobUtils.createOrReplaceCronJob(scheduler, dataPacket.getPacketId(), dataPacket.getOptId(), "task", dataPacket.getTaskCron(),
+                        CollectionsOpt.createHashMap("taskExchange", dataPacket));
+                } catch (SchedulerException e){
+                        logger.error("create CronJob " + dataPacket.getPacketId() + " error", e);
+                        OperationLogCenter.log(OperationLog.create().level(OperationLog.LEVEL_ERROR)
+                            .operation("refreshTask").user("scheduler")
+                            .method("createCronJob").content("get trigger keys error")
+                            .newObject(dataPacket));
+                }
             }
         }
         for (TriggerKey tKey : triggerKeys) {
@@ -101,7 +128,15 @@ public class TaskSchedulers {
                 }
             }
             if (!found) {
+                try {
                 QuartzJobUtils.deleteJob(scheduler, tKey.getName(), tKey.getGroup());
+                } catch (SchedulerException e){
+                    logger.error("delete CronJob " + tKey.getName() + " error", e);
+                    OperationLogCenter.log(OperationLog.create().level(OperationLog.LEVEL_ERROR)
+                        .operation("refreshTask").user("scheduler")
+                        .method("deleteCronJob").content("get trigger keys error")
+                        .newObject(tKey));
+                }
             }
         }
     }
@@ -117,7 +152,7 @@ public class TaskSchedulers {
      * 5minute
      */
     @Scheduled(fixedDelay = 1000 * 50)
-    public void work() throws SchedulerException {
+    public void work() {
         refreshTask();
     }
 
