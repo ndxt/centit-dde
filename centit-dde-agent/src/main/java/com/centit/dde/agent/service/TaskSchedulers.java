@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,7 +67,25 @@ public class TaskSchedulers {
     }
 
     private void refreshTask() {
-        List<DataPacket> list =  new CopyOnWriteArrayList<>(dataPacketDao.listObjectsByProperties(queryParams));
+        List<DataPacket> list = dataPacketDao.listObjectsByProperties(queryParams);
+        if(list==null || list.isEmpty()){
+            staticTaskMd5= "";
+            try {
+                Set<TriggerKey> triggerKeys = new CopyOnWriteArraySet<>(scheduler.getTriggerKeys(GroupMatcher.anyTriggerGroup()));
+                if(triggerKeys!=null && !triggerKeys.isEmpty()){
+                    for (TriggerKey tKey : triggerKeys) {
+                        QuartzJobUtils.deleteJob(scheduler, tKey.getName(), tKey.getGroup());
+                    }
+                }
+            } catch (SchedulerException e){
+                logger.error("clear trigger keys error", e);
+                OperationLogCenter.log(OperationLog.create().level(OperationLog.LEVEL_ERROR)
+                    .operation("refreshTask").user("scheduler")
+                    .method("clearTriggerKeys").content("get trigger keys error"));
+            }
+            return;
+        }
+
         if (isEqualMd5(list)) {
             return;
         }
@@ -129,7 +148,7 @@ public class TaskSchedulers {
             }
             if (!found) {
                 try {
-                QuartzJobUtils.deleteJob(scheduler, tKey.getName(), tKey.getGroup());
+                    QuartzJobUtils.deleteJob(scheduler, tKey.getName(), tKey.getGroup());
                 } catch (SchedulerException e){
                     logger.error("delete CronJob " + tKey.getName() + " error", e);
                     OperationLogCenter.log(OperationLog.create().level(OperationLog.LEVEL_ERROR)
@@ -158,9 +177,10 @@ public class TaskSchedulers {
 
     private boolean isEqualMd5(List<DataPacket> list) {
         boolean result = false;
-        StringBuffer stringBuffer = new StringBuffer(100);
+        StringBuffer stringBuffer = new StringBuffer(10000);
+        list.sort(Comparator.comparing(DataPacket::getPacketId));
         for (DataPacket i : list) {
-            stringBuffer.append(i.getTaskCron());
+            stringBuffer.append(i.getPacketId()).append(i.getTaskCron());
         }
         String taskMd5 = "";
         try {
