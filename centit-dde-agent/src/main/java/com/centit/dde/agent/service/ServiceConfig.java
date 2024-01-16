@@ -49,11 +49,6 @@ public class ServiceConfig implements EnvironmentAware {
     }
 
     @Bean
-    public Scheduler scheduler() {
-        return schedulerFactoryBean().getScheduler();
-    }
-
-    @Bean
     public NotificationCenter notificationCenter() {
         NotificationCenterImpl notificationCenter = new NotificationCenterImpl();
         notificationCenter.initDummyMsgSenders();

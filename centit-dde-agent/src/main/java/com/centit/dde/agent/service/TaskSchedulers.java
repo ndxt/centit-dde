@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -34,7 +35,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -51,11 +51,11 @@ public class TaskSchedulers {
     private static ConcurrentHashMap<String, Object> queryParams = new ConcurrentHashMap<>(2);
 
     @Autowired
-    public TaskSchedulers(@Autowired DataPacketDao dataPacketDao,@Autowired  PlatformEnvironment dbPlatformEnvironment,
-                          @Autowired Scheduler scheduler, @Autowired OperationLogWriter operationLogWriter,
+    public TaskSchedulers(@Autowired DataPacketDao dataPacketDao, @Autowired  PlatformEnvironment dbPlatformEnvironment,
+                          @Autowired SchedulerFactoryBean schedulerFactoryBean, @Autowired OperationLogWriter operationLogWriter,
                           @Autowired PathConfig pathConfig) {
         this.dataPacketDao = dataPacketDao;
-        this.scheduler = scheduler;
+        this.scheduler = schedulerFactoryBean.getScheduler();
         this.operationLogWriter = operationLogWriter;
         CodeRepositoryCache.setPlatformEnvironment(dbPlatformEnvironment);
         queryParams.put("taskType", ConstantValue.TASK_TYPE_AGENT);
