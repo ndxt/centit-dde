@@ -247,10 +247,7 @@ public class HttpTaskController extends BaseController {
                     FileItem fi = cMultipartFile.getFileItem();
                     String fieldName = fi.getFieldName();
                     String itemType = fi.getHeaders().getHeader("Content-Type");
-                    if (itemType.contains("application/json")) {
-                        String bodyString = fi.getString();
-                        bodyMap.put(fieldName, JSON.parse(bodyString));
-                    } else if (itemType.contains("application/octet-stream")) {
+                    if (!fi.isFormField() || itemType.contains("application/octet-stream")) {
                         String filename = fi.getHeaders().getHeader("filename");
                         if (StringUtils.isBlank(filename)) {
                             filename = StringBaseOpt.castObjectToString(params.get("filename"));
@@ -264,17 +261,20 @@ public class HttpTaskController extends BaseController {
                         }
                         InputStream inputStream = fi.getInputStream();
                         if (inputStream != null) {
-                            dataOptContext.setStackData(ConstantValue.REQUEST_FILE_TAG,
-                                CollectionsOpt.createHashMap(
-                                    "fileName", filename,
-                                    "fileSize", inputStream.available(),
-                                    "fileContent", inputStream));
+                            Map<String, Object> fileData = CollectionsOpt.createHashMap(
+                                "fileName", filename,
+                                "fileSize", inputStream.available(),
+                                "fileContent", inputStream);
+                            dataOptContext.setStackData(ConstantValue.REQUEST_FILE_TAG, fileData);
+                            bodyMap.put(fieldName, fileData);
                         }
-                    } else if (itemType.contains("text/plain")) {
+                    } else if (itemType.contains("application/json")) {
+                        String bodyString = fi.getString();
+                        bodyMap.put(fieldName, JSON.parse(bodyString));
+                    } else { //if (itemType.contains("text/plain")) {
                         String bodyString = fi.getString();
                         bodyMap.put(fieldName, bodyString);
                     }
-
                 }
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, bodyMap);
             } else { //
