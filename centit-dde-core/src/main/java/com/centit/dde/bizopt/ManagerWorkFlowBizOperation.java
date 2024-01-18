@@ -29,14 +29,13 @@ public class ManagerWorkFlowBizOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
+        BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel);
         String flowInstId = StringBaseOpt.objectToString(
             JSONTransformer.transformer(
-                bizOptJson.getString("flowInstId"),
-                new BizModelJSONTransform(bizModel)));
+                bizOptJson.getString("flowInstId"), transformer));
         String nodeInstId = StringBaseOpt.objectToString(
             JSONTransformer.transformer(
-                bizOptJson.getString("nodeInstId"),
-                new BizModelJSONTransform(bizModel)));
+                bizOptJson.getString("nodeInstId"), transformer));
 
         String userCode="";
         if (bizModel.getStackData(ConstantValue.SESSION_DATA_TAG) instanceof CentitUserDetails) {
