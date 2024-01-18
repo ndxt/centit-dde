@@ -2,6 +2,7 @@ package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
+import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
@@ -11,7 +12,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import org.apache.commons.net.ftp.FTPClient;
 
-public class FtpUploadOperation extends FtpOperation {
+public class FtpUploadOperation extends FtpOperation implements BizOperation {
 
     public FtpUploadOperation(SourceInfoDao sourceInfoDao) {
         super(sourceInfoDao);

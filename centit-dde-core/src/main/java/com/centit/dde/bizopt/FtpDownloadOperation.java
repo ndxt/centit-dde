@@ -3,6 +3,7 @@ package com.centit.dde.bizopt;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.BizModel;
+import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.FtpOperation;
@@ -13,7 +14,7 @@ import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.ByteArrayOutputStream;
 
-public class FtpDownloadOperation extends FtpOperation {
+public class FtpDownloadOperation extends FtpOperation implements BizOperation {
 
     public FtpDownloadOperation(SourceInfoDao sourceInfoDao){
         super(sourceInfoDao);
