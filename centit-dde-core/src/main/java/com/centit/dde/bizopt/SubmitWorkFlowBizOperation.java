@@ -103,7 +103,7 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                     String columnName = StringBaseOpt.objectToString(map.get("columnName"));
                     String expression = StringBaseOpt.objectToString(map.get("expression"));
                     if (StringUtils.isBlank(expression)) continue;
-                    Object value = JSONTransformer.transformer(expression,bizModelJSONTransform);
+                    Object value = JSONTransformer.transformer(expression, bizModelJSONTransform);
                     switch (columnName) {
                         case "grantorCode":
                             submitOptOptions.setGrantorCode(StringBaseOpt.objectToString(value));

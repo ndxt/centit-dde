@@ -1,6 +1,5 @@
 package com.centit.dde.utils;
 
-import com.centit.dde.core.BizOperation;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -15,7 +14,7 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.UnknownHostException;
 
-public abstract class FtpOperation implements BizOperation {
+public abstract class FtpOperation {
 
 
     // 这个地方可以考虑 用线程变量 来绑定 ftp 客户端链接
@@ -59,7 +58,14 @@ public abstract class FtpOperation implements BizOperation {
                 ftp.setProxy(proxy);
             ftp.connect(ftpUrl, ftpPort);//连接FTP服务器
             //如果采用默认端口，可以使用ftp.connect(url)的方式直接连接FTP服务器
-            ftp.login(ftpService.getUsername(), ftpService.getClearPassword());//登录
+            if(StringUtils.isNotBlank(ftpService.getUsername())) {
+                ftp.login(ftpService.getUsername(), ftpService.getClearPassword());//登录
+            }
+            String controlEncoding =  StringBaseOpt.castObjectToString(ftpService.getExtProp("controlEncoding"));
+            if(StringUtils.isNotBlank(controlEncoding)) {
+                ftp.setControlEncoding(controlEncoding);
+            }
+
             reply = ftp.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
                 ftp.disconnect();
