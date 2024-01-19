@@ -5,6 +5,7 @@ import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
@@ -65,6 +66,7 @@ public abstract class FtpOperation {
             if(StringUtils.isNotBlank(controlEncoding)) {
                 ftp.setControlEncoding(controlEncoding);
             }
+            ftp.setFileType(FTP.BINARY_FILE_TYPE);// 设置文件传输类型
 
             reply = ftp.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
