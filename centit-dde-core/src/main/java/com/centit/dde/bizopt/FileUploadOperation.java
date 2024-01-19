@@ -6,10 +6,13 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.fileserver.po.FileInfo;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -38,8 +41,20 @@ public class FileUploadOperation implements BizOperation {
             return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
                 sourDsName + "：文件上传失败，该数据集文件名称不能为空！");
         }
+        String fileName = mapFileInfo.getFileName();
+        String fileNameDesc = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", "");
+        if(StringUtils.isNotBlank(fileNameDesc)) {
+            String tempFileName = StringBaseOpt.objectToString(
+                JSONTransformer.transformer(fileNameDesc, new BizModelJSONTransform(bizModel)));
+            if (StringUtils.isNotBlank(tempFileName)) {
+                fileName = tempFileName;
+            } else {
+                fileName = fileNameDesc;
+            }
+        }
+
         FileInfo fileInfo = new FileInfo();
-        fileInfo.setFileName(mapFileInfo.getFileName());
+        fileInfo.setFileName(fileName);
         fileInfo.setOptId(dataOptContext.getOptId());
         fileInfo.setOsId(dataOptContext.getOsId());
         //TODO optTag 这个不是当前业务主键，这个应该是不对的
@@ -48,12 +63,6 @@ public class FileUploadOperation implements BizOperation {
         fileInfo.setFileOwner(dataOptContext.getCurrentUserCode());
         fileInfo.setFileUnit(dataOptContext.getCurrentUnitCode());
 
-        /*Object session=bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
-        if(session instanceof CentitUserDetails){
-            CentitUserDetails centitUserDetails=(CentitUserDetails)session;
-            fileInfo.setFileUnit(centitUserDetails.getTopUnitCode());
-            fileInfo.setFileOwner(centitUserDetails.getUserCode());
-        }*/
         String fileId= fileInfoOpt.saveFile(fileInfo, -1, mapFileInfo.getFileInputStream());
         fileInfo.setFileId(fileId);
         bizModel.putDataSet(targetDsName, new DataSet(fileInfo));
