@@ -242,9 +242,7 @@ public class HttpTaskController extends BaseController {
             } else if(StringUtils.contains(contentType, "multipart/form-data")){
                 MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
                 MultipartHttpServletRequest multiRequest = resolver.resolveMultipart(request);
-                Map<String, MultipartFile> map = multiRequest.getFileMap();
                 Map<String, Object> bodyMap = new HashMap<>(32);
-
                 Map<String, String[]> mParams =  multiRequest.getParameterMap();
                 if(mParams!=null) {
                     for (Map.Entry<String, String[]> entry : mParams.entrySet()) {
@@ -258,6 +256,7 @@ public class HttpTaskController extends BaseController {
                     }
                 }
 
+                Map<String, MultipartFile> map = multiRequest.getFileMap();
                 for (Map.Entry<String, MultipartFile> entry : map.entrySet()) {
                     CommonsMultipartFile cMultipartFile = (CommonsMultipartFile) entry.getValue();
                     FileItem fi = cMultipartFile.getFileItem();
