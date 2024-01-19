@@ -130,7 +130,7 @@ public class HttpServiceOperation implements BizOperation {
                 if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)) {
                     String source = bizOptJson.getString("source");
                     DataSet dataSet = bizModel.getDataSet(source);
-                    FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
+                    FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson);
                     InputStream fileIS = fileInfo.getFileInputStream();
 
                     if (fileIS != null) {

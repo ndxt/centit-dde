@@ -36,25 +36,14 @@ public class FileUploadOperation implements BizOperation {
             return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
                 "文件上传失败，请选择数据集！");
         }
-        FileDataSet mapFileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
+        FileDataSet mapFileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson);
         if(StringUtils.isBlank(mapFileInfo.getFileName())){
             return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
                 sourDsName + "：文件上传失败，该数据集文件名称不能为空！");
         }
-        String fileName = mapFileInfo.getFileName();
-        String fileNameDesc = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", "");
-        if(StringUtils.isNotBlank(fileNameDesc)) {
-            String tempFileName = StringBaseOpt.objectToString(
-                JSONTransformer.transformer(fileNameDesc, new BizModelJSONTransform(bizModel)));
-            if (StringUtils.isNotBlank(tempFileName)) {
-                fileName = tempFileName;
-            } else {
-                fileName = fileNameDesc;
-            }
-        }
 
         FileInfo fileInfo = new FileInfo();
-        fileInfo.setFileName(fileName);
+        fileInfo.setFileName(mapFileInfo.getFileName());
         fileInfo.setOptId(dataOptContext.getOptId());
         fileInfo.setOsId(dataOptContext.getOsId());
         //TODO optTag 这个不是当前业务主键，这个应该是不对的

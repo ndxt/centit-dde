@@ -20,6 +20,7 @@ import com.centit.support.compiler.VariableFormula;
 import com.centit.support.compiler.VariableTranslate;
 import com.centit.support.database.utils.QueryUtils;
 import com.centit.support.file.FileIOOpt;
+import com.centit.support.json.JSONTransformer;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
@@ -896,28 +897,44 @@ public abstract class DataSetOptUtil {
         data.sort((o1, o2) -> compareTwoRow(o1, o2, fields, nullAsFirst));
     }
 
-    public static FileDataSet attainFileDataset(DataSet dataSet, JSONObject jsonStep){
+    public static FileDataSet attainFileDataset(BizModel bizModel, DataSet dataSet, JSONObject jsonStep){
         if(dataSet instanceof FileDataSet){
             return (FileDataSet) dataSet;
         }
+
         Map<String, Object> mapFirstRow = dataSet.getFirstRow();
         String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep,  ConstantValue.FILE_CONTENT, "");
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
-        String fileName;
+
+        BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel);
+
+        String fileName=null;
         if(StringUtils.isNotBlank(fileNameDesc)){
             fileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(dataSet.getData(), fileNameDesc));
-        } else {
-            fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
+            if(StringUtils.isBlank(fileName)){
+                fileName = StringBaseOpt.objectToString(JSONTransformer.transformer(fileNameDesc, transformer));
+            }
         }
+
         if(StringUtils.isBlank(fileName)){
-            fileName = fileNameDesc;
+            String tempName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
+            if(StringUtils.isBlank(tempName)) {
+                fileName = fileNameDesc;
+            } else {
+                fileName = tempName;
+            }
         }
+
         Object fileData;
         if(StringUtils.isNotBlank(fileContentDesc)){
             fileData = mapFirstRow.get(fileContentDesc);
+            if(fileData == null){
+                fileData = JSONTransformer.transformer(fileContentDesc, transformer);
+            }
         } else {
             fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
         }
+
         HashMap<String, Object> fileInfo = new HashMap<>();
         for(Map.Entry<String, Object> entry : mapFirstRow.entrySet()){
             if(! StringUtils.equalsAny(entry.getKey(), fileContentDesc, fileNameDesc)){

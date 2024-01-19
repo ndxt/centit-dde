@@ -385,7 +385,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 detailLog.setLogInfo("获取数据集："+ dataSetId +"出错！");
                 throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION, "找不到对应的文件数据集："+dataSetId+"！");
             }
-            FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, stepJson);
+            FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, stepJson);
             bizModel.getOptResult().setResultFile(fileInfo.getFirstRow());
             return;
         }

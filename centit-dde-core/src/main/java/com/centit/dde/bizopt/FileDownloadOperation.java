@@ -80,6 +80,7 @@ public class FileDownloadOperation implements BizOperation {
         } else {
             fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
         }
+
         FileDataSet objectToDataSet = new FileDataSet();
         if(fileIds.size()==1) {
             FileBaseInfo fileInfo = fileInfoOpt.getFileInfo(fileIds.get(0));

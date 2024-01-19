@@ -39,7 +39,7 @@ public class ReadExcelOperation implements BizOperation {
         }
 
         DataSet dataSet = bizModel.getDataSet(source);
-        FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
+        FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson);
         InputStream inputStream = fileInfo.getFileInputStream();
 
         int beginRow = NumberBaseOpt.castObjectToInteger(

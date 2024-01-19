@@ -40,7 +40,7 @@ public class FtpUploadOperation extends FtpOperation implements BizOperation {
             }
         }
 
-        FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(dataSet, bizOptJson);
+        FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson);
 
         FTPClient ftpClient = connectFtp(ftpServiceId);
         if(ftpClient==null){
