@@ -155,7 +155,7 @@ public class DataPacket implements Serializable, DataPacketInterface {
     private JSONObject schemaProps;
 
     @Column(name = "request_body_type")
-    @ApiModelProperty(value = "api请求体数据类型  O:对象，F:文件")
+    @ApiModelProperty(value = "api请求体数据类型  obj:对象，file:文件 both: 多部件")
     @NotBlank
     private String requestBodyType;
 
