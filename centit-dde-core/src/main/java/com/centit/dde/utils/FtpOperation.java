@@ -60,7 +60,10 @@ public abstract class FtpOperation {
             ftp.connect(ftpUrl, ftpPort);//连接FTP服务器
             //如果采用默认端口，可以使用ftp.connect(url)的方式直接连接FTP服务器
             if(StringUtils.isNotBlank(ftpService.getUsername())) {
-                ftp.login(ftpService.getUsername(), ftpService.getClearPassword());//登录
+                boolean loginSuccess=ftp.login(ftpService.getUsername(), ftpService.getClearPassword());//登录
+                if(!loginSuccess){
+                    return null;
+                }
             }
             String controlEncoding =  StringBaseOpt.castObjectToString(ftpService.getExtProp("controlEncoding"));
             if(StringUtils.isNotBlank(controlEncoding)) {
@@ -73,6 +76,7 @@ public abstract class FtpOperation {
                 ftp.disconnect();
                 return null;
             }
+            ftp.enterLocalPassiveMode();
             return ftp;
         } catch (IOException e) {
             e.printStackTrace();

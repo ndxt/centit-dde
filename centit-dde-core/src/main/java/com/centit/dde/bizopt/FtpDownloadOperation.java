@@ -10,11 +10,15 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.FtpOperation;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPClientConfig;
+import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPReply;
 
 import java.io.ByteArrayOutputStream;
 
@@ -50,9 +54,13 @@ public class FtpDownloadOperation extends FtpOperation implements BizOperation {
                 "FPT服务配置信息错误！");
         }
         ByteArrayOutputStream outs = new ByteArrayOutputStream();
+        boolean change;
+        boolean file;
+        String path="";
         try {
-            ftpClient.changeWorkingDirectory(filePath);
-            ftpClient.retrieveFile(fileName, outs);
+            change=ftpClient.changeWorkingDirectory(new String(filePath.getBytes("GBK"),"iso-8859-1"));
+            path=ftpClient.printWorkingDirectory();
+            file=ftpClient.retrieveFile(new String(fileName.getBytes("GBK"),"iso-8859-1"), outs);
         } finally {
             disConnectFtp(ftpClient);
         }
@@ -60,7 +68,7 @@ public class FtpDownloadOperation extends FtpOperation implements BizOperation {
         DataSet objectToDataSet = DataSet.toDataSet(
             CollectionsOpt.createHashMap(ConstantValue.FILE_NAME, fileName,
                 ConstantValue.FILE_SIZE, outs.size(),
-                ConstantValue.FILE_CONTENT ,outs));
+                ConstantValue.FILE_CONTENT ,outs,"当前路径",path,"切换目录是否成功", change,"获取文件是否成功",file));
         String id = bizOptJson.getString("id");
         bizModel.putDataSet(id,objectToDataSet);
         return BuiltInOperation.createResponseSuccessData(1);
