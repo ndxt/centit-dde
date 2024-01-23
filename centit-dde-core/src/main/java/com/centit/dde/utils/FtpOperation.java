@@ -53,6 +53,10 @@ public abstract class FtpOperation {
 
         try {
             FTPClient ftp = new FTPClient();
+            String controlEncoding =  StringBaseOpt.castObjectToString(ftpService.getExtProp("controlEncoding"));
+            if(StringUtils.isNotBlank(controlEncoding)) {
+                ftp.setControlEncoding(controlEncoding);
+            }
             int reply;
             if (hasProxy)
                 ftp.setProxy(proxy);
@@ -63,10 +67,6 @@ public abstract class FtpOperation {
                 if(!loginSuccess){
                     throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "ftp登录用户名密码设置不正确！");
                 }
-            }
-            String controlEncoding =  StringBaseOpt.castObjectToString(ftpService.getExtProp("controlEncoding"));
-            if(StringUtils.isNotBlank(controlEncoding)) {
-                ftp.setControlEncoding(controlEncoding);
             }
             ftp.setFileType(FTP.BINARY_FILE_TYPE);// 设置文件传输类型
 
