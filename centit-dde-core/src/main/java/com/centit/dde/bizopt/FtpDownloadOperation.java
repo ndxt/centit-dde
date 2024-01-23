@@ -33,7 +33,8 @@ public class FtpDownloadOperation extends FtpOperation implements BizOperation {
         String ftpServiceId = BuiltInOperation.getJsonFieldString(bizOptJson, "ftpService", null);
         String filePathDesc = BuiltInOperation.getJsonFieldString(bizOptJson, "filePath", "");
         String fileNameDesc = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", "");
-
+        String sourceCharset = BuiltInOperation.getJsonFieldString(bizOptJson, "sourceCharset", "GBK");
+        String targetCharset = BuiltInOperation.getJsonFieldString(bizOptJson, "targetCharset", "iso-8859-1");
         BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel);
         String filePath = StringBaseOpt.objectToString(JSONTransformer.transformer(filePathDesc, transformer));
         if(StringUtils.isBlank(filePath)){
@@ -58,9 +59,9 @@ public class FtpDownloadOperation extends FtpOperation implements BizOperation {
         boolean file;
         String path="";
         try {
-            change=ftpClient.changeWorkingDirectory(new String(filePath.getBytes("GBK"),"iso-8859-1"));
+            change=ftpClient.changeWorkingDirectory(new String(filePath.getBytes(sourceCharset),targetCharset));
             path=ftpClient.printWorkingDirectory();
-            file=ftpClient.retrieveFile(new String(fileName.getBytes("GBK"),"iso-8859-1"), outs);
+            file=ftpClient.retrieveFile(new String(fileName.getBytes(sourceCharset),targetCharset), outs);
         } finally {
             disConnectFtp(ftpClient);
         }
