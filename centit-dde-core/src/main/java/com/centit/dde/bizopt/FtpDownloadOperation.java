@@ -51,9 +51,9 @@ public class FtpDownloadOperation extends FtpOperation implements BizOperation {
         FTPClient ftpClient = connectFtp(ftpService);
 
         String pathEncoding =  StringBaseOpt.castObjectToString(ftpService.getExtProp("pathEncoding"));
-        if("gbk-iso".equalsIgnoreCase(pathEncoding)){
-            filePath = new String(filePath.getBytes("GBK"), StandardCharsets.ISO_8859_1);
-            fileName = new String(fileName.getBytes("GBK"), StandardCharsets.ISO_8859_1);
+        if(!StringBaseOpt.isNvl(pathEncoding)){
+            filePath = new String(filePath.getBytes(pathEncoding), StandardCharsets.ISO_8859_1);
+            fileName = new String(fileName.getBytes(pathEncoding), StandardCharsets.ISO_8859_1);
         }
         ByteArrayOutputStream outs = new ByteArrayOutputStream();
         try {
