@@ -10,17 +10,16 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.FtpOperation;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
-import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPClientConfig;
-import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPReply;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class FtpDownloadOperation extends FtpOperation implements BizOperation {
 
@@ -28,7 +27,7 @@ public class FtpDownloadOperation extends FtpOperation implements BizOperation {
         super(sourceInfoDao);
     }
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {
 
         String ftpServiceId = BuiltInOperation.getJsonFieldString(bizOptJson, "ftpService", null);
         String filePathDesc = BuiltInOperation.getJsonFieldString(bizOptJson, "filePath", "");
@@ -48,19 +47,18 @@ public class FtpDownloadOperation extends FtpOperation implements BizOperation {
             fileName = fileNameDesc;
         }
 
-        FTPClient ftpClient = connectFtp(ftpServiceId);
-        if(ftpClient==null){
-            return BuiltInOperation.createResponseData(0,1,ResponseData.ERROR_USER_CONFIG,
-                "FPT服务配置信息错误！");
+        SourceInfo ftpService = sourceInfoDao.getDatabaseInfoById(ftpServiceId);
+        FTPClient ftpClient = connectFtp(ftpService);
+
+        String pathEncoding =  StringBaseOpt.castObjectToString(ftpService.getExtProp("pathEncoding"));
+        if("gbk-iso".equalsIgnoreCase(pathEncoding)){
+            filePath = new String(filePath.getBytes("GBK"), StandardCharsets.ISO_8859_1);
+            fileName = new String(fileName.getBytes("GBK"), StandardCharsets.ISO_8859_1);
         }
         ByteArrayOutputStream outs = new ByteArrayOutputStream();
-        boolean change;
-        boolean file;
-        String path="";
         try {
-            change=ftpClient.changeWorkingDirectory(new String(filePath.getBytes("GBK"),"iso-8859-1"));
-            path=ftpClient.printWorkingDirectory();
-            file=ftpClient.retrieveFile(new String(fileName.getBytes("GBK"),"iso-8859-1"), outs);
+            ftpClient.changeWorkingDirectory(filePath);
+            ftpClient.retrieveFile(fileName, outs);
         } finally {
             disConnectFtp(ftpClient);
         }
@@ -68,7 +66,7 @@ public class FtpDownloadOperation extends FtpOperation implements BizOperation {
         DataSet objectToDataSet = DataSet.toDataSet(
             CollectionsOpt.createHashMap(ConstantValue.FILE_NAME, fileName,
                 ConstantValue.FILE_SIZE, outs.size(),
-                ConstantValue.FILE_CONTENT ,outs,"当前路径",path,"切换目录是否成功", change,"获取文件是否成功",file));
+                ConstantValue.FILE_CONTENT ,outs));
         String id = bizOptJson.getString("id");
         bizModel.putDataSet(id,objectToDataSet);
         return BuiltInOperation.createResponseSuccessData(1);

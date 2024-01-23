@@ -4,6 +4,7 @@ import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -26,10 +27,9 @@ public abstract class FtpOperation {
         this.sourceInfoDao = sourceInfoDao;
     }
 
-    public FTPClient connectFtp(String sourceId){
-        SourceInfo ftpService = sourceInfoDao.getDatabaseInfoById(sourceId);
+    public FTPClient connectFtp(SourceInfo ftpService){
         if(ftpService==null){
-            return null;
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "ftp服务资源找不到，资源ID"+ ftpService.getDatabaseCode());
         }
         String ftpUrl = ftpService.getDatabaseUrl();
         int ftpPort = NumberBaseOpt.castObjectToInteger(
@@ -48,8 +48,7 @@ public abstract class FtpOperation {
                     new InetSocketAddress(InetAddress.getByName(proxyHost), proxyPort));
             }
         } catch (UnknownHostException e) {
-            e.printStackTrace();
-            return null;
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "ftp代理设置不正确，："+ e.getMessage(), e);
         }
 
         try {
@@ -62,7 +61,7 @@ public abstract class FtpOperation {
             if(StringUtils.isNotBlank(ftpService.getUsername())) {
                 boolean loginSuccess=ftp.login(ftpService.getUsername(), ftpService.getClearPassword());//登录
                 if(!loginSuccess){
-                    return null;
+                    throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "ftp登录用户名密码设置不正确！");
                 }
             }
             String controlEncoding =  StringBaseOpt.castObjectToString(ftpService.getExtProp("controlEncoding"));
@@ -74,14 +73,13 @@ public abstract class FtpOperation {
             reply = ftp.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
                 ftp.disconnect();
-                return null;
+                throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "登录ftp服务失败！");
             }
             ftp.enterLocalPassiveMode();
             return ftp;
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "登录ftp服务失败，："+ e.getMessage(), e);
         }
-        return null;
     }
 
     public void disConnectFtp(FTPClient ftp ){

@@ -11,6 +11,7 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.dde.utils.FtpOperation;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
@@ -41,12 +42,9 @@ public class FtpUploadOperation extends FtpOperation implements BizOperation {
         }
 
         FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson);
+        SourceInfo ftpService = sourceInfoDao.getDatabaseInfoById(ftpServiceId);
+        FTPClient ftpClient = connectFtp(ftpService);
 
-        FTPClient ftpClient = connectFtp(ftpServiceId);
-        if(ftpClient==null){
-            return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_USER_CONFIG,
-                "FPT服务配置信息错误！");
-        }
         try{
             ftpClient.changeWorkingDirectory(filePath);
             ftpClient.storeFile(fileInfo.getFileName(),
