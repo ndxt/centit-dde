@@ -47,9 +47,6 @@ public class FileUploadOperation implements BizOperation {
         fileInfo.setOptMethod("api");
         fileInfo.setFileOwner(dataOptContext.getCurrentUserCode());
         fileInfo.setFileUnit(dataOptContext.getCurrentUnitCode());
-        if(dataSet.getFirstRow().containsKey("fileId")) {
-           fileInfo.setFileId(StringBaseOpt.objectToString(dataSet.getFirstRow().get("fileId")));
-        }
         if(dataSet.getFirstRow().containsKey("optTag")) {
             fileInfo.setOptTag(StringBaseOpt.objectToString(dataSet.getFirstRow().get("optTag")));
         }
