@@ -9,6 +9,7 @@ import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -23,6 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +57,7 @@ public class WriteExcelOperation implements BizOperation {
         /**fileType（生成方式） ： none, append, excel, jxls；*/
         String optType = bizOptJson.getString("fileType");
         int mergeColCell = NumberBaseOpt.castObjectToInteger(bizOptJson.getString("mergeColCell"), -1);
+
         if("append".equals(optType)){
             String fileDataSetName = bizOptJson.getString("fileDataSet");
             DataSet dataSet2 = bizModel.getDataSet(fileDataSetName);
@@ -75,14 +78,23 @@ public class WriteExcelOperation implements BizOperation {
             fileDataSet.setFileData(byteArrayInputStream);
             byteArrayOutputStream.close();
             xssfWorkbook.close();
+
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
 
+        boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), true);
         String fileName = StringUtils.isNotBlank(bizOptJson.getString("fileName")) ?
             StringBaseOpt.castObjectToString(Pretreatment.mapTemplateStringAsFormula(
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))) :
             DatetimeOpt.currentTimeWithSecond();
-        fileName = fileName.endsWith(".xlsx") ? fileName : fileName + ".xlsx";
+
+        if(transToPdf){
+            if(!fileName.endsWith(".pdf")) {
+                fileName = fileName.endsWith(".xlsx") ? fileName.substring(0, fileName.length() - 5) : fileName + ".pdf";
+            }
+        } else {
+            fileName = fileName.endsWith(".xlsx") ? fileName : fileName + ".xlsx";
+        }
         //模板文件id
         String templateFileId = bizOptJson.getString("templateFileId");
         //根据模板生成
@@ -109,18 +121,24 @@ public class WriteExcelOperation implements BizOperation {
             }
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
 
-            FileDataSet objectToDataSet = new FileDataSet(fileName, byteArrayOutputStream.size(), byteArrayInputStream);
+            FileDataSet objectToDataSet =  transToPdf?
+                new FileDataSet(fileName, -1, excel2pdf(byteArrayInputStream))  :
+                new FileDataSet(fileName, byteArrayInputStream.available(), byteArrayInputStream);
             bizModel.putDataSet(id, objectToDataSet);
             byteArrayOutputStream.close();
-
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
 
         InputStream inputStream = ExcelExportUtil.generateExcelStream(sheetName, dataAsList, titles, fields);
-        FileDataSet objectToDataSet = new FileDataSet(fileName, inputStream.available(), inputStream);
+        FileDataSet objectToDataSet = transToPdf? new FileDataSet(fileName,
+            -1, excel2pdf(inputStream)) : new FileDataSet(fileName, inputStream.available(), inputStream);
         bizModel.putDataSet(id, objectToDataSet);
-
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }
 
+    private OutputStream excel2pdf(InputStream in) {
+        OutputStream outPdf = new ByteArrayOutputStream();
+        com.centit.support.office.OfficeToPdf.excel2Pdf(in, outPdf);
+        return outPdf;
+    }
 }

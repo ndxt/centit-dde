@@ -301,8 +301,11 @@ public class BizOptFlowImpl implements BizOptFlow {
 
         //断点调试，指定节点数据返回； 除了通过 断点判断 还可以通过 step 判断（计步骤）；
         if(ConstantValue.RUN_TYPE_DEBUG.equals(dataOptContext.getRunType())) {
-            if (StringUtils.equals(dataOptContext.getDebugId(), stepJson.getString("id")) ||
-                (dataOptContext.getBreakStepNo() != -1 && dataOptContext.getStepNo()> dataOptContext.getBreakStepNo()) ) {
+            boolean isBreak= dataOptContext.getBreakStepNo() != -1 ?
+                dataOptContext.getStepNo() > dataOptContext.getBreakStepNo() :
+                StringUtils.equals(dataOptContext.getDebugId(), stepJson.getString("id"));
+
+            if (isBreak) {
                 String currentNodeId = stepJson.getString("id");
                 dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions", "1");
                 String source = stepJson.getString("source");
