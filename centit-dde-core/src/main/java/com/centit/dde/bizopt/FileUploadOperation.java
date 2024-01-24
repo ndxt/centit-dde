@@ -10,6 +10,7 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.fileserver.po.FileInfo;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -43,12 +44,15 @@ public class FileUploadOperation implements BizOperation {
         fileInfo.setFileName(mapFileInfo.getFileName());
         fileInfo.setOptId(dataOptContext.getOptId());
         fileInfo.setOsId(dataOptContext.getOsId());
-        //TODO optTag 这个不是当前业务主键，这个应该是不对的
-        fileInfo.setOptTag(dataOptContext.getPacketId());
         fileInfo.setOptMethod("api");
         fileInfo.setFileOwner(dataOptContext.getCurrentUserCode());
         fileInfo.setFileUnit(dataOptContext.getCurrentUnitCode());
-
+        if(dataSet.getFirstRow().containsKey("fileId")) {
+           fileInfo.setFileId(StringBaseOpt.objectToString(dataSet.getFirstRow().get("fileId")));
+        }
+        if(dataSet.getFirstRow().containsKey("optTag")) {
+            fileInfo.setOptTag(StringBaseOpt.objectToString(dataSet.getFirstRow().get("optTag")));
+        }
         String fileId= fileInfoOpt.saveFile(fileInfo, -1, mapFileInfo.getFileInputStream());
         fileInfo.setFileId(fileId);
         bizModel.putDataSet(targetDsName, new DataSet(fileInfo));
