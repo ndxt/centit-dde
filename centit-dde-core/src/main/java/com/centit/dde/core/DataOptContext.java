@@ -20,7 +20,14 @@ public class DataOptContext {
     private String osId;
     private String packetId;
     private Integer logLevel;
+    private Integer breakStepNo;
     private String topUnit;
+
+    public DataOptContext() {
+        this.callStackData = new HashMap<>(8);
+        breakStepNo = -1;
+        debugId = null;
+    }
     /**
      * 调用参数
      * RequestBody/File
@@ -47,9 +54,7 @@ public class DataOptContext {
         }
         return this.taskLog.plusStepNo();
     }
-    public DataOptContext() {
-        this.callStackData = new HashMap<>(8);
-    }
+
 
     //String runType = StringBaseOpt.castObjectToString(bizModel.getStackData(ConstantValue.RUN_TYPE_TAG));
     public String getRunType() {

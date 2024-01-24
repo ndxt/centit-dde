@@ -13,7 +13,6 @@ import com.centit.search.utils.ImagePdfTextExtractor;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.workflow.service.impl.SystemUserUnitCalcContextFactoryImpl;
 import org.apache.commons.lang3.StringUtils;
-import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;

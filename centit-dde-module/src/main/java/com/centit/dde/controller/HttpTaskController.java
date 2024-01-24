@@ -25,6 +25,7 @@ import com.centit.framework.model.basedata.OsInfo;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.ObjectTranslate;
@@ -44,10 +45,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
@@ -164,7 +163,7 @@ public class HttpTaskController extends BaseController {
         DataPacketInterface dataPacketInterface;
         if(ConstantValue.RUN_TYPE_DEBUG.equals(runType)){
             dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
-        }else {
+        } else {
             DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
             DataPacket cachedPacket = dataPacketCachedMap.get(packetId);
             if(cachedPacket == null || DatetimeOpt.compareTwoDate(dataPacket.getPublishDate(), cachedPacket.getPublishDate()) != 0){
@@ -194,8 +193,14 @@ public class HttpTaskController extends BaseController {
         //保存内部逻辑变量，有些时候需要将某些值传递到其它标签节点，这时候需要用到它
         DataOptContext dataOptContext = new DataOptContext();
         dataOptContext.setRunType(runType);
-
-        dataOptContext.setDebugId((String) params.getOrDefault("debugId", ""));
+        Object obj =  params.get("debugId");
+        if(obj!=null) {
+            dataOptContext.setDebugId(StringBaseOpt.castObjectToString(obj));
+        }
+        obj =  params.get("breakStepNo");
+        if(obj!=null) {
+            dataOptContext.setBreakStepNo(NumberBaseOpt.castObjectToInteger(obj, -1));
+        }
 
         if (taskType == ConstantValue.TASK_TYPE_POST || taskType == ConstantValue.TASK_TYPE_PUT ||
             "POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {

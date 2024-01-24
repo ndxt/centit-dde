@@ -99,7 +99,7 @@ public class SqlDataSetReader implements DataSetReader {
             qap = QueryUtils.translateQuery(sqlSen, params);
         }
         //debug模式下，添加日志，显示sql语句
-        if( ConstantValue.RUN_TYPE_DEBUG.equals(dataOptContext.getRunType()) ||
+        if(ConstantValue.RUN_TYPE_DEBUG.equals(dataOptContext.getRunType()) ||
             (ConstantValue.LOGLEVEL_CHECK_DEBUG & dataOptContext.getLogLevel()) != 0){
             TaskLog taskLog = dataOptContext.getTaskLog();
             TaskDetailLog detailLog = new TaskDetailLog();

@@ -299,25 +299,30 @@ public class BizOptFlowImpl implements BizOptFlow {
             runOneStepOpt(bizModel, dataOptStep, dataOptContext);
         }
 
-        //断点调试，指定节点数据返回
-        String debugId = dataOptContext.getDebugId();
-        if (StringUtils.equals(debugId, stepJson.getString("id"))) {
-            dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions", "1");
-            String source = stepJson.getString("source");
-            //设置返回节点  内部方法会通过这个source 来判断返回具体的某个节点 这个只能重置为当前ID 下面再重置回去
-            dataOptStep.getCurrentStep().getJSONObject("properties").put("source", stepJson.getString("id"));
-            //恢复原始JSON数据，否则后面更新的时候会将原本的数据替换为当前节点id
-            dataOptStep.getCurrentStep().getJSONObject("properties").put("source", source);
-            JSONObject bizData = new JSONObject();
-            JSONObject dump = new JSONObject();
-            dump.put("allNodeData", bizModel.getBizData());
-            dump.put("stackData", bizModel.dumpStackData());
-            bizData.put("currentNodeData", bizModel.getDataSet(debugId));
-            bizData.put("dump", dump);
-            //添加断点调试的返回结果
-            bizModel.getOptResult().setResultObject(bizData);
-            dataOptStep.setEndStep();
-            return;
+        //断点调试，指定节点数据返回； 除了通过 断点判断 还可以通过 step 判断（计步骤）；
+        if(ConstantValue.RUN_TYPE_DEBUG.equals(dataOptContext.getRunType())) {
+            if (StringUtils.equals(dataOptContext.getDebugId(), stepJson.getString("id")) ||
+                (dataOptContext.getBreakStepNo() != -1 && dataOptContext.getStepNo()> dataOptContext.getBreakStepNo()) ) {
+                String currentNodeId = stepJson.getString("id");
+                dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions", "1");
+                String source = stepJson.getString("source");
+                //设置返回节点  内部方法会通过这个source 来判断返回具体的某个节点 这个只能重置为当前ID 下面再重置回去
+                dataOptStep.getCurrentStep().getJSONObject("properties").put("source", stepJson.getString("id"));
+                //恢复原始JSON数据，否则后面更新的时候会将原本的数据替换为当前节点id
+                dataOptStep.getCurrentStep().getJSONObject("properties").put("source", source);
+                JSONObject bizData = new JSONObject();
+                JSONObject dump = new JSONObject();
+                dump.put("allNodeData", bizModel.getBizData());
+                dump.put("stackData", bizModel.dumpStackData());
+                //添加计步器
+                bizData.put("stepNo", dataOptContext.getStepNo());
+                bizData.put("currentNodeData", bizModel.getDataSet(currentNodeId));
+                bizData.put("dump", dump);
+                //添加断点调试的返回结果
+                bizModel.getOptResult().setResultObject(bizData);
+                dataOptStep.setEndStep();
+                return;
+            }
         }
 
         dataOptStep.setNextStep();
