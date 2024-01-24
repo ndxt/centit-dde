@@ -82,7 +82,7 @@ public class WriteExcelOperation implements BizOperation {
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
 
-        boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), true);
+        boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), false);
         String fileName = StringUtils.isNotBlank(bizOptJson.getString("fileName")) ?
             StringBaseOpt.castObjectToString(Pretreatment.mapTemplateStringAsFormula(
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))) :
