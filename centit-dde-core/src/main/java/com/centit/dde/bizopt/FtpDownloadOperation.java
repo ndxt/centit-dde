@@ -48,7 +48,7 @@ public class FtpDownloadOperation extends FtpOperation implements BizOperation {
         }
 
         SourceInfo ftpService = sourceInfoDao.getDatabaseInfoById(ftpServiceId);
-        FTPClient ftpClient = connectFtp(ftpService);
+        FTPClient ftpClient = getFtp(ftpService);
 
         String pathEncoding =  StringBaseOpt.castObjectToString(ftpService.getExtProp("pathEncoding"));
         if(!StringBaseOpt.isNvl(pathEncoding)){
@@ -56,20 +56,13 @@ public class FtpDownloadOperation extends FtpOperation implements BizOperation {
             fileName = new String(fileName.getBytes(pathEncoding), StandardCharsets.ISO_8859_1);
         }
         ByteArrayOutputStream outs = new ByteArrayOutputStream();
-        boolean changeDir;
-        String[] names;
-        try {
-            changeDir=ftpClient.changeWorkingDirectory(filePath);
-            names=ftpClient.listNames();
-            ftpClient.retrieveFile(fileName, outs);
-        } finally {
-            disConnectFtp(ftpClient);
-        }
+        boolean changeDir= ftpClient.changeWorkingDirectory(filePath);
+        ftpClient.retrieveFile(fileName, outs);
         // outs.close();
         DataSet objectToDataSet = DataSet.toDataSet(
             CollectionsOpt.createHashMap(ConstantValue.FILE_NAME, fileName,
                 ConstantValue.FILE_SIZE, outs.size(),
-                ConstantValue.FILE_CONTENT ,outs,"切换目录",changeDir,"目录下文件",names));
+                ConstantValue.FILE_CONTENT ,outs,"切换目录",changeDir));
         String id = bizOptJson.getString("id");
         bizModel.putDataSet(id,objectToDataSet);
         return BuiltInOperation.createResponseSuccessData(1);
