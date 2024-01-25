@@ -62,7 +62,7 @@ public class FtpDownloadOperation extends FtpOperation implements BizOperation {
         DataSet objectToDataSet = DataSet.toDataSet(
             CollectionsOpt.createHashMap(ConstantValue.FILE_NAME, fileName,
                 ConstantValue.FILE_SIZE, outs.size(),
-                ConstantValue.FILE_CONTENT ,outs,"切换目录",changeDir));
+                ConstantValue.FILE_CONTENT ,outs,"changeDir",changeDir));
         String id = bizOptJson.getString("id");
         bizModel.putDataSet(id,objectToDataSet);
         return BuiltInOperation.createResponseSuccessData(1);

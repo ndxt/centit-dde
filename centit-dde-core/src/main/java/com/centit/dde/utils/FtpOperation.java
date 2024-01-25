@@ -39,9 +39,13 @@ public abstract class FtpOperation {
             ftpClientPools.put(ftpService, ftpClient);
         }
         if (!ftpClient.isConnected()) {
-            reconnect(ftpClient,ftpService);
+            reconnect(ftpClient, ftpService);
         }
-        ftpClient.sendNoOp();
+        try {
+            ftpClient.sendNoOp();
+        } catch (IOException io) {
+            reconnect(ftpClient, ftpService);
+        }
         ftpClient.changeWorkingDirectory("/");
         return ftpClient;
     }
