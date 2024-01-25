@@ -41,6 +41,8 @@ public abstract class FtpOperation {
         if (!ftpClient.isConnected()) {
             reconnect(ftpClient,ftpService);
         }
+        ftpClient.sendNoOp();
+        ftpClient.changeWorkingDirectory("/");
         return ftpClient;
     }
 
