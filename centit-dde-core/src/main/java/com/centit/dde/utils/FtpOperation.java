@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class FtpOperation {
 
-    private final Map<ISourceInfo, FTPClient> ftpClientPools = new ConcurrentHashMap<>(10);
+    private final Map<ISourceInfo, FTPClient> ftpClientPools = new ConcurrentHashMap<>(16);
 
     // 这个地方可以考虑 用线程变量 来绑定 ftp 客户端链接
     // 暂时不做这个。
