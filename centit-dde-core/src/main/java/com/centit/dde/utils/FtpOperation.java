@@ -1,5 +1,6 @@
 package com.centit.dde.utils;
 
+import com.centit.product.metadata.api.ISourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -15,9 +16,12 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.UnknownHostException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class FtpOperation {
 
+    private final Map<ISourceInfo, FTPClient> ftpClientPools = new ConcurrentHashMap<>(10);
 
     // 这个地方可以考虑 用线程变量 来绑定 ftp 客户端链接
     // 暂时不做这个。
