@@ -69,8 +69,9 @@ public abstract class FtpOperation {
             ftp.setControlEncoding(controlEncoding);
         }
         int reply;
-        if (hasProxy)
+        if (hasProxy) {
             ftp.setProxy(proxy);
+        }
         ftp.connect(ftpUrl, ftpPort);//连接FTP服务器
         //如果采用默认端口，可以使用ftp.connect(url)的方式直接连接FTP服务器
         if (StringUtils.isNotBlank(ftpService.getUsername())) {
@@ -101,12 +102,5 @@ public abstract class FtpOperation {
         }
     }
 
-    public void disConnectFtp(FTPClient ftp) {
-        try {
-            ftp.logout();
-            ftp.disconnect();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 }

@@ -33,8 +33,8 @@ public class FtpUploadOperation extends FtpOperation implements BizOperation {
 
         BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel);
         String filePath = StringBaseOpt.objectToString(JSONTransformer.transformer(filePathDesc, transformer));
-        if(StringUtils.isBlank(filePath)){
-            if(StringUtils.isBlank(filePathDesc)){
+        if (StringUtils.isBlank(filePath)) {
+            if (StringUtils.isBlank(filePathDesc)) {
                 filePath = "/";
             } else {
                 filePath = filePathDesc;
@@ -44,14 +44,9 @@ public class FtpUploadOperation extends FtpOperation implements BizOperation {
         FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson);
         SourceInfo ftpService = sourceInfoDao.getDatabaseInfoById(ftpServiceId);
         FTPClient ftpClient = getFtp(ftpService);
-
-        try{
-            ftpClient.changeWorkingDirectory(filePath);
-            ftpClient.storeFile(fileInfo.getFileName(),
-                fileInfo.getFileInputStream());
-        } finally {
-            disConnectFtp(ftpClient);
-        }
+        ftpClient.changeWorkingDirectory(filePath);
+        ftpClient.storeFile(fileInfo.getFileName(),
+            fileInfo.getFileInputStream());
         return BuiltInOperation.createResponseSuccessData(1);
     }
 }
