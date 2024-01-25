@@ -97,9 +97,16 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-workflow-module</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>fileserver-client</artifactId>
             <version>${project.version}</version>
         </dependency>
 

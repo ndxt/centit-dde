@@ -40,6 +40,8 @@ framework:
   app:
     home: D:/Projects/RunData/dde
 
+fileserver:
+  url: http://192.168.134.250:10086/file/
 
 
 

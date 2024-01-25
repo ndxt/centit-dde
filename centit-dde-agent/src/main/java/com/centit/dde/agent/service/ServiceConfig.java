@@ -1,5 +1,8 @@
 package com.centit.dde.agent.service;
 
+import com.centit.fileserver.client.FileClientImpl;
+import com.centit.fileserver.client.FileInfoOptClient;
+import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
 import com.centit.framework.core.service.DataScopePowerManager;
@@ -111,6 +114,16 @@ public class ServiceConfig implements EnvironmentAware {
         config.setPassword(env.getProperty("elasticsearch.server.password"));
         config.setMinScore(NumberBaseOpt.parseFloat(env.getProperty("elasticsearch.filter.minScore"), 0.5F));
         return config;
+    }
+
+    @Bean
+    public FileInfoOpt fileInfoOpt() {
+        String fileServerUrl = env.getProperty("fileserver.url");
+        FileClientImpl fileClient = new FileClientImpl();
+        fileClient.init(fileServerUrl, fileServerUrl, "u0000000", "000000", fileServerUrl);
+        FileInfoOptClient fileStoreBean = new FileInfoOptClient();
+        fileStoreBean.setFileClient(fileClient);
+        return fileStoreBean;
     }
 
 }
