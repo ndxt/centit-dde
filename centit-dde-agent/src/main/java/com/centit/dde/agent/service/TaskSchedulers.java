@@ -192,6 +192,7 @@ public class TaskSchedulers {
             }
             taskMd5 = new String(Hex.encodeHex(md5.digest()));
         } catch (NoSuchAlgorithmException | IOException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
         if (taskMd5.equals(staticTaskMd5)) {

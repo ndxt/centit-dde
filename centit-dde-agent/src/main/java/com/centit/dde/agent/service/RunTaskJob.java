@@ -1,8 +1,10 @@
 package com.centit.dde.agent.service;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.quartz.AbstractQuartzJob;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -56,7 +58,10 @@ public class RunTaskJob extends AbstractQuartzJob {
                 logger.info(String.format("execute scheduled tasks,taskName:%s,taskID：%s,cron expression：%s,execute time:%s",
                     dataPacket.getPacketName(),dataPacket.getPacketId(),dataPacket.getTaskCron(),getDate(dataPacket.getTaskCron())));
                 taskRun.agentRunTask(dataPacket.getPacketId());
-            } finally {
+            } catch (RuntimeException e){
+                logger.error(e.getMessage(), e);
+            }
+            finally {
                 runningTask.put(dataPacket.getPacketId(), false);
             }
         }
