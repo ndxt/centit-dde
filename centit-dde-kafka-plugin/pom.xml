@@ -21,6 +21,7 @@
             <artifactId>centit-dde-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
@@ -32,6 +33,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- 引入kafka客户端 -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>

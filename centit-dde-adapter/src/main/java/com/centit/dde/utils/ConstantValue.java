@@ -1,4 +1,4 @@
-package com.centit.dde.adapter.utils;
+package com.centit.dde.utils;
 
 /**
  * @author zhf

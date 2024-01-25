@@ -1,13 +1,13 @@
 package com.centit.dde.core;
 
-import com.centit.dde.adapter.utils.ConstantValue;
-import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ToResponseData;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.common.ObjectException;
+import com.centit.support.file.FileIOOpt;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -104,7 +104,8 @@ public class DataOptResult implements ToResponseData, Serializable {
             return null;
         }
         Map<String, Object> fileInfo = (Map<String, Object> )this.resultObject;
-        return DataSetOptUtil.getInputStreamFormFile(fileInfo);
+        Object data = fileInfo.get(ConstantValue.FILE_CONTENT);
+        return FileIOOpt.castObjectToInputStream(data);
     }
 
     public boolean hasErrors(){

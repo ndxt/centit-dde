@@ -1,11 +1,11 @@
 package com.centit.dde.dataset;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetReader;
 import com.centit.dde.core.DataSetWriter;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;

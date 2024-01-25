@@ -2,7 +2,7 @@ package com.centit.dde.adapter.po;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
-import com.centit.dde.adapter.utils.ConstantValue;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.core.dao.DictionaryMap;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;

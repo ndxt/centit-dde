@@ -2,9 +2,9 @@ package com.centit.dde.services.impl;
 
 import com.centit.dde.adapter.DdeDubboTaskRun;
 import com.centit.dde.adapter.po.DataPacket;
-import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.services.DataPacketService;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OsInfo;
 import com.centit.support.common.ObjectException;

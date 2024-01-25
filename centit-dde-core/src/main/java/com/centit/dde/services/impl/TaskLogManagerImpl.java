@@ -2,8 +2,8 @@ package com.centit.dde.services.impl;
 
 import com.centit.dde.adapter.dao.TaskLogDao;
 import com.centit.dde.adapter.po.TaskLog;
-import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.services.TaskLogManager;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.dde.vo.StatisticsParameter;
 import com.centit.support.algorithm.CollectionsOpt;

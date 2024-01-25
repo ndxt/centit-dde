@@ -2,7 +2,6 @@ package com.centit.dde.utils;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.centit.dde.adapter.utils.ConstantValue;
 import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
@@ -947,7 +946,7 @@ public abstract class DataSetOptUtil {
         return fileDataset;
     }
 
-    public static InputStream getInputStreamFormFile( Map<String, Object> fileInfo){
+    public static InputStream getInputStreamFormFile(Map<String, Object> fileInfo){
         Object data = fileInfo.get(ConstantValue.FILE_CONTENT);
         return FileIOOpt.castObjectToInputStream(data);
     }
