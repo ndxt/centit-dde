@@ -11,12 +11,11 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.product</groupId>
-    <version>5.4-SNAPSHOT</version>
+    <version>5.5-SNAPSHOT</version>
     <artifactId>centit-dde-agent</artifactId>
 
     <properties>
-        <centit.dde.version>5.4-SNAPSHOT</centit.dde.version>
-        <common.module.version>5.4-SNAPSHOT</common.module.version>
+        <centit.framework.version>5.5-SNAPSHOT</centit.framework.version>
         <elasticsearch.version>7.17.9</elasticsearch.version>
     </properties>
 
@@ -25,7 +24,7 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-module</artifactId>
-            <version>5.4-SNAPSHOT</version>
+            <version>${centit.framework.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.logging.log4j</groupId>
@@ -51,7 +50,7 @@
         <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-quartz-extend</artifactId>
-            <version>${common.module.version}</version>
+            <version>${centit.framework.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.logging.log4j</groupId>
@@ -67,7 +66,7 @@
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-core</artifactId>
-            <version>${project.version}</version>
+            <version>${centit.framework.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.logging.log4j</groupId>
@@ -83,7 +82,7 @@
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>database-metadata-rmdb</artifactId>
-            <version>${project.version}</version>
+            <version>${centit.framework.version}</version>
         </dependency>
 
         <dependency>
@@ -101,13 +100,13 @@
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-workflow-module</artifactId>
-            <version>${project.version}</version>
+            <version>${centit.framework.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>fileserver-client</artifactId>
-            <version>${project.version}</version>
+            <version>${centit.framework.version}</version>
         </dependency>
 
         <dependency>
@@ -148,8 +147,9 @@
         </dependency>
 
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.2.0</version>
             <scope>runtime</scope>
         </dependency>
 
