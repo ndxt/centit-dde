@@ -1,6 +1,5 @@
 package com.centit.dde.utils;
 
-import ch.qos.logback.core.joran.conditional.ThenAction;
 import com.centit.product.metadata.api.ISourceInfo;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
