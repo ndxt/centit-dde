@@ -76,7 +76,11 @@ public class DataOptContext {
     }
 
     public CentitUserDetails getCurrentUserDetail(){
-        return (CentitUserDetails)callStackData.get(ConstantValue.SESSION_DATA_TAG);
+        if(callStackData.get(ConstantValue.SESSION_DATA_TAG) instanceof CentitUserDetails) {
+            return (CentitUserDetails) callStackData.get(ConstantValue.SESSION_DATA_TAG);
+        }else{
+            return null;
+        }
     }
 
     public String getCurrentUserCode(){
