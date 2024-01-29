@@ -1,11 +1,13 @@
 package com.centit.dde.dao.impl;
 
 import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.dao.DataPacketDraftDao;
 import com.centit.dde.adapter.po.DataPacketDraft;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -48,8 +50,17 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
             " [:(like)packetId| and a.packet_id like :packetId]"+
             " order by a.update_date desc";
 
-        return DatabaseOptUtils.listObjectsByParamsDriverSqlAsJson(this,
+        JSONArray jsonArray = DatabaseOptUtils.listObjectsByParamsDriverSqlAsJson(this,
             sqlSen, params, pageDesc);
+        if(jsonArray == null){
+            return null;
+        }
+        for(Object obj : jsonArray){
+            JSONObject jsonObject = (JSONObject) obj;
+            jsonObject.put("isValid", BooleanBaseOpt.castObjectToBoolean(jsonObject.get("isValid"), true));
+            jsonObject.put("isDisable", BooleanBaseOpt.castObjectToBoolean(jsonObject.get("isDisable"), false));
+        }
+        return jsonArray;
     }
 
 
