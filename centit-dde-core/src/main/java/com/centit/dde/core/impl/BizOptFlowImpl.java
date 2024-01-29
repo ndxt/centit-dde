@@ -710,7 +710,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         moduleOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
         moduleOptContext.setStackData(ConstantValue.REQUEST_HEADERS_TAG, bizModel.getStackData(ConstantValue.REQUEST_HEADERS_TAG));
         moduleOptContext.setStackData(ConstantValue.REQUEST_COOKIES_TAG, bizModel.getStackData(ConstantValue.REQUEST_COOKIES_TAG));
-        moduleOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, bizModel.getStackData(ConstantValue.SESSION_DATA_TAG));
+        moduleOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, bizModel.fetchCurrentUserDetail());
 
         DataOptResult result = runInner(dataPacketInterface, moduleOptContext);
 

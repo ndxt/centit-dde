@@ -7,7 +7,6 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.service.FlowEngine;
@@ -38,8 +37,8 @@ public class ManagerWorkFlowBizOperation implements BizOperation {
                 bizOptJson.getString("nodeInstId"), transformer));
 
         String userCode="";
-        if (bizModel.getStackData(ConstantValue.SESSION_DATA_TAG) instanceof CentitUserDetails) {
-            userCode = ((CentitUserDetails) bizModel.getStackData(ConstantValue.SESSION_DATA_TAG)).getUserCode();
+        if (bizModel.fetchCurrentUserDetail() !=null) {
+            userCode = bizModel.fetchCurrentUserDetail().getUserCode();
         }
         Integer taskType = bizOptJson.getInteger("taskType");
 
