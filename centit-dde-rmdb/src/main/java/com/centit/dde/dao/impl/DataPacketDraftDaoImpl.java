@@ -10,6 +10,7 @@ import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.PageDesc;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Repository;
 
@@ -37,6 +38,15 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
     }
 
     public JSONArray listDataPacketDraft(Map<String, Object> params, PageDesc pageDesc){
+
+        String orderBySql = this.fetchSelfOrderSql(params);
+        if(StringUtils.isBlank(orderBySql)){
+            orderBySql = "a.update_date desc";
+        }else {
+            if(orderBySql.indexOf('.')<=0)
+                orderBySql = "a." + orderBySql;
+        }
+
         String sqlSen = "select a.packet_id, a.packet_name, a.packet_desc, a.owner_type, a.owner_code, " +
             "a.recorder, a.record_date, a.update_date, a.os_id, a.opt_id, " +
             "a.task_type, a.task_cron, a.is_valid, a.publish_date, a.opt_code," +
@@ -47,8 +57,9 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
             " [:optId| and a.opt_id=:optId]"+
             " [:isDisable| and a.is_disable=:isDisable]"+
             " [:taskType| and a.task_type=:taskType]"+
-            " [:(like)packetId| and a.packet_id like :packetId]"+
-            " order by a.update_date desc";
+            " [:(like)packetId| and a.packet_id like :packetId]" +
+            " order by " + orderBySql;
+
 
         JSONArray jsonArray = DatabaseOptUtils.listObjectsByParamsDriverSqlAsJson(this,
             sqlSen, params, pageDesc);
