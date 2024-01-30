@@ -72,7 +72,6 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
         return jsonArray;
     }
 
-
     @Override
     public void publishDataPacket(String optCode, DataPacketDraft dataPacketCopy) {
         String sql = "update q_data_packet_draft SET publish_date=? ,opt_code=?  WHERE  PACKET_ID=? ";

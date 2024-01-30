@@ -10,14 +10,13 @@
     </parent>
     <groupId>com.centit.dde.kafka.consumer</groupId>
     <artifactId>centit-dde-consumer-server</artifactId>
-    <version>5.4-SNAPSHOT</version>
+    <version>5.4.240119</version>
     <name>centit-dde-consumer-server</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
         <java.version>1.8</java.version>
-        <centit.dde.version>5.4-SNAPSHOT</centit.dde.version>
-        <common.module.version>5.4-SNAPSHOT</common.module.version>
+        <centit.framework.version>5.4.240119</centit.framework.version>
     </properties>
     <dependencies>
         <dependency>
@@ -37,7 +36,7 @@
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-dde-core</artifactId>
-            <version>${centit.dde.version}</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
@@ -60,8 +59,8 @@
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
+            <version>8.2.0</version>
         </dependency>
-
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>

@@ -52,9 +52,9 @@ public class BizModel implements  Serializable {
             return ((OsInfo)appObj).getTopUnit();
         }
 
-        Object userObj = this.getStackData(ConstantValue.SESSION_DATA_TAG);
-        if (userObj instanceof CentitUserDetails) {
-            return ((CentitUserDetails)userObj).getTopUnitCode();
+        CentitUserDetails userObj = this.fetchCurrentUserDetail();
+        if (userObj !=null) {
+            return userObj.getTopUnitCode();
         }
         return null;
     }
@@ -162,6 +162,15 @@ public class BizModel implements  Serializable {
             return new HashMap<>(0);
         }else{
             return object;
+        }
+    }
+
+    public CentitUserDetails fetchCurrentUserDetail(){
+        Object userObj = this.stackData.get(ConstantValue.SESSION_DATA_TAG);
+        if(userObj instanceof CentitUserDetails) {
+            return (CentitUserDetails) userObj;
+        }else{
+            return null;
         }
     }
 

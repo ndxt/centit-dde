@@ -6,7 +6,6 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.ReflectionOpt;
@@ -19,27 +18,25 @@ public class SessionDataOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");
         JSONArray config = bizOptJson.getJSONArray("config");
-        CentitUserDetails currentUserDetails = (CentitUserDetails)
-            bizModel.getDataSet(ConstantValue.SESSION_DATA_TAG).getData();
-        // 这个本来就不应该有 userPin
-        //if(currentUserDetails != null && currentUserDetails.getUserInfo() != null) {
-        //    currentUserDetails.getUserInfo().remove("userPin");
-        //}
-
-        if (config == null || config.size() == 0){
-            bizModel.putDataSet(id, new DataSet(currentUserDetails));
-        } else {
-            Map<String, Object> result = new HashMap<>(8);
-            for (Object o : config) {
-                JSONObject jsonObject = (JSONObject) o;
-                String sessionKey = jsonObject.getString("sessionKey");
-                Object sessionData = ReflectionOpt.attainExpressionValue(currentUserDetails, sessionKey);
-                if(sessionData!=null) {
-                    result.put(sessionKey, sessionData);
+        CentitUserDetails currentUserDetails = bizModel.fetchCurrentUserDetail();
+        if(currentUserDetails!=null) {
+            if (config == null || config.isEmpty()) {
+                bizModel.putDataSet(id, new DataSet(currentUserDetails));
+            } else {
+                Map<String, Object> result = new HashMap<>(8);
+                for (Object o : config) {
+                    JSONObject jsonObject = (JSONObject) o;
+                    String sessionKey = jsonObject.getString("sessionKey");
+                    Object sessionData = ReflectionOpt.attainExpressionValue(currentUserDetails, sessionKey);
+                    if (sessionData != null) {
+                        result.put(sessionKey, sessionData);
+                    }
                 }
+                bizModel.putDataSet(id, new DataSet(result));
             }
-            bizModel.putDataSet(id, new DataSet(result));
+            return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
         }
-        return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
+        bizModel.putDataSet(id, new DataSet(new HashMap<>()));
+        return BuiltInOperation.createResponseSuccessData(0);
     }
 }

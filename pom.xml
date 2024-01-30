@@ -5,13 +5,13 @@
 
     <parent>
         <groupId>com.centit.framework</groupId>
-        <artifactId>framework-snapshot-dependencies</artifactId>
-        <version>5.4-SNAPSHOT</version>
+        <artifactId>centit-project-bulid-parent</artifactId>
+        <version>5.4.240119</version>
     </parent>
 
 	<groupId>com.centit.product</groupId>
 	<artifactId>centit-dde3</artifactId>
-	<version>5.4-SNAPSHOT</version>
+	<version>${revision}</version>
     <modules>
         <module>centit-dde-core</module>
         <module>centit-dde-module</module>

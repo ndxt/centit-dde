@@ -111,7 +111,7 @@ public class DataPacket implements Serializable, DataPacketInterface {
     private Date nextRunTime;
 
     @Column(name = "is_valid")
-    @ApiModelProperty(value = "是否启用", required = true)
+    @ApiModelProperty(value = "是否启用， T：启用， F 禁用", required = true)
     private Boolean isValid;
 
     @Column(name = "need_rollback")
@@ -146,7 +146,7 @@ public class DataPacket implements Serializable, DataPacketInterface {
     private Integer logLevel;
 
     @Column(name = "is_disable")
-    @ApiModelProperty(value = "是否逻辑删除，T：禁用，F：未禁用", required = true)
+    @ApiModelProperty(value = "是否逻辑删除，T：删除，F：未删除 ，等价于isDelete", required = true)
     private Boolean isDisable;
 
     @Basic(fetch = FetchType.LAZY)
