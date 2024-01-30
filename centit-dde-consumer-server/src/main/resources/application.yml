@@ -7,7 +7,7 @@ spring:
     name: DDE-KAFKA-CONSUMER
   datasource:
     type: org.apache.commons.dbcp2.BasicDataSource
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://192.168.137.63:31426/locodedata?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: stat
     password: stat
