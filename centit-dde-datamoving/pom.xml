@@ -10,13 +10,13 @@
     </parent>
 
     <groupId>com.centit.product</groupId>
-    <version>5.5-SNAPSHOT</version>
+    <version>5.4.240119</version>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>centit-dde-datamoving</artifactId>
 
     <properties>
-        <centit.framework.version>5.5-SNAPSHOT</centit.framework.version>
+        <centit.framework.version>5.4.240119</centit.framework.version>
     </properties>
 
     <dependencies>

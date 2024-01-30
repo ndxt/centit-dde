@@ -42,7 +42,7 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
         if(StringUtils.isBlank(orderBySql)){
             orderBySql = "a.update_date desc";
         }else {
-            if(orderBySql.indexOf('.')<=0)
+            if(orderBySql.indexOf('.')<0)
                 orderBySql = "a." + orderBySql;
         }
 
