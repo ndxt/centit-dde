@@ -319,7 +319,13 @@ public class BizOptFlowImpl implements BizOptFlow {
                 dump.put("stackData", bizModel.dumpStackData());
                 //添加计步器
                 bizData.put("stepNo", dataOptContext.getStepNo());
-                bizData.put("currentNodeData", bizModel.getDataSet(currentNodeId));
+                //添加当前节点数据
+                DataSet currentNodeData = bizModel.getDataSet(currentNodeId);
+                if(currentNodeData==null){
+                    currentNodeData = new DataSet(currentNodeId,
+                        CollectionsOpt.createHashMap("message","当前节点没有产生新的数据集"));
+                }
+                bizData.put("currentNodeData", currentNodeData);
                 bizData.put("dump", dump);
                 //添加断点调试的返回结果
                 bizModel.getOptResult().setResultObject(bizData);
