@@ -299,10 +299,14 @@ public class BizOptFlowImpl implements BizOptFlow {
             runOneStepOpt(bizModel, dataOptStep, dataOptContext);
         }
 
+        if(dataOptStep.isEndStep()){
+            return;
+        }
+
         //断点调试，指定节点数据返回； 除了通过 断点判断 还可以通过 step 判断（计步骤）；
         if(ConstantValue.RUN_TYPE_DEBUG.equals(dataOptContext.getRunType())) {
             boolean isBreak= dataOptContext.getBreakStepNo() != -1 ?
-                dataOptContext.getStepNo() >= dataOptContext.getBreakStepNo() :
+                dataOptStep.getStepNo() >= dataOptContext.getBreakStepNo() :
                 StringUtils.equals(dataOptContext.getDebugId(), stepJson.getString("id"));
 
             if (isBreak) {
@@ -318,7 +322,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 dump.put("allNodeData", bizModel.getBizData());
                 dump.put("stackData", bizModel.dumpStackData());
                 //添加计步器
-                bizData.put("stepNo", dataOptContext.getStepNo());
+                bizData.put("stepNo", dataOptStep.getStepNo());
                 //添加当前节点数据
                 DataSet currentNodeData = bizModel.getDataSet(currentNodeId);
                 if(currentNodeData==null){
@@ -571,7 +575,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 //执行节点操作，并设置该节点的下个节点信息
                 runStep(bizModel, dataOptStep, dataOptContext);
             }
-            if (endCycle) { // break;
+            if (endCycle || dataOptStep.isEndStep()) { // break; dataOptStep.isEndStep() debug模式会有这样的情况
                 break;
             }
             //获取下一个迭代数据，继续循环
@@ -579,11 +583,12 @@ public class BizOptFlowImpl implements BizOptFlow {
                 iter = (Integer) iter + cycleVo.getRangeStep();
             }
         }
-
-        if(cycleEndNode !=null) {
-            dataOptStep.setCurrentStep(cycleEndNode);
-        } else {
-            dataOptStep.seekToCycleEnd(cycleVo.getId());
+        if(!dataOptStep.isEndStep()) {
+            if (cycleEndNode != null) {
+                dataOptStep.setCurrentStep(cycleEndNode);
+            } else {
+                dataOptStep.seekToCycleEnd(cycleVo.getId());
+            }
         }
     }
 
