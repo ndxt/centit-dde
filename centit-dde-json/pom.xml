@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.centit.product</groupId>
         <artifactId>centit-dde3</artifactId>
-        <version>5.4.240131</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>centit-dde-json</artifactId>
