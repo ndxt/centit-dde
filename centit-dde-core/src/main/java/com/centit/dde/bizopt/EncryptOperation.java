@@ -43,9 +43,14 @@ public class EncryptOperation  implements BizOperation {
         //AES(ECB) / AES_CBC (CBC)  / SM4(EBC) / SM4_CBC(CBC)
         String algorithm = BuiltInOperation.getJsonFieldString(bizOptJson, "algorithm", "AES");
         String password = BuiltInOperation.getJsonFieldString(bizOptJson, "password", "");
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
+        if (dataSet == null) {
+            return BuiltInOperation.createResponseData(0, 1,
+                ResponseData.ERROR_OPERATION, "加密计算异常，请指定数据集！");
+        }
 
         if(StringUtils.isNotBlank(password)){
-            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
+            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel, dataSet.getData());
             password = StringBaseOpt.castObjectToString(
                 DataSetOptUtil.fetchFieldValue(transform, password), password);
         }
@@ -54,11 +59,6 @@ public class EncryptOperation  implements BizOperation {
             BooleanBaseOpt.castObjectToBoolean(
                 BuiltInOperation.getJsonFieldString(bizOptJson, "base64", ""), ! "file".equals(encryptDataType));
 
-        DataSet dataSet = bizModel.getDataSet(sourDsName);
-        if (dataSet == null) {
-            return BuiltInOperation.createResponseData(0, 1,
-                ResponseData.ERROR_OPERATION, "加密计算异常，请指定数据集！");
-        }
         if("dataSet".equals(encryptDataType)) {
             byte[] cipherText = null;
             switch (algorithm){

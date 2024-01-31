@@ -49,7 +49,7 @@ public class ProducerBizOperation implements BizOperation {
         //指定发送key , 这个key可以接收 变量
         String key = bizOptJson.getString("key");
         key = StringBaseOpt.castObjectToString(
-             DataSetOptUtil.fetchFieldValue(new BizModelJSONTransform(bizModel) ,bizOptJson.getString("key")), key);
+             DataSetOptUtil.fetchFieldValue(new BizModelJSONTransform(bizModel), bizOptJson.getString("key")), key);
         //是否异步发送
         Boolean isAsyn = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getBoolean("isAsyn"),false);
 

@@ -27,6 +27,11 @@ public class BizModelJSONTransform
         this.stack = new ArrayList<>(10);
     }
 
+    public BizModelJSONTransform(BizModel obj, Object stackValue) {
+        this(obj);
+        pushStackValue(stackValue);
+    }
+
     @Override
     public Object attainExpressionValue(String expression) {
         if (expression == null) {

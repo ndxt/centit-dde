@@ -34,7 +34,6 @@ public class RedisReadOperation implements BizOperation {
                 "配置信息不正确，没有对应的Redis数据库：" +  databaseCode);
         }
 
-
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", "redisRead");
         String redisKey = BuiltInOperation.getJsonFieldString(bizOptJson, "redisKey", "");
 

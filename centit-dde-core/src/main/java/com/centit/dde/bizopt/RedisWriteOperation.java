@@ -38,7 +38,7 @@ public class RedisWriteOperation implements BizOperation {
         String redisKey = BuiltInOperation.getJsonFieldString(bizOptJson, "redisKey", "");
 
         redisKey = StringBaseOpt.castObjectToString(
-            DataSetOptUtil.fetchFieldValue(new BizModelJSONTransform(bizModel), redisKey), redisKey);
+            DataSetOptUtil.fetchFieldValue(new BizModelJSONTransform(bizModel, dataSet.getData()), redisKey), redisKey);
 
         int expireTime = NumberBaseOpt.castObjectToInteger(
             BuiltInOperation.getJsonFieldString(bizOptJson, "expireTime", "30"), 30);

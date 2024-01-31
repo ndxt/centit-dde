@@ -28,30 +28,26 @@ public class DecipherOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
-
-
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         String cipherDataType = BuiltInOperation.getJsonFieldString(bizOptJson, "decipherData", "dataSet");
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
+        if (dataSet == null){
+            return BuiltInOperation.createResponseData(0, 1,
+                ResponseData.ERROR_OPERATION, "解密算法异常，请指定数据集！");
+        }
         //AES / SM4
         String algorithm = BuiltInOperation.getJsonFieldString(bizOptJson, "algorithm", "AES");
         String password = BuiltInOperation.getJsonFieldString(bizOptJson, "password", "");
 
         if(StringUtils.isNotBlank(password)){
-            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
+            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel, dataSet.getData());
             password = StringBaseOpt.castObjectToString(
                 DataSetOptUtil.fetchFieldValue(transform, password), password);
         }
         Boolean base64 =
             BooleanBaseOpt.castObjectToBoolean(
                 BuiltInOperation.getJsonFieldString(bizOptJson, "base64", ""),  ! "file".equals(cipherDataType));
-
-        DataSet dataSet = bizModel.getDataSet(sourDsName);
-        if (dataSet == null){
-            return BuiltInOperation.createResponseData(0, 1,
-                ResponseData.ERROR_OPERATION, "解密算法异常，请指定数据集！");
-        }
-
 
         String fieldName = BuiltInOperation.getJsonFieldString(bizOptJson, "fieldName", "");
 
