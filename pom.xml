@@ -28,10 +28,6 @@
 
     <properties>
         <cxf.version>2.7.3</cxf.version>
-        <metadata.version>5.4-SNAPSHOT</metadata.version>
-        <centit.dde.version>5.4-SNAPSHOT</centit.dde.version>
-        <centit.fileserver.version>5.4-SNAPSHOT</centit.fileserver.version>
-        <centit.workflow.version>5.4-SNAPSHOT</centit.workflow.version>
     </properties>
 
 
