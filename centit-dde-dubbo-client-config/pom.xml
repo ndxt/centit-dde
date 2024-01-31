@@ -5,7 +5,7 @@
     <parent>
         <artifactId>centit-dde3</artifactId>
         <groupId>com.centit.product</groupId>
-        <version>${revision}</version>
+        <version>5.4.240131</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
