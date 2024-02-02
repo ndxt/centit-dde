@@ -11,7 +11,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.product</groupId>
-    <version>5.4.240119</version>
+    <version>5.5-SNAPSHOT</version>
     <artifactId>centit-dde-agent</artifactId>
 
     <properties>
