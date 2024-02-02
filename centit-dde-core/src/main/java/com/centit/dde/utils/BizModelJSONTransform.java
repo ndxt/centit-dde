@@ -32,6 +32,7 @@ public class BizModelJSONTransform
         pushStackValue(stackValue);
     }
 
+
     @Override
     public Object attainExpressionValue(String expression) {
         if (expression == null) {
@@ -51,6 +52,13 @@ public class BizModelJSONTransform
 
     private Object peekStackValue() {
         return stackLength > 1 ? stack.get(stackLength - 2) : null;
+    }
+
+    /**
+     * 清理栈中的值
+     */
+    public void clearStackValue() {
+        this.stackLength = 0;
     }
 
     @Override

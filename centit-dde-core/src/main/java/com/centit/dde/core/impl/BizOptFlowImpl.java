@@ -282,7 +282,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             return;
         }
         if (ConstantValue.BRANCH.equals(stepType)) {
-            setBatchStep(bizModel, dataOptStep);
+            calcBatchStep(bizModel, dataOptStep);
             return;
         }
         // 模块调用
@@ -458,7 +458,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         bizModel.getOptResult().setResultType(DataOptResult.RETURN_OPT_DATA);
     }
 
-    private void setBatchStep(BizModel bizModel, DataOptStep dataOptStep) {
+    private void calcBatchStep(BizModel bizModel, DataOptStep dataOptStep) {
         JSONObject stepJson = dataOptStep.getCurrentStep();
         stepJson = stepJson.getJSONObject("properties");
         String stepId = stepJson.getString("id");
@@ -484,8 +484,10 @@ public class BizOptFlowImpl implements BizOptFlow {
                 return;
             }
         }
-        logger.error("当前分支节点("+stepId+")的" + linksJson.size() + "个分支中没有符合业务逻辑的分支、也没有else分支。");
-        dataOptStep.setEndStep();
+        // logger.error("当前分支节点("+stepId+")的" + linksJson.size() + "个分支中没有符合业务逻辑的分支、也没有else分支。");
+        // dataOptStep.setEndStep();
+        throw new ObjectException(stepJson, ResponseData.ERROR_OPERATION,
+            "当前分支节点("+stepId+")的" + linksJson.size() + "个分支中没有符合业务逻辑的分支、也没有else分支。");
     }
 
     private void runCycle(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) throws Exception {
@@ -501,7 +503,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             iter = cycleVo.getRangeBegin();
         }  else {
             DataSet refObject = bizModel.getDataSet(cycleVo.getSource());
-            Collection searchData =null;
+            Collection<? extends Object> searchData =null;
             if (refObject != null) {
                 if (StringUtils.isNotBlank(cycleVo.getSubsetFieldName())) {
                     Object obj = ReflectionOpt.attainExpressionValue(refObject.getData(), cycleVo.getSubsetFieldName());
@@ -519,11 +521,11 @@ public class BizOptFlowImpl implements BizOptFlow {
                     String childrenField = stepJson.getString("childrenField");
                     if(StringUtils.isBlank(childrenField)){
                         iter = searchData.iterator();
-                    } else if(searchData.size()>0){
+                    } else if(!searchData.isEmpty()){
                         if(breadthFirst){ //广度优先遍历
                             expendTree = CollectionsOpt.breadthFirstTraverseForest(searchData, childrenField);
                         } else { // 深度优先遍历
-                            expendTree = CollectionsOpt.depthFirstTraverseTree(searchData, childrenField);
+                            expendTree = CollectionsOpt.depthFirstTraverseForest(searchData, childrenField);
                         }
                         iter = expendTree.iterator();
                     }
