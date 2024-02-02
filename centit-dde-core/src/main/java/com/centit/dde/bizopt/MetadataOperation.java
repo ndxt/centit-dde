@@ -116,8 +116,10 @@ public class MetadataOperation implements BizOperation {
                         Map<String, String> tableAlias = new HashMap<>(3);
                         tableAlias.put(table.getTableName(), "");
                         QueryAndNamedParams qap = dataPowerFilter.translateQueryFilter(tableAlias, filters);
-                        parames.putAll(qap.getParams());
-                        extFilter = qap.getQuery();
+                        if(qap!=null) {
+                            parames.putAll(qap.getParams());
+                            extFilter = qap.getQuery();
+                        }
                     }
                 }
                 PageDesc pageDesc = new PageDesc();
