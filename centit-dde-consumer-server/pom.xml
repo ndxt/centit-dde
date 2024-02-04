@@ -10,13 +10,13 @@
     </parent>
     <groupId>com.centit.dde.kafka.consumer</groupId>
     <artifactId>centit-dde-consumer-server</artifactId>
-    <version>5.4.240119</version>
+    <version>5.5-SNAPSHOT</version>
     <name>centit-dde-consumer-server</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
         <java.version>1.8</java.version>
-        <centit.framework.version>5.4.240119</centit.framework.version>
+        <centit.framework.version>${project.version}</centit.framework.version>
     </properties>
     <dependencies>
         <dependency>

@@ -15,7 +15,8 @@
     <artifactId>centit-dde-agent</artifactId>
 
     <properties>
-        <centit.framework.version>5.4.240119</centit.framework.version>
+        <java.version>1.8</java.version>
+        <centit.framework.version>${project.version}</centit.framework.version>
         <elasticsearch.version>7.17.9</elasticsearch.version>
     </properties>
 
