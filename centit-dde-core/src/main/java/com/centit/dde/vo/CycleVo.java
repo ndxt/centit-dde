@@ -21,13 +21,13 @@ public class CycleVo {
     private String cycleType;
 
     @ApiModelProperty(value = "区间循环:循环初始值,默认0")
-    private Integer rangeBegin;
+    private String rangeBegin;
 
     @ApiModelProperty(value = "区间循环:循环结束值，不包含这个值")
-    private Integer rangeEnd;
+    private String rangeEnd;
 
     @ApiModelProperty(value = "区间循环:每次循环递增值，默认1")
-    private Integer rangeStep;
+    private String rangeStep;
 
     @ApiModelProperty(value = "数据对象")
     private String source;
@@ -38,15 +38,16 @@ public class CycleVo {
     @ApiModelProperty(value = "赋值类型：复制或者引用  1:复制  2：引用")
     private String assignType;
 
-    public CycleVo(){
-        rangeBegin = 0;
-        rangeStep = 1;
-        assignType = "2";
-    }
 
-    public void setRangeStep(Integer rangeStep) {
-        if(rangeStep != 0) {
-            this.rangeStep = rangeStep;
-        }
+    private Integer intRangeBegin;
+
+    private Integer intRangeEnd;
+
+    private Integer intRangeStep;
+
+    public CycleVo(){
+        intRangeBegin = 0;
+        intRangeStep = 1;
+        assignType = "2";
     }
 }

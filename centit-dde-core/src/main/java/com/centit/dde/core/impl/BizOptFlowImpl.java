@@ -490,6 +490,16 @@ public class BizOptFlowImpl implements BizOptFlow {
             "当前分支节点("+stepId+")的" + linksJson.size() + "个分支中没有符合业务逻辑的分支、也没有else分支。");
     }
 
+    private Integer ckeckRangeSet(String expression, BizModelJSONTransform varTrains, Integer defaultValue){
+        if(StringUtils.isBlank(expression))
+            return defaultValue;
+        if(StringRegularOpt.isNumber(expression)){
+            return NumberBaseOpt.castObjectToInteger(expression);
+        }
+        return NumberBaseOpt.castObjectToInteger(
+            VariableFormula.calculate(expression, varTrains), defaultValue);
+    }
+
     private void runCycle(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) throws Exception {
         JSONObject stepJson = dataOptStep.getCurrentStep();
         stepJson = stepJson.getJSONObject("properties");
@@ -500,7 +510,13 @@ public class BizOptFlowImpl implements BizOptFlow {
         List<Object> expendTree;
         //提取出需要操作的数据
         if (ConstantValue.CYCLE_TYPE_RANGE.equals(cycleVo.getCycleType())) {
-            iter = cycleVo.getRangeBegin();
+            // 计算 range 的设置值
+            BizModelJSONTransform varTrains = new BizModelJSONTransform(bizModel);
+            cycleVo.setIntRangeBegin(ckeckRangeSet(cycleVo.getRangeBegin(), varTrains, 0));
+            cycleVo.setIntRangeStep(ckeckRangeSet(cycleVo.getRangeStep(), varTrains, 1));
+            cycleVo.setIntRangeEnd(ckeckRangeSet(cycleVo.getRangeEnd(), varTrains, 0));
+
+            iter = cycleVo.getIntRangeBegin();
         }  else {
             DataSet refObject = bizModel.getDataSet(cycleVo.getSource());
             Collection<? extends Object> searchData =null;
@@ -539,8 +555,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         while (iter != null) {
             //rang循环
             if (ConstantValue.CYCLE_TYPE_RANGE.equals(cycleVo.getCycleType()) && iter instanceof Integer) {
-                boolean isRangeEnd = (cycleVo.getRangeStep() > 0 && (Integer) iter >= cycleVo.getRangeEnd()) ||
-                    ((cycleVo.getRangeStep() < 0 && (Integer) iter <= cycleVo.getRangeEnd()));
+                boolean isRangeEnd = (cycleVo.getIntRangeStep() > 0 && (Integer) iter >= cycleVo.getIntRangeEnd()) ||
+                    ((cycleVo.getIntRangeStep() < 0 && (Integer) iter <= cycleVo.getIntRangeEnd()));
                 if (isRangeEnd) {
                     break;
                 }
@@ -583,7 +599,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             }
             //获取下一个迭代数据，继续循环
             if (ConstantValue.CYCLE_TYPE_RANGE.equals(cycleVo.getCycleType()) && iter instanceof Integer) {
-                iter = (Integer) iter + cycleVo.getRangeStep();
+                iter = (Integer) iter + cycleVo.getIntRangeStep();
             }
         }
         if(!dataOptStep.isEndStep()) {
