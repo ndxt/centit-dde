@@ -51,11 +51,13 @@ public class AssignmentOperation implements BizOperation {
             if (".".equals(property)){
                return ResponseData.makeErrorMessage("属性名称不能为空！");
             }
-            if( targetDataSet.getSize() < 1){
-                JSONObject jsonObject = new JSONObject();
-                JSONOpt.appendData(jsonObject, property, sourceData);
-                targetDataSet.setData(jsonObject);
-            } else if(targetDataSet.getSize() == 1){
+            if( targetDataSet.getSize() < 1 ){
+                if(sourceData != null){
+                    JSONObject jsonObject = new JSONObject();
+                    JSONOpt.appendData(jsonObject, property, sourceData);
+                    targetDataSet.setData(jsonObject);
+                }
+            } else if(targetDataSet.getSize() == 1) {
                 //尽量不改变原来的数据对象
                 Map<String, Object> objMap = targetDataSet.getFirstRow();
                 if(objMap instanceof JSONObject){
@@ -64,8 +66,7 @@ public class AssignmentOperation implements BizOperation {
                     objMap.put(property, sourceData);
                 }
                 targetDataSet.setData(objMap);
-
-            } else {
+            } else { // targetDataSet.getSize() > 1
                 List<Map<String, Object>> objList = targetDataSet.getDataAsList();
                 List<JSONObject> jsonList = new ArrayList<>(objList.size() +1);
                 for(Map<String, Object> objMap : objList){
@@ -75,9 +76,17 @@ public class AssignmentOperation implements BizOperation {
                 }
                 targetDataSet.setData(jsonList);
             }
-        } else if("append".equals(assignType)) { // 追加
+            return BuiltInOperation.createResponseSuccessData(targetDataSet.getSize());
+        }
+
+        if(sourceData==null){
+            //没有获取数据，无需赋值
+            return BuiltInOperation.createResponseSuccessData(targetDataSet.getSize());
+        }
+
+        if("append".equals(assignType)) { // 追加
             if (targetDataSet.getSize() < 1) {
-                targetDataSet.setData(CollectionsOpt.createList(sourceData));
+                targetDataSet.setData(CollectionsOpt.objectToList(sourceData));
             } else {
                 List<Map<String, Object>>  objList = new ArrayList<>(targetDataSet.getDataAsList());
                 if (sourceData instanceof Collection) {
