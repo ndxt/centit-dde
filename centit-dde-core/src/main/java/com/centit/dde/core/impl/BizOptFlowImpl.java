@@ -570,7 +570,8 @@ public class BizOptFlowImpl implements BizOptFlow {
                 }
                 if (ConstantValue.CYCLE_JUMP_OUT.equals(stepType)) {
                     // break or continue
-                    String breakType = step.getString("endType");
+                    JSONObject jumpStepJson = step.getJSONObject("properties");
+                    String breakType = jumpStepJson.getString("endType");
                     endCycle = ConstantValue.CYCLE_JUMP_BREAK.equals(breakType);
                     break; // break 内循环 继续循环
                 }
