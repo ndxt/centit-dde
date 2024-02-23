@@ -957,6 +957,7 @@ public abstract class DataSetOptUtil {
         }
         return getInputStreamFormFile(dataSet.getFirstRow());
     }
+
     public static Map<String, Object> getDataSetParames(BizModel bizModel, JSONObject bizOptJson){
         //参数类型
         String paramsType = bizOptJson.getString("sourceType");
@@ -1001,7 +1002,11 @@ public abstract class DataSetOptUtil {
                 }
             } else {
                 DataSet dataSet = bizModel.getDataSet(source);
-                parames =  dataSet.getFirstRow();
+                if (dataSet != null) {
+                    parames = dataSet.getFirstRow();
+                } else {
+                    parames = new HashMap<>();
+                }
             }
         }
         return parames;
