@@ -467,8 +467,8 @@ public class BizOptFlowImpl implements BizOptFlow {
             logger.error("当前分支节点("+stepId+")没有后续节点，请检查对应的业务逻辑图。");
         }
         for (JSONObject jsonObject : linksJson) {
-            if (!ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
-                String expression = jsonObject.getString("expression");
+            String expression = jsonObject.getString("expression");
+            if (StringUtils.isNotBlank(expression) && !ConstantValue.ELSE.equalsIgnoreCase(expression)) {
                 Object calculate = VariableFormula.calculate(expression, new BizModelJSONTransform(bizModel), DataSetOptUtil.extendFuncs);
                 if (BooleanBaseOpt.castObjectToBoolean(calculate, false)) {
                     stepJson = dataOptStep.getOptStep(jsonObject.getString("targetId"));
