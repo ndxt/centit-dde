@@ -40,11 +40,10 @@ public class UnitFilterOperation implements BizOperation {
             Pretreatment.mapTemplateStringAsFormula(bizOptJson.getString("unitFilter"),
                 new BizModelJSONTransform(bizModel));
 
+        //两种类别 机构表达式， 根据属性查询 filterType： express， properties
+
         Set<String> units;
         Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
-        //两种类别 机构表达式， 根据属性查询 filterType： exact， properties， express
-
-
         if (userObj instanceof CentitUserDetails) {
             CentitUserDetails centitUserDetails = (CentitUserDetails) userObj;
             units = SysUnitFilterEngine.calcSystemUnitsByExp(
@@ -59,8 +58,8 @@ public class UnitFilterOperation implements BizOperation {
                 new UserUnitMapTranslate()
             );
         }
-
         List<UnitInfo> retUntis = CodeRepositoryUtil.getUnitInfosByCodes(topUnit, units);
+
         retUntis.sort(Comparator.comparing(UnitInfo::getUnitOrder));
         CollectionsOpt.sortAsTree(retUntis,
             ( p,  c) -> StringUtils.equals(p.getUnitCode(),c.getParentUnit()) );
