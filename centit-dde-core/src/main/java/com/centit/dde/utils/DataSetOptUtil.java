@@ -181,6 +181,9 @@ public abstract class DataSetOptUtil {
      * @return 新的数据集
      */
     public static DataSet mapDateSetByFormula(BizModel bizModel, DataSet inData, Collection<Map.Entry<String, String>> formulaMap) {
+        if(inData==null || inData.getSize() == 0){
+            return new DataSet(null);
+        }
         if(DataSet.DATA_SET_TYPE_TABLE.equals(inData.getDataSetType())) {
             List<Map<String, Object>> data = inData.getDataAsList();
             List<Map<String, Object>> newData = new ArrayList<>(data.size());
@@ -192,9 +195,6 @@ public abstract class DataSetOptUtil {
             }
             return new DataSet(newData);
         } else {
-            if(inData.getSize() == 0){
-                return new DataSet(null);
-            }
             Map<String, Object> firstRow = inData.getFirstRow();
             return new DataSet(mapDataRow(bizModel, firstRow, 0, 1, formulaMap));
         }
