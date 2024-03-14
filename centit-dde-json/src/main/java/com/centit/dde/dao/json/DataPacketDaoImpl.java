@@ -80,20 +80,17 @@ public class DataPacketDaoImpl implements DataPacketDao {
 
     @Override
     public int saveObjectReferences(DataPacket dataPacket) {
-        throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+        return 1;
     }
 
     @Override
     public int mergeObject(DataPacket dataPacket) {
-        throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+        return 1;
     }
 
     @Override
     public int updateObject(String[] fields, DataPacket dataPacket) {
-        throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+        return 1;
     }
 
     @Override
@@ -152,7 +149,6 @@ public class DataPacketDaoImpl implements DataPacketDao {
 
     @Override
     public int clearTrashStand(String osId) {
-        throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+        return 1;
     }
 }
