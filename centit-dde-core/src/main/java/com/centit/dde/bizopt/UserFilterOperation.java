@@ -16,6 +16,7 @@ import com.centit.framework.model.basedata.UserInfo;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.compiler.Pretreatment;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.*;
@@ -41,35 +42,88 @@ public class UserFilterOperation implements BizOperation {
         String topUnit = bizModel.fetchTopUnit();
         //获取用户信息
         Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
-        //两种类别 用户表达式， 根据属性查询 filterType： express， properties，
+        //两种类别 用户表达式， 根据属性查询 filterType： express， properties，//exact
+        String filterType = bizOptJson.getString("filterType");
+        BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
 
-        String userFilter = Pretreatment.mapTemplateStringAsFormula(bizOptJson.getString("userFilter"),
-            new BizModelJSONTransform(bizModel));
-
-        Set<String> users ;
-        if (userObj instanceof CentitUserDetails) {
-            CentitUserDetails centitUserDetails = (CentitUserDetails) userObj;
-            users = SysUserFilterEngine.calcSystemOperators(
-                StringEscapeUtils.unescapeHtml4(userFilter), topUnit,
-                createFilterParam("C", centitUserDetails.getCurrentUnitCode()),
-                createFilterParam("C", centitUserDetails.getUserCode()), null,
-                new UserUnitMapTranslate(BuiltInOperation.makeCalcParam(centitUserDetails)));
-        } else {
-            users = SysUserFilterEngine.calcSystemOperators(
-                StringEscapeUtils.unescapeHtml4(userFilter), topUnit,
-                null, null, null,
-                new UserUnitMapTranslate() );
-        }
-
-        List<UserInfo> retUsers = CodeRepositoryUtil.getUserInfosByCodes(bizModel.fetchTopUnit(), users);
-        List<UserInfo> lsUserInfo = new ArrayList<>(retUsers.size() + 1);
-        for (UserInfo ui : retUsers) {
-            if ("T".equals(ui.getIsValid())) {
-                lsUserInfo.add(ui);
+        if ("properties".equals(filterType)) {
+            //returnAsObject
+            String propName = bizOptJson.getString("propName");
+            String propValue = bizOptJson.getString("propValue");
+            String pv = Pretreatment.mapTemplateStringAsFormula(propValue, transform);
+            if(StringUtils.isNotBlank(pv)){
+                propValue = pv;
             }
+            UserInfo userInfo = null;
+            CentitUserDetails ud ;
+            switch (propName){
+                case "loginName":
+                    ud =  this.platformEnvironment.loadUserDetailsByLoginName(propValue);
+                    if(ud != null){
+                        userInfo = ud.getUserInfo();
+                    }
+                    break;
+                case "regEmail":
+                    ud =  this.platformEnvironment.loadUserDetailsByRegEmail(propValue);
+                    if(ud != null){
+                        userInfo = ud.getUserInfo();
+                    }
+                    break;
+                case "cellPhone":
+                    ud =  this.platformEnvironment.loadUserDetailsByRegCellPhone(propValue);
+                    if(ud != null){
+                        userInfo = ud.getUserInfo();
+                    }
+                    break;
+                case "userWord":
+                    userInfo = this.platformEnvironment.getUserInfoByUserWord(propValue);
+                    break;
+                case "idCardNo":
+                    userInfo = this.platformEnvironment.getUserInfoByIdCardNo(propValue);
+                    break;
+                default:
+                    ud =  this.platformEnvironment.loadUserDetailsByUserCode(propValue);
+                    if(ud != null){
+                        userInfo = ud.getUserInfo();
+                    }
+                    break;
+            }
+            if(userInfo!=null) {
+                bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(userInfo));
+                return BuiltInOperation.createResponseSuccessData(1);
+            } else {
+                bizModel.putDataSet(bizOptJson.getString("id"), new DataSet());
+                return BuiltInOperation.createResponseSuccessData(0);
+            }
+        } else {
+            String userFilter = Pretreatment.mapTemplateStringAsFormula(bizOptJson.getString("userFilter"),
+                transform);
+
+            Set<String> users;
+            if (userObj instanceof CentitUserDetails) {
+                CentitUserDetails centitUserDetails = (CentitUserDetails) userObj;
+                users = SysUserFilterEngine.calcSystemOperators(
+                    StringEscapeUtils.unescapeHtml4(userFilter), topUnit,
+                    createFilterParam("C", centitUserDetails.getCurrentUnitCode()),
+                    createFilterParam("C", centitUserDetails.getUserCode()), null,
+                    new UserUnitMapTranslate(BuiltInOperation.makeCalcParam(centitUserDetails)));
+            } else {
+                users = SysUserFilterEngine.calcSystemOperators(
+                    StringEscapeUtils.unescapeHtml4(userFilter), topUnit,
+                    null, null, null,
+                    new UserUnitMapTranslate());
+            }
+
+            List<UserInfo> retUsers = CodeRepositoryUtil.getUserInfosByCodes(bizModel.fetchTopUnit(), users);
+            List<UserInfo> lsUserInfo = new ArrayList<>(retUsers.size() + 1);
+            for (UserInfo ui : retUsers) {
+                if ("T".equals(ui.getIsValid())) {
+                    lsUserInfo.add(ui);
+                }
+            }
+            lsUserInfo.sort(Comparator.comparing(UserInfo::getUserOrder));
+            bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(lsUserInfo));
+            return BuiltInOperation.createResponseSuccessData(1);
         }
-        lsUserInfo.sort(Comparator.comparing(UserInfo::getUserOrder));
-        bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(lsUserInfo));
-        return BuiltInOperation.createResponseSuccessData(1);
     }
 }
