@@ -6,6 +6,7 @@ import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
+import com.centit.fileserver.common.FileBaseInfo;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
@@ -13,12 +14,14 @@ import com.centit.framework.model.basedata.DataDictionary;
 import com.centit.framework.security.StandardPasswordEncoderImpl;
 import com.centit.search.utils.TikaTextExtractor;
 import com.centit.support.algorithm.*;
+import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.compiler.VariableTranslate;
 import com.centit.support.database.utils.QueryUtils;
 import com.centit.support.file.FileIOOpt;
+import com.centit.support.file.FileType;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,9 +29,13 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.StatUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @author codefan@sina.com
@@ -896,12 +903,29 @@ public abstract class DataSetOptUtil {
         data.sort((o1, o2) -> compareTwoRow(o1, o2, fields, nullAsFirst));
     }
 
+    public static FileDataSet mapDataToFile(Map<String, Object> objectMap){
+        if(objectMap==null)
+           return null;
+        String fileName = StringBaseOpt.castObjectToString(objectMap.get(ConstantValue.FILE_NAME));
+        Object fileData = objectMap.get(ConstantValue.FILE_CONTENT);
+        if(fileData == null)
+            return null;
+        HashMap<String, Object> fileInfo = new HashMap<>();
+        for(Map.Entry<String, Object> entry : objectMap.entrySet()){
+            if(! StringUtils.equalsAny(entry.getKey(), ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT)){
+                fileInfo.put(entry.getKey(), entry.getValue());
+            }
+        }
+        FileDataSet fileDataset =  new FileDataSet();
+        fileDataset.setFileInfo(fileInfo);
+        fileDataset.setFileContent(fileName, -1, fileData);
+        return fileDataset;
+    }
+
     public static FileDataSet attainFileDataset(BizModel bizModel, DataSet dataSet, JSONObject jsonStep){
         if(dataSet instanceof FileDataSet){
             return (FileDataSet) dataSet;
         }
-
-        Map<String, Object> mapFirstRow = dataSet.getFirstRow();
         String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep,  ConstantValue.FILE_CONTENT, "");
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
 
@@ -915,34 +939,77 @@ public abstract class DataSetOptUtil {
             }
         }
 
-        if(StringUtils.isBlank(fileName)){
-            String tempName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
-            if(StringUtils.isBlank(tempName)) {
-                fileName = fileNameDesc;
+        if(dataSet.getSize()==1) {
+            Map<String, Object> mapFirstRow = dataSet.getFirstRow();
+            if (StringUtils.isBlank(fileName)) {
+                String tempName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
+                if (StringUtils.isBlank(tempName)) {
+                    fileName = fileNameDesc;
+                } else {
+                    fileName = tempName;
+                }
+            }
+
+            Object fileData;
+            if (StringUtils.isNotBlank(fileContentDesc)) {
+                fileData = mapFirstRow.get(fileContentDesc);
+                if (fileData == null) {
+                    fileData = JSONTransformer.transformer(fileContentDesc, transformer);
+                }
             } else {
-                fileName = tempName;
+                fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
             }
+
+            HashMap<String, Object> fileInfo = new HashMap<>();
+            for (Map.Entry<String, Object> entry : mapFirstRow.entrySet()) {
+                if (!StringUtils.equalsAny(entry.getKey(), fileContentDesc, fileNameDesc)) {
+                    fileInfo.put(entry.getKey(), entry.getValue());
+                }
+            }
+            FileDataSet fileDataset = new FileDataSet();
+            fileDataset.setFileInfo(fileInfo);
+            fileDataset.setFileContent(fileName, -1, fileData);
+            return fileDataset;
         }
 
-        Object fileData;
-        if(StringUtils.isNotBlank(fileContentDesc)){
-            fileData = mapFirstRow.get(fileContentDesc);
-            if(fileData == null){
-                fileData = JSONTransformer.transformer(fileContentDesc, transformer);
+        List<FileDataSet> files = new ArrayList<>();
+        for(Map<String, Object> objectMap : dataSet.getDataAsList()){
+            FileDataSet fileDataSet = mapDataToFile(objectMap);
+            if(fileDataSet != null){
+                files.add(fileDataSet);
             }
-        } else {
-            fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
+        }
+        if(files.isEmpty()){
+            throw new ObjectException(ObjectException.EMPTY_RESULT_EXCEPTION, "文件数据获取失败");
         }
 
-        HashMap<String, Object> fileInfo = new HashMap<>();
-        for(Map.Entry<String, Object> entry : mapFirstRow.entrySet()){
-            if(! StringUtils.equalsAny(entry.getKey(), fileContentDesc, fileNameDesc)){
-                fileInfo.put(entry.getKey(), entry.getValue());
+        if(files.size()==1){
+            FileDataSet ds = files.get(0);
+            if (StringUtils.isNotBlank(fileName)) {
+                ds.setFileName(fileName);
             }
+            return ds;
         }
-        FileDataSet fileDataset =  new FileDataSet();
-        fileDataset.setFileInfo(fileInfo);
-        fileDataset.setFileContent(fileName, -1, fileData);
+        FileDataSet fileDataset = new FileDataSet();
+        ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
+        try(ZipOutputStream out = ZipCompressor.convertToZipOutputStream(outBuf)) {
+            Map<String, Integer> fileNameMap = new HashMap<>(files.size() + 4);
+            for (FileDataSet ds : files) {
+                InputStream inputStream = ds.getFileInputStream();
+                String fn = ds.getFileName();
+                while (fileNameMap.containsKey(fn)) {
+                    int copies = fileNameMap.get(fn) + 1;
+                    fileNameMap.put(fn, copies);
+                    fn = FileType.truncateFileExtName(fn) + "(" + copies + ")." + FileType.getFileExtName(fn);
+                }
+                fileNameMap.put(fn, 1);
+                ZipCompressor.compressFile(inputStream, fn, out, "");
+
+            }
+        } catch (IOException e) {
+            throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED, "压缩多个文件时报错："+ e.getMessage(), e);
+        }
+        fileDataset.setFileContent(fileName, outBuf.size(), outBuf);
         return fileDataset;
     }
 
