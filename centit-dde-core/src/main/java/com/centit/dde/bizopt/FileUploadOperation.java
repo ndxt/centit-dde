@@ -34,7 +34,7 @@ public class FileUploadOperation implements BizOperation {
             return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
                 "文件上传失败，请选择数据集！");
         }
-        FileDataSet mapFileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson);
+        FileDataSet mapFileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
         if(StringUtils.isBlank(mapFileInfo.getFileName())){
             return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
                 sourDsName + "：文件上传失败，该数据集文件名称不能为空！");

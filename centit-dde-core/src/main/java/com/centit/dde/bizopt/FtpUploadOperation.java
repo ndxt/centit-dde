@@ -41,7 +41,7 @@ public class FtpUploadOperation extends FtpOperation implements BizOperation {
             }
         }
 
-        FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson);
+        FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
         SourceInfo ftpService = sourceInfoDao.getDatabaseInfoById(ftpServiceId);
         FTPClient ftpClient = getFtp(ftpService);
         ftpClient.changeWorkingDirectory(filePath);

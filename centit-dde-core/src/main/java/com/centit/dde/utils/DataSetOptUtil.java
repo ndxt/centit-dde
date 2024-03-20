@@ -922,7 +922,7 @@ public abstract class DataSetOptUtil {
         return fileDataset;
     }
 
-    public static FileDataSet attainFileDataset(BizModel bizModel, DataSet dataSet, JSONObject jsonStep){
+    public static FileDataSet attainFileDataset(BizModel bizModel, DataSet dataSet, JSONObject jsonStep, boolean singleFile){
         if(dataSet instanceof FileDataSet){
             return (FileDataSet) dataSet;
         }
@@ -939,7 +939,7 @@ public abstract class DataSetOptUtil {
             }
         }
 
-        if(dataSet.getSize()==1) {
+        if(singleFile || dataSet.getSize()==1) {
             Map<String, Object> mapFirstRow = dataSet.getFirstRow();
             if (StringUtils.isBlank(fileName)) {
                 String tempName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
