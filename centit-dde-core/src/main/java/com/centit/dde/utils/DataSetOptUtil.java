@@ -903,16 +903,28 @@ public abstract class DataSetOptUtil {
         data.sort((o1, o2) -> compareTwoRow(o1, o2, fields, nullAsFirst));
     }
 
-    public static FileDataSet mapDataToFile(Map<String, Object> objectMap){
+    public static FileDataSet mapDataToFile(Map<String, Object> objectMap,
+                                            String fileNameDesc, String fileContentDesc){
         if(objectMap==null)
            return null;
-        String fileName = StringBaseOpt.castObjectToString(objectMap.get(ConstantValue.FILE_NAME));
-        Object fileData = objectMap.get(ConstantValue.FILE_CONTENT);
+
+        String fileName = StringBaseOpt.castObjectToString(objectMap.get(fileContentDesc));
+        if (StringUtils.isBlank(fileName)) {
+            fileName = StringBaseOpt.castObjectToString(objectMap.get(ConstantValue.FILE_NAME));
+        }
+
+        Object fileData = objectMap.get(fileContentDesc);
+        if (fileData == null) {
+            fileData = objectMap.get(ConstantValue.FILE_CONTENT);
+        }
+
         if(fileData == null)
             return null;
+
         HashMap<String, Object> fileInfo = new HashMap<>();
         for(Map.Entry<String, Object> entry : objectMap.entrySet()){
-            if(! StringUtils.equalsAny(entry.getKey(), ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT)){
+            if(! StringUtils.equalsAny(entry.getKey(),
+                    ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT, fileNameDesc, fileContentDesc)){
                 fileInfo.put(entry.getKey(), entry.getValue());
             }
         }
@@ -941,40 +953,22 @@ public abstract class DataSetOptUtil {
 
         if(singleFile || dataSet.getSize()==1) {
             Map<String, Object> mapFirstRow = dataSet.getFirstRow();
-            if (StringUtils.isBlank(fileName)) {
-                String tempName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
-                if (StringUtils.isBlank(tempName)) {
-                    fileName = fileNameDesc;
-                } else {
-                    fileName = tempName;
+            FileDataSet fileDataset = mapDataToFile(mapFirstRow, fileNameDesc, fileContentDesc);
+            if(fileDataset==null){
+                Object fileData = JSONTransformer.transformer(fileContentDesc, transformer);
+                if(fileData==null){
+                    throw new ObjectException(ObjectException.EMPTY_RESULT_EXCEPTION, "文件数据获取失败");
                 }
+                fileDataset = new FileDataSet(fileName, -1, fileData);
+            } else if (StringUtils.isNotBlank(fileName)) {
+                fileDataset.setFileName(fileName);
             }
-
-            Object fileData;
-            if (StringUtils.isNotBlank(fileContentDesc)) {
-                fileData = mapFirstRow.get(fileContentDesc);
-                if (fileData == null) {
-                    fileData = JSONTransformer.transformer(fileContentDesc, transformer);
-                }
-            } else {
-                fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
-            }
-
-            HashMap<String, Object> fileInfo = new HashMap<>();
-            for (Map.Entry<String, Object> entry : mapFirstRow.entrySet()) {
-                if (!StringUtils.equalsAny(entry.getKey(), fileContentDesc, fileNameDesc)) {
-                    fileInfo.put(entry.getKey(), entry.getValue());
-                }
-            }
-            FileDataSet fileDataset = new FileDataSet();
-            fileDataset.setFileInfo(fileInfo);
-            fileDataset.setFileContent(fileName, -1, fileData);
             return fileDataset;
         }
 
         List<FileDataSet> files = new ArrayList<>();
         for(Map<String, Object> objectMap : dataSet.getDataAsList()){
-            FileDataSet fileDataSet = mapDataToFile(objectMap);
+            FileDataSet fileDataSet = mapDataToFile(objectMap, fileNameDesc, fileContentDesc);
             if(fileDataSet != null){
                 files.add(fileDataSet);
             }
@@ -990,6 +984,7 @@ public abstract class DataSetOptUtil {
             }
             return ds;
         }
+
         FileDataSet fileDataset = new FileDataSet();
         ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
         try(ZipOutputStream out = ZipCompressor.convertToZipOutputStream(outBuf)) {

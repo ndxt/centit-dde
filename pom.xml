@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.centit.framework</groupId>
         <artifactId>centit-project-bulid-parent</artifactId>
-        <version>5.4.2401</version>
+        <version>5.5-SNAPSHOT</version>
     </parent>
 
 	<groupId>com.centit.product</groupId>
@@ -27,7 +27,7 @@
 	<packaging>pom</packaging>
 
     <properties>
-        <revision>0.0.1-SNAPSHOT</revision>
+        <revision>5.5-SNAPSHOT</revision>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <cxf.version>2.7.3</cxf.version>
