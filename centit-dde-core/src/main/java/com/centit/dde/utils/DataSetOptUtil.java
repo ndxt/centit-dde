@@ -1114,7 +1114,7 @@ public abstract class DataSetOptUtil {
             return null;
         }
 
-        if(StringUtils.equalsAny(".",ConstantValue.ROOT_NODE_TAG, VariableTranslate.THE_DATA_SELF_LABEL)){
+        if(StringUtils.equalsAny(fieldFormula, ".",ConstantValue.ROOT_NODE_TAG, VariableTranslate.THE_DATA_SELF_LABEL)){
             return data;
         }
 
