@@ -939,9 +939,9 @@ public abstract class DataSetOptUtil {
         BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel);
         String fileName=null;
         if(StringUtils.isNotBlank(fileNameDesc)){
-            fileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(dataSet.getData(), fileNameDesc));
-            if(StringUtils.isBlank(fileName)){
-                fileName = StringBaseOpt.objectToString(JSONTransformer.transformer(fileNameDesc, transformer));
+            fileName = StringBaseOpt.objectToString(JSONTransformer.transformer(fileNameDesc, transformer));
+            if(StringUtils.isBlank(fileName) || fileName.startsWith(".")){
+                fileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(dataSet.getData(), fileNameDesc));
             }
         }
         if(dataSet instanceof FileDataSet){
