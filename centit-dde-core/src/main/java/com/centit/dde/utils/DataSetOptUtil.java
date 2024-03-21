@@ -935,14 +935,8 @@ public abstract class DataSetOptUtil {
     }
 
     public static FileDataSet attainFileDataset(BizModel bizModel, DataSet dataSet, JSONObject jsonStep, boolean singleFile){
-        if(dataSet instanceof FileDataSet){
-            return (FileDataSet) dataSet;
-        }
-        String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep,  ConstantValue.FILE_CONTENT, "");
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
-
         BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel);
-
         String fileName=null;
         if(StringUtils.isNotBlank(fileNameDesc)){
             fileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(dataSet.getData(), fileNameDesc));
@@ -950,6 +944,14 @@ public abstract class DataSetOptUtil {
                 fileName = StringBaseOpt.objectToString(JSONTransformer.transformer(fileNameDesc, transformer));
             }
         }
+        if(dataSet instanceof FileDataSet){
+            if(StringUtils.isNotBlank(fileName)){
+                ((FileDataSet) dataSet).setFileName(fileName);
+            }
+            return (FileDataSet) dataSet;
+        }
+
+        String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep,  ConstantValue.FILE_CONTENT, "");
 
         if(singleFile || dataSet.getSize()==1) {
             Map<String, Object> mapFirstRow = dataSet.getFirstRow();
