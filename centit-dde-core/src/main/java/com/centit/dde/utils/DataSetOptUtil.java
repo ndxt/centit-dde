@@ -908,7 +908,9 @@ public abstract class DataSetOptUtil {
         if(objectMap==null)
            return null;
 
-        String fileName = StringBaseOpt.castObjectToString(objectMap.get(fileContentDesc));
+        String fileName = StringUtils.isNotBlank(fileContentDesc)?
+            StringBaseOpt.castObjectToString(objectMap.get(fileContentDesc)) : null;
+
         if (StringUtils.isBlank(fileName)) {
             fileName = StringBaseOpt.castObjectToString(objectMap.get(ConstantValue.FILE_NAME));
         }
@@ -935,20 +937,21 @@ public abstract class DataSetOptUtil {
     }
 
     public static FileDataSet attainFileDataset(BizModel bizModel, DataSet dataSet, JSONObject jsonStep, boolean singleFile){
+
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
         BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel);
         String fileName=null;
         if(StringUtils.isNotBlank(fileNameDesc)){
-            fileName = StringBaseOpt.objectToString(JSONTransformer.transformer(fileNameDesc, transformer));
-            if(StringUtils.isBlank(fileName) || fileName.startsWith(".")){
-                fileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(dataSet.getData(), fileNameDesc));
-            }
+            fileName = Pretreatment.mapTemplateStringAsFormula(fileNameDesc, transformer);
         }
         if(dataSet instanceof FileDataSet){
-            if(StringUtils.isNotBlank(fileName)){
-                ((FileDataSet) dataSet).setFileName(fileName);
+            FileDataSet fileDataSet = (FileDataSet) dataSet;
+            String currentFileName =  fileDataSet.getFileName();
+            if(StringUtils.isBlank(currentFileName) || StringUtils.equals(
+                FileType.getFileExtName(currentFileName), FileType.getFileExtName(fileName)) ){
+                fileDataSet.setFileName(fileName);
             }
-            return (FileDataSet) dataSet;
+            return fileDataSet;
         }
 
         String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep,  ConstantValue.FILE_CONTENT, "");
@@ -981,7 +984,9 @@ public abstract class DataSetOptUtil {
 
         if(files.size()==1){
             FileDataSet ds = files.get(0);
-            if (StringUtils.isNotBlank(fileName)) {
+            String currentFileName =  ds.getFileName();
+            if(StringUtils.isBlank(currentFileName) || StringUtils.equals(
+                FileType.getFileExtName(currentFileName), FileType.getFileExtName(fileName)) ){
                 ds.setFileName(fileName);
             }
             return ds;
