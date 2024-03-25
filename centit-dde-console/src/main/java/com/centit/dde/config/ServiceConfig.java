@@ -13,7 +13,10 @@ import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
+import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.model.security.CentitUserDetailsService;
 import com.centit.framework.security.StandardPasswordEncoderImpl;
+import com.centit.framework.security.UserDetailsServiceImpl;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.utils.ImagePdfTextExtractor;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -23,10 +26,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 /**
  * @author zhf
@@ -66,6 +74,32 @@ public class ServiceConfig {
     @Bean("passwordEncoder")
     public StandardPasswordEncoderImpl passwordEncoder() {
         return new StandardPasswordEncoderImpl();
+    }
+
+
+    @Bean
+    public CentitUserDetailsService centitUserDetailsService(@Autowired PlatformEnvironment platformEnvironment) {
+        UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl();
+        userDetailsService.setPlatformEnvironment(platformEnvironment);
+        return userDetailsService;
+    }
+
+    @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
+        return new HttpSessionCsrfTokenRepository();
+    }
+
+    @Bean
+    MessageSource messageSource() {
+        ReloadableResourceBundleMessageSource ms = new ReloadableResourceBundleMessageSource();
+        ms.setBasename("classpath:i18n");
+        ms.setDefaultEncoding("UTF-8");
+        return ms;
+    }
+
+    @Bean
+    public LocalValidatorFactoryBean validatorFactory() {
+        return new LocalValidatorFactoryBean();
     }
 
     @Bean
