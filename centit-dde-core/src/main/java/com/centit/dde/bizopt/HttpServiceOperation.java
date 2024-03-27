@@ -17,6 +17,7 @@ import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.json.JSONTransformer;
 import com.centit.support.network.HttpExecutor;
@@ -69,6 +70,7 @@ public class HttpServiceOperation implements BizOperation {
         }*/
 
         HttpExecutorContext httpExecutorContext = getHttpClientContext(sourceInfo);
+        int timeOut = NumberBaseOpt.castObjectToInteger(bizOptJson.get("timeout"), -1);
 
         if (sourceInfo.getExtProps() != null) {
             Map<String, String> extProps = CollectionsOpt.objectMapToStringMap(sourceInfo.getExtProps());
@@ -76,11 +78,15 @@ public class HttpServiceOperation implements BizOperation {
                 if(StringUtils.equalsAnyIgnoreCase(ent.getKey(),
                     "Content-Type", "Accept", "Accept-Encoding", "Accept-Language", "Connection",
                     "Host", "User-Agent", "Cache-Control", "Date", "Pragma",
-                    "Trailer", "Transfer-Encoding", "Via", "Referer", "Cookie")) {
+                    "Trailer", "Transfer-Encoding", "Via", "Referer", "Cookie", "timeout")) {
                     headers.put(ent.getKey(), ent.getValue());
                 }
             }
+            if(timeOut== -1){
+                timeOut = NumberBaseOpt.castObjectToInteger(extProps.get("timeout"), -1);
+            }
         }
+        httpExecutorContext.timout(timeOut);
 
         boolean inheritHeader = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("inheritHeader"), false);
         if(inheritHeader){
@@ -90,7 +96,7 @@ public class HttpServiceOperation implements BizOperation {
         }
 
         Map<String, Object> localHeaders = getRequestParams(bizOptJson, bizModel, "headList", "headName", "headValue");
-        if(localHeaders != null && localHeaders.size()>0){
+        if(!localHeaders.isEmpty()){
             headers.putAll(CollectionsOpt.objectMapToStringMap(localHeaders));
         }
         httpExecutorContext.headers(headers);
@@ -105,11 +111,10 @@ public class HttpServiceOperation implements BizOperation {
         }
 
         Map<String, Object> localCookiess = getRequestParams(bizOptJson, bizModel, "cookieList", "cookieName", "cookieValue");
-        if(localCookiess != null && localCookiess.size()>0){
+        if(!localCookiess.isEmpty()){
             cookies.putAll(CollectionsOpt.objectMapToStringMap(localCookiess));
         }
         httpExecutorContext.cookies(cookies);
-
         //获取请求参数
         Map<String, Object> requestParams = getRequestParams(bizOptJson, bizModel);
         boolean inheritParams = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("inheritParameter"), false);
@@ -196,7 +201,7 @@ public class HttpServiceOperation implements BizOperation {
         return mapObject;
     }
     //计算请求参数列表中的参数
-    private Map<String, Object> getRequestParams(JSONObject bizOptJson,BizModel bizModel) {
+    private Map<String, Object> getRequestParams(JSONObject bizOptJson, BizModel bizModel) {
         return getRequestParams(bizOptJson, bizModel, "parameterList", "urlname", "urlValue");
     }
 
