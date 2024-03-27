@@ -18,14 +18,20 @@ import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
+import com.centit.support.file.FileIOOpt;
 import com.centit.support.json.JSONTransformer;
-import com.centit.support.network.HttpExecutor;
-import com.centit.support.network.HttpExecutorContext;
-import com.centit.support.network.UrlOptUtils;
+import com.centit.support.network.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.CloseableHttpClient;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -151,10 +157,20 @@ public class HttpServiceOperation implements BizOperation {
                 break;
             case "put":
                 Object requestBody = getRequestBody(bizOptJson, bizModel);
+                // 这个是否有必要和 post一样 可以提交文件
                 receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext,
                     UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
                 break;
             case "get":
+                Boolean returnAsFile = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getString("returnAsFile"), false);
+                //TODO 添加 是否是获取 文件的参数, 需要验证
+                if(returnAsFile){
+                    FileDataSet fileDataSet = fetchFileDataSetByUrl(httpExecutorContext, requestServerAddress, requestParams);
+                    String id = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
+                    bizModel.putDataSet(id, fileDataSet);
+                    return BuiltInOperation.createResponseSuccessData(1);
+                }
+
                 receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGet(httpExecutorContext, requestServerAddress, requestParams));
                 if (receiveJson.getCode() != ResponseData.RESULT_OK) {
                     return BuiltInOperation.createResponseData(0, 1, receiveJson.getCode(), receiveJson.getMessage());
@@ -163,6 +179,7 @@ public class HttpServiceOperation implements BizOperation {
             case "delete":
                 DataSet dataSet = DataSet.toDataSet(HttpExecutor.simpleDelete(httpExecutorContext, requestServerAddress, requestParams));
                 return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+
             default:
                 return BuiltInOperation.createResponseData(0, 1, 500, "无效请求！");
         }
@@ -219,4 +236,44 @@ public class HttpServiceOperation implements BizOperation {
         return requestBody;
     }
 
+    private FileDataSet fetchFileDataSetByUrl(HttpExecutorContext executorContext, String uri, Map<String, Object> queryParam) throws IOException {
+
+        HttpGet httpGet = new HttpGet(UrlOptUtils.appendParamsToUrl(uri, queryParam));
+        CloseableHttpClient httpClient = null;
+        boolean createSelfClient = executorContext.getHttpclient() == null;
+        if (createSelfClient) {
+            httpClient = executorContext.getHttpProxy() == null ?
+                HttpExecutor.createHttpClient() :
+                HttpExecutor.createHttpClient(executorContext.getHttpProxy());
+        } else {
+            httpClient = executorContext.getHttpclient();
+        }
+
+        try (CloseableHttpResponse response = httpClient.execute(httpGet, executorContext.getHttpContext())) {
+
+            Header[] contentTypeHeader = response.getHeaders("Content-Type");
+            if (contentTypeHeader == null || contentTypeHeader.length < 1 ||
+                StringUtils.indexOf(
+                    contentTypeHeader[0].getValue(), "text/") >= 0
+            ) {
+                String responseContent = Utf8ResponseHandler.INSTANCE
+                    .handleResponse(response);
+                throw new ObjectException(responseContent);
+            }
+
+            String fileName = HttpExecutor.extraFileName(response);
+            FileDataSet fileDataSet = new FileDataSet();
+            fileDataSet.setFileName(fileName);
+            try (InputStream inputStream = InputStreamResponseHandler.INSTANCE
+                .handleResponse(response)) {
+                // FileIOOpt.writeInputStreamToOutputStream()
+                fileDataSet.setFileData(inputStream);
+            }
+            return fileDataSet;
+        } finally {
+            if (createSelfClient) {
+                httpClient.close();
+            }
+        }
+    }
 }
