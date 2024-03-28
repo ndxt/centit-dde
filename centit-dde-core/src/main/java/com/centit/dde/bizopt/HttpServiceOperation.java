@@ -250,6 +250,8 @@ public class HttpServiceOperation implements BizOperation {
         } else {
             httpClient = executorContext.getHttpclient();
         }
+        // 添加对应的参数设置
+        HttpExecutor.prepareHttpRequest(executorContext, httpGet);
 
         try (CloseableHttpResponse response = httpClient.execute(httpGet, executorContext.getHttpContext())) {
 
