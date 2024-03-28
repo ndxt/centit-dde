@@ -268,11 +268,18 @@ public class HttpServiceOperation implements BizOperation {
                 fileName = UrlOptUtils.fetchFilenameFromUrl(uri);
             }
             FileDataSet fileDataSet = new FileDataSet();
-            fileDataSet.setFileName(fileName);
+
             try (InputStream inputStream = InputStreamResponseHandler.INSTANCE
                 .handleResponse(response)) {
-                // FileIOOpt.writeInputStreamToOutputStream()
-                fileDataSet.setFileData(inputStream);
+                int fileSize = inputStream.available();
+                if(fileSize<0){
+                    fileSize = 10485760;
+                } else {
+                    fileSize += 10;
+                }
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream(fileSize);
+                FileIOOpt.writeInputStreamToOutputStream(inputStream, outputStream);
+                fileDataSet.setFileContent(fileName, outputStream.size(), outputStream);
             }
             return fileDataSet;
         } finally {
