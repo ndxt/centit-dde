@@ -86,7 +86,7 @@ public class HttpServiceOperation implements BizOperation {
                 if(StringUtils.equalsAnyIgnoreCase(ent.getKey(),
                     "Content-Type", "Accept", "Accept-Encoding", "Accept-Language", "Connection",
                     "Host", "User-Agent", "Cache-Control", "Date", "Pragma",
-                    "Trailer", "Transfer-Encoding", "Via", "Referer", "Cookie", "timeout")) {
+                    "Trailer", "Transfer-Encoding", "Via", "Referer", "Cookie")) {
                     headers.put(ent.getKey(), ent.getValue());
                 }
             }
