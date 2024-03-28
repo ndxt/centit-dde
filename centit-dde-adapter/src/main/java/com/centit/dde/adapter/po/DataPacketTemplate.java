@@ -27,12 +27,12 @@ public class DataPacketTemplate  implements Serializable {
     @ApiModelProperty(value = "数据处理ID", hidden = true)
     @Id
     @Column(name = "id")
-    @NotBlank(message = "字段不能为空")
+    @NotBlank
     @ValueGenerator(strategy = GeneratorType.UUID)
     private String id;
 
     @Column(name = "template_type")
-    @ApiModelProperty(value = "模板(操作)类型 1：新建 2：修改 3：删除 4：查询 5：查看 6：创建流程 7：提交流程 8：http调用")
+    @ApiModelProperty(value = "模板(操作)类型 1：新建 2：修改 3：删除 4：查询 5：查看 6：创建流程 7：提交流程 8：http调用 9: Excel导出")
     private Integer templateType;
 
     @Column(name = "os_id")

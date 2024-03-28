@@ -34,13 +34,13 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     @ApiModelProperty(value = "数据处理ID", hidden = true)
     @Id
     @Column(name = "packet_id")
-    @NotBlank(message = "字段不能为空")
+    @NotBlank
     @ValueGenerator(strategy = GeneratorType.UUID)
     private String packetId;
 
     @ApiModelProperty(value = "数据处理名称")
     @Column(name = "packet_name")
-    @NotBlank(message = "字段不能为空")
+    @NotBlank
     private String packetName;
 
     @ApiModelProperty(value = "详细描述")
@@ -85,12 +85,12 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
 
     @ApiModelProperty(value = "业务模块代码", required = true)
     @Column(name = "os_id")
-    @NotBlank(message = "osId字段不能为空")
+    @NotBlank
     private String osId;
 
     @ApiModelProperty(value = "所属模块", required = true)
     @Column(name = "opt_id")
-    @NotBlank(message = "optId字段不能为空")
+    @NotBlank
     private String optId;
 
     @Column(name = "task_type")
@@ -131,8 +131,9 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     private String optCode;
 
     @Column(name = "template_type")
-    @ApiModelProperty(value = "模板(操作)类型：1：新建 2：修改 3：删除 4：查询 5：查看 6：创建流程 7：提交流程 8：http调用")
+    @ApiModelProperty(value = "模板(操作)类型：1：新建 2：修改 3：删除 4：查询 5：查看 6：创建流程 7：提交流程 8：http调用 9: 导出Excel")
     private Integer templateType;
+
     /**
      * template_type  metadata_table_id  这2个字段都是给前端做判断使用的，dde本身不需要这2个字段
      */

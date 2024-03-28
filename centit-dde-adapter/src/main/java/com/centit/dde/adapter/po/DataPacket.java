@@ -36,13 +36,13 @@ public class DataPacket implements Serializable, DataPacketInterface {
     @ApiModelProperty(value = "数据处理ID", hidden = true)
     @Id
     @Column(name = "packet_id")
-    @NotBlank(message = "字段不能为空")
+    @NotBlank
     @ValueGenerator(strategy = GeneratorType.UUID)
     private String packetId;
 
     @ApiModelProperty(value = "数据处理名称")
     @Column(name = "packet_name")
-    @NotBlank(message = "字段不能为空")
+    @NotBlank
     private String packetName;
 
     @ApiModelProperty(value = "详细描述")

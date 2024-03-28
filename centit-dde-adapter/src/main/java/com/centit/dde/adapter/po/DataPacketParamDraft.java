@@ -27,7 +27,7 @@ public class DataPacketParamDraft implements Serializable {
     @Id
     @ApiModelProperty(value = "数据包ID", hidden = true)
     @Column(name = "PACKET_ID")
-    @NotBlank(message = "字段不能为空")
+    @NotBlank
     @JSONField(serialize = false)
     private String packetId;
 
