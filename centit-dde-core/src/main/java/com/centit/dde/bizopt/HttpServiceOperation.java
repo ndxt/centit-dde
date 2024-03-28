@@ -264,6 +264,9 @@ public class HttpServiceOperation implements BizOperation {
             }
 
             String fileName = HttpExecutor.extraFileName(response);
+            if(StringUtils.isBlank(fileName)){
+                fileName = UrlOptUtils.fetchFilenameFromUrl(uri);
+            }
             FileDataSet fileDataSet = new FileDataSet();
             fileDataSet.setFileName(fileName);
             try (InputStream inputStream = InputStreamResponseHandler.INSTANCE
