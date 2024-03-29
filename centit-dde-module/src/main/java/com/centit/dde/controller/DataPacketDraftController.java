@@ -186,13 +186,11 @@ public class DataPacketDraftController extends ResourceBaseController {
             JSONObject nodeData = (JSONObject) node;
             JSONObject properties = nodeData.getJSONObject("properties");
             String metadataType = properties.getString("type");
-            if (StringUtils.isNotBlank(metadataType) && metadataType.startsWith("metadata")) {
+            if (StringUtils.startsWith(metadataType, "metadata")) {
                 properties.put("tableId", tableId);
                 properties.put("templateType", type == 6 || type == 7 ? 1 : type);
                 properties.put("databaseName", dataBaseCode);
-            }
-
-            if (StringUtils.equals(metadataType, "generateExcel")) {
+            } else if (StringUtils.equals(metadataType, "generateExcel")) {
                 MetaTable metaTable = metaDataCache.getTableInfo(tableId);
                 properties.put("fileName", "导出" +  metaTable.getTableLabelName() + ".xlsx");
                 JSONArray configArray = new JSONArray();
