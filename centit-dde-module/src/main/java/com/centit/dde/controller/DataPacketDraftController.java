@@ -200,6 +200,7 @@ public class DataPacketDraftController extends ResourceBaseController {
                     JSONObject col = new JSONObject();
                     col.put("columnName", column.getFieldLabelName());
                     col.put("expression", column.getPropertyName());
+                    configArray.add(col);
                 }
                 properties.put("config", configArray);
             }
