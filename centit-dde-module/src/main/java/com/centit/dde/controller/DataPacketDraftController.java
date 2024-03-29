@@ -192,7 +192,7 @@ public class DataPacketDraftController extends ResourceBaseController {
                 properties.put("databaseName", dataBaseCode);
             }
 
-            if (StringUtils.isNotBlank(metadataType) && metadataType.startsWith("generateExcel")) {
+            if (StringUtils.equals(metadataType, "generateExcel")) {
                 MetaTable metaTable = metaDataCache.getTableInfo(tableId);
                 properties.put("fileName", "导出" +  metaTable.getTableLabelName() + ".xlsx");
                 JSONArray configArray = new JSONArray();
