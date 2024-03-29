@@ -24,6 +24,7 @@ public class DataPacketTemplateDaoImpl extends BaseDaoImpl<DataPacketTemplate, S
 
     @Override
     public JSONObject getDataPacketTemplateByType(Integer type) {
+        //this.getObjectByProperties(CollectionsOpt.createHashMap())
         String sql = "SELECT * FROM q_data_packet_template WHERE is_valid = 0  and template_type = ? ";
         return DatabaseOptUtils.getObjectBySqlAsJson(this, sql,new Object[]{type});
     }

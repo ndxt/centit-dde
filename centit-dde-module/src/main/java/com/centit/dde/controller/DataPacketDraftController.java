@@ -19,6 +19,9 @@ import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.operationlog.RecordOperationLog;
+import com.centit.product.metadata.po.MetaColumn;
+import com.centit.product.metadata.po.MetaTable;
+import com.centit.product.metadata.service.MetaDataCache;
 import com.centit.product.oa.team.utils.ResourceBaseController;
 import com.centit.product.oa.team.utils.ResourceLock;
 import com.centit.support.algorithm.DatetimeOpt;
@@ -67,6 +70,9 @@ public class DataPacketDraftController extends ResourceBaseController {
 
     @Autowired
     private PlatformEnvironment platformEnvironment;
+
+    @Autowired
+    private MetaDataCache metaDataCache;
 
     public DataPacketDraftController(DataPacketDraftService dataPacketDraftService) {
         this.dataPacketDraftService = dataPacketDraftService;
@@ -132,7 +138,6 @@ public class DataPacketDraftController extends ResourceBaseController {
         return dataPacketDraft;
     }
 
-
     @ApiOperation(value = "新增元数据类型API")
     @PostMapping("/metadata/api")
     @WrapUpResponseBody
@@ -186,7 +191,20 @@ public class DataPacketDraftController extends ResourceBaseController {
                 properties.put("templateType", type == 6 || type == 7 ? 1 : type);
                 properties.put("databaseName", dataBaseCode);
             }
+
+            if (StringUtils.isNotBlank(metadataType) && metadataType.startsWith("generateExcel")) {
+                MetaTable metaTable = metaDataCache.getTableInfo(tableId);
+                properties.put("fileName", "导出" +  metaTable.getTableLabelName() + ".xlsx");
+                JSONArray configArray = new JSONArray();
+                for(MetaColumn column : metaTable.getColumns()){
+                    JSONObject col = new JSONObject();
+                    col.put("columnName", column.getFieldLabelName());
+                    col.put("expression", column.getPropertyName());
+                }
+                properties.put("config", configArray);
+            }
         }
+
         JSONObject schemaProps = dataPacketTemplate.getJSONObject("schemaProps");
         dataPacketDraft.setSchemaProps(schemaProps);
         dataPacketDraft.setMetadataTableId(tableId);
