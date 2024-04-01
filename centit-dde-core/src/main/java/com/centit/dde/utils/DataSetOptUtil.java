@@ -47,7 +47,8 @@ public abstract class DataSetOptUtil {
 
     static {
         extendFuncs.put("uuid", (a) -> UuidOpt.getUuidAsString32());
-        extendFuncs.put("encode", (a) -> new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
+        extendFuncs.put("encode", (a) -> a==null || a.length<1 || a[0] == null ? null
+             : new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
         extendFuncs.put("dict", (a) -> {
             String topUnit = WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest());
             String lang = WebOptUtils.getCurrentLang(RequestThreadLocal.getLocalThreadWrapperRequest());
