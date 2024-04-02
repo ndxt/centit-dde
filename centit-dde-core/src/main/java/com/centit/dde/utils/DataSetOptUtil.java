@@ -6,7 +6,6 @@ import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
-import com.centit.fileserver.common.FileBaseInfo;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
@@ -28,9 +27,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.StatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -41,7 +41,7 @@ import java.util.zip.ZipOutputStream;
  * @author codefan@sina.com
  */
 public abstract class DataSetOptUtil {
-
+    protected static final Logger logger = LoggerFactory.getLogger(DataSetOptUtil.class);
     private static final boolean SORT_NULL_AS_FIRST = false;
     public static final Map<String, Function<Object[], Object>> extendFuncs = new HashMap<>();
 
@@ -134,6 +134,8 @@ public abstract class DataSetOptUtil {
             }
         });
         extendFuncs.put("size", (a) -> {
+            if (a == null || a.length < 1)
+                return 0;
             Object o = a[0];
             if (o instanceof Collection) {
                 return ((Collection<?>) o).size();
@@ -148,12 +150,14 @@ public abstract class DataSetOptUtil {
             return o==null? 0 : 1;
         });
         extendFuncs.put("fileToText", (a) -> {
+            if (a == null || a.length < 1)
+                return null;
             Object file = a[0];
             try {
                 return TikaTextExtractor.extractInputStreamText(FileIOOpt.castObjectToInputStream(file));
             } catch (Exception e) {
-                e.printStackTrace();
-                return "文件转换文本失败！";
+                logger.error("扩展函数fileToText中文件转换失败："+e.getMessage(), e);
+                return null;
             }
         });
     }
