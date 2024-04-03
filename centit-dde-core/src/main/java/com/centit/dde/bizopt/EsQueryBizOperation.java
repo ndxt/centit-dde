@@ -89,7 +89,9 @@ public class EsQueryBizOperation implements BizOperation {
 
             String keyword = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("queryParameter")));
             QueryBuilder queryBuilder = queryBuilder(queryParam, keyword, indexFile, esSearcher, bizOptJson, transform);
-            Pair<Long, List<Map<String, Object>>> search = esSearcher.esSearch(queryBuilder, null, null, pageNo, pageSize);
+
+            Pair<Long, List<Map<String, Object>>> search = esSearcher.esSearch(queryBuilder,
+                ESSearcher.mapSortBuilder(queryParam), null, null, pageNo, pageSize);
 
             PageDesc pageDesc = new PageDesc();
             pageDesc.setPageNo(pageNo);
