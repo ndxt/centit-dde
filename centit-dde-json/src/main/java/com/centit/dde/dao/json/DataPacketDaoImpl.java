@@ -63,19 +63,19 @@ public class DataPacketDaoImpl implements DataPacketDao {
     @Override
     public List<DataPacket> listObjectsByProperties(Map<String, Object> params, PageDesc pageDesc) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public List<DataPacket> listObjectsByProperties(Map<String, Object> params) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public void saveNewObject(DataPacket dataPacket) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
@@ -96,55 +96,55 @@ public class DataPacketDaoImpl implements DataPacketDao {
     @Override
     public int deleteObjectReferences(DataPacket dataPacket) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public int deleteObjectById(Object dataPacket) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public void publishDataPacket(DataPacket dataPacket) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public void updateDataPacketOptJson(String packetId, String dataPacketOptJson) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public int[] batchUpdateOptIdByApiId(String optId, List<String> apiIds) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public void updateDisableStatus(String packetId, String disable) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public void batchDeleteByPacketIds(String[] packetIds) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public void updatePackedLogLevel(int logLevel, List<String> packetIds) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public void updateApplicationLogLevel(int logLevel, String osId) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override

@@ -19,42 +19,42 @@ public class DataPacketTemplateDaoImpl implements DataPacketTemplateDao {
     @Override
     public void saveNewObject(DataPacketTemplate dataPacket) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public int updateObject(DataPacketTemplate dataPacket) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public DataPacketTemplate getObjectById(Object id) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public int deleteObjectById(Object id) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public void updateDataPacketTemplateContent(String id, String content) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public List<DataPacketTemplate> listObjectsByProperties(Map<String, Object> params, PageDesc pageDesc) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public JSONObject getDataPacketTemplateByType(Integer type) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 }

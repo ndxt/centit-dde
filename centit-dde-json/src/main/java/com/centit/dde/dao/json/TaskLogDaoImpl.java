@@ -39,30 +39,30 @@ public class TaskLogDaoImpl implements TaskLogDao {
     @Override
     public TaskLog getObjectById(Object id) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public int deleteObjectForceById(Object id) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public List<TaskLog> listObjectsByProperties(Map<String, Object> param, PageDesc pageDesc) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public Map<String, Object> getLogStatisticsInfo(Map<String, Object> queryparameter) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 
     @Override
     public int deleteTaskLog(String packetId, Date runBeginTime, boolean isError) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "该方法在当前版本下没有实现，请联系研发人员!");
+            "Runtime 运行时环境，不支持元数据的修改!");
     }
 }
