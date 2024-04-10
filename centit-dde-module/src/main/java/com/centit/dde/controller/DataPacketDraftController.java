@@ -197,7 +197,7 @@ public class DataPacketDraftController extends ResourceBaseController {
                 for(MetaColumn column : metaTable.getColumns()){
                     JSONObject col = new JSONObject();
                     col.put("columnName", column.getFieldLabelName());
-                    if("0".equals(column.getReferenceType())) {
+                    if(StringUtils.isBlank(column.getReferenceType()) || "0".equals(column.getReferenceType())) {
                         col.put("expression", column.getPropertyName());
                     } else {
                         col.put("expression", column.getPropertyName()+"Desc");
