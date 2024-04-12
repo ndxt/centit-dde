@@ -15,9 +15,11 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
+import com.centit.support.image.ImageOpt;
 import com.centit.support.office.Watermark4Pdf;
 import org.apache.commons.lang3.StringUtils;
 
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,62 @@ public class AddWaterMarkOperation implements BizOperation {
     }
 
     private ResponseData addImageWaterMark(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
+        //获取参数 BufferedImage image, String waterMark, String fontName, Color color, int size, int x, int y
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
+        String waterMarkStr = bizOptJson.getString("waterMark");
+        String font = bizOptJson.getString("font");
+        if(StringUtils.isBlank(font)){
+            font = "宋体";
+        }
+        String color = bizOptJson.getString("color");
+        int fontSize = bizOptJson.getIntValue("size");
+        int x = bizOptJson.getIntValue("x");
+        int y = bizOptJson.getIntValue("y");
+        String sourDsName = bizOptJson.getString("source");
+        Color markColor = ImageOpt.castObjectToColor(color, Color.WHITE);
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
+
+        if(dataSet.getSize() == 1) {
+            FileDataSet fileDataSet;
+            if (dataSet instanceof FileDataSet) {
+                fileDataSet = (FileDataSet) dataSet;
+            } else {
+                fileDataSet = DataSetOptUtil.mapDataToFile(dataSet.getFirstRow(),
+                    ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
+            }
+            if(fileDataSet!=null) {
+                ByteArrayOutputStream imageFile = new ByteArrayOutputStream();
+                if(ImageOpt.addWaterMark(fileDataSet.getFileInputStream(), imageFile,
+                    waterMarkStr, font, markColor, fontSize, x, y)) {
+                    FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
+                        imageFile.size(), imageFile);
+                    bizModel.putDataSet(targetDsName, pdfDataset);
+                    return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+                }
+            }
+            return BuiltInOperation.createResponseSuccessData(0);
+        }
+        //文件列表
+        if(dataSet.getSize() > 1) {
+            List<Map<String, Object>> fileList = new ArrayList<>();
+            for(Map<String, Object> rowData : dataSet.getDataAsList()){
+                FileDataSet fileDataSet = DataSetOptUtil.mapDataToFile(rowData,
+                    ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
+                if(fileDataSet!=null){
+                    ByteArrayOutputStream imageFile = new ByteArrayOutputStream();
+                    if(ImageOpt.addWaterMark(fileDataSet.getFileInputStream(), imageFile,
+                        waterMarkStr, font, markColor, fontSize, x, y)) {
+                        fileList.add(CollectionsOpt.createHashMap(
+                            ConstantValue.FILE_NAME, fileDataSet.getFileName(),
+                            ConstantValue.FILE_SIZE, imageFile.size(),
+                            ConstantValue.FILE_CONTENT, imageFile
+                        ));
+                    }
+                }
+            }
+            bizModel.putDataSet(targetDsName, new DataSet(fileList));
+            return BuiltInOperation.createResponseSuccessData(fileList.size());
+        }
         return BuiltInOperation.createResponseSuccessData(0);
     }
 
@@ -85,7 +143,7 @@ public class AddWaterMarkOperation implements BizOperation {
                 FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
                     pdfFile.size(), pdfFile);
                 bizModel.putDataSet(targetDsName, pdfDataset);
-                return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+                return BuiltInOperation.createResponseSuccessData(1);
             } else {
                 return BuiltInOperation.createResponseSuccessData(0);
             }

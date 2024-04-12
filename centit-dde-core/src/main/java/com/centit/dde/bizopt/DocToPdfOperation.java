@@ -6,18 +6,13 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
-import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileType;
 import com.centit.support.office.OfficeToPdf;
-import com.centit.support.office.Watermark4Pdf;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -67,7 +62,7 @@ public class DocToPdfOperation implements BizOperation {
                 FileDataSet pdfDataset = new FileDataSet(FileType.truncateFileExtName(fileDataSet.getFileName()) + ".pdf",
                     pdfFile.size(), pdfFile);
                 bizModel.putDataSet(targetDsName, pdfDataset);
-                return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+                return BuiltInOperation.createResponseSuccessData(1);
             } else {
                 return BuiltInOperation.createResponseSuccessData(0);
             }

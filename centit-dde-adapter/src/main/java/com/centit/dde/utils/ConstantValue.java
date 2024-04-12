@@ -90,6 +90,8 @@ public class ConstantValue {
     public static final String ELASTICSEARCH_QUERY = "esQuery";
     public static final String ELASTICSEARCH_WRITE = "esWrite";
 
+    public static final String DOCUMENT_TO_PDF = "docToPdf";
+    public static final String ADD_WATER_MARK = "waterMark";
     //dde手动提交事物
     public static final String  COMMIT_TRANSACTION="commitTransaction";
     //交集
