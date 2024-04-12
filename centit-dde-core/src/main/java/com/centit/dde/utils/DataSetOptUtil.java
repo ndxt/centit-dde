@@ -913,8 +913,8 @@ public abstract class DataSetOptUtil {
         if(objectMap==null)
            return null;
 
-        String fileName = StringUtils.isNotBlank(fileContentDesc)?
-            StringBaseOpt.castObjectToString(objectMap.get(fileContentDesc)) : null;
+        String fileName = StringUtils.isNotBlank(fileNameDesc)?
+            StringBaseOpt.castObjectToString(objectMap.get(fileNameDesc)) : null;
 
         if (StringUtils.isBlank(fileName)) {
             fileName = StringBaseOpt.castObjectToString(objectMap.get(ConstantValue.FILE_NAME));

@@ -39,7 +39,7 @@ public class DocReportOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
-        String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String fileId = bizOptJson.getString("fileId");
         boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), true);
 
@@ -59,7 +59,7 @@ public class DocReportOperation implements BizOperation {
         FileDataSet dataSet = transToPdf? new FileDataSet(fileName,
             -1, word2Pdf(in)) : new FileDataSet(fileName, -1, in);
 
-        bizModel.putDataSet(sourDsName, dataSet);
+        bizModel.putDataSet(targetDsName, dataSet);
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }
 

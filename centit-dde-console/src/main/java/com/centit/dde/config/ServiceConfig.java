@@ -76,7 +76,6 @@ public class ServiceConfig {
         return new StandardPasswordEncoderImpl();
     }
 
-
     @Bean
     public CentitUserDetailsService centitUserDetailsService(@Autowired PlatformEnvironment platformEnvironment) {
         UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl();
@@ -92,7 +91,7 @@ public class ServiceConfig {
     @Bean
     MessageSource messageSource() {
         ReloadableResourceBundleMessageSource ms = new ReloadableResourceBundleMessageSource();
-        ms.setBasename("classpath:i18n/messages");
+        ms.setBasenames("classpath:i18n/messages", "classpath:org/springframework/security/messages");
         ms.setDefaultEncoding("UTF-8");
         return ms;
     }
