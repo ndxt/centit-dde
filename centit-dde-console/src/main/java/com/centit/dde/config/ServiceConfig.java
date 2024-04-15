@@ -49,8 +49,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
         value = org.springframework.stereotype.Controller.class))
 @Configuration
 @EnableNacosConfig(globalProperties = @NacosProperties(serverAddr = "${nacos.server-addr}"))
-@NacosPropertySources({@NacosPropertySource(dataId = "${nacos.system-dataid}", groupId = "CENTIT", autoRefreshed = true)}
-)
+@NacosPropertySources({@NacosPropertySource(dataId = "${nacos.system-dataid}", groupId = "CENTIT", autoRefreshed = true)})
 public class ServiceConfig {
     Logger logger = LoggerFactory.getLogger(ServiceConfig.class);
 
