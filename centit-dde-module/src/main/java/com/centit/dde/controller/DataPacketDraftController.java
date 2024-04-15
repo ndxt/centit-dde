@@ -28,6 +28,7 @@ import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
+import com.centit.support.security.SecurityOptUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -217,7 +218,6 @@ public class DataPacketDraftController extends ResourceBaseController {
         return dataPacketDraft;
     }
 
-
     @ApiOperation(value = "编辑API网关")
     @ApiImplicitParam(
         name = "packetId", value = "apiID号",
@@ -228,7 +228,11 @@ public class DataPacketDraftController extends ResourceBaseController {
         tag = "{arg0}", newValue = "无")
     @WrapUpResponseBody
     public void updateDataPacket(@PathVariable String packetId,
-                                 @RequestBody DataPacketDraft dataPacketDraft, HttpServletRequest request) throws ParseException {
+                                 @RequestBody String packetJsonStr, HttpServletRequest request) throws ParseException {
+        DataPacketDraft dataPacketDraft = JSONObject.parseObject(
+            SecurityOptUtils.decodeSecurityString(packetJsonStr),
+            DataPacketDraft.class);
+
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
         }
