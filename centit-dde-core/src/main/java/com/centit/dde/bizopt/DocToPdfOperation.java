@@ -48,7 +48,7 @@ public class DocToPdfOperation implements BizOperation {
             if(fileDataSet!=null) {
                 ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
                 String extName = FileType.getFileExtName(fileDataSet.getFileName());
-                if(StringUtils.isBlank(extName)){
+                if(StringUtils.isBlank(extName)){//|| !"ext".equalsIgnoreCase(fileType)
                     extName = fileType;
                 }
                 if("doc".equalsIgnoreCase(extName) || "docx".equalsIgnoreCase(extName)) {

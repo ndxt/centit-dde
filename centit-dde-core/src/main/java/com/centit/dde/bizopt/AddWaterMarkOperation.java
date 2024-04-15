@@ -52,7 +52,7 @@ public class AddWaterMarkOperation implements BizOperation {
             font = "宋体";
         }
         String color = bizOptJson.getString("color");
-        int fontSize = bizOptJson.getIntValue("size");
+        int fontSize = bizOptJson.getIntValue("fontSize");
         int x = bizOptJson.getIntValue("x");
         int y = bizOptJson.getIntValue("y");
         String sourDsName = bizOptJson.getString("source");
