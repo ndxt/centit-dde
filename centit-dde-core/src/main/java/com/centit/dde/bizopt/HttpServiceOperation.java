@@ -99,8 +99,17 @@ public class HttpServiceOperation implements BizOperation {
         boolean inheritHeader = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("inheritHeader"), false);
         if(inheritHeader){
             Map<String, String> parentHeaders = (Map<String, String>) dataOptContext.getStackData(ConstantValue.REQUEST_HEADERS_TAG);
-            if(parentHeaders!=null)
-                headers.putAll(parentHeaders);
+            if(parentHeaders!=null) {
+                for(Map.Entry<String, String> ent : parentHeaders.entrySet()) {
+                    //accept-language:"zh-CN,zh;q=0.9"
+                    //x-auth-token:"e4fcbbb5-db3a-4b4c-a065-a261f7d4d8fa"
+                    if("x-auth-token".equalsIgnoreCase(ent.getKey())) {
+                        headers.put(ent.getKey(), ent.getValue());
+                    } else if("accept-language".equalsIgnoreCase(ent.getKey())) {
+                        headers.put(ent.getKey(), ent.getValue());
+                    }
+                }
+            }
         }
 
         Map<String, Object> localHeaders = getRequestParams(bizOptJson, bizModel, "headList", "headName", "headValue");
