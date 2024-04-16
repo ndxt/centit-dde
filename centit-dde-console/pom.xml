@@ -17,9 +17,15 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>centit-dde-dubbo-server-config</artifactId>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-dubbo-config</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-system-dubbo-client-config</artifactId>
+            <version>${revision}</version>
         </dependency>
 
         <dependency>
@@ -67,12 +73,6 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-persistence-jdbc-config</artifactId>
-            <version>${revision}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>framework-system-dubbo-client-config</artifactId>
             <version>${revision}</version>
         </dependency>
 

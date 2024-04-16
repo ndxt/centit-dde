@@ -18,7 +18,7 @@
     <dependencies>
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>framework-dubbo-client-config</artifactId>
+            <artifactId>framework-dubbo-config</artifactId>
             <version>${revision}</version>
             <exclusions>
                 <exclusion>

@@ -17,7 +17,6 @@
         <module>centit-dde-module</module>
         <module>centit-dde-kafka-plugin</module>
         <!--<module>centit-dde-adapter</module>-->
-        <module>centit-dde-dubbo-server-config</module>
         <module>centit-dde-dubbo-client-config</module>
         <module>centit-dde-msg-plugin</module>
         <module>centit-dde-rmdb</module>

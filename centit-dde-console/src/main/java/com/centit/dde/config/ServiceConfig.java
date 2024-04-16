@@ -11,12 +11,11 @@ import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.config.SpringSecurityDaoConfig;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.core.service.impl.DataScopePowerManagerImpl;
+import com.centit.framework.dubbo.config.DubboConfig;
+import com.centit.framework.dubbo.config.IpServerDubboClientConfig;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
-import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.model.security.CentitUserDetailsService;
 import com.centit.framework.security.StandardPasswordEncoderImpl;
-import com.centit.framework.security.UserDetailsServiceImpl;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.utils.ImagePdfTextExtractor;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -26,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -40,17 +40,21 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
  * @author zhf
  */
 @EnableAsync
+@Configuration
 @EnableScheduling
-@Import({//IPOrStaticAppSystemBeanConfig.class,
+@PropertySource("classpath:system.properties")
+@Import({
+    DubboConfig.class,
+    IpServerDubboClientConfig.class,
     SpringSecurityDaoConfig.class,
     JdbcConfig.class})
 @ComponentScan(basePackages = "com.centit",
     excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION,
         value = org.springframework.stereotype.Controller.class))
-@Configuration
+
 @EnableNacosConfig(globalProperties = @NacosProperties(serverAddr = "${nacos.server-addr}"))
 @NacosPropertySources({@NacosPropertySource(dataId = "${nacos.system-dataid}", groupId = "CENTIT", autoRefreshed = true)})
-public class ServiceConfig {
+public class ServiceConfig implements EnvironmentAware {
     Logger logger = LoggerFactory.getLogger(ServiceConfig.class);
 
     @Value("${app.home:./}")
@@ -62,8 +66,14 @@ public class ServiceConfig {
     @Value("${redis.default.host}")
     private String redisHost;
 
-    @Autowired
-    Environment env;
+    protected Environment env;
+
+    @Override
+    public void setEnvironment(@Autowired Environment environment) {
+        if (environment != null) {
+            this.env = environment;
+        }
+    }
 
     /**
      * 这个bean必须要有
@@ -73,13 +83,6 @@ public class ServiceConfig {
     @Bean("passwordEncoder")
     public StandardPasswordEncoderImpl passwordEncoder() {
         return new StandardPasswordEncoderImpl();
-    }
-
-    @Bean
-    public CentitUserDetailsService centitUserDetailsService(@Autowired PlatformEnvironment platformEnvironment) {
-        UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl();
-        userDetailsService.setPlatformEnvironment(platformEnvironment);
-        return userDetailsService;
     }
 
     @Bean

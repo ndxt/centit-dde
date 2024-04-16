@@ -1,4 +1,4 @@
-package com.centit.dde.dubbo.server;
+package com.centit.dde.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
