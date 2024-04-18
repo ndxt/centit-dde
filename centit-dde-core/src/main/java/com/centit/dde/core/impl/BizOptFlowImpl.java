@@ -614,72 +614,77 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
     }
 
-    private void runOneStepOpt(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) {
+    private void runOneStepOpt(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) throws Exception {
         int logLevel = dataOptContext.getLogLevel();
         Date runBeginTime = new Date();// 获取当期时间
 
         JSONObject bizOptJson = dataOptStep.getCurrentStep().getJSONObject("properties");
+
+        String optType = bizOptJson.getString("type");
+        BizOperation opt = allOperations.get(optType);
+        if(opt==null){
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "组件："+optType+ " 不存在请和开发人员联系！");
+        }
+        ResponseData responseData;
         try {
-            String optType = bizOptJson.getString("type");
-            BizOperation opt = allOperations.get(optType);
-            if(opt==null){
-                throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "组件："+optType+ " 不存在请和开发人员联系！");
-            }
-            ResponseData responseData = opt.runOpt(bizModel, bizOptJson, dataOptContext);
-            /*if (responseData.getCode() != ResponseData.RESULT_OK) {
-                throw new ObjectException(responseData, responseData.getCode(), responseData.getMessage());
-            }*/
-            // 记录日志
-            if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
-                TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
-                Map<String, Object> jsonObject = CollectionsOpt.objectToMap(responseData.getData());
-                if(jsonObject==null){
-                    detailLog.setSuccessPieces(0);
-                    detailLog.setErrorPieces(0);
-                } else {
-                    detailLog.setSuccessPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("success"), 0));
-                    detailLog.setErrorPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("error"), 0));
-                }
-
-                if("start".equals(optType)){
-                    Object callData = dataOptContext.getStackData(ConstantValue.MODULE_CALL_TAG);
-                    if(callData!=null){
-                        detailLog.setLogInfo(JSON.toJSONString(callData));
-                    } else {
-                        detailLog.setLogInfo(JSON.toJSONString(dataOptContext.getCallStackData()));
-                    }
-                } else if("append".equals(optType) || "desensitize".equals(optType)){
-                    DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
-                    detailLog.setLogInfo(dataSet.toJSONString());
-                } else if(ConstantValue.ASSIGNMENT.equals(optType)){
-                    DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("target"));
-                    detailLog.setLogInfo(dataSet.toJSONString());
-                } else {
-                    DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("id"));
-                    if (dataSet != null) {
-                        detailLog.setLogInfo(dataSet.toJSONString());
-                    } else {
-                        detailLog.setLogInfo(responseData.toJSONString());
-                    }
-                }
-                detailLog.setRunBeginTime(runBeginTime);
-            }
-            //正确返回也要设置运行结果
-            bizModel.getOptResult().setStepResponse(bizOptJson.getString("id"), responseData);
-
-        } catch(Exception e ) {
+            responseData = opt.runOpt(bizModel, bizOptJson, dataOptContext);
+        } catch (Exception e) {
+            boolean exceptionAsError = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("exceptionAsError"), true);
             TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
             String errMsg = ObjectException.extortExceptionMessage(e);
             detailLog.setLogInfo(errMsg);
             detailLog.setRunBeginTime(runBeginTime);
-            int errorCode = ResponseData.ERROR_OPERATION;
-            if(e instanceof ObjectException){
-                errorCode = ((ObjectException)e).getExceptionCode();
+
+            if(exceptionAsError){
+                if(e instanceof ObjectException){
+                    ObjectException objectException = (ObjectException)e;
+                    responseData = ResponseData.makeErrorMessageWithData(objectException.getObjectData(),
+                        objectException.getExceptionCode(), objectException.getMessage());
+                } else {
+                    responseData = ResponseData.makeErrorMessage(ResponseData.ERROR_OPERATION, e.getMessage());
+                }
+            } else {
+                throw e;
             }
-            ResponseData responseData = ResponseData.makeErrorMessageWithData(errMsg, errorCode,
-                e.getMessage());
-            bizModel.getOptResult().setStepResponse(bizOptJson.getString("id"), responseData);
         }
+
+        // 记录日志
+        if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
+            TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
+            Map<String, Object> jsonObject = CollectionsOpt.objectToMap(responseData.getData());
+            if(jsonObject==null){
+                detailLog.setSuccessPieces(0);
+                detailLog.setErrorPieces(0);
+            } else {
+                detailLog.setSuccessPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("success"), 0));
+                detailLog.setErrorPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("error"), 0));
+            }
+
+            if("start".equals(optType)){
+                Object callData = dataOptContext.getStackData(ConstantValue.MODULE_CALL_TAG);
+                if(callData!=null){
+                    detailLog.setLogInfo(JSON.toJSONString(callData));
+                } else {
+                    detailLog.setLogInfo(JSON.toJSONString(dataOptContext.getCallStackData()));
+                }
+            } else if("append".equals(optType) || "desensitize".equals(optType)){
+                DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
+                detailLog.setLogInfo(dataSet.toJSONString());
+            } else if(ConstantValue.ASSIGNMENT.equals(optType)){
+                DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("target"));
+                detailLog.setLogInfo(dataSet.toJSONString());
+            } else {
+                DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("id"));
+                if (dataSet != null) {
+                    detailLog.setLogInfo(dataSet.toJSONString());
+                } else {
+                    detailLog.setLogInfo(responseData.toJSONString());
+                }
+            }
+            detailLog.setRunBeginTime(runBeginTime);
+        }
+        //正确返回也要设置运行结果
+        bizModel.getOptResult().setStepResponse(bizOptJson.getString("id"), responseData);
     }
 
     private TaskDetailLog createLogDetail(DataOptStep dataOptStep, DataOptContext dataOptContext) {

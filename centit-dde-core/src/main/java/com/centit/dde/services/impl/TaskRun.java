@@ -2,7 +2,6 @@ package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.dao.DataPacketDao;
-import com.centit.dde.adapter.dao.DataPacketDraftDao;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.adapter.po.DataPacketInterface;
 import com.centit.dde.adapter.po.TaskDetailLog;
@@ -34,19 +33,15 @@ import java.util.Date;
 public class TaskRun {
 
     private final TaskLogManager taskLogManager;
-
-    private final DataPacketDraftDao dataPacketDraftDao;
     private final DataPacketDao dataPacketDao;
     private final BizOptFlow bizOptFlow;
     @Autowired
     private PlatformEnvironment platformEnvironment;
 
     @Autowired
-    public TaskRun(TaskLogManager taskLogManager,
-                   DataPacketDraftDao dataPacketCopyDao, DataPacketDao dataPacketDao,
+    public TaskRun(TaskLogManager taskLogManager, DataPacketDao dataPacketDao,
                    BizOptFlow bizOptFlow) {
         this.taskLogManager = taskLogManager;
-        this.dataPacketDraftDao = dataPacketCopyDao;
         this.dataPacketDao = dataPacketDao;
         this.bizOptFlow = bizOptFlow;
     }
