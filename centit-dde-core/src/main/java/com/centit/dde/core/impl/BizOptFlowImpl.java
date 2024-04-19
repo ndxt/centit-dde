@@ -667,10 +667,10 @@ public class BizOptFlowImpl implements BizOptFlow {
                 } else {
                     detailLog.setLogInfo(JSON.toJSONString(dataOptContext.getCallStackData()));
                 }
-            } else if("append".equals(optType) || "desensitize".equals(optType)){
+            } else if("append".equals(optType) || "desensitize".equals(optType)){ // 派生 和 脱敏
                 DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
                 detailLog.setLogInfo(dataSet.toJSONString());
-            } else if(ConstantValue.ASSIGNMENT.equals(optType)){
+            } else if(ConstantValue.ASSIGNMENT.equals(optType)){ // 赋值
                 DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("target"));
                 detailLog.setLogInfo(dataSet.toJSONString());
             } else {
