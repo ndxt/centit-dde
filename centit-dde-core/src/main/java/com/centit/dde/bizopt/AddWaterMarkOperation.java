@@ -10,6 +10,7 @@ import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -25,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,12 @@ import java.util.Map;
  * 可以给pdf 和 图标 添加水印
  */
 public class AddWaterMarkOperation implements BizOperation {
+
+    private FileInfoOpt fileInfoOpt;
+
+    public AddWaterMarkOperation(FileInfoOpt fileInfoOpt) {
+        this.fileInfoOpt = fileInfoOpt;
+    }
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
@@ -65,16 +73,25 @@ public class AddWaterMarkOperation implements BizOperation {
         int  w = NumberBaseOpt.castObjectToInteger(bizOptJson.get("width"), 0);
         int  h = NumberBaseOpt.castObjectToInteger(bizOptJson.get("height"), 0);
 
-
+        Image image = null;
         String imageDate = bizOptJson.getString("image");
-        DataSet idataSet = bizModel.getDataSet(imageDate);
-        if(idataSet==null){
+        if(StringUtils.isBlank(imageDate)){
+            String imageFileId = bizOptJson.getString("imageFileId");
+            InputStream inputStream = fileInfoOpt.loadFileStream(imageFileId);
+            image = Watermark4Pdf.createPdfImage(
+                FileIOOpt.readBytesFromInputStream(inputStream));
+        } else {
+            DataSet idataSet = bizModel.getDataSet(imageDate);
+            if(idataSet != null) {
+                FileDataSet imageDataset = DataSetOptUtil.castToFileDataSet(idataSet);
+                image = Watermark4Pdf.createPdfImage(
+                    FileIOOpt.readBytesFromInputStream(imageDataset.getFileInputStream()));
+            }
+        }
+        if (image == null) {
             throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION,
                 "找不到水印图片！");
         }
-        FileDataSet imageDataset = DataSetOptUtil.castToFileDataSet(idataSet);
-        Image image = Watermark4Pdf.createPdfImage(
-            FileIOOpt.readBytesFromInputStream(imageDataset.getFileInputStream()));
 
         if(dataSet.getSize() == 1) {
             FileDataSet fileDataSet;
