@@ -920,7 +920,10 @@ public abstract class DataSetOptUtil {
             fileName = StringBaseOpt.castObjectToString(objectMap.get(ConstantValue.FILE_NAME));
         }
 
-        Object fileData = objectMap.get(fileContentDesc);
+        Object fileData =null;
+        if(StringUtils.isNotBlank(fileContentDesc)) {
+            fileData = objectMap.get(fileContentDesc);
+        }
         if (fileData == null) {
             fileData = objectMap.get(ConstantValue.FILE_CONTENT);
         }
@@ -939,6 +942,14 @@ public abstract class DataSetOptUtil {
         fileDataset.setFileInfo(fileInfo);
         fileDataset.setFileContent(fileName, -1, fileData);
         return fileDataset;
+    }
+    public static FileDataSet castToFileDataSet(DataSet dataSet){
+        if(dataSet==null){
+            return null;
+        }
+        if(dataSet instanceof FileDataSet)
+            return (FileDataSet) dataSet;
+        return mapDataToFile(dataSet.getFirstRow(), null, null);
     }
 
     public static FileDataSet attainFileDataset(BizModel bizModel, DataSet dataSet, JSONObject jsonStep, boolean singleFile){

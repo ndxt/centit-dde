@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -13,10 +14,13 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
+import com.centit.support.file.FileIOOpt;
 import com.centit.support.image.ImageOpt;
 import com.centit.support.office.Watermark4Pdf;
+import com.itextpdf.text.Image;
 import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
@@ -33,28 +37,111 @@ public class AddWaterMarkOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String fileType = bizOptJson.getString("fileType");
-        if("image".equalsIgnoreCase(fileType)){
+        if("imageText".equalsIgnoreCase(fileType)){
             return addImageWaterMark(bizModel, bizOptJson, dataOptContext);
-        } else if("pdf".equalsIgnoreCase(fileType)){
+        } else if("pdfText".equalsIgnoreCase(fileType)){
             return addPdfWaterMark(bizModel, bizOptJson, dataOptContext);
+        } else if("pdfImage".equalsIgnoreCase(fileType)){
+            return addImage2Pdf(bizModel, bizOptJson, dataOptContext);
         } else {
             return BuiltInOperation.createResponseData(0, 1,
                 ObjectException.FUNCTION_NOT_SUPPORT, "不支持的文件类型！");
         }
     }
 
+    private ResponseData addImage2Pdf(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception{
+        //获取参数
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
+
+        String sourDsName = bizOptJson.getString("source");
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
+        if (dataSet == null){
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION, "找不到源文件！");
+        }
+        int  page = NumberBaseOpt.castObjectToInteger(bizOptJson.get("page"), -1);
+        int  x = NumberBaseOpt.castObjectToInteger(bizOptJson.get("x"), 0);
+        int  y = NumberBaseOpt.castObjectToInteger(bizOptJson.get("y"), 0);
+        int  w = NumberBaseOpt.castObjectToInteger(bizOptJson.get("width"), 0);
+        int  h = NumberBaseOpt.castObjectToInteger(bizOptJson.get("height"), 0);
+
+
+        String imageDate = bizOptJson.getString("image");
+        DataSet idataSet = bizModel.getDataSet(imageDate);
+        if(idataSet==null){
+            throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                "找不到水印图片！");
+        }
+        FileDataSet imageDataset = DataSetOptUtil.castToFileDataSet(idataSet);
+        Image image = Watermark4Pdf.createPdfImage(
+            FileIOOpt.readBytesFromInputStream(imageDataset.getFileInputStream()));
+
+        if(dataSet.getSize() == 1) {
+            FileDataSet fileDataSet;
+            if (dataSet instanceof FileDataSet) {
+                fileDataSet = (FileDataSet) dataSet;
+            } else {
+                fileDataSet = DataSetOptUtil.mapDataToFile(dataSet.getFirstRow(),
+                    ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
+            }
+            if(fileDataSet!=null) {
+                ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
+                Watermark4Pdf.addImage2Pdf(fileDataSet.getFileInputStream(),
+                    pdfFile, page, image, x, y, w, h);
+
+                FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
+                    pdfFile.size(), pdfFile);
+                bizModel.putDataSet(targetDsName, pdfDataset);
+                return BuiltInOperation.createResponseSuccessData(1);
+            } else {
+                return BuiltInOperation.createResponseSuccessData(0);
+            }
+        }
+        //文件列表
+        if(dataSet.getSize() > 1) {
+            List<Map<String, Object>> fileList = new ArrayList<>();
+            for(Map<String, Object> rowData : dataSet.getDataAsList()){
+                FileDataSet fileDataSet = DataSetOptUtil.mapDataToFile(rowData,
+                    ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
+                if(fileDataSet!=null){
+                    ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
+                    Watermark4Pdf.addImage2Pdf(fileDataSet.getFileInputStream(),
+                        pdfFile, page, image, x, y, w, h);
+                    fileList.add(CollectionsOpt.createHashMap(
+                        ConstantValue.FILE_NAME, fileDataSet.getFileName(),
+                        ConstantValue.FILE_SIZE, pdfFile.size(),
+                        ConstantValue.FILE_CONTENT, pdfFile
+                    ));
+                }
+            }
+            bizModel.putDataSet(targetDsName, new DataSet(fileList));
+            return BuiltInOperation.createResponseSuccessData(fileList.size());
+        }
+        return BuiltInOperation.createResponseSuccessData(0);
+    }
+
     private ResponseData addImageWaterMark(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
         //获取参数 BufferedImage image, String waterMark, String fontName, Color color, int size, int x, int y
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
-        String waterMarkStr = bizOptJson.getString("waterMark");
+        //String waterMarkStr = bizOptJson.getString("waterMark");
         String font = bizOptJson.getString("font");
         if(StringUtils.isBlank(font)){
             font = "宋体";
         }
         String color = bizOptJson.getString("color");
         int fontSize = bizOptJson.getIntValue("fontSize");
-        int x = bizOptJson.getIntValue("x");
-        int y = bizOptJson.getIntValue("y");
+        JSONArray textArray = bizOptJson.getJSONArray("textList");
+        List<ImageOpt.ImageTextInfo> textList = new ArrayList<>();
+        if(textArray!=null) {
+            for (Object obj : textArray){
+                if(obj instanceof JSONObject){
+                    JSONObject textObj = (JSONObject) obj;
+                    textList.add(ImageOpt.createImageText(textObj.getIntValue("x"),
+                        textObj.getIntValue("y"),
+                        textObj.getString("text")));
+                }
+            }
+        }
         String sourDsName = bizOptJson.getString("source");
         Color markColor = ImageOpt.castObjectToColor(color, Color.WHITE);
         DataSet dataSet = bizModel.getDataSet(sourDsName);
@@ -69,8 +156,8 @@ public class AddWaterMarkOperation implements BizOperation {
             }
             if(fileDataSet!=null) {
                 ByteArrayOutputStream imageFile = new ByteArrayOutputStream();
-                if(ImageOpt.addWaterMark(fileDataSet.getFileInputStream(), imageFile,
-                    waterMarkStr, font, markColor, fontSize, x, y)) {
+                if(ImageOpt.addTextToImage(fileDataSet.getFileInputStream(), imageFile,
+                    font, markColor, fontSize,textList)) {
                     FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
                         imageFile.size(), imageFile);
                     bizModel.putDataSet(targetDsName, pdfDataset);
@@ -87,8 +174,8 @@ public class AddWaterMarkOperation implements BizOperation {
                     ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
                 if(fileDataSet!=null){
                     ByteArrayOutputStream imageFile = new ByteArrayOutputStream();
-                    if(ImageOpt.addWaterMark(fileDataSet.getFileInputStream(), imageFile,
-                        waterMarkStr, font, markColor, fontSize, x, y)) {
+                    if(ImageOpt.addTextToImage(fileDataSet.getFileInputStream(), imageFile,
+                        font, markColor, fontSize, textList)) {
                         fileList.add(CollectionsOpt.createHashMap(
                             ConstantValue.FILE_NAME, fileDataSet.getFileName(),
                             ConstantValue.FILE_SIZE, imageFile.size(),
