@@ -36,7 +36,7 @@ public class AddWaterMarkOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
-        String fileType = bizOptJson.getString("fileType");
+        String fileType = bizOptJson.getString("optType");
         if("imageText".equalsIgnoreCase(fileType)){
             return addImageWaterMark(bizModel, bizOptJson, dataOptContext);
         } else if("pdfText".equalsIgnoreCase(fileType)){
