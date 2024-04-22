@@ -74,7 +74,7 @@ public class AddWaterMarkOperation implements BizOperation {
         int  h = NumberBaseOpt.castObjectToInteger(bizOptJson.get("height"), 0);
 
         Image image = null;
-        String imageDate = bizOptJson.getString("image");
+        String imageDate = bizOptJson.getString("imageDataset");
         if(StringUtils.isBlank(imageDate)){
             String imageFileId = bizOptJson.getString("imageFileId");
             InputStream inputStream = fileInfoOpt.loadFileStream(imageFileId);
