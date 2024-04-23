@@ -150,12 +150,18 @@ public class AddWaterMarkOperation implements BizOperation {
         JSONArray textArray = bizOptJson.getJSONArray("textList");
         List<ImageOpt.ImageTextInfo> textList = new ArrayList<>();
         if(textArray!=null) {
+            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
             for (Object obj : textArray){
                 if(obj instanceof JSONObject){
                     JSONObject textObj = (JSONObject) obj;
+                    String text = textObj.getString("text");
+                    String transMark = StringBaseOpt.castObjectToString(
+                        DataSetOptUtil.fetchFieldValue(transform, text));
+                    if(StringUtils.isNotBlank(transMark)){
+                        text = transMark;
+                    }
                     textList.add(ImageOpt.createImageText(textObj.getIntValue("x"),
-                        textObj.getIntValue("y"),
-                        textObj.getString("text")));
+                        textObj.getIntValue("y"), text ));
                 }
             }
         }
