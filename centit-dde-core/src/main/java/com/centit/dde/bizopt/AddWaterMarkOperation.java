@@ -72,6 +72,7 @@ public class AddWaterMarkOperation implements BizOperation {
         int  y = NumberBaseOpt.castObjectToInteger(bizOptJson.get("y"), 0);
         int  w = NumberBaseOpt.castObjectToInteger(bizOptJson.get("width"), 0);
         int  h = NumberBaseOpt.castObjectToInteger(bizOptJson.get("height"), 0);
+        float opacity = NumberBaseOpt.castObjectToFloat(bizOptJson.get("opacity"), 0.5f);
 
         Image image = null;
         String imageDate = bizOptJson.getString("imageDataset");
@@ -104,7 +105,7 @@ public class AddWaterMarkOperation implements BizOperation {
             if(fileDataSet!=null) {
                 ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
                 Watermark4Pdf.addImage2Pdf(fileDataSet.getFileInputStream(),
-                    pdfFile, page, image, x, y, w, h);
+                    pdfFile, page, image, opacity, x, y, w, h);
 
                 FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
                     pdfFile.size(), pdfFile);
@@ -123,7 +124,7 @@ public class AddWaterMarkOperation implements BizOperation {
                 if(fileDataSet!=null){
                     ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
                     Watermark4Pdf.addImage2Pdf(fileDataSet.getFileInputStream(),
-                        pdfFile, page, image, x, y, w, h);
+                        pdfFile, page, image, opacity, x, y, w, h);
                     fileList.add(CollectionsOpt.createHashMap(
                         ConstantValue.FILE_NAME, fileDataSet.getFileName(),
                         ConstantValue.FILE_SIZE, pdfFile.size(),
@@ -146,7 +147,7 @@ public class AddWaterMarkOperation implements BizOperation {
             font = "宋体";
         }
         String color = bizOptJson.getString("color");
-        int fontSize = bizOptJson.getIntValue("fontSize");
+        int fontSize = NumberBaseOpt.castObjectToInteger(bizOptJson.get("fontSize"), 14);// bizOptJson.getIntValue("fontSize");
         JSONArray textArray = bizOptJson.getJSONArray("textList");
         List<ImageOpt.ImageTextInfo> textList = new ArrayList<>();
         if(textArray!=null) {
@@ -217,9 +218,9 @@ public class AddWaterMarkOperation implements BizOperation {
         //获取参数
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String waterMarkStr = bizOptJson.getString("waterMark");
-        float opacity = bizOptJson.getFloatValue("opacity");
-        float rotation = bizOptJson.getFloatValue("rotation");
-        float fontSize = bizOptJson.getFloatValue("fontSize");
+        float opacity =  NumberBaseOpt.castObjectToFloat(bizOptJson.get("opacity"), 0.5f);
+        float rotation = NumberBaseOpt.castObjectToFloat(bizOptJson.get("rotation"), 0.5f);
+        float fontSize = NumberBaseOpt.castObjectToFloat(bizOptJson.get("fontSize"), 14f);
         String sourDsName = bizOptJson.getString("source");
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null){
