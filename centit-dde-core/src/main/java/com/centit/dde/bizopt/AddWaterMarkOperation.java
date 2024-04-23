@@ -219,7 +219,7 @@ public class AddWaterMarkOperation implements BizOperation {
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String waterMarkStr = bizOptJson.getString("waterMark");
         float opacity =  NumberBaseOpt.castObjectToFloat(bizOptJson.get("opacity"), 0.5f);
-        float rotation = NumberBaseOpt.castObjectToFloat(bizOptJson.get("rotation"), 0.5f);
+        float rotation = NumberBaseOpt.castObjectToFloat(bizOptJson.get("rotation"), -45f);
         float fontSize = NumberBaseOpt.castObjectToFloat(bizOptJson.get("fontSize"), 14f);
         String sourDsName = bizOptJson.getString("source");
         DataSet dataSet = bizModel.getDataSet(sourDsName);
