@@ -9,6 +9,7 @@ import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -78,14 +79,15 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
         this.getJdbcTemplate().update(sql, new Object[]{dataPacketCopy.getPublishDate(), optCode, dataPacketCopy.getPacketId()});
     }
 
-        @Override
+    @Override
     public int[] batchUpdateOptIdByApiId(String optId, List<String> apiIds) {
-        String sql="UPDATE q_data_packet_draft SET OPT_ID=? ,IS_DISABLE='F' WHERE PACKET_ID = ? ";
+        String sql="UPDATE q_data_packet_draft SET OPT_ID=?, PUBLISH_DATE =?, IS_DISABLE='F' WHERE PACKET_ID = ? ";
         int[] dataPacket = this.getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 ps.setString(1, optId);
-                ps.setString(2, apiIds.get(i));
+                ps.setTimestamp(2, DatetimeOpt.currentSqlTimeStamp());
+                ps.setString(3, apiIds.get(i));
             }
 
             @Override

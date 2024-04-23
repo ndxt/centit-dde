@@ -5,6 +5,7 @@ import com.centit.dde.adapter.po.DataPacket;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.DatetimeOpt;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Repository;
 
@@ -43,12 +44,13 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
 
     @Override
     public int[] batchUpdateOptIdByApiId(String optId, List<String> apiIds) {
-        String sql = "UPDATE q_data_packet SET OPT_ID=? , IS_DISABLE='F' WHERE PACKET_ID = ?";
+        String sql = "UPDATE q_data_packet SET OPT_ID=?, PUBLISH_DATE =?, IS_DISABLE='F' WHERE PACKET_ID = ?";
         int[] dataPacket = this.getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 ps.setString(1, optId);
-                ps.setString(2, apiIds.get(i));
+                ps.setTimestamp(2, DatetimeOpt.currentSqlTimeStamp());
+                ps.setString(3, apiIds.get(i));
             }
 
             @Override
