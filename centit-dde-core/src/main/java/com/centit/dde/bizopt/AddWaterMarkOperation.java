@@ -19,6 +19,7 @@ import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileIOOpt;
+import com.centit.support.file.FileType;
 import com.centit.support.image.ImageOpt;
 import com.centit.support.office.Watermark4Pdf;
 import com.itextpdf.text.Image;
@@ -180,7 +181,13 @@ public class AddWaterMarkOperation implements BizOperation {
             }
             if(fileDataSet!=null) {
                 ByteArrayOutputStream imageFile = new ByteArrayOutputStream();
-                if(ImageOpt.addTextToImage(fileDataSet.getFileInputStream(), imageFile,
+                String imageType = FileType.getFileExtName(fileDataSet.getFileName());
+                if(StringUtils.isBlank(imageType)){
+                    imageType = "png";
+                }else {
+                    imageType = imageType.toLowerCase();
+                }
+                if(ImageOpt.addTextToImage(fileDataSet.getFileInputStream(), imageType, imageFile,
                     font, markColor, fontSize,textList)) {
                     FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
                         imageFile.size(), imageFile);
@@ -197,8 +204,14 @@ public class AddWaterMarkOperation implements BizOperation {
                 FileDataSet fileDataSet = DataSetOptUtil.mapDataToFile(rowData,
                     ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
                 if(fileDataSet!=null){
+                    String imageType = FileType.getFileExtName(fileDataSet.getFileName());
+                    if(StringUtils.isBlank(imageType)){
+                        imageType = "png";
+                    }else {
+                        imageType = imageType.toLowerCase();
+                    }
                     ByteArrayOutputStream imageFile = new ByteArrayOutputStream();
-                    if(ImageOpt.addTextToImage(fileDataSet.getFileInputStream(), imageFile,
+                    if(ImageOpt.addTextToImage(fileDataSet.getFileInputStream(), imageType, imageFile,
                         font, markColor, fontSize, textList)) {
                         fileList.add(CollectionsOpt.createHashMap(
                             ConstantValue.FILE_NAME, fileDataSet.getFileName(),
