@@ -68,10 +68,10 @@ public class AddWaterMarkOperation implements BizOperation {
                 ObjectException.DATA_NOT_FOUND_EXCEPTION, "找不到源文件！");
         }
         int  page = NumberBaseOpt.castObjectToInteger(bizOptJson.get("page"), -1);
-        int  x = NumberBaseOpt.castObjectToInteger(bizOptJson.get("x"), 0);
-        int  y = NumberBaseOpt.castObjectToInteger(bizOptJson.get("y"), 0);
-        int  w = NumberBaseOpt.castObjectToInteger(bizOptJson.get("width"), 0);
-        int  h = NumberBaseOpt.castObjectToInteger(bizOptJson.get("height"), 0);
+        float  x = NumberBaseOpt.castObjectToFloat(bizOptJson.get("x"), 0f);
+        float  y = NumberBaseOpt.castObjectToFloat(bizOptJson.get("y"), 0f);
+        float  w = NumberBaseOpt.castObjectToFloat(bizOptJson.get("width"), 120f);
+        float  h = NumberBaseOpt.castObjectToFloat(bizOptJson.get("height"), 80f);
         float opacity = NumberBaseOpt.castObjectToFloat(bizOptJson.get("opacity"), 0.5f);
 
         Image image = null;
