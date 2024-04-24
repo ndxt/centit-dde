@@ -71,8 +71,8 @@ public class AddWaterMarkOperation implements BizOperation {
         int  page = NumberBaseOpt.castObjectToInteger(bizOptJson.get("page"), -1);
         float  x = NumberBaseOpt.castObjectToFloat(bizOptJson.get("x"), 0f);
         float  y = NumberBaseOpt.castObjectToFloat(bizOptJson.get("y"), 0f);
-        float  w = NumberBaseOpt.castObjectToFloat(bizOptJson.get("width"), 120f);
-        float  h = NumberBaseOpt.castObjectToFloat(bizOptJson.get("height"), 80f);
+        float  w = NumberBaseOpt.castObjectToFloat(bizOptJson.get("width"), -1f);
+        float  h = NumberBaseOpt.castObjectToFloat(bizOptJson.get("height"), -1f);
         float opacity = NumberBaseOpt.castObjectToFloat(bizOptJson.get("opacity"), 0.5f);
 
         Image image = null;
