@@ -630,20 +630,24 @@ public class BizOptFlowImpl implements BizOptFlow {
             responseData = opt.runOpt(bizModel, bizOptJson, dataOptContext);
         } catch (Exception e) {
             boolean exceptionAsError = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("exceptionAsError"), true);
-            TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
-            String errMsg = ObjectException.extortExceptionMessage(e);
-            detailLog.setLogInfo(errMsg);
-            detailLog.setRunBeginTime(runBeginTime);
-
             if(exceptionAsError){
                 if(e instanceof ObjectException){
                     ObjectException objectException = (ObjectException)e;
                     responseData = ResponseData.makeErrorMessageWithData(objectException.getObjectData(),
                         objectException.getExceptionCode(), objectException.getMessage());
                 } else {
-                    responseData = ResponseData.makeErrorMessage(ResponseData.ERROR_OPERATION, e.getMessage());
+                    responseData = ResponseData.makeErrorMessageWithData(
+                        CollectionsOpt.createHashMap("exception", e.getClass().getName(),
+                            "trace", ObjectException.extortExceptionMessage(e)),
+                        ResponseData.ERROR_OPERATION,
+                        e.getMessage());
                 }
             } else {
+                TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
+                String errMsg = ObjectException.extortExceptionMessage(e);
+                detailLog.setLogInfo(errMsg);
+                detailLog.setRunBeginTime(runBeginTime);
+                //添加 异常处理流程
                 throw e;
             }
         }
@@ -667,14 +671,15 @@ public class BizOptFlowImpl implements BizOptFlow {
                 } else {
                     detailLog.setLogInfo(JSON.toJSONString(dataOptContext.getCallStackData()));
                 }
-            } else if("append".equals(optType) || "desensitize".equals(optType)){ // 派生 和 脱敏
-                DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
-                detailLog.setLogInfo(dataSet.toJSONString());
-            } else if(ConstantValue.ASSIGNMENT.equals(optType)){ // 赋值
-                DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("target"));
-                detailLog.setLogInfo(dataSet.toJSONString());
             } else {
-                DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("id"));
+                DataSet dataSet;
+                if ("append".equals(optType) || "desensitize".equals(optType)) { // 派生 和 脱敏
+                    dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
+                } else if (ConstantValue.ASSIGNMENT.equals(optType)) { // 赋值
+                    dataSet = bizModel.getDataSet(bizOptJson.getString("target"));
+                } else {
+                    dataSet = bizModel.getDataSet(bizOptJson.getString("id"));
+                }
                 if (dataSet != null) {
                     detailLog.setLogInfo(dataSet.toJSONString());
                 } else {
