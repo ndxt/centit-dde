@@ -7,9 +7,12 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.json.JSONOpt;
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,13 +40,25 @@ public class AssignmentOperation implements BizOperation {
 
         //assignType 赋值类型， assign 直接赋值， property 对属性复制 ， append 追加元素, merge 合并属性
         String assignType = BuiltInOperation.getJsonFieldString(bizOptJson, "assignType", "assign");
-
         //取值表达式
         String formula = BuiltInOperation.getJsonFieldString(bizOptJson, "formula", ".");
 
         //计算赋值数据
         Object sourceData =(StringUtils.isBlank(formula) || ".".equals(formula) ) ? dataSet.getData() :
             DataSetOptUtil.fetchFieldValue(new BizModelJSONTransform(bizModel, dataSet.getData()), formula);
+
+        if(ConstantValue.SESSION_DATA_TAG.equals(targetDsName)) { // 对session 赋值
+            //ReflectionOpt.setFieldValue()
+            Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
+            if (userObj instanceof CentitUserDetails) {
+                String property = bizOptJson.getString("attributeName");
+                if(StringUtils.isNotBlank(property)) {
+                    ReflectionOpt.setFieldValue(userObj, property, sourceData);
+                }
+                return BuiltInOperation.createResponseSuccessData(1);
+            }
+            return BuiltInOperation.createResponseSuccessData(0);
+        }
 
         // 对属性赋值
         if("property".equals(assignType)){
