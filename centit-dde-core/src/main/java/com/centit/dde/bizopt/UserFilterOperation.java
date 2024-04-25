@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -89,7 +90,7 @@ public class UserFilterOperation implements BizOperation {
                     break;
             }
             if(userInfo!=null) {
-                bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(userInfo));
+                bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(JSON.toJSON(userInfo)));
                 return BuiltInOperation.createResponseSuccessData(1);
             } else {
                 bizModel.putDataSet(bizOptJson.getString("id"), new DataSet());
@@ -122,7 +123,7 @@ public class UserFilterOperation implements BizOperation {
                 }
             }
             lsUserInfo.sort(Comparator.comparing(UserInfo::getUserOrder));
-            bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(lsUserInfo));
+            bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(JSON.toJSON(lsUserInfo)));
             return BuiltInOperation.createResponseSuccessData(1);
         }
     }

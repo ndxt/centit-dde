@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -63,7 +64,8 @@ public class UnitFilterOperation implements BizOperation {
         retUntis.sort(Comparator.comparing(UnitInfo::getUnitOrder));
         CollectionsOpt.sortAsTree(retUntis,
             ( p,  c) -> StringUtils.equals(p.getUnitCode(),c.getParentUnit()) );
-        bizModel.putDataSet(bizOptJson.getString("id"),new DataSet(retUntis));
+
+        bizModel.putDataSet(bizOptJson.getString("id"),new DataSet(JSON.toJSON(retUntis)));
         return BuiltInOperation.createResponseSuccessData(1);
     }
 
