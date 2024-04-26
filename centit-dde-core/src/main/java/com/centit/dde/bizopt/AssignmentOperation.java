@@ -1,6 +1,5 @@
 package com.centit.dde.bizopt;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -78,21 +77,15 @@ public class AssignmentOperation implements BizOperation {
             } else if(targetDataSet.getSize() == 1) {
                 //尽量不改变原来的数据对象
                 Map<String, Object> objMap = targetDataSet.getFirstRow();
-                if(objMap instanceof JSONObject){
-                    JSONOpt.appendData((JSONObject)objMap, property, sourceData);
-                } else {
-                    objMap.put(property, sourceData);
-                }
+                ReflectionOpt.setAttributeValue(objMap, property, sourceData);
                 targetDataSet.setData(objMap);
             } else { // targetDataSet.getSize() > 1
                 List<Map<String, Object>> objList = targetDataSet.getDataAsList();
-                List<JSONObject> jsonList = new ArrayList<>(objList.size() +1);
                 for(Map<String, Object> objMap : objList){
-                    JSONObject jsonObject = (JSONObject)JSON.toJSON(objMap);
-                    JSONOpt.appendData(jsonObject, property, sourceData);
-                    jsonList.add(jsonObject);
+                    //JSONObject jsonObject = (JSONObject)JSON.toJSON(objMap);
+                    ReflectionOpt.setAttributeValue(objMap, property, sourceData);
                 }
-                targetDataSet.setData(jsonList);
+                targetDataSet.setData(objList);
             }
             return BuiltInOperation.createResponseSuccessData(targetDataSet.getSize());
         }
