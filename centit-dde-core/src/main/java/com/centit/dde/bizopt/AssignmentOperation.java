@@ -54,7 +54,10 @@ public class AssignmentOperation implements BizOperation {
                 String property = bizOptJson.getString("attributeName");
                 if(StringUtils.isNotBlank(property)) {
                     boolean succeed = ReflectionOpt.setAttributeValue(userObj, property, sourceData);
-                    return BuiltInOperation.createResponseSuccessData(succeed?1:0);
+                    if(succeed) {
+                        // SecurityContextHolder.getContext().setAuthentication((CentitUserDetails)userObj);
+                        return BuiltInOperation.createResponseSuccessData(1);
+                    }
                 }
             }
             return BuiltInOperation.createResponseSuccessData(0);
