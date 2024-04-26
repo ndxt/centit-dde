@@ -129,7 +129,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         //allOperations.put(ConstantValue.SCHEDULER, (bizModel1, bizOptJson1, dataOptContext) -> BuiltInOperation.runStart(bizModel1, bizOptJson1));//模块调度
         allOperations.put("start", (bizModel, bizOptJson, dataOptContext)-> BuiltInOperation.runStart());
 
-        allOperations.put(ConstantValue.SESSION_DATA, new SessionDataOperation());
+        //allOperations.put(ConstantValue.SESSION_DATA, new SessionDataOperation());
         allOperations.put("postData", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runRequestBody(bizModel, bizOptJson));
         allOperations.put("postFile", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runRequestFile(bizModel, bizOptJson));
 

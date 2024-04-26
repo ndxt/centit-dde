@@ -53,9 +53,9 @@ public class AssignmentOperation implements BizOperation {
             if (userObj instanceof CentitUserDetails) {
                 String property = bizOptJson.getString("attributeName");
                 if(StringUtils.isNotBlank(property)) {
-                    ReflectionOpt.setFieldValue(userObj, property, sourceData);
+                    boolean succeed = ReflectionOpt.setAttributeValue(userObj, property, sourceData);
+                    return BuiltInOperation.createResponseSuccessData(succeed?1:0);
                 }
-                return BuiltInOperation.createResponseSuccessData(1);
             }
             return BuiltInOperation.createResponseSuccessData(0);
         }
