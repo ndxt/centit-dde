@@ -23,7 +23,7 @@ public class FileDataSet extends DataSet {
         this.data = null;// Collections.emptyList();
     }
 
-    public FileDataSet(String fileName, int fileSize, Object fileData) {
+    public FileDataSet(String fileName, long fileSize, Object fileData) {
         this.dataSetName = FileDataSet.FILE_DATA_SET_DEFAULT_NAME;
         this.setFileContent(fileName, fileSize, fileData);
     }
@@ -96,7 +96,7 @@ public class FileDataSet extends DataSet {
     }
 
     @JSONField(serialize = false)
-    public int getFileSize(){
+    public long getFileSize(){
         if(this.data==null){
             return 0;
         }

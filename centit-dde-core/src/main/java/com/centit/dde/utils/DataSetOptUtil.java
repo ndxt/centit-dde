@@ -940,7 +940,10 @@ public abstract class DataSetOptUtil {
         }
         FileDataSet fileDataset =  new FileDataSet();
         fileDataset.setFileInfo(fileInfo);
-        fileDataset.setFileContent(fileName, -1, fileData);
+
+        fileDataset.setFileContent(fileName,
+            NumberBaseOpt.castObjectToLong(objectMap.get(ConstantValue.FILE_SIZE), -1l),
+            fileData);
         return fileDataset;
     }
     public static FileDataSet castToFileDataSet(DataSet dataSet){
@@ -970,7 +973,7 @@ public abstract class DataSetOptUtil {
             return fileDataSet;
         }
 
-        String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep,  ConstantValue.FILE_CONTENT, "");
+        String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_CONTENT, "");
 
         if(singleFile || dataSet.getSize()==1) {
             Map<String, Object> mapFirstRow = dataSet.getFirstRow();
@@ -980,7 +983,9 @@ public abstract class DataSetOptUtil {
                 if(fileData==null){
                     throw new ObjectException(ObjectException.EMPTY_RESULT_EXCEPTION, "文件数据获取失败");
                 }
-                fileDataset = new FileDataSet(fileName, -1, fileData);
+                fileDataset = new FileDataSet(fileName,
+                    NumberBaseOpt.castObjectToLong(jsonStep.get(ConstantValue.FILE_SIZE), -1l),
+                    fileData);
             } else if (StringUtils.isNotBlank(fileName)) {
                 fileDataset.setFileName(fileName);
             }
