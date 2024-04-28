@@ -84,13 +84,19 @@ public class FileDownloadOperation implements BizOperation {
         FileDataSet objectToDataSet = new FileDataSet();
         if(fileIds.size()==1) {
             FileBaseInfo fileInfo = fileInfoOpt.getFileInfo(fileIds.get(0));
+            long fileSize = -1;
             if(fileInfo!=null) {
                 if (StringUtils.isBlank(fileName))
                     fileName = fileInfo.getFileName();
                 objectToDataSet.setFileInfo(fileInfo);
+                fileSize = fileInfo.getFileSize();
             }
-            InputStream inputStream = new FileInputStream(fileInfoOpt.getFile(fileIds.get(0)));
-            objectToDataSet.setFileContent(fileName, inputStream.available(), inputStream);
+            InputStream inputStream = fileInfoOpt.loadFileStream(fileIds.get(0));
+            long fileLength = inputStream.available();
+            if(fileLength <= 0){
+                fileLength = fileSize;
+            }
+            objectToDataSet.setFileContent(fileName, fileLength, inputStream);
         } else {
             ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
             ZipOutputStream out = ZipCompressor.convertToZipOutputStream(outBuf);
@@ -98,7 +104,7 @@ public class FileDownloadOperation implements BizOperation {
             for(String fid : fileIds) {
                 FileBaseInfo fileInfo = fileInfoOpt.getFileInfo(fid);
                 if(fileInfo!=null) {
-                    InputStream inputStream = new FileInputStream(fileInfoOpt.getFile(fid));
+                    InputStream inputStream = fileInfoOpt.loadFileStream(fid);
                     String fn = fileInfo.getFileName();
                     while(fileNameMap.containsKey(fn)){
                         int copies = fileNameMap.get(fn)+1;

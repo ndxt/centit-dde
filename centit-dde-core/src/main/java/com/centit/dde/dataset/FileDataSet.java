@@ -61,7 +61,7 @@ public class FileDataSet extends DataSet {
         }
     }
 
-    public void setFileContent(String fileName, int fileSize, Object fileData){
+    public void setFileContent(String fileName, long fileSize, Object fileData){
         if(this.data == null || !(this.data instanceof Map)){
             this.data = new HashMap<>(20);
         }
