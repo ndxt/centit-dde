@@ -50,7 +50,12 @@ public class FileUploadOperation implements BizOperation {
         if(dataSet.getFirstRow().containsKey("optTag")) {
             fileInfo.setOptTag(StringBaseOpt.objectToString(dataSet.getFirstRow().get("optTag")));
         }
-        String fileId= fileInfoOpt.saveFile(fileInfo, -1, mapFileInfo.getFileInputStream());
+        long fileSize = mapFileInfo.getFileSize();
+        if(fileSize<=0){
+            fileSize = mapFileInfo.getFileInputStream().available();
+        }
+        fileInfo.setFileSize(fileSize);
+        String fileId = fileInfoOpt.saveFile(fileInfo, fileSize, mapFileInfo.getFileInputStream());
         fileInfo.setFileId(fileId);
         bizModel.putDataSet(targetDsName, new DataSet(fileInfo));
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());

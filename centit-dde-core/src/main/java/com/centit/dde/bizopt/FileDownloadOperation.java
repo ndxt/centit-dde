@@ -13,11 +13,11 @@ import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.ZipCompressor;
+import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -84,19 +84,18 @@ public class FileDownloadOperation implements BizOperation {
         FileDataSet objectToDataSet = new FileDataSet();
         if(fileIds.size()==1) {
             FileBaseInfo fileInfo = fileInfoOpt.getFileInfo(fileIds.get(0));
-            long fileSize = -1;
+
             if(fileInfo!=null) {
                 if (StringUtils.isBlank(fileName))
                     fileName = fileInfo.getFileName();
                 objectToDataSet.setFileInfo(fileInfo);
-                fileSize = fileInfo.getFileSize();
+
             }
-            InputStream inputStream = fileInfoOpt.loadFileStream(fileIds.get(0));
-            long fileLength = inputStream.available();
-            if(fileLength <= 0){
-                fileLength = fileSize;
+            try(InputStream inputStream = fileInfoOpt.loadFileStream(fileIds.get(0))) {
+                ByteArrayOutputStream outs = new ByteArrayOutputStream();
+                FileIOOpt.writeInputStreamToOutputStream(inputStream, outs);
+                objectToDataSet.setFileContent(fileName, outs.size(), outs); // outs
             }
-            objectToDataSet.setFileContent(fileName, fileLength, inputStream);
         } else {
             ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
             ZipOutputStream out = ZipCompressor.convertToZipOutputStream(outBuf);
