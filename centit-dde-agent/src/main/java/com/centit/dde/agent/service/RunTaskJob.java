@@ -1,10 +1,8 @@
 package com.centit.dde.agent.service;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.services.impl.TaskRun;
 import com.centit.support.algorithm.BooleanBaseOpt;
-import com.centit.support.common.ObjectException;
 import com.centit.support.quartz.AbstractQuartzJob;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;

@@ -145,21 +145,23 @@ public class HttpTaskController extends BaseController {
         returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_DELETE, request, response);
     }
 
-    private void judgePower(@PathVariable String packetId, String loginUser, String runType) {
+    private void judgePower(@PathVariable String packetId, String loginUser, String runType, HttpServletRequest request) {
         if (ConstantValue.RUN_TYPE_DEBUG.equals(runType)) {
             if (StringUtils.isBlank(loginUser)) {
-                throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "您未登录！");
+                throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,
+                    getI18nMessage( "error.302.user_not_login", request));
             }
             DataPacketInterface dataPacket = dataPacketDraftService.getDataPacket(packetId);
             if (!platformEnvironment.loginUserIsExistWorkGroup(dataPacket.getOsId(), loginUser)) {
-                throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION, "您没有权限！");
+                throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION,
+                    getI18nMessage( "error.403.access_forbidden", request));
             }
         }
     }
 
     private void returnObject(String packetId, String runType, String taskType,
                               HttpServletRequest request, HttpServletResponse response) throws IOException {
-        //judgePower(packetId,runType);
+        //judgePower(packetId,runType,request);
         DataPacketInterface dataPacketInterface;
         if(ConstantValue.RUN_TYPE_DEBUG.equals(runType)){
             dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
@@ -175,17 +177,21 @@ public class HttpTaskController extends BaseController {
         }
 
         if (dataPacketInterface == null) {
-            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "API接口：" + packetId + "不存在！");
+            throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION,
+               getI18nMessage("dde.604.api_not_found", request, packetId));
         }
         if (ConstantValue.TASK_TYPE_MSG.equals(dataPacketInterface.getTaskType())) {
-            throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "消息触发不支持请求，该类型任务会自动触发！");
+            throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED,
+                getI18nMessage("dde.405.method_not_support", request, packetId));
         }
         if (!taskType.equals(dataPacketInterface.getTaskType()) &&
             !ConstantValue.TASK_TYPE_TIME.equals(dataPacketInterface.getTaskType())) {
-            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "任务类型和请求方式不匹配，请保持一致！");
+            throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED,
+                getI18nMessage("dde.405.request_type_not_match", request, packetId));
         }
         if (dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()) {
-            throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "API接口已被禁用，请先恢复！");
+            throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED,
+                getI18nMessage("dde.405.api_is_disable", request, packetId));
         }
         //根据api默认值初始化
         Map<String, Object> params = new HashMap<>(dataPacketInterface.getPacketParamsValue());
@@ -298,7 +304,8 @@ public class HttpTaskController extends BaseController {
                 }
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, bodyMap);
             } else { //
-                throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT, "不支持的表单格式，Content-Type:" + contentType);
+                throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
+                    getI18nMessage("dde.613.form_type_not_support", request, contentType));
             }
         }
 
@@ -332,7 +339,8 @@ public class HttpTaskController extends BaseController {
                     in.available(), fileName, request.getParameter("downloadType"), null);
             } else {
                 JsonResultUtils.writeOriginalObject(
-                    ResponseData.makeErrorMessage("没不错误，没有返回的文件实体！"), response);
+                    ResponseData.makeErrorMessage(ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                        getI18nMessage("dde.604.return_file_not_found", request)), response);
             }
             return;
         }

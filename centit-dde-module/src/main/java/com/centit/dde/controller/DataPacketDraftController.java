@@ -83,7 +83,7 @@ public class DataPacketDraftController extends ResourceBaseController {
     @PostMapping
     @WrapUpResponseBody
     public DataPacketDraft createDataPacket(@RequestBody DataPacketDraft dataPacketDraft, HttpServletRequest request) {
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
         dataPacketDraft.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
         dataPacketDraft.setLogLevel(ConstantValue.LOGLEVEL_TYPE_ERROR);
@@ -98,7 +98,7 @@ public class DataPacketDraftController extends ResourceBaseController {
     public DataPacketDraft createHttpTypeApi(@RequestBody HttpParameter httpParames, HttpServletRequest request) {
         DataPacketDraft dataPacketDraft = new DataPacketDraft();
         dataPacketDraft.setOsId(httpParames.getOsId());
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
         String loginUser = WebOptUtils.getCurrentUserCode(request);
         if (StringUtils.isBlank(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(request, "userCode");
@@ -147,7 +147,7 @@ public class DataPacketDraftController extends ResourceBaseController {
                                                    HttpServletRequest request) throws ParseException {
         DataPacketDraft dataPacket = new DataPacketDraft();
         dataPacket.setOsId(metaDataOrHttpParams.getOsId());
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacket.getOsId(), request);
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacket.getOsId(), request);
         String loginUser = WebOptUtils.getCurrentUserCode(request);
         if (StringUtils.isBlank(loginUser)) {
             loginUser = WebOptUtils.getRequestFirstOneParameter(request, "userCode");
@@ -236,7 +236,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
         dataPacketDraft.setPacketId(packetId);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateStr = dateFormat.format(new Date());
@@ -254,7 +254,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "发布数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
         dataPacketDraft.setPublishDate(DatetimeOpt.truncateToSecond(DatetimeOpt.currentUtilDate()));
         dataPacketDraftService.publishDataPacket(dataPacketDraft);
     }
@@ -271,7 +271,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
         dataPacketDraftService.updateDataPacketOptJson(packetId, dataOptDescJson);
     }
 
@@ -284,7 +284,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "删除数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
         platformEnvironment.deleteOptMethod(dataPacketDraft.getOptCode());
         dataPacketService.deleteDataPacket(packetId);
         dataPacketDraftService.deleteDataPacket(packetId);
@@ -299,7 +299,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacketDraft.getOsId(), request);
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
         //启用  disableType 必须等于T 或者 F
         if ("F".equals(disableType) || "T".equals(disableType)) {
             DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
@@ -357,7 +357,7 @@ public class DataPacketDraftController extends ResourceBaseController {
     public void batchDeleteByPacketIds(@RequestBody JSONObject jsonObject, HttpServletRequest request) {
         JSONArray packetIds = jsonObject.getJSONArray("packetIds");
         String osId = jsonObject.getString("osId");
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, osId, request);
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, osId, request);
         if (packetIds != null && packetIds.size() > 0) {
             String[] ids = packetIds.toArray(new String[packetIds.size()]);
             dataPacketDraftService.batchDeleteByPacketIds(ids);
@@ -386,7 +386,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         if (dataPacket == null) {
             return ResponseData.makeErrorMessage("复制的API接口不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, dataPacket.getOsId(), request);
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacket.getOsId(), request);
         String packetId = UuidOpt.getUuidAsString32();
         dataPacket.setPacketId(packetId);
         dataPacket.setPacketName(packetName);

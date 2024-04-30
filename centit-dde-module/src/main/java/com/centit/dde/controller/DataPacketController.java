@@ -73,7 +73,7 @@ public class DataPacketController extends BaseController {
     public void chgLogLevel(@RequestBody JSONObject jsonObject, HttpServletRequest request) {
         JSONArray packetIds = jsonObject.getJSONArray("packetIds");
         String osId = jsonObject.getString("osId");
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, osId, request);
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, osId, request);
         String logLevel = jsonObject.getString("logLevel");
         int lv = DataPacket.mapLogLevel(logLevel);
         if(lv<1){
@@ -94,7 +94,7 @@ public class DataPacketController extends BaseController {
     public void chgOSLogLevel(@RequestBody JSONObject jsonObject, HttpServletRequest request) {
         String osId = jsonObject.getString("osId");
         String logLevel = jsonObject.getString("logLevel");
-        LoginUserPermissionCheck.loginUserPermissionCheck(platformEnvironment, osId, request);
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, osId, request);
         int lv = DataPacket.mapLogLevel(logLevel);
         if(lv<1){
             throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "日志等级参数不正确！");
