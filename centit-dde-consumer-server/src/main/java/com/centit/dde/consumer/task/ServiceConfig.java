@@ -1,4 +1,4 @@
-package com.centit.dde.agent.service;
+package com.centit.dde.consumer.task;
 
 import com.centit.fileserver.client.FileClientImpl;
 import com.centit.fileserver.client.FileInfoOptClient;
@@ -16,7 +16,6 @@ import com.centit.search.utils.ImagePdfTextExtractor;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.workflow.service.impl.SystemUserUnitCalcContextFactoryImpl;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -35,14 +34,6 @@ public class ServiceConfig implements EnvironmentAware {
     @Override
     public void setEnvironment(Environment environment) {
         this.env = environment;
-    }
-
-    private final PathConfig pathConfig;
-
-
-    @Autowired
-    public ServiceConfig(PathConfig pathConfig) {
-        this.pathConfig = pathConfig;
     }
 
     @Bean
@@ -66,7 +57,7 @@ public class ServiceConfig implements EnvironmentAware {
     public OperationLogWriter operationLogWriter() {
         TextOperationLogWriterImpl textOperationLogWriter
             = new TextOperationLogWriterImpl();
-        textOperationLogWriter.setOptLogHomePath(pathConfig.getLogs());
+        textOperationLogWriter.setOptLogHomePath(env.getProperty("app.home")+"/logs");
         return textOperationLogWriter;
     }
 

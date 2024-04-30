@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -35,6 +36,10 @@ public class TaskRun {
     private final TaskLogManager taskLogManager;
     private final DataPacketDao dataPacketDao;
     private final BizOptFlow bizOptFlow;
+
+    @Autowired
+    protected MessageSource messageSource;
+
     @Autowired
     private PlatformEnvironment platformEnvironment;
 

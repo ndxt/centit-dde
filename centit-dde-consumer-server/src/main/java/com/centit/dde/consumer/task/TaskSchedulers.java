@@ -21,6 +21,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -54,6 +55,9 @@ public class TaskSchedulers {
 
     @Autowired
     ConsumerPoolConfig consumerPoolConfig;
+
+    @Autowired
+    protected MessageSource messageSource;
 
     @Autowired
     private PlatformEnvironment platformEnvironment;
