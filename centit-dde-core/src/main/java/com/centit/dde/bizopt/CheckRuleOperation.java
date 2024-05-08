@@ -12,6 +12,7 @@ import com.centit.product.metadata.po.DataCheckRule;
 import com.centit.product.metadata.service.DataCheckRuleService;
 import com.centit.product.metadata.utils.DataCheckResult;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,10 +33,18 @@ public class CheckRuleOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String dataSetId = bizOptJson.getString("source");
         DataSet dataSet = bizModel.getDataSet(dataSetId);
-        if (dataSet == null) return ResponseData.makeErrorMessage("校验数据不能为空！");
+        if (dataSet == null) {
+            return ResponseData.makeErrorMessage(
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
+        }
+
         //校验信息勾选项
         JSONArray checkRuleMsg = bizOptJson.getJSONArray("checkRuleMsg");
-        if (checkRuleMsg == null || checkRuleMsg.size() == 0) return ResponseData.makeErrorMessage("校验信息不能为空！");
+        if (checkRuleMsg == null || checkRuleMsg.isEmpty()) {
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "checkRuleMsg"));
+        }
         //是否返回校验信息，默认不返回
         boolean isReturnCheckMsg = checkRuleMsg.contains("checkRuleResultMsgField");
         //是否返回校验结果

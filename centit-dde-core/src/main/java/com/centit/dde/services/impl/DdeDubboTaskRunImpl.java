@@ -9,18 +9,23 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OsInfo;
 import com.centit.support.common.ObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
 import java.util.Map;
 
 @Service("ddeDubboTaskRunImpl")
 public class DdeDubboTaskRunImpl implements DdeDubboTaskRun {
 
     @Autowired
-    TaskRun taskRun;
+    protected MessageSource messageSource;
 
     @Autowired
-    DataPacketService dataPacketService;
+    protected TaskRun taskRun;
+
+    @Autowired
+    protected DataPacketService dataPacketService;
 
     @Autowired
     private PlatformEnvironment platformEnvironment;
@@ -31,7 +36,7 @@ public class DdeDubboTaskRunImpl implements DdeDubboTaskRun {
         if(dataPacket==null){
             throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION, "配置信息有误，找不到对应的模块:" + packetId);
         }
-        DataOptContext dataOptContext = new DataOptContext();
+        DataOptContext dataOptContext = new DataOptContext(messageSource, Locale.SIMPLIFIED_CHINESE);
         OsInfo osInfo = platformEnvironment.getOsInfo(dataPacket.getOsId());
         dataOptContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
         dataOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, queryParams);

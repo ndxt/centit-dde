@@ -34,7 +34,8 @@ public class DocToPdfOperation implements BizOperation {
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null){
             return BuiltInOperation.createResponseData(0, 1,
-                ObjectException.DATA_NOT_FOUND_EXCEPTION, "找不到源文件！");
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
         }
 
         if(dataSet.getSize() == 1) {
@@ -57,7 +58,8 @@ public class DocToPdfOperation implements BizOperation {
                     OfficeToPdf.excel2Pdf(fileDataSet.getFileInputStream(), pdfFile);
                 } else {
                     return BuiltInOperation.createResponseData(0, 1,
-                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID, "不支持的文件类型！");
+                        ObjectException.FUNCTION_NOT_SUPPORT,
+                        dataOptContext.getI18nMessage("dde.613.file_type_not_support"));
                 }
                 FileDataSet pdfDataset = new FileDataSet(FileType.truncateFileExtName(fileDataSet.getFileName()) + ".pdf",
                     pdfFile.size(), pdfFile);

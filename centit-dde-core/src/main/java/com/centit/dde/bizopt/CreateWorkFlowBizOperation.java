@@ -42,19 +42,24 @@ public class CreateWorkFlowBizOperation implements BizOperation {
         String flowOptName = bizOptJson.getString("flowOptName");
         String flowOptTag = bizOptJson.getString("flowOptTag");
         if (StringUtils.isBlank(flowCode)) {
-            return ResponseData.makeErrorMessage(500, "flowCode不能为空！");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "flowCode"));
         }
         if (StringUtils.isBlank(unitCode)) {
-            return ResponseData.makeErrorMessage(500, "unitCode不能为空！");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "unitCode"));
         }
         if (StringUtils.isBlank(userCode)) {
-            return ResponseData.makeErrorMessage(500, "userCode不能为空！");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "userCode"));
         }
         if (StringUtils.isBlank(flowOptName)) {
-            return ResponseData.makeErrorMessage(500, "flowOptName不能为空！");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "flowOptName"));
         }
         if (StringUtils.isBlank(flowOptTag)) {
-            return ResponseData.makeErrorMessage(500, "flowOptTag不能为空！");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "flowOptTag"));
         }
         String id = bizOptJson.getString("id");
         BizModelJSONTransform bizModelJSONTransform = new BizModelJSONTransform(bizModel);

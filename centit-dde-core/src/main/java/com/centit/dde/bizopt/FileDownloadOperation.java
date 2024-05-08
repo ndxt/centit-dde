@@ -13,6 +13,7 @@ import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.ZipCompressor;
+import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileType;
 import org.apache.commons.lang3.StringUtils;
@@ -44,8 +45,8 @@ public class FileDownloadOperation implements BizOperation {
         String fileName = BuiltInOperation.getJsonFieldString(bizOptJson, ConstantValue.FILE_NAME, "");
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null) {
-            return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
-                bizOptJson.getString("SetsName") + "：文件下载失败，请选择数据集！");
+            return BuiltInOperation.createResponseData(0, 1, ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
         }
         ArrayList<String> fileIds = new ArrayList<>();
 

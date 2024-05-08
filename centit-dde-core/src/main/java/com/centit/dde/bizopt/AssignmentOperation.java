@@ -12,6 +12,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.json.JSONOpt;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,8 +34,8 @@ public class AssignmentOperation implements BizOperation {
         DataSet targetDataSet = bizModel.getDataSet(targetDsName);
         DataSet dataSet = bizModel.getDataSet(sourceDsName);
         if(dataSet == null  || targetDataSet == null){
-            return BuiltInOperation.createResponseData(0,1, ResponseData.ERROR_USER_CONFIG,
-                "配置信息出错，找不到对应的数据集："+targetDsName+"，"+sourceDsName+"。");
+            return BuiltInOperation.createResponseData(0,1, ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found2", targetDsName+"，"+sourceDsName));
         }
 
         //assignType 赋值类型， assign 直接赋值， property 对属性复制 ， append 追加元素, merge 合并属性
@@ -66,7 +67,8 @@ public class AssignmentOperation implements BizOperation {
         if("property".equals(assignType)){
             String property = BuiltInOperation.getJsonFieldString(bizOptJson, "attributeName", ".");
             if (".".equals(property)){
-               return ResponseData.makeErrorMessage("属性名称不能为空！");
+               return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                   dataOptContext.getI18nMessage("error.701.field_is_blank", "attributeName"));
             }
             if( targetDataSet.getSize() < 1 ){
                 if(sourceData != null){

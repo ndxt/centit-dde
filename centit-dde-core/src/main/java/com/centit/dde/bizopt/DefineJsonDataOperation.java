@@ -32,7 +32,9 @@ public class DefineJsonDataOperation implements BizOperation {
                 bizModel.putDataSet(targetDsName,new DataSet(data));
             }
         }else {
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")+"：表达式不能为空！");
+            return BuiltInOperation.createResponseData(0, 1,
+                ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "SetsName"));
         }
         return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(targetDsName).getSize());
     }

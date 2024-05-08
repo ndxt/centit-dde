@@ -53,7 +53,8 @@ public class DocReportOperation implements BizOperation {
             if(! StringUtils.endsWithIgnoreCase(fileName, ".docx"))
                 fileName = fileName +".docx";
         }
-        Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "cName");
+        Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"),
+            "columnName", "cName");
         ByteArrayInputStream in = generateWord(bizModel, fileId, params);
 
         FileDataSet dataSet = transToPdf? new FileDataSet(fileName,

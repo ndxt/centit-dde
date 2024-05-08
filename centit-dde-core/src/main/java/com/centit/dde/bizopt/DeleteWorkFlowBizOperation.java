@@ -32,7 +32,8 @@ public class DeleteWorkFlowBizOperation implements BizOperation {
                 bizOptJson.getString("userCode"),
                 new BizModelJSONTransform(bizModel)));
         if (StringUtils.isBlank(flowInstId) || StringUtils.isBlank(userCode)){
-            return  ResponseData.makeErrorMessage(500,"flowInstId或userCode不能为空！");
+            return  ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "flowInstId|userCode"));
         }
         boolean deleteFlowInstById = flowManager.deleteFlowInstById(flowInstId,userCode);
         bizModel.putDataSet(id,new DataSet(deleteFlowInstById));

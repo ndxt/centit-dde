@@ -5,14 +5,17 @@ import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.common.ObjectException;
 import lombok.Data;
+import lombok.Setter;
+import org.springframework.context.MessageSource;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @Data
 public class DataOptContext {
-    private String runType;
 
+    private String runType;
     private String needRollback;
     private TaskLog taskLog;
     private String optId;
@@ -22,18 +25,31 @@ public class DataOptContext {
     private Integer logLevel;
     private Integer breakStepNo;
     private String topUnit;
-
-    public DataOptContext() {
-        this.callStackData = new HashMap<>(8);
-        breakStepNo = -1;
-        debugId = null;
-    }
     /**
      * 调用参数
      * RequestBody/File
      * Session
      */
+    @Setter(lombok.AccessLevel.NONE)
     private Map<String, Object> callStackData;
+
+    @Setter(lombok.AccessLevel.NONE)
+    private MessageSource messageSource;
+
+    @Setter(lombok.AccessLevel.NONE)
+    private Locale locale;
+
+    public DataOptContext(MessageSource messageSource, Locale locale) {
+        this.callStackData = new HashMap<>(8);
+        this.messageSource = messageSource;
+        this.locale = locale;
+        breakStepNo = -1;
+        debugId = null;
+    }
+
+    public String getI18nMessage(String code, Object ... args) {
+        return messageSource.getMessage(code, args, "Message:" + code, locale);
+    }
 
     public String getLogId() {
         if (taskLog==null){

@@ -12,6 +12,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.ByteBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.security.AESSecurityUtils;
 import com.centit.support.security.SM4Util;
 import com.centit.support.security.SecurityOptUtils;
@@ -46,7 +47,8 @@ public class EncryptOperation  implements BizOperation {
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null) {
             return BuiltInOperation.createResponseData(0, 1,
-                ResponseData.ERROR_OPERATION, "加密计算异常，请指定数据集！");
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
         }
 
         if(StringUtils.isNotBlank(password)){
@@ -102,10 +104,11 @@ public class EncryptOperation  implements BizOperation {
 
             if (StringUtils.isBlank(fieldName) || StringUtils.isBlank(encryptFieldName)) {
                 return BuiltInOperation.createResponseData(0, 1,
-                    ResponseData.ERROR_OPERATION, "加密计算异常，请指定明文字段和者密文字段！");
+                    ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                    dataOptContext.getI18nMessage("error.701.field_is_blank", "encryptFieldName"));
             }
             List<Map<String, Object>> encryptData = dataSet.getDataAsList();
-            if(encryptData.size()<1){
+            if(encryptData.isEmpty()){
                 return BuiltInOperation.createResponseSuccessData(0);
             }
 

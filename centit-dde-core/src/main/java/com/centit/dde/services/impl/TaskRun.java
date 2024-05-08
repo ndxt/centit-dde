@@ -25,6 +25,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author zhf
@@ -54,7 +55,7 @@ public class TaskRun {
     public void agentRunTask(String dataPacketId) {
         DataPacket dataPacket = dataPacketDao.getObjectById(dataPacketId);
 //        CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
-        DataOptContext optContext = new DataOptContext();
+        DataOptContext optContext = new DataOptContext(messageSource, Locale.SIMPLIFIED_CHINESE);
         OsInfo osInfo = platformEnvironment.getOsInfo(dataPacket.getOsId());
         optContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
         optContext.setTopUnit(osInfo.getTopUnit());

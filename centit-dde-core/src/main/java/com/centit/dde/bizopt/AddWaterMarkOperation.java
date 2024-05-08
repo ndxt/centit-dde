@@ -54,7 +54,8 @@ public class AddWaterMarkOperation implements BizOperation {
             return addImage2Pdf(bizModel, bizOptJson, dataOptContext);
         } else {
             return BuiltInOperation.createResponseData(0, 1,
-                ObjectException.FUNCTION_NOT_SUPPORT, "不支持的文件类型！");
+                ObjectException.FUNCTION_NOT_SUPPORT,
+                dataOptContext.getI18nMessage("dde.613.file_type_not_support"));
         }
     }
 
@@ -66,7 +67,8 @@ public class AddWaterMarkOperation implements BizOperation {
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null){
             return BuiltInOperation.createResponseData(0, 1,
-                ObjectException.DATA_NOT_FOUND_EXCEPTION, "找不到源文件！");
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
         }
         int  page = NumberBaseOpt.castObjectToInteger(bizOptJson.get("page"), -1);
         float  x = NumberBaseOpt.castObjectToFloat(bizOptJson.get("x"), 0f);
@@ -92,7 +94,7 @@ public class AddWaterMarkOperation implements BizOperation {
         }
         if (image == null) {
             throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION,
-                "找不到水印图片！");
+                dataOptContext.getI18nMessage("dde.604.img_file_not_found"));
         }
 
         if(dataSet.getSize() == 1) {
@@ -238,7 +240,8 @@ public class AddWaterMarkOperation implements BizOperation {
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null){
             return BuiltInOperation.createResponseData(0, 1,
-                ObjectException.DATA_NOT_FOUND_EXCEPTION, "找不到源文件！");
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
         }
         if(StringUtils.isNotBlank(waterMarkStr)){
             BizModelJSONTransform transform = new BizModelJSONTransform(bizModel, dataSet.getData());

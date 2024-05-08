@@ -32,7 +32,7 @@ public class BizModelServiceImpl implements BizModelService {
         if (notNeedBuf(dataPacket)) {
             return taskRun.runTask(dataPacket, optContext);
         }
-        Map<String,Object> bufferStack=optContext.getCallStackData();
+        Map<String,Object> bufferStack = optContext.getCallStackData();
         bufferStack.remove(ConstantValue.REQUEST_COOKIES_TAG);
         bufferStack.remove(ConstantValue.REQUEST_HEADERS_TAG);
         String key = makeDataPacketBufId(dataPacket, optContext.getCallStackData());

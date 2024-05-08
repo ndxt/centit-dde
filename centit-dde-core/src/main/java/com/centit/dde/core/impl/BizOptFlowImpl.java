@@ -743,7 +743,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()) {
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "API接口已被禁用，请先恢复！");
         }
-        DataOptContext moduleOptContext = new DataOptContext();
+        DataOptContext moduleOptContext = new DataOptContext(dataOptContext.getMessageSource(), dataOptContext.getLocale());
         moduleOptContext.setTaskLog(dataOptContext.getTaskLog());
         moduleOptContext.setOptId(dataOptContext.getOptId());
         moduleOptContext.setNeedRollback(dataOptContext.getNeedRollback());

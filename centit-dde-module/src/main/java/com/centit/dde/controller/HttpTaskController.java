@@ -197,7 +197,7 @@ public class HttpTaskController extends BaseController {
         Map<String, Object> params = new HashMap<>(dataPacketInterface.getPacketParamsValue());
         params.putAll(collectRequestParameters(request));
         //保存内部逻辑变量，有些时候需要将某些值传递到其它标签节点，这时候需要用到它
-        DataOptContext dataOptContext = new DataOptContext();
+        DataOptContext dataOptContext = new DataOptContext(this.messageSource, WebOptUtils.getCurrentLocale(request));
         dataOptContext.setRunType(runType);
         Object obj =  params.get("debugId");
         if(obj!=null) {
