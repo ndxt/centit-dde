@@ -330,7 +330,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 DataSet currentNodeData = bizModel.getDataSet(currentNodeId);
                 if(currentNodeData==null){
                     currentNodeData = new DataSet(currentNodeId,
-                        CollectionsOpt.createHashMap("message","当前节点没有产生新的数据集"));
+                        CollectionsOpt.createHashMap("message", "当前节点没有产生新的数据集"));
                 }
                 bizData.put("currentNodeData", currentNodeData);
                 bizData.put("dump", dump);
@@ -373,11 +373,13 @@ public class BizOptFlowImpl implements BizOptFlow {
             DataSet dataSet = bizModel.getDataSet(dataSetId);
             if (dataSet == null) {
                 bizModel.getOptResult().setStepResponse(
-                    BuiltInOperation.getJsonFieldString(stepJson, "id", "endNode"), ResponseData.makeErrorMessage(
-                    ResponseData.ERROR_OPERATION, "获取数据集："+ dataSetId +"出错！" ));
+                    BuiltInOperation.getJsonFieldString(stepJson, "id", "endNode"),
+                    ResponseData.makeErrorMessage(ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                        dataOptContext.getI18nMessage("dde.604.data_source_not_found2", dataSetId)));
+
                 //添加错误日志
                 TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
-                detailLog.setLogInfo("获取数据集："+ dataSetId +"出错！");
+                detailLog.setLogInfo(dataOptContext.getI18nMessage("dde.604.data_source_not_found2", dataSetId));
             } else {
                 bizModel.getOptResult().setResultObject(dataSet.getData());
                 //这段代码是为了兼容以前的文件类型返回值，后面应该不需要了
@@ -403,8 +405,9 @@ public class BizOptFlowImpl implements BizOptFlow {
             DataSet dataSet = bizModel.getDataSet(dataSetId);
             if(dataSet==null){
                 TaskDetailLog detailLog = createLogDetail(dataOptStep, dataOptContext);
-                detailLog.setLogInfo("获取数据集："+ dataSetId +"出错！");
-                throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION, "找不到对应的文件数据集："+dataSetId+"！");
+                detailLog.setLogInfo(dataOptContext.getI18nMessage("dde.604.data_source_not_found2", dataSetId));
+                throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                    dataOptContext.getI18nMessage("dde.604.file_dataset_not_found",dataSetId));
             }
             FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, stepJson, false);
             bizModel.getOptResult().setResultFile(fileInfo.getFirstRow());
@@ -489,7 +492,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
         // logger.error("当前分支节点("+stepId+")的" + linksJson.size() + "个分支中没有符合业务逻辑的分支、也没有else分支。");
         // dataOptStep.setEndStep();
-        throw new ObjectException(stepJson, ResponseData.ERROR_OPERATION,
+        throw new ObjectException(stepJson,
+            ResponseData.ERROR_OPERATION,
             "当前分支节点("+stepId+")的" + linksJson.size() + "个分支中没有符合业务逻辑的分支、也没有else分支。");
     }
 
@@ -623,7 +627,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         String optType = bizOptJson.getString("type");
         BizOperation opt = allOperations.get(optType);
         if(opt==null){
-            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "组件："+optType+ " 不存在请和开发人员联系！");
+            throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
+                dataOptContext.getI18nMessage("dde.613.component_not_found", optType));
         }
         ResponseData responseData;
         try {
