@@ -37,13 +37,16 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
         String unitCodeDesc = bizOptJson.getString("unitCode");
         String userCodeDesc = bizOptJson.getString("userCode");
         if (StringUtils.isBlank(nodeInstIdDesc)) {
-            return ResponseData.makeErrorMessage(500, "nodeInstId不能为空！");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "nodeInstId"));
         }
         if (StringUtils.isBlank(unitCodeDesc)) {
-            return ResponseData.makeErrorMessage(500, "unitCode不能为空！");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "unitCode"));
         }
         if (StringUtils.isBlank(userCodeDesc)) {
-            return ResponseData.makeErrorMessage(500, "userCode不能为空！");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "userCode"));
         }
         SubmitOptOptions submitOptOptions = SubmitOptOptions.create();
         BizModelJSONTransform bizModelJSONTransform = new BizModelJSONTransform(bizModel);

@@ -45,31 +45,41 @@ public class ManagerWorkFlowBizOperation implements BizOperation {
         switch (taskType) {
             case ConstantValue.STOP_WFINST:
                 if (StringUtils.isBlank(flowInstId)) {
-                    return ResponseData.makeErrorMessage(500, "flowInstId不能为空！");
+                    return ResponseData.makeErrorMessage(
+                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "flowInstId"));
                 }
                 flowManager.stopInstance(flowInstId, userCode, dataOptContext.getOptId());
                 break;
             case ConstantValue.SUSPEND_WFINST:
                 if (StringUtils.isBlank(flowInstId)) {
-                    return ResponseData.makeErrorMessage(500, "flowInstId不能为空！");
+                    return ResponseData.makeErrorMessage(
+                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "flowInstId"));
                 }
                 flowManager.suspendInstance(flowInstId, userCode, dataOptContext.getOptId());
                 break;
             case ConstantValue.ACTIVE_WFINST:
                 if (StringUtils.isBlank(flowInstId)) {
-                    return ResponseData.makeErrorMessage(500, "flowInstId不能为空！");
+                    return ResponseData.makeErrorMessage(
+                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "flowInstId"));
                 }
                 flowManager.activizeInstance(flowInstId, userCode, dataOptContext.getOptId());
                 break;
             case ConstantValue.ROLLBACK_NODE:
                 if (StringUtils.isBlank(nodeInstId)) {
-                    return ResponseData.makeErrorMessage(500, "nodeInstId不能为空！");
+                    return ResponseData.makeErrorMessage(
+                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "nodeInstId"));
                 }
                 flowEngine.rollBackNode(nodeInstId, userCode);
                 break;
             case ConstantValue.RECLAIM_NODE:
                 if (StringUtils.isBlank(nodeInstId)) {
-                    return ResponseData.makeErrorMessage(500, "nodeInstId不能为空！");
+                    return ResponseData.makeErrorMessage(
+                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "nodeInstId"));
                 }
                 flowEngine.reclaimNode(nodeInstId, userCode);
                 break;

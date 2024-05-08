@@ -24,7 +24,8 @@ public class ObjectCompareOperation implements BizOperation {
         DataSet oldDataSet = bizModel.getDataSet(oldSource);
         DataSet newDataSet = bizModel.getDataSet(newSource);
         if(oldDataSet==null || newDataSet==null || oldDataSet.getSize() != 1 || newDataSet.getSize() !=1 ){
-            return ResponseData.makeErrorMessage("数据对比组件只能对比单个记录的差异，源和目标数据集都只能有一条记录（DataSet.getSize()==1）。");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_POSTCONDITION_FAILED,
+                dataOptContext.getI18nMessage("dde.705.bad_data_for_compare"));
         }
         Map<String,Object> oldObject = oldDataSet.getFirstRow();
         boolean oldIsEmpty = oldObject.isEmpty();

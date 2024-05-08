@@ -12,6 +12,7 @@ import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.image.ImageOpt;
 import com.centit.support.image.QrCodeConfig;
 import com.centit.support.image.QrCodeGenerator;
@@ -49,8 +50,9 @@ public class QrCodeOperation  implements BizOperation {
         String source = bizOptJson.getString("source");
         DataSet dataSet = bizModel.getDataSet(source);
         if (dataSet == null) {
-            return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
-                bizOptJson.getString("SetsName") + "：生成二维码异常，请指定数据集！");
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found2", source));
         }
         String id = bizOptJson.getString("id");
         String createType = bizOptJson.getString("createType");
@@ -80,7 +82,8 @@ public class QrCodeOperation  implements BizOperation {
                 imageList.add(bufferedImage);
                 if("single".equals(createType)){
                     String qrCodeFileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(rowData, fileName));
-                    qrCodeFileName = StringUtils.isNotBlank(qrCodeFileName) ? ( qrCodeFileName.endsWith(".jpg") ? qrCodeFileName : qrCodeFileName + ".jpg")
+                    qrCodeFileName = StringUtils.isNotBlank(qrCodeFileName) ? ( qrCodeFileName.endsWith(".jpg") ?
+                        qrCodeFileName : qrCodeFileName + ".jpg")
                         : System.currentTimeMillis() + ".jpg";
                     InputStream inputStream = ImageOpt.imageToInputStream(bufferedImage);
                     Map<String, Object> mapData = new HashMap<>();

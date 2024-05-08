@@ -11,6 +11,7 @@ import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.fileserver.po.FileInfo;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -31,13 +32,15 @@ public class FileUploadOperation implements BizOperation {
 
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null) {
-            return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
-                "文件上传失败，请选择数据集！");
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
         }
         FileDataSet mapFileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
         if(StringUtils.isBlank(mapFileInfo.getFileName())){
-            return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
-                sourDsName + "：文件上传失败，该数据集文件名称不能为空！");
+            return BuiltInOperation.createResponseData(0, 1,
+                ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "fileName"));
         }
 
         FileInfo fileInfo = new FileInfo();

@@ -12,6 +12,7 @@ import com.centit.framework.core.dao.DictionaryMapUtils;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.po.UserTask;
@@ -77,7 +78,9 @@ public class WorkFlowUserTaskBizOperation implements BizOperation {
             //岗位待办
             case 3:
                 if (StringUtils.isBlank(userCode)) {
-                    return ResponseData.makeErrorMessage("userCode不能为空！");
+                    return ResponseData.makeErrorMessage(
+                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "userCode"));
                 }
                 responseData = flowEngine.dubboUserDynamicTask(queryParam, pageDesc);
                 bizModel.putDataSet(id, new DataSet(responseData.getData()));
@@ -90,7 +93,9 @@ public class WorkFlowUserTaskBizOperation implements BizOperation {
             //所有待办
             case 5:
                 if (StringUtils.isBlank(userCode)) {
-                    return ResponseData.makeErrorMessage("userCode不能为空！");
+                    return ResponseData.makeErrorMessage(
+                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "userCode"));
                 }
                 responseData = flowEngine.dubboUserAllTask(queryParam, pageDesc);
                 bizModel.putDataSet(id, new DataSet(responseData.getData()));
@@ -99,13 +104,15 @@ public class WorkFlowUserTaskBizOperation implements BizOperation {
             case 6:
                 String flowInstId = StringBaseOpt.castObjectToString(queryParam.get("flowInstId"));
                 if (StringUtils.isBlank(flowInstId)) {
-                    return ResponseData.makeErrorMessage("flowInstId不能为空！");
+                    return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "flowInstId"));
                 }
                 List<UserTask> userTask = flowEngine.listFlowActiveNodeOperators(flowInstId);
                 bizModel.putDataSet(id, new DataSet(DictionaryMapUtils.objectsToJSONArray(userTask)));
                 break;
             default:
-                return ResponseData.makeErrorMessage("未知操作类型！");
+                return ResponseData.makeErrorMessage(ObjectException.PARAMETER_NOT_CORRECT,
+                    dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "taskType"));
         }
         return BuiltInOperation.createResponseSuccessData(1);
     }

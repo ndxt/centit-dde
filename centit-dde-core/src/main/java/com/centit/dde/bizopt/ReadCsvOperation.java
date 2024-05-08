@@ -9,6 +9,7 @@ import com.centit.dde.dataset.CsvDataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.common.ObjectException;
 
 import java.io.InputStream;
 
@@ -32,8 +33,9 @@ public class ReadCsvOperation implements BizOperation {
             bizModel.putDataSet(targetDsName, simpleDataSet);
             return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
         } else {
-            return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
-                bizOptJson.getString("SetsName") + "：读取CSV文件异常，不支持的流类型转换！");
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found2", sourDsName));
         }
     }
 }

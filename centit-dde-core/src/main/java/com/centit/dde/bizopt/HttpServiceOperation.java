@@ -51,7 +51,9 @@ public class HttpServiceOperation implements BizOperation {
         //请求服务ip地址
         String serverIpAddressId = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseId", "");
         if (StringUtils.isBlank(serverIpAddressId))
-            return BuiltInOperation.createResponseData(0, 1, 500, "服务ip地址不能为空！");
+            return BuiltInOperation.createResponseData(0, 1,
+                ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "http service Id"));
 
         //请求接口
         String interfaceAddress = BuiltInOperation.getJsonFieldString(bizOptJson, "httpUrl", null);

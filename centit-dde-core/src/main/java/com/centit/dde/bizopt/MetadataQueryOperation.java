@@ -113,7 +113,8 @@ public class MetadataQueryOperation implements BizOperation {
                 bizModel.putDataSet(id, dataSet);
                 return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
-        return BuiltInOperation.createResponseData(0, 1, ObjectException.DATA_VALIDATE_ERROR,
-            "配置信息不正确，未知查询类型！");
+        return BuiltInOperation.createResponseData(0, 1,
+            ObjectException.PARAMETER_NOT_CORRECT,
+            dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "queryType"));
     }
 }

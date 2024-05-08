@@ -36,7 +36,9 @@ public class OptflowSerialNumberOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
         String codeCode = bizOptJson.getString("codeCode");
         if (StringUtils.isBlank(codeCode)) {
-            return ResponseData.makeErrorMessage("类别代码没有填写！");
+            return ResponseData.makeErrorMessage(
+                ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "codeCode"));
         }
         String type = BuiltInOperation.getJsonFieldString(bizOptJson, "lshType", PRODUCE);
         String baseDateType = BuiltInOperation.getJsonFieldString(bizOptJson, "baseDateType", "Y");
@@ -49,7 +51,8 @@ public class OptflowSerialNumberOperation implements BizOperation {
         boolean isBaseDate = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("isBaseDate"), false);
         Date codeBaseDate = null;
         if (isBaseDate) {
-            codeBaseDate = DatetimeOpt.castObjectToDate(JSONTransformer.transformer(bizOptJson.get("codeBaseDate"),new BizModelJSONTransform(bizModel)));
+            codeBaseDate = DatetimeOpt.castObjectToDate(JSONTransformer.transformer(bizOptJson.get("codeBaseDate"),
+                new BizModelJSONTransform(bizModel)));
         }
         if(codeBaseDate == null){
             codeBaseDate = DatetimeOpt.currentUtilDate();

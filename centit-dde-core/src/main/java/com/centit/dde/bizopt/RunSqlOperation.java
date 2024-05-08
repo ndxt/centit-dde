@@ -11,6 +11,7 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryAndParams;
@@ -53,7 +54,9 @@ public class RunSqlOperation implements BizOperation {
             String databaseCode = bizOptJson.getString("databaseName");
             String sql = bizOptJson.getString("sql");
             if (StringUtils.isBlank(databaseCode) || StringUtils.isBlank(sql)) {
-                return ResponseData.makeErrorMessage("数据库或sql不能为空！");
+                return ResponseData.makeErrorMessage(
+                    ObjectException.PARAMETER_NOT_CORRECT,
+                    dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "sql sentence"));
             }
             Map<String, Object> params = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
             QueryAndNamedParams qap = QueryUtils.translateQuery(sql, params);

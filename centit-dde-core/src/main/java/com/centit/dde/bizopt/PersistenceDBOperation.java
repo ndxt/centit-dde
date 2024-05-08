@@ -14,6 +14,7 @@ import com.centit.product.metadata.po.MetaTable;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.service.MetaDataService;
 import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileNotFoundException;
@@ -74,27 +75,32 @@ public class PersistenceDBOperation implements BizOperation {
         String resultMsg =BuiltInOperation.getJsonFieldString(bizOptJson,"resultMsg",WRITER_ERROR_MSG);
         String result =BuiltInOperation.getJsonFieldString(bizOptJson,"result",WRITER_ERROR_TAG);
         if (databaseCode == null || tableId == null) {
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
-                "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.metadata_not_found", databaseCode, tableId));
         }
         SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
-                "数据库信息无效：" + databaseCode);
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.database_not_found", databaseCode));
         }
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null) {
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
-                "数据源信息无效：" + sourDsName);
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found2", sourDsName));
         }
         MetaTable tableInfo = metaDataService.getMetaTableWithRelations(tableId);
         if (tableInfo == null) {
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
-                "对应的元数据信息找不到，数据库：" + databaseCode + " 表:" + tableId);
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.metadata_not_found", databaseCode, tableId));
         }
         if (bizOptJson.get(ConstantValue.CONFIG) == null) {
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
-                "没有配置交换字段");
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.PARAMETER_NOT_CORRECT,
+                dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "config (object value)"));
         }
         SqlDataSetWriter dataSetWriter = new SqlDataSetWriter(bizModel, databaseInfo, tableInfo, result, resultMsg);
 
@@ -117,7 +123,8 @@ public class PersistenceDBOperation implements BizOperation {
                 break;
         }
         if (dataSetWriter.getErrorNums() > 0) {
-            return BuiltInOperation.createResponseData(dataSetWriter.getSuccessNums(), dataSetWriter.getErrorNums(),ResponseData.ERROR_PROCESS_ERROR, dataSetWriter.getInfo());
+            return BuiltInOperation.createResponseData(dataSetWriter.getSuccessNums(), dataSetWriter.getErrorNums(),
+                ResponseData.ERROR_PROCESS_ERROR, dataSetWriter.getInfo());
         }
         return BuiltInOperation.createResponseSuccessData(dataSetWriter.getSuccessNums());
     }

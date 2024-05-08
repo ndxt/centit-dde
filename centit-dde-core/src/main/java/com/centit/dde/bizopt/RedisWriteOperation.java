@@ -14,6 +14,7 @@ import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
 
@@ -28,11 +29,17 @@ public class RedisWriteOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
         SourceInfo redisInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+        if (redisInfo == null ){
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.redis_db_not_found", databaseCode));
+        }
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         DataSet dataSet = bizModel.getDataSet(sourDsName);
-        if (redisInfo == null || dataSet.getData() ==null) {
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
-                "配置信息不正确，没有对应的Redis数据库：" +  databaseCode +" 或者数据集中无数据" + sourDsName);
+        if(dataSet == null || dataSet.getData() ==null){
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found2", sourDsName));
         }
 
         String redisKey = BuiltInOperation.getJsonFieldString(bizOptJson, "redisKey", "");

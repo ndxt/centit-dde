@@ -13,6 +13,7 @@ import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
 import org.apache.commons.lang3.StringUtils;
@@ -30,8 +31,9 @@ public class RedisReadOperation implements BizOperation {
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
         SourceInfo redisInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         if (redisInfo == null ) {
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
-                "配置信息不正确，没有对应的Redis数据库：" +  databaseCode);
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.redis_db_not_found", databaseCode));
         }
 
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", "redisRead");
@@ -44,8 +46,9 @@ public class RedisReadOperation implements BizOperation {
         RedisCommands<String, String> commands = rc.sync();
         String strData = commands.get(redisKey);
         if(StringUtils.isBlank(strData)){
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION,
-                "读取数据失败或者对应的值为空：" + redisKey);
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.PARAMETER_NOT_CORRECT,
+                dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "redisKey"));
         }
 
         DataSet dataSet = new DataSet(JSON.parse(strData));

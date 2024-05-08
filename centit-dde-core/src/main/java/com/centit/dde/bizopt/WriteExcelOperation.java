@@ -13,6 +13,7 @@ import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.report.ExcelExportUtil;
 import com.centit.support.report.ExcelImportUtil;
@@ -42,11 +43,13 @@ public class WriteExcelOperation implements BizOperation {
         String source = bizOptJson.getString("source");
         DataSet dataSet = bizModel.getDataSet(source);
         if (dataSet == null) {
-            return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
-                bizOptJson.getString("SetsName") + "：生成EXCEL文件异常，请指定数据集！");
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found2", source));
         }
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
-        Map<String, String> mapInfoDesc = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"), "columnName", "expression");
+        Map<String, String> mapInfoDesc = BuiltInOperation.jsonArrayToMap(
+            bizOptJson.getJSONArray("config"), "columnName", "expression");
         String sheetName = bizOptJson.getString("sheetName");
         if(StringUtils.isBlank(sheetName)){
             sheetName = "Sheet1";
@@ -62,8 +65,9 @@ public class WriteExcelOperation implements BizOperation {
             String fileDataSetName = bizOptJson.getString("fileDataSet");
             DataSet dataSet2 = bizModel.getDataSet(fileDataSetName);
             if(!(dataSet2 instanceof FileDataSet)){
-                return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_USER_CONFIG,
-                    bizOptJson.getString("SetsName") + "：追加文件数据集配置错误！");
+                return BuiltInOperation.createResponseData(0, 1,
+                    ResponseData.ERROR_USER_CONFIG,
+                    dataOptContext.getI18nMessage("dde.604.data_source_not_found2",fileDataSetName));
             }
             FileDataSet fileDataSet = (FileDataSet)dataSet2;
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileDataSet.getFileInputStream());
@@ -101,8 +105,9 @@ public class WriteExcelOperation implements BizOperation {
         if (StringUtils.endsWithAny(optType,"jxls","excel") && StringUtils.isNotBlank(templateFileId)) {
             InputStream inputStream = fileInfoOpt.loadFileStream(templateFileId);
             if (inputStream == null) {
-                return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION,
-                    bizOptJson.getString("SetsName") + "：Excel模板不存在，请先上传模板！");
+                return BuiltInOperation.createResponseData(0, 1,
+                    ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                    dataOptContext.getI18nMessage("error.701.field_is_blank", "excel template"));
             }
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             if("jxls".equals(optType)){

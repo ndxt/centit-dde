@@ -11,6 +11,7 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,7 +34,9 @@ public class WriteCsvOperation implements BizOperation {
 
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet==null){
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, bizOptJson.getString("SetsName")+"：生成CSV文件异常，请指定数据集！");
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found2", sourDsName));
         }
         InputStream inputStream = CsvDataSet.createCsvStream(dataSet, bizOptJson);
 

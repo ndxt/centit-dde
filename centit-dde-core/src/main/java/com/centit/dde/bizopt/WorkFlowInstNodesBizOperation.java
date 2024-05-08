@@ -11,6 +11,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.service.FlowManager;
@@ -35,7 +36,8 @@ public class WorkFlowInstNodesBizOperation implements BizOperation {
         String id = bizOptJson.getString("id");
         String queryType = bizOptJson.getString("queryType");
         if (StringUtils.isBlank(queryType)) {
-            return ResponseData.makeErrorMessage("请选择获取类别！");
+            return ResponseData.makeErrorMessage(ObjectException.PARAMETER_NOT_CORRECT,
+                dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "queryType"));
         }
         Map<String, Object> queryParam = new HashMap<>(10);
         if (!"ALL".equals(queryType)) {
@@ -46,7 +48,8 @@ public class WorkFlowInstNodesBizOperation implements BizOperation {
             Map<String, Object> fieldMap = CollectionsOpt.objectToMap(fieldInfo);
             String fieldValue = StringBaseOpt.castObjectToString(fieldMap.get("fieldValue"));
             if (StringUtils.isNotBlank(fieldValue)) {
-                String formulaValue = StringBaseOpt.castObjectToString(JSONTransformer.transformer(fieldValue, new BizModelJSONTransform(bizModel)));
+                String formulaValue = StringBaseOpt.castObjectToString(JSONTransformer.transformer(fieldValue,
+                    new BizModelJSONTransform(bizModel)));
                 queryParam.put(StringBaseOpt.castObjectToString(fieldMap.get("fieldName")), formulaValue);
             }
         }

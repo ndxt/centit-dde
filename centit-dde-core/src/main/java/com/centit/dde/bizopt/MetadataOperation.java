@@ -36,7 +36,8 @@ public class MetadataOperation implements BizOperation {
 
     private MetaDataCache metaDataCache;
 
-    public MetadataOperation(MetaObjectService metaObjectService, DataScopePowerManager queryDataScopeFilter, MetaDataCache metaDataCache) {
+    public MetadataOperation(MetaObjectService metaObjectService,
+                             DataScopePowerManager queryDataScopeFilter, MetaDataCache metaDataCache) {
         this.metaObjectService = metaObjectService;
         this.queryDataScopeFilter=queryDataScopeFilter;
         this.metaDataCache=metaDataCache;
@@ -57,7 +58,8 @@ public class MetadataOperation implements BizOperation {
         Map<String, Object> parames;
         // 自定义参数类型
         if("customSource".equals(paramsType)){
-            Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("parameterList"), "key", "value");
+            Map<String, String> mapString = BuiltInOperation.jsonArrayToMap(
+                bizOptJson.getJSONArray("parameterList"), "key", "value");
             parames = new HashMap<>(16);
             if (mapString != null) {
                 for (Map.Entry<String, String> map : mapString.entrySet()) {
@@ -147,7 +149,8 @@ public class MetadataOperation implements BizOperation {
             {
                 String source = bizOptJson.getString("source");
                 if("customSource".equals(paramsType) || StringUtils.isBlank(source)){
-                    throw new ObjectException("批量删除时不能设置为自定义参数形式");
+                    throw new ObjectException(ObjectException.PARAMETER_NOT_CORRECT,
+                       dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "customSource/source"));
                 }
                 DataSet dataSet = bizModel.getDataSet(source);
                 List<Map<String, Object>> delParames = dataSet.getDataAsList();

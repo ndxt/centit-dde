@@ -68,13 +68,13 @@ public class MetadataUpdateOperation implements BizOperation {
             List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit,
                 currentUserCode, dataOptContext.getOptId(), "api");
 
-            if (filters != null && filters.size() > 0) {
+            if (filters != null && !filters.isEmpty()) {
                 DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(currentUserDetails);
                 MetaTable tableInfo = metaObjectService.fetchTableInfo(tableId);
                 for(Map<String, Object> objectMap : optData) {
                     if (tableInfo != null && !dataPowerFilter.checkObject(objectMap, tableInfo.getTableName(), filters)) {
-                        throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR,
-                            "数据范围权限校验不通过，用户：" + currentUserCode + "，校验条件" + JSON.toJSONString(filters) + "。");
+                        throw new ObjectException(ResponseData.ERROR_BAD_PROCESS_DATASCOPE,
+                            dataOptContext.getI18nMessage("dde.707.bad_process_data_scope", JSON.toJSONString(filters)));
                     }
                 }
             }
@@ -122,7 +122,8 @@ public class MetadataUpdateOperation implements BizOperation {
                 }
                 return BuiltInOperation.createResponseSuccessData(updateCount);
             default:
-                return ResponseData.makeErrorMessage("未知操作类型！");
+                return ResponseData.makeErrorMessage(ObjectException.PARAMETER_NOT_CORRECT,
+                    dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "updateType"));
         }
     }
 }

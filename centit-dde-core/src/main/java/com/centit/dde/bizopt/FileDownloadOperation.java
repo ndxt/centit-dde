@@ -45,7 +45,8 @@ public class FileDownloadOperation implements BizOperation {
         String fileName = BuiltInOperation.getJsonFieldString(bizOptJson, ConstantValue.FILE_NAME, "");
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null) {
-            return BuiltInOperation.createResponseData(0, 1, ObjectException.DATA_NOT_FOUND_EXCEPTION,
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
                 dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
         }
         ArrayList<String> fileIds = new ArrayList<>();

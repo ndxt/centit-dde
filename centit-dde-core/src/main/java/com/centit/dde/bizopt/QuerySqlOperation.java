@@ -12,6 +12,7 @@ import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.common.ObjectException;
 
 import java.util.Map;
 
@@ -40,7 +41,9 @@ public class QuerySqlOperation implements BizOperation {
 
         SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
         if (databaseInfo == null) {
-            return BuiltInOperation.createResponseData(0, 1,ResponseData.ERROR_OPERATION, "找不到对应的集成数据库：" + databaseCode);
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.database_not_found", databaseCode));
         }
         SqlDataSetReader sqlDsr = new SqlDataSetReader();
         sqlDsr.setDataSource(databaseInfo);
