@@ -285,7 +285,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             return;
         }
         if (ConstantValue.BRANCH.equals(stepType)) {
-            calcBatchStep(bizModel, dataOptStep);
+            calcBatchStep(bizModel, dataOptStep, dataOptContext);
             return;
         }
         // 模块调用
@@ -330,7 +330,8 @@ public class BizOptFlowImpl implements BizOptFlow {
                 DataSet currentNodeData = bizModel.getDataSet(currentNodeId);
                 if(currentNodeData==null){
                     currentNodeData = new DataSet(currentNodeId,
-                        CollectionsOpt.createHashMap("message", "当前节点没有产生新的数据集"));
+                        CollectionsOpt.createHashMap("message",
+                            dataOptContext.getI18nMessage("dde.705.no_data_was_generated")));
                 }
                 bizData.put("currentNodeData", currentNodeData);
                 bizData.put("dump", dump);
@@ -464,7 +465,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         bizModel.getOptResult().setResultType(DataOptResult.RETURN_OPT_DATA);
     }
 
-    private void calcBatchStep(BizModel bizModel, DataOptStep dataOptStep) {
+    private void calcBatchStep(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext ) {
         JSONObject stepJson = dataOptStep.getCurrentStep();
         stepJson = stepJson.getJSONObject("properties");
         String stepId = stepJson.getString("id");
@@ -493,8 +494,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         // logger.error("当前分支节点("+stepId+")的" + linksJson.size() + "个分支中没有符合业务逻辑的分支、也没有else分支。");
         // dataOptStep.setEndStep();
         throw new ObjectException(stepJson,
-            ResponseData.ERROR_OPERATION,
-            "当前分支节点("+stepId+")的" + linksJson.size() + "个分支中没有符合业务逻辑的分支、也没有else分支。");
+            ResponseData.ERROR_POSTCONDITION_FAILED, //705
+            dataOptContext.getI18nMessage("dde.705.no_follow_up_node", stepId));
     }
 
     private Integer ckeckRangeSet(String expression, BizModelJSONTransform varTrains, Integer defaultValue){
@@ -743,10 +744,12 @@ public class BizOptFlowImpl implements BizOptFlow {
         }
         String taskType = dataPacketInterface.getTaskType();
         if (ConstantValue.TASK_TYPE_TIME.equals(taskType) || ConstantValue.TASK_TYPE_MSG.equals(taskType)) {
-            throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "定时任务或消息触发不支持请求，该类型任务会自动触发！");
+            throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED,
+                dataOptContext.getI18nMessage("dde.405.cant_request_schedule_task"));
         }
         if (dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()) {
-            throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED, "API接口已被禁用，请先恢复！");
+            throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED,
+                dataOptContext.getI18nMessage("dde.405.api_is_disable", packetId));
         }
         DataOptContext moduleOptContext = new DataOptContext(dataOptContext.getMessageSource(), dataOptContext.getLocale());
         moduleOptContext.setTaskLog(dataOptContext.getTaskLog());

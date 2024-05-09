@@ -248,7 +248,8 @@ public class HttpTaskController extends BaseController {
                             "fileContent", inputStream));
                 }
             } else if(StringUtils.contains(contentType, "text/plain")){
-                String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(StandardCharsets.UTF_8));
+                String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(),
+                    String.valueOf(StandardCharsets.UTF_8));
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, bodyString);
             } else if(StringUtils.contains(contentType, "multipart/form-data")){
                 MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
