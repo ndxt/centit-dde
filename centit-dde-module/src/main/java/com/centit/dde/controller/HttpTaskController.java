@@ -456,14 +456,12 @@ public class HttpTaskController extends BaseController {
     @PutMapping(value = "/updateOptId")
     @Transactional(rollbackFor = Exception.class)
     public ResponseData updateOptIdByOptCodes(@RequestBody UpdateOptIdParameter updateOptIdParamVo) {
-        int[] optdefCount = platformEnvironment.updateOptIdByOptCodes(updateOptIdParamVo.getOptId(), Arrays.asList(updateOptIdParamVo.getOptCodes()));
         String[] apiIds = updateOptIdParamVo.getApiIds();
         int[] dataPacketDraftCount = apiIds != null && apiIds.length > 0 ?
             dataPacketDraftService.batchUpdateOptIdByApiId(updateOptIdParamVo.getOptId(), Arrays.asList(apiIds)) : null;
         int[] dataPacketCount = apiIds != null && apiIds.length > 0 ?
             dataPacketService.batchUpdateOptIdByApiId(updateOptIdParamVo.getOptId(), Arrays.asList(apiIds)) : null;
         JSONObject result = new JSONObject();
-        result.put("optdefCount", optdefCount);
         result.put("dataPacketDraftCount", dataPacketDraftCount);
         result.put("dataPacketCount", dataPacketCount);
         return ResponseData.makeSuccessResponse(result.toJSONString());
