@@ -180,6 +180,6 @@ public class CreateWorkFlowBizOperation implements BizOperation {
         if (instance != null) {
             bizModel.putDataSet(id, new DataSet(instance));
         }
-        return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
+        return BuiltInOperation.createResponseSuccessData(1);
     }
 }

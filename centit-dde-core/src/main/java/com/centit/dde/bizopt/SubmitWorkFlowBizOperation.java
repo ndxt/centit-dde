@@ -144,6 +144,6 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
         }
         Map<String, Object> objectMap = flowEngine.submitFlowOpt(submitOptOptions);
         bizModel.putDataSet(id, new DataSet(objectMap));
-        return BuiltInOperation.createResponseSuccessData(bizModel.getDataSet(id).getSize());
+        return BuiltInOperation.createResponseSuccessData(1);
     }
 }
