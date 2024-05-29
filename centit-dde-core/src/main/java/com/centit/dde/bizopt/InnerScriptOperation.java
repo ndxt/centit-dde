@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author zhf
  */
-public class InnerJSOperation implements BizOperation {
+public class InnerScriptOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", "js");

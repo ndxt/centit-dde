@@ -148,7 +148,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("static", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runStaticData(bizModel, bizOptJson));
         allOperations.put("http", new HttpServiceOperation(sourceInfoDao));
         allOperations.put("clear", new ClearDataOperation());
-        allOperations.put("js", new InnerJSOperation());
+        allOperations.put("js", new InnerScriptOperation());
         allOperations.put("persistence", new PersistenceDBOperation(/*path,*/ sourceInfoDao, metaDataService));
         allOperations.put("database", new QuerySqlOperation(sourceInfoDao, queryDataScopeFilter));
         allOperations.put("excel", new ReadExcelOperation());
