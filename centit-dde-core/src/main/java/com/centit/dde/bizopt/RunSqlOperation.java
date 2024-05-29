@@ -19,7 +19,9 @@ import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,19 +60,37 @@ public class RunSqlOperation implements BizOperation {
                     ObjectException.PARAMETER_NOT_CORRECT,
                     dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "sql sentence"));
             }
-            Map<String, Object> params = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
-            QueryAndNamedParams qap = QueryUtils.translateQuery(sql, params);
-            Map<String, Object> paramsMap = new HashMap<>(params == null ? 0 : params.size() + 6);
-            if (params != null) {
-                paramsMap.putAll(params);
-                paramsMap.putAll(qap.getParams());
-                qap.setParams(paramsMap);
+            List<Map<String, Object>> optData;
+            if(!"customSource".equals(bizOptJson.getString("sourceType"))){
+                //考虑批量操作
+                optData = DataSetOptUtil.fetchDataSet(bizModel, bizOptJson);
+                if(optData==null)
+                    throw new ObjectException(ObjectException.PARAMETER_NOT_CORRECT,
+                        dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "source data"));
+            } else {
+                // 获取单个参数
+                Map<String, Object> params = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
+                optData = new ArrayList<>(2);
+                optData.add(params);
             }
+            Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(
+                sourceInfoDao.getDatabaseInfoById((databaseCode)));
 
-            QueryAndParams q = QueryAndParams.createFromQueryAndNamedParams(qap);
-            Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfoDao.getDatabaseInfoById((databaseCode)));
-            count = DatabaseAccess.doExecuteSql(conn, q.getQuery(), q.getParams());
-            bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(qap));
+            for(Map<String, Object> params : optData) {
+                QueryAndNamedParams qap = QueryUtils.translateQuery(sql, params);
+                Map<String, Object> paramsMap = new HashMap<>(params == null ? 0 : params.size() + 6);
+                if (params != null) {
+                    paramsMap.putAll(params);
+                    paramsMap.putAll(qap.getParams());
+                    qap.setParams(paramsMap);
+                }
+
+                QueryAndParams q = QueryAndParams.createFromQueryAndNamedParams(qap);
+                if(count==0) {
+                    bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(qap));
+                }
+                count += DatabaseAccess.doExecuteSql(conn, q.getQuery(), q.getParams());
+            }
         }
         return BuiltInOperation.createResponseSuccessData(count);
     }

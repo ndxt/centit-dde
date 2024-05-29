@@ -1107,6 +1107,8 @@ public abstract class DataSetOptUtil {
     public static List<Map<String, Object>> fetchDataSet(BizModel bizModel, JSONObject bizOptJson) {
         String source = bizOptJson.getString("source");
         DataSet dataSet = bizModel.getDataSet(StringUtils.isBlank(source) ? ConstantValue.REQUEST_PARAMS_TAG : source);
+        if(dataSet==null)
+            return null;
         return dataSet.getDataAsList();
     }
 
