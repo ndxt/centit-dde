@@ -142,7 +142,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("sort", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runSort(bizModel, bizOptJson));
         allOperations.put("sortAsTree", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runSortAsTree(bizModel, bizOptJson));
         allOperations.put("toTree", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runToTree(bizModel, bizOptJson));
-        allOperations.put("join", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runJoin(bizModel, bizOptJson));
+        allOperations.put("join", new JoinDataOperation());
         allOperations.put("union", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runUnion(bizModel, bizOptJson));
         allOperations.put("check", new CheckRuleOperation(dataCheckRuleService));
         allOperations.put("static", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runStaticData(bizModel, bizOptJson));
