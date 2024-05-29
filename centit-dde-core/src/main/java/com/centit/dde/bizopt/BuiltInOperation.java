@@ -315,23 +315,6 @@ public abstract class BuiltInOperation {
         return createResponseSuccessData(destDs.getSize());
     }
 
-    public static ResponseData runJoin(BizModel bizModel, JSONObject bizOptJson) {
-        String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
-        String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);
-        String join = getJsonFieldString(bizOptJson, "operation", "join");
-        Map<String, String> map = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("configfield"), "primaryKey1", "primaryKey2");
-        if (map != null) {
-            DataSet dataSet = bizModel.getDataSet(sour1DsName);
-            DataSet dataSet2 = bizModel.getDataSet(sour2DsName);
-            DataSet destDs = DataSetOptUtil.joinTwoDataSet(dataSet, dataSet2, new ArrayList<>(map.entrySet()), join);
-            if (destDs != null) {
-                bizModel.putDataSet(getJsonFieldString(bizOptJson, "id", bizModel.getModelName()), destDs);
-                return createResponseSuccessData(destDs.getSize());
-            }
-        }
-        return createResponseSuccessData(0);
-    }
-
     public static ResponseData runUnion(BizModel bizModel, JSONObject bizOptJson) {
         String sour1DsName = getJsonFieldString(bizOptJson, "source1", null);
         String sour2DsName = getJsonFieldString(bizOptJson, "source2", null);

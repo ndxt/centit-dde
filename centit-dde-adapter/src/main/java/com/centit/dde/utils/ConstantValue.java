@@ -120,10 +120,11 @@ public class ConstantValue {
     //定时任务
     public static final String TASK_TYPE_TIME="2";
 
-    public static final String DATASET_JOIN_TYPE_INNER = "innerjoin";
-    public static final String DATASET_JOIN_TYPE_LEFT = "leftjoin";
-    public static final String DATASET_JOIN_TYPE_RIGHT = "rightjoin";
-    public static final String DATASET_JOIN_TYPE_ALL = "alljoin";
+    public static final String DATASET_JOIN_TYPE_INNER = "innerJoin";// join
+    public static final String DATASET_JOIN_TYPE_APPEND = "leftAppend";
+    public static final String DATASET_JOIN_TYPE_LEFT = "leftJoin";
+    public static final String DATASET_JOIN_TYPE_RIGHT = "rightJoin";
+    public static final String DATASET_JOIN_TYPE_ALL = "allJoin";
 
     //可以2个都选，但是必须选择其中一个
     public static final String CHECK_RULE_RESULT_TAG = "__check_rule_result";

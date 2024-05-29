@@ -636,6 +636,26 @@ public abstract class DataSetOptUtil {
         }
     }
 
+    public static DataSet leftAppendTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet, List<Map.Entry<String, String>> primaryFields) {
+        if (slaveDataSet == null || mainDataSet == null) {
+            return mainDataSet;
+        }
+        List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
+        List<Map<String, Object>> newData = new ArrayList<>();
+        for(Map<String, Object> leftRow : mainDataSet.getDataAsList()){
+            Map<String, Object> newRow = new LinkedHashMap<>();
+            for(Map<String, Object> rightRow : slaveData){
+                if(compareTwoRowWithMap(leftRow, rightRow, primaryFields, SORT_NULL_AS_FIRST) == 0) {
+                    newRow.putAll(rightRow);
+                    break;
+                }
+            }
+            newRow.putAll(leftRow);
+            newData.add(newRow);
+        }
+        return new DataSet(newData);
+    }
+
     /**
      * 合并两个数据集; 类似于 数据的 join， 但是不同的是 如果有相同的字段 以mainDataSet为准，
      * 连接字段最好是主键（或者唯一），否则系统会保证多的哪个dataSet被加入，但不一定会被连接
@@ -647,14 +667,20 @@ public abstract class DataSetOptUtil {
      * @return DataSet
      */
     public static DataSet joinTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet, List<Map.Entry<String, String>> primaryFields, String join) {
+        final boolean leftJoin = ConstantValue.DATASET_JOIN_TYPE_LEFT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join);
+        final boolean rightJoin = ConstantValue.DATASET_JOIN_TYPE_RIGHT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join);
         if (mainDataSet == null) {
-            return slaveDataSet;
+            if(rightJoin)
+                return slaveDataSet;
+            return null;
         }
         if (slaveDataSet == null) {
-            return mainDataSet;
+            if(leftJoin)
+                return mainDataSet;
+            return null;
         }
-        List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
-        List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
+        List<Map<String, Object>> mainData = CollectionsOpt.cloneList(mainDataSet.getDataAsList());
+        List<Map<String, Object>> slaveData = CollectionsOpt.cloneList(slaveDataSet.getDataAsList());
         List<String> mainFields = new ArrayList<>();
         List<String> slaveFields = new ArrayList<>();
         splitMainAndSlave(primaryFields, mainFields, slaveFields);
@@ -664,8 +690,6 @@ public abstract class DataSetOptUtil {
         int j = 0;
         List<Map<String, Object>> newData = new ArrayList<>();
 
-        final boolean leftJoin = ConstantValue.DATASET_JOIN_TYPE_LEFT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join);
-        final boolean rightJoin = ConstantValue.DATASET_JOIN_TYPE_RIGHT.equalsIgnoreCase(join) || ConstantValue.DATASET_JOIN_TYPE_ALL.equalsIgnoreCase(join);
         while (i < mainData.size() && j < slaveData.size()) {
             int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_FIRST);
             Map<String, Object> newRow = new LinkedHashMap<>();
@@ -757,8 +781,8 @@ public abstract class DataSetOptUtil {
         if (slaveDataSet == null) {
             return null;
         }
-        List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
-        List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
+        List<Map<String, Object>> mainData = CollectionsOpt.cloneList(mainDataSet.getDataAsList());
+        List<Map<String, Object>> slaveData = CollectionsOpt.cloneList(slaveDataSet.getDataAsList());
         List<String> mainFields = new ArrayList<>();
         List<String> slaveFields = new ArrayList<>();
         splitMainAndSlave(primaryFields, mainFields, slaveFields);
@@ -806,8 +830,8 @@ public abstract class DataSetOptUtil {
         if (slaveDataSet == null) {
             return mainDataSet;
         }
-        List<Map<String, Object>> mainData = mainDataSet.getDataAsList();
-        List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
+        List<Map<String, Object>> mainData = CollectionsOpt.cloneList(mainDataSet.getDataAsList());
+        List<Map<String, Object>> slaveData = CollectionsOpt.cloneList(slaveDataSet.getDataAsList());
         List<String> mainFields = new ArrayList<>();
         List<String> slaveFields = new ArrayList<>();
         splitMainAndSlave(primaryFields, mainFields, slaveFields);
