@@ -31,7 +31,7 @@ public class InnerJSOperation implements BizOperation {
             runtimeContext.compileScript(javaScript);
         }
         int count = 0;
-        Object object = runtimeContext.callJsFunc("runOpt", bizModel);
+        Object object = runtimeContext.callFunc("runOpt", bizModel);
         bizModel.putDataSet(targetDsName, DataSet.toDataSet(object));
         if (object != null) {
             count = bizModel.getDataSet(targetDsName).getSize();
