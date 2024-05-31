@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
@@ -92,7 +93,7 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                 String roleCode = StringBaseOpt.objectToString(roleMap.get("roleCode"));
                 Object expression = roleMap.get("expression");
                 if (expression != null) {
-                    Object transform = JSONTransformer.transformer(expression,bizModelJSONTransform);
+                    Object transform = JSONTransformer.transformer(expression, bizModelJSONTransform);
                     flowRoleUsers.put(roleCode, StringBaseOpt.objectToStringList(transform));
                 }
             }
@@ -109,32 +110,56 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
                     Object value = JSONTransformer.transformer(expression, bizModelJSONTransform);
                     switch (columnName) {
                         case "grantorCode":
-                            submitOptOptions.setGrantorCode(StringBaseOpt.objectToString(value));
+                            submitOptOptions.setGrantorCode(StringBaseOpt.castObjectToString(
+                                JSONTransformer.transformer(StringBaseOpt.objectToString(value), bizModelJSONTransform)));
                             break;
                         case "lockOptUser":
-                            submitOptOptions.setLockOptUser(BooleanBaseOpt.castObjectToBoolean(value));
+                            submitOptOptions.setLockOptUser(BooleanBaseOpt.castObjectToBoolean(
+                                JSONTransformer.transformer(StringBaseOpt.objectToString(value), bizModelJSONTransform)));
                             break;
                         case "workUserCode":
-                            submitOptOptions.setWorkUserCode(StringBaseOpt.objectToString(value));
+                            submitOptOptions.setWorkUserCode(StringBaseOpt.castObjectToString(
+                                JSONTransformer.transformer(StringBaseOpt.objectToString(value), bizModelJSONTransform)));
                             break;
-                        case "flowOrganizes":
+                        case "flowOptName":
+                            submitOptOptions.setFlowOptName(StringBaseOpt.castObjectToString(
+                                JSONTransformer.transformer(StringBaseOpt.objectToString(value), bizModelJSONTransform)));
+                            break;
+                        case "flowOrganizes": {
+                            String jsonValue = StringBaseOpt.objectToString(value);
+                            Object data =
+                                JSONTransformer.transformer(jsonValue.startsWith("{") || jsonValue.startsWith("[") ?
+                                    JSON.parse(jsonValue) : jsonValue, new BizModelJSONTransform(bizModel));
+
                             Map<String, List<String>> flowOrganizes = CollectionsOpt.translateMapType(
-                                CollectionsOpt.objectToMap(value),
+                                CollectionsOpt.objectToMap(data),
                                 StringBaseOpt::objectToString,
                                 StringBaseOpt::objectToStringList);
+
                             submitOptOptions.setFlowOrganizes(flowOrganizes);
+                        }
                             break;
-                        case "nodeUnits":
+                        case "nodeUnits": {
+                            String jsonValue = StringBaseOpt.objectToString(value);
+                            Object data =
+                                JSONTransformer.transformer(jsonValue.startsWith("{") || jsonValue.startsWith("[") ?
+                                    JSON.parse(jsonValue) : jsonValue, new BizModelJSONTransform(bizModel));
                             Map<String, String> nodeUnits = CollectionsOpt.objectMapToStringMap(
-                                CollectionsOpt.objectToMap(value));
+                                CollectionsOpt.objectToMap(data));
                             submitOptOptions.setNodeUnits(nodeUnits);
+                        }
                             break;
-                        case "nodeOptUsers":
+                        case "nodeOptUsers": {
+                            String jsonValue = StringBaseOpt.objectToString(value);
+                            Object data =
+                                JSONTransformer.transformer(jsonValue.startsWith("{") || jsonValue.startsWith("[") ?
+                                    JSON.parse(jsonValue) : jsonValue, new BizModelJSONTransform(bizModel));
                             Map<String, Set<String>> nodeOptUsers = CollectionsOpt.translateMapType(
-                                CollectionsOpt.objectToMap(value),
+                                CollectionsOpt.objectToMap(data),
                                 StringBaseOpt::objectToString,
                                 StringBaseOpt::objectToStringSet);
                             submitOptOptions.setNodeOptUsers(nodeOptUsers);
+                        }
                             break;
                         default:
                             break;
