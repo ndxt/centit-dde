@@ -1,5 +1,6 @@
 package com.centit.dde.dataset;
 
+import com.alibaba.fastjson2.JSON;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetWriter;
@@ -8,7 +9,6 @@ import com.centit.product.metadata.api.ISourceInfo;
 import com.centit.product.metadata.po.MetaTable;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.common.ObjectException;
-import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,6 @@ import java.util.Map;
  *
  * @author zhf
  */
-@Data
 public class SqlDataSetWriter implements DataSetWriter {
     private static final Logger logger = LoggerFactory.getLogger(SqlDataSetWriter.class);
 
@@ -33,7 +32,7 @@ public class SqlDataSetWriter implements DataSetWriter {
     private Map fieldsMap;
     private int successNums;
     private int errorNums;
-    private String info;
+    private StringBuilder operateMessage;
     private String writeTag;
     private String writeMsg;
 
@@ -60,6 +59,7 @@ public class SqlDataSetWriter implements DataSetWriter {
         this.dataSource = dataSource;
         this.writeMsg = writeMsg;
         this.writeTag = writeTag;
+        this.operateMessage = new StringBuilder();
     }
 
     private void fetchConnect() {
@@ -86,7 +86,6 @@ public class SqlDataSetWriter implements DataSetWriter {
                     tableInfo, dataSet.getDataAsList(), fieldsMap);
                 successNums = 0;
                 errorNums = 0;
-                info = "ok";
                 for (Map<String, Object> row : dataSet.getDataAsList()) {
                     dealResultMsg(row);
                     successNums++;
@@ -98,7 +97,6 @@ public class SqlDataSetWriter implements DataSetWriter {
             /* 这部分也可以 直接运行sql语句 而不是用 GeneralJsonObjectDao 方式来提高效率 */
             successNums = 0;
             errorNums = 0;
-            info = "ok";
 
             for (Map<String, Object> row : dataSet.getDataAsList()) {
                 try {
@@ -117,9 +115,8 @@ public class SqlDataSetWriter implements DataSetWriter {
                     row.put(writeTag,false);
                     row.put(writeMsg, e.getMessage());
                     errorNums++;
-                    if ((info.length() + e.getMessage().length()) <= 2000) {
-                        info = info.concat(e.getMessage());
-                    }
+                    operateMessage.append(e.getMessage()).append("\r\n")
+                        .append(JSON.toJSONString(row)).append("\r\n");
                 }
             }
         }
@@ -142,7 +139,6 @@ public class SqlDataSetWriter implements DataSetWriter {
                     tableInfo, dataSet.getDataAsList(), fieldsMap);
                 successNums = 0;
                 errorNums = 0;
-                info = "ok";
                 for (Map<String, Object> row : dataSet.getDataAsList()) {
                     dealResultMsg(row);
                     successNums++;
@@ -153,7 +149,6 @@ public class SqlDataSetWriter implements DataSetWriter {
         } else {
             successNums = 0;
             errorNums = 0;
-            info = "ok";
             for (Map<String, Object> row : dataSet.getDataAsList()) {
                 try {
                     int iResult = DBBatchUtils.mergeObject(bizModel, connection,
@@ -171,9 +166,10 @@ public class SqlDataSetWriter implements DataSetWriter {
                     row.put(writeTag,false);
                     row.put(writeMsg, e.getMessage());
                     errorNums++;
-                    if ((info.length() + e.getMessage().length()) <= 2000) {
-                        info = info.concat(e.getMessage());
-                    }
+
+                    operateMessage.append(e.getMessage()).append("\r\n")
+                        .append(JSON.toJSONString(row)).append("\r\n");
+
                 }
             }
 
@@ -188,7 +184,7 @@ public class SqlDataSetWriter implements DataSetWriter {
     private void dealWholeException(DataSet dataSet, SQLException e) {
         successNums = 0;
         errorNums = 0;
-        info = e.getMessage();
+        operateMessage.append(e.getMessage()).append("\r\n");
         for (Map<String, Object> row : dataSet.getDataAsList()) {
             row.put(writeTag,false);
             row.put(writeMsg, e.getMessage());
@@ -198,5 +194,19 @@ public class SqlDataSetWriter implements DataSetWriter {
 
     public void setSaveAsWhole(boolean saveAsWhole) {
         this.saveAsWhole = saveAsWhole;
+    }
+
+    public int getSuccessNums() {
+        return successNums;
+    }
+
+    public int getErrorNums() {
+        return errorNums;
+    }
+
+    public String getOperateMessage() {
+        if(operateMessage.length()<1)
+            return "ok";
+        return operateMessage.toString();
     }
 }

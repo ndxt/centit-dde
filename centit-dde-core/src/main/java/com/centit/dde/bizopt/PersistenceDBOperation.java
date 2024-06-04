@@ -124,7 +124,7 @@ public class PersistenceDBOperation implements BizOperation {
         }
         if (dataSetWriter.getErrorNums() > 0) {
             return BuiltInOperation.createResponseData(dataSetWriter.getSuccessNums(), dataSetWriter.getErrorNums(),
-                ResponseData.ERROR_PROCESS_ERROR, dataSetWriter.getInfo());
+                ResponseData.ERROR_PROCESS_ERROR, dataSetWriter.getOperateMessage());
         }
         return BuiltInOperation.createResponseSuccessData(dataSetWriter.getSuccessNums());
     }

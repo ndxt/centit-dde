@@ -105,7 +105,7 @@ public abstract class DBBatchUtils {
         int rowCount = objects.size();
 
         QueryLogUtils.printSql(logger, sqlPair.getLeft(), sqlPair.getRight());
-
+        Map<String, Object> currentOptData = null;
         if(tableInfo.hasGeneratedKeys()){ //批量插入 并找回主键
             MetaColumn column = tableInfo.fetchGeneratedKey();
             try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft(), Statement.RETURN_GENERATED_KEYS)) {
@@ -115,6 +115,7 @@ public abstract class DBBatchUtils {
                         prepareObjectForSave(tableInfo, fieldsMap != null  && fieldsMap.size()>0?
                             DataSetOptUtil.mapDataRow(bizModel, object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
                     savedObjects.add(object);
+                    currentOptData = objectForSave;
                     DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), objectForSave);
                     rowIndex++;
                     stmt.addBatch();
@@ -134,7 +135,7 @@ public abstract class DBBatchUtils {
                     stmt.clearBatch();
                 }
             } catch (SQLException e) {
-                throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
+                throw DatabaseAccess.createAccessExceptionWithData(sqlPair.getLeft(), e, currentOptData);
             }
         } else { //批量插入
             try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())) {
@@ -142,7 +143,7 @@ public abstract class DBBatchUtils {
                     Map<String, Object> objectForSave =
                         prepareObjectForSave(tableInfo, fieldsMap != null  && fieldsMap.size()>0?
                             DataSetOptUtil.mapDataRow(bizModel, object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
-
+                    currentOptData = objectForSave;
                     DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), objectForSave);
                     rowIndex++;
                     stmt.addBatch();
@@ -156,7 +157,7 @@ public abstract class DBBatchUtils {
                     stmt.clearBatch();
                 }
             } catch (SQLException e) {
-                throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
+                throw DatabaseAccess.createAccessExceptionWithData(sqlPair.getLeft(), e, currentOptData);
             }
         }
         return rowIndex;
@@ -258,7 +259,7 @@ public abstract class DBBatchUtils {
         boolean exists = false;
         PreparedStatement insertStmt = null;
         PreparedStatement updateStmt = null;
-
+        Map<String, Object> currentOptData = null;
         MetaColumn column = tableInfo.fetchGeneratedKey();
         boolean needFetchId = tableInfo.hasGeneratedKeys() && column!=null;
         try (PreparedStatement checkStmt = conn.prepareStatement(checkSqlPair.getLeft())) {
@@ -285,7 +286,7 @@ public abstract class DBBatchUtils {
                 Map<String, Object> objectForSave =
                     prepareObjectForSave(tableInfo,fieldsMap != null && fieldsMap.size()>0?
                         DataSetOptUtil.mapDataRow(bizModel, object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
-
+                currentOptData = objectForSave;
                 rowIndex++;
                 DatabaseAccess.setQueryStmtParameters(checkStmt, checkSqlPair.getRight(), objectForSave);
                 ResultSet rs = checkStmt.executeQuery();
@@ -346,9 +347,9 @@ public abstract class DBBatchUtils {
             }
         } catch (SQLException e) {
             if (exists) {
-                throw DatabaseAccess.createAccessException(updateSqlPair.getLeft(), e);
+                throw DatabaseAccess.createAccessExceptionWithData(updateSqlPair.getLeft(), e, currentOptData);
             } else {
-                throw DatabaseAccess.createAccessException(insertSqlPair.getLeft(), e);
+                throw DatabaseAccess.createAccessExceptionWithData(insertSqlPair.getLeft(), e, currentOptData);
             }
         }finally {
             if (updateStmt != null){
