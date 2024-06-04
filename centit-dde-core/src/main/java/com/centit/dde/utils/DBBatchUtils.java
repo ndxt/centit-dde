@@ -76,15 +76,11 @@ public abstract class DBBatchUtils {
                     object.put(column.getPropertyName(), rs.getObject(1));
                     rs.close();
                 }
-            } catch (SQLException e) {
-                throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
             }
         } else { //插入
             try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())) {
                 DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), objectForSave);
                 stmt.executeUpdate();
-            } catch (SQLException e) {
-                throw DatabaseAccess.createAccessException(sqlPair.getLeft(), e);
             }
         }
         return 1;
