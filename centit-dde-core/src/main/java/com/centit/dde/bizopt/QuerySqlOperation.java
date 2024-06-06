@@ -45,7 +45,7 @@ public class QuerySqlOperation implements BizOperation {
                 ObjectException.DATA_NOT_FOUND_EXCEPTION,
                 dataOptContext.getI18nMessage("dde.604.database_not_found", databaseCode));
         }
-        SqlDataSetReader sqlDsr = new SqlDataSetReader();
+        SqlDataSetReader sqlDsr = new SqlDataSetReader(bizOptJson);
         sqlDsr.setDataSource(databaseInfo);
         sqlDsr.setSqlSen(sql);
         sqlDsr.setQueryDataScopeFilter(queryDataScopeFilter);

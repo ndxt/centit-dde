@@ -50,6 +50,9 @@ public class RunSqlOperation implements BizOperation {
                     databaseCode = jsonObject.getJSONObject("databaseName").getString("value");
                 }
                 Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfoDao.getDatabaseInfoById((databaseCode)));
+                if(count==0) {
+                    bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(q));
+                }
                 count += DatabaseAccess.doExecuteSql(conn, q.getQuery(), q.getParams());
             }
         } else {
