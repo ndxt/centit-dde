@@ -51,7 +51,6 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 @ComponentScan(basePackages = "com.centit",
     excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION,
         value = org.springframework.stereotype.Controller.class))
-
 @EnableNacosConfig(globalProperties = @NacosProperties(serverAddr = "${nacos.server-addr}"))
 @NacosPropertySources({@NacosPropertySource(dataId = "${nacos.system-dataid}", groupId = "CENTIT", autoRefreshed = true)})
 public class ServiceConfig implements EnvironmentAware {
@@ -91,7 +90,7 @@ public class ServiceConfig implements EnvironmentAware {
     }
 
     @Bean
-    MessageSource messageSource() {
+    public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource ms = new ReloadableResourceBundleMessageSource();
         ms.setUseCodeAsDefaultMessage(true);
         ms.setBasenames("classpath:i18n/messages", "classpath:i18n/dde",
