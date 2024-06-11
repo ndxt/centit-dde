@@ -19,7 +19,6 @@ import com.centit.framework.security.StandardPasswordEncoderImpl;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.utils.ImagePdfTextExtractor;
 import com.centit.support.algorithm.NumberBaseOpt;
-import io.lettuce.core.RedisClient;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,14 +55,8 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 public class ServiceConfig implements EnvironmentAware {
     Logger logger = LoggerFactory.getLogger(ServiceConfig.class);
 
-    @Value("${app.home:./}")
-    private String appHome;
-
     @Value("${fileserver.url}")
     private String fileserver;
-
-    @Value("${redis.default.host}")
-    private String redisHost;
 
     protected Environment env;
 
@@ -102,11 +95,6 @@ public class ServiceConfig implements EnvironmentAware {
     @Bean
     public LocalValidatorFactoryBean validatorFactory() {
         return new LocalValidatorFactoryBean();
-    }
-
-    @Bean
-    public RedisClient redisClient() {
-        return RedisClient.create(redisHost);
     }
 
     @Bean

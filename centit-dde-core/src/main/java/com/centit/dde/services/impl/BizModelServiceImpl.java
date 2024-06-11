@@ -8,21 +8,21 @@ import com.centit.dde.core.DataOptResult;
 import com.centit.dde.services.BizModelService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.support.security.Md5Encoder;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.sync.RedisCommands;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author zhf
  */
 @Service
 public class BizModelServiceImpl implements BizModelService {
+
     @Autowired(required = false)
-    private RedisClient redisClient;
+    private RedisTemplate<String, Object> objectRedisTemplate;
 
     @Autowired
     private TaskRun taskRun;
@@ -52,7 +52,7 @@ public class BizModelServiceImpl implements BizModelService {
     }
 
     private boolean notNeedBuf(DataPacketInterface dataPacket) {
-        return redisClient == null
+        return objectRedisTemplate == null
             //|| ! ConstantValue.TASK_TYPE_GET.equals(dataPacket.getTaskType())
             || dataPacket.getBufferFreshPeriodType() == null
             || dataPacket.getBufferFreshPeriodType() == ConstantValue.MINUS_ONE
@@ -61,12 +61,7 @@ public class BizModelServiceImpl implements BizModelService {
     }
 
     private Object fetchBizModelFromBuf(String key) {
-        String strObj;
-        StatefulRedisConnection<String, String> connection = redisClient.connect();
-        RedisCommands<String, String> commands = connection.sync();
-        strObj = commands.get(key);
-        connection.close();
-        return JSON.parse(strObj);
+        return objectRedisTemplate.opsForValue().get(key);
     }
 
     private String makeDataPacketBufId(DataPacketInterface dataPacket, Map<String, Object> paramsMap) {
@@ -81,28 +76,25 @@ public class BizModelServiceImpl implements BizModelService {
     }
 
     private void setBizModelBuf(Object returnData, DataPacketInterface dataPacket, String key) {
-        if (notNeedBuf(dataPacket)) {
+        if (notNeedBuf(dataPacket) || returnData == null) {
             return;
         }
-        StatefulRedisConnection<String, String> connection = redisClient.connect();
-        RedisCommands<String, String> commands = connection.sync();
-        commands.set(key, JSON.toJSONString(returnData));
         int seconds = dataPacket.getBufferFreshPeriod();
         int iPeriod = dataPacket.getBufferFreshPeriodType();
         //按分
         if (iPeriod == ConstantValue.ONE) {
-            commands.expire(key, seconds * 60);
+            objectRedisTemplate.opsForValue().set(key, returnData, seconds, TimeUnit.MINUTES);
         }
         //按时
         else if (iPeriod == ConstantValue.TWO) {
-            commands.expire(key, seconds * 3600);
+            objectRedisTemplate.opsForValue().set(key, returnData, seconds, TimeUnit.HOURS);
         }
         //按天
         else if (iPeriod == ConstantValue.THREE) {
-            int days = seconds * 24 * 3600;
-            commands.expire(key, days);
+            objectRedisTemplate.opsForValue().set(key, returnData, seconds, TimeUnit.DAYS);
+        } else {
+            objectRedisTemplate.opsForValue().set(key, returnData);
         }
-        connection.close();
     }
 
 }
