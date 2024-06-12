@@ -4,10 +4,13 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.model.basedata.WorkGroup;
 import com.centit.support.common.ObjectException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 public class LoginUserPermissionCheck {
 
@@ -25,7 +28,8 @@ public class LoginUserPermissionCheck {
             throw new ObjectException(ResponseData.HTTP_MOVE_TEMPORARILY,
                 controller.getI18nMessage( "error.302.user_not_login", request));
         }
-        if (!platformEnvironment.loginUserIsExistWorkGroup(osId, loginUser)){
+        List<WorkGroup> userGroups = platformEnvironment.listWorkGroup(osId, loginUser, null);
+        if(CollectionUtils.isEmpty(userGroups)){
             throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION,
                 controller.getI18nMessage( "error.403.access_forbidden", request));
         }

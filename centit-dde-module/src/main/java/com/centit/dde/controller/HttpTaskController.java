@@ -22,6 +22,7 @@ import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OsInfo;
+import com.centit.framework.model.basedata.WorkGroup;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
@@ -33,6 +34,7 @@ import com.centit.support.compiler.VariableFormula;
 import com.centit.support.file.FileIOOpt;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -152,7 +154,8 @@ public class HttpTaskController extends BaseController {
                     getI18nMessage( "error.302.user_not_login", request));
             }
             DataPacketInterface dataPacket = dataPacketDraftService.getDataPacket(packetId);
-            if (!platformEnvironment.loginUserIsExistWorkGroup(dataPacket.getOsId(), loginUser)) {
+            List<WorkGroup> userGroups = platformEnvironment.listWorkGroup(dataPacket.getOsId(), loginUser, null);
+            if(CollectionUtils.isEmpty(userGroups)){
                 throw new ObjectException(ResponseData.HTTP_NON_AUTHORITATIVE_INFORMATION,
                     getI18nMessage( "error.403.access_forbidden", request));
             }
