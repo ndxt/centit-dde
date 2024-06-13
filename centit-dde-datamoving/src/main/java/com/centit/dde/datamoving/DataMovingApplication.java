@@ -17,6 +17,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+
+import java.util.Locale;
 
 /**
  * @author zhf
@@ -42,13 +45,20 @@ public class DataMovingApplication {
         if (args == null || args.length < 1) {
             return;
         }
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setUseCodeAsDefaultMessage(true);
+        //"classpath:org/springframework/security/messages"
+        messageSource.setBasenames("classpath:i18n/messages", "classpath:i18n/workflow", "classpath:i18n/dde",
+            "classpath:org/springframework/security/messages");
+        messageSource.setDefaultEncoding("UTF-8");
+
         ConfigurableApplicationContext context = SpringApplication.run(DataMovingApplication.class, args);
         TaskRun taskRun = context.getBean(TaskRun.class);
         DataPacketService dataPacketService = context.getBean(DataPacketService.class);
         DataPacket dataPacket = dataPacketService.getDataPacket(args[0]);
 
         PlatformEnvironment platformEnvironment = context.getBean(PlatformEnvironment.class);
-        DataOptContext optContext = new DataOptContext();
+        DataOptContext optContext = new DataOptContext(messageSource, Locale.SIMPLIFIED_CHINESE);
         OsInfo osInfo =platformEnvironment.getOsInfo(dataPacket.getOsId());
         optContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
         optContext.setTopUnit(osInfo.getTopUnit());
