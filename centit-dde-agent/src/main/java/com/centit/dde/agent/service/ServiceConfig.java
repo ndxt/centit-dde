@@ -14,7 +14,9 @@ import com.centit.framework.security.StandardPasswordEncoderImpl;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.utils.ImagePdfTextExtractor;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.security.SecurityOptUtils;
 import com.centit.workflow.service.impl.SystemUserUnitCalcContextFactoryImpl;
+import io.lettuce.core.RedisClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
@@ -139,4 +141,18 @@ public class ServiceConfig implements EnvironmentAware {
         return fileStoreBean;
     }
 
+    @Bean
+    public RedisClient redisClient() {
+        String host = env.getProperty("redis.default.host");
+        Integer port = NumberBaseOpt.castObjectToInteger(env.getProperty("redis.default.port"), 6379);
+        String password = env.getProperty("redis.default.password");
+        Integer database =  NumberBaseOpt.castObjectToInteger(env.getProperty("redis.default.database"), 0);
+        // redis:[password@]host[:port][/database]
+        StringBuilder redisUri = new StringBuilder("redis://");
+        if (StringUtils.isNotBlank(password)) {
+            redisUri.append(SecurityOptUtils.decodeSecurityString(password)).append("@");
+        }
+        redisUri.append(host).append(":").append(port).append("/").append(database);
+        return RedisClient.create(redisUri.toString());
+    }
 }

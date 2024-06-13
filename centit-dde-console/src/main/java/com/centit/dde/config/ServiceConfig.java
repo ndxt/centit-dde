@@ -15,6 +15,7 @@ import com.centit.framework.dubbo.config.DubboConfig;
 import com.centit.framework.dubbo.config.IpServerDubboClientConfig;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
+import com.centit.framework.redis.config.RedisClientConfig;
 import com.centit.framework.security.StandardPasswordEncoderImpl;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.utils.ImagePdfTextExtractor;
@@ -44,9 +45,10 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 @PropertySource("classpath:system.properties")
 @Import({
     DubboConfig.class,
+    JdbcConfig.class,
+    RedisClientConfig.class,
     IpServerDubboClientConfig.class,
-    SpringSecurityDaoConfig.class,
-    JdbcConfig.class})
+    SpringSecurityDaoConfig.class})
 @ComponentScan(basePackages = "com.centit",
     excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION,
         value = org.springframework.stereotype.Controller.class))

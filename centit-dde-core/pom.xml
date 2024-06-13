@@ -42,11 +42,6 @@
             <version>${revision}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>centit-persistence-redis-config</artifactId>
-            <version>${revision}</version>
-        </dependency>
 
         <dependency>
             <groupId>com.centit.framework</groupId>
