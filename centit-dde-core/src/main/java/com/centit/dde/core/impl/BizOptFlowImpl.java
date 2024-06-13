@@ -633,27 +633,29 @@ public class BizOptFlowImpl implements BizOptFlow {
         ResponseData responseData;
         try {
             responseData = opt.runOpt(bizModel, bizOptJson, dataOptContext);
-        } catch (Exception e) {
+        } catch (Exception runOptException) {
+            //记录异常日志信息
+            TaskDetailLog detailLog = BizOptUtils.createLogDetail(bizOptJson, dataOptContext);
+            String errMsg = ObjectException.extortExceptionMessage(runOptException);
+            detailLog.setLogInfo(errMsg);
+            detailLog.setRunBeginTime(runBeginTime);
+
             boolean exceptionAsError = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("exceptionAsError"), true);
             if(exceptionAsError){
-                if(e instanceof ObjectException){
-                    ObjectException objectException = (ObjectException)e;
+                if(runOptException instanceof ObjectException){
+                    ObjectException objectException = (ObjectException)runOptException;
                     responseData = ResponseData.makeErrorMessageWithData(objectException.getObjectData(),
                         objectException.getExceptionCode(), objectException.getMessage());
                 } else {
                     responseData = ResponseData.makeErrorMessageWithData(
-                        CollectionsOpt.createHashMap("exception", e.getClass().getName(),
-                            "trace", ObjectException.extortExceptionMessage(e)),
+                        CollectionsOpt.createHashMap("exception", runOptException.getClass().getName(),
+                            "trace", ObjectException.extortExceptionMessage(runOptException)),
                         ResponseData.ERROR_OPERATION,
-                        e.getMessage());
+                        runOptException.getMessage());
                 }
             } else {
-                TaskDetailLog detailLog = BizOptUtils.createLogDetail(bizOptJson, dataOptContext);
-                String errMsg = ObjectException.extortExceptionMessage(e);
-                detailLog.setLogInfo(errMsg);
-                detailLog.setRunBeginTime(runBeginTime);
                 //添加 异常处理流程
-                throw e;
+                throw runOptException;
             }
         }
         int logLevel = dataOptContext.getLogLevel();
