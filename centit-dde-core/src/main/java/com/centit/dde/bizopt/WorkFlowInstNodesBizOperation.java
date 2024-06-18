@@ -12,6 +12,7 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
+import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.service.FlowManager;
@@ -52,6 +53,14 @@ public class WorkFlowInstNodesBizOperation implements BizOperation {
                     new BizModelJSONTransform(bizModel)));
                 queryParam.put(StringBaseOpt.castObjectToString(fieldMap.get("fieldName")), formulaValue);
             }
+        }
+        String sortField = bizOptJson.getString(GeneralJsonObjectDao.TABLE_SORT_FIELD);
+        if(StringUtils.isNotBlank(sortField)){
+            queryParam.put(GeneralJsonObjectDao.TABLE_SORT_FIELD, sortField);
+        }
+        String orderField = bizOptJson.getString(GeneralJsonObjectDao.TABLE_SORT_ORDER);
+        if(StringUtils.isNotBlank(orderField)){
+            queryParam.put(GeneralJsonObjectDao.TABLE_SORT_ORDER, orderField);
         }
         PageDesc pageDesc = new PageDesc();
         Object pageNo = queryParam.get("pageNo");
