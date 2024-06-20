@@ -201,8 +201,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.MANAGER_WORKFLOW, new ManagerWorkFlowBizOperation(flowManager, flowEngine));
         //注册查询待办节点
         allOperations.put(ConstantValue.USER_TASK_WORKFLOW, new WorkFlowUserTaskBizOperation(flowEngine));
-
         allOperations.put(ConstantValue.INST_NODES_WORKFLOW, new WorkFlowInstNodesBizOperation(flowManager));
+        allOperations.put(ConstantValue.WF_TASK_MANAGER, new WorkFlowTaskManagerOperation(flowManager));
 
         //注册FTP下载组件
         allOperations.put(ConstantValue.FTP_FILE_DOWNLOAD,new FtpDownloadOperation(sourceInfoDao));

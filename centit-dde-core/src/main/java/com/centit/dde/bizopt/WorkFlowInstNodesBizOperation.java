@@ -41,9 +41,6 @@ public class WorkFlowInstNodesBizOperation implements BizOperation {
                 dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "queryType"));
         }
         Map<String, Object> queryParam = new HashMap<>(10);
-        if (!"ALL".equals(queryType)) {
-            queryParam.put("nodeState", queryType);
-        }
         JSONArray paramList = bizOptJson.getJSONArray("paramList");
         for (Object fieldInfo : paramList) {
             Map<String, Object> fieldMap = CollectionsOpt.objectToMap(fieldInfo);
@@ -62,7 +59,7 @@ public class WorkFlowInstNodesBizOperation implements BizOperation {
         if(StringUtils.isNotBlank(orderField)){
             queryParam.put(GeneralJsonObjectDao.TABLE_SORT_ORDER, orderField);
         }
-        PageDesc pageDesc = new PageDesc();
+        PageDesc pageDesc = PageDesc.createNotPaging();
         Object pageNo = queryParam.get("pageNo");
         Object pageSize = queryParam.get("pageSize");
         if (pageNo != null && pageSize != null) {
