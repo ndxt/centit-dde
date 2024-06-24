@@ -325,7 +325,7 @@ public abstract class DataSetOptUtil {
         }
         Map<String, List<Double>> tempDataDouble = new HashMap<>(statDesc.size());
         for (Triple<String, String, String> tr : statDesc) {
-            if (!"concat".equals(tr.getRight())) {
+            if (!"concat".equals(tr.getRight()) && !"gather".equals(tr.getRight())) {
                 tempData.forEach((key, value) -> {
                     List<Double> doubleList = new ArrayList<>();
                     List<Object> list = value;
@@ -366,16 +366,20 @@ public abstract class DataSetOptUtil {
                 case "variance":
                     db = StatUtils.variance(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
                     break;
+                case "gather": // 作为集合提供
+                    db = tempData.get(tr.getLeft());
+                    break;
                 /* percentile 这个没有实现*/
+                case "concat": //连接字符串
                 case "splitJ":
                     List<Object> objects = tempData.get(tr.getLeft());
                     StringBuilder builder = new StringBuilder();
                     for (Object object : objects) {
-                        builder.append(object);
+                        builder.append(object);//.append(";");
                     }
                     db = builder.toString();
                     break;
-                default:
+                default: // count
                     db = tempData.get(tr.getLeft()).size();
                     break;
             }
