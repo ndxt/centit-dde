@@ -202,6 +202,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         //注册查询待办节点
         allOperations.put(ConstantValue.USER_TASK_WORKFLOW, new WorkFlowUserTaskBizOperation(flowEngine));
         allOperations.put(ConstantValue.INST_NODES_WORKFLOW, new WorkFlowInstNodesBizOperation(flowManager));
+
         allOperations.put(ConstantValue.WF_TASK_MANAGER, new WorkFlowTaskManagerOperation(flowManager));
 
         //注册FTP下载组件
@@ -498,9 +499,10 @@ public class BizOptFlowImpl implements BizOptFlow {
             dataOptContext.getI18nMessage("dde.705.no_follow_up_node", stepId));
     }
 
-    private Integer ckeckRangeSet(String expression, BizModelJSONTransform varTrains, Integer defaultValue){
-        if(StringUtils.isBlank(expression))
+    private Integer getRangeSet(String expression, BizModelJSONTransform varTrains, Integer defaultValue){
+        if(StringUtils.isBlank(expression)) {
             return defaultValue;
+        }
         if(StringRegularOpt.isNumber(expression)){
             return NumberBaseOpt.castObjectToInteger(expression);
         }
@@ -520,9 +522,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (ConstantValue.CYCLE_TYPE_RANGE.equals(cycleVo.getCycleType())) {
             // 计算 range 的设置值
             BizModelJSONTransform varTrains = new BizModelJSONTransform(bizModel);
-            cycleVo.setIntRangeBegin(ckeckRangeSet(cycleVo.getRangeBegin(), varTrains, 0));
-            cycleVo.setIntRangeStep(ckeckRangeSet(cycleVo.getRangeStep(), varTrains, 1));
-            cycleVo.setIntRangeEnd(ckeckRangeSet(cycleVo.getRangeEnd(), varTrains, 0));
+            cycleVo.setIntRangeBegin(getRangeSet(cycleVo.getRangeBegin(), varTrains, 0));
+            cycleVo.setIntRangeStep(getRangeSet(cycleVo.getRangeStep(), varTrains, 1));
+            cycleVo.setIntRangeEnd(getRangeSet(cycleVo.getRangeEnd(), varTrains, 0));
 
             iter = cycleVo.getIntRangeBegin();
         }  else {
