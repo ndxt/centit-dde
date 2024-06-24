@@ -31,12 +31,12 @@ public class WorkFlowTaskManagerOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");
-        Integer taskType = bizOptJson.getInteger("taskType");
+        String taskType = bizOptJson.getString("taskType");
         String fromUserCode, toUserCode;
         int result;
         switch (taskType) {
             //根据节点实例转移任务
-            case 1:
+            case "moveTask":
                 Object nodeInstIds = JSONTransformer.transformer(bizOptJson.getString("nodeInstIds"), new BizModelJSONTransform(bizModel));
                 fromUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("fromUserCode"), new BizModelJSONTransform(bizModel)));
                 toUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("toUserCode"), new BizModelJSONTransform(bizModel)));
@@ -44,14 +44,14 @@ public class WorkFlowTaskManagerOperation implements BizOperation {
                 bizModel.putDataSet(id, new DataSet(result));
                 break;
             //根据应用转移任务
-            case 2:
+            case "moveTaskByOs":
                 fromUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("fromUserCode"), new BizModelJSONTransform(bizModel)));
                 toUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("toUserCode"), new BizModelJSONTransform(bizModel)));
                 result = flowManager.moveUserTaskTo(dataOptContext.getOsId(), fromUserCode, toUserCode, dataOptContext.getCurrentUserCode(), "");
                 bizModel.putDataSet(id, new DataSet(result));
                 break;
             //创建任务委托
-            case 3:
+            case "createRelegate":
                 RoleRelegate roleRelegate = new RoleRelegate();
                 roleRelegate.setExpireTime(DatetimeOpt.castObjectToDate(
                     JSONTransformer.transformer(bizOptJson.getString("expireTime"), new BizModelJSONTransform(bizModel))
@@ -78,7 +78,7 @@ public class WorkFlowTaskManagerOperation implements BizOperation {
                 flowManager.saveRoleRelegate(roleRelegate);
                 break;
             //获取委托人委托列表
-            case 4:
+            case "listGrantee":
                 List<RoleRelegate> granteeRelegateList = flowManager.listRoleRelegateByUser(
                     StringBaseOpt.castObjectToString(
                         JSONTransformer.transformer(bizOptJson.getString("grantee"), new BizModelJSONTransform(bizModel))
@@ -87,7 +87,7 @@ public class WorkFlowTaskManagerOperation implements BizOperation {
                 bizModel.putDataSet(id, new DataSet(granteeRelegateList));
                 break;
             //获取受委托人委托列表
-            case 5:
+            case "listGrantor":
                 List<RoleRelegate> grantorRelegateList = flowManager.listRoleRelegateByGrantor(
                     StringBaseOpt.castObjectToString(
                         JSONTransformer.transformer(bizOptJson.getString("grantor"), new BizModelJSONTransform(bizModel))
@@ -95,7 +95,7 @@ public class WorkFlowTaskManagerOperation implements BizOperation {
                 );
                 bizModel.putDataSet(id, new DataSet(grantorRelegateList));
                 break;
-            case 6:
+            case "deleteRelegate":
                 flowManager.deleteRoleRelegateByUserCode(
                     StringBaseOpt.castObjectToString(
                         JSONTransformer.transformer(bizOptJson.getString("grantor"), new BizModelJSONTransform(bizModel))
