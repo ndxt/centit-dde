@@ -35,12 +35,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 /**
  * @author zhf
  */
 @EnableAsync
 @Configuration
+@EnableWebSecurity
 @EnableScheduling
 @PropertySource("classpath:system.properties")
 @Import({
