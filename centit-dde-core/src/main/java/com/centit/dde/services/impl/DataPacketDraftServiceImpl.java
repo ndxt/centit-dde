@@ -9,6 +9,7 @@ import com.centit.dde.adapter.po.DataPacketParam;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OptMethod;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -100,14 +102,18 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
     @Override
     public void updateDataPacket(DataPacketDraft dataPacketCopy) {
+        Date updateTime = DatetimeOpt.truncateToSecond(DatetimeOpt.currentUtilDate());
+        dataPacketCopy.setRecordDate(updateTime);
         dataPacketDraftDao.updateObject(dataPacketCopy);
         dataPacketDraftDao.saveObjectReferences(dataPacketCopy);
     }
 
-
     @Override
     public void publishDataPacket(DataPacketDraft dataPacketCopy) {
         String optCode = mergeApiOptMethod(dataPacketCopy);
+        Date publishTime = DatetimeOpt.truncateToSecond(DatetimeOpt.currentUtilDate());
+        dataPacketCopy.setPublishDate(publishTime);
+        dataPacketCopy.setRecordDate(publishTime);
         dataPacketDraftDao.publishDataPacket(optCode, dataPacketCopy);
 
         DataPacket dataPacket = new DataPacket();
@@ -122,6 +128,8 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
            });
         }
         dataPacket.setPacketParams(dataPacketParamList);
+        dataPacket.setPublishDate(publishTime);
+        dataPacket.setRecordDate(publishTime);
         dataPacketDao.publishDataPacket(dataPacket);
     }
 

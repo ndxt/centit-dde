@@ -238,9 +238,6 @@ public class DataPacketDraftController extends ResourceBaseController {
         }
         LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
         dataPacketDraft.setPacketId(packetId);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateStr = dateFormat.format(new Date());
-        dataPacketDraft.setUpdateDate(dateFormat.parse(dateStr));
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
         dataPacketDraftService.updateDataPacket(dataPacketDraft);
     }
@@ -255,7 +252,6 @@ public class DataPacketDraftController extends ResourceBaseController {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "发布数据不存在！");
         }
         LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
-        dataPacketDraft.setPublishDate(DatetimeOpt.truncateToSecond(DatetimeOpt.currentUtilDate()));
         dataPacketDraftService.publishDataPacket(dataPacketDraft);
     }
 
