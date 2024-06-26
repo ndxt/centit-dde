@@ -95,7 +95,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     @NotNull
     private OperationLogWriter operationLogWriter;
 
-    @Autowired
+    @Autowired(required = false)
     private OptFlowNoInfoManager optFlowNoInfoManager;
 
     @Autowired
@@ -727,6 +727,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         moduleOptContext.setTaskLog(dataOptContext.getTaskLog());
         moduleOptContext.setOptId(dataOptContext.getOptId());
         moduleOptContext.setNeedRollback(dataOptContext.getNeedRollback());
+        moduleOptContext.setRunType(dataOptContext.getRunType());
         //添加原始调用参数
         moduleOptContext.setStackData(ConstantValue.MODULE_CALL_TAG, callParams);
         //添加调用环境的上下文

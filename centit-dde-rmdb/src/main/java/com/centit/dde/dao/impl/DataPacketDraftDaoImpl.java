@@ -75,8 +75,9 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
 
     @Override
     public void publishDataPacket(String optCode, DataPacketDraft dataPacketCopy) {
-        String sql = "update q_data_packet_draft SET publish_date=? ,opt_code=?  WHERE  PACKET_ID=? ";
-        this.getJdbcTemplate().update(sql, new Object[]{dataPacketCopy.getPublishDate(), optCode, dataPacketCopy.getPacketId()});
+        String sql = "update q_data_packet_draft SET publish_date=?, update_date =?, opt_code=?  WHERE  PACKET_ID=? ";
+        this.getJdbcTemplate().update(sql, new Object[]{dataPacketCopy.getPublishDate(), dataPacketCopy.getUpdateDate(),
+            optCode, dataPacketCopy.getPacketId()});
     }
 
     @Override
@@ -128,7 +129,8 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
     @Override
     public void updateDataPacketOptJson(String packetId, String dataPacketOptJson) {
         DatabaseOptUtils.batchUpdateObject(this, DataPacketDraft.class,
-            CollectionsOpt.createHashMap("dataOptDescJson", dataPacketOptJson),
+            CollectionsOpt.createHashMap("dataOptDescJson", dataPacketOptJson,
+                    "updateDate", DatetimeOpt.truncateToSecond(DatetimeOpt.currentUtilDate())),
             CollectionsOpt.createHashMap("packetId", packetId)
         );
     }
