@@ -388,6 +388,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         dataPacket.setPacketName(packetName);
         dataPacket.setOptId(optId);
         dataPacket.setPublishDate(null);
+        dataPacket.setUpdateDate(DatetimeOpt.truncateToSecond(DatetimeOpt.currentUtilDate()));
         JSONObject schemaJson = dataPacket.getSchemaProps();
         if (schemaJson != null) {
             String schemaString = JSONObject.toJSONString(schemaJson);
