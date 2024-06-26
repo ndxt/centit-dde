@@ -103,7 +103,7 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
     @Override
     public void updateDataPacket(DataPacketDraft dataPacketCopy) {
         Date updateTime = DatetimeOpt.truncateToSecond(DatetimeOpt.currentUtilDate());
-        dataPacketCopy.setRecordDate(updateTime);
+        dataPacketCopy.setUpdateDate(updateTime);
         dataPacketDraftDao.updateObject(dataPacketCopy);
         dataPacketDraftDao.saveObjectReferences(dataPacketCopy);
     }
