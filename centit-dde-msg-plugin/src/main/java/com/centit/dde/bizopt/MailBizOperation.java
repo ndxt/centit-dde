@@ -10,8 +10,8 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.basedata.NoticeMessage;
 import com.centit.msgpusher.plugins.EMailMsgPusher;
 import com.centit.msgpusher.plugins.SystemUserEmailSupport;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
@@ -25,17 +25,17 @@ import java.util.Set;
  */
 public class MailBizOperation implements BizOperation {
     private static final String SEND_TYPE_MAIL = "M";
-    private SourceInfoDao sourceInfoDao;
+    private SourceInfoMetadata sourceInfoMetadata;
 
-    public MailBizOperation(SourceInfoDao sourceInfoDao) {
-        this.sourceInfoDao = sourceInfoDao;
+    public MailBizOperation(SourceInfoMetadata sourceInfoMetadata) {
+        this.sourceInfoMetadata = sourceInfoMetadata;
     }
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String sendType = bizOptJson.getString("sendType");
         String id=bizOptJson.getString("id");
-        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(bizOptJson.getString("mailServer"));
+        SourceInfo sourceInfo = sourceInfoMetadata.fetchSourceInfo(bizOptJson.getString("mailServer"));
         BizModelJSONTransform jsonTransform = new BizModelJSONTransform(bizModel);
         Set<String> optUsers = CollectionsOpt.createHashSet(
             StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("optUsers"), jsonTransform)));

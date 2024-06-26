@@ -7,8 +7,8 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.framework.common.ResponseData;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -19,10 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConsumerBizOperation implements BizOperation {
-    private SourceInfoDao sourceInfoDao;
+    private SourceInfoMetadata sourceInfoMetadata;
 
-    public ConsumerBizOperation(SourceInfoDao sourceInfoDao) {
-        this.sourceInfoDao=sourceInfoDao;
+    public ConsumerBizOperation(SourceInfoMetadata sourceInfoMetadata) {
+        this.sourceInfoMetadata=sourceInfoMetadata;
     }
 
     /**
@@ -40,7 +40,7 @@ public class ConsumerBizOperation implements BizOperation {
         if (StringUtils.isBlank(topic) || StringUtils.isBlank(databaseId)){
             return ResponseData.makeErrorMessage("Kafka服务地址或topic不能为空！");
         }
-        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(databaseId);
+        SourceInfo sourceInfo = sourceInfoMetadata.fetchSourceInfo(databaseId);
         if (sourceInfo==null){
             return ResponseData.makeErrorMessage("Kafka服务资源不存在或已被删除！");
         }

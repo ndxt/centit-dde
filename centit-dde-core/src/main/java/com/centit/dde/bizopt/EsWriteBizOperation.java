@@ -9,8 +9,8 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataRowVariableTranslate;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.search.document.FileDocument;
 import com.centit.search.document.ObjectDocument;
@@ -49,10 +49,10 @@ public class EsWriteBizOperation implements BizOperation {
 
     private final ESServerConfig esServerConfig;
     private final ImagePdfTextExtractor.OcrServerHost ocrServerHost;
-    private  SourceInfoDao sourceInfoDao;
-    public EsWriteBizOperation(ESServerConfig esServerConfig, SourceInfoDao sourceInfoDao, ImagePdfTextExtractor.OcrServerHost ocrServerHost) {
+    private  SourceInfoMetadata sourceInfoMetadata;
+    public EsWriteBizOperation(ESServerConfig esServerConfig, SourceInfoMetadata sourceInfoMetadata, ImagePdfTextExtractor.OcrServerHost ocrServerHost) {
         this.esServerConfig = esServerConfig;
-        this.sourceInfoDao = sourceInfoDao;
+        this.sourceInfoMetadata = sourceInfoMetadata;
         this.ocrServerHost = ocrServerHost;
     }
 
@@ -89,7 +89,7 @@ public class EsWriteBizOperation implements BizOperation {
                 ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
                 dataOptContext.getI18nMessage("error.701.field_is_blank", "databaseName"));
 
-        SourceInfo esInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+        SourceInfo esInfo = sourceInfoMetadata.fetchSourceInfo(databaseCode);
         String indexName = BuiltInOperation.getJsonFieldString(bizOptJson, "indexName", null);
         if (StringUtils.isBlank(indexName)) return ResponseData.makeErrorMessage(
             ResponseData.ERROR_FIELD_INPUT_NOT_VALID,

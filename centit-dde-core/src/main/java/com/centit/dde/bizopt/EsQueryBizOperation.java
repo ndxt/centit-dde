@@ -11,8 +11,8 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.dao.PageQueryResult;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.search.document.FileDocument;
 import com.centit.search.document.ObjectDocument;
@@ -55,11 +55,11 @@ public class EsQueryBizOperation implements BizOperation {
 
     private final ESServerConfig esServerConfig;
 
-    private  SourceInfoDao sourceInfoDao;
+    private  SourceInfoMetadata sourceInfoMetadata;
 
-    public EsQueryBizOperation(ESServerConfig esServerConfig, SourceInfoDao sourceInfoDao) {
+    public EsQueryBizOperation(ESServerConfig esServerConfig, SourceInfoMetadata sourceInfoMetadata) {
         this.esServerConfig = esServerConfig;
-        this.sourceInfoDao = sourceInfoDao;
+        this.sourceInfoMetadata = sourceInfoMetadata;
     }
 
     @Override
@@ -146,7 +146,7 @@ public class EsQueryBizOperation implements BizOperation {
     private ResponseData customQueryOperation(BizModel bizModel, JSONObject bizOptJson, BizModelJSONTransform transform,
                                               Integer pageNo, Integer pageSize, DataOptContext dataOptContext ) throws Exception {
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
-        SourceInfo esInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+        SourceInfo esInfo = sourceInfoMetadata.fetchSourceInfo(databaseCode);
         String indexName = BuiltInOperation.getJsonFieldString(bizOptJson, "indexName", null);
         if (StringUtils.isBlank(indexName)){
             return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,

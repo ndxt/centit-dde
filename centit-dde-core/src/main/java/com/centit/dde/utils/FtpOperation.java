@@ -1,8 +1,8 @@
 package com.centit.dde.utils;
 
 import com.centit.product.metadata.api.ISourceInfo;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
@@ -25,10 +25,10 @@ public abstract class FtpOperation {
 
     // 这个地方可以考虑 用线程变量 来绑定 ftp 客户端链接
     // 暂时不做这个。
-    public SourceInfoDao sourceInfoDao;
+    public SourceInfoMetadata sourceInfoMetadata;
 
-    public FtpOperation(SourceInfoDao sourceInfoDao) {
-        this.sourceInfoDao = sourceInfoDao;
+    public FtpOperation(SourceInfoMetadata sourceInfoMetadata) {
+        this.sourceInfoMetadata = sourceInfoMetadata;
     }
 
     public FTPClient getFtp(SourceInfo ftpService) throws IOException {

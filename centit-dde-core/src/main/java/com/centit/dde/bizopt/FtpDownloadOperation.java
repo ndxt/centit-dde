@@ -9,8 +9,8 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.FtpOperation;
 import com.centit.framework.common.ResponseData;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
@@ -23,8 +23,8 @@ import java.nio.charset.StandardCharsets;
 
 public class FtpDownloadOperation extends FtpOperation implements BizOperation {
 
-    public FtpDownloadOperation(SourceInfoDao sourceInfoDao){
-        super(sourceInfoDao);
+    public FtpDownloadOperation(SourceInfoMetadata sourceInfoMetadata){
+        super(sourceInfoMetadata);
     }
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {
@@ -47,7 +47,7 @@ public class FtpDownloadOperation extends FtpOperation implements BizOperation {
             fileName = fileNameDesc;
         }
 
-        SourceInfo ftpService = sourceInfoDao.getDatabaseInfoById(ftpServiceId);
+        SourceInfo ftpService = sourceInfoMetadata.fetchSourceInfo(ftpServiceId);
         FTPClient ftpClient = getFtp(ftpService);
 
         String pathEncoding =  StringBaseOpt.castObjectToString(ftpService.getExtProp("pathEncoding"));

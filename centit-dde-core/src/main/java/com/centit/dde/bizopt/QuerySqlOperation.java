@@ -9,8 +9,8 @@ import com.centit.dde.dataset.SqlDataSetReader;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.service.DataScopePowerManager;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.common.ObjectException;
 
@@ -21,12 +21,12 @@ import java.util.Map;
  * @author zhf
  */
 public class QuerySqlOperation implements BizOperation {
-    private SourceInfoDao sourceInfoDao;
+    private SourceInfoMetadata sourceInfoMetadata;
 
     private DataScopePowerManager queryDataScopeFilter;
 
-    public QuerySqlOperation(SourceInfoDao sourceInfoDao, DataScopePowerManager queryDataScopeFilter) {
-        this.sourceInfoDao = sourceInfoDao;
+    public QuerySqlOperation(SourceInfoMetadata sourceInfoMetadata, DataScopePowerManager queryDataScopeFilter) {
+        this.sourceInfoMetadata = sourceInfoMetadata;
         this.queryDataScopeFilter = queryDataScopeFilter;
     }
 
@@ -39,7 +39,7 @@ public class QuerySqlOperation implements BizOperation {
 
         Map<String, Object> parames = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
 
-        SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+        SourceInfo databaseInfo = sourceInfoMetadata.fetchSourceInfo(databaseCode);
         if (databaseInfo == null) {
             return BuiltInOperation.createResponseData(0, 1,
                 ObjectException.DATA_NOT_FOUND_EXCEPTION,
