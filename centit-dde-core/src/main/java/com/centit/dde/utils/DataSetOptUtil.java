@@ -12,6 +12,7 @@ import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.basedata.DataDictionary;
 import com.centit.framework.security.StandardPasswordEncoderImpl;
 import com.centit.search.utils.TikaTextExtractor;
+import com.centit.support.algorithm.*;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.Pretreatment;

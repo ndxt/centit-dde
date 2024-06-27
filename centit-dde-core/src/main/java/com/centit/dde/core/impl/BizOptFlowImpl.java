@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.dao.DataPacketDao;
 import com.centit.dde.adapter.dao.DataPacketDraftDao;
+import com.centit.dde.adapter.po.*;
 import com.centit.dde.bizopt.*;
 import com.centit.dde.core.*;
 import com.centit.dde.dataset.FileDataSet;
@@ -23,6 +24,7 @@ import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder
 import com.centit.product.oa.service.OptFlowNoInfoManager;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.utils.ImagePdfTextExtractor;
+import com.centit.support.algorithm.*;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.file.FileIOOpt;
@@ -35,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
