@@ -58,11 +58,9 @@ public class QuerySqlOperation implements BizOperation {
             }
         }
         //是否分页
-        sqlDsr.setPaging(BooleanBaseOpt.castObjectToBoolean(
-            BuiltInOperation.getJsonFieldString(bizOptJson, "paging", "false"), false));
+        sqlDsr.setPaging(BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("paging"), false));
         //是否返回总数
-        sqlDsr.setHasCount(BooleanBaseOpt.castObjectToBoolean(
-            BuiltInOperation.getJsonFieldString(bizOptJson, "hasCount", "false"), false));
+        sqlDsr.setHasCount(BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("hasCount"), false));
 
         //分页参数属性
         //页码参数属性
