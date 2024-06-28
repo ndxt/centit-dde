@@ -113,7 +113,6 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         String optCode = mergeApiOptMethod(dataPacketCopy);
         Date publishTime = DatetimeOpt.truncateToSecond(DatetimeOpt.currentUtilDate());
         dataPacketCopy.setPublishDate(publishTime);
-        dataPacketCopy.setRecordDate(publishTime);
         dataPacketDraftDao.publishDataPacket(optCode, dataPacketCopy);
 
         DataPacket dataPacket = new DataPacket();
@@ -129,13 +128,16 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         }
         dataPacket.setPacketParams(dataPacketParamList);
         dataPacket.setPublishDate(publishTime);
-        dataPacket.setRecordDate(publishTime);
         dataPacketDao.publishDataPacket(dataPacket);
     }
 
     @Override
     public void batchPublishByOsId(String osId){
-
+        List<DataPacketDraft> dataPacketDraftList = dataPacketDraftDao.listNeedPublishDataPacket(osId);
+        if(dataPacketDraftList==null || dataPacketDraftList.isEmpty()) return;
+        for(DataPacketDraft dataPacketDraft : dataPacketDraftList){
+            publishDataPacket(dataPacketDraft);
+        }
     }
 
     @Override

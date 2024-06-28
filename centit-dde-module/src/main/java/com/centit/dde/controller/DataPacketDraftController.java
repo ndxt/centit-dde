@@ -257,12 +257,8 @@ public class DataPacketDraftController extends ResourceBaseController {
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
     public void batchPublishByOsId(@PathVariable String osId, HttpServletRequest request) {
-        DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
-        if (dataPacketDraft == null) {
-            throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "发布数据不存在！");
-        }
-        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
-        dataPacketDraftService.publishDataPacket(dataPacketDraft);
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, osId, request);
+        dataPacketDraftService.batchPublishByOsId(osId);
     }
 
     @ApiOperation(value = "编辑API网关数据处理描述信息")

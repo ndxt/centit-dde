@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +72,12 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
             jsonObject.put("isDisable", BooleanBaseOpt.castObjectToBoolean(jsonObject.get("isDisable"), false));
         }
         return jsonArray;
+    }
+
+    @Override
+    public List<DataPacketDraft> listNeedPublishDataPacket(String osId) {
+        return this.listObjectsByFilter(" where os_id = ? and update_date > publish_date",
+            new Object[]{osId});
     }
 
     @Override
