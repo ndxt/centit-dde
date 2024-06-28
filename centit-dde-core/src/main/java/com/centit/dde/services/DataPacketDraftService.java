@@ -26,6 +26,8 @@ public interface DataPacketDraftService {
 
     void publishDataPacket(DataPacketDraft dataPacketCopy);
 
+    void batchPublishByOsId(String osId);
+
     int[] batchUpdateOptIdByApiId(String optId, List<String> apiIds);
 
     void updateDisableStatus(String packetId, String disable);

@@ -134,7 +134,12 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
     }
 
     @Override
-    public int[] batchUpdateOptIdByApiId(String optId,List<String> apiIds) {
+    public void batchPublishByOsId(String osId){
+
+    }
+
+    @Override
+    public int[] batchUpdateOptIdByApiId(String optId, List<String> apiIds) {
           for(String apiId:apiIds){
               DataPacketDraft dataPacketDraft=getDataPacket(apiId);
               if(dataPacketDraft.getPublishDate()!=null){

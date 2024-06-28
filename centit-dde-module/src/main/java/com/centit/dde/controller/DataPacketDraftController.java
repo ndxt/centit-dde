@@ -38,10 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -144,7 +141,7 @@ public class DataPacketDraftController extends ResourceBaseController {
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
     public List<DataPacketDraft> createMetaDataApi(@RequestBody MetaDataParameter metaDataOrHttpParams,
-                                                   HttpServletRequest request) throws ParseException {
+                                                   HttpServletRequest request) {
         DataPacketDraft dataPacket = new DataPacketDraft();
         dataPacket.setOsId(metaDataOrHttpParams.getOsId());
         LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacket.getOsId(), request);
@@ -228,7 +225,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         tag = "{arg0}", newValue = "无")
     @WrapUpResponseBody
     public void updateDataPacket(@PathVariable String packetId,
-                                 @RequestBody String packetJsonStr, HttpServletRequest request) throws ParseException {
+                                 @RequestBody String packetJsonStr, HttpServletRequest request){
         DataPacketDraft dataPacketDraft = JSONObject.parseObject(
             SecurityOptUtils.decodeSecurityString(packetJsonStr),
             DataPacketDraft.class);
@@ -246,7 +243,20 @@ public class DataPacketDraftController extends ResourceBaseController {
     @PutMapping(value = "publish/{packetId}")
     @WrapUpResponseBody
     @Transactional(rollbackFor = Exception.class)
-    public void publishDataPacket(@PathVariable String packetId, HttpServletRequest request) throws ParseException {
+    public void publishDataPacket(@PathVariable String packetId, HttpServletRequest request){
+        DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
+        if (dataPacketDraft == null) {
+            throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "发布数据不存在！");
+        }
+        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
+        dataPacketDraftService.publishDataPacket(dataPacketDraft);
+    }
+
+    @ApiOperation(value = "API网关按应用批量发布")
+    @PutMapping(value = "batchPublish/{osId}")
+    @WrapUpResponseBody
+    @Transactional(rollbackFor = Exception.class)
+    public void batchPublishByOsId(@PathVariable String osId, HttpServletRequest request) {
         DataPacketDraft dataPacketDraft = dataPacketDraftService.getDataPacket(packetId);
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "发布数据不存在！");
