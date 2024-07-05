@@ -35,6 +35,11 @@
             <artifactId>fileserver-adapter</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-metadata-adapter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.centit.framework</groupId>
