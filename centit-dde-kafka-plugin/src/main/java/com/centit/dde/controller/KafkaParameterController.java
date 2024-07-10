@@ -6,8 +6,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
 import com.centit.framework.core.dao.PageQueryResult;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.support.security.AESSecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,7 +36,7 @@ import java.util.Set;
 @RequestMapping(value = "/kafka")
 public class KafkaParameterController {
     @Resource
-    private SourceInfoDao sourceInfoDao;
+    private SourceInfoMetadata sourceInfoMetadata;
 
     @ApiOperation(value = "消费者参数配置")
     @GetMapping("/consumer")
@@ -59,7 +59,7 @@ public class KafkaParameterController {
     @ApiOperation(value = "获取topic列表")
     @GetMapping("/topics/{databaseCode}")
     public ResponseData topics(@PathVariable String databaseCode) throws Exception {
-        SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+        SourceInfo databaseInfo = sourceInfoMetadata.fetchSourceInfo(databaseCode);
         JSONArray topicArr = new JSONArray();
         Properties props = new Properties();
         String username = databaseInfo.getUsername();

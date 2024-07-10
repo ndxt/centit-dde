@@ -21,32 +21,37 @@
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>optflow-serial-number</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>database-metadata</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>fileserver-adapter</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-metadata-adapter</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-persistence-jdbc</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
 
 
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-core</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -62,19 +67,19 @@
         <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-report-utils</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>centit-workflow-core</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-office-utils</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.docx4j</groupId>

@@ -9,7 +9,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
-import com.centit.product.metadata.dao.SourceInfoDao;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.DatabaseAccess;
@@ -28,10 +28,10 @@ import java.util.Map;
  * @author zhf
  */
 public class RunSqlOperation implements BizOperation {
-    private SourceInfoDao sourceInfoDao;
+    private SourceInfoMetadata sourceInfoMetadata;
 
-    public RunSqlOperation(SourceInfoDao sourceInfoDao) {
-        this.sourceInfoDao = sourceInfoDao;
+    public RunSqlOperation(SourceInfoMetadata sourceInfoMetadata) {
+        this.sourceInfoMetadata = sourceInfoMetadata;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class RunSqlOperation implements BizOperation {
                 } else {
                     databaseCode = jsonObject.getJSONObject("databaseName").getString("value");
                 }
-                Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfoDao.getDatabaseInfoById((databaseCode)));
+                Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfoMetadata.fetchSourceInfo((databaseCode)));
                 if(count==0) {
                     bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(q));
                 }
@@ -77,7 +77,7 @@ public class RunSqlOperation implements BizOperation {
                 optData.add(params);
             }
             Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(
-                sourceInfoDao.getDatabaseInfoById((databaseCode)));
+                sourceInfoMetadata.fetchSourceInfo((databaseCode)));
 
             for(Map<String, Object> params : optData) {
                 QueryAndNamedParams qap = QueryUtils.translateQuery(sql, params);

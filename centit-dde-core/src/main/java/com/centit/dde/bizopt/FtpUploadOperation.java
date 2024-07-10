@@ -10,8 +10,8 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.dde.utils.FtpOperation;
 import com.centit.framework.common.ResponseData;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
@@ -19,8 +19,8 @@ import org.apache.commons.net.ftp.FTPClient;
 
 public class FtpUploadOperation extends FtpOperation implements BizOperation {
 
-    public FtpUploadOperation(SourceInfoDao sourceInfoDao) {
-        super(sourceInfoDao);
+    public FtpUploadOperation(SourceInfoMetadata sourceInfoMetadata) {
+        super(sourceInfoMetadata);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class FtpUploadOperation extends FtpOperation implements BizOperation {
         }
 
         FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
-        SourceInfo ftpService = sourceInfoDao.getDatabaseInfoById(ftpServiceId);
+        SourceInfo ftpService = sourceInfoMetadata.fetchSourceInfo(ftpServiceId);
         FTPClient ftpClient = getFtp(ftpService);
         ftpClient.changeWorkingDirectory(filePath);
         ftpClient.storeFile(fileInfo.getFileName(),

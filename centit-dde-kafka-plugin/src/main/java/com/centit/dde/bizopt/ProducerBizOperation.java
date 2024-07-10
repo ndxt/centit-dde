@@ -9,8 +9,8 @@ import com.centit.dde.producer.KafkaProducerConfig;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -23,9 +23,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ProducerBizOperation implements BizOperation {
-    private SourceInfoDao sourceInfoDao;
-    public ProducerBizOperation(SourceInfoDao sourceInfoDao) {
-        this.sourceInfoDao=sourceInfoDao;
+    private SourceInfoMetadata sourceInfoMetadata;
+    public ProducerBizOperation(SourceInfoMetadata sourceInfoMetadata) {
+        this.sourceInfoMetadata=sourceInfoMetadata;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ProducerBizOperation implements BizOperation {
         if (StringUtils.isBlank(source)){
             return ResponseData.makeErrorMessage("推送消息不能为空！");
         }
-        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(databaseId);
+        SourceInfo sourceInfo = sourceInfoMetadata.fetchSourceInfo(databaseId);
         if (sourceInfo==null){
             return ResponseData.makeErrorMessage("Kafka服务资源不存在或已被删除！");
         }

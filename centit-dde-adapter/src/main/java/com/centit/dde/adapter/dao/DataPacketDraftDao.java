@@ -28,7 +28,7 @@ public interface DataPacketDraftDao {
 
     JSONArray listDataPacketDraft(Map<String, Object> params, PageDesc pageDesc);
 
-    //List<DataPacketDraft> listObjectsByProperties(Map<String, Object> params, PageDesc pageDesc);
+    List<DataPacketDraft> listNeedPublishDataPacket(String osId);
 
     int[] batchUpdateOptIdByApiId(String optId, List<String> apiIds);
 

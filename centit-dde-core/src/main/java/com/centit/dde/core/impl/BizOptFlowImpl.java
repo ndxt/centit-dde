@@ -19,11 +19,7 @@ import com.centit.framework.common.ResponseSingleData;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.product.metadata.dao.SourceInfoDao;
-import com.centit.product.metadata.service.DataCheckRuleService;
-import com.centit.product.metadata.service.MetaDataCache;
-import com.centit.product.metadata.service.MetaDataService;
-import com.centit.product.metadata.service.MetaObjectService;
+import com.centit.product.metadata.service.*;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.product.oa.service.OptFlowNoInfoManager;
 import com.centit.search.service.ESServerConfig;
@@ -41,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
@@ -71,7 +68,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     private String path;
 
     @Autowired
-    private SourceInfoDao sourceInfoDao;
+    private SourceInfoMetadata sourceInfoMetadata;
 
     @Autowired
     private MetaDataService metaDataService;
@@ -101,7 +98,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     @NotNull
     private OperationLogWriter operationLogWriter;
 
-    @Autowired
+    @Autowired(required = false)
     private OptFlowNoInfoManager optFlowNoInfoManager;
 
     @Autowired
@@ -147,22 +144,22 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("union", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runUnion(bizModel, bizOptJson));
         allOperations.put("check", new CheckRuleOperation(dataCheckRuleService));
         allOperations.put("static", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runStaticData(bizModel, bizOptJson));
-        allOperations.put("http", new HttpServiceOperation(sourceInfoDao));
+        allOperations.put("http", new HttpServiceOperation(sourceInfoMetadata));
         allOperations.put("clear", new ClearDataOperation());
         allOperations.put("js", new InnerScriptOperation());
-        allOperations.put("persistence", new PersistenceDBOperation(/*path,*/ sourceInfoDao, metaDataService));
-        allOperations.put("database", new QuerySqlOperation(sourceInfoDao, queryDataScopeFilter));
+        allOperations.put("persistence", new PersistenceDBOperation(/*path,*/ sourceInfoMetadata, metaDataService));
+        allOperations.put("database", new QuerySqlOperation(sourceInfoMetadata, queryDataScopeFilter));
         allOperations.put("excel", new ReadExcelOperation());
         allOperations.put("csv", new ReadCsvOperation());
         allOperations.put("json", new ReadJsonFileOperation());
-        allOperations.put("sqlS", new RunSqlOperation(sourceInfoDao));
+        allOperations.put("sqlS", new RunSqlOperation(sourceInfoMetadata));
         allOperations.put("SSD", new DocReportOperation(fileInfoOpt));
         allOperations.put("optflow", new OptflowSerialNumberOperation(optFlowNoInfoManager));
         allOperations.put("unit", new UnitFilterOperation(platformEnvironment));
         allOperations.put("user", new UserFilterOperation(platformEnvironment));
 
-        allOperations.put("redisRead", new RedisReadOperation(sourceInfoDao));
-        allOperations.put("redisWrite", new RedisWriteOperation(sourceInfoDao));
+        allOperations.put("redisRead", new RedisReadOperation(sourceInfoMetadata));
+        allOperations.put("redisWrite", new RedisWriteOperation(sourceInfoMetadata));
         allOperations.put("logWrite", new OptLogOperation());
         allOperations.put("logRead", new OptLogQueryOperation(operationLogWriter));
         allOperations.put("qrCode", new QrCodeOperation(fileInfoOpt));
@@ -185,7 +182,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.METADATA_OPERATION_UPDATE, new MetadataUpdateOperation(metaObjectService, queryDataScopeFilter));
         allOperations.put(ConstantValue.COMPARE_SOURCE, new ObjectCompareOperation());
 
-        allOperations.put(ConstantValue.COMMIT_TRANSACTION, new TransactionCommitOperation(sourceInfoDao));
+        allOperations.put(ConstantValue.COMMIT_TRANSACTION, new TransactionCommitOperation(sourceInfoMetadata));
         allOperations.put(ConstantValue.INTERSECT_DATASET, new IntersectDataSetOperation());
         allOperations.put(ConstantValue.MINUS_DATASET, new MinusDataSetOperation());
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentOperation());
@@ -206,16 +203,16 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.WF_TASK_MANAGER, new WorkFlowTaskManagerOperation(flowManager));
 
         //注册FTP下载组件
-        allOperations.put(ConstantValue.FTP_FILE_DOWNLOAD,new FtpDownloadOperation(sourceInfoDao));
+        allOperations.put(ConstantValue.FTP_FILE_DOWNLOAD,new FtpDownloadOperation(sourceInfoMetadata));
         //注册FTP上传组件
-        allOperations.put(ConstantValue.FTP_FILE_UPLOAD,new FtpUploadOperation(sourceInfoDao));
+        allOperations.put(ConstantValue.FTP_FILE_UPLOAD,new FtpUploadOperation(sourceInfoMetadata));
 
         //注册查询操作类
         allOperations.put(ConstantValue.ELASTICSEARCH_QUERY,
-            new EsQueryBizOperation(esServerConfig, sourceInfoDao));
+            new EsQueryBizOperation(esServerConfig, sourceInfoMetadata));
         //注册插入操作类
         allOperations.put(ConstantValue.ELASTICSEARCH_WRITE,
-            new EsWriteBizOperation(esServerConfig, sourceInfoDao, ocrServerHost));
+            new EsWriteBizOperation(esServerConfig, sourceInfoMetadata, ocrServerHost));
 
         allOperations.put(ConstantValue.DOCUMENT_TO_PDF, new DocToPdfOperation()); //"docToPdf"
         allOperations.put(ConstantValue.ADD_WATER_MARK, new AddWaterMarkOperation(fileInfoOpt)); //"waterMark"
@@ -733,6 +730,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         moduleOptContext.setTaskLog(dataOptContext.getTaskLog());
         moduleOptContext.setOptId(dataOptContext.getOptId());
         moduleOptContext.setNeedRollback(dataOptContext.getNeedRollback());
+        moduleOptContext.setRunType(dataOptContext.getRunType());
         //添加原始调用参数
         moduleOptContext.setStackData(ConstantValue.MODULE_CALL_TAG, callParams);
         //添加调用环境的上下文

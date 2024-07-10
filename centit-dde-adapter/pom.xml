@@ -17,7 +17,7 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-adapter</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,9 +75,16 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
     }
 
     @Override
+    public List<DataPacketDraft> listNeedPublishDataPacket(String osId) {
+        return this.listObjectsByFilter(" where os_id = ? and update_date > publish_date",
+            new Object[]{osId});
+    }
+
+    @Override
     public void publishDataPacket(String optCode, DataPacketDraft dataPacketCopy) {
-        String sql = "update q_data_packet_draft SET publish_date=? ,opt_code=?  WHERE  PACKET_ID=? ";
-        this.getJdbcTemplate().update(sql, new Object[]{dataPacketCopy.getPublishDate(), optCode, dataPacketCopy.getPacketId()});
+        String sql = "update q_data_packet_draft SET publish_date=?, update_date =?, opt_code=?  WHERE  PACKET_ID=? ";
+        this.getJdbcTemplate().update(sql, new Object[]{dataPacketCopy.getPublishDate(), dataPacketCopy.getUpdateDate(),
+            optCode, dataPacketCopy.getPacketId()});
     }
 
     @Override
@@ -128,7 +136,8 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
     @Override
     public void updateDataPacketOptJson(String packetId, String dataPacketOptJson) {
         DatabaseOptUtils.batchUpdateObject(this, DataPacketDraft.class,
-            CollectionsOpt.createHashMap("dataOptDescJson", dataPacketOptJson),
+            CollectionsOpt.createHashMap("dataOptDescJson", dataPacketOptJson,
+                    "updateDate", DatetimeOpt.truncateToSecond(DatetimeOpt.currentUtilDate())),
             CollectionsOpt.createHashMap("packetId", packetId)
         );
     }

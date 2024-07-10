@@ -9,10 +9,10 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.SqlDataSetWriter;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.MetaTable;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.service.MetaDataService;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
@@ -33,15 +33,15 @@ public class PersistenceDBOperation implements BizOperation {
     private static final String WRITER_INDICATE_MERGE = "merge";
     private static final String WRITER_INDICATE_UPDATE = "update";
 
-    private SourceInfoDao sourceInfoDao;
+    private SourceInfoMetadata sourceInfoMetadata;
     private MetaDataService metaDataService;
     //private String exportPath;
 
     public PersistenceDBOperation(//String exportPath,
-                                  SourceInfoDao sourceInfoDao,
+                                  SourceInfoMetadata sourceInfoMetadata,
                                   MetaDataService metaDataService) {
         //this.exportPath = exportPath;
-        this.sourceInfoDao = sourceInfoDao;
+        this.sourceInfoMetadata = sourceInfoMetadata;
         this.metaDataService = metaDataService;
     }
 
@@ -79,7 +79,7 @@ public class PersistenceDBOperation implements BizOperation {
                 ObjectException.DATA_NOT_FOUND_EXCEPTION,
                 dataOptContext.getI18nMessage("dde.604.metadata_not_found", databaseCode, tableId));
         }
-        SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+        SourceInfo databaseInfo = sourceInfoMetadata.fetchSourceInfo(databaseCode);
         if (databaseInfo == null) {
             return BuiltInOperation.createResponseData(0, 1,
                 ObjectException.DATA_NOT_FOUND_EXCEPTION,

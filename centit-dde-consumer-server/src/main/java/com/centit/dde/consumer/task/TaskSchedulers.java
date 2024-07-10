@@ -10,8 +10,8 @@ import com.centit.dde.services.impl.TaskRun;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OsInfo;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -32,7 +32,10 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -73,15 +76,15 @@ public class TaskSchedulers {
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.AbortPolicy());*/
     private final DataPacketDao dataPacketDao;
-    private final SourceInfoDao sourceInfoDao;
+    private final SourceInfoMetadata sourceInfoMetadata;
 
     private static ConcurrentHashMap<String, Object> queryParams = new ConcurrentHashMap<>(2);
     private static ConcurrentHashMap<String, String> packetMD5 = new ConcurrentHashMap<>(20);
 
     @Autowired
-    public TaskSchedulers(DataPacketDao dataPacketDao, SourceInfoDao sourceInfoDao) {
+    public TaskSchedulers(DataPacketDao dataPacketDao, SourceInfoMetadata sourceInfoMetadata) {
         this.dataPacketDao = dataPacketDao;
-        this.sourceInfoDao=sourceInfoDao;
+        this.sourceInfoMetadata=sourceInfoMetadata;
         queryParams.put("taskType", "4");
         queryParams.put("isValid", "T");
     }
@@ -91,7 +94,7 @@ public class TaskSchedulers {
      */
     @Scheduled(fixedDelay = 1000 * 50)
     private void runTask(){
-        List<DataPacket> list = new  CopyOnWriteArrayList(dataPacketDao.listObjectsByProperties(queryParams));
+        List<DataPacket> list = new CopyOnWriteArrayList(dataPacketDao.listObjectsByProperties(queryParams));
         if(list.size()==0 && packetMD5.size()>0){
             packetMD5.clear();
             return;
@@ -110,14 +113,12 @@ public class TaskSchedulers {
                 packetMD5.remove(packetId);
             }
         }
-        List<SourceInfo> sourceInfos = sourceInfoDao.listDatabase();
-        Map<String, SourceInfo> sourceInfoMap = new HashMap<>();
-        sourceInfos.stream().forEach(sourceInfo -> sourceInfoMap.put(sourceInfo.getDatabaseCode(),sourceInfo));
+
         for (DataPacket dataPacket : list) {
             if (!packetMD5.containsKey(dataPacket.getPacketId())){//不存在，第一次加载
                 packetMD5.put(dataPacket.getPacketId(),dataPacketMD5(dataPacket));
                 logger.info(String.format("创建消息触发任务,任务名：%s,任务ID：%s",dataPacket.getPacketName(),dataPacket.getPacketId()));
-                run(dataPacket,sourceInfoMap);
+                run(dataPacket);
             }else if (packetMD5.get(dataPacket.getPacketId())!=null
                 && packetMD5.get(dataPacket.getPacketId()).equals(dataPacketMD5(dataPacket))){//数据没做任何修改
                 logger.info(String.format("%s：任务数据没变化，跳过！",dataPacket.getPacketName()));
@@ -127,15 +128,15 @@ public class TaskSchedulers {
                 logger.info(String.format("%s:任务数据有变化，重新执行!",dataPacket.getPacketName()));
                 //替换新的MD5值
                 packetMD5.put(dataPacket.getPacketId(),dataPacketMD5(dataPacket));
-                run(dataPacket,sourceInfoMap);
+                run(dataPacket);
             }
         }
     }
 
-    private  void run(DataPacket dataPacket, Map<String, SourceInfo> sourceInfoMap){
+    private void run(DataPacket dataPacket){
         threadPool.execute(()->{
             JSONObject extProps = dataPacket.getExtProps();
-            SourceInfo sourceInfo = sourceInfoMap.get(extProps.getString("databaseId"));
+            SourceInfo sourceInfo = sourceInfoMetadata.fetchSourceInfo(extProps.getString("databaseId"));
             Assert.notNull(sourceInfo,"连接信息不能为空，请配置kafka连接信息");
             JSONObject properties = sourceInfo.getExtProps();
             Properties proper=new Properties();
@@ -184,7 +185,7 @@ public class TaskSchedulers {
                         String value = record.value();
                         //开始处理任务逻辑
                         TaskRun taskRun = ContextUtils.getBean(TaskRun.class);
-                        DataOptContext dataOptContext = new DataOptContext();
+                        DataOptContext dataOptContext = new DataOptContext(messageSource, Locale.SIMPLIFIED_CHINESE);
                         if (platformEnvironment != null){
                             OsInfo osInfo = platformEnvironment.getOsInfo(dataPacket.getOsId());
                             dataOptContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);

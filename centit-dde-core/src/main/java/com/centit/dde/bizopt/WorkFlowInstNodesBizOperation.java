@@ -41,6 +41,7 @@ public class WorkFlowInstNodesBizOperation implements BizOperation {
                 dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "queryType"));
         }
         Map<String, Object> queryParam = new HashMap<>(10);
+        queryParam.put("queryType",queryType);
         JSONArray paramList = bizOptJson.getJSONArray("paramList");
         for (Object fieldInfo : paramList) {
             Map<String, Object> fieldMap = CollectionsOpt.objectToMap(fieldInfo);

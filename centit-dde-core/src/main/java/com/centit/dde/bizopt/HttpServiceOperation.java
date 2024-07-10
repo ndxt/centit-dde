@@ -12,8 +12,8 @@ import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.appclient.HttpReceiveJSON;
 import com.centit.framework.common.ResponseData;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -40,10 +40,10 @@ import java.util.Map;
  * @author zhf
  */
 public class HttpServiceOperation implements BizOperation {
-    private SourceInfoDao sourceInfoDao;
+    private SourceInfoMetadata sourceInfoMetadata;
 
-    public HttpServiceOperation(SourceInfoDao sourceInfoDao) {
-        this.sourceInfoDao = sourceInfoDao;
+    public HttpServiceOperation(SourceInfoMetadata sourceInfoMetadata) {
+        this.sourceInfoMetadata = sourceInfoMetadata;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class HttpServiceOperation implements BizOperation {
         if (StringUtils.isBlank(interfaceAddress))
             return BuiltInOperation.createResponseData(0, 1, 500, "接口地址不能为空！");
 
-        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(serverIpAddressId);
+        SourceInfo sourceInfo = sourceInfoMetadata.fetchSourceInfo(serverIpAddressId);
         if (sourceInfo == null)
             return ResponseData.makeErrorMessage(ResponseData.ERROR_PRECONDITION_FAILED, "无效请求地址！");
 

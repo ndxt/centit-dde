@@ -7,6 +7,7 @@ import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -62,6 +63,11 @@ public class DataPacketDraftDaoImpl implements DataPacketDraftDao{
     public JSONArray listDataPacketDraft(Map<String, Object> params, PageDesc pageDesc) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
             "Runtime 运行时环境，不支持元数据的修改!");
+    }
+
+    @Override
+    public List<DataPacketDraft> listNeedPublishDataPacket(String osId) {
+        return null;
     }
 
     @Override

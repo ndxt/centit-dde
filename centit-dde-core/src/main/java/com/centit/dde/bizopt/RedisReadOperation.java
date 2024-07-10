@@ -9,8 +9,8 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
@@ -20,16 +20,16 @@ import org.apache.commons.lang3.StringUtils;
 
 public class RedisReadOperation implements BizOperation {
 
-    private SourceInfoDao sourceInfoDao;
+    private SourceInfoMetadata sourceInfoMetadata;
 
-    public RedisReadOperation(SourceInfoDao sourceInfoDao) {
-        this.sourceInfoDao = sourceInfoDao;
+    public RedisReadOperation(SourceInfoMetadata sourceInfoMetadata) {
+        this.sourceInfoMetadata = sourceInfoMetadata;
     }
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
-        SourceInfo redisInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+        SourceInfo redisInfo = sourceInfoMetadata.fetchSourceInfo(databaseCode);
         if (redisInfo == null ) {
             return BuiltInOperation.createResponseData(0, 1,
                 ObjectException.DATA_NOT_FOUND_EXCEPTION,

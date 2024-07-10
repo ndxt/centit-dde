@@ -8,8 +8,8 @@ import com.centit.dde.dataset.JSONDataSet;
 import com.centit.dde.services.GenerateFieldsService;
 import com.centit.dde.vo.ColumnSchema;
 import com.centit.fileserver.common.FileStore;
-import com.centit.product.metadata.dao.SourceInfoDao;
 import com.centit.product.metadata.po.SourceInfo;
+import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.*;
@@ -35,16 +35,16 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     @Autowired(required = false)
     private FileStore fileStore;
 
-    private final SourceInfoDao sourceInfoDao;
+    private final SourceInfoMetadata sourceInfoMetadata;
 
     @Autowired
-    public GenerateFieldsServiceImpl(SourceInfoDao sourceInfoDao) {
-        this.sourceInfoDao = sourceInfoDao;
+    public GenerateFieldsServiceImpl(SourceInfoMetadata sourceInfoMetadata) {
+        this.sourceInfoMetadata = sourceInfoMetadata;
     }
 
     @Override
     public JSONArray queryViewSqlData(String databaseCode, String sql, Map<String, Object> params) {
-        SourceInfo sourceInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+        SourceInfo sourceInfo = sourceInfoMetadata.fetchSourceInfo(databaseCode);
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(QueryUtils.translateQuery(sql, params));
         try {
             Connection conn=AbstractSourceConnectThreadHolder.fetchConnect(sourceInfo);
@@ -147,7 +147,7 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     public List<ColumnSchema> generateSqlFields(String databaseCode, String sql, Map<String, Object> params) {
         List<String> sColumn = QueryUtils.getSqlFiledNames(sql);
         if (sColumn == null || sColumn.size() == 0) {
-            SourceInfo databaseInfo = sourceInfoDao.getDatabaseInfoById(databaseCode);
+            SourceInfo databaseInfo = sourceInfoMetadata.fetchSourceInfo(databaseCode);
             QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(QueryUtils.translateQuery(sql, params));
             String sSql = QueryUtils.buildLimitQuerySQL(qap.getQuery(), 0, 2, false,
                 DBType.mapDBType(databaseInfo.getDatabaseUrl()));
