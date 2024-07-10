@@ -40,14 +40,14 @@ public class WorkFlowTaskManagerOperation implements BizOperation {
                 Object nodeInstIds = JSONTransformer.transformer(bizOptJson.getString("nodeInstIds"), new BizModelJSONTransform(bizModel));
                 fromUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("fromUserCode"), new BizModelJSONTransform(bizModel)));
                 toUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("toUserCode"), new BizModelJSONTransform(bizModel)));
-                result = flowManager.moveUserTaskTo(StringBaseOpt.objectToStringList(nodeInstIds), fromUserCode, toUserCode, dataOptContext.getCurrentUserCode(), "");
+                result = flowManager.moveUserTaskTo(StringBaseOpt.objectToStringList(nodeInstIds), fromUserCode, toUserCode, dataOptContext.getCurrentUserDetail(), "");
                 bizModel.putDataSet(id, new DataSet(result));
                 break;
             //根据应用转移任务
             case "moveTaskByOs":
                 fromUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("fromUserCode"), new BizModelJSONTransform(bizModel)));
                 toUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("toUserCode"), new BizModelJSONTransform(bizModel)));
-                result = flowManager.moveUserTaskTo(dataOptContext.getOsId(), fromUserCode, toUserCode, dataOptContext.getCurrentUserCode(), "");
+                result = flowManager.moveUserTaskTo(dataOptContext.getOsId(), fromUserCode, toUserCode, dataOptContext.getCurrentUserDetail(), "");
                 bizModel.putDataSet(id, new DataSet(result));
                 break;
             //创建任务委托

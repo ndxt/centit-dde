@@ -57,6 +57,8 @@ public class SubmitWorkFlowBizOperation implements BizOperation {
         submitOptOptions.setNodeInstId(nodeInstId);
         submitOptOptions.setUnitCode(unitCode);
         submitOptOptions.setUserCode(userCode);
+        submitOptOptions.setClientLocale(dataOptContext.getLocale());
+        submitOptOptions.setLoginIp(dataOptContext.getCurrentUserDetail().getLoginIp());
         //根据表达式获取流程变量信息
         //根据表达式    获取流程变量信息(非必填参数)
         JSONArray flowVariables = bizOptJson.getJSONArray("flowVariables");

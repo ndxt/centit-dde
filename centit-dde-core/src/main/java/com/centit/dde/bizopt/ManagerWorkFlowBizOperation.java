@@ -49,7 +49,7 @@ public class ManagerWorkFlowBizOperation implements BizOperation {
                         ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
                         dataOptContext.getI18nMessage("error.701.field_is_blank", "flowInstId"));
                 }
-                flowManager.stopInstance(flowInstId, userCode, dataOptContext.getOptId());
+                flowManager.stopInstance(flowInstId, dataOptContext.getCurrentUserDetail(), dataOptContext.getOptId());
                 break;
             case ConstantValue.SUSPEND_WFINST:
                 if (StringUtils.isBlank(flowInstId)) {
@@ -57,7 +57,7 @@ public class ManagerWorkFlowBizOperation implements BizOperation {
                         ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
                         dataOptContext.getI18nMessage("error.701.field_is_blank", "flowInstId"));
                 }
-                flowManager.suspendInstance(flowInstId, userCode, dataOptContext.getOptId());
+                flowManager.suspendInstance(flowInstId, dataOptContext.getCurrentUserDetail(), dataOptContext.getOptId());
                 break;
             case ConstantValue.ACTIVE_WFINST:
                 if (StringUtils.isBlank(flowInstId)) {
@@ -65,7 +65,7 @@ public class ManagerWorkFlowBizOperation implements BizOperation {
                         ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
                         dataOptContext.getI18nMessage("error.701.field_is_blank", "flowInstId"));
                 }
-                flowManager.activizeInstance(flowInstId, userCode, dataOptContext.getOptId());
+                flowManager.activizeInstance(flowInstId, dataOptContext.getCurrentUserDetail(), dataOptContext.getOptId());
                 break;
             case ConstantValue.ROLLBACK_NODE:
                 if (StringUtils.isBlank(nodeInstId)) {
@@ -73,7 +73,7 @@ public class ManagerWorkFlowBizOperation implements BizOperation {
                         ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
                         dataOptContext.getI18nMessage("error.701.field_is_blank", "nodeInstId"));
                 }
-                flowEngine.rollBackNode(nodeInstId, userCode);
+                flowEngine.rollBackNode(nodeInstId, dataOptContext.getCurrentUserDetail());
                 break;
             case ConstantValue.RECLAIM_NODE:
                 if (StringUtils.isBlank(nodeInstId)) {
