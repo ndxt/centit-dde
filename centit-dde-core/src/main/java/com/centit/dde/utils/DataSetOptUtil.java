@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -640,6 +641,28 @@ public abstract class DataSetOptUtil {
         }
     }
 
+    private static boolean matchToRow(Map<String, Object> data1, Map<String, Object> data2, List<Map.Entry<String, String>> fields) {
+        if (data1 == null || data2 == null || fields == null) {
+            return false;
+        }
+        for (Map.Entry<String, String> field : fields) {
+            Object object1 = data1.get(field.getKey());
+            Object object2 = data2.get(field.getKey());
+            if(GeneralAlgorithm.compareTwoObject(object1, object2, false) != 0) {
+                if (object2 instanceof String) {
+                    boolean mch = Pattern.compile((String) object2)
+                        .matcher(StringBaseOpt.objectToString(object1)).find();
+                    if (!mch) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public static DataSet leftAppendTwoDataSet(DataSet mainDataSet, DataSet slaveDataSet, List<Map.Entry<String, String>> primaryFields) {
         if (slaveDataSet == null || mainDataSet == null) {
             return mainDataSet;
@@ -649,7 +672,8 @@ public abstract class DataSetOptUtil {
         for(Map<String, Object> leftRow : mainDataSet.getDataAsList()){
             Map<String, Object> newRow = new LinkedHashMap<>();
             for(Map<String, Object> rightRow : slaveData){
-                if(compareTwoRowWithMap(leftRow, rightRow, primaryFields, SORT_NULL_AS_FIRST) == 0) {
+                // 不是严格相等，相等或者 模式匹配
+                if(matchToRow(leftRow, rightRow, primaryFields)) {
                     newRow.putAll(rightRow);
                     break;
                 }
@@ -905,7 +929,6 @@ public abstract class DataSetOptUtil {
         }
         return 0;
     }
-
 
     private static int compareTwoRowWithMap(Map<String, Object> data1, Map<String, Object> data2, List<Map.Entry<String, String>> fields, boolean nullAsFirst) {
         if (data1 == null && data2 == null) {
