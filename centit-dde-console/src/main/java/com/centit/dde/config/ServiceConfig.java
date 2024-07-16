@@ -42,9 +42,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
  */
 @EnableAsync
 @Configuration
-@EnableWebSecurity
 @EnableScheduling
 @PropertySource("classpath:system.properties")
+@EnableWebSecurity
 @Import({
     DubboConfig.class,
     JdbcConfig.class,
