@@ -36,7 +36,8 @@ public class UnitFilterOperation implements BizOperation {
     }
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext){
-        String topUnit = bizModel.fetchTopUnit();
+        String topUnit = StringUtils.isBlank(dataOptContext.getTopUnit())? bizModel.fetchTopUnit() : dataOptContext.getTopUnit();
+
         String unitFilter=
             Pretreatment.mapTemplateStringAsFormula(bizOptJson.getString("unitFilter"),
                 new BizModelJSONTransform(bizModel));

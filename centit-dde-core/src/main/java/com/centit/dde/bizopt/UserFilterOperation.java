@@ -40,7 +40,7 @@ public class UserFilterOperation implements BizOperation {
     }
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
-        String topUnit = bizModel.fetchTopUnit();
+        String topUnit = StringUtils.isBlank(dataOptContext.getTopUnit())? bizModel.fetchTopUnit() : dataOptContext.getTopUnit();
         //获取用户信息
         Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
         //两种类别 用户表达式， 根据属性查询 filterType： express， properties，//exact
@@ -115,7 +115,7 @@ public class UserFilterOperation implements BizOperation {
                     new UserUnitMapTranslate());
             }
 
-            List<UserInfo> retUsers = CodeRepositoryUtil.getUserInfosByCodes(bizModel.fetchTopUnit(), users);
+            List<UserInfo> retUsers = CodeRepositoryUtil.getUserInfosByCodes(topUnit, users);
             List<UserInfo> lsUserInfo = new ArrayList<>(retUsers.size() + 1);
             for (UserInfo ui : retUsers) {
                 if ("T".equals(ui.getIsValid())) {
