@@ -4,10 +4,12 @@ import com.centit.dde.adapter.po.TaskLog;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.common.ObjectException;
+import com.centit.support.network.HardWareUtils;
 import lombok.Data;
 import lombok.Setter;
 import org.springframework.context.MessageSource;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -97,6 +99,17 @@ public class DataOptContext {
         }else{
             return null;
         }
+    }
+
+    public String getLoginIp(){
+        CentitUserDetails ud = getCurrentUserDetail();
+        if(ud!=null){
+            return ud.getLoginIp();
+        }
+        InetAddress loacalHost = HardWareUtils.getLocalhost();
+        if(loacalHost!=null)
+            return loacalHost.getHostAddress();
+        return "127.0.0.1";
     }
 
     public String getCurrentUserCode(){

@@ -76,7 +76,7 @@ public class CreateWorkFlowBizOperation implements BizOperation {
         createFlowOptions.setUserCode(userCodeTran);
         createFlowOptions.setFlowOptName(flowOptNameTran);
         createFlowOptions.setClientLocale(dataOptContext.getLocale());
-        createFlowOptions.setLoginIp(dataOptContext.getCurrentUserDetail().getLoginIp());
+        createFlowOptions.setLoginIp(dataOptContext.getLoginIp());
         //根据表达式    获取流程变量信息(非必填参数)
         JSONArray flowVariables = bizOptJson.getJSONArray("flowVariables");
         if (flowVariables != null) {
