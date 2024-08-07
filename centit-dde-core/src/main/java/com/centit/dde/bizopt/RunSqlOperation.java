@@ -38,7 +38,7 @@ public class RunSqlOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         JSONArray jsonArray = bizOptJson.getJSONArray("config");
         int count = 0;
-        if (jsonArray != null) {
+        if (jsonArray != null) { // 这个批量sql的已经废弃
             for (Object object : jsonArray) {
                 JSONObject jsonObject = (JSONObject) object;
                 QueryAndNamedParams qap = QueryUtils.translateQuery(jsonObject.getString("sql"), new BizModelJSONTransform(bizModel));
@@ -64,13 +64,13 @@ public class RunSqlOperation implements BizOperation {
                     dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "sql sentence"));
             }
             List<Map<String, Object>> optData;
-            if(!"customSource".equals(bizOptJson.getString("sourceType"))){
+            if(!"customSource".equals(bizOptJson.getString("sourceType"))){ // 数据集
                 //考虑批量操作
                 optData = DataSetOptUtil.fetchDataSet(bizModel, bizOptJson);
                 if(optData==null)
                     throw new ObjectException(ObjectException.PARAMETER_NOT_CORRECT,
                         dataOptContext.getI18nMessage("dde.614.parameter_not_correct", "source data"));
-            } else {
+            } else { //自定义参数
                 // 获取单个参数
                 Map<String, Object> params = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
                 optData = new ArrayList<>(2);
