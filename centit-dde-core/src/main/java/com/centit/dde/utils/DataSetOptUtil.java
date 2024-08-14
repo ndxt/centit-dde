@@ -329,22 +329,35 @@ public abstract class DataSetOptUtil {
             if (!"concat".equals(tr.getRight()) && !"gather".equals(tr.getRight())) {
                 tempData.forEach((key, value) -> {
                     List<Double> doubleList = new ArrayList<>();
-                    List<Object> list = value;
-                    for (Object o : list) {
-                        doubleList.add(NumberBaseOpt.castObjectToDouble(o));
+                    for (Object o : value) {
+                        Double db = NumberBaseOpt.castObjectToDouble(o);
+                        if(db != null) {
+                            doubleList.add(db);
+                        }
                     }
                     tempDataDouble.put(key, doubleList);
                 });
             }
         }
+        List<Double> doubleList;
         for (Triple<String, String, String> tr : statDesc) {
             Object db;
             switch (tr.getRight()) {
                 case "min":
-                    db = StatUtils.min(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
+                    doubleList = tempDataDouble.get(tr.getLeft());
+                    if(doubleList!=null && !doubleList.isEmpty()) {
+                        db = StatUtils.min(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
+                    } else {
+                        db = StringBaseOpt.minString(tempData.get(tr.getLeft()));
+                    }
                     break;
                 case "max":
-                    db = StatUtils.max(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
+                    doubleList = tempDataDouble.get(tr.getLeft());
+                    if(doubleList!=null && !doubleList.isEmpty()) {
+                        db = StatUtils.max(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
+                    } else {
+                        db = StringBaseOpt.maxString(tempData.get(tr.getLeft()));
+                    }
                     break;
                 case "mean":
                     db = StatUtils.mean(listDoubleToArray(tempDataDouble.get(tr.getLeft())));
