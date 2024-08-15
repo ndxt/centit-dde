@@ -187,7 +187,6 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.MINUS_DATASET, new MinusDataSetOperation());
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentOperation());
 
-
         //注册查询操作类
         allOperations.put(ConstantValue.CREATE_WORKFLOW, new CreateWorkFlowBizOperation(flowEngine));
         //注册插入操作类

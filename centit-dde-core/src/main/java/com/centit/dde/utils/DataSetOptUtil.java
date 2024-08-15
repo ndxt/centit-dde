@@ -558,7 +558,7 @@ public abstract class DataSetOptUtil {
             return inData;
         }
         List<Map<String, Object>> data = inData.getDataAsList();
-        if (data == null || data.size() == 0) {
+        if (data == null || data.isEmpty()) {
             return inData;
         }
         if (rowHeaderFields.size() + colHeaderFields.size() >= data.get(0).size()) {
