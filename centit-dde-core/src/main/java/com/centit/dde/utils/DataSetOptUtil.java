@@ -1077,6 +1077,9 @@ public abstract class DataSetOptUtil {
             return ds;
         }
 
+        if(StringUtils.isBlank(fileName)){
+            fileName ="download.zip";
+        }
         FileDataSet fileDataset = new FileDataSet();
         ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
         try(ZipOutputStream out = ZipCompressor.convertToZipOutputStream(outBuf)) {

@@ -271,6 +271,7 @@ public class BizOptFlowImpl implements BizOptFlow {
     private void runStep(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) throws Exception {
         JSONObject stepJson = dataOptStep.getCurrentStep().getJSONObject("properties");
         String stepType = stepJson.getString("type");
+        //返回节点
         if (ConstantValue.RESULTS.equals(stepType)) {
             //bizModel.getOptResult().setResultObject(returnResult(bizModel, dataOptStep));
             returnResult(bizModel, dataOptStep, dataOptContext);
