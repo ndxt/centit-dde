@@ -468,19 +468,27 @@ public class BizOptFlowImpl implements BizOptFlow {
         stepJson = stepJson.getJSONObject("properties");
         String stepId = stepJson.getString("id");
         List<JSONObject> linksJson = dataOptStep.getNextLinks(stepId);
-        if(linksJson==null){
+        if(linksJson==null || linksJson.isEmpty()){
             logger.error("当前分支节点("+stepId+")没有后续节点，请检查对应的业务逻辑图。");
         }
+        boolean found = false;
+        String stepTag = null;
         for (JSONObject jsonObject : linksJson) {
             String expression = jsonObject.getString("expression");
             if (StringUtils.isNotBlank(expression) && !ConstantValue.ELSE.equalsIgnoreCase(expression)) {
-                Object calculate = VariableFormula.calculate(expression, new BizModelJSONTransform(bizModel), DataSetOptUtil.extendFuncs);
-                if (BooleanBaseOpt.castObjectToBoolean(calculate, false)) {
-                    stepJson = dataOptStep.getOptStep(jsonObject.getString("targetId"));
-                    dataOptStep.setCurrentStep(stepJson);
-                    return;
+                if(!found || StringUtils.compare(stepTag, jsonObject.getString("step"), false) > 0) {
+                    Object calculate = VariableFormula.calculate(expression, new BizModelJSONTransform(bizModel), DataSetOptUtil.extendFuncs);
+                    if (BooleanBaseOpt.castObjectToBoolean(calculate, false)) {
+                        stepJson = dataOptStep.getOptStep(jsonObject.getString("targetId"));
+                        dataOptStep.setCurrentStep(stepJson);
+                        stepTag = jsonObject.getString("step");
+                        found = true;
+                    }
                 }
             }
+        }
+        if(found){
+            return;
         }
         for (JSONObject jsonObject : linksJson) {
             if (ConstantValue.ELSE.equalsIgnoreCase(jsonObject.getString("expression"))) {
