@@ -102,7 +102,7 @@ public class WriteExcelOperation implements BizOperation {
         //模板文件id
         String templateFileId = bizOptJson.getString("templateFileId");
         //根据模板生成
-        if (StringUtils.endsWithAny(optType,"jxls","excel") && StringUtils.isNotBlank(templateFileId)) {
+        if (StringUtils.equalsAny(optType,"jxls","excel") && StringUtils.isNotBlank(templateFileId)) {
             InputStream inputStream = fileInfoOpt.loadFileStream(templateFileId);
             if (inputStream == null) {
                 return BuiltInOperation.createResponseData(0, 1,
