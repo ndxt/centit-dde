@@ -104,7 +104,12 @@ public class OptflowSerialNumberOperation implements BizOperation {
 
         String template = bizOptJson.getString("template");
         if (StringUtils.isNotBlank(template)) {
-            Object calculate = Pretreatment.mapTemplateStringAsFormula(template, new BizModelJSONTransform(bizModel, data),"");
+            Object calculate;
+            if(template.startsWith("@")){
+                calculate = Pretreatment.mapTemplateStringAsFormula(template, new BizModelJSONTransform(bizModel, data),"");
+            } else {
+                calculate = VariableFormula.calculate(template, new BizModelJSONTransform(bizModel, data), DataSetOptUtil.extendFuncs);
+            }
             data.put(lshField, calculate);
         } else {
             data.put(lshField, lsh);
