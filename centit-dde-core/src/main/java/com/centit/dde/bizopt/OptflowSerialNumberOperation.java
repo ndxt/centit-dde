@@ -96,7 +96,7 @@ public class OptflowSerialNumberOperation implements BizOperation {
             }
         }
         Map<String, Object> data = CollectionsOpt.createHashMap(
-            "lsh", lsh,
+            "no", lsh,
             "owner", owner,
             "codeCode", codeCode,
             "baseDate", codeBaseDate);
