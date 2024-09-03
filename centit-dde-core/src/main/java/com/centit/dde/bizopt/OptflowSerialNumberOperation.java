@@ -13,6 +13,7 @@ import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
@@ -103,7 +104,7 @@ public class OptflowSerialNumberOperation implements BizOperation {
 
         String template = bizOptJson.getString("template");
         if (StringUtils.isNotBlank(template)) {
-            Object calculate = VariableFormula.calculate(template, new BizModelJSONTransform(bizModel, data), DataSetOptUtil.extendFuncs);
+            Object calculate = Pretreatment.mapTemplateStringAsFormula(template, new BizModelJSONTransform(bizModel, data),"");
             data.put(lshField, calculate);
         } else {
             data.put(lshField, lsh);
