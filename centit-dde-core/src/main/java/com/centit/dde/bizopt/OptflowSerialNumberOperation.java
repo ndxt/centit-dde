@@ -98,10 +98,11 @@ public class OptflowSerialNumberOperation implements BizOperation {
         }
         Map<String, Object> data = CollectionsOpt.createHashMap(
             "no", lsh,
+            "lsh", lsh,
             "owner", owner,
             "codeCode", codeCode,
             "baseDate", codeBaseDate);
-
+        bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(data));
         String template = bizOptJson.getString("template");
         if (StringUtils.isNotBlank(template)) {
             Object calculate;
