@@ -69,6 +69,9 @@ public class OptflowSerialNumberOperation implements BizOperation {
                 case "Y":
                     lsh = optFlowNoInfoManager.newNextLshBaseYear(ownCode, codeCode, codeBaseDate);
                     break;
+                case "W":
+                    lsh = optFlowNoInfoManager.newNextLshBaseWeek(ownCode, codeCode, codeBaseDate);
+                    break;
                 default:
                     lsh = optFlowNoInfoManager.newNextLsh(ownCode, codeCode);
                     break;
@@ -84,20 +87,29 @@ public class OptflowSerialNumberOperation implements BizOperation {
                 case "Y":
                     lsh = optFlowNoInfoManager.viewNextLshBaseYear(ownCode, codeCode, codeBaseDate);
                     break;
+                case "W":
+                    lsh = optFlowNoInfoManager.viewNextLshBaseWeek(ownCode, codeCode, codeBaseDate);
+                    break;
                 default:
                     lsh = optFlowNoInfoManager.viewNextLsh(ownCode, codeCode);
                     break;
             }
         }
-        Map<String, Object> data = CollectionsOpt.createHashMap(lshField, lsh);
-        data.put("owner",owner);
-        bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(data));
+        Map<String, Object> data = CollectionsOpt.createHashMap(
+            "lsh", lsh,
+            "owner", owner,
+            "codeCode", codeCode,
+            "baseDate", codeBaseDate);
+
         String template = bizOptJson.getString("template");
         if (StringUtils.isNotBlank(template)) {
-            Object calculate = VariableFormula.calculate(template, new BizModelJSONTransform(bizModel), DataSetOptUtil.extendFuncs);
-            Map<String, Object> dataTemplate = CollectionsOpt.createHashMap(lshField, calculate);
-            bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(dataTemplate));
+            Object calculate = VariableFormula.calculate(template, new BizModelJSONTransform(bizModel, data), DataSetOptUtil.extendFuncs);
+            data.put(lshField, calculate);
+        } else {
+            data.put(lshField, lsh);
         }
+        bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(data));
+
         return BuiltInOperation.createResponseSuccessData(1);
     }
 
