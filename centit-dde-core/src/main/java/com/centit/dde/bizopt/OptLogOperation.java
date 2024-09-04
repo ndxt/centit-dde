@@ -9,6 +9,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.model.basedata.OperationLog;
 import com.centit.framework.model.security.CentitUserDetails;
+import com.centit.support.algorithm.GeneralAlgorithm;
 import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,11 +32,15 @@ public class OptLogOperation implements BizOperation {
         String optTag = bizOptJson.getString("optTag");
         if( StringUtils.isNotBlank(optTag))
             optTag = StringBaseOpt.castObjectToString(transform.attainExpressionValue(optTag), optTag);
-
+        else
+            optTag = dataOptContext.getOptId();
         String optContent = bizOptJson.getString("optContent");
         if( StringUtils.isNotBlank(optContent))
             optContent = StringBaseOpt.castObjectToString(transform.attainExpressionValue(optContent), optContent);
-
+        String optMethod = bizOptJson.getString("optMethod");
+        if(StringUtils.isBlank(optMethod)){
+            optMethod = dataOptContext.getPacketId();
+        }
         OperationLog optLog = OperationLog.create().application(dataOptContext.getOsId())
             .level(logLevel)
             .operation(dataOptContext.getOptId())
@@ -45,7 +50,7 @@ public class OptLogOperation implements BizOperation {
             .loginIp(userDetails.getLoginIp())
             .correlation(dataOptContext.getLogId())
             .tag(optTag)
-            .method(bizOptJson.getString("optMethod"))
+            .method(optMethod)
             .content(optContent);
         if("compare".equals(logType)){
             optLog.makeDifference(oldObj, newObj);
