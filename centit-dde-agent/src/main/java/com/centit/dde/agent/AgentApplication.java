@@ -13,8 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @EnableScheduling
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.centit"},
-    excludeFilters = @ComponentScan.Filter(value = org.springframework.stereotype.Controller.class))
+@ComponentScan(basePackages = {"com.centit"})
 public class AgentApplication {
     /**
      * 运行一个后台进程，最好作为服务启动
