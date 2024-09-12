@@ -13,10 +13,7 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.security.CentitUserDetails;
-import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.*;
 import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileType;
@@ -237,6 +234,7 @@ public class AddWaterMarkOperation implements BizOperation {
         float opacity =  NumberBaseOpt.castObjectToFloat(bizOptJson.get("opacity"), 0.5f);
         float rotation = NumberBaseOpt.castObjectToFloat(bizOptJson.get("rotation"), -45f);
         float fontSize = NumberBaseOpt.castObjectToFloat(bizOptJson.get("fontSize"), 14f);
+        boolean isRepeat= BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("isRepeat"),false);
         String sourDsName = bizOptJson.getString("source");
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null){
@@ -266,7 +264,7 @@ public class AddWaterMarkOperation implements BizOperation {
             if(fileDataSet!=null) {
                 ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
                 Watermark4Pdf.addWatermark4Pdf(fileDataSet.getFileInputStream(),
-                    pdfFile, waterMarkStr, opacity, rotation, fontSize);
+                    pdfFile, waterMarkStr, opacity, rotation, fontSize, isRepeat);
 
                 FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
                     pdfFile.size(), pdfFile);
@@ -285,7 +283,7 @@ public class AddWaterMarkOperation implements BizOperation {
                 if(fileDataSet!=null){
                     ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
                     Watermark4Pdf.addWatermark4Pdf(fileDataSet.getFileInputStream(),
-                        pdfFile, waterMarkStr, opacity, rotation, fontSize);
+                        pdfFile, waterMarkStr, opacity, rotation, fontSize, isRepeat);
                     fileList.add(CollectionsOpt.createHashMap(
                         ConstantValue.FILE_NAME, fileDataSet.getFileName(),
                         ConstantValue.FILE_SIZE, pdfFile.size(),
