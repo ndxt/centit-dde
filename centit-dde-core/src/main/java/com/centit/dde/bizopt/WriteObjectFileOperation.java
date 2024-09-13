@@ -11,6 +11,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
+import com.centit.support.file.FileType;
 import com.centit.support.xml.XMLObject;
 import org.apache.commons.lang3.StringUtils;
 
@@ -45,9 +46,12 @@ public class WriteObjectFileOperation implements BizOperation {
             }
             object = XMLObject.objectToXMLString(rootName, data);
         }
+        if(!fileName.endsWith("."+fileType)){
+            fileName = FileType.truncateFileExtName(fileName)+"."+fileType;
+        }
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(object.getBytes());
-        FileDataSet objectToDataSet =new FileDataSet(fileName.endsWith(".json")?fileName:fileName+".json",
+        FileDataSet objectToDataSet =new FileDataSet(fileName,
             inputStream.available(), inputStream);
 
         bizModel.putDataSet(targetDsName,objectToDataSet);
