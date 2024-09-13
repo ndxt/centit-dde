@@ -11,6 +11,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
+import com.centit.support.xml.XMLObject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -19,7 +20,7 @@ import java.io.IOException;
 /**
  * 生成json文件节点信息
  */
-public class WriteJsonFileOperation implements BizOperation {
+public class WriteObjectFileOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {
@@ -29,10 +30,23 @@ public class WriteJsonFileOperation implements BizOperation {
             StringBaseOpt.castObjectToString(Pretreatment.mapTemplateStringAsFormula(
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))):
             DatetimeOpt.currentTimeWithSecond();
+        String fileType = bizOptJson.getString("fileType");
+        if(StringUtils.isBlank(fileType)){
+            fileType = "json";
+        }
         Object data = bizModel.getDataSet(sourDsName).getData();
-        String object = JSON.toJSONString(data);
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(object.getBytes());
+        String object;
+        if("xml".equalsIgnoreCase(fileType)) {
+            object = JSON.toJSONString(data);
+        }else {
+            String rootName = bizOptJson.getString("rootName");
+            if(StringUtils.isBlank(rootName)){
+                rootName = "object";
+            }
+            object = XMLObject.objectToXMLString(rootName, data);
+        }
 
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(object.getBytes());
         FileDataSet objectToDataSet =new FileDataSet(fileName.endsWith(".json")?fileName:fileName+".json",
             inputStream.available(), inputStream);
 

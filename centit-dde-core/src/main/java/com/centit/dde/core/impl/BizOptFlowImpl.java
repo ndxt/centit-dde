@@ -151,7 +151,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("database", new QuerySqlOperation(sourceInfoMetadata, queryDataScopeFilter));
         allOperations.put("excel", new ReadExcelOperation());
         allOperations.put("csv", new ReadCsvOperation());
-        allOperations.put("json", new ReadJsonFileOperation());
+        allOperations.put("json", new ReadObjectFileOperation());
         allOperations.put("sqlS", new RunSqlOperation(sourceInfoMetadata));
         allOperations.put("SSD", new DocReportOperation(fileInfoOpt));
         allOperations.put("optflow", new OptflowSerialNumberOperation(optFlowNoInfoManager));
@@ -169,7 +169,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.ENCRYPT, new EncryptOperation());
         allOperations.put(ConstantValue.DECIPHER, new DecipherOperation());
         allOperations.put(ConstantValue.GENERATE_CSV, new WriteCsvOperation());
-        allOperations.put(ConstantValue.GENERATE_JSON, new WriteJsonFileOperation());
+        allOperations.put(ConstantValue.GENERATE_JSON, new WriteObjectFileOperation());
         allOperations.put(ConstantValue.GENERAT_EXCEL, new WriteExcelOperation(fileInfoOpt));
         allOperations.put(ConstantValue.DEFINE_JSON_DATA, new DefineJsonDataOperation());
         allOperations.put(ConstantValue.FILE_UPLOAD, new FileUploadOperation(fileInfoOpt));
