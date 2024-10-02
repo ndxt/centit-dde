@@ -159,7 +159,7 @@ public class HttpServiceOperation implements BizOperation {
                     InputStream fileIS = fileInfo.getFileInputStream();
 
                     if (fileIS != null) {
-                        receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
+                        receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
                             UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), fileIS,
                             "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()));
                     }
@@ -191,7 +191,7 @@ public class HttpServiceOperation implements BizOperation {
                     FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
                     InputStream fileIS = fileInfo.getFileInputStream();
                     if (fileIS != null) {
-                        receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUploadPut(httpExecutorContext,
+                        receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.inputStreamUploadPut(httpExecutorContext,
                             UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), fileIS,
                             "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()));
                     }
