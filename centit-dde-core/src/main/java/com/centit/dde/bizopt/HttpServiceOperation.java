@@ -171,6 +171,7 @@ public class HttpServiceOperation implements BizOperation {
                             requestBodyMap.get("requestBodyAsForm"), false);
                         if(requestBodyAsForm){
                             requestType = ConstantValue.FORM_REQUEST_TYPE;
+                            requestBodyMap.remove("requestBodyAsForm");
                         }
                     }
                     if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
@@ -202,6 +203,7 @@ public class HttpServiceOperation implements BizOperation {
                             requestBodyMap.get("requestBodyAsForm"), false);
                         if(requestBodyAsForm){
                             requestType = ConstantValue.FORM_REQUEST_TYPE;
+                            requestBodyMap.remove("requestBodyAsForm");
                         }
                     }
                     if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
