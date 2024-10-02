@@ -175,10 +175,10 @@ public class HttpServiceOperation implements BizOperation {
                         }
                     }
                     if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
-                        receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPost(httpExecutorContext,
+                        receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.formPost(httpExecutorContext,
                             UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
                     } else {
-                        receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
+                        receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.jsonPost(httpExecutorContext,
                             UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
                     }
                 }
@@ -207,10 +207,10 @@ public class HttpServiceOperation implements BizOperation {
                         }
                     }
                     if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
-                        receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPut(httpExecutorContext,
+                        receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.formPut(httpExecutorContext,
                             UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
                     } else {
-                        receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext,
+                        receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.jsonPut(httpExecutorContext,
                             UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
                     }
                 }
