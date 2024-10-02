@@ -18,6 +18,7 @@ import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.file.FileIOOpt;
@@ -138,19 +139,19 @@ public class HttpServiceOperation implements BizOperation {
         Map<String, Object> requestParams = getRequestParams(bizOptJson, bizModel);
         boolean inheritParams = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("inheritParameter"), false);
         if(inheritParams){
-            requestParams = CollectionsOpt.unionTwoMap(requestParams, (Map<String, Object>)
-                    dataOptContext.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
+            requestParams = CollectionsOpt.unionTwoMap(requestParams,
+                CollectionsOpt.objectToMap(dataOptContext.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
         }
-
 
         // 添加url中的参数 __request_params
         // requestParams.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
         //请求方式
         String requestMode = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post");
         HttpReceiveJSON receiveJson = null;
+        String requestType;
         switch (requestMode.toLowerCase()) {
             case "post":
-                String requestType = BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
+                requestType = BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
                 if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)) {
                     String source = bizOptJson.getString("source");
                     DataSet dataSet = bizModel.getDataSet(source);
@@ -164,15 +165,53 @@ public class HttpServiceOperation implements BizOperation {
                     }
                 } else {
                     Object requestBody = getRequestBody(bizOptJson, bizModel);
-                    receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
-                        UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
+                    if(requestBody instanceof Map){
+                        Map<String, Object> requestBodyMap = (Map<String, Object>) requestBody;
+                        Boolean requestBodyAsForm = BooleanBaseOpt.castObjectToBoolean(
+                            requestBodyMap.get("requestBodyAsForm"), false);
+                        if(requestBodyAsForm){
+                            requestType = ConstantValue.FORM_REQUEST_TYPE;
+                        }
+                    }
+                    if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
+                        receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPost(httpExecutorContext,
+                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
+                    } else {
+                        receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
+                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
+                    }
                 }
                 break;
             case "put":
-                Object requestBody = getRequestBody(bizOptJson, bizModel);
-                // 这个是否有必要和 post一样 可以提交文件
-                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext,
-                    UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
+                requestType = BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
+                if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)) {
+                    String source = bizOptJson.getString("source");
+                    DataSet dataSet = bizModel.getDataSet(source);
+                    FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
+                    InputStream fileIS = fileInfo.getFileInputStream();
+                    if (fileIS != null) {
+                        receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUploadPut(httpExecutorContext,
+                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), fileIS,
+                            "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()));
+                    }
+                } else{
+                    Object requestBody = getRequestBody(bizOptJson, bizModel);
+                    if(requestBody instanceof Map){
+                        Map<String, Object> requestBodyMap = (Map<String, Object>) requestBody;
+                        Boolean requestBodyAsForm = BooleanBaseOpt.castObjectToBoolean(
+                            requestBodyMap.get("requestBodyAsForm"), false);
+                        if(requestBodyAsForm){
+                            requestType = ConstantValue.FORM_REQUEST_TYPE;
+                        }
+                    }
+                    if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
+                        receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPut(httpExecutorContext,
+                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
+                    } else {
+                        receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext,
+                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
+                    }
+                }
                 break;
             case "get":
                 Boolean returnAsFile = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getString("returnAsFile"), false);
