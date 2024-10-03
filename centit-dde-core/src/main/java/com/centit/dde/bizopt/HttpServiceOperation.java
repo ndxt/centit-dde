@@ -18,7 +18,6 @@ import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.file.FileIOOpt;
@@ -146,11 +145,12 @@ public class HttpServiceOperation implements BizOperation {
         // 添加url中的参数 __request_params
         // requestParams.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
         //请求方式
-        String requestMode = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post");
+        String requestMode = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post").toLowerCase();
         HttpReceiveJSON receiveJson = null;
         String requestType;
-        switch (requestMode.toLowerCase()) {
+        switch (requestMode) {
             case "post":
+            case "put":
                 requestType = BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
                 if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)) {
                     String source = bizOptJson.getString("source");
@@ -159,9 +159,15 @@ public class HttpServiceOperation implements BizOperation {
                     InputStream fileIS = fileInfo.getFileInputStream();
 
                     if (fileIS != null) {
-                        receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
-                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), fileIS,
-                            "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()));
+                        if("put".equals(requestMode)){
+                            receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.inputStreamUploadPut(httpExecutorContext,
+                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), fileIS,
+                                "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()));
+                        } else {
+                            receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
+                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), fileIS,
+                                "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()));
+                        }
                     }
                 } else {
                     Object requestBody = getRequestBody(bizOptJson, bizModel);
@@ -174,44 +180,22 @@ public class HttpServiceOperation implements BizOperation {
                             requestBodyMap.remove("requestBodyAsForm");
                         }
                     }
-                    if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
-                        receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.formPost(httpExecutorContext,
-                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
-                    } else {
-                        receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.jsonPost(httpExecutorContext,
-                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
-                    }
-                }
-                break;
-            case "put":
-                requestType = BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
-                if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)) {
-                    String source = bizOptJson.getString("source");
-                    DataSet dataSet = bizModel.getDataSet(source);
-                    FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
-                    InputStream fileIS = fileInfo.getFileInputStream();
-                    if (fileIS != null) {
-                        receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.inputStreamUploadPut(httpExecutorContext,
-                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), fileIS,
-                            "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()));
-                    }
-                } else{
-                    Object requestBody = getRequestBody(bizOptJson, bizModel);
-                    if(requestBody instanceof Map){
-                        Map<String, Object> requestBodyMap = (Map<String, Object>) requestBody;
-                        Boolean requestBodyAsForm = BooleanBaseOpt.castObjectToBoolean(
-                            requestBodyMap.get("requestBodyAsForm"), false);
-                        if(requestBodyAsForm){
-                            requestType = ConstantValue.FORM_REQUEST_TYPE;
-                            requestBodyMap.remove("requestBodyAsForm");
+                    if("put".equals(requestMode)){
+                        if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
+                            receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.formPut(httpExecutorContext,
+                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
+                        } else {
+                            receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.jsonPut(httpExecutorContext,
+                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
                         }
-                    }
-                    if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
-                        receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.formPut(httpExecutorContext,
-                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
                     } else {
-                        receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.jsonPut(httpExecutorContext,
-                            UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
+                        if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
+                            receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.formPost(httpExecutorContext,
+                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
+                        } else {
+                            receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.jsonPost(httpExecutorContext,
+                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
+                        }
                     }
                 }
                 break;
@@ -224,19 +208,18 @@ public class HttpServiceOperation implements BizOperation {
                     bizModel.putDataSet(id, fileDataSet);
                     return BuiltInOperation.createResponseSuccessData(1);
                 }
-
                 receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGet(httpExecutorContext, requestServerAddress, requestParams));
-                if (receiveJson.getCode() != ResponseData.RESULT_OK) {
+                if (receiveJson.getCode() != ResponseData.RESULT_OK && receiveJson.getCode() != ResponseData.HTTP_OK) {
                     return BuiltInOperation.createResponseData(0, 1, receiveJson.getCode(), receiveJson.getMessage());
                 }
                 break;
             case "delete":
-                DataSet dataSet = DataSet.toDataSet(HttpExecutor.simpleDelete(httpExecutorContext, requestServerAddress, requestParams));
-                return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
-
+                receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.simpleDelete(httpExecutorContext, requestServerAddress, requestParams));
+                break;
             default:
                 return BuiltInOperation.createResponseData(0, 1, 500, "无效请求！");
         }
+
         if (receiveJson != null) {
             DataSet dataSet = DataSet.toDataSet(receiveJson.getData());
             String id = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
