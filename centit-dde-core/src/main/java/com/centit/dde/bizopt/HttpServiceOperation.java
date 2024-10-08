@@ -160,11 +160,11 @@ public class HttpServiceOperation implements BizOperation {
 
                     if (fileIS != null) {
                         if("put".equals(requestMode)){
-                            receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.inputStreamUploadPut(httpExecutorContext,
+                            receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUploadPut(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), fileIS,
                                 "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()));
                         } else {
-                            receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
+                            receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), fileIS,
                                 "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()));
                         }
@@ -182,18 +182,18 @@ public class HttpServiceOperation implements BizOperation {
                     }
                     if("put".equals(requestMode)){
                         if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
-                            receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.formPut(httpExecutorContext,
+                            receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPut(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
                         } else {
-                            receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.jsonPut(httpExecutorContext,
+                            receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
                         }
                     } else {
                         if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
-                            receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.formPost(httpExecutorContext,
+                            receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPost(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
                         } else {
-                            receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.jsonPost(httpExecutorContext,
+                            receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
                         }
                     }
@@ -214,14 +214,19 @@ public class HttpServiceOperation implements BizOperation {
                 }
                 break;
             case "delete":
-                receiveJson = HttpReceiveJSON.dataOfJson(HttpExecutor.simpleDelete(httpExecutorContext, requestServerAddress, requestParams));
+                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleDelete(httpExecutorContext, requestServerAddress, requestParams));
                 break;
             default:
                 return BuiltInOperation.createResponseData(0, 1, 500, "无效请求！");
         }
 
         if (receiveJson != null) {
-            DataSet dataSet = DataSet.toDataSet(receiveJson.getData());
+            DataSet dataSet;
+            if(receiveJson.getData() == null){
+                dataSet = DataSet.toDataSet(receiveJson.toResponseData());
+            } else{
+                dataSet = DataSet.toDataSet(receiveJson.getData());
+            }
             String id = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
             bizModel.putDataSet(id, dataSet);
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
