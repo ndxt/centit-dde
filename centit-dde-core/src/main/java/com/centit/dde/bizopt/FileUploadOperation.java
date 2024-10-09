@@ -45,21 +45,8 @@ public class FileUploadOperation implements BizOperation {
                 dataOptContext.getI18nMessage("error.701.field_is_blank", "fileName"));
         }
 
-        String fileName = mapFileInfo.getFileName();
-        String fileNameDesc = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", "");
-        if(StringUtils.isNotBlank(fileNameDesc)) {
-            String tempFileName = StringBaseOpt.objectToString(
-                JSONTransformer.transformer(fileNameDesc, new BizModelJSONTransform(bizModel)));
-            if (StringUtils.isNotBlank(tempFileName)) {
-                fileName = tempFileName;
-            } else {
-                if(StringUtils.isBlank(fileName))
-                    fileName = fileNameDesc;
-            }
-        }
-
         FileInfo fileInfo = new FileInfo();
-        fileInfo.setFileName(fileName);
+        fileInfo.setFileName(mapFileInfo.getFileName());
         fileInfo.setOptId(dataOptContext.getOptId());
         fileInfo.setOsId(dataOptContext.getOsId());
         fileInfo.setOptMethod("api");

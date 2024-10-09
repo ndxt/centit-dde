@@ -1023,15 +1023,25 @@ public abstract class DataSetOptUtil {
 
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
         BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel);
-        String fileName=null;
+        String fileName = null;
+
         if(StringUtils.isNotBlank(fileNameDesc)){
-            fileName = Pretreatment.mapTemplateStringAsFormula(fileNameDesc, transformer);
+            if(fileNameDesc.startsWith("@")) {
+                fileName = Pretreatment.mapTemplateStringAsFormula(fileNameDesc, transformer);
+            } else {
+                fileName = StringBaseOpt.objectToString(
+                    JSONTransformer.transformer(fileNameDesc, transformer));
+                if (StringUtils.isBlank(fileName)) {
+                    fileName = Pretreatment.mapTemplateStringAsFormula(fileNameDesc, transformer);
+                }
+            }
         }
+
         if(dataSet instanceof FileDataSet){
             FileDataSet fileDataSet = (FileDataSet) dataSet;
             String currentFileName =  fileDataSet.getFileName();
-            if(StringUtils.isBlank(currentFileName) || StringUtils.equals(
-                FileType.getFileExtName(currentFileName), FileType.getFileExtName(fileName)) ){
+            if(StringUtils.isNotBlank(fileName) && (StringUtils.isBlank(currentFileName) || StringUtils.equals(
+                FileType.getFileExtName(currentFileName), FileType.getFileExtName(fileName)))){
                 fileDataSet.setFileName(fileName);
             }
             return fileDataSet;
@@ -1067,11 +1077,11 @@ public abstract class DataSetOptUtil {
             throw new ObjectException(ObjectException.EMPTY_RESULT_EXCEPTION, "文件数据获取失败");
         }
 
-        if(files.size()==1){
+        if(files.size() == 1){
             FileDataSet ds = files.get(0);
-            String currentFileName =  ds.getFileName();
-            if(StringUtils.isBlank(currentFileName) || StringUtils.equals(
-                FileType.getFileExtName(currentFileName), FileType.getFileExtName(fileName)) ){
+            String currentFileName = ds.getFileName();
+            if(StringUtils.isNotBlank(fileName) && (StringUtils.isBlank(currentFileName) || StringUtils.equals(
+                FileType.getFileExtName(currentFileName), FileType.getFileExtName(fileName))) ){
                 ds.setFileName(fileName);
             }
             return ds;
