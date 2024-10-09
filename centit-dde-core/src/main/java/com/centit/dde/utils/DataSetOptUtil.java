@@ -1026,15 +1026,7 @@ public abstract class DataSetOptUtil {
         String fileName = null;
 
         if(StringUtils.isNotBlank(fileNameDesc)){
-            if(fileNameDesc.startsWith("@")) {
-                fileName = Pretreatment.mapTemplateStringAsFormula(fileNameDesc, transformer);
-            } else {
-                fileName = StringBaseOpt.objectToString(
-                    JSONTransformer.transformer(fileNameDesc, transformer));
-                if (StringUtils.isBlank(fileName)) {
-                    fileName = Pretreatment.mapTemplateStringAsFormula(fileNameDesc, transformer);
-                }
-            }
+            fileName = StringBaseOpt.objectToString(JSONTransformer.transformer(fileNameDesc, transformer));
         }
 
         if(dataSet instanceof FileDataSet){
