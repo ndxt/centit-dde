@@ -6,12 +6,14 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.fileserver.po.FileInfo;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
+import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -43,8 +45,21 @@ public class FileUploadOperation implements BizOperation {
                 dataOptContext.getI18nMessage("error.701.field_is_blank", "fileName"));
         }
 
+        String fileName = mapFileInfo.getFileName();
+        String fileNameDesc = BuiltInOperation.getJsonFieldString(bizOptJson, "fileName", "");
+        if(StringUtils.isNotBlank(fileNameDesc)) {
+            String tempFileName = StringBaseOpt.objectToString(
+                JSONTransformer.transformer(fileNameDesc, new BizModelJSONTransform(bizModel)));
+            if (StringUtils.isNotBlank(tempFileName)) {
+                fileName = tempFileName;
+            } else {
+                if(StringUtils.isBlank(fileName))
+                    fileName = fileNameDesc;
+            }
+        }
+
         FileInfo fileInfo = new FileInfo();
-        fileInfo.setFileName(mapFileInfo.getFileName());
+        fileInfo.setFileName(fileName);
         fileInfo.setOptId(dataOptContext.getOptId());
         fileInfo.setOsId(dataOptContext.getOsId());
         fileInfo.setOptMethod("api");
