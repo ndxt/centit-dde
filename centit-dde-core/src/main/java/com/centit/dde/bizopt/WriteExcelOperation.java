@@ -14,7 +14,7 @@ import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
-import com.centit.support.compiler.Pretreatment;
+import com.centit.support.json.JSONTransformer;
 import com.centit.support.report.ExcelExportUtil;
 import com.centit.support.report.ExcelImportUtil;
 import com.centit.support.report.ExcelReportUtil;
@@ -88,7 +88,7 @@ public class WriteExcelOperation implements BizOperation {
 
         boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), false);
         String fileName = StringUtils.isNotBlank(bizOptJson.getString("fileName")) ?
-            StringBaseOpt.castObjectToString(Pretreatment.mapTemplateStringAsFormula(
+            StringBaseOpt.castObjectToString(JSONTransformer.transformer(
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))) :
             DatetimeOpt.currentTimeWithSecond();
 

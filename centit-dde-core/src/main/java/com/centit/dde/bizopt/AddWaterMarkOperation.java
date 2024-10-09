@@ -19,9 +19,8 @@ import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileType;
 import com.centit.support.image.ImageOpt;
 import com.centit.support.office.Watermark4Pdf;
-import org.apache.commons.lang3.StringUtils;
-
 import com.itextpdf.text.Image;
+import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.io.ByteArrayOutputStream;

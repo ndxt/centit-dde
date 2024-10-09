@@ -12,7 +12,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
-import com.centit.support.compiler.Pretreatment;
+import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.InputStream;
@@ -28,7 +28,7 @@ public class WriteCsvOperation implements BizOperation {
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
 
         String fileName=StringUtils.isNotBlank(bizOptJson.getString("fileName"))?
-            StringBaseOpt.castObjectToString(Pretreatment.mapTemplateStringAsFormula(
+            StringBaseOpt.castObjectToString(JSONTransformer.transformer(
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))):
             DatetimeOpt.currentTimeWithSecond();
 

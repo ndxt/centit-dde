@@ -34,7 +34,7 @@ public class ReadExcelOperation implements BizOperation {
         String source = bizOptJson.getString("source");
         BizModelJSONTransform modelTrasform = new BizModelJSONTransform(bizModel);
         String sheetName = bizOptJson.getString("sheetName");
-        if( StringUtils.isNotBlank(sheetName)) {
+        if(StringUtils.isNotBlank(sheetName)) {
             sheetName = Pretreatment.mapTemplateStringAsFormula(sheetName, modelTrasform);
         }
 

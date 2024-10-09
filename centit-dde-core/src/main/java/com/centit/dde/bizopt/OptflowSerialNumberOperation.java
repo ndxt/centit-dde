@@ -6,15 +6,12 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
-import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.oa.service.OptFlowNoInfoManager;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.compiler.Pretreatment;
-import com.centit.support.compiler.VariableFormula;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
@@ -105,12 +102,8 @@ public class OptflowSerialNumberOperation implements BizOperation {
         bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(data));
         String template = bizOptJson.getString("template");
         if (StringUtils.isNotBlank(template)) {
-            Object calculate;
-            if(template.startsWith("@")){
-                calculate = Pretreatment.mapTemplateStringAsFormula(template, new BizModelJSONTransform(bizModel, data),"");
-            } else {
-                calculate = VariableFormula.calculate(template, new BizModelJSONTransform(bizModel, data), DataSetOptUtil.extendFuncs);
-            }
+            BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel);
+            Object calculate = JSONTransformer.transformer(template, transformer);
             data.put(lshField, calculate);
         } else {
             data.put(lshField, lsh);

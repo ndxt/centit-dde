@@ -10,8 +10,8 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.compiler.Pretreatment;
 import com.centit.support.file.FileType;
+import com.centit.support.json.JSONTransformer;
 import com.centit.support.xml.XMLObject;
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,8 +27,8 @@ public class WriteObjectFileOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String fileName = StringUtils.isNotBlank(bizOptJson.getString("fileName"))?
-            StringBaseOpt.castObjectToString(Pretreatment.mapTemplateStringAsFormula(
+        String fileName =   StringUtils.isNotBlank(bizOptJson.getString("fileName"))?
+            StringBaseOpt.castObjectToString(JSONTransformer.transformer(
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))):
             DatetimeOpt.currentTimeWithSecond();
         String fileType = bizOptJson.getString("fileType");
