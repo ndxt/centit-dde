@@ -27,10 +27,7 @@ public class WriteObjectFileOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String fileName =   StringUtils.isNotBlank(bizOptJson.getString("fileName"))?
-            StringBaseOpt.castObjectToString(JSONTransformer.transformer(
-                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))):
-            DatetimeOpt.currentTimeWithSecond();
+
         String fileType = bizOptJson.getString("fileType");
         if(StringUtils.isBlank(fileType)){
             fileType = "json";
@@ -45,6 +42,14 @@ public class WriteObjectFileOperation implements BizOperation {
                 rootName = "object";
             }
             object = XMLObject.objectToXMLString(rootName, data);
+        }
+        String fileName = null;
+        if(StringUtils.isNotBlank(bizOptJson.getString("fileName"))) {
+            fileName = StringBaseOpt.castObjectToString(JSONTransformer.transformer(
+                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))) ;
+        }
+        if(StringUtils.isBlank(fileName)) {
+            fileName = DatetimeOpt.currentTimeWithSecond();
         }
         if(!fileName.endsWith("."+fileType)){
             fileName = FileType.truncateFileExtName(fileName)+"."+fileType;

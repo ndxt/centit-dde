@@ -27,10 +27,14 @@ public class WriteCsvOperation implements BizOperation {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
 
-        String fileName=StringUtils.isNotBlank(bizOptJson.getString("fileName"))?
-            StringBaseOpt.castObjectToString(JSONTransformer.transformer(
-                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))):
-            DatetimeOpt.currentTimeWithSecond();
+        String fileName = null;
+        if(StringUtils.isNotBlank(bizOptJson.getString("fileName"))) {
+            fileName = StringBaseOpt.castObjectToString(JSONTransformer.transformer(
+                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))) ;
+        }
+        if(StringUtils.isBlank(fileName)) {
+            fileName = DatetimeOpt.currentTimeWithSecond();
+        }
 
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet==null){
