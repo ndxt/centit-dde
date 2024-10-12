@@ -102,11 +102,12 @@ public class OptflowSerialNumberOperation implements BizOperation {
         bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(data));
         String template = bizOptJson.getString("template");
         if (StringUtils.isNotBlank(template)) {
-            BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel);
+            BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel, data);
             Object calculate = JSONTransformer.transformer(template, transformer);
-            data.put(lshField, calculate);
-        } else {
-            data.put(lshField, lsh);
+            String serialNo = StringBaseOpt.castObjectToString(calculate);
+            if(StringUtils.isNotBlank(serialNo)){
+                data.put(lshField, serialNo);
+            }
         }
         bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(data));
 
