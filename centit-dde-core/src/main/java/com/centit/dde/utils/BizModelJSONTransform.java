@@ -99,7 +99,7 @@ public class BizModelJSONTransform
                 return fetchRootData(labelName.substring(1));
             }
         } else {
-            if (stackLength > 0) {
+            if (stackLength > 0) { // 优先从栈中获取变量
                 Object obj = ReflectionOpt.attainExpressionValue(
                     stack.get(stackLength - 1),
                     labelName);
