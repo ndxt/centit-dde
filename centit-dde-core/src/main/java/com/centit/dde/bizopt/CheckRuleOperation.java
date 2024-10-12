@@ -86,7 +86,7 @@ public class CheckRuleOperation implements BizOperation {
                         String paramName = temp.getString("label");
                         Object paramValue = temp.get("value");
                         if (StringUtils.isNotBlank(paramName) && paramValue != null) {
-                            Object transformer = JSONTransformer.transformer(paramValue, new BizModelJSONTransform(bizModel));
+                            Object transformer = JSONTransformer.transformer(paramValue, new BizModelJSONTransform(bizModel, dataSet.getData()));
                             String valueTrans = StringBaseOpt.castObjectToString(transformer);
                             paramMap.put(paramName, valueTrans);
                         }

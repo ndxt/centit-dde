@@ -141,6 +141,8 @@ public class AddWaterMarkOperation implements BizOperation {
     private ResponseData addImageWaterMark(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
         //获取参数 BufferedImage image, String waterMark, String fontName, Color color, int size, int x, int y
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
+        String sourDsName = bizOptJson.getString("source");
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
         //String waterMarkStr = bizOptJson.getString("waterMark");
         String font = bizOptJson.getString("font");
         if(StringUtils.isBlank(font)){
@@ -151,7 +153,7 @@ public class AddWaterMarkOperation implements BizOperation {
         JSONArray textArray = bizOptJson.getJSONArray("textList");
         List<ImageOpt.ImageTextInfo> textList = new ArrayList<>();
         if(textArray!=null) {
-            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
+            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel, dataSet.getData());
             for (Object obj : textArray){
                 if(obj instanceof JSONObject){
                     JSONObject textObj = (JSONObject) obj;
@@ -166,10 +168,8 @@ public class AddWaterMarkOperation implements BizOperation {
                 }
             }
         }
-        String sourDsName = bizOptJson.getString("source");
-        Color markColor = ImageOpt.castObjectToColor(color, Color.WHITE);
-        DataSet dataSet = bizModel.getDataSet(sourDsName);
 
+        Color markColor = ImageOpt.castObjectToColor(color, Color.WHITE);
         if(dataSet.getSize() == 1) {
             FileDataSet fileDataSet;
             if (dataSet instanceof FileDataSet) {

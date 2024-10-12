@@ -43,7 +43,6 @@ public class UnitFilterOperation implements BizOperation {
                 new BizModelJSONTransform(bizModel));
 
         //两种类别 机构表达式， 根据属性查询 filterType： express， properties
-
         Set<String> units;
         Object userObj = bizModel.getStackData(ConstantValue.SESSION_DATA_TAG);
         if (userObj instanceof CentitUserDetails) {

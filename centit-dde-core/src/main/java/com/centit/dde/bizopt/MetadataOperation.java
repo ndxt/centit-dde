@@ -49,9 +49,7 @@ public class MetadataOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");
-
         String tableId = bizOptJson.getString("tableLabelName");
-
         //操作类型
         Integer templateType = bizOptJson.getInteger("templateType");
         String paramsType = bizOptJson.getString("sourceType");
@@ -64,7 +62,7 @@ public class MetadataOperation implements BizOperation {
             if (mapString != null) {
                 for (Map.Entry<String, String> map : mapString.entrySet()) {
                     if (StringUtils.isNotBlank(map.getValue())) {
-                        parames.put(map.getKey(),  VariableFormula.calculate(map.getValue(),new BizModelJSONTransform(bizModel)));
+                        parames.put(map.getKey(),  VariableFormula.calculate(map.getValue(), new BizModelJSONTransform(bizModel)));
                     }
                 }
             }

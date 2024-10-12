@@ -90,7 +90,7 @@ public class WriteExcelOperation implements BizOperation {
         String fileName = null;
         if(StringUtils.isNotBlank(bizOptJson.getString("fileName"))) {
             fileName = StringBaseOpt.castObjectToString(JSONTransformer.transformer(
-                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))) ;
+                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel, dataSet.getData()))) ;
         }
         if(StringUtils.isBlank(fileName)) {
             fileName = DatetimeOpt.currentTimeWithSecond();

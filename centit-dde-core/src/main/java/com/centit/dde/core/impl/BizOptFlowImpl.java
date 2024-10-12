@@ -415,13 +415,13 @@ public class BizOptFlowImpl implements BizOptFlow {
         if (RETURN_RESULT_ERROR.equals(type)) {
             String code = stepJson.getString("code");
             String message = stepJson.getString("message");
-            dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
-            DataSet dataSet = bizModel.getDataSet(dataSetId);
             ResponseSingleData response = new ResponseSingleData();
             response.setCode(NumberBaseOpt.castObjectToInteger(code, 500));
             String reMessage = StringBaseOpt.objectToString(
                     JSONTransformer.transformer(message, new BizModelJSONTransform(bizModel)));
             response.setMessage(StringUtils.isNotBlank(reMessage) ? reMessage : message);
+            dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
+            DataSet dataSet = bizModel.getDataSet(dataSetId);
             if (dataSet != null) {
                 response.setData(dataSet.getData());
             }
@@ -525,7 +525,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         //提取出需要操作的数据
         if (ConstantValue.CYCLE_TYPE_RANGE.equals(cycleVo.getCycleType())) {
             // 计算 range 的设置值
-            BizModelJSONTransform varTrains = new BizModelJSONTransform(bizModel);
+            BizModelJSONTransform varTrains = new BizModelJSONTransform(bizModel, stepJson);
             cycleVo.setIntRangeBegin(getRangeSet(cycleVo.getRangeBegin(), varTrains, 0));
             cycleVo.setIntRangeStep(getRangeSet(cycleVo.getRangeStep(), varTrains, 1));
             cycleVo.setIntRangeEnd(getRangeSet(cycleVo.getRangeEnd(), varTrains, 0));

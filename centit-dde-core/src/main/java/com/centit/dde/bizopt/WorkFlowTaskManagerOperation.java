@@ -34,19 +34,20 @@ public class WorkFlowTaskManagerOperation implements BizOperation {
         String taskType = bizOptJson.getString("taskType");
         String fromUserCode, toUserCode;
         int result;
+        BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
         switch (taskType) {
             //根据节点实例转移任务
             case "moveTask":
-                Object nodeInstIds = JSONTransformer.transformer(bizOptJson.getString("nodeInstIds"), new BizModelJSONTransform(bizModel));
-                fromUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("fromUserCode"), new BizModelJSONTransform(bizModel)));
-                toUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("toUserCode"), new BizModelJSONTransform(bizModel)));
+                Object nodeInstIds = JSONTransformer.transformer(bizOptJson.getString("nodeInstIds"), transform);
+                fromUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("fromUserCode"), transform));
+                toUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("toUserCode"), transform));
                 result = flowManager.moveUserTaskTo(StringBaseOpt.objectToStringList(nodeInstIds), fromUserCode, toUserCode, dataOptContext.getCurrentUserDetail(), "");
                 bizModel.putDataSet(id, new DataSet(result));
                 break;
             //根据应用转移任务
             case "moveTaskByOs":
-                fromUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("fromUserCode"), new BizModelJSONTransform(bizModel)));
-                toUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("toUserCode"), new BizModelJSONTransform(bizModel)));
+                fromUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("fromUserCode"), transform));
+                toUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("toUserCode"), transform));
                 result = flowManager.moveUserTaskTo(dataOptContext.getOsId(), fromUserCode, toUserCode, dataOptContext.getCurrentUserDetail(), "");
                 bizModel.putDataSet(id, new DataSet(result));
                 break;
@@ -54,24 +55,24 @@ public class WorkFlowTaskManagerOperation implements BizOperation {
             case "createRelegate":
                 RoleRelegate roleRelegate = new RoleRelegate();
                 roleRelegate.setExpireTime(DatetimeOpt.castObjectToDate(
-                    JSONTransformer.transformer(bizOptJson.getString("expireTime"), new BizModelJSONTransform(bizModel))
+                    JSONTransformer.transformer(bizOptJson.getString("expireTime"), transform)
                 ));
                 //原处理人，委托人
                 roleRelegate.setGrantee(StringBaseOpt.castObjectToString(
-                    JSONTransformer.transformer(bizOptJson.getString("grantee"), new BizModelJSONTransform(bizModel))
+                    JSONTransformer.transformer(bizOptJson.getString("grantee"), transform)
                 ));
                 //现处理人，受委托人
                 roleRelegate.setGrantor(StringBaseOpt.castObjectToString(
-                    JSONTransformer.transformer(bizOptJson.getString("grantor"), new BizModelJSONTransform(bizModel))
+                    JSONTransformer.transformer(bizOptJson.getString("grantor"), transform)
                 ));
                 roleRelegate.setOptId(StringBaseOpt.castObjectToString(
-                    JSONTransformer.transformer(bizOptJson.getString("grantee"), new BizModelJSONTransform(bizModel))
+                    JSONTransformer.transformer(bizOptJson.getString("grantee"), transform)
                 ));
                 roleRelegate.setUnitCode(StringBaseOpt.castObjectToString(
-                    JSONTransformer.transformer(bizOptJson.getString("unitCode"), new BizModelJSONTransform(bizModel))
+                    JSONTransformer.transformer(bizOptJson.getString("unitCode"), transform)
                 ));
                 roleRelegate.setRoleCode(StringBaseOpt.castObjectToString(
-                    JSONTransformer.transformer(bizOptJson.getString("roleCode"), new BizModelJSONTransform(bizModel))
+                    JSONTransformer.transformer(bizOptJson.getString("roleCode"), transform)
                 ));
                 roleRelegate.setTopUnit(dataOptContext.getTopUnit());
                 roleRelegate.setRecordDate(new Date());
@@ -81,7 +82,7 @@ public class WorkFlowTaskManagerOperation implements BizOperation {
             case "listGrantee":
                 List<RoleRelegate> granteeRelegateList = flowManager.listRoleRelegateByUser(
                     StringBaseOpt.castObjectToString(
-                        JSONTransformer.transformer(bizOptJson.getString("grantee"), new BizModelJSONTransform(bizModel))
+                        JSONTransformer.transformer(bizOptJson.getString("grantee"), transform)
                     )
                 );
                 bizModel.putDataSet(id, new DataSet(granteeRelegateList));
@@ -90,7 +91,7 @@ public class WorkFlowTaskManagerOperation implements BizOperation {
             case "listGrantor":
                 List<RoleRelegate> grantorRelegateList = flowManager.listRoleRelegateByGrantor(
                     StringBaseOpt.castObjectToString(
-                        JSONTransformer.transformer(bizOptJson.getString("grantor"), new BizModelJSONTransform(bizModel))
+                        JSONTransformer.transformer(bizOptJson.getString("grantor"), transform)
                     )
                 );
                 bizModel.putDataSet(id, new DataSet(grantorRelegateList));
@@ -98,10 +99,10 @@ public class WorkFlowTaskManagerOperation implements BizOperation {
             case "deleteRelegate":
                 flowManager.deleteRoleRelegateByUserCode(
                     StringBaseOpt.castObjectToString(
-                        JSONTransformer.transformer(bizOptJson.getString("grantor"), new BizModelJSONTransform(bizModel))
+                        JSONTransformer.transformer(bizOptJson.getString("grantor"), transform)
                     ),
                     StringBaseOpt.castObjectToString(
-                        JSONTransformer.transformer(bizOptJson.getString("grantee"), new BizModelJSONTransform(bizModel))
+                        JSONTransformer.transformer(bizOptJson.getString("grantee"), transform)
                     )
                 );
                 break;

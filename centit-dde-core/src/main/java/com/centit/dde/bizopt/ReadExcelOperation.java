@@ -13,6 +13,7 @@ import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.report.ExcelImportUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -32,13 +33,18 @@ public class ReadExcelOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id =bizOptJson.getString("id");
         String source = bizOptJson.getString("source");
-        BizModelJSONTransform modelTrasform = new BizModelJSONTransform(bizModel);
+        DataSet dataSet = bizModel.getDataSet(source);
+        if (dataSet == null){
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
+        }
+        BizModelJSONTransform modelTrasform = new BizModelJSONTransform(bizModel, dataSet.getData());
         String sheetName = bizOptJson.getString("sheetName");
         if(StringUtils.isNotBlank(sheetName)) {
             sheetName = Pretreatment.mapTemplateStringAsFormula(sheetName, modelTrasform);
         }
 
-        DataSet dataSet = bizModel.getDataSet(source);
         FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, true);
         InputStream inputStream = fileInfo.getFileInputStream();
 

@@ -29,7 +29,9 @@ public class BizModelJSONTransform
 
     public BizModelJSONTransform(BizModel obj, Object stackValue) {
         this(obj);
-        pushStackValue(stackValue);
+        if(stackValue!=null) {
+            pushStackValue(stackValue);
+        }
     }
 
 

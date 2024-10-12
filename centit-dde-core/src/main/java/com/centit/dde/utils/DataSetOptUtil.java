@@ -1022,7 +1022,7 @@ public abstract class DataSetOptUtil {
     public static FileDataSet attainFileDataset(BizModel bizModel, DataSet dataSet, JSONObject jsonStep, boolean singleFile){
 
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
-        BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel);
+        BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel, dataSet.getData());
         String fileName = null;
 
         if(StringUtils.isNotBlank(fileNameDesc)){

@@ -46,7 +46,7 @@ public class WriteObjectFileOperation implements BizOperation {
         String fileName = null;
         if(StringUtils.isNotBlank(bizOptJson.getString("fileName"))) {
             fileName = StringBaseOpt.castObjectToString(JSONTransformer.transformer(
-                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))) ;
+                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel, data))) ;
         }
         if(StringUtils.isBlank(fileName)) {
             fileName = DatetimeOpt.currentTimeWithSecond();

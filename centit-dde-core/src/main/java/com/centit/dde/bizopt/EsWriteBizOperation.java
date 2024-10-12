@@ -50,7 +50,8 @@ public class EsWriteBizOperation implements BizOperation {
     private final ESServerConfig esServerConfig;
     private final ImagePdfTextExtractor.OcrServerHost ocrServerHost;
     private  SourceInfoMetadata sourceInfoMetadata;
-    public EsWriteBizOperation(ESServerConfig esServerConfig, SourceInfoMetadata sourceInfoMetadata, ImagePdfTextExtractor.OcrServerHost ocrServerHost) {
+    public EsWriteBizOperation(ESServerConfig esServerConfig, SourceInfoMetadata sourceInfoMetadata,
+                               ImagePdfTextExtractor.OcrServerHost ocrServerHost) {
         this.esServerConfig = esServerConfig;
         this.sourceInfoMetadata = sourceInfoMetadata;
         this.ocrServerHost = ocrServerHost;

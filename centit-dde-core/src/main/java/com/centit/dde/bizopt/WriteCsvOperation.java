@@ -26,24 +26,22 @@ public class WriteCsvOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-
-        String fileName = null;
-        if(StringUtils.isNotBlank(bizOptJson.getString("fileName"))) {
-            fileName = StringBaseOpt.castObjectToString(JSONTransformer.transformer(
-                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel))) ;
-        }
-        if(StringUtils.isBlank(fileName)) {
-            fileName = DatetimeOpt.currentTimeWithSecond();
-        }
-
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet==null){
             return BuiltInOperation.createResponseData(0, 1,
                 ObjectException.DATA_NOT_FOUND_EXCEPTION,
                 dataOptContext.getI18nMessage("dde.604.data_source_not_found2", sourDsName));
         }
-        InputStream inputStream = CsvDataSet.createCsvStream(dataSet, bizOptJson);
+        String fileName = null;
+        if(StringUtils.isNotBlank(bizOptJson.getString("fileName"))) {
+            fileName = StringBaseOpt.castObjectToString(JSONTransformer.transformer(
+                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel, dataSet.getData()))) ;
+        }
+        if(StringUtils.isBlank(fileName)) {
+            fileName = DatetimeOpt.currentTimeWithSecond();
+        }
 
+        InputStream inputStream = CsvDataSet.createCsvStream(dataSet, bizOptJson);
         FileDataSet objectToDataSet = new FileDataSet(fileName.endsWith(".csv")?fileName:fileName+".csv",
             inputStream.available(), inputStream);
         bizModel.putDataSet(targetDsName,objectToDataSet);
