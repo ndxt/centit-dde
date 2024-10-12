@@ -100,12 +100,14 @@ public class BizModelJSONTransform
             }
         } else {
             if (stackLength > 0) {
-                return ReflectionOpt.attainExpressionValue(
+                Object obj = ReflectionOpt.attainExpressionValue(
                     stack.get(stackLength - 1),
                     labelName);
-            } else {
-                return fetchRootData(labelName);
+                if(obj!=null){
+                    return obj;
+                }
             }
+            return fetchRootData(labelName);
         }
     }
 
