@@ -53,6 +53,9 @@ import java.util.*;
 @Service
 public class BizOptFlowImpl implements BizOptFlow {
 
+    @Value("${app.home:./}")
+    private String appHome;
+
     protected static final Logger logger = LoggerFactory.getLogger(BizOptFlowImpl.class);
     public static final String RETURN_RESULT_ALL_DATASET = "1";
     public static final String RETURN_RESULT_STATE = "2";
@@ -62,9 +65,6 @@ public class BizOptFlowImpl implements BizOptFlow {
     public static final String RETURN_RESULT_ERROR = "5";
     public static final String RETURN_RESULT_FILE = "6";
     public static final String RETURN_RESULT_INNERDATA = "7";
-
-    @Value("${os.file.base.dir:./file_home/export}")
-    private String path;
 
     @Autowired
     private SourceInfoMetadata sourceInfoMetadata;
@@ -214,7 +214,8 @@ public class BizOptFlowImpl implements BizOptFlow {
 
         allOperations.put(ConstantValue.DOCUMENT_TO_PDF, new DocToPdfOperation()); //"docToPdf"
         allOperations.put(ConstantValue.ADD_WATER_MARK, new AddWaterMarkOperation(fileInfoOpt)); //"waterMark"
-
+        allOperations.put("sqlitein", new SqliteImportOperation(this.appHome));
+        allOperations.put("sqliteout", new SqliteExportOperation(this.appHome));
         //--------添加 文件获取函数，用于 excel中的图片加载
         DataSetOptUtil.extendFuncs.put("loadFile", (a) -> {
                 try {
