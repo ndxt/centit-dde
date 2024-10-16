@@ -20,6 +20,7 @@ import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.FieldType;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileSystemOpt;
+import com.centit.support.file.FileType;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
@@ -83,6 +84,10 @@ public class SqliteExportOperation implements BizOperation {
         if (StringUtils.isBlank(fileName)) {
             fileName = DatetimeOpt.currentTimeWithSecond();
         }
+        if(!"db".equalsIgnoreCase(FileType.getFileExtName(fileName))) {
+            fileName = fileName + ".db";
+        }
+
         byte[] fileBytes = FileIOOpt.readBytesFromFile(dbFileName);
         FileSystemOpt.deleteFile(dbFileName);
         FileDataSet fileDataSet = new FileDataSet(fileName, fileBytes.length, fileBytes);
