@@ -214,8 +214,8 @@ public class BizOptFlowImpl implements BizOptFlow {
 
         allOperations.put(ConstantValue.DOCUMENT_TO_PDF, new DocToPdfOperation()); //"docToPdf"
         allOperations.put(ConstantValue.ADD_WATER_MARK, new AddWaterMarkOperation(fileInfoOpt)); //"waterMark"
-        allOperations.put("sqlitein", new SqliteImportOperation(this.appHome));
-        allOperations.put("sqliteout", new SqliteExportOperation(this.appHome));
+        allOperations.put("sqliteIn", new SqliteImportOperation(this.appHome));
+        allOperations.put("sqliteOut", new SqliteExportOperation(this.appHome));
         //--------添加 文件获取函数，用于 excel中的图片加载
         DataSetOptUtil.extendFuncs.put("loadFile", (a) -> {
                 try {
