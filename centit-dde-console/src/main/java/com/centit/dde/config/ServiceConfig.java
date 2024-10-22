@@ -57,7 +57,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @EnableNacosConfig(globalProperties = @NacosProperties(serverAddr = "${nacos.server-addr}"))
 @NacosPropertySources({@NacosPropertySource(dataId = "${nacos.system-dataid}", groupId = "CENTIT", autoRefreshed = true)})
 public class ServiceConfig implements EnvironmentAware {
-    Logger logger = LoggerFactory.getLogger(ServiceConfig.class);
 
     @Value("${fileserver.url}")
     private String fileserver;
