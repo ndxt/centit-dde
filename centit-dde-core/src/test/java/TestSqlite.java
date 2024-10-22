@@ -1,17 +1,13 @@
 import org.sqlite.JDBC;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Properties;
 
 public class TestSqlite {
     public static void main(String[] args) {
-        Connection connection = null;
-        try {
-            // 连接到SQLite数据库（如果数据库不存在，会自动创建）
-            connection = JDBC.createConnection("jdbc:sqlite:/Users/codefan/projects/RunData/temp/example2.db", new Properties());
+        try (Connection connection = JDBC.createConnection("jdbc:sqlite:/Users/codefan/projects/RunData/temp/example2.db", new Properties())){
 
             // 创建一个表
             Statement statement = connection.createStatement();
@@ -35,14 +31,6 @@ public class TestSqlite {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 }
