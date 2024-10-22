@@ -23,14 +23,15 @@ import com.centit.support.file.FileSystemOpt;
 import com.centit.support.file.FileType;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
+import org.sqlite.JDBC;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class SqliteExportOperation implements BizOperation {
 
@@ -120,7 +121,7 @@ public class SqliteExportOperation implements BizOperation {
     }
 
     private void writeTableData2DB(String dbFileName, List<Map<String, Object>> data, String tableName, String primaryKey) throws SQLException, IOException {
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dbFileName)) {
+        try (Connection connection = JDBC.createConnection("jdbc:sqlite:" + dbFileName, new Properties())) {
             writeTableData(connection, data, tableName, primaryKey);
         }
     }
@@ -154,7 +155,7 @@ public class SqliteExportOperation implements BizOperation {
             return;
         }
         Map<String, Object> datasMap = (Map<String, Object>) tablesData;
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dbFileName)) {
+        try (Connection connection = JDBC.createConnection("jdbc:sqlite:" + dbFileName, new Properties())) {
             for(Map.Entry<String, Object> ent : datasMap.entrySet()) {
                 if(ent.getValue() instanceof JSONArray) {
                     JSONArray tbArray = (JSONArray) ent.getValue();

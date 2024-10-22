@@ -19,14 +19,15 @@ import com.centit.support.database.utils.QueryUtils;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileSystemOpt;
 import org.apache.commons.lang3.StringUtils;
+import org.sqlite.JDBC;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 
 public class SqliteImportOperation implements BizOperation {
 
@@ -87,7 +88,7 @@ public class SqliteImportOperation implements BizOperation {
     }
 
     private JSONArray readDataFormTable(String dbFileName, String tableName) throws SQLException, IOException {
-        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dbFileName)) {
+        try(Connection connection = JDBC.createConnection("jdbc:sqlite:" + dbFileName, new Properties())) {
             return DatabaseAccess.findObjectsAsJSON(connection, "SELECT * FROM " + QueryUtils.trimSqlIdentifier(tableName));
         }
     }
@@ -98,7 +99,7 @@ public class SqliteImportOperation implements BizOperation {
         if(tabNames == null || tabNames.length == 0){
             return object;
         }
-        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dbFileName)) {
+        try(Connection connection = JDBC.createConnection("jdbc:sqlite:" + dbFileName, new Properties())) {
             for(String tn : tabNames) {
                 String tableName = QueryUtils.trimSqlIdentifier(tn);
                 if(StringUtils.isNotBlank(tableName)) {
@@ -112,7 +113,7 @@ public class SqliteImportOperation implements BizOperation {
 
     private JSONObject readDataFormTables(String dbFileName) throws SQLException, IOException {
         JSONObject object = new JSONObject();
-        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dbFileName)) {
+        try(Connection connection = JDBC.createConnection("jdbc:sqlite:" + dbFileName, new Properties())) {
             JdbcMetadata metadata = new JdbcMetadata();
             metadata.setDBConfig(connection);
             List<SimpleTableInfo> tableInfos = metadata.listTables(false, null);
