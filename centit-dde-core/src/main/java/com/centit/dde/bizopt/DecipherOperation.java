@@ -15,6 +15,7 @@ import com.centit.support.algorithm.ByteBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.security.AESSecurityUtils;
+import com.centit.support.security.SM2Util;
 import com.centit.support.security.SM4Util;
 import com.centit.support.security.SecurityOptUtils;
 import org.apache.commons.codec.binary.Base64;
@@ -25,6 +26,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 解密算法
+ */
 public class DecipherOperation implements BizOperation {
 
     @Override
@@ -89,17 +93,21 @@ public class DecipherOperation implements BizOperation {
                     objectText = AESSecurityUtils.decryptAsCBCType(cipherBytes,
                         keyAndIv.getKey(), keyAndIv.getValue());
                 }
-                break;
+                    break;
                 case "SM4_CBC": {
                     Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "SM4");
                     objectText = SM4Util.decryptAsCBCType(cipherBytes,
                         keyAndIv.getKey(), keyAndIv.getValue());
                 }
-                break;
+                    break;
+                case "SM2":
+                    objectText = SM2Util.decryptUserPrivateKey(cipherBytes, password);
+                    break;
                 case "AES":
                 default:
                     objectText = AESSecurityUtils.decrypt(cipherBytes, password);
                     break;
+
             }
             //整个数据集都是以json形式存储的
             String jsonString = new String(objectText);
@@ -155,6 +163,9 @@ public class DecipherOperation implements BizOperation {
                                 keyAndIv.getKey(), keyAndIv.getValue());
                         }
                         break;
+                        case "SM2":
+                            objectText = SM2Util.decryptUserPrivateKey(cipherBytes, password);
+                            break;
                         case "AES":
                         default:
                             objectText = AESSecurityUtils.decrypt(cipherBytes, password);

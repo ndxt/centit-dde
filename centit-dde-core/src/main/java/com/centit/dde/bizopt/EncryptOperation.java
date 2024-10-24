@@ -14,6 +14,7 @@ import com.centit.support.algorithm.ByteBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.security.AESSecurityUtils;
+import com.centit.support.security.SM2Util;
 import com.centit.support.security.SM4Util;
 import com.centit.support.security.SecurityOptUtils;
 import org.apache.commons.codec.binary.Base64;
@@ -26,6 +27,9 @@ import java.util.Map;
 
 /**
  * @author codefan@sina.com
+ * 加密算法
+ */
+/**
  * 加密算法
  */
 public class EncryptOperation  implements BizOperation {
@@ -79,6 +83,10 @@ public class EncryptOperation  implements BizOperation {
                     cipherText = SM4Util.encryptAsCBCType(dataSet.toJSONString().getBytes(StandardCharsets.UTF_8),
                         keyAndIv.getKey(), keyAndIv.getValue());
                     }
+                    break;
+                case "SM2":
+                    cipherText = SM2Util.encryptUsePublicKey(dataSet.toJSONString().getBytes(StandardCharsets.UTF_8),
+                        password);
                     break;
                 case "AES":
                 default:
@@ -135,6 +143,10 @@ public class EncryptOperation  implements BizOperation {
                                 keyAndIv.getKey(), keyAndIv.getValue());
                         }
                         break;
+                        case "SM2":
+                            cipherText = SM2Util.encryptUsePublicKey(ByteBaseOpt.castObjectToBytes(mw),
+                                password);
+                            break;
                         case "AES":
                         default:
                             cipherText = AESSecurityUtils.encrypt(ByteBaseOpt.castObjectToBytes(mw),
