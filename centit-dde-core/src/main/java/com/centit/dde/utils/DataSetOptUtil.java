@@ -1081,6 +1081,8 @@ public abstract class DataSetOptUtil {
 
         if(StringUtils.isBlank(fileName)){
             fileName ="download.zip";
+        } else if(!fileName.toLowerCase().endsWith(".zip")) {
+            fileName = fileName + ".zip";
         }
         FileDataSet fileDataset = new FileDataSet();
         ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
