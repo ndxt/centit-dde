@@ -68,6 +68,15 @@ public class SqliteImportOperation implements BizOperation {
             }
             FileIOOpt.writeInputStreamToFile(inputStream, dbFileName);
             resObj = readDataFormTable(dbFileName, tableName);
+        } else if("sqlAsList".equals(readType)){
+            String querySQL = bizOptJson.getString("querySQL");
+            if(StringUtils.isBlank(querySQL)){
+                return BuiltInOperation.createResponseData(0, 1,
+                    ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                    dataOptContext.getI18nMessage("error.701.field_is_blank", "querySQL"));
+            }
+            FileIOOpt.writeInputStreamToFile(inputStream, dbFileName);
+            resObj = readDataUsingSql(dbFileName, querySQL);
         } else if("multiAsMap".equals(readType)){
             String tableNames = bizOptJson.getString("tableNames");
             if(StringUtils.isBlank(tableNames)){
@@ -93,6 +102,11 @@ public class SqliteImportOperation implements BizOperation {
         }
     }
 
+    private JSONArray readDataUsingSql(String dbFileName, String sqlSen) throws SQLException, IOException {
+        try(Connection connection = JDBC.createConnection("jdbc:sqlite:" + dbFileName, new Properties())) {
+            return DatabaseAccess.findObjectsAsJSON(connection, sqlSen);
+        }
+    }
     private JSONObject readDataFormTables(String dbFileName, String tableNames) throws SQLException, IOException {
         JSONObject object = new JSONObject();
         String tabNames [] = tableNames.split(",");
