@@ -361,7 +361,7 @@ public class HttpTaskController extends BaseController {
             "表达式:toObject(string),名称:转json,示例:formula:toObject(name);json:{name:\\{sex:'man'}}  \n" +
             "表达式:uuid(),名称:获取uuid,示例:formula:uuid()  \n" +
             "表达式:random(len),名称:获取随机数,示例:formula:random(6)  \n" +
-            "表达式:encode(rawPassword),名称:对字符串加密,示例:formula:encode(name)  \n" +
+            "表达式:password(rawPassword),名称:对字符串加密,示例:formula:password(password)  \n" +
             "表达式:toByteArray(inputStream),名称:把输入流转为byte数组,示例:formula:toByteArray(name)  \n" +
             "表达式:dict(catalog,key),名称:获取代码对应的数据字典,示例:formula:dict('userCode',name)  \n" +
             "表达式:dictTrans(catalog,expression),名称:获取代码表达式对应的数据字典,示例:formula:dictTrans('userCode',names),names为逗号分开多个name组成  \n" +
@@ -448,7 +448,7 @@ public class HttpTaskController extends BaseController {
     @GetMapping(value = "/extensionFunction")
     public JSONArray extensionFunction() {
         String extensionFunction = "[" +
-            "{\"encode\": \"对字符串加密,示例:formula:encode(name)\"}," +
+            "{\"password\": \"对字符串加密,示例:formula:password(password)\"}," +
             "{\"dict\": \"获取代码对应的数据字典,示例:formula:dict('userCode',name)\"}," +
             "{\"dictTrans\": \"获取代码表达式对应的数据字典,示例:formula:dictTrans('userCode',names),names为逗号分开多个name组成\"}" +
             "]";
