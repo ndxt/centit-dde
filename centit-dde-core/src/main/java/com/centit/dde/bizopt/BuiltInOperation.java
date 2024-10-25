@@ -49,13 +49,13 @@ public abstract class BuiltInOperation {
         return ResponseSingleData.makeResponseData(map);
     }
 
-    public static ResponseData createResponseData(int success, int error, int errorCode, String info) {
+    public static ResponseData createResponseData(int success, int error, int errorCode, String message) {
         JSONObject map = new JSONObject();
         map.put("success", success);
         map.put("error", error);
         ResponseSingleData result = ResponseSingleData.makeResponseData(map);
         result.setCode(errorCode);
-        result.setMessage(info);
+        result.setMessage(message);
         return result;
     }
 
@@ -241,7 +241,7 @@ public abstract class BuiltInOperation {
             DataSet dataSet = bizModel.getDataSet(sourDsName);
             if (dataSet != null) {
                 DataSet destDs = DataSetOptUtil.analyseDataset(bizModel, dataSet,
-                    groupFields, orderFields, ((Map) analyse).entrySet());
+                    groupFields, orderFields, analyse.entrySet());
                 count = destDs.getSize();
                 bizModel.putDataSet(targetDsName, destDs);
             }
