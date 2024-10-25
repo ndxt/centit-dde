@@ -161,6 +161,16 @@ public class SqliteExportOperation implements BizOperation {
                     JSONArray tbArray = (JSONArray) ent.getValue();
                     writeTableData(connection, tbArray, FieldType.humpNameToColumn(ent.getKey(), true),
                         fetchPrimaryKey(ent.getKey(), pkMap, defaultKey));
+                } else if(ent.getValue() instanceof List){
+                    JSONArray tbArray = JSONArray.from(ent.getValue());
+                    writeTableData(connection, tbArray, FieldType.humpNameToColumn(ent.getKey(), true),
+                        fetchPrimaryKey(ent.getKey(), pkMap, defaultKey));
+                } else if(ent.getValue() instanceof Map){
+                    JSONArray tbArray = new JSONArray();
+                    JSONObject object = JSONObject.from(ent.getValue());
+                    tbArray.add(object);
+                    writeTableData(connection, tbArray, FieldType.humpNameToColumn(ent.getKey(), true),
+                        fetchPrimaryKey(ent.getKey(), pkMap, defaultKey));
                 }
             }
         }
