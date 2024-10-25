@@ -1213,9 +1213,6 @@ public abstract class DataSetOptUtil {
         if(StringUtils.isBlank(fieldFormula)){
             return null;
         }
-        if(StringUtils.equalsAny(fieldFormula, ".",ConstantValue.ROOT_NODE_TAG, VariableTranslate.THE_DATA_SELF_LABEL)){
-            return data;
-        }
         return JSONTransformer.transformer(fieldFormula, data);
     }
 }

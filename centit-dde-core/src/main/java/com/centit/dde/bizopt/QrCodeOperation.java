@@ -6,6 +6,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileInfoOpt;
@@ -67,21 +68,21 @@ public class QrCodeOperation  implements BizOperation {
 
         for(Map<String, Object> rowData : dataSet.getDataAsList()){
             String msg=null;
-
+            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel, rowData);
             if(StringUtils.isNotBlank(dataField)){
-                msg = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(rowData, dataField));
+                msg = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform, dataField));
             }
             if(StringUtils.isBlank(msg)) {
                 msg = StringBaseOpt.castObjectToString(rowData);
             }
-            qrCodeConfig.setTopText(StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(rowData, topTextField)));
-            qrCodeConfig.setDownText(StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(rowData, downTextField)));
+            qrCodeConfig.setTopText(StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform, topTextField)));
+            qrCodeConfig.setDownText(StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform, downTextField)));
             qrCodeConfig.setMsg(msg);
             try {
                 BufferedImage bufferedImage = QrCodeGenerator.createQRImage(qrCodeConfig);
                 imageList.add(bufferedImage);
                 if("single".equals(createType)){
-                    String qrCodeFileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(rowData, fileName));
+                    String qrCodeFileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform, fileName));
                     qrCodeFileName = StringUtils.isNotBlank(qrCodeFileName) ? ( qrCodeFileName.endsWith(".jpg") ?
                         qrCodeFileName : qrCodeFileName + ".jpg")
                         : System.currentTimeMillis() + ".jpg";
@@ -102,7 +103,8 @@ public class QrCodeOperation  implements BizOperation {
             bizModel.putDataSet(id, objectToDataSet);
             return BuiltInOperation.createResponseSuccessData(resultData.size());
         } else if("pdf".equals(createType)){ // 图片合并为 pdf
-            fileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(dataSet.getData(), fileName), fileName);
+            fileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(
+                new BizModelJSONTransform(bizModel, dataSet.getData()), fileName), fileName);
             try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                 ImagesToPdf.bufferedImagesToA4SizePdf(imageList, byteArrayOutputStream);
                 String pdfFileName = StringUtils.isNotBlank(fileName) ? ( fileName.endsWith(".pdf") ? fileName : fileName + ".pdf")
@@ -117,7 +119,8 @@ public class QrCodeOperation  implements BizOperation {
                 return BuiltInOperation.createResponseSuccessData(0);
             }
         } else { // 图片合并为一个 大的 jpg
-            fileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(dataSet.getData(), fileName), fileName);
+            fileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(
+                new BizModelJSONTransform(bizModel,dataSet.getData()), fileName), fileName);
             // 合并时每行几个二维码
             int	qrEachRow = NumberBaseOpt.castObjectToInteger(bizOptJson.get("qrEachRow"), 2);
             int whiteSpace = qrCodeConfig.getPadding()>0 ? qrCodeConfig.getPadding() * 5 : 10;
