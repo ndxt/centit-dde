@@ -135,20 +135,15 @@ public class DataOptResult implements ToResponseData, Serializable {
     }
 
     public Object getResultData() {
+        if(resultObject == null && hasErrors()){
+            return makeErrorResponse();
+        }
         if(resultType == RETURN_CODE_AND_MESSAGE) {
             if(resultObject instanceof ResponseData) {
                 return resultObject;
             }
-        }
-
-        if(hasErrors()){
-            return makeErrorResponse();
-        }
-
-        if(resultType == RETURN_CODE_AND_MESSAGE) {
             return ResponseData.makeResponseData(resultObject);
         }
-
         return resultObject;
     }
 
