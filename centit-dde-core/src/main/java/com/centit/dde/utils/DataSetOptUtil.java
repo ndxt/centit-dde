@@ -21,6 +21,7 @@ import com.centit.support.compiler.VariableTranslate;
 import com.centit.support.database.utils.QueryUtils;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileType;
+import com.centit.support.json.JSONTransformDataSupport;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1208,24 +1209,13 @@ public abstract class DataSetOptUtil {
         }
     }
 
-    public static Object fetchFieldValue(Object data, String fieldFormula){
+    public static Object fetchFieldValue(BizModelJSONTransform data, String fieldFormula){
         if(StringUtils.isBlank(fieldFormula)){
             return null;
         }
-
         if(StringUtils.equalsAny(fieldFormula, ".",ConstantValue.ROOT_NODE_TAG, VariableTranslate.THE_DATA_SELF_LABEL)){
             return data;
         }
-
-        if (fieldFormula.startsWith("@")){
-            return Pretreatment.mapTemplateStringAsFormula(fieldFormula.substring(1),
-                data, null, true);
-        }
-        VariableTranslate translate = data instanceof VariableTranslate ? (VariableTranslate) data : new ObjectTranslate(data);
-        VariableFormula variableFormula = new VariableFormula();
-        variableFormula.setExtendFuncMap(DataSetOptUtil.extendFuncs);
-        variableFormula.setTrans(translate);
-        variableFormula.setFormula(fieldFormula);
-        return variableFormula.calcFormula();
+        return JSONTransformer.transformer(fieldFormula, data);
     }
 }
