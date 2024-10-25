@@ -109,7 +109,7 @@ public class DataOptResult implements ToResponseData, Serializable {
     }
 
     public boolean hasErrors(){
-        return errorList.size() > 0;
+        return !errorList.isEmpty();
     }
 
     public ResponseData makeErrorResponse(){
