@@ -7,6 +7,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.algorithm.ZipCompressor;
 import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileIOOpt;
@@ -14,13 +15,10 @@ import com.centit.support.file.FileType;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public abstract class FileDataSetOptUtil {
@@ -107,14 +105,44 @@ public abstract class FileDataSetOptUtil {
         return fileDataset;
     }
 
-    public static List<FileDataSet> unzipFileDatasetList(FileDataSet zipFileDataset){
+    public static List<FileDataSet> unzipFileDatasetList(String tempPath, FileDataSet zipFileDataset) throws IOException{
+        String fileName = tempPath + File.separatorChar + UuidOpt.getUuidAsString32()+".zip";
+        FileIOOpt.writeInputStreamToFile(zipFileDataset.getFileInputStream(), fileName);
         List<FileDataSet> files = new ArrayList<>();
+        try (ZipFile zip = new ZipFile(fileName)) {
+            for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements(); ) {
+                ZipEntry entry = entries.nextElement();
+                String zipEntryName = entry.getName();
+                if(entry.isDirectory()) continue;
+                try (InputStream in = zip.getInputStream(entry);
+                     ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                    byte[] buf1 = new byte[1024];
+                    int len;
+                    while ((len = in.read(buf1)) > 0) {
+                        out.write(buf1, 0, len);
+                    }
+                    FileDataSet fileDataSet = new FileDataSet(zipEntryName, out.size(), out);
+                    files.add(fileDataSet);
+                }
+            }
+        }
+        return files;
+    }
 
+    public static List<FileDataSet> fetchFiles(DataSet dataSet, JSONObject jsonStep) {
+        String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
+        String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_CONTENT, "");
+        List<FileDataSet> files = new ArrayList<>();
+        for(Map<String, Object> objectMap : dataSet.getDataAsList()){
+            FileDataSet fileDataSet = mapDataToFile(objectMap, fileNameDesc, fileContentDesc);
+            if(fileDataSet != null){
+                files.add(fileDataSet);
+            }
+        }
         return files;
     }
 
     public static FileDataSet attainFileDataset(BizModel bizModel, DataSet dataSet, JSONObject jsonStep, boolean singleFile){
-
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
         BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel, dataSet.getData());
         String fileName = null;
@@ -152,13 +180,7 @@ public abstract class FileDataSetOptUtil {
             return fileDataset;
         }
 
-        List<FileDataSet> files = new ArrayList<>();
-        for(Map<String, Object> objectMap : dataSet.getDataAsList()){
-            FileDataSet fileDataSet = mapDataToFile(objectMap, fileNameDesc, fileContentDesc);
-            if(fileDataSet != null){
-                files.add(fileDataSet);
-            }
-        }
+        List<FileDataSet> files = fetchFiles(dataSet, jsonStep);
         if(files.isEmpty()){
             throw new ObjectException(ObjectException.EMPTY_RESULT_EXCEPTION, "文件数据获取失败");
         }
