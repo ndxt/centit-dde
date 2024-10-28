@@ -107,6 +107,8 @@ public class EncryptOperation  implements BizOperation {
                 if(StringUtils.isBlank(fieldName)){
                     fieldName = ConstantValue.FILE_CONTENT;
                 }
+                //获取文件数据集内容; 多个文件 自动压缩为 zip文件
+                dataSet = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
                 encryptFieldName = fieldName; //文件加密 不需要填写这个字段
             }
 
@@ -153,6 +155,7 @@ public class EncryptOperation  implements BizOperation {
                                 password);
                             break;
                     }
+
                     if(base64)
                         map.put(encryptFieldName, new String(Base64.encodeBase64(cipherText)));
                     else
