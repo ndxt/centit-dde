@@ -36,12 +36,14 @@ public class WriteObjectFileOperation implements BizOperation {
         String object;
         if("json".equalsIgnoreCase(fileType)) {
             object = JSON.toJSONString(data);
-        }else {
+        }else if("xml".equalsIgnoreCase(fileType)){
             String rootName = bizOptJson.getString("rootName");
             if(StringUtils.isBlank(rootName)){
                 rootName = "object";
             }
             object = XMLObject.objectToXMLString(rootName, data);
+        }else{
+            object=StringBaseOpt.castObjectToString(data);
         }
         String fileName = null;
         if(StringUtils.isNotBlank(bizOptJson.getString("fileName"))) {
