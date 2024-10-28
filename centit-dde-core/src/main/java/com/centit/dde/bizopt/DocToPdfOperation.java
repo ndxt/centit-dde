@@ -61,7 +61,7 @@ public class DocToPdfOperation implements BizOperation {
                         ObjectException.FUNCTION_NOT_SUPPORT,
                         dataOptContext.getI18nMessage("dde.613.file_type_not_support"));
                 }
-                FileDataSet pdfDataset = new FileDataSet(FileType.truncateFileExtName(fileDataSet.getFileName()) + ".pdf",
+                FileDataSet pdfDataset = new FileDataSet(FileType.truncateFileExtNameWithPath(fileDataSet.getFileName()) + ".pdf",
                     pdfFile.size(), pdfFile);
                 bizModel.putDataSet(targetDsName, pdfDataset);
                 return BuiltInOperation.createResponseSuccessData(1);
@@ -89,7 +89,7 @@ public class DocToPdfOperation implements BizOperation {
                         continue;
                     }
                     fileList.add(CollectionsOpt.createHashMap(
-                        ConstantValue.FILE_NAME, FileType.truncateFileExtName(fileDataSet.getFileName()) + ".pdf",
+                        ConstantValue.FILE_NAME, FileType.truncateFileExtNameWithPath(fileDataSet.getFileName()) + ".pdf",
                         ConstantValue.FILE_SIZE, pdfFile.size(),
                         ConstantValue.FILE_CONTENT, pdfFile
                     ));

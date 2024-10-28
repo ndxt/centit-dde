@@ -1095,7 +1095,7 @@ public abstract class DataSetOptUtil {
                 while (fileNameMap.containsKey(fn)) {
                     int copies = fileNameMap.get(fn) + 1;
                     fileNameMap.put(fn, copies);
-                    fn = FileType.truncateFileExtName(fn) + "(" + copies + ")." + FileType.getFileExtName(fn);
+                    fn = FileType.truncateFileExtNameWithPath(fn) + "(" + copies + ")." + FileType.getFileExtName(fn);
                 }
                 fileNameMap.put(fn, 1);
                 ZipCompressor.compressFile(inputStream, fn, out, "");

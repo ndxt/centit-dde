@@ -52,7 +52,7 @@ public class WriteObjectFileOperation implements BizOperation {
             fileName = DatetimeOpt.currentTimeWithSecond();
         }
         if(!fileName.endsWith("."+fileType)){
-            fileName = FileType.truncateFileExtName(fileName)+"."+fileType;
+            fileName = FileType.truncateFileExtNameWithPath(fileName)+"."+fileType;
         }
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(object.getBytes());
