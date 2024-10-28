@@ -7,6 +7,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.algorithm.ZipCompressor;
 import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileIOOpt;
@@ -14,13 +15,11 @@ import com.centit.support.file.FileType;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public abstract class FileDataSetOptUtil {
@@ -107,9 +106,27 @@ public abstract class FileDataSetOptUtil {
         return fileDataset;
     }
 
-    public static List<FileDataSet> unzipFileDatasetList(FileDataSet zipFileDataset){
+    public static List<FileDataSet> unzipFileDatasetList(String tempPath, FileDataSet zipFileDataset) throws IOException{
+        String fileName = tempPath + File.separatorChar + UuidOpt.getUuidAsString32()+".zip";
+        FileIOOpt.writeInputStreamToFile(zipFileDataset.getFileInputStream(), fileName);
         List<FileDataSet> files = new ArrayList<>();
-
+        try (ZipFile zip = new ZipFile(fileName)) {
+            for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements(); ) {
+                ZipEntry entry = entries.nextElement();
+                String zipEntryName = entry.getName();
+                if(entry.isDirectory()) continue;
+                try (InputStream in = zip.getInputStream(entry);
+                     ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                    byte[] buf1 = new byte[1024];
+                    int len;
+                    while ((len = in.read(buf1)) > 0) {
+                        out.write(buf1, 0, len);
+                    }
+                    FileDataSet fileDataSet = new FileDataSet(zipEntryName, out.size(), out);
+                    files.add(fileDataSet);
+                }
+            }
+        }
         return files;
     }
 
