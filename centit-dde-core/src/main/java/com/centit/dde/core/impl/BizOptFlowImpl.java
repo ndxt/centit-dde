@@ -214,6 +214,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("sqliteIn", new SqliteImportOperation(this.appHome));
         allOperations.put("sqliteOut", new SqliteExportOperation(this.appHome));
         allOperations.put("signature", new SignatureVerifyOperation());
+        //压缩和解压
+        allOperations.put("zip", new ZipUnzipOperation(this.appHome));
 
         //--------添加 文件获取函数，用于 excel中的图片加载
         DataSetOptUtil.extendFuncs.put("loadFile", (a) -> {

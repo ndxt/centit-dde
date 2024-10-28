@@ -19,7 +19,6 @@ import java.io.*;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public abstract class FileDataSetOptUtil {
@@ -130,8 +129,20 @@ public abstract class FileDataSetOptUtil {
         return files;
     }
 
-    public static FileDataSet attainFileDataset(BizModel bizModel, DataSet dataSet, JSONObject jsonStep, boolean singleFile){
+    public static List<FileDataSet> fetchFiles(DataSet dataSet, JSONObject jsonStep) {
+        String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
+        String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_CONTENT, "");
+        List<FileDataSet> files = new ArrayList<>();
+        for(Map<String, Object> objectMap : dataSet.getDataAsList()){
+            FileDataSet fileDataSet = mapDataToFile(objectMap, fileNameDesc, fileContentDesc);
+            if(fileDataSet != null){
+                files.add(fileDataSet);
+            }
+        }
+        return files;
+    }
 
+    public static FileDataSet attainFileDataset(BizModel bizModel, DataSet dataSet, JSONObject jsonStep, boolean singleFile){
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
         BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel, dataSet.getData());
         String fileName = null;
@@ -169,13 +180,7 @@ public abstract class FileDataSetOptUtil {
             return fileDataset;
         }
 
-        List<FileDataSet> files = new ArrayList<>();
-        for(Map<String, Object> objectMap : dataSet.getDataAsList()){
-            FileDataSet fileDataSet = mapDataToFile(objectMap, fileNameDesc, fileContentDesc);
-            if(fileDataSet != null){
-                files.add(fileDataSet);
-            }
-        }
+        List<FileDataSet> files = fetchFiles(dataSet, jsonStep);
         if(files.isEmpty()){
             throw new ObjectException(ObjectException.EMPTY_RESULT_EXCEPTION, "文件数据获取失败");
         }
