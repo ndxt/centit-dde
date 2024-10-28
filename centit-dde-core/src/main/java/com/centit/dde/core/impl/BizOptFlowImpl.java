@@ -8,10 +8,7 @@ import com.centit.dde.adapter.po.*;
 import com.centit.dde.bizopt.*;
 import com.centit.dde.core.*;
 import com.centit.dde.dataset.FileDataSet;
-import com.centit.dde.utils.BizModelJSONTransform;
-import com.centit.dde.utils.BizOptUtils;
-import com.centit.dde.utils.ConstantValue;
-import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.utils.*;
 import com.centit.dde.vo.CycleVo;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
@@ -201,9 +198,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.WF_TASK_MANAGER, new WorkFlowTaskManagerOperation(flowManager));
 
         //注册FTP下载组件
-        allOperations.put(ConstantValue.FTP_FILE_DOWNLOAD,new FtpDownloadOperation(sourceInfoMetadata));
+        allOperations.put(ConstantValue.FTP_FILE_DOWNLOAD,new FtpDownloadOperationUtil(sourceInfoMetadata));
         //注册FTP上传组件
-        allOperations.put(ConstantValue.FTP_FILE_UPLOAD,new FtpUploadOperation(sourceInfoMetadata));
+        allOperations.put(ConstantValue.FTP_FILE_UPLOAD,new FtpUploadOperationUtil(sourceInfoMetadata));
 
         //注册查询操作类
         allOperations.put(ConstantValue.ELASTICSEARCH_QUERY,
@@ -410,7 +407,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION,
                     dataOptContext.getI18nMessage("dde.604.file_dataset_not_found",dataSetId));
             }
-            FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, stepJson, false);
+            FileDataSet fileInfo = FileDataSetOptUtil.attainFileDataset(bizModel, dataSet, stepJson, false);
             bizModel.getOptResult().setResultFile(fileInfo.getFirstRow());
             return;
         }

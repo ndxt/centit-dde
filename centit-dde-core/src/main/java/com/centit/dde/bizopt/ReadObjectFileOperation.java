@@ -8,6 +8,7 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.utils.FileDataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileIOOpt;
@@ -37,7 +38,7 @@ public class ReadObjectFileOperation implements BizOperation {
                 ObjectException.DATA_NOT_FOUND_EXCEPTION,
                 dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
         }
-        FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, true);
+        FileDataSet fileInfo = FileDataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, true);
         InputStream inputStream = fileInfo.getFileInputStream();
         if (inputStream != null) {
             DataSet simpleDataSet;

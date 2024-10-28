@@ -7,7 +7,7 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
-import com.centit.dde.utils.FtpOperation;
+import com.centit.dde.utils.FtpOperationUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.service.SourceInfoMetadata;
@@ -21,9 +21,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class FtpDownloadOperation extends FtpOperation implements BizOperation {
+public class FtpDownloadOperationUtil extends FtpOperationUtil implements BizOperation {
 
-    public FtpDownloadOperation(SourceInfoMetadata sourceInfoMetadata){
+    public FtpDownloadOperationUtil(SourceInfoMetadata sourceInfoMetadata){
         super(sourceInfoMetadata);
     }
     @Override

@@ -7,6 +7,7 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.utils.FileDataSetOptUtil;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.fileserver.po.FileInfo;
 import com.centit.framework.common.ResponseData;
@@ -36,7 +37,7 @@ public class FileUploadOperation implements BizOperation {
                 ObjectException.DATA_NOT_FOUND_EXCEPTION,
                 dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
         }
-        FileDataSet mapFileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
+        FileDataSet mapFileInfo = FileDataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
         if(StringUtils.isBlank(mapFileInfo.getFileName())){
             return BuiltInOperation.createResponseData(0, 1,
                 ResponseData.ERROR_FIELD_INPUT_NOT_VALID,

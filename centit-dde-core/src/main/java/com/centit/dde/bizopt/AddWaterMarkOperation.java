@@ -10,6 +10,7 @@ import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.utils.FileDataSetOptUtil;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.security.CentitUserDetails;
@@ -84,7 +85,7 @@ public class AddWaterMarkOperation implements BizOperation {
         } else {
             DataSet idataSet = bizModel.getDataSet(imageDate);
             if(idataSet != null) {
-                FileDataSet imageDataset = DataSetOptUtil.castToFileDataSet(idataSet);
+                FileDataSet imageDataset = FileDataSetOptUtil.castToFileDataSet(idataSet);
                 image = Watermark4Pdf.createPdfImage(
                     FileIOOpt.readBytesFromInputStream(imageDataset.getFileInputStream()));
             }
@@ -99,7 +100,7 @@ public class AddWaterMarkOperation implements BizOperation {
             if (dataSet instanceof FileDataSet) {
                 fileDataSet = (FileDataSet) dataSet;
             } else {
-                fileDataSet = DataSetOptUtil.mapDataToFile(dataSet.getFirstRow(),
+                fileDataSet = FileDataSetOptUtil.mapDataToFile(dataSet.getFirstRow(),
                     ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
             }
             if(fileDataSet!=null) {
@@ -119,7 +120,7 @@ public class AddWaterMarkOperation implements BizOperation {
         if(dataSet.getSize() > 1) {
             List<Map<String, Object>> fileList = new ArrayList<>();
             for(Map<String, Object> rowData : dataSet.getDataAsList()){
-                FileDataSet fileDataSet = DataSetOptUtil.mapDataToFile(rowData,
+                FileDataSet fileDataSet = FileDataSetOptUtil.mapDataToFile(rowData,
                     ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
                 if(fileDataSet!=null){
                     ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
@@ -175,7 +176,7 @@ public class AddWaterMarkOperation implements BizOperation {
             if (dataSet instanceof FileDataSet) {
                 fileDataSet = (FileDataSet) dataSet;
             } else {
-                fileDataSet = DataSetOptUtil.mapDataToFile(dataSet.getFirstRow(),
+                fileDataSet = FileDataSetOptUtil.mapDataToFile(dataSet.getFirstRow(),
                     ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
             }
             if(fileDataSet!=null) {
@@ -200,7 +201,7 @@ public class AddWaterMarkOperation implements BizOperation {
         if(dataSet.getSize() > 1) {
             List<Map<String, Object>> fileList = new ArrayList<>();
             for(Map<String, Object> rowData : dataSet.getDataAsList()){
-                FileDataSet fileDataSet = DataSetOptUtil.mapDataToFile(rowData,
+                FileDataSet fileDataSet = FileDataSetOptUtil.mapDataToFile(rowData,
                     ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
                 if(fileDataSet!=null){
                     String imageType = FileType.getFileExtName(fileDataSet.getFileName());
@@ -257,7 +258,7 @@ public class AddWaterMarkOperation implements BizOperation {
             if (dataSet instanceof FileDataSet) {
                 fileDataSet = (FileDataSet) dataSet;
             } else {
-                fileDataSet = DataSetOptUtil.mapDataToFile(dataSet.getFirstRow(),
+                fileDataSet = FileDataSetOptUtil.mapDataToFile(dataSet.getFirstRow(),
                     ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
             }
             if(fileDataSet!=null) {
@@ -277,7 +278,7 @@ public class AddWaterMarkOperation implements BizOperation {
         if(dataSet.getSize() > 1) {
             List<Map<String, Object>> fileList = new ArrayList<>();
             for(Map<String, Object> rowData : dataSet.getDataAsList()){
-                FileDataSet fileDataSet = DataSetOptUtil.mapDataToFile(rowData,
+                FileDataSet fileDataSet = FileDataSetOptUtil.mapDataToFile(rowData,
                     ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
                 if(fileDataSet!=null){
                     ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();

@@ -8,6 +8,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.utils.FileDataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.ByteBaseOpt;
@@ -108,7 +109,7 @@ public class EncryptOperation  implements BizOperation {
                     fieldName = ConstantValue.FILE_CONTENT;
                 }
                 //获取文件数据集内容; 多个文件 自动压缩为 zip文件
-                dataSet = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
+                dataSet = FileDataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
                 encryptFieldName = fieldName; //文件加密 不需要填写这个字段
             }
 

@@ -8,7 +8,8 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
-import com.centit.dde.utils.FtpOperation;
+import com.centit.dde.utils.FileDataSetOptUtil;
+import com.centit.dde.utils.FtpOperationUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.service.SourceInfoMetadata;
@@ -18,9 +19,9 @@ import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 
-public class FtpUploadOperation extends FtpOperation implements BizOperation {
+public class FtpUploadOperationUtil extends FtpOperationUtil implements BizOperation {
 
-    public FtpUploadOperation(SourceInfoMetadata sourceInfoMetadata) {
+    public FtpUploadOperationUtil(SourceInfoMetadata sourceInfoMetadata) {
         super(sourceInfoMetadata);
     }
 
@@ -46,7 +47,7 @@ public class FtpUploadOperation extends FtpOperation implements BizOperation {
                 filePath = filePathDesc;
             }
         }
-        FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
+        FileDataSet fileInfo = FileDataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
         SourceInfo ftpService = sourceInfoMetadata.fetchSourceInfo(ftpServiceId);
         FTPClient ftpClient = getFtp(ftpService);
         ftpClient.changeWorkingDirectory(filePath);

@@ -19,7 +19,7 @@ import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class FtpOperation {
+public abstract class FtpOperationUtil {
 
     private static final Map<ISourceInfo, FTPClient> ftpClientPools = new ConcurrentHashMap<>(16);
 
@@ -27,7 +27,7 @@ public abstract class FtpOperation {
     // 暂时不做这个。
     public SourceInfoMetadata sourceInfoMetadata;
 
-    public FtpOperation(SourceInfoMetadata sourceInfoMetadata) {
+    public FtpOperationUtil(SourceInfoMetadata sourceInfoMetadata) {
         this.sourceInfoMetadata = sourceInfoMetadata;
     }
 

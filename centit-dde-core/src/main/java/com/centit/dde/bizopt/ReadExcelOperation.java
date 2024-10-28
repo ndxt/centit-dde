@@ -8,6 +8,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.utils.FileDataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -45,7 +46,7 @@ public class ReadExcelOperation implements BizOperation {
             sheetName = Pretreatment.mapTemplateStringAsFormula(sheetName, modelTrasform);
         }
 
-        FileDataSet fileInfo = DataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, true);
+        FileDataSet fileInfo = FileDataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, true);
         InputStream inputStream = fileInfo.getFileInputStream();
 
         int beginRow = NumberBaseOpt.castObjectToInteger(

@@ -8,6 +8,7 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataRowVariableTranslate;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.utils.FileDataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.service.SourceInfoMetadata;
@@ -166,7 +167,7 @@ public class EsWriteBizOperation implements BizOperation {
         fileInfo.setUnitCode(dataOptContext.getCurrentUnitCode());
         // 获取文件文本，这边需要添加 图片pdf文件的获取方式
         // ocrServerHost
-        InputStream fileInputStream = DataSetOptUtil.getInputStreamFormDataSet(dataSet);
+        InputStream fileInputStream = FileDataSetOptUtil.getInputStreamFormDataSet(dataSet);
         if(fileInputStream!=null) {
             String fileType = bizOptJson.getString("fileType");
             if ("jpg".equals(fileType)) {
