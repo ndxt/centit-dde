@@ -34,7 +34,7 @@ public class WriteObjectFileOperation implements BizOperation {
         }
         Object data = bizModel.getDataSet(sourDsName).getData();
         String object;
-        if("xml".equalsIgnoreCase(fileType)) {
+        if("json".equalsIgnoreCase(fileType)) {
             object = JSON.toJSONString(data);
         }else {
             String rootName = bizOptJson.getString("rootName");
