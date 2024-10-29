@@ -15,7 +15,10 @@ import com.centit.support.file.FileType;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -28,9 +31,10 @@ public abstract class FileDataSetOptUtil {
         if(objectMap==null)
             return null;
 
-        String fileName = StringUtils.isNotBlank(fileNameDesc)?
-            StringBaseOpt.castObjectToString(objectMap.get(fileNameDesc)) : null;
-
+        String fileName = null;
+        if(StringUtils.isNotBlank(fileNameDesc)) {
+            fileName = StringBaseOpt.castObjectToString(objectMap.get(fileNameDesc));
+        }
         if (StringUtils.isBlank(fileName)) {
             fileName = StringBaseOpt.castObjectToString(objectMap.get(ConstantValue.FILE_NAME));
         }
@@ -61,6 +65,7 @@ public abstract class FileDataSetOptUtil {
             fileData);
         return fileDataset;
     }
+
     public static FileDataSet castToFileDataSet(DataSet dataSet){
         if(dataSet==null){
             return null;
@@ -130,9 +135,14 @@ public abstract class FileDataSetOptUtil {
     }
 
     public static List<FileDataSet> fetchFiles(DataSet dataSet, JSONObject jsonStep) {
+        List<FileDataSet> files = new ArrayList<>();
+        if(dataSet instanceof FileDataSet){
+            files.add((FileDataSet) dataSet);
+            return files;
+        }
+
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
         String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_CONTENT, "");
-        List<FileDataSet> files = new ArrayList<>();
         for(Map<String, Object> objectMap : dataSet.getDataAsList()){
             FileDataSet fileDataSet = mapDataToFile(objectMap, fileNameDesc, fileContentDesc);
             if(fileDataSet != null){
@@ -146,38 +156,8 @@ public abstract class FileDataSetOptUtil {
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
         BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel, dataSet.getData());
         String fileName = null;
-
         if(StringUtils.isNotBlank(fileNameDesc)){
             fileName = StringBaseOpt.objectToString(JSONTransformer.transformer(fileNameDesc, transformer));
-        }
-
-        if(dataSet instanceof FileDataSet){
-            FileDataSet fileDataSet = (FileDataSet) dataSet;
-            String currentFileName =  fileDataSet.getFileName();
-            if(StringUtils.isNotBlank(fileName) && (StringUtils.isBlank(currentFileName) || StringUtils.equals(
-                FileType.getFileExtName(currentFileName), FileType.getFileExtName(fileName)))){
-                fileDataSet.setFileName(fileName);
-            }
-            return fileDataSet;
-        }
-
-        String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_CONTENT, "");
-
-        if(singleFile || dataSet.getSize()==1) {
-            Map<String, Object> mapFirstRow = dataSet.getFirstRow();
-            FileDataSet fileDataset = mapDataToFile(mapFirstRow, fileNameDesc, fileContentDesc);
-            if(fileDataset==null){
-                Object fileData = JSONTransformer.transformer(fileContentDesc, transformer);
-                if(fileData==null){
-                    throw new ObjectException(ObjectException.EMPTY_RESULT_EXCEPTION, "文件数据获取失败");
-                }
-                fileDataset = new FileDataSet(fileName,
-                    NumberBaseOpt.castObjectToLong(jsonStep.get(ConstantValue.FILE_SIZE), -1l),
-                    fileData);
-            } else if (StringUtils.isNotBlank(fileName)) {
-                fileDataset.setFileName(fileName);
-            }
-            return fileDataset;
         }
 
         List<FileDataSet> files = fetchFiles(dataSet, jsonStep);
@@ -185,7 +165,7 @@ public abstract class FileDataSetOptUtil {
             throw new ObjectException(ObjectException.EMPTY_RESULT_EXCEPTION, "文件数据获取失败");
         }
 
-        if(files.size() == 1){
+        if(singleFile || files.size() == 1){
             FileDataSet ds = files.get(0);
             String currentFileName = ds.getFileName();
             if(StringUtils.isNotBlank(fileName) && (StringUtils.isBlank(currentFileName) || StringUtils.equals(

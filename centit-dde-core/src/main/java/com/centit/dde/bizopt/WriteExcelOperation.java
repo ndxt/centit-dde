@@ -93,12 +93,12 @@ public class WriteExcelOperation implements BizOperation {
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel, dataSet.getData()))) ;
         }
         if(StringUtils.isBlank(fileName)) {
-            fileName = DatetimeOpt.currentTimeWithSecond();
+            fileName = DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(),"yyyyMMDD_HHmm");
         }
 
         if(transToPdf){
             if(!fileName.endsWith(".pdf")) {
-                fileName = fileName.endsWith(".xlsx") ? fileName.substring(0, fileName.length() - 5) : fileName + ".pdf";
+                fileName = (fileName.endsWith(".xlsx") ? fileName.substring(0, fileName.length() - 5) : fileName ) + ".pdf";
             }
         } else {
             fileName = fileName.endsWith(".xlsx") ? fileName : fileName + ".xlsx";

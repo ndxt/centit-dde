@@ -10,7 +10,6 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.file.FileType;
 import com.centit.support.json.JSONTransformer;
 import com.centit.support.xml.XMLObject;
 import org.apache.commons.lang3.StringUtils;
@@ -33,15 +32,21 @@ public class WriteObjectFileOperation implements BizOperation {
             fileType = "json";
         }
         Object data = bizModel.getDataSet(sourDsName).getData();
-        String object;
+        byte[] objBytes;
         if("xml".equalsIgnoreCase(fileType)) {
-            object = JSON.toJSONString(data);
-        }else {
             String rootName = bizOptJson.getString("rootName");
             if(StringUtils.isBlank(rootName)){
                 rootName = "object";
             }
-            object = XMLObject.objectToXMLString(rootName, data);
+            objBytes = XMLObject.objectToXMLString(rootName, data).getBytes();
+        }else {
+            if(data instanceof String){
+                objBytes =((String) data).getBytes();
+            } else if(data instanceof byte[]){
+                objBytes =(byte[]) data;
+            } else {
+                objBytes = JSON.toJSONString(data).getBytes();
+            }
         }
         String fileName = null;
         if(StringUtils.isNotBlank(bizOptJson.getString("fileName"))) {
@@ -49,13 +54,11 @@ public class WriteObjectFileOperation implements BizOperation {
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel, data))) ;
         }
         if(StringUtils.isBlank(fileName)) {
-            fileName = DatetimeOpt.currentTimeWithSecond();
-        }
-        if(!fileName.endsWith("."+fileType)){
-            fileName = FileType.truncateFileExtNameWithPath(fileName)+"."+fileType;
+            fileName = DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(),"yyyyMMDD_HHmm")
+            + "."+fileType;
         }
 
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(object.getBytes());
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(objBytes);
         FileDataSet objectToDataSet =new FileDataSet(fileName,
             inputStream.available(), inputStream);
 

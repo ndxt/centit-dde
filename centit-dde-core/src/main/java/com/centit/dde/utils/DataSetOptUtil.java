@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.dataset.FileDataSet;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
@@ -13,15 +12,9 @@ import com.centit.framework.model.basedata.DataDictionary;
 import com.centit.framework.security.StandardPasswordEncoderImpl;
 import com.centit.search.utils.TikaTextExtractor;
 import com.centit.support.algorithm.*;
-import com.centit.support.common.ObjectException;
-import com.centit.support.compiler.ObjectTranslate;
-import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
-import com.centit.support.compiler.VariableTranslate;
 import com.centit.support.database.utils.QueryUtils;
 import com.centit.support.file.FileIOOpt;
-import com.centit.support.file.FileType;
-import com.centit.support.json.JSONTransformDataSupport;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,13 +24,9 @@ import org.apache.commons.math3.stat.StatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.zip.ZipOutputStream;
 
 /**
  * @author codefan@sina.com

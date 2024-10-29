@@ -83,7 +83,8 @@ public class SqliteExportOperation implements BizOperation {
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel, dataSet.getData())));
         }
         if (StringUtils.isBlank(fileName)) {
-            fileName = DatetimeOpt.currentTimeWithSecond();
+            fileName = DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(),"yyyyMMDD_HHmm")
+                + ".db";
         }
         if(!"db".equalsIgnoreCase(FileType.getFileExtName(fileName))) {
             fileName = fileName + ".db";

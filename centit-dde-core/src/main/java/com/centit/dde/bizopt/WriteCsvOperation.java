@@ -38,7 +38,8 @@ public class WriteCsvOperation implements BizOperation {
                 bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel, dataSet.getData()))) ;
         }
         if(StringUtils.isBlank(fileName)) {
-            fileName = DatetimeOpt.currentTimeWithSecond();
+            fileName = DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(),"yyyyMMDD_HHmm")
+                + ".csv";
         }
 
         InputStream inputStream = CsvDataSet.createCsvStream(dataSet, bizOptJson);
