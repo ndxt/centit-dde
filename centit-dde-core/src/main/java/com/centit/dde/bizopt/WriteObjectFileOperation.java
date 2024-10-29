@@ -10,6 +10,7 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileType;
 import com.centit.support.json.JSONTransformer;
 import com.centit.support.xml.XMLObject;
@@ -33,6 +34,10 @@ public class WriteObjectFileOperation implements BizOperation {
             fileType = "json";
         }
         Object data = bizModel.getDataSet(sourDsName).getData();
+        if(data == null){
+            throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
+        }
         byte[] objBytes;
         if("xml".equalsIgnoreCase(fileType)) {
             String rootName = bizOptJson.getString("rootName");
