@@ -10,6 +10,7 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.file.FileType;
 import com.centit.support.json.JSONTransformer;
 import com.centit.support.xml.XMLObject;
 import org.apache.commons.lang3.StringUtils;
