@@ -46,13 +46,13 @@ public class WriteObjectFileOperation implements BizOperation {
             }
             objBytes = XMLObject.objectToXMLString(rootName, data).getBytes();
         }else {
-            if(data instanceof String){
+           /* if(data instanceof String){
                 objBytes =((String) data).getBytes();
             } else if(data instanceof byte[]){
                 objBytes =(byte[]) data;
-            } else {
+            } else {*/
                 objBytes = JSON.toJSONString(data).getBytes();
-            }
+            //}
         }
         String fileName = null;
         if(StringUtils.isNotBlank(bizOptJson.getString("fileName"))) {
