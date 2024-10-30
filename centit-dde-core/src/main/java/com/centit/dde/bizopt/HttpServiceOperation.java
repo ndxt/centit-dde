@@ -152,7 +152,7 @@ public class HttpServiceOperation implements BizOperation {
             case "post":
             case "put":
                 requestType = BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
-                if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)) {
+                if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)) { // 发送文件（附件）的请求
                     String source = bizOptJson.getString("source");
                     DataSet dataSet = bizModel.getDataSet(source);
                     if (dataSet == null){
@@ -162,7 +162,6 @@ public class HttpServiceOperation implements BizOperation {
                     }
                     FileDataSet fileInfo = FileDataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
                     InputStream fileIS = fileInfo.getFileInputStream();
-
                     if (fileIS != null) {
                         if("put".equals(requestMode)){
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUploadPut(httpExecutorContext,
@@ -174,9 +173,9 @@ public class HttpServiceOperation implements BizOperation {
                                 "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()));
                         }
                     }
-                } else {
+                } else { // json 或者 form
                     Object requestBody = getRequestBody(bizOptJson, bizModel);
-                    if(requestBody instanceof Map){
+                    if(requestBody instanceof Map){ // 对外服务平台补丁，确认后删除
                         Map<String, Object> requestBodyMap = (Map<String, Object>) requestBody;
                         Boolean requestBodyAsForm = BooleanBaseOpt.castObjectToBoolean(
                             requestBodyMap.get("requestBodyAsForm"), false);
