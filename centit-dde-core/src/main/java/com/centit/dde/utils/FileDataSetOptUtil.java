@@ -11,6 +11,7 @@ import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.algorithm.ZipCompressor;
 import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileIOOpt;
+import com.centit.support.file.FileSystemOpt;
 import com.centit.support.file.FileType;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
@@ -131,6 +132,8 @@ public abstract class FileDataSetOptUtil {
                 }
             }
         }
+        //删除临时文件
+        FileSystemOpt.deleteFile(fileName);
         return files;
     }
 
