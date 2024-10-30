@@ -131,8 +131,9 @@ public class EncryptOperation  implements BizOperation {
 
                     switch (algorithm){
                         case "SM4":
-                            cipherText = SM4Util.encryptEcbPadding(password.getBytes(StandardCharsets.UTF_8),
-                                ByteBaseOpt.castObjectToBytes(mw) );
+                            cipherText = SM4Util.encryptEcbPadding(
+                                password.getBytes(StandardCharsets.UTF_8),
+                                ByteBaseOpt.castObjectToBytes(mw));
                             break;
                         case "AES_CBC": {
                             Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "AES");
@@ -157,12 +158,21 @@ public class EncryptOperation  implements BizOperation {
                             break;
                     }
 
-                    if(base64)
-                        map.put(encryptFieldName, new String(Base64.encodeBase64(cipherText)));
-                    else
+                    if(base64) {
+                        String base64Str = Base64.encodeBase64String(cipherText);
+                        map.put(encryptFieldName, base64Str);
+                        if("file".equals(encryptDataType)) {
+                            map.put(ConstantValue.FILE_SIZE, base64Str.length());
+                        }
+                    } else {
                         map.put(encryptFieldName, cipherText);
+                        if("file".equals(encryptDataType)) {
+                            map.put(ConstantValue.FILE_SIZE, cipherText.length);
+                        }
+                    }
                 }
             }
+
             DataSet objectToDataSet = dataSet.getSize() == 1? new DataSet(encryptData.get(0)) : new DataSet(encryptData);
             bizModel.putDataSet(targetDsName, objectToDataSet);
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
