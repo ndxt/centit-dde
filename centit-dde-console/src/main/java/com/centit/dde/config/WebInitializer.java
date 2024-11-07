@@ -22,10 +22,10 @@ public class WebInitializer implements WebApplicationInitializer {
         String [] servletUrlPatterns = {"/system/*","/dde/*"};
         WebConfig.registerServletConfig(servletContext, "system",
             "/system/*",
-            SystemSpringMvcConfig.class, SwaggerConfig.class);
+            SystemSpringMvcConfig.class);
         WebConfig.registerServletConfig(servletContext, "dde",
             "/dde/*",
-            DdeSpringMvcConfig.class,SwaggerConfig.class);
+            DdeSpringMvcConfig.class);
 
         //druid 监控配置信息
 //        ServletRegistration.Dynamic druidStatView = servletContext.addServlet("druidStatView", StatViewServlet.class);
