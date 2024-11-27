@@ -19,7 +19,9 @@ import com.centit.support.security.SM2Util;
 import com.centit.support.security.SM4Util;
 import com.centit.support.security.SecurityOptUtils;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.charset.StandardCharsets;
@@ -35,6 +37,22 @@ import java.util.Map;
  */
 public class EncryptOperation  implements BizOperation {
 
+
+    private Pair<Integer, Object> encodeBytes(byte[] bytes, String encodeType) {
+        switch (encodeType) {
+            case "base64": {
+                String base64String = Base64.encodeBase64String(bytes); //new String(Base64.encodeBase64(cipherText))
+                return new MutablePair<>(base64String.length(), base64String);
+            }
+            case "hex": {
+                String HexString = String.valueOf(Hex.encodeHex(bytes));
+                return new MutablePair<>(HexString.length(), HexString);
+            }
+            case "raw":
+            default:
+                return new MutablePair<>(bytes.length, bytes);
+        }
+    }
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
@@ -61,10 +79,14 @@ public class EncryptOperation  implements BizOperation {
             password = StringBaseOpt.castObjectToString(
                 DataSetOptUtil.fetchFieldValue(transform, password), password);
         }
-
-        Boolean base64 =
+        // raw hex base64
+        String encodeType = BuiltInOperation.getJsonFieldString(bizOptJson, "encodeType", "raw");
+        Boolean base64Compatible =
             BooleanBaseOpt.castObjectToBoolean(
                 BuiltInOperation.getJsonFieldString(bizOptJson, "base64", ""), ! "file".equals(encryptDataType));
+        if(base64Compatible){
+            encodeType = "base64";
+        }
 
         if("dataSet".equals(encryptDataType)) {
             byte[] cipherText = null;
@@ -96,7 +118,7 @@ public class EncryptOperation  implements BizOperation {
                     break;
             }
 
-            DataSet objectToDataSet = new DataSet(base64 ? new String(Base64.encodeBase64(cipherText)) : cipherText);
+            DataSet objectToDataSet = new DataSet(encodeBytes(cipherText, encodeType).getRight());
             bizModel.putDataSet(targetDsName, objectToDataSet);
             return BuiltInOperation.createResponseSuccessData(objectToDataSet.getSize());
         } else {
@@ -157,18 +179,10 @@ public class EncryptOperation  implements BizOperation {
                                 password);
                             break;
                     }
-
-                    if(base64) {
-                        String base64Str = Base64.encodeBase64String(cipherText);
-                        map.put(encryptFieldName, base64Str);
-                        if("file".equals(encryptDataType)) {
-                            map.put(ConstantValue.FILE_SIZE, base64Str.length());
-                        }
-                    } else {
-                        map.put(encryptFieldName, cipherText);
-                        if("file".equals(encryptDataType)) {
-                            map.put(ConstantValue.FILE_SIZE, cipherText.length);
-                        }
+                    Pair<Integer, Object> data = encodeBytes(cipherText, encodeType);
+                    map.put(encryptFieldName, data.getRight());
+                    if("file".equals(encryptDataType)) {
+                        map.put(ConstantValue.FILE_SIZE, data.getLeft());
                     }
                 }
             }

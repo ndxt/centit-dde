@@ -8,6 +8,7 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
@@ -43,7 +44,11 @@ public class WriteObjectFileOperation implements BizOperation {
             if(StringUtils.isBlank(rootName)){
                 rootName = "object";
             }
-            objBytes = XMLObject.objectToXMLString(rootName, data).getBytes();
+            boolean addAttr = BooleanBaseOpt.castObjectToBoolean(
+                    bizOptJson.getString("addTypeAttr"), true);
+            boolean fieldAsKey = BooleanBaseOpt.castObjectToBoolean(
+                bizOptJson.getString("fieldAsKey"), true);
+            objBytes = XMLObject.objectToXMLString(rootName, data, addAttr, fieldAsKey).getBytes();
         }else {
             if(data instanceof String){
                 objBytes =((String) data).getBytes();

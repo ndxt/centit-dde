@@ -19,6 +19,7 @@ import com.centit.support.security.SM2Util;
 import com.centit.support.security.SM4Util;
 import com.centit.support.security.SecurityOptUtils;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -30,6 +31,27 @@ import java.util.Map;
  * 解密算法
  */
 public class DecipherOperation implements BizOperation {
+
+    private byte[] decodeBytes(Object cipherData, String encodeType) {
+        switch (encodeType) {
+            case "base64": {
+                String cipherText = StringBaseOpt.castObjectToString(cipherData);
+                return Base64.decodeBase64(cipherText);
+            }
+            case "hex": {
+                try {
+                    String cipherText = StringBaseOpt.castObjectToString(cipherData);
+                    return Hex.decodeHex(cipherText);
+                } catch (Exception e) {
+                    throw new ObjectException(ObjectException.ILLEGALACCESS_EXCEPTION,
+                        "HEX解码失败" +e.getMessage(), e);
+                }
+            }
+            case "raw":
+            default:
+                return ByteBaseOpt.castObjectToBytes(cipherData);
+        }
+    }
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
@@ -51,9 +73,14 @@ public class DecipherOperation implements BizOperation {
             password = StringBaseOpt.castObjectToString(
                 DataSetOptUtil.fetchFieldValue(transform, password), password);
         }
-        Boolean base64 =
+        // raw hex base64
+        String encodeType = BuiltInOperation.getJsonFieldString(bizOptJson, "encodeType", "raw");
+        Boolean base64Compatible =
             BooleanBaseOpt.castObjectToBoolean(
-                BuiltInOperation.getJsonFieldString(bizOptJson, "base64", ""),  ! "file".equals(cipherDataType));
+                BuiltInOperation.getJsonFieldString(bizOptJson, "base64", ""), ! "file".equals(cipherDataType));
+        if(base64Compatible){
+            encodeType = "base64";
+        }
 
         String fieldName = BuiltInOperation.getJsonFieldString(bizOptJson, "fieldName", "");
 
@@ -74,13 +101,7 @@ public class DecipherOperation implements BizOperation {
                     ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
                     dataOptContext.getI18nMessage("error.701.field_is_blank", "cipherData"));
             }
-            byte[] cipherBytes;
-            if (base64) {
-                String cipherText = StringBaseOpt.castObjectToString(cipherData);
-                cipherBytes = Base64.decodeBase64(cipherText);
-            } else {
-                cipherBytes = ByteBaseOpt.castObjectToBytes(cipherData);
-            }
+            byte[] cipherBytes = decodeBytes(cipherData, encodeType);
             byte[] objectText = null;
 
             switch (algorithm){
@@ -137,14 +158,7 @@ public class DecipherOperation implements BizOperation {
             for(Map<String, Object> map : encryptData){
                 Object mw = map.get(fieldName);
                 if(mw!=null){
-                    byte[] cipherBytes;
-                    if (base64) {
-                        String cipherText = StringBaseOpt.castObjectToString(mw);
-                        cipherBytes = Base64.decodeBase64(cipherText);
-                    } else {
-                        cipherBytes = ByteBaseOpt.castObjectToBytes(mw);
-                    }
-
+                    byte[] cipherBytes = decodeBytes(mw, encodeType);
                     byte[] objectText = null;
                     switch (algorithm){
                         case "SM4":
