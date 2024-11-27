@@ -81,11 +81,13 @@ public class EncryptOperation  implements BizOperation {
         }
         // raw hex base64
         String encodeType = BuiltInOperation.getJsonFieldString(bizOptJson, "encodeType", "raw");
-        Boolean base64Compatible =
-            BooleanBaseOpt.castObjectToBoolean(
-                BuiltInOperation.getJsonFieldString(bizOptJson, "base64", ""), ! "file".equals(encryptDataType));
-        if(base64Compatible){
-            encodeType = "base64";
+        String baseStr = BuiltInOperation.getJsonFieldString(bizOptJson, "base64", "");
+        if(StringUtils.isNotBlank(baseStr)) {
+            Boolean base64Compatible =
+                BooleanBaseOpt.castObjectToBoolean(baseStr, !"file".equals(encryptDataType));
+            if (base64Compatible) {
+                encodeType = "base64";
+            }
         }
 
         if("dataSet".equals(encryptDataType)) {
