@@ -211,7 +211,7 @@ public class HttpTaskController extends BaseController {
             dataOptContext.setBreakStepNo(NumberBaseOpt.castObjectToInteger(obj, -1));
         }
 
-        if (taskType == ConstantValue.TASK_TYPE_POST || taskType == ConstantValue.TASK_TYPE_PUT ||
+        if (ConstantValue.TASK_TYPE_POST.equals(taskType) || ConstantValue.TASK_TYPE_PUT.equals(taskType) ||
             "POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
             String contentType = request.getHeader("Content-Type");
             if (StringUtils.contains(contentType, "application/json")) {
