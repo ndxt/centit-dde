@@ -53,7 +53,8 @@ public class MailBizOperation implements BizOperation {
             messageManager.setTopUnit(topUnit);
             messageManager.setUserEmailSupport(new SystemUserEmailSupport());
             ResponseData responseData= messageManager.sendMessage("system", optUsers,
-                NoticeMessage.create().operation(dataOptContext.getOsId()).method(dataOptContext.getOptId()).subject(subject)
+                NoticeMessage.create().topUnit(topUnit)
+                    .operation(dataOptContext.getOsId()).method(dataOptContext.getOptId()).subject(subject)
                     .content(content));
             bizModel.putDataSet(id, new DataSet(responseData));
             return responseData;
