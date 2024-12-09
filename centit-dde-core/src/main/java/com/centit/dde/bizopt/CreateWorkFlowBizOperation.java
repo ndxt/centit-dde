@@ -42,39 +42,40 @@ public class CreateWorkFlowBizOperation implements BizOperation {
         String userCode = bizOptJson.getString("userCode");
         String flowOptName = bizOptJson.getString("flowOptName");
         String flowOptTag = bizOptJson.getString("flowOptTag");
-        if (StringUtils.isBlank(flowCode)) {
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
-                dataOptContext.getI18nMessage("error.701.field_is_blank", "flowCode"));
-        }
-        if (StringUtils.isBlank(unitCode)) {
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
-                dataOptContext.getI18nMessage("error.701.field_is_blank", "unitCode"));
-        }
-        if (StringUtils.isBlank(userCode)) {
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
-                dataOptContext.getI18nMessage("error.701.field_is_blank", "userCode"));
-        }
-        if (StringUtils.isBlank(flowOptName)) {
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
-                dataOptContext.getI18nMessage("error.701.field_is_blank", "flowOptName"));
-        }
-        if (StringUtils.isBlank(flowOptTag)) {
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
-                dataOptContext.getI18nMessage("error.701.field_is_blank", "flowOptTag"));
-        }
-        String id = bizOptJson.getString("id");
+
         BizModelJSONTransform bizModelJSONTransform = new BizModelJSONTransform(bizModel);
         String unitCodeTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(unitCode, bizModelJSONTransform));
         String userCodeTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(userCode, bizModelJSONTransform));
         String flowOptNameTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowOptName, bizModelJSONTransform));
         String flowOptTagTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowOptTag, bizModelJSONTransform));
         String flowCodeTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowCode, bizModelJSONTransform));
-        if(StringUtils.isBlank(flowCodeTran)){
-            flowCodeTran = flowCode;
+
+        if (StringUtils.isBlank(flowCodeTran)) {
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "flowCode"));
         }
+        if (StringUtils.isBlank(unitCodeTran)) {
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "unitCode"));
+        }
+        if (StringUtils.isBlank(userCodeTran)) {
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "userCode"));
+        }
+        if (StringUtils.isBlank(flowOptNameTran)) {
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "flowOptName"));
+        }
+        if (StringUtils.isBlank(flowOptTagTran)) {
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                dataOptContext.getI18nMessage("error.701.field_is_blank", "flowOptTag"));
+        }
+
+        String id = bizOptJson.getString("id");
         CreateFlowOptions createFlowOptions = CreateFlowOptions.create();
-        createFlowOptions.flow(flowCodeTran).optName(flowOptTagTran).unit(unitCodeTran)
+        createFlowOptions.flow(flowCodeTran).optTag(flowOptTagTran).unit(unitCodeTran)
                 .user(userCodeTran).optName(flowOptNameTran);
+
         createFlowOptions.setClientLocale(dataOptContext.getLocale());
         createFlowOptions.setLoginIp(dataOptContext.getLoginIp());
         //根据表达式    获取流程变量信息(非必填参数)
