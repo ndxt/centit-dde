@@ -69,12 +69,12 @@ public class CreateWorkFlowBizOperation implements BizOperation {
         String flowOptNameTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowOptName, bizModelJSONTransform));
         String flowOptTagTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowOptTag, bizModelJSONTransform));
         String flowCodeTran = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowCode, bizModelJSONTransform));
+        if(StringUtils.isBlank(flowCodeTran)){
+            flowCodeTran = flowCode;
+        }
         CreateFlowOptions createFlowOptions = CreateFlowOptions.create();
-        createFlowOptions.setFlowCode(flowCodeTran);
-        createFlowOptions.setFlowOptTag(flowOptTagTran);
-        createFlowOptions.setUnitCode(unitCodeTran);
-        createFlowOptions.setUserCode(userCodeTran);
-        createFlowOptions.setFlowOptName(flowOptNameTran);
+        createFlowOptions.flow(flowCodeTran).optName(flowOptTagTran).unit(unitCodeTran)
+                .user(userCodeTran).optName(flowOptNameTran);
         createFlowOptions.setClientLocale(dataOptContext.getLocale());
         createFlowOptions.setLoginIp(dataOptContext.getLoginIp());
         //根据表达式    获取流程变量信息(非必填参数)
