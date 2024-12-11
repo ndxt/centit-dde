@@ -29,9 +29,9 @@ public class BizModelJSONTransform
         }
     }
 
-    private BizModel bizModel;
+    private final BizModel bizModel;
     private int stackLength;
-    private List<StackData> stack;
+    private final List<StackData> stack;
 
     public BizModelJSONTransform(BizModel obj) {
         this.bizModel = obj;
@@ -45,7 +45,6 @@ public class BizModelJSONTransform
             pushStackValue(stackValue,0,1);
         }
     }
-
 
     @Override
     public Object attainExpressionValue(String expression) {
