@@ -17,9 +17,21 @@ import java.util.List;
  */
 public class BizModelJSONTransform
     implements VariableTranslate, JSONTransformDataSupport {
+
+    static class StackData{
+        Object data;
+        int  index;
+        int  count;
+        public StackData(Object data, int index, int count) {
+            this.data = data;
+            this.index = index;
+            this.count = count;
+        }
+    }
+
     private BizModel bizModel;
     private int stackLength;
-    private List<Object> stack;
+    private List<StackData> stack;
 
     public BizModelJSONTransform(BizModel obj) {
         this.bizModel = obj;
@@ -30,7 +42,7 @@ public class BizModelJSONTransform
     public BizModelJSONTransform(BizModel obj, Object stackValue) {
         this(obj);
         if(stackValue!=null) {
-            pushStackValue(stackValue);
+            pushStackValue(stackValue,0,1);
         }
     }
 
@@ -52,10 +64,6 @@ public class BizModelJSONTransform
         return Pretreatment.mapTemplateStringAsFormula(templateString, this, "", true);
     }
 
-    private Object peekStackValue() {
-        return stackLength > 1 ? stack.get(stackLength - 2) : null;
-    }
-
     /**
      * 清理栈中的值
      */
@@ -64,18 +72,18 @@ public class BizModelJSONTransform
     }
 
     @Override
-    public void pushStackValue(Object value) {
+    public void pushStackValue(Object value, int index, int count) {
         if (stack.size() > stackLength) {
-            stack.set(stackLength, value);
+            stack.set(stackLength, new StackData(value, index, count));
         } else {
-            stack.add(value);
+            stack.add(new StackData(value, index, count));
         }
         stackLength++;
     }
 
     @Override
     public Object popStackValue() {
-        Object obj = stackLength > 0 ? stack.get(stackLength - 1) : null;
+        Object obj = stackLength > 0 ? stack.get(stackLength - 1).data : null;
         if (stackLength > 0) {
             stackLength--;
         }
@@ -87,21 +95,42 @@ public class BizModelJSONTransform
         if (labelName.startsWith(ConstantValue.ROOT_NODE_TAG)) {
             return fetchRootData(labelName.substring(1));
         } else if (labelName.startsWith(ConstantValue.DOUBLE_SPOT)) {
-            return ReflectionOpt.attainExpressionValue(
-                peekStackValue(),
-                labelName.substring(2));
+            if (stackLength > 1) {
+                if ("..__row_index".equals(labelName)) {
+                    return stack.get(stackLength - 2).index;
+                }
+                if ("..__row_count".equals(labelName)) {
+                    return stack.get(stackLength - 2).count;
+                }
+                return ReflectionOpt.attainExpressionValue(
+                    stack.get(stackLength - 2).data,
+                    labelName.substring(2));
+            }
+            return null;
         } else if (labelName.startsWith(ConstantValue.SPOT)) {
             if (stackLength > 0) {
+                if (".__row_index".equals(labelName)) {
+                    return stack.get(stackLength - 1).index;
+                }
+                if (".__row_count".equals(labelName)) {
+                    return stack.get(stackLength - 1).count;
+                }
                 return ReflectionOpt.attainExpressionValue(
-                    stack.get(stackLength - 1),
+                    stack.get(stackLength - 1).data,
                     labelName.substring(1));
             } else {
                 return fetchRootData(labelName.substring(1));
             }
         } else {
             if (stackLength > 0) { // 优先从栈中获取变量
+                if ("__row_index".equals(labelName)) {
+                    return stack.get(stackLength - 1).index;
+                }
+                if ("__row_count".equals(labelName)) {
+                    return stack.get(stackLength - 1).count;
+                }
                 Object obj = ReflectionOpt.attainExpressionValue(
-                    stack.get(stackLength - 1),
+                    stack.get(stackLength - 1).data,
                     labelName);
                 if(obj!=null){
                     return obj;
