@@ -33,7 +33,8 @@ import java.util.regex.Pattern;
  */
 public abstract class DataSetOptUtil {
     protected static final Logger logger = LoggerFactory.getLogger(DataSetOptUtil.class);
-    private static final boolean SORT_NULL_AS_FIRST = false;
+    private static final boolean SORT_NULL_AS_LAST = false;
+    private static final boolean SORT_NULL_AS_FIRST = true;
     public static final Map<String, Function<Object[], Object>> extendFuncs = new HashMap<>();
 
     static {
@@ -440,7 +441,7 @@ public abstract class DataSetOptUtil {
         }
 
         for (Map<String, Object> row : data) {
-            if (0 != compareTwoRow(preRow, row, groupByFields, SORT_NULL_AS_FIRST)) {
+            if (0 != compareTwoRow(preRow, row, groupByFields, SORT_NULL_AS_LAST)) {
                 if (preRow != null) {
                     //保存newRow
                     Map<String, Object> newRow = makeNewStatRow(groupByFields, statDesc, preRow, tempData);
@@ -510,7 +511,7 @@ public abstract class DataSetOptUtil {
         List<Map<String, Object>> data = inData.getDataAsList();
         List<String> keyRows = ListUtils.union(groupByFields, orderByFields);
         //根据维度进行排序 行头、列头
-        sortByFields(data, keyRows, SORT_NULL_AS_FIRST);
+        sortByFields(data, keyRows, SORT_NULL_AS_LAST);
         Map<String, Object> preRow = null;
         int n = data.size();
         int prePos = 0;
@@ -519,7 +520,7 @@ public abstract class DataSetOptUtil {
         for (int i = 0; i < n; i++) {
             Map<String, Object> row = data.get(i);
             //主键不相等，开启新的一组
-            if (compareTwoRow(preRow, row, groupByFields, SORT_NULL_AS_FIRST) != 0) {
+            if (compareTwoRow(preRow, row, groupByFields, SORT_NULL_AS_LAST) != 0) {
                 if (preRow != null) {
                     analyseDatasetGroup(newData, data, prePos, i, dvt, refDesc);
                 }
@@ -557,7 +558,7 @@ public abstract class DataSetOptUtil {
         int colHeaderCount = colHeaderFields.size();
         List<String> keyRows = ListUtils.union(rowHeaderFields, colHeaderFields);
         //根据维度进行排序 行头、列头
-        sortByFields(data, keyRows, SORT_NULL_AS_FIRST);
+        sortByFields(data, keyRows, SORT_NULL_AS_LAST);
         List<Map<String, Object>> newData = new ArrayList<>();
         Map<String, Object> preRow = null;
         Map<String, Object> newRow = null;
@@ -565,7 +566,7 @@ public abstract class DataSetOptUtil {
             if (row == null) {
                 continue;
             }
-            if (compareTwoRow(preRow, row, rowHeaderFields, SORT_NULL_AS_FIRST) != 0) {
+            if (compareTwoRow(preRow, row, rowHeaderFields, SORT_NULL_AS_LAST) != 0) {
                 if (preRow != null && newRow != null) {
                     newData.add(newRow);
                 }
@@ -715,22 +716,22 @@ public abstract class DataSetOptUtil {
         List<String> mainFields = new ArrayList<>();
         List<String> slaveFields = new ArrayList<>();
         splitMainAndSlave(primaryFields, mainFields, slaveFields);
-        sortByFields(mainData, mainFields, SORT_NULL_AS_FIRST);
-        sortByFields(slaveData, slaveFields, SORT_NULL_AS_FIRST);
+        sortByFields(mainData, mainFields, SORT_NULL_AS_LAST);
+        sortByFields(slaveData, slaveFields, SORT_NULL_AS_LAST);
         int i = 0;
         int j = 0;
         List<Map<String, Object>> newData = new ArrayList<>();
 
         while (i < mainData.size() && j < slaveData.size()) {
-            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_FIRST);
+            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_LAST);
             Map<String, Object> newRow = new LinkedHashMap<>();
             if (nc == 0) {
                 newRow.putAll(slaveData.get(j));
                 newRow.putAll(mainData.get(i));
                 /** 这边如果需要实现 数据库jion 的 笛卡尔积，需要遍列所有相同的key ， 只确保每一条数据都有对应上
                  * 就是只能保证一对多的情况正确，不能保证多对多的情况正确*/
-                boolean equalNextMain = i < mainData.size() - 1 && compareTwoRow(mainData.get(i), mainData.get(i + 1), mainFields, SORT_NULL_AS_FIRST) == 0;
-                boolean equalNextSlave = j < slaveData.size() - 1 && compareTwoRow(slaveData.get(j), slaveData.get(j + 1), slaveFields, SORT_NULL_AS_FIRST) == 0;
+                boolean equalNextMain = i < mainData.size() - 1 && compareTwoRow(mainData.get(i), mainData.get(i + 1), mainFields, SORT_NULL_AS_LAST) == 0;
+                boolean equalNextSlave = j < slaveData.size() - 1 && compareTwoRow(slaveData.get(j), slaveData.get(j + 1), slaveFields, SORT_NULL_AS_LAST) == 0;
                 if (equalNextMain && !equalNextSlave) {
                     i++;
                 } else if (!equalNextMain && equalNextSlave) {
@@ -817,13 +818,13 @@ public abstract class DataSetOptUtil {
         List<String> mainFields = new ArrayList<>();
         List<String> slaveFields = new ArrayList<>();
         splitMainAndSlave(primaryFields, mainFields, slaveFields);
-        sortByFields(mainData, mainFields, SORT_NULL_AS_FIRST);
-        sortByFields(slaveData, slaveFields, SORT_NULL_AS_FIRST);
+        sortByFields(mainData, mainFields, SORT_NULL_AS_LAST);
+        sortByFields(slaveData, slaveFields, SORT_NULL_AS_LAST);
         int i = 0;
         int j = 0;
         List<Map<String, Object>> newData = new ArrayList<>();
         while (i < mainData.size() && j < slaveData.size()) {
-            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_FIRST);
+            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_LAST);
             if (nc == 0) {
                 Map<String, Object> newRow = new LinkedHashMap<>();
                 if (unionData) {
@@ -866,13 +867,13 @@ public abstract class DataSetOptUtil {
         List<String> mainFields = new ArrayList<>();
         List<String> slaveFields = new ArrayList<>();
         splitMainAndSlave(primaryFields, mainFields, slaveFields);
-        sortByFields(mainData, mainFields, SORT_NULL_AS_FIRST);
-        sortByFields(slaveData, slaveFields, SORT_NULL_AS_FIRST);
+        sortByFields(mainData, mainFields, SORT_NULL_AS_LAST);
+        sortByFields(slaveData, slaveFields, SORT_NULL_AS_LAST);
         int i = 0;
         int j = 0;
         List<Map<String, Object>> newData = new ArrayList<>();
         while (i < mainData.size() && j < slaveData.size()) {
-            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_FIRST);
+            int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_LAST);
             if (nc == 0) {
                 //newRow.putAll(slaveData.get(j));
                 i++;
