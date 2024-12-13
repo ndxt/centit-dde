@@ -421,15 +421,15 @@ public abstract class DataSetOptUtil {
             return inData;
         }
         List<Map<String, Object>> data = inData.getDataAsList();
-        if (data == null || data.size() == 0) {
+        if (data == null || data.isEmpty()) {
             return inData;
         }
         if(groupByFields==null){
             groupByFields=new ArrayList<>(0);
         }
         //按group by字段排序
-        if (groupByFields != null && groupByFields.size() > 0) {
-            sortByFields(data, groupByFields, false);
+        if (!groupByFields.isEmpty()) {
+            sortByFields(data, groupByFields, SORT_NULL_AS_LAST);
         }
 
         List<Map<String, Object>> newData = new ArrayList<>();
@@ -652,7 +652,7 @@ public abstract class DataSetOptUtil {
         for (Map.Entry<String, String> field : fields) {
             Object object1 = data1.get(field.getKey());
             Object object2 = data2.get(field.getKey());
-            if(GeneralAlgorithm.compareTwoObject(object1, object2, false) != 0) {
+            if(GeneralAlgorithm.compareTwoObject(object1, object2, SORT_NULL_AS_FIRST) != 0) {
                 if (object2 instanceof String) {
                     boolean mch = Pattern.compile((String) object2)
                         .matcher(StringBaseOpt.objectToString(object1)).find();
@@ -899,7 +899,7 @@ public abstract class DataSetOptUtil {
     }
 
     private static int compareTwoRow(Map<String, Object> data1, Map<String, Object> data2, List<String> fields, boolean nullAsFirst) {
-        if ((data1 == null && data2 == null)|| (fields == null)) {
+        if ((data1 == null && data2 == null) || (fields == null)) {
             return 0;
         }
 
