@@ -169,7 +169,7 @@ public abstract class DataSetOptUtil {
         VariableFormula formula = new VariableFormula();
         formula.setExtendFuncMap(extendFuncs);
         formula.setTrans(new DataRowVariableTranslate(bizModel, inRow, rowInd, rowCount));
-        Map<String, Object> newRow = new LinkedHashMap<>(formulaMap.size());
+        Map<String, Object> newRow = new HashMap<>(formulaMap.size());
         for (Map.Entry<String, String> ent : formulaMap) {
             formula.setFormula(ent.getValue());
             newRow.put(ent.getKey(), formula.calcFormula());
@@ -674,7 +674,7 @@ public abstract class DataSetOptUtil {
         List<Map<String, Object>> slaveData = slaveDataSet.getDataAsList();
         List<Map<String, Object>> newData = new ArrayList<>();
         for(Map<String, Object> leftRow : mainDataSet.getDataAsList()){
-            Map<String, Object> newRow = new LinkedHashMap<>();
+            Map<String, Object> newRow = new HashMap<>();
             for(Map<String, Object> rightRow : slaveData){
                 // 不是严格相等，相等或者 模式匹配
                 if(matchToRow(leftRow, rightRow, primaryFields)) {
@@ -724,7 +724,7 @@ public abstract class DataSetOptUtil {
 
         while (i < mainData.size() && j < slaveData.size()) {
             int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_LAST);
-            Map<String, Object> newRow = new LinkedHashMap<>();
+            Map<String, Object> newRow = new HashMap<>();
             if (nc == 0) {
                 newRow.putAll(slaveData.get(j));
                 newRow.putAll(mainData.get(i));
@@ -757,14 +757,14 @@ public abstract class DataSetOptUtil {
         }
         if (leftJoin) {
             while (i < mainData.size()) {
-                Map<String, Object> newRow = new LinkedHashMap<>(mainData.get(i));
+                Map<String, Object> newRow = new HashMap<>(mainData.get(i));
                 newData.add(newRow);
                 i++;
             }
         }
         if (rightJoin) {
             while (j < slaveData.size()) {
-                Map<String, Object> newRow = new LinkedHashMap<>(slaveData.get(j));
+                Map<String, Object> newRow = new HashMap<>(slaveData.get(j));
                 newData.add(newRow);
                 j++;
             }
@@ -826,7 +826,7 @@ public abstract class DataSetOptUtil {
         while (i < mainData.size() && j < slaveData.size()) {
             int nc = compareTwoRowWithMap(mainData.get(i), slaveData.get(j), primaryFields, SORT_NULL_AS_LAST);
             if (nc == 0) {
-                Map<String, Object> newRow = new LinkedHashMap<>();
+                Map<String, Object> newRow = new HashMap<>();
                 if (unionData) {
                     newRow.putAll(slaveData.get(j));
                 }
@@ -879,9 +879,8 @@ public abstract class DataSetOptUtil {
                 i++;
                 j++;
             } else if (nc < 0) {
-                Map<String, Object> newRow = new LinkedHashMap<>();
-                newRow.putAll(mainData.get(i));
-                if (newRow.size() > 0) {
+                Map<String, Object> newRow = new HashMap<>(mainData.get(i));
+                if (!newRow.isEmpty()) {
                     newData.add(newRow);
                 }
                 i++;
@@ -890,8 +889,8 @@ public abstract class DataSetOptUtil {
             }
         }
         while (i < mainData.size()) {
-            Map<String, Object> newRow = new LinkedHashMap<>(mainData.get(i));
-            if (newRow.size() > 0) {
+            Map<String, Object> newRow = new HashMap<>(mainData.get(i));
+            if (!newRow.isEmpty()) {
                 newData.add(newRow);
             }
             i++;
