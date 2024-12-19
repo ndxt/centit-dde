@@ -56,7 +56,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
                     maxE = dl.getErrorPieces();
                 }
                 if(maxS < dl.getSuccessPieces()){
-                    maxS = dl.getErrorPieces();
+                    maxS = dl.getSuccessPieces();
                 }
             }
         }
