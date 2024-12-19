@@ -64,11 +64,11 @@ public class TaskLog implements java.io.Serializable {
 
     @Column(name="error_pieces")
     @ApiModelProperty(value = "失败条数")
-    private String errorPieces;
+    private Integer errorPieces;
 
     @Column(name="success_pieces")
     @ApiModelProperty(value = "成功条数")
-    private String successPieces;
+    private Integer successPieces;
 
     @Column(name="api_type")
     @ApiModelProperty(value = "API类别，是草稿还是正式运行的日志，0 草稿，1 正式")

@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author zhf
@@ -106,6 +103,11 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         dataPacketCopy.setUpdateDate(updateTime);
         dataPacketDraftDao.updateObject(dataPacketCopy);
         dataPacketDraftDao.saveObjectReferences(dataPacketCopy);
+        // update error level
+        DataPacket dataPacket = dataPacketDao.getObjectById(dataPacketCopy.getPacketId());
+        if(dataPacket != null && !Objects.equals(dataPacket.getLogLevel(), dataPacketCopy.getLogLevel())) {
+            dataPacketDao.updatePublishPackedLogLevel(dataPacketCopy.getLogLevel(), dataPacketCopy.getPacketId());
+        }
     }
 
     @Override

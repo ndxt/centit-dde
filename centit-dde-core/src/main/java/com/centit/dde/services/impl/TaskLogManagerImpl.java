@@ -1,6 +1,7 @@
 package com.centit.dde.services.impl;
 
 import com.centit.dde.adapter.dao.TaskLogDao;
+import com.centit.dde.adapter.po.TaskDetailLog;
 import com.centit.dde.adapter.po.TaskLog;
 import com.centit.dde.services.TaskLogManager;
 import com.centit.dde.utils.ConstantValue;
@@ -48,6 +49,19 @@ public class TaskLogManagerImpl implements TaskLogManager {
         if(logLevel == ConstantValue.LOGLEVEL_CHECK_ERROR && detailLogsCount == 0){
             return;
         }
+        int maxE = 0, maxS = 0;
+        if(taskLog.getDetailLogs()!=null){
+            for(TaskDetailLog dl : taskLog.getDetailLogs()){
+                if(maxE < dl.getErrorPieces()){
+                    maxE = dl.getErrorPieces();
+                }
+                if(maxS < dl.getSuccessPieces()){
+                    maxS = dl.getErrorPieces();
+                }
+            }
+        }
+        taskLog.setErrorPieces(maxE);
+        taskLog.setSuccessPieces(maxS);
         this.taskLogDao.saveNewObject(taskLog);
         this.taskLogDao.saveObjectReferences(taskLog);
     }

@@ -81,6 +81,15 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
         });
     }
 
+    @Override
+    public void updatePublishPackedLogLevel(int logLevel, String  packetId){
+        String sql ="UPDATE q_data_packet SET log_level= :logLevel WHERE PACKET_ID = :api ";
+        DatabaseOptUtils.doExecuteNamedSql(this, sql, CollectionsOpt.createHashMap(
+            "logLevel", logLevel,
+            "api", packetId
+        ));
+    }
+
     /**
      * @Column(name = "log_level")
      *     @ApiModelProperty(value = "日志记录级别，1=ERROR,3=INFO,7=DEBUG")

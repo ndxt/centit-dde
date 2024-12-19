@@ -136,6 +136,12 @@ public class DataPacketDaoImpl implements DataPacketDao {
     }
 
     @Override
+    public void updatePublishPackedLogLevel(int logLevel, String  packetId){
+        throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
+            "Runtime 运行时环境，不支持元数据的修改!");
+    }
+
+    @Override
     public void updatePackedLogLevel(int logLevel, List<String> packetIds) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
             "Runtime 运行时环境，不支持元数据的修改!");

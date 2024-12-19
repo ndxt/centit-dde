@@ -53,21 +53,21 @@ public class TaskLogDaoImpl extends BaseDaoImpl<TaskLog, Long> implements TaskLo
         JSONArray dataList = DatabaseOptUtils.listObjectsByNamedSqlAsJson(this, params.getQuery(), params.getParams());
         //饼图统计
         String  pieSql=
-            " SELECT 'day' as time,other_message as message,count(*) as num FROM d_task_log " +
+            " SELECT 'day' as time, other_message as message,count(*) as num FROM d_task_log " +
                 " where to_days(run_begin_time) = to_days(now()) " +
                 " and other_message is not NULL " +
                 " [:packetId | AND task_id=:packetId ] " +
                 " [:optId | AND OPT_ID=:optId] "+
                 " GROUP BY other_message " +
                 " UNION ALL" +
-                " SELECT 'weeks' as time,other_message as message,count(*) as num FROM d_task_log " +
+                " SELECT 'weeks' as time, other_message as message,count(*) as num FROM d_task_log " +
                 " where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(run_begin_time) " +
                 " and other_message is not NULL  " +
                 " [:packetId | AND task_id=:packetId ] " +
                 " [:optId | AND OPT_ID=:optId] "+
                 " GROUP BY other_message" +
                 " UNION ALL" +
-                " SELECT 'month' as time,other_message as message,count(*) as num FROM d_task_log " +
+                " SELECT 'month' as time, other_message as message, count(*) as num FROM d_task_log " +
                 " where DATE_SUB(CURDATE(), INTERVAL 30 DAY) <= date(run_begin_time) " +
                 " and other_message is not NULL " +
                 " [:packetId | AND task_id=:packetId ] " +
@@ -85,7 +85,7 @@ public class TaskLogDaoImpl extends BaseDaoImpl<TaskLog, Long> implements TaskLo
     public int deleteTaskLog(String packetId, Date runBeginTime, boolean isError) {
         StringBuilder sql=new StringBuilder("delete from d_task_log  where task_id = ? AND run_begin_time <= ? ");
         if (! isError){
-            sql.append(" AND other_message !='error' ");
+            sql.append(" AND (error_pieces is null or error_pieces = 0) ");
         }
         return DatabaseOptUtils.doExecuteSql(this, sql.toString(),
             new Object[]{packetId, runBeginTime});
