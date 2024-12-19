@@ -33,8 +33,8 @@ import java.util.regex.Pattern;
  */
 public abstract class DataSetOptUtil {
     protected static final Logger logger = LoggerFactory.getLogger(DataSetOptUtil.class);
-    private static final boolean SORT_NULL_AS_LAST = false;
-    private static final boolean SORT_NULL_AS_FIRST = true;
+    public static final boolean SORT_NULL_AS_LAST = false;
+    public static final boolean SORT_NULL_AS_FIRST = true;
     public static final Map<String, Function<Object[], Object>> extendFuncs = new HashMap<>();
 
     static {
@@ -288,10 +288,6 @@ public abstract class DataSetOptUtil {
      * @param inData 原始数据集
      * @param fields 排序字段
      */
-    public static void sortDataSetByFields(DataSet inData, List<String> fields) {
-        sortDataSetByFields(inData, fields, SORT_NULL_AS_FIRST);
-    }
-
     public static void sortDataSetByFields(DataSet inData, List<String> fields, boolean nullAsFirst) {
         sortByFields(inData.getDataAsList(), fields, nullAsFirst);
     }

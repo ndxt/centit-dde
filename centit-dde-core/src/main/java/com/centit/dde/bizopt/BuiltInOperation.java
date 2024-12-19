@@ -290,7 +290,9 @@ public abstract class BuiltInOperation {
                 return fieldName;
             }, true);
         DataSet dataSet = bizModel.getDataSet(sour1DsName);
-        DataSetOptUtil.sortDataSetByFields(dataSet, orderByFields);
+        boolean nullAsFist = BooleanBaseOpt.castObjectToBoolean(
+            bizOptJson.getString("nullAsFist"),  DataSetOptUtil.SORT_NULL_AS_LAST);
+        DataSetOptUtil.sortDataSetByFields(dataSet, orderByFields, nullAsFist);
         return createResponseSuccessData(dataSet.getSize());
     }
 
