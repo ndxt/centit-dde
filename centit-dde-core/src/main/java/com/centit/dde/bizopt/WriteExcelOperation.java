@@ -61,20 +61,28 @@ public class WriteExcelOperation implements BizOperation {
         String optType = bizOptJson.getString("fileType");
         int mergeColCell = NumberBaseOpt.castObjectToInteger(bizOptJson.getString("mergeColCell"), -1);
 
-        if("append".equals(optType)){
+        if("append".equals(optType)) {
             String fileDataSetName = bizOptJson.getString("fileDataSet");
             DataSet dataSet2 = bizModel.getDataSet(fileDataSetName);
-            if(!(dataSet2 instanceof FileDataSet)){
+            if (!(dataSet2 instanceof FileDataSet)) {
                 return BuiltInOperation.createResponseData(0, 1,
                     ResponseData.ERROR_USER_CONFIG,
-                    dataOptContext.getI18nMessage("dde.604.data_source_not_found2",fileDataSetName));
+                    dataOptContext.getI18nMessage("dde.604.data_source_not_found2", fileDataSetName));
             }
-            FileDataSet fileDataSet = (FileDataSet)dataSet2;
+            FileDataSet fileDataSet = (FileDataSet) dataSet2;
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileDataSet.getFileInputStream());
             XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
-            //Integer beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
-           // Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
-            ExcelExportUtil.generateExcelSheet(sheet, dataAsList, titles, fields);
+
+            //boolean asTemplate = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getString("asTemplate"), false);
+
+            //if (asTemplate) {
+                //从第几行开始插入
+                int beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
+                Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
+                ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
+            //} else {
+            //    ExcelExportUtil.generateExcelSheet(sheet, dataAsList, titles, fields);
+            //}
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             xssfWorkbook.write(byteArrayOutputStream);
@@ -125,6 +133,7 @@ public class WriteExcelOperation implements BizOperation {
 
                 Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
                 ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
+
                 xssfWorkbook.write(byteArrayOutputStream);
                 xssfWorkbook.close();
             }
