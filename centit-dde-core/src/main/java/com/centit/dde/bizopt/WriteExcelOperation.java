@@ -54,7 +54,7 @@ public class WriteExcelOperation implements BizOperation {
         if(StringUtils.isBlank(sheetName)){
             sheetName = "Sheet1";
         }
-
+        boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), false);
         /**fileType（生成方式） ： none, append, excel, jxls；*/
         String optType = bizOptJson.getString("fileType");
         int mergeColCell = NumberBaseOpt.castObjectToInteger(bizOptJson.getString("mergeColCell"), -1);
@@ -71,27 +71,32 @@ public class WriteExcelOperation implements BizOperation {
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileDataSet.getFileInputStream());
             XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
 
-            //boolean asTemplate = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getString("asTemplate"), false);
-            //if (asTemplate) {
+            boolean asTemplate = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getString("asTemplate"), false);
+            if (asTemplate) {
                 //从第几行开始插入
                 int beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
                 Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
                 ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
-            //} else {
-            //    ExcelExportUtil.generateExcelSheet(sheet, dataAsList, titles, fields);
-            //}
+            } else {
+                //获取表达式信息
+                String[] titles = mapInfoDesc.keySet().toArray(new String[0]);
+                String[] fields = mapInfoDesc.values().toArray(new String[0]);
+                ExcelExportUtil.generateExcelSheet(sheet, dataAsList, titles, fields);
+            }
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             xssfWorkbook.write(byteArrayOutputStream);
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            fileDataSet.setFileData(byteArrayInputStream);
+            if(transToPdf){
+                fileDataSet.setFileData(excel2pdf(byteArrayInputStream));
+            } else {
+                fileDataSet.setFileData(byteArrayInputStream);
+            }
             byteArrayOutputStream.close();
             xssfWorkbook.close();
-
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
 
-        boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), false);
         String fileName = null;
         if(StringUtils.isNotBlank(bizOptJson.getString("fileName"))) {
             fileName = StringBaseOpt.castObjectToString(JSONTransformer.transformer(
