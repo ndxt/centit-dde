@@ -54,9 +54,7 @@ public class WriteExcelOperation implements BizOperation {
         if(StringUtils.isBlank(sheetName)){
             sheetName = "Sheet1";
         }
-        //获取表达式信息
-        String[] titles = mapInfoDesc.keySet().toArray(new String[0]);
-        String[] fields = mapInfoDesc.values().toArray(new String[0]);
+
         /**fileType（生成方式） ： none, append, excel, jxls；*/
         String optType = bizOptJson.getString("fileType");
         int mergeColCell = NumberBaseOpt.castObjectToInteger(bizOptJson.getString("mergeColCell"), -1);
@@ -74,7 +72,6 @@ public class WriteExcelOperation implements BizOperation {
             XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
 
             //boolean asTemplate = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getString("asTemplate"), false);
-
             //if (asTemplate) {
                 //从第几行开始插入
                 int beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
@@ -146,7 +143,9 @@ public class WriteExcelOperation implements BizOperation {
             byteArrayOutputStream.close();
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
-
+        //获取表达式信息
+        String[] titles = mapInfoDesc.keySet().toArray(new String[0]);
+        String[] fields = mapInfoDesc.values().toArray(new String[0]);
         InputStream inputStream = ExcelExportUtil.generateExcelStream(sheetName, dataAsList, titles, fields);
         FileDataSet objectToDataSet = transToPdf? new FileDataSet(fileName,
             -1, excel2pdf(inputStream)) : new FileDataSet(fileName, inputStream.available(), inputStream);
