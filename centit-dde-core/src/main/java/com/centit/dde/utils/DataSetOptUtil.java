@@ -38,6 +38,7 @@ public abstract class DataSetOptUtil {
     public static final Map<String, Function<Object[], Object>> extendFuncs = new HashMap<>();
 
     static {
+        //deprecated,用random('str','uuid')实现
         extendFuncs.put("uuid", (a) -> UuidOpt.getUuidAsString32());
         extendFuncs.put("password", (a) -> a==null || a.length<1 || a[0] == null ? null
              : new StandardPasswordEncoderImpl().encode(StringBaseOpt.castObjectToString(a[0])));
@@ -125,6 +126,7 @@ public abstract class DataSetOptUtil {
                 return null;
             }
         });
+        //deprecated,字符串用 strlen 不是字符串用 count
         extendFuncs.put("size", (a) -> {
             if (a == null || a.length < 1)
                 return 0;
