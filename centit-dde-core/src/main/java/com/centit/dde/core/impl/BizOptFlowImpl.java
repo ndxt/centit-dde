@@ -535,7 +535,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             iter = cycleVo.getIntRangeBegin();
         }  else {
             DataSet refObject = bizModel.getDataSet(cycleVo.getSource());
-            Collection<? extends Object> searchData =null;
+            Collection<?> searchData =null;
             if (refObject != null) {
                 if (StringUtils.isNotBlank(cycleVo.getSubsetFieldName())) {
                     Object obj = ReflectionOpt.attainExpressionValue(refObject.getData(), cycleVo.getSubsetFieldName());
