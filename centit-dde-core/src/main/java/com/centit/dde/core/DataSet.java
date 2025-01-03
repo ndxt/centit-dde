@@ -216,4 +216,7 @@ public class DataSet implements DataSetReader, Serializable {
         return JSON.toJSONString(this.data);
     }
 
+    public String toDebugString(){
+        return JSON.toJSONString(this.data);
+    }
 }

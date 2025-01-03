@@ -6,9 +6,11 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
+import com.centit.dde.utils.FileDataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.ByteBaseOpt;
@@ -57,7 +59,7 @@ public class DecipherOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source", bizModel.getModelName());
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
-        String cipherDataType = BuiltInOperation.getJsonFieldString(bizOptJson, "decipherData", "dataSet");
+        String cipherDataType = BuiltInOperation.getJsonFieldString(bizOptJson, "cipherData", "dataSet");
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null){
             return BuiltInOperation.createResponseData(0, 1,
@@ -86,7 +88,7 @@ public class DecipherOperation implements BizOperation {
         String fieldName = BuiltInOperation.getJsonFieldString(bizOptJson, "fieldName", "");
 
         /**
-         * 解密数据 decipherData ，整个数据集 dataSet，
+         * 解密数据 cipherData ，整个数据集 dataSet，
          * 对文件加密 file
          * 某一个具体的字段 field ： fieldName ， cipherFieldName
          */
@@ -193,8 +195,13 @@ public class DecipherOperation implements BizOperation {
                     }
                 }
             }
-            DataSet objectToDataSet = dataSet.getSize() == 1? new DataSet(encryptData.get(0)) : new DataSet(encryptData);
-            bizModel.putDataSet(targetDsName, objectToDataSet);
+            if ("file".equals(cipherDataType) && dataSet.getSize() == 1) {
+                FileDataSet fileDataSet = FileDataSetOptUtil.castToFileDataSet(new DataSet(encryptData.get(0)));
+                bizModel.putDataSet(targetDsName, fileDataSet);
+            } else {
+                DataSet objectToDataSet = dataSet.getSize() == 1 ? new DataSet(encryptData.get(0)) : new DataSet(encryptData);
+                bizModel.putDataSet(targetDsName, objectToDataSet);
+            }
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
     }

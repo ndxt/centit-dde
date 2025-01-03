@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 public class FileDataSet extends DataSet {
 
     public static String FILE_DATA_SET_DEFAULT_NAME = "fileInfo";
@@ -113,4 +114,18 @@ public class FileDataSet extends DataSet {
         return FileIOOpt.castObjectToInputStream(fileObj);
     }
 
+    @Override
+    public String toDebugString(){
+        if(this.getFileSize()<=1024)
+            return JSON.toJSONString(this.data);
+        JSONObject obj = new JSONObject();
+        for(Map.Entry<String, Object> ent : ((Map<String, Object>)this.data).entrySet()){
+            if(ConstantValue.FILE_CONTENT.equals(ent.getKey())){
+                obj.put(ConstantValue.FILE_CONTENT, "File content is too large.");
+            }else {
+                obj.put(ent.getKey(), ent.getValue());
+            }
+        }
+        return JSON.toJSONString(obj);
+    }
 }

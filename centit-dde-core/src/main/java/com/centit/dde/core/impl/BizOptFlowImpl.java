@@ -693,7 +693,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                     dataSet = bizModel.getDataSet(bizOptJson.getString("id"));
                 }
                 if (dataSet != null) {
-                    detailLog.setLogInfo(dataSet.toJSONString());
+                    detailLog.setLogInfo(dataSet.toDebugString());
                 } else {
                     detailLog.setLogInfo(responseData.toJSONString());
                 }

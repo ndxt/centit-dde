@@ -5,6 +5,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
@@ -127,9 +128,9 @@ public class EncryptOperation  implements BizOperation {
             String fieldName = BuiltInOperation.getJsonFieldString(bizOptJson, "fieldName", "");
             String encryptFieldName = BuiltInOperation.getJsonFieldString(bizOptJson, "encryptFieldName", "");
 
-            if("file".equals(encryptDataType)) {
+            if ("file".equals(encryptDataType)) {
                 //ConstantValue.FILE_CONTENT
-                if(StringUtils.isBlank(fieldName)){
+                if (StringUtils.isBlank(fieldName)) {
                     fieldName = ConstantValue.FILE_CONTENT;
                 }
                 //获取文件数据集内容; 多个文件 自动压缩为 zip文件
@@ -143,17 +144,17 @@ public class EncryptOperation  implements BizOperation {
                     dataOptContext.getI18nMessage("error.701.field_is_blank", "encryptFieldName"));
             }
             List<Map<String, Object>> encryptData = dataSet.getDataAsList();
-            if(encryptData.isEmpty()){
+            if (encryptData.isEmpty()) {
                 return BuiltInOperation.createResponseSuccessData(0);
             }
 
-            for(Map<String, Object> map : encryptData){
+            for (Map<String, Object> map : encryptData) {
                 Object mw = map.get(fieldName);
 
-                if(mw!=null){
+                if (mw != null) {
                     byte[] cipherText = null;
 
-                    switch (algorithm){
+                    switch (algorithm) {
                         case "SM4":
                             cipherText = SM4Util.encryptEcbPadding(
                                 password.getBytes(StandardCharsets.UTF_8),
@@ -183,14 +184,18 @@ public class EncryptOperation  implements BizOperation {
                     }
                     Pair<Integer, Object> data = encodeBytes(cipherText, encodeType);
                     map.put(encryptFieldName, data.getRight());
-                    if("file".equals(encryptDataType)) {
+                    if ("file".equals(encryptDataType)) {
                         map.put(ConstantValue.FILE_SIZE, data.getLeft());
                     }
                 }
             }
-
-            DataSet objectToDataSet = dataSet.getSize() == 1? new DataSet(encryptData.get(0)) : new DataSet(encryptData);
-            bizModel.putDataSet(targetDsName, objectToDataSet);
+            if ("file".equals(encryptDataType)) {
+                FileDataSet fileDataSet = FileDataSetOptUtil.castToFileDataSet(new DataSet(encryptData.get(0)));
+                bizModel.putDataSet(targetDsName, fileDataSet);
+            } else {
+                DataSet objectToDataSet = dataSet.getSize() == 1 ? new DataSet(encryptData.get(0)) : new DataSet(encryptData);
+                bizModel.putDataSet(targetDsName, objectToDataSet);
+            }
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
     }
