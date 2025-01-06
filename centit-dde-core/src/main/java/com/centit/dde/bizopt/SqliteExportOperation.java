@@ -150,9 +150,6 @@ public class SqliteExportOperation implements BizOperation {
                 jsonObjectDao.saveNewObject((JSONObject)object);
             }
         }
-        //TODO  适配国资委数据上报
-        DatabaseAccess.doExecuteSql(connection, "insert into sqlite_sequence values (?,?)" ,
-            new Object[]{tableName, objArray.size()});
     }
 
     private void writeTablesData2DB(String dbFileName, Object tablesData, Map<String, String> pkMap, String defaultKey) throws SQLException, IOException {
