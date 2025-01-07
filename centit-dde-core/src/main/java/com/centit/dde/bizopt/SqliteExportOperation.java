@@ -100,12 +100,12 @@ public class SqliteExportOperation implements BizOperation {
     private void setTablePrimaryKey(SimpleTableInfo tableInfo, String primaryKey){
         if(StringUtils.isNotBlank(primaryKey)) {
             if(primaryKey.indexOf(',')>0){
-                String keys[] = primaryKey.split(",");
+                String [] keys = primaryKey.split(",");
                 for (String pk : keys){
-                    tableInfo.setColumnAsPrimaryKey(pk);
+                    SqliteDDLOperations.setTablePrimaryKey(tableInfo, pk, false);
                 }
             } else {
-                tableInfo.setColumnAsPrimaryKey(primaryKey);
+                SqliteDDLOperations.setTablePrimaryKey(tableInfo, primaryKey, false);
             }
         }
     }
