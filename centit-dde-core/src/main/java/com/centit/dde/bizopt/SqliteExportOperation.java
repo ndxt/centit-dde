@@ -136,6 +136,7 @@ public class SqliteExportOperation implements BizOperation {
                     return new MutablePair<>(entry.getKey(), entry.getValue());
                 }
             }
+            return new MutablePair<>(propertyName, defaultKey);
         }
 
         String tableName = FieldType.humpNameToColumn(propertyName, true);
@@ -145,7 +146,7 @@ public class SqliteExportOperation implements BizOperation {
             }
             if(StringUtils.equalsIgnoreCase(entry.getKey(), propertyName)){
                 if(StringUtils.equals(propertyName, propertyName.toLowerCase())){
-                    return new MutablePair<>(propertyName, entry.getValue());
+                    return new MutablePair<>(entry.getKey(), entry.getValue());
                 }
                 return new MutablePair<>(tableName, entry.getValue());
             }
