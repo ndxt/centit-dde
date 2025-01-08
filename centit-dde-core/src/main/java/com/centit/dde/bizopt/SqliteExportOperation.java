@@ -23,6 +23,8 @@ import com.centit.support.file.FileSystemOpt;
 import com.centit.support.file.FileType;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.sqlite.JDBC;
 
 import java.io.File;
@@ -127,16 +129,32 @@ public class SqliteExportOperation implements BizOperation {
         }
     }
 
-    private String fetchPrimaryKey(String tableName, Map<String, String> pkMap, String defaultKey){
-        String pk = pkMap.get(FieldType.humpNameToColumn(tableName, true));
-        if(StringUtils.isNotBlank(pk)){
-            return pk;
+    public Pair<String, String> fetchTableNameAndPrimaryKey(String propertyName, Map<String, String> pkMap, String defaultKey){
+        if(propertyName.indexOf('_')>0) {
+            for(Map.Entry<String, String> entry : pkMap.entrySet()){
+                if(StringUtils.equalsIgnoreCase(entry.getKey(), propertyName)){
+                    return new MutablePair<>(entry.getKey(), entry.getValue());
+                }
+            }
         }
-        pk = pkMap.get(tableName);
-        if(StringUtils.isNotBlank(pk)){
-            return pk;
+
+        String tableName = FieldType.humpNameToColumn(propertyName, true);
+        for(Map.Entry<String, String> entry : pkMap.entrySet()){
+            if(StringUtils.equalsIgnoreCase(entry.getKey(), tableName)){
+                return new MutablePair<>(entry.getKey(), entry.getValue());
+            }
+            if(StringUtils.equalsIgnoreCase(entry.getKey(), propertyName)){
+                if(StringUtils.equals(propertyName, propertyName.toLowerCase())){
+                    return new MutablePair<>(propertyName, entry.getValue());
+                }
+                return new MutablePair<>(tableName, entry.getValue());
+            }
         }
-        return defaultKey;
+
+        if(StringUtils.equals(propertyName, propertyName.toLowerCase())){
+            return new MutablePair<>(propertyName, defaultKey);
+        }
+        return new MutablePair<>(tableName, defaultKey);
     }
 
     private void writeTableData(Connection connection, JSONArray objArray, String tableName, String primaryKey) throws SQLException, IOException {
@@ -159,20 +177,18 @@ public class SqliteExportOperation implements BizOperation {
         Map<String, Object> datasMap = (Map<String, Object>) tablesData;
         try (Connection connection = JDBC.createConnection("jdbc:sqlite:" + dbFileName, new Properties())) {
             for(Map.Entry<String, Object> ent : datasMap.entrySet()) {
+                Pair<String, String> talNameAndKey = fetchTableNameAndPrimaryKey(ent.getKey(), pkMap, defaultKey);
                 if(ent.getValue() instanceof JSONArray) {
                     JSONArray tbArray = (JSONArray) ent.getValue();
-                    writeTableData(connection, tbArray, FieldType.humpNameToColumn(ent.getKey(), true),
-                        fetchPrimaryKey(ent.getKey(), pkMap, defaultKey));
+                    writeTableData(connection, tbArray, talNameAndKey.getLeft(), talNameAndKey.getRight());
                 } else if(ent.getValue() instanceof List){
                     JSONArray tbArray = JSONArray.from(ent.getValue());
-                    writeTableData(connection, tbArray, FieldType.humpNameToColumn(ent.getKey(), true),
-                        fetchPrimaryKey(ent.getKey(), pkMap, defaultKey));
+                    writeTableData(connection, tbArray, talNameAndKey.getLeft(), talNameAndKey.getRight());
                 } else if(ent.getValue() instanceof Map){
                     JSONArray tbArray = new JSONArray();
                     JSONObject object = JSONObject.from(ent.getValue());
                     tbArray.add(object);
-                    writeTableData(connection, tbArray, FieldType.humpNameToColumn(ent.getKey(), true),
-                        fetchPrimaryKey(ent.getKey(), pkMap, defaultKey));
+                    writeTableData(connection, tbArray, talNameAndKey.getLeft(), talNameAndKey.getRight());
                 }
             }
         }
