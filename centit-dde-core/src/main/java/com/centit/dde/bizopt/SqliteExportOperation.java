@@ -65,6 +65,9 @@ public class SqliteExportOperation implements BizOperation {
         if ("multiTables".equals(dataModel)) {
             // 多个表，属性名必须和表名一致
             String defaultKey = bizOptJson.getString("defaultPrimaryKey");
+            if(StringUtils.isBlank(defaultKey)) {
+                defaultKey = "id";
+            }
             Map<String, String> mapInfo = BuiltInOperation.jsonArrayToMap(
                 bizOptJson.getJSONArray("primaryKeyMap"), "tableName", "primaryKey");
             writeTablesData2DB(dbFileName, dataSet.getData(), mapInfo, defaultKey);
