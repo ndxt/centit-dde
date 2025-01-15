@@ -6,6 +6,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DatasetVariableTranslate;
 import com.centit.fileserver.common.FileBaseInfo;
@@ -78,7 +79,7 @@ public class FileDownloadOperation implements BizOperation {
         }
 
         if(StringUtils.isNotBlank(fileName)){
-            fileName = new DatasetVariableTranslate(dataSet).mapTemplateString(fileName);
+            fileName = new BizModelJSONTransform(bizModel).mapTemplateString(fileName);
         } else {
             fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
         }
