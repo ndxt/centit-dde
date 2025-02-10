@@ -234,6 +234,7 @@ public class DataPacketDraftController extends ResourceBaseController {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "修改数据不存在！");
         }
         LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
+        dataPacketDraft.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacketDraft.setPacketId(packetId);
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
         dataPacketDraftService.updateDataPacket(dataPacketDraft);
@@ -321,19 +322,9 @@ public class DataPacketDraftController extends ResourceBaseController {
     @ApiOperation(value = "查询API网关")
     @GetMapping
     @WrapUpResponseBody
-    public PageQueryResult<Object> listDataPacket(HttpServletRequest request, PageDesc pageDesc) {
+    public PageQueryResult listDataPacket(HttpServletRequest request, PageDesc pageDesc) {
         JSONArray returnList = dataPacketDraftService.listDataPacketForList(BaseController.collectRequestParameters(request), pageDesc);
-        if(returnList!=null) {
-            for (Object obj : returnList) {
-                if(obj instanceof JSONObject){
-                    JSONObject jsonObject = (JSONObject)obj;
-                    String optId = jsonObject.getString("optId");
-                    String optName = CodeRepositoryUtil.getValue("optId", optId);
-                    jsonObject.put("optName", optName);
-                }
-            }
-        }
-        return PageQueryResult.createResult(returnList, pageDesc);
+        return PageQueryResult.createJSONArrayResult(returnList, pageDesc,DataPacketDraft.class);
     }
 
     @ApiOperation(value = "查询单个API网关")

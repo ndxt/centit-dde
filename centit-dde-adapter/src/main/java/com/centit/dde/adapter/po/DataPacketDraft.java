@@ -89,6 +89,7 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
 
     @ApiModelProperty(value = "所属模块", required = true)
     @Column(name = "opt_id")
+    @DictionaryMap(fieldName = "optName", value = "optId")
     @NotBlank
     private String optId;
 
