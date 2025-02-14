@@ -49,19 +49,24 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
     }
 
     @Override
+    public void deleteLogDetailById(String logId) {
+
+    }
+
+    @Override
     public List<CallApiLogDetail> listLogDetails(String logId) {
         return Collections.emptyList();
     }
 
     @Override
-    public List<CallApiLog> listLogsByProperties(Map<String, Object> param, PageDesc pageDesc) {
+    public List<Map<String, Object>> listLogsByProperties(Map<String, Object> param, PageDesc pageDesc) {
         return Collections.emptyList();
     }
 
     @Override
     public Map<String, Object> getLogStatisticsInfo(Map<String, Object> queryparameter) {
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
-            "Runtime 运行时环境，不记录运行日志!");
+            "Runtime 运行时环境，无法统计运行日志!");
     }
 
     @Override

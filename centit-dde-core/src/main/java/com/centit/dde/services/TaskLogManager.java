@@ -33,7 +33,7 @@ public interface TaskLogManager{
 
     CallApiLog getLog(String logId);
 
-    List<CallApiLog> listTaskLog(Map<String, Object> param, PageDesc pageDesc);
+    List<Map<String, Object>> listTaskLog(Map<String, Object> param, PageDesc pageDesc);
 
     void createTaskLog(CallApiLog callApiLog);
 

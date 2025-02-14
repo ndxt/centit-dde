@@ -33,7 +33,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
     }
 
     @Override
-    public List<CallApiLog> listTaskLog(Map<String, Object> param, PageDesc pageDesc) {
+    public List<Map<String, Object>> listTaskLog(Map<String, Object> param, PageDesc pageDesc) {
         return this.taskLogDao.listLogsByProperties(param, pageDesc);
     }
 

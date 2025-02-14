@@ -10,6 +10,7 @@ import com.centit.search.service.Impl.ESIndexer;
 import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
 import com.centit.support.database.utils.PageDesc;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,8 +97,11 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
     }
 
     @Override
-    public List<CallApiLog> listLogsByProperties(Map<String, Object> param, PageDesc pageDesc) {
-        return Collections.emptyList();
+    public List<Map<String, Object>> listLogsByProperties(Map<String, Object> param, PageDesc pageDesc) {
+        Pair<Long, List<Map<String, Object>>> queryOut =
+            callApiLogSearcher.search(param, null, pageDesc.getPageNo(), pageDesc.getPageSize());
+        pageDesc.setTotalRows(queryOut.getLeft().intValue());
+        return queryOut.getRight();
     }
 
     @Override

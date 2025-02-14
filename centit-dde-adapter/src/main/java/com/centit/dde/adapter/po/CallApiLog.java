@@ -47,6 +47,10 @@ public class CallApiLog implements ESDocument, Serializable {
     @ApiModelProperty(value = "项目id", hidden = true)
     private String applicationId;
 
+    @ESField(type = "keyword") //(name="opt_id")
+    @ApiModelProperty(value = "菜单ID", hidden = true)
+    private String topUnit;
+
     @ApiModelProperty(value = "执行开始时间")
     @ESField(type = "Date") //
     private Date runBeginTime;

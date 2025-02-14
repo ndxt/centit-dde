@@ -58,10 +58,10 @@ public class TaskLogController extends BaseController {
     @GetMapping
     @ApiOperation(value = "查询所有日志")
     @WrapUpResponseBody
-    public PageQueryResult<CallApiLog> listTaskExchange(PageDesc pageDesc, HttpServletRequest request){
+    public PageQueryResult<Map<String, Object>> listTaskExchange(PageDesc pageDesc, HttpServletRequest request){
         Map<String, Object> parameters = collectRequestParameters(request);
-        List<CallApiLog> callApiLogs = taskLogManager.listTaskLog(parameters, pageDesc);
-        return PageQueryResult.createResult(callApiLogs,pageDesc);
+        List<Map<String, Object>> callApiLogs = taskLogManager.listTaskLog(parameters, pageDesc);
+        return PageQueryResult.createResult(callApiLogs, pageDesc);
     }
 
     @GetMapping(value = "/{logId}")
