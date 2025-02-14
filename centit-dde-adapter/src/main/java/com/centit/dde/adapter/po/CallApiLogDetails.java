@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.annotation.ESField;
 import com.centit.search.annotation.ESType;
 import com.centit.search.document.ESDocument;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -14,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@ApiModel
 @ESType(indexName = "callapilogdetails", shards = 5)
 public class CallApiLogDetails implements ESDocument, Serializable {
 

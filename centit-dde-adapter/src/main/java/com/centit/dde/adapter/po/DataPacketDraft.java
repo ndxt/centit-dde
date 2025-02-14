@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.annotation.JSONField;
 import com.centit.framework.core.dao.DictionaryMap;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.database.orm.GeneratorCondition;
 import com.centit.support.database.orm.GeneratorTime;
 import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
