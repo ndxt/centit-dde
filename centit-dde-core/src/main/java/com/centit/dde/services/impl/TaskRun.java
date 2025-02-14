@@ -148,6 +148,9 @@ public class TaskRun {
         //taskLog.setLogId(UuidOpt.getUuidAsString32());
         callApiLog.setOptId(dataPacketInterface.getOptId());
         callApiLog.setTopUnit(context.getTopUnit());
+        callApiLog.setRequestIp(context.getLoginIp());
+        callApiLog.setRequestParams(context.getRequestParams());
+        callApiLog.setRunner(context.getCurrentUserCode());
         callApiLog.setApplicationId(dataPacketInterface.getOsId());
         callApiLog.setRunType(dataPacketInterface.getPacketName());
         callApiLog.setTaskId(dataPacketInterface.getPacketId());

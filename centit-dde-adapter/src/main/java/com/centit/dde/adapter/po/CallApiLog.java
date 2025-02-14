@@ -50,6 +50,14 @@ public class CallApiLog implements ESDocument, Serializable {
     @ApiModelProperty(value = "菜单ID", hidden = true)
     private String topUnit;
 
+    @ESField(type = "keyword")
+    @ApiModelProperty(value = "请求方地址")
+    private String requestIp;
+
+    @ESField(type = "keyword")
+    @ApiModelProperty(value = "请求参数")
+    private String requestParams;
+
     @ApiModelProperty(value = "执行开始时间")
     @ESField(type = "Date") //
     private Date runBeginTime;
@@ -63,7 +71,7 @@ public class CallApiLog implements ESDocument, Serializable {
     private String runType;
 
     @ESField(type = "keyword") //(name="runner")
-    @ApiModelProperty(value = "执行人员", hidden = true)
+    @ApiModelProperty(value = "执行人员")
     private String runner;
 
     @ESField(type = "keyword") //(name="other_message")

@@ -3,6 +3,7 @@ package com.centit.dde.core;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.model.security.CentitUserDetails;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.network.HardWareUtils;
 import lombok.Data;
@@ -126,5 +127,10 @@ public class DataOptContext {
             return currentUserDetails.getCurrentUnitCode();
         }
         return null;
+    }
+
+    public String getRequestParams (){
+        return StringBaseOpt.castObjectToString(
+            this.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
     }
 }
