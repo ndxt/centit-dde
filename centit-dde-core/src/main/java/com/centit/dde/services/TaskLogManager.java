@@ -35,8 +35,6 @@ public interface TaskLogManager{
 
     List<Map<String, Object>> listTaskLog(Map<String, Object> param, PageDesc pageDesc);
 
-    void createTaskLog(CallApiLog callApiLog);
-
     void deleteTaskLogById(String logId);
 
     Map<String,Object> getLogStatisticsInfo(StatisticsParameter parameter);

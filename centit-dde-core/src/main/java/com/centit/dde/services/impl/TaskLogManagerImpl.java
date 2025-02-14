@@ -38,12 +38,6 @@ public class TaskLogManagerImpl implements TaskLogManager {
     }
 
     @Override
-    public void createTaskLog(CallApiLog callApiLog) {
-        this.taskLogDao.saveLog(callApiLog);
-        this.taskLogDao.saveLogDetils(callApiLog);
-    }
-
-    @Override
     public void saveTaskLog(CallApiLog callApiLog, int logLevel){
         int detailLogsCount = callApiLog.getDetailLogs() == null ? 0 : callApiLog.getDetailLogs().size();
         if(logLevel == ConstantValue.LOGLEVEL_CHECK_ERROR && detailLogsCount == 0){
@@ -63,7 +57,9 @@ public class TaskLogManagerImpl implements TaskLogManager {
         callApiLog.setErrorPieces(maxE);
         callApiLog.setSuccessPieces(maxS);
         this.taskLogDao.saveLog(callApiLog);
-        this.taskLogDao.saveLogDetils(callApiLog);
+        if(detailLogsCount > 0) {
+            this.taskLogDao.saveLogDetils(callApiLog);
+        }
     }
 
     @Override

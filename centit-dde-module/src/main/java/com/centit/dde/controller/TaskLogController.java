@@ -40,25 +40,18 @@ public class TaskLogController extends BaseController {
         this.taskLogManager = taskLogManager;
     }
 
-    @PostMapping
-    @ApiOperation(value = "新增日志")
-    @WrapUpResponseBody
-    public void createTaskLog(CallApiLog callApiLog){
-        taskLogManager.createTaskLog(callApiLog);
-    }
-
     @DeleteMapping(value = "/{logId}")
     @ApiOperation(value = "删除日志")
     @ApiImplicitParam(name = "logId", value = "日志ID")
     @WrapUpResponseBody
-    public void delTaskExchange(@PathVariable String logId){
+    public void delTaskLog(@PathVariable String logId){
         taskLogManager.deleteTaskLogById(logId);
     }
 
     @GetMapping
     @ApiOperation(value = "查询所有日志")
     @WrapUpResponseBody
-    public PageQueryResult<Map<String, Object>> listTaskExchange(PageDesc pageDesc, HttpServletRequest request){
+    public PageQueryResult<Map<String, Object>> listTaskLog(PageDesc pageDesc, HttpServletRequest request){
         Map<String, Object> parameters = collectRequestParameters(request);
         List<Map<String, Object>> callApiLogs = taskLogManager.listTaskLog(parameters, pageDesc);
         return PageQueryResult.createResult(callApiLogs, pageDesc);
