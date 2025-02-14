@@ -278,7 +278,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             returnResult(bizModel, dataOptStep, dataOptContext);
             //debug 时把返回结果也记录到日志中
             if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & dataOptContext.getLogLevel()) != 0) {
-                TaskDetailLog detailLog = BizOptUtils.createLogDetail(stepJson, dataOptContext);
+                CallApiLogDetail detailLog = BizOptUtils.createLogDetail(stepJson, dataOptContext);
                 detailLog.setLogInfo(bizModel.getOptResult().toResponseData().toJSONString());
             }
             dataOptStep.setEndStep();
@@ -378,7 +378,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                         dataOptContext.getI18nMessage("dde.604.data_source_not_found2", dataSetId)));
 
                 //添加错误日志
-                TaskDetailLog detailLog = BizOptUtils.createLogDetail(stepJson, dataOptContext);
+                CallApiLogDetail detailLog = BizOptUtils.createLogDetail(stepJson, dataOptContext);
                 detailLog.setLogInfo(dataOptContext.getI18nMessage("dde.604.data_source_not_found2", dataSetId));
             } else {
                 bizModel.getOptResult().setResultObject(dataSet.getData());
@@ -404,7 +404,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "fileDataSet", "");
             DataSet dataSet = bizModel.getDataSet(dataSetId);
             if(dataSet==null){
-                TaskDetailLog detailLog = BizOptUtils.createLogDetail(stepJson, dataOptContext);
+                CallApiLogDetail detailLog = BizOptUtils.createLogDetail(stepJson, dataOptContext);
                 detailLog.setLogInfo(dataOptContext.getI18nMessage("dde.604.data_source_not_found2", dataSetId));
                 throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION,
                     dataOptContext.getI18nMessage("dde.604.file_dataset_not_found",dataSetId));
@@ -430,7 +430,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
             if(response.getCode() >= 400){
                 if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & dataOptContext.getLogLevel()) != 0) {
-                    TaskDetailLog detailLog = BizOptUtils.createLogDetail(stepJson, dataOptContext);
+                    CallApiLogDetail detailLog = BizOptUtils.createLogDetail(stepJson, dataOptContext);
                     detailLog.setLogInfo(response.toJSONString());
                 }
                 throw new ObjectException(response.getData(), response.getCode(), response.getMessage());
@@ -643,7 +643,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             responseData = opt.runOpt(bizModel, bizOptJson, dataOptContext);
         } catch (Exception runOptException) {
             //记录异常日志信息
-            TaskDetailLog detailLog = BizOptUtils.createLogDetail(bizOptJson, dataOptContext);
+            CallApiLogDetail detailLog = BizOptUtils.createLogDetail(bizOptJson, dataOptContext);
             String errMsg = ObjectException.extortExceptionMessage(runOptException);
             detailLog.setLogInfo(errMsg);
             detailLog.setRunBeginTime(runBeginTime);
@@ -669,7 +669,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         int logLevel = dataOptContext.getLogLevel();
         // 记录日志
         if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & logLevel) != 0) {
-            TaskDetailLog detailLog = BizOptUtils.createLogDetail(bizOptJson, dataOptContext);
+            CallApiLogDetail detailLog = BizOptUtils.createLogDetail(bizOptJson, dataOptContext);
             Map<String, Object> jsonObject = CollectionsOpt.objectToMap(responseData.getData());
             if(jsonObject != null){
                 detailLog.setSuccessPieces(NumberBaseOpt.castObjectToInteger(jsonObject.get("success"), 0));
@@ -736,7 +736,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                 dataOptContext.getI18nMessage("dde.405.api_is_disable", packetId));
         }
         DataOptContext moduleOptContext = new DataOptContext(dataOptContext.getMessageSource(), dataOptContext.getLocale());
-        moduleOptContext.setTaskLog(dataOptContext.getTaskLog());
+        moduleOptContext.setCallApiLog(dataOptContext.getCallApiLog());
         moduleOptContext.setOptId(dataOptContext.getOptId());
         moduleOptContext.setNeedRollback(dataOptContext.getNeedRollback());
         moduleOptContext.setRunType(dataOptContext.getRunType());

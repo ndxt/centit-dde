@@ -2,10 +2,10 @@ package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.dao.DataPacketDao;
+import com.centit.dde.adapter.po.CallApiLog;
+import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.adapter.po.DataPacketInterface;
-import com.centit.dde.adapter.po.TaskDetailLog;
-import com.centit.dde.adapter.po.TaskLog;
 import com.centit.dde.core.BizOptFlow;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataOptResult;
@@ -72,21 +72,21 @@ public class TaskRun {
     }
 
     public DataOptResult runTask(DataPacketInterface dataPacketInterface, DataOptContext optContext) {
-        TaskLog taskLog = buildLogInfo(optContext, dataPacketInterface);
-        optContext.setTaskLog(taskLog);
+        CallApiLog callApiLog = buildLogInfo(optContext, dataPacketInterface);
+        optContext.setCallApiLog(callApiLog);
         try {
             DataOptResult runResult = runOptModule(dataPacketInterface, optContext);
             //更新定时任务的API最后执行时间
             updateApiData(dataPacketInterface);//optContext.getRunType(),
             if(runResult.hasErrors()){
-                taskLog.setOtherMessage(runResult.makeErrorResponse().getMessage());
+                callApiLog.setOtherMessage(runResult.makeErrorResponse().getMessage());
             } else {
-                taskLog.setOtherMessage("ok！");
+                callApiLog.setOtherMessage("ok！");
             }
-            taskLog.setRunEndTime(new Date());
+            callApiLog.setRunEndTime(new Date());
             return runResult;
         } catch (Exception e) { // 未知异常，一般是泡不到这儿的
-            dealException(taskLog, optContext, e);
+            dealException(callApiLog, optContext, e);
             //创建一个错误的返回结果
             if(e instanceof ObjectException){
                 ObjectException objex = (ObjectException) e;
@@ -99,7 +99,7 @@ public class TaskRun {
             //如果是 debug 并且是断点（debugId不为空）状态不写入日志
             if(StringUtils.equals(optContext.getRunType(), ConstantValue.RUN_TYPE_NORMAL)
                 || StringUtils.isBlank(optContext.getDebugId()))
-                taskLogManager.saveTaskLog(taskLog, dataPacketInterface.getLogLevel());
+                taskLogManager.saveTaskLog(callApiLog, dataPacketInterface.getLogLevel());
         }
     }
 
@@ -111,48 +111,46 @@ public class TaskRun {
         return bizOptFlow.run(dataPacketInterface, dataOptContext);
     }
 
-    private void dealException(TaskLog taskLog, DataOptContext optContext, Exception e) {
-        taskLog.setOtherMessage(ObjectException.extortExceptionOriginMessage(e));
-        taskLog.setRunEndTime(new Date());
+    private void dealException(CallApiLog callApiLog, DataOptContext optContext, Exception e) {
+        callApiLog.setOtherMessage(ObjectException.extortExceptionOriginMessage(e));
+        callApiLog.setRunEndTime(new Date());
 
-        TaskDetailLog detailLog = new TaskDetailLog();
+        CallApiLogDetail detailLog = new CallApiLogDetail();
         detailLog.setRunBeginTime(new Date());
-        detailLog.setTaskId(taskLog.getTaskId());
-        detailLog.setLogId(taskLog.getLogId());
         detailLog.setOptNodeId("api");
         detailLog.setLogType("error");
         detailLog.setLogInfo(ObjectException.extortExceptionMessage(e));
         optContext.plusStepNo();
         detailLog.setStepNo(optContext.getStepNo());
         detailLog.setRunEndTime(new Date());
-        taskLog.addDetailLog(detailLog);
+        callApiLog.addDetailLog(detailLog);
     }
 
-    private TaskLog buildLogInfo(DataOptContext context, DataPacketInterface dataPacketInterface) {
-        TaskLog taskLog = new TaskLog();
-        taskLog.setRunBeginTime(new Date());
+    private CallApiLog buildLogInfo(DataOptContext context, DataPacketInterface dataPacketInterface) {
+        CallApiLog callApiLog = new CallApiLog();
+        callApiLog.setRunBeginTime(new Date());
         if(ConstantValue.RUN_TYPE_DEBUG.equals(context.getRunType())) {
             // 运行的是草稿
-            taskLog.setApiType(0);
+            callApiLog.setApiType(0);
             // debug 状态将日志模式强制设置为 debug
             dataPacketInterface.setLogLevel(ConstantValue.LOGLEVEL_CHECK_DEBUG);
         } else {
-            taskLog.setApiType(1);
+            callApiLog.setApiType(1);
         }
 
         if (dataPacketInterface != null) {
             if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())) {
-                taskLog.setRunner("定时任务");
+                callApiLog.setRunner("定时任务");
             } else {
-                taskLog.setRunner(context.getCurrentUserCode());
+                callApiLog.setRunner(context.getCurrentUserCode());
             }
         }
         //taskLog.setLogId(UuidOpt.getUuidAsString32());
-        taskLog.setOptId(dataPacketInterface.getOptId());
-        taskLog.setApplicationId(dataPacketInterface.getOsId());
-        taskLog.setRunType(dataPacketInterface.getPacketName());
-        taskLog.setTaskId(dataPacketInterface.getPacketId());
-        return taskLog;
+        callApiLog.setOptId(dataPacketInterface.getOptId());
+        callApiLog.setApplicationId(dataPacketInterface.getOsId());
+        callApiLog.setRunType(dataPacketInterface.getPacketName());
+        callApiLog.setTaskId(dataPacketInterface.getPacketId());
+        return callApiLog;
     }
 
     /**

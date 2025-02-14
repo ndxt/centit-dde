@@ -159,7 +159,7 @@
                                  <!-- 保持数据完整性，只能禁用 -->
                             <%-- <a href="${contextPath }/dde/exchangeTask!delete.do?taskId=${exchangeTask.taskId}&s_taskType=${s_taskType }"
 				                 target="ajaxTodo" title="删除${taskTypeList[s_taskType] }任务"><span class="icon icon-trash"></span></a> --%>
-				            <a href="${contextPath }/dde/taskLog!list.do?s_taskId=${exchangeTask.taskId}&s_taskType=${s_taskType }"
+				            <a href="${contextPath }/dde/callApiLog!list.do?s_taskId=${exchangeTask.taskId}&s_taskType=${s_taskType }"
 				                target="navTab" width="800" rel="dlg_tasklog" title="查看${taskTypeList[s_taskType] }任务日志"><span class="icon icon-document"></span></a>
                             
                                 <a href="${contextPath }/dde/exchangeTask!console.do?taskId=${exchangeTask.taskId}&s_taskType=${s_taskType }"
@@ -179,7 +179,7 @@
 	                                 <!-- 保持数据完整性，只能禁用 -->
 	                            <a href="${contextPath }/dde/exchangeTask!delete.do?taskId=${exchangeTask.taskId}&s_taskType=${s_taskType }"
 					                 target="ajaxTodo" title="删除交换任务"><span class="icon icon-trash"></span></a>
-					            <a href="${contextPath }/dde/taskLog!list.do?s_taskId=${exchangeTask.taskId}&s_taskType=${s_taskType }"
+					            <a href="${contextPath }/dde/callApiLog!list.do?s_taskId=${exchangeTask.taskId}&s_taskType=${s_taskType }"
 					                target="navTab" width="800" rel="dlg_tasklog" title="查看交换任务日志"><span class="icon icon-document"></span></a>
 					            <a href="${contextPath }/dde/transfer!doTransfer.do?id=${exchangeTask.taskId}&s_taskType=${s_taskType }" 
 					                target="ajaxTodo" title="执行交换任务"><span class="icon icon-arrowrefresh-n"> </span></a> 
@@ -191,7 +191,7 @@
 	                                 target='navTab' title="编辑导出任务" rel="bjjhrw"><span class="icon icon-edit"></span></a>
 	                            <a href="${contextPath }/dde/exchangeTask!delete.do?taskId=${exchangeTask.taskId}&s_taskType=${s_taskType }"
 					                 target="ajaxTodo" title="删除导出任务"><span class="icon icon-trash"></span></a>
-					            <a href="${contextPath }/dde/taskLog!list.do?s_taskId=${exchangeTask.taskId}&s_taskType=${s_taskType }"
+					            <a href="${contextPath }/dde/callApiLog!list.do?s_taskId=${exchangeTask.taskId}&s_taskType=${s_taskType }"
 					                target="navTab" width="800" rel="dlg_tasklog" title="查看导出任务日志"><span class="icon icon-document"></span></a>
 					            <a href="${contextPath }/dde/transfer!doTransfer.do?id=${exchangeTask.taskId}&s_taskType=${s_taskType }" 
 					                target="ajaxTodo" title="执行导出任务"><span class="icon icon-arrowrefresh-n"> </span></a> 

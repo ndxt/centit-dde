@@ -2,7 +2,7 @@ package com.centit.dde.dataset;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.centit.dde.adapter.po.TaskDetailLog;
+import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.core.DataSetReader;
@@ -108,7 +108,7 @@ public class SqlDataSetReader implements DataSetReader {
         //debug模式下，添加日志，显示sql语句
         if(ConstantValue.RUN_TYPE_DEBUG.equals(dataOptContext.getRunType()) ||
             (ConstantValue.LOGLEVEL_CHECK_DEBUG & dataOptContext.getLogLevel()) != 0){
-            TaskDetailLog detailLog = BizOptUtils.createLogDetail( this.bizOptStepJson, dataOptContext);
+            CallApiLogDetail detailLog = BizOptUtils.createLogDetail( this.bizOptStepJson, dataOptContext);
             detailLog.setLogInfo(qap.toString());
         }
 

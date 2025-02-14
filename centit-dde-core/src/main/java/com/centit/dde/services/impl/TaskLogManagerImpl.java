@@ -1,8 +1,8 @@
 package com.centit.dde.services.impl;
 
-import com.centit.dde.adapter.dao.TaskLogDao;
-import com.centit.dde.adapter.po.TaskDetailLog;
-import com.centit.dde.adapter.po.TaskLog;
+import com.centit.dde.adapter.dao.CallApiLogDao;
+import com.centit.dde.adapter.po.CallApiLogDetail;
+import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.services.TaskLogManager;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.DelTaskLogParameter;
@@ -25,33 +25,33 @@ import java.util.Map;
 public class TaskLogManagerImpl implements TaskLogManager {
 
     @Autowired
-    protected TaskLogDao taskLogDao;
+    protected CallApiLogDao taskLogDao;
 
     @Override
-    public TaskLog getLog(String logId) {
-        return this.taskLogDao.getObjectById(logId);
+    public CallApiLog getLog(String logId) {
+        return this.taskLogDao.getLog(logId);
     }
 
     @Override
-    public List<TaskLog> listTaskLog(Map<String, Object> param, PageDesc pageDesc) {
-        return this.taskLogDao.listObjectsByProperties(param, pageDesc);
+    public List<CallApiLog> listTaskLog(Map<String, Object> param, PageDesc pageDesc) {
+        return this.taskLogDao.listLogsByProperties(param, pageDesc);
     }
 
     @Override
-    public void createTaskLog(TaskLog taskLog) {
-        this.taskLogDao.saveNewObject(taskLog);
-        this.taskLogDao.saveObjectReferences(taskLog);
+    public void createTaskLog(CallApiLog callApiLog) {
+        this.taskLogDao.saveLog(callApiLog);
+        this.taskLogDao.saveLogDetils(callApiLog);
     }
 
     @Override
-    public void saveTaskLog(TaskLog taskLog, int logLevel){
-        int detailLogsCount = taskLog.getDetailLogs() == null ? 0 : taskLog.getDetailLogs().size();
+    public void saveTaskLog(CallApiLog callApiLog, int logLevel){
+        int detailLogsCount = callApiLog.getDetailLogs() == null ? 0 : callApiLog.getDetailLogs().size();
         if(logLevel == ConstantValue.LOGLEVEL_CHECK_ERROR && detailLogsCount == 0){
             return;
         }
         int maxE = 0, maxS = 0;
-        if(taskLog.getDetailLogs()!=null){
-            for(TaskDetailLog dl : taskLog.getDetailLogs()){
+        if(callApiLog.getDetailLogs()!=null){
+            for(CallApiLogDetail dl : callApiLog.getDetailLogs()){
                 if(maxE < dl.getErrorPieces()){
                     maxE = dl.getErrorPieces();
                 }
@@ -60,21 +60,15 @@ public class TaskLogManagerImpl implements TaskLogManager {
                 }
             }
         }
-        taskLog.setErrorPieces(maxE);
-        taskLog.setSuccessPieces(maxS);
-        this.taskLogDao.saveNewObject(taskLog);
-        this.taskLogDao.saveObjectReferences(taskLog);
-    }
-
-    @Override
-    public void updateTaskLog(TaskLog taskLog) {
-        this.taskLogDao.updateObject(taskLog);
-        this.taskLogDao.saveObjectReferences(taskLog);
+        callApiLog.setErrorPieces(maxE);
+        callApiLog.setSuccessPieces(maxS);
+        this.taskLogDao.saveLog(callApiLog);
+        this.taskLogDao.saveLogDetils(callApiLog);
     }
 
     @Override
     public void deleteTaskLogById(String logId) {
-        this.taskLogDao.deleteObjectForceById(logId);
+        this.taskLogDao.deleteLogById(logId);
     }
 
     @Override
@@ -88,6 +82,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
         return taskLogDao.deleteTaskLog(delTaskLogParameter.getPacketId(),
             DatetimeOpt.smartPraseDate(delTaskLogParameter.getRunBeginTime()),
             delTaskLogParameter.getIsError());
+        // delete with detail
     }
 
 }

@@ -2,7 +2,7 @@
 <%@ include file="/page/common/taglibs.jsp"%>
 
 <div class="pageHeader">
-	<form id="pagerForm" onsubmit="return navTabSearch(this);" action="${pageContext.request.contextPath }/dde/taskLog!listStat.do" method="post">
+	<form id="pagerForm" onsubmit="return navTabSearch(this);" action="${pageContext.request.contextPath }/dde/callApiLog!listStat.do" method="post">
 		<div class="searchBar">
 			<ul class="searchContent">
 				
@@ -81,11 +81,11 @@
 					<tr>
 						<td align="center" title="${line[0]}" >
 						<c:if test="${fn:length(line[0])!=7}">
-						<a href="${contextPath }/dde/taskLog!listall.do?s_runBeginTime=${line[0]}&s_runBeginTime2=${line[0]}" 
+						<a href="${contextPath }/dde/callApiLog!listall.do?s_runBeginTime=${line[0]}&s_runBeginTime2=${line[0]}"
 						rel="ErrorData" target='navTab' width="850" height="500" title="任务明细日志"> 
 						</c:if>
 						<c:if test="${fn:length(line[0])==7}">
-						<a href="${contextPath }/dde/taskLog!listall.do?s_runBeginTime=${line[0]}-01&s_runBeginTime2=${line[0]}-31" 
+						<a href="${contextPath }/dde/callApiLog!listall.do?s_runBeginTime=${line[0]}-01&s_runBeginTime2=${line[0]}-31"
 						rel="ErrorData" target='navTab' width="850" height="500" title="任务明细日志"> 
 						</c:if>
 						${line[0]}</a>

@@ -1,16 +1,15 @@
 package com.centit.dde.utils;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.centit.dde.adapter.po.TaskDetailLog;
+import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.core.DataOptContext;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
 public abstract class BizOptUtils {
-    public static TaskDetailLog createLogDetail(JSONObject bizOptJson, DataOptContext dataOptContext) {
-        TaskDetailLog detailLog = new TaskDetailLog();
-
+    public static CallApiLogDetail createLogDetail(JSONObject bizOptJson, DataOptContext dataOptContext) {
+        CallApiLogDetail detailLog = new CallApiLogDetail();
         String sOptType = bizOptJson.getString("type");
         String processName = bizOptJson.getString("processName");
         if (StringUtils.isBlank(processName)) {
@@ -22,8 +21,7 @@ public abstract class BizOptUtils {
         detailLog.setLogType(logType);
         detailLog.setStepNo(dataOptContext.getStepNo());
         detailLog.setRunEndTime(new Date());
-        detailLog.setTaskId(dataOptContext.getPacketId());
-        dataOptContext.getTaskLog().addDetailLog(detailLog);
+        dataOptContext.getCallApiLog().addDetailLog(detailLog);
         return detailLog;
     }
 }

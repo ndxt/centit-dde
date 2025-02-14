@@ -69,20 +69,20 @@
                 </tr>
                 </thead>
                 <tbody>
-                <c:forEach items="${object.taskDetailLogs}" var="taskDetailLogs"
+                <c:forEach items="${object.callApiLogDetails}" var="callApiLogDetails"
                            varStatus="s">
-                    <tr target="pk" rel="${taskDetailLogs.logDetailId}">
+                    <tr target="pk" rel="${callApiLogDetails.logDetailId}">
 
                         <td align="center">
                                 ${s.index+1 }
                         </td>
-                        <td align="center">${taskDetailLogs.mapInfoName}</td>
-                        <td align="center"><fmt:formatDate value="${taskDetailLogs.runBeginTime}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
-                        <td align="center"><fmt:formatDate value="${taskDetailLogs.runEndTime}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
-                        <td align="center">${taskDetailLogs.successPieces}</td>
-                        <td align="center">${taskDetailLogs.errorPieces}</td>
+                        <td align="center">${callApiLogDetails.mapInfoName}</td>
+                        <td align="center"><fmt:formatDate value="${callApiLogDetails.runBeginTime}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
+                        <td align="center"><fmt:formatDate value="${callApiLogDetails.runEndTime}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
+                        <td align="center">${callApiLogDetails.successPieces}</td>
+                        <td align="center">${callApiLogDetails.errorPieces}</td>
                         <td align="center">
-                            <a href="${contextPath }/dde/taskDetailLog!edit.do?logDetailId=${taskDetailLogs.logDetailId}"
+                            <a href="${contextPath }/dde/callApiLogDetail!edit.do?logDetailId=${callApiLogDetails.logDetailId}"
                                rel="ErrorData" target='dialog' width="950" height="500" title="错误日志明细"
                                resizable="true" drawable="true" maxable="true" minable="true">
                                 <span class="icon icon-search"></span></a>

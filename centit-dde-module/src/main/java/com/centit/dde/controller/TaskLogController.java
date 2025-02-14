@@ -1,8 +1,7 @@
 package com.centit.dde.controller;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.centit.dde.adapter.po.TaskLog;
-import com.centit.dde.services.TaskDetailLogManager;
+import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.services.TaskLogManager;
 import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.dde.vo.StatisticsParameter;
@@ -36,28 +35,16 @@ public class TaskLogController extends BaseController {
 
     private final TaskLogManager taskLogManager;
 
-    private final TaskDetailLogManager taskDetailLogManager;
-
     @Autowired
-    public TaskLogController(TaskLogManager taskLogManager,TaskDetailLogManager taskDetailLogManager) {
+    public TaskLogController(TaskLogManager taskLogManager) {
         this.taskLogManager = taskLogManager;
-        this.taskDetailLogManager=taskDetailLogManager;
     }
 
     @PostMapping
     @ApiOperation(value = "新增日志")
     @WrapUpResponseBody
-    public void createTaskLog(TaskLog taskLog){
-        taskLogManager.createTaskLog(taskLog);
-    }
-
-    @PutMapping(value = "/{logId}")
-    @ApiOperation(value = "编辑日志")
-    @ApiImplicitParam(name = "logId", value = "日志ID")
-    @WrapUpResponseBody
-    public void updateTaskExchange(@PathVariable String logId, TaskLog taskLog){
-        taskLog.setLogId(logId);
-        taskLogManager.updateTaskLog(taskLog);
+    public void createTaskLog(CallApiLog callApiLog){
+        taskLogManager.createTaskLog(callApiLog);
     }
 
     @DeleteMapping(value = "/{logId}")
@@ -71,17 +58,17 @@ public class TaskLogController extends BaseController {
     @GetMapping
     @ApiOperation(value = "查询所有日志")
     @WrapUpResponseBody
-    public PageQueryResult<TaskLog> listTaskExchange(PageDesc pageDesc, HttpServletRequest request){
+    public PageQueryResult<CallApiLog> listTaskExchange(PageDesc pageDesc, HttpServletRequest request){
         Map<String, Object> parameters = collectRequestParameters(request);
-        List<TaskLog> taskLogs = taskLogManager.listTaskLog(parameters, pageDesc);
-        return PageQueryResult.createResult(taskLogs,pageDesc);
+        List<CallApiLog> callApiLogs = taskLogManager.listTaskLog(parameters, pageDesc);
+        return PageQueryResult.createResult(callApiLogs,pageDesc);
     }
 
     @GetMapping(value = "/{logId}")
     @ApiOperation(value = "查询单个日志")
     @ApiImplicitParam(name = "logId", value = "日志ID")
     @WrapUpResponseBody
-    public TaskLog getTaskLog(@PathVariable String logId){
+    public CallApiLog getTaskLog(@PathVariable String logId){
         return taskLogManager.getLog(logId);
     }
 
@@ -100,10 +87,8 @@ public class TaskLogController extends BaseController {
         if (StringUtils.isBlank(delTaskLogParameter.getPacketId()))return ResponseData.makeErrorMessage("主键不能为空！");
         if (StringUtils.isBlank(delTaskLogParameter.getRunBeginTime()))return ResponseData.makeErrorMessage("删除时间不能为空！");
         int taskLogCount = taskLogManager.deleteTaskLog(delTaskLogParameter);
-        int taskDetailLogCount = taskDetailLogManager.delTaskDetailLog(delTaskLogParameter);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("taskLogCount",taskLogCount);
-        jsonObject.put("taskDetailLogCount",taskDetailLogCount);
         return ResponseData.makeResponseData(jsonObject);
     }
 

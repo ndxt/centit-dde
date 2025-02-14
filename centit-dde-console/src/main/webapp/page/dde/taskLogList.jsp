@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <%@ include file="/page/common/taglibs.jsp"%>
 
-<form id="pagerForm" method="post" action="${pageContext.request.contextPath}/dde/taskLog!list.do?s_taskId=${exchangeTask.taskId}">
+<form id="pagerForm" method="post" action="${pageContext.request.contextPath}/dde/callApiLog!list.do?s_taskId=${exchangeTask.taskId}">
 	<input type="hidden" name="pageNum" value="1" /> 
 	<input type="hidden" name="numPerPage" value="${pageDesc.pageSize}" /> 
 	<input type="hidden" name="orderField" value="${s_orderField}" />
@@ -62,7 +62,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach items="${objList }" var="taskLog"  varStatus="s">
+				<c:forEach items="${objList }" var="callApiLog"  varStatus="s">
 						<tr>
 							
 								<td align="center"><c:out value="${s.index+1 }"></c:out></td>								
@@ -71,26 +71,26 @@
 									${exchangeTask.taskName}
 								</td>
 								
-								<td align="center" title="<fmt:formatDate	value='${taskLog.runBeginTime}'	pattern='yyyy-MM-dd HH:mm:ss' />">
-									<fmt:formatDate	value='${taskLog.runBeginTime}'	pattern='yyyy-MM-dd HH:mm:ss' />								
+								<td align="center" title="<fmt:formatDate	value='${callApiLog.runBeginTime}'	pattern='yyyy-MM-dd HH:mm:ss' />">
+									<fmt:formatDate	value='${callApiLog.runBeginTime}'	pattern='yyyy-MM-dd HH:mm:ss' />
 								</td>
 							
-								<td align="center" title="<fmt:formatDate	value='${taskLog.runEndTime}'	pattern='yyyy-MM-dd HH:mm:ss' />">
-									<fmt:formatDate	value='${taskLog.runEndTime}'	pattern='yyyy-MM-dd HH:mm:ss' />		
+								<td align="center" title="<fmt:formatDate	value='${callApiLog.runEndTime}'	pattern='yyyy-MM-dd HH:mm:ss' />">
+									<fmt:formatDate	value='${callApiLog.runEndTime}'	pattern='yyyy-MM-dd HH:mm:ss' />
 								</td>
 							
 								<td align="center">
-									<c:if test="${!empty taskLog.runType  && 1== taskLog.runType }">手动</c:if> 
-									<c:if test="${!empty taskLog.runType  && 0== taskLog.runType }">自动</c:if> 
+									<c:if test="${!empty callApiLog.runType  && 1== callApiLog.runType }">手动</c:if>
+									<c:if test="${!empty callApiLog.runType  && 0== callApiLog.runType }">自动</c:if>
 								</td>
 							
-								<td align="center" title="${cp:MAPVALUE("usercode",taskLog.runner)}">${cp:MAPVALUE("usercode",taskLog.runner)}</td>
+								<td align="center" title="${cp:MAPVALUE("usercode",callApiLog.runner)}">${cp:MAPVALUE("usercode",callApiLog.runner)}</td>
 							
-								<td align="center" title="${taskLog.otherMessage}">${taskLog.otherMessage}</td>
+								<td align="center" title="${callApiLog.otherMessage}">${callApiLog.otherMessage}</td>
 								<td align="center" id="td_annex">
-								    <a href="${contextPath }/dde/taskLog!edit.do?logId=${taskLog.logId}" 
+								    <a href="${contextPath }/dde/callApiLog!edit.do?logId=${callApiLog.logId}"
 								        rel="ErrorData" target='navTab' width="850" height="500" title="任务明细日志"> <span class="icon icon-search"></span></a>
-								   <a href="#" onclick="downFile('${taskLog.logId}','${exchangeTask.taskName}')">下载</a>
+								   <a href="#" onclick="downFile('${callApiLog.logId}','${exchangeTask.taskName}')">下载</a>
 								</td>
 							
 						</tr>
@@ -101,7 +101,7 @@
 <jsp:include page="../common/panelBar.jsp"></jsp:include>
 <script>
 function downFile(id,name) {
-	var url = "${contextPath }/dde/taskLog!downFile.do?logid=" + id+"&logname="+name;
+	var url = "${contextPath }/dde/callApiLog!downFile.do?logid=" + id+"&logname="+name;
 	document.location.href = url;
 }	
 </script>

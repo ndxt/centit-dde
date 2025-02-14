@@ -1,6 +1,6 @@
 package com.centit.dde.services;
 
-import com.centit.dde.adapter.po.TaskLog;
+import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.dde.vo.StatisticsParameter;
 import com.centit.support.database.utils.PageDesc;
@@ -31,13 +31,11 @@ import java.util.Map;
  */
 public interface TaskLogManager{
 
-    TaskLog getLog(String logId);
+    CallApiLog getLog(String logId);
 
-    List<TaskLog> listTaskLog(Map<String, Object> param, PageDesc pageDesc);
+    List<CallApiLog> listTaskLog(Map<String, Object> param, PageDesc pageDesc);
 
-    void createTaskLog(TaskLog taskLog);
-
-    void updateTaskLog(TaskLog taskLog);
+    void createTaskLog(CallApiLog callApiLog);
 
     void deleteTaskLogById(String logId);
 
@@ -45,5 +43,5 @@ public interface TaskLogManager{
 
     int deleteTaskLog(DelTaskLogParameter delTaskLogParameter);
 
-    void saveTaskLog(TaskLog taskLog, int logLevel);
+    void saveTaskLog(CallApiLog callApiLog, int logLevel);
 }

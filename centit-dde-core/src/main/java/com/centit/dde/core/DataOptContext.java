@@ -1,6 +1,6 @@
 package com.centit.dde.core;
 
-import com.centit.dde.adapter.po.TaskLog;
+import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.common.ObjectException;
@@ -19,7 +19,7 @@ public class DataOptContext {
 
     private String runType;
     private String needRollback;
-    private TaskLog taskLog;
+    private CallApiLog callApiLog;
     private String optId;
     private String debugId;
     private String osId;
@@ -54,23 +54,23 @@ public class DataOptContext {
     }
 
     public String getLogId() {
-        if (taskLog==null){
+        if (callApiLog ==null){
             return null;
         }
-        return this.taskLog.getLogId();
+        return this.callApiLog.getLogId();
     }
 
     public int getStepNo() {
-        if (taskLog==null){
-            taskLog = new TaskLog();
+        if (callApiLog ==null){
+            callApiLog = new CallApiLog();
         }
-        return this.taskLog.getStepNo();
+        return this.callApiLog.getStepNo();
     }
     public int plusStepNo() {
-        if (taskLog==null){
-            taskLog = new TaskLog();
+        if (callApiLog ==null){
+            callApiLog = new CallApiLog();
         }
-        return this.taskLog.plusStepNo();
+        return this.callApiLog.plusStepNo();
     }
 
 

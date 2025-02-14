@@ -5,7 +5,7 @@
 
 
 <div class="pageHeader">
-	<form id="pagerForm" onsubmit="return navTabSearch(this);" action="${pageContext.request.contextPath }/dde/taskLog!listall.do" method="post">
+	<form id="pagerForm" onsubmit="return navTabSearch(this);" action="${pageContext.request.contextPath }/dde/callApiLog!listall.do" method="post">
 		<input type="hidden" name="pageNum" value="1" /> 
 	<input type="hidden" name="numPerPage" value="${pageDesc.pageSize}" /> 
 	<input type="hidden" name="orderField" value="${s_orderField}" />
@@ -83,44 +83,44 @@
 			</thead>
 			<tbody id="tbody_taskLogListAll">
 			
-				<c:forEach items="${objList }" var="taskLog"  varStatus="s">
+				<c:forEach items="${objList }" var="callApiLog"  varStatus="s">
 						<tr>
 							
 								<td align="center"><c:out value="${s.index+1 }"></c:out></td>								
 							
 							    <td align="center" >
 									<c:forEach var="row" items="${exchangeTasklist}">
-                                     <c:if test="${row.taskId eq taskLog.taskId}"> 
+                                     <c:if test="${row.taskId eq callApiLog.taskId}">
                                      ${row.taskName}
                                      </c:if>
                                     </c:forEach>
 								</td>
 								 
 								
-								<td align="center" title="<fmt:formatDate	value='${taskLog.runBeginTime}'	pattern='yyyy-MM-dd HH:mm:ss' />">
-									<fmt:formatDate	value='${taskLog.runBeginTime}'	pattern='yyyy-MM-dd HH:mm:ss' />								
+								<td align="center" title="<fmt:formatDate	value='${callApiLog.runBeginTime}'	pattern='yyyy-MM-dd HH:mm:ss' />">
+									<fmt:formatDate	value='${callApiLog.runBeginTime}'	pattern='yyyy-MM-dd HH:mm:ss' />
 								</td>
 							
-								<td align="center" title="<fmt:formatDate	value='${taskLog.runEndTime}'	pattern='yyyy-MM-dd HH:mm:ss' />">
-									<fmt:formatDate	value='${taskLog.runEndTime}'	pattern='yyyy-MM-dd HH:mm:ss' />		
+								<td align="center" title="<fmt:formatDate	value='${callApiLog.runEndTime}'	pattern='yyyy-MM-dd HH:mm:ss' />">
+									<fmt:formatDate	value='${callApiLog.runEndTime}'	pattern='yyyy-MM-dd HH:mm:ss' />
 								</td>
 							
 								<td align="center">
-									<c:if test="${!empty taskLog.runType  && 1== taskLog.runType }">手动</c:if> 
-									<c:if test="${!empty taskLog.runType  && 0== taskLog.runType }">自动</c:if> 
+									<c:if test="${!empty callApiLog.runType  && 1== callApiLog.runType }">手动</c:if>
+									<c:if test="${!empty callApiLog.runType  && 0== callApiLog.runType }">自动</c:if>
 								</td>
 							
 								<td align="center" >
-								    <c:if test="${!empty taskLog.taskType  && 1== taskLog.taskType }">直接交换</c:if> 
-									<c:if test="${!empty taskLog.taskType  && 2== taskLog.taskType }">导出离线文件</c:if>
-									<c:if test="${!empty taskLog.taskType  && 3== taskLog.taskType }">监控文件夹导入文件</c:if>
-									<c:if test="${!empty taskLog.taskType  && 4== taskLog.taskType }">调用接口</c:if>
-									<c:if test="${!empty taskLog.taskType  && 5== taskLog.taskType }">接口事件</c:if>
+								    <c:if test="${!empty callApiLog.taskType  && 1== callApiLog.taskType }">直接交换</c:if>
+									<c:if test="${!empty callApiLog.taskType  && 2== callApiLog.taskType }">导出离线文件</c:if>
+									<c:if test="${!empty callApiLog.taskType  && 3== callApiLog.taskType }">监控文件夹导入文件</c:if>
+									<c:if test="${!empty callApiLog.taskType  && 4== callApiLog.taskType }">调用接口</c:if>
+									<c:if test="${!empty callApiLog.taskType  && 5== callApiLog.taskType }">接口事件</c:if>
 								</td>
 							
-								<td align="center" title="${taskLog.otherMessage}">${taskLog.otherMessage}</td>
+								<td align="center" title="${callApiLog.otherMessage}">${callApiLog.otherMessage}</td>
 								<td align="center">
-								    <a href="${contextPath }/dde/taskLog!edit.do?logId=${taskLog.logId}" 
+								    <a href="${contextPath }/dde/callApiLog!edit.do?logId=${callApiLog.logId}"
 								        rel="ErrorData" target='navTab' width="850" height="500" title="任务明细日志"> <span class="icon icon-search"></span></a>
 								</td>
 							

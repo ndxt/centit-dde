@@ -1,13 +1,19 @@
 package com.centit.dde.adapter.po;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.annotation.JSONField;
+import com.centit.search.annotation.ESField;
+import com.centit.search.annotation.ESType;
+import com.centit.search.document.ESDocument;
 import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,70 +23,69 @@ import java.util.List;
  * @author zhf
  */
 @Data
-@Entity
 @ApiModel
-@Table(name="d_task_log")
-public class TaskLog implements java.io.Serializable {
-    private static final long serialVersionUID = 1L;
+@ESType(indexName = "callapilog", shards = 5)
+public class CallApiLog implements ESDocument, Serializable {
 
-    @Id
-    @Column(name="log_id")
+    private static final long serialVersionUID =  1L;
+
+    @ESField(type = "keyword") //(name="log_id")
     @ValueGenerator(strategy = GeneratorType.UUID)
     @ApiModelProperty(value = "日志ID", hidden = true)
     @NotBlank
     private String logId;
 
-    @Column(name="task_id")
+    @ESField(type = "keyword") //(name="task_id")
     @ApiModelProperty(value = "API网关ID", hidden = true)
     private String taskId;
 
-    @Column(name="opt_id")
+    @ESField(type = "keyword") //(name="opt_id")
     @ApiModelProperty(value = "菜单ID", hidden = true)
     private String optId;
 
-    @Column(name="application_id")
+    @ESField(type = "keyword") //(name="application_id")
     @ApiModelProperty(value = "项目id", hidden = true)
     private String applicationId;
 
-    @Column(name="run_begin_time")
     @ApiModelProperty(value = "执行开始时间")
+    @ESField(type = "Date") //
     private Date runBeginTime;
 
-    @Column(name="run_end_time")
     @ApiModelProperty(value = "执行结束时间")
+    @ESField(type = "Date") //
     private Date runEndTime;
 
-    @Column(name="run_type")
+    @ESField(type = "keyword") //(name="run_type")
     @ApiModelProperty(value = "执行方式", required = true)
     private String runType;
 
-    @Column(name="runner")
+    @ESField(type = "keyword") //(name="runner")
     @ApiModelProperty(value = "执行人员", hidden = true)
     private String runner;
 
-    @Column(name="other_message")
+    @ESField(type = "keyword") //(name="other_message")
     @ApiModelProperty(value = "其他提示信息", required = true)
     private String otherMessage;
 
-    @Column(name="error_pieces")
+    @ESField(type = "keyword") //(name="error_pieces")
     @ApiModelProperty(value = "失败条数")
     private Integer errorPieces;
 
-    @Column(name="success_pieces")
+    @ESField(type = "keyword") //(name="success_pieces")
     @ApiModelProperty(value = "成功条数")
     private Integer successPieces;
 
-    @Column(name="api_type")
+    @ESField(type = "keyword") //(name="api_type")
     @ApiModelProperty(value = "API类别，是草稿还是正式运行的日志，0 草稿，1 正式")
     private Integer apiType;
 
+    //@OneToMany(targetEntity = TaskDetailLog.class)
+    //@JoinESField(type = "keyword") //(name = "log_id", referencedESField(type = "keyword") //Name = "log_id")
+    @JSONField(serialize = false, deserialize = false)
+    @ApiModelProperty(value = "日志明细")
+    private List<CallApiLogDetail> detailLogs;
 
-    @OneToMany(targetEntity = TaskDetailLog.class)
-    @JoinColumn(name = "log_id", referencedColumnName = "log_id")
-    private List<TaskDetailLog> detailLogs;
-
-
-    public void addDetailLog(TaskDetailLog detailLog) {
+    public void addDetailLog(CallApiLogDetail detailLog) {
         if (this.detailLogs == null) {
             this.detailLogs = new ArrayList<>();
         }
@@ -91,7 +96,7 @@ public class TaskLog implements java.io.Serializable {
      */
     private int stepNo;
 
-    public TaskLog(){
+    public CallApiLog(){
         this.stepNo = 0;
     }
 
@@ -100,4 +105,13 @@ public class TaskLog implements java.io.Serializable {
         return this.stepNo;
     }
 
+    @Override
+    public String obtainDocumentId() {
+        return this.logId;
+    }
+
+    @Override
+    public JSONObject toJSONObject() {
+        return (JSONObject) JSON.toJSON(this);
+    }
 }
