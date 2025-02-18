@@ -24,7 +24,7 @@ public class CallApiLogDetails implements ESDocument, Serializable {
     @ESField(type = "keyword")
     private String taskId;
 
-    @ESField(type = "Date")
+    @ESField(type = "date")
     @ApiModelProperty(value = "执行开始时间")
     private Date runBeginTime;
 
@@ -38,6 +38,11 @@ public class CallApiLogDetails implements ESDocument, Serializable {
 
     @Override
     public JSONObject toJSONObject() {
-        return (JSONObject) JSON.toJSON(this);
+        JSONObject jsonObject = new JSONObject();// JSON.toJSON(this);
+        jsonObject.put("logId", this.logId);
+        jsonObject.put("taskId", this.taskId);
+        jsonObject.put("runBeginTime", this.runBeginTime);
+        jsonObject.put("detailLogs", JSON.toJSONString(detailLogs));
+        return jsonObject;
     }
 }

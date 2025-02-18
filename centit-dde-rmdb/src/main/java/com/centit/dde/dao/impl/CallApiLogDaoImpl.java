@@ -1,5 +1,6 @@
 package com.centit.dde.dao.impl;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.dao.CallApiLogDao;
 import com.centit.dde.adapter.po.CallApiLog;
@@ -66,14 +67,14 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         }
         return object.toJavaObject(CallApiLog.class);
     }
+
     @Override
     public List<CallApiLogDetail> listLogDetails(String logId) {
         JSONObject object = callApiLogDetailSearcher.getDocumentById("logId", logId);
         if(object==null){
             return null;
         }
-        CallApiLogDetails details = object.toJavaObject(CallApiLogDetails.class);
-        return details.getDetailLogs();
+        return JSONArray.parseArray(object.getString("detailLogs"), CallApiLogDetail.class);
     }
 
     @Override

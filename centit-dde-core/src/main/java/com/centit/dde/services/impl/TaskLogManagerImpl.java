@@ -9,7 +9,9 @@ import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.dde.vo.StatisticsParameter;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.database.utils.PageDesc;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,11 @@ public class TaskLogManagerImpl implements TaskLogManager {
     @Override
     public CallApiLog getLog(String logId) {
         return this.taskLogDao.getLog(logId);
+    }
+
+    @Override
+    public CallApiLog getLogWithDetail(String logId) {
+        return this.taskLogDao.getLogWithDetail(logId);
     }
 
     @Override
@@ -56,6 +63,9 @@ public class TaskLogManagerImpl implements TaskLogManager {
         }
         callApiLog.setErrorPieces(maxE);
         callApiLog.setSuccessPieces(maxS);
+        if(StringUtils.isBlank(callApiLog.getLogId())){
+            callApiLog.setLogId(UuidOpt.getUuidAsString22());
+        }
         this.taskLogDao.saveLog(callApiLog);
         if(detailLogsCount > 0) {
             this.taskLogDao.saveLogDetils(callApiLog);

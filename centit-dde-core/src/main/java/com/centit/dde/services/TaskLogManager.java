@@ -33,6 +33,8 @@ public interface TaskLogManager{
 
     CallApiLog getLog(String logId);
 
+    CallApiLog getLogWithDetail(String logId);
+
     List<Map<String, Object>> listTaskLog(Map<String, Object> param, PageDesc pageDesc);
 
     void deleteTaskLogById(String logId);

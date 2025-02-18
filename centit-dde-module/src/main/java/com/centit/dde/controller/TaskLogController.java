@@ -62,7 +62,7 @@ public class TaskLogController extends BaseController {
     @ApiImplicitParam(name = "logId", value = "日志ID")
     @WrapUpResponseBody
     public CallApiLog getTaskLog(@PathVariable String logId){
-        return taskLogManager.getLog(logId);
+        return taskLogManager.getLogWithDetail(logId);
     }
 
     @PostMapping(value = "/statistics")
@@ -71,7 +71,6 @@ public class TaskLogController extends BaseController {
     public Map<String, Object> getLogStatisticsInfo(@RequestBody StatisticsParameter parameter){
         return taskLogManager.getLogStatisticsInfo(parameter);
     }
-
 
     @PostMapping(value = "delLogInfoAndLogDetail")
     @ApiOperation(value = "删除某个时间段之前的日志")

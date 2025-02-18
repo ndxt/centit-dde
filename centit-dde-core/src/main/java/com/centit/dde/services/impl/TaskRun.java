@@ -16,6 +16,7 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OsInfo;
 import com.centit.framework.model.basedata.UserInfo;
 import com.centit.framework.model.security.CentitUserDetails;
+import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -129,6 +130,7 @@ public class TaskRun {
     private CallApiLog buildLogInfo(DataOptContext context, DataPacketInterface dataPacketInterface) {
         CallApiLog callApiLog = new CallApiLog();
         callApiLog.setRunBeginTime(new Date());
+        callApiLog.setLogId(UuidOpt.getUuidAsString22());
         if(ConstantValue.RUN_TYPE_DEBUG.equals(context.getRunType())) {
             // 运行的是草稿
             callApiLog.setApiType(0);
@@ -145,7 +147,6 @@ public class TaskRun {
                 callApiLog.setRunner(context.getCurrentUserCode());
             }
         }
-        //taskLog.setLogId(UuidOpt.getUuidAsString32());
         callApiLog.setOptId(dataPacketInterface.getOptId());
         callApiLog.setTopUnit(context.getTopUnit());
         callApiLog.setRequestIp(context.getLoginIp());

@@ -6,8 +6,6 @@ import com.alibaba.fastjson2.annotation.JSONField;
 import com.centit.search.annotation.ESField;
 import com.centit.search.annotation.ESType;
 import com.centit.search.document.ESDocument;
-import com.centit.support.database.orm.GeneratorType;
-import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -29,7 +27,6 @@ public class CallApiLog implements ESDocument, Serializable {
     private static final long serialVersionUID =  1L;
 
     @ESField(type = "keyword") //(name="log_id")
-    @ValueGenerator(strategy = GeneratorType.UUID)
     @ApiModelProperty(value = "日志ID", hidden = true)
     @NotBlank
     private String logId;
@@ -59,11 +56,11 @@ public class CallApiLog implements ESDocument, Serializable {
     private String requestParams;
 
     @ApiModelProperty(value = "执行开始时间")
-    @ESField(type = "Date") //
+    @ESField(type = "date") //
     private Date runBeginTime;
 
     @ApiModelProperty(value = "执行结束时间")
-    @ESField(type = "Date") //
+    @ESField(type = "date") //
     private Date runEndTime;
 
     @ESField(type = "keyword") //(name="run_type")
