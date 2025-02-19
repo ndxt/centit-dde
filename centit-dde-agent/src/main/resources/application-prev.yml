@@ -42,6 +42,17 @@ framework:
 
 fileserver:
   url: http://192.168.134.250:10086/file/
+elasticsearch:
+  index: operationindex
+  osId: operatorlog
+  server:
+   ip: 192.168.134.250
+   port: 32590
+   username: elastic
+   password: MrGehkgo
+   cluster:
+  filter:
+   minScore: 0.5
 
 
 

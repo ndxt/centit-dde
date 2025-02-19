@@ -7,14 +7,18 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.po.RoleRelegate;
 import com.centit.workflow.service.FlowManager;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WorkFlowTaskManagerOperation implements BizOperation {
 
@@ -32,25 +36,44 @@ public class WorkFlowTaskManagerOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String id = bizOptJson.getString("id");
         String taskType = bizOptJson.getString("taskType");
-        String fromUserCode, toUserCode;
-        int result;
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
         switch (taskType) {
             //根据节点实例转移任务
             case "moveTask":
-                Object nodeInstIds = JSONTransformer.transformer(bizOptJson.getString("nodeInstIds"), transform);
+                String fromUserCode, toUserCode;
                 fromUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("fromUserCode"), transform));
                 toUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("toUserCode"), transform));
-                result = flowManager.moveUserTaskTo(StringBaseOpt.objectToStringList(nodeInstIds), fromUserCode, toUserCode, dataOptContext.getCurrentUserDetail(), "");
-                bizModel.putDataSet(id, new DataSet(result));
+                if (StringUtils.isBlank(fromUserCode)) {
+                    return ResponseData.makeErrorMessage(
+                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "fromUserCode"));
+                }
+                if (StringUtils.isBlank(toUserCode)) {
+                    return ResponseData.makeErrorMessage(
+                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "toUserCode"));
+                }
+                Map<String, Object> params=new HashMap<>();
+                params.put("topUnit",dataOptContext.getTopUnit());
+                boolean isAllOsId= BooleanBaseOpt.castObjectToBoolean(JSONTransformer.transformer(bizOptJson.getString("isAllOsId"), transform),false);
+                if(!isAllOsId){
+                    params.put("osId",dataOptContext.getOsId());
+                }
+                String unitCode=StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("unitCode"), transform));
+                if(!StringBaseOpt.isNvl(unitCode)){
+                    params.put("unitCode",unitCode);
+                }
+                String optId=StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("optId"), transform));
+                if(!StringBaseOpt.isNvl(optId)){
+                    params.put("optId",optId);
+                }
+                String flowCode=StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("flowCode"), transform));
+                if(!StringBaseOpt.isNvl(flowCode)){
+                    params.put("flowCode",flowCode);
+                }
+                flowManager.moveUserTaskTo(params, fromUserCode, toUserCode, dataOptContext.getCurrentUserDetail(), "api");
                 break;
-            //根据应用转移任务
-            case "moveTaskByOs":
-                fromUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("fromUserCode"), transform));
-                toUserCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("toUserCode"), transform));
-                result = flowManager.moveUserTaskTo(dataOptContext.getOsId(), fromUserCode, toUserCode, dataOptContext.getCurrentUserDetail(), "");
-                bizModel.putDataSet(id, new DataSet(result));
-                break;
+
             //创建任务委托
             case "createRelegate":
                 RoleRelegate roleRelegate = new RoleRelegate();

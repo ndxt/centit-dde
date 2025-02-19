@@ -83,6 +83,15 @@ public class ManagerWorkFlowBizOperation implements BizOperation {
                 }
                 flowEngine.reclaimNode(nodeInstId, userCode);
                 break;
+            //重新运行指定节点
+            case ConstantValue.RESET_NODE:
+                if (StringUtils.isBlank(nodeInstId)) {
+                    return ResponseData.makeErrorMessage(
+                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "nodeInstId"));
+                }
+                flowManager.resetFlowToThisNode(nodeInstId, dataOptContext.getCurrentUserDetail());
+                break;
             default:
                 break;
         }

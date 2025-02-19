@@ -73,7 +73,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
         }
         this.taskLogDao.saveLog(callApiLog);
         if(detailLogsCount > 0) {
-            this.taskLogDao.saveLogDetils(callApiLog);
+            this.taskLogDao.saveLogDetails(callApiLog);
         }
     }
 

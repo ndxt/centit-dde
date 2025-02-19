@@ -50,7 +50,7 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
     }
 
     @Override
-    public void saveLogDetils(CallApiLog callApiLog) {
+    public void saveLogDetails(CallApiLog callApiLog) {
         CallApiLogDetails details = new CallApiLogDetails();
         details.setLogId(callApiLog.getLogId());
         details.setTaskId(callApiLog.getTaskId());
