@@ -29,7 +29,7 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
     }
 
     @Override
-    public void saveLogDetils(CallApiLog callApiLog) {
+    public void saveLogDetails(CallApiLog callApiLog) {
         logger.info(JSON.toJSONString(callApiLog.getDetailLogs()));
     }
 

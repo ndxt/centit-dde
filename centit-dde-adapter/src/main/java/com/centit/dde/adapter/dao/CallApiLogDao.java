@@ -17,7 +17,7 @@ public interface CallApiLogDao {
 
     void saveLog(CallApiLog callApiLog);
 
-    void saveLogDetils(CallApiLog callApiLog);
+    void saveLogDetails(CallApiLog callApiLog);
 
     CallApiLog getLog(String logId);
 
