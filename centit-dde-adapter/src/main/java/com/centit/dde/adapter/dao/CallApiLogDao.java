@@ -1,6 +1,5 @@
 package com.centit.dde.adapter.dao;
 
-import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.support.database.utils.PageDesc;

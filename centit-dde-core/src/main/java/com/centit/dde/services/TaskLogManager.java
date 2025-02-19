@@ -1,6 +1,7 @@
 package com.centit.dde.services;
 
 import com.centit.dde.adapter.po.CallApiLog;
+import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.dde.vo.StatisticsParameter;
 import com.centit.support.database.utils.PageDesc;
@@ -34,6 +35,8 @@ public interface TaskLogManager{
     CallApiLog getLog(String logId);
 
     CallApiLog getLogWithDetail(String logId);
+
+    List<CallApiLogDetail> listLogDetails(String logId);
 
     List<Map<String, Object>> listTaskLog(Map<String, Object> param, PageDesc pageDesc);
 

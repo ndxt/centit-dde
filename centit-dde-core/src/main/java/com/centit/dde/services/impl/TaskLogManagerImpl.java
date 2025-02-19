@@ -40,6 +40,11 @@ public class TaskLogManagerImpl implements TaskLogManager {
     }
 
     @Override
+    public List<CallApiLogDetail> listLogDetails(String logId){
+        return this.taskLogDao.listLogDetails(logId);
+    }
+
+    @Override
     public List<Map<String, Object>> listTaskLog(Map<String, Object> param, PageDesc pageDesc) {
         return this.taskLogDao.listLogsByProperties(param, pageDesc);
     }

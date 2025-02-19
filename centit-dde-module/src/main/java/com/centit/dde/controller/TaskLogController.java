@@ -2,6 +2,7 @@ package com.centit.dde.controller;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.CallApiLog;
+import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.services.TaskLogManager;
 import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.dde.vo.StatisticsParameter;
@@ -63,6 +64,14 @@ public class TaskLogController extends BaseController {
     @WrapUpResponseBody
     public CallApiLog getTaskLog(@PathVariable String logId){
         return taskLogManager.getLogWithDetail(logId);
+    }
+
+    @GetMapping(value = "/details/{logId}")
+    @ApiOperation(value = "查询单个日志")
+    @ApiImplicitParam(name = "logId", value = "日志ID")
+    @WrapUpResponseBody
+    public List<CallApiLogDetail> getTaskLogDetails(@PathVariable String logId){
+        return taskLogManager.listLogDetails(logId);
     }
 
     @PostMapping(value = "/statistics")
