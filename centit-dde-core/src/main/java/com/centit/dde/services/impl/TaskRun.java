@@ -133,6 +133,7 @@ public class TaskRun {
         } else {
             detailLog.setLogInfo(ObjectException.extortExceptionMessage(e));
         }
+        detailLog.setErrorPieces(1);
         optContext.plusStepNo();
         detailLog.setStepNo(optContext.getStepNo());
         detailLog.setRunEndTime(new Date());
