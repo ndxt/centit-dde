@@ -99,8 +99,16 @@ public class TaskRun {
         } finally { // 写入日志
             //如果是 debug 并且是断点（debugId不为空）状态不写入日志
             if(StringUtils.equals(optContext.getRunType(), ConstantValue.RUN_TYPE_NORMAL)
-                || StringUtils.isBlank(optContext.getDebugId()))
+                || StringUtils.isBlank(optContext.getDebugId())) {
+                if (dataPacketInterface != null) {
+                    if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())) {
+                        callApiLog.setRunner("定时任务");
+                    } else {
+                        callApiLog.setRunner(optContext.getCurrentUserCode());
+                    }
+                }
                 taskLogManager.saveTaskLog(callApiLog, dataPacketInterface.getLogLevel());
+            }
         }
     }
 
@@ -115,7 +123,6 @@ public class TaskRun {
     private void dealException(CallApiLog callApiLog, DataOptContext optContext, Exception e) {
         callApiLog.setOtherMessage(ObjectException.extortExceptionOriginMessage(e));
         callApiLog.setRunEndTime(new Date());
-
         CallApiLogDetail detailLog = new CallApiLogDetail();
         detailLog.setRunBeginTime(new Date());
         detailLog.setOptNodeId("api");
@@ -139,19 +146,10 @@ public class TaskRun {
         } else {
             callApiLog.setApiType(1);
         }
-
-        if (dataPacketInterface != null) {
-            if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())) {
-                callApiLog.setRunner("定时任务");
-            } else {
-                callApiLog.setRunner(context.getCurrentUserCode());
-            }
-        }
         callApiLog.setOptId(dataPacketInterface.getOptId());
         callApiLog.setTopUnit(context.getTopUnit());
         callApiLog.setRequestIp(context.getLoginIp());
         callApiLog.setRequestParams(context.getRequestParams());
-        callApiLog.setRunner(context.getCurrentUserCode());
         callApiLog.setApplicationId(dataPacketInterface.getOsId());
         callApiLog.setRunType(dataPacketInterface.getPacketName());
         callApiLog.setTaskId(dataPacketInterface.getPacketId());

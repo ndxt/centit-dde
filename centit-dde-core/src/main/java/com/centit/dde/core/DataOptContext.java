@@ -133,4 +133,29 @@ public class DataOptContext {
         return StringBaseOpt.castObjectToString(
             this.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
     }
+
+    /**
+     * 用于记录日志
+     * @return callStackData 的部分内容
+     */
+    public Map<String, Object> getContextData(){
+        //MODULE_CALL_TAG
+        Map<String, Object> objectMap = new HashMap<>();
+        Object modulaTag = callStackData.get(ConstantValue.MODULE_CALL_TAG);
+        if(modulaTag != null){
+            objectMap.put(ConstantValue.MODULE_CALL_TAG, modulaTag);
+            return objectMap;
+        }
+        for(String key : callStackData.keySet()){
+            if(key.startsWith("__request_")){
+                objectMap.put(key, callStackData.get(key));
+            }
+        }
+        CentitUserDetails userDetails = this.getCurrentUserDetail();
+        if(userDetails != null) {
+            objectMap.put(ConstantValue.SESSION_DATA_TAG, userDetails.getUserInfo());
+            objectMap.put("currentUnit", userDetails.getCurrentUnitCode());
+        }
+        return objectMap;
+    }
 }

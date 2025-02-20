@@ -677,12 +677,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             }
 
             if("start".equals(optType)){
-                Object callData = dataOptContext.getStackData(ConstantValue.MODULE_CALL_TAG);
-                if(callData!=null){
-                    detailLog.setLogInfo(JSON.toJSONString(callData));
-                } else {
-                    detailLog.setLogInfo(JSON.toJSONString(dataOptContext.getCallStackData()));
-                }
+                detailLog.setLogInfo(JSON.toJSONString(dataOptContext.getContextData()));
             } else {
                 DataSet dataSet;
                 if ("append".equals(optType) || "desensitize".equals(optType)) { // 派生 和 脱敏
