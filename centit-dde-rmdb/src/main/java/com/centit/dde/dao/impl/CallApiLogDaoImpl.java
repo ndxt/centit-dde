@@ -10,6 +10,7 @@ import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Impl.ESIndexer;
 import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -102,7 +103,13 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         Pair<Long, List<Map<String, Object>>> queryOut =
             callApiLogSearcher.search(param, null, pageDesc.getPageNo(), pageDesc.getPageSize());
         pageDesc.setTotalRows(queryOut.getLeft().intValue());
-        return queryOut.getRight();
+        List<Map<String, Object>> objectList =  queryOut.getRight();
+        if(objectList==null) return null;
+        for(Map<String, Object> obj : objectList){
+            obj.put("runBeginTime", DatetimeOpt.smartPraseDate((String)obj.get("runBeginTime")));
+            obj.put("runEndTime", DatetimeOpt.smartPraseDate((String)obj.get("runEndTime")));
+        }
+        return objectList;
     }
 
     @Override
