@@ -127,7 +127,12 @@ public class TaskRun {
         detailLog.setRunBeginTime(new Date());
         detailLog.setOptNodeId("api");
         detailLog.setLogType("error");
-        detailLog.setLogInfo(ObjectException.extortExceptionMessage(e));
+        if(e instanceof ObjectException){
+            ObjectException objectException = (ObjectException)e;
+            detailLog.setLogInfo(objectException.toJSONString());
+        } else {
+            detailLog.setLogInfo(ObjectException.extortExceptionMessage(e));
+        }
         optContext.plusStepNo();
         detailLog.setStepNo(optContext.getStepNo());
         detailLog.setRunEndTime(new Date());
