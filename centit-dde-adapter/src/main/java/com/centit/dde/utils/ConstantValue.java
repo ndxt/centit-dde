@@ -154,6 +154,8 @@ public class ConstantValue {
     public static final String FILE_REQUEST_TYPE="file";
     public static final String JSON_REQUEST_TYPE="json";
     public static final String FORM_REQUEST_TYPE="form";
+    public static final String SOAP_REQUEST_TYPE="soap";
+
     public static final String HTTP_REQUEST_PREFIX="://";
 
     public static final String HEADERS = "headers";

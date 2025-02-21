@@ -113,7 +113,6 @@ public class HttpServiceOperation implements BizOperation {
                 }
             }
         }
-
         Map<String, Object> localHeaders = getRequestParams(bizOptJson, bizModel, "headList", "headName", "headValue");
         if(!localHeaders.isEmpty()){
             headers.putAll(CollectionsOpt.objectMapToStringMap(localHeaders));
@@ -175,20 +174,14 @@ public class HttpServiceOperation implements BizOperation {
                     }
                 } else { // json 或者 form
                     Object requestBody = getRequestBody(bizOptJson, bizModel);
-                    if(requestBody instanceof Map){ // 对外服务平台补丁，确认后删除
-                        Map<String, Object> requestBodyMap = (Map<String, Object>) requestBody;
-                        Boolean requestBodyAsForm = BooleanBaseOpt.castObjectToBoolean(
-                            requestBodyMap.get("requestBodyAsForm"), false);
-                        if(requestBodyAsForm){
-                            requestType = ConstantValue.FORM_REQUEST_TYPE;
-                            requestBodyMap.remove("requestBodyAsForm");
-                        }
-                    }
                     if("put".equals(requestMode)){
                         if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPut(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
-                        } else {
+                        } /*else if (ConstantValue.SOAP_REQUEST_TYPE.equals(requestType)) {
+                            // WEB SERVICE 请求
+
+                        } */else {
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
                         }
