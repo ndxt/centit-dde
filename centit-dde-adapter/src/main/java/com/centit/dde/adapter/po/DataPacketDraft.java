@@ -42,6 +42,11 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     @NotBlank
     private String packetName;
 
+    @ApiModelProperty(value = "API接口URL - 路由")
+    @Column(name = "route_url")
+    @NotBlank
+    private String routeUrl;
+
     @ApiModelProperty(value = "详细描述")
     @Column(name = "packet_desc")
     private String packetDesc;
