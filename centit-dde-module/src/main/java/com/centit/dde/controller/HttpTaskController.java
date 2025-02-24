@@ -7,9 +7,6 @@ import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.adapter.po.DataPacketInterface;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataOptResult;
-import com.centit.dde.services.BizModelService;
-import com.centit.dde.services.DataPacketDraftService;
-import com.centit.dde.services.DataPacketService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.dde.vo.FormulaParameter;
@@ -18,9 +15,7 @@ import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
-import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
-import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OsInfo;
 import com.centit.framework.model.basedata.WorkGroup;
 import com.centit.framework.model.security.CentitUserDetails;
@@ -38,7 +33,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -57,7 +51,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author zhf
@@ -65,22 +58,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Api(value = "Http触发任务响应", tags = "Http触发任务响应")
 @RestController
 @RequestMapping(value = "run")
-public class HttpTaskController extends BaseController {
-
-    @Autowired
-    private PlatformEnvironment platformEnvironment;
-
-    private final DataPacketService dataPacketService;
-    private final DataPacketDraftService dataPacketDraftService;
-    private final BizModelService bizmodelService;
-
-    public Map<String, DataPacket> dataPacketCachedMap = new ConcurrentHashMap<>(10000);
-    public HttpTaskController(DataPacketService dataPacketService, DataPacketDraftService dataPacketDraftService,
-                              BizModelService bizmodelService) {
-        this.dataPacketService = dataPacketService;
-        this.dataPacketDraftService = dataPacketDraftService;
-        this.bizmodelService = bizmodelService;
-    }
+public class HttpTaskController extends DoApiController {
 
     /**
      * 草稿-----------请求方法
@@ -113,7 +91,6 @@ public class HttpTaskController extends BaseController {
                                         HttpServletResponse response) throws IOException {
         returnObject(packetId, ConstantValue.RUN_TYPE_DEBUG, ConstantValue.TASK_TYPE_DELETE, request, response);
     }
-
 
     /**
      * 发布-------请求方法

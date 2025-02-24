@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.dao.DataPacketDao;
 import com.centit.support.common.CachedObject;
 import com.centit.support.common.ICachedObject;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -20,7 +19,6 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class RouteMetadataServiceImpl implements RouteMetadataService{
