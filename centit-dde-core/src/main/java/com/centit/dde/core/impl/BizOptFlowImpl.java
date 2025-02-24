@@ -187,6 +187,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.CREATE_WORKFLOW, new CreateWorkFlowBizOperation(flowEngine));
         //注册插入操作类
         allOperations.put(ConstantValue.SUBMIT_WORKFLOW, new SubmitWorkFlowBizOperation(flowEngine));
+        allOperations.put(ConstantValue.FLOW_INSTANCE_TEAM_VAR,new ManageFlowInstanceTeamAndVarBizOperation(flowEngine));
         //注册删除节点
         allOperations.put(ConstantValue.DELETE_WORKFLOW, new DeleteWorkFlowBizOperation(flowManager));
 
