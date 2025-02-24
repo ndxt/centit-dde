@@ -154,6 +154,11 @@ public class DataPacketDaoImpl implements DataPacketDao {
     }
 
     @Override
+    public JSONArray listApiWithRoute(){
+        return null;
+    }
+
+    @Override
     public int clearTrashStand(String osId) {
         return 1;
     }

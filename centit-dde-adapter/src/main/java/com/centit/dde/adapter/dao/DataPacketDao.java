@@ -1,5 +1,6 @@
 package com.centit.dde.adapter.dao;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.support.database.utils.PageDesc;
 
@@ -47,6 +48,8 @@ public interface DataPacketDao {
     void updatePackedLogLevel(int logLevel, List<String>  packetIds);
 
     void updateApplicationLogLevel(int logLevel, String osId);
+
+    JSONArray listApiWithRoute();
 
     int clearTrashStand(String osId);
 }

@@ -118,6 +118,7 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         dataPacketDraftDao.publishDataPacket(optCode, dataPacketCopy);
 
         DataPacket dataPacket = new DataPacket();
+        //复制属性
         BeanUtils.copyProperties(dataPacketCopy, dataPacket);
         dataPacket.setOptCode(dataPacketCopy.getPacketId());
         List<DataPacketParam> dataPacketParamList = new ArrayList<>();

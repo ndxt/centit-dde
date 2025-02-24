@@ -1,5 +1,6 @@
 package com.centit.dde.dao.impl;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.adapter.dao.DataPacketDao;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
@@ -120,6 +121,11 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
         DatabaseOptUtils.doExecuteSql(this, sql, new Object[]{logLevel, osId});
     }
 
+    @Override
+    public JSONArray listApiWithRoute(){
+        return DatabaseOptUtils.listObjectsBySqlAsJson(this,
+            "select packet_id, route_url, taskType from q_data_packet where route_url is not null");
+    }
     @Override
     public int clearTrashStand(String osId) {
         String delSql ="DELETE FROM q_data_packet WHERE IS_DISABLE = 'T' AND OS_ID=? ";
