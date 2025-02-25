@@ -28,7 +28,7 @@ public class RouteMetadataServiceImpl implements RouteMetadataService {
     @Autowired
     private DataPacketDao dataPacketDao;
 
-    public static List<String> praiseUrl(String uri) {
+    public static List<String> parseUrl(String uri) {
         String[] uriPieces = uri.split("/");
         List<String> path = new ArrayList<>();
         try {
@@ -77,7 +77,7 @@ public class RouteMetadataServiceImpl implements RouteMetadataService {
                 if(StringUtils.isBlank(routeUrl) || StringUtils.isBlank(packetId)) {
                     continue;
                 }
-                List<String> pieces = praiseUrl(routeUrl);
+                List<String> pieces = parseUrl(routeUrl);
                 ApiRouteTree packetNode = routeTree.fetchChildNode(method);
                 for(String piece: pieces){
                     packetNode = packetNode.fetchChildNode(piece);
@@ -99,7 +99,7 @@ public class RouteMetadataServiceImpl implements RouteMetadataService {
 
     @Override
     public Pair<String, List<String>> mapUrlToPacketId(String url, String method) {
-        List<String> pieces = praiseUrl(url);
+        List<String> pieces = parseUrl(url);
         if(pieces==null || pieces.isEmpty()) return null;
         ApiRouteTree routeNode = optTreeNodeCache.getCachedValue(pieces.get(0));
         ApiRouteTree packetNode = routeNode.getChildNode(method);
@@ -119,7 +119,7 @@ public class RouteMetadataServiceImpl implements RouteMetadataService {
 
     @Override
     public String getPublishPacketId(String topUnit, String url, String method){
-        List<String> pieces = praiseUrl(url);
+        List<String> pieces = parseUrl(url);
         ApiRouteTree routeNode = optTreeNodeCache.getCachedValue(topUnit);
         ApiRouteTree packetNode = routeNode.getChildNode(method);
         for(String piece: pieces){
