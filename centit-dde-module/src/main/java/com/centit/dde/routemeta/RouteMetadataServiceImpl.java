@@ -39,7 +39,10 @@ public class RouteMetadataServiceImpl implements RouteMetadataService {
             }
             i++;
             while (i < n){
-                path.add(URLDecoder.decode(uriPieces[i], "UTF-8"));
+                String piece = URLDecoder.decode(uriPieces[i], "UTF-8");
+                if(StringUtils.isNotBlank(piece)) {
+                    path.add(piece);
+                }
                 i++;
             }
         } catch (UnsupportedEncodingException e) {

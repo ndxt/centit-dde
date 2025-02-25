@@ -3,16 +3,23 @@ package com.centit.dde.controller;
 import com.centit.dde.routemeta.RouteMetadataService;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.model.security.CentitUserDetails;
+import com.centit.framework.security.CentitSecurityMetadata;
 import com.centit.support.common.ObjectException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 @Api(value = "api路由", tags = "api路由")
@@ -22,6 +29,47 @@ public class ApiRouteController extends DoApiController {
 
     @Autowired
     private RouteMetadataService routeMetadataService;
+
+    private void judgePower(String packetId, HttpServletRequest request){
+        List<ConfigAttribute> needRoles = CentitSecurityMetadata.getApiRoleList(packetId);
+        if(needRoles==null || needRoles.isEmpty()) return ;
+        CentitUserDetails ud = WebOptUtils.assertUserDetails(request);
+        Collection<? extends GrantedAuthority> userRoles = ud.getAuthorities();
+        if(userRoles!=null){
+            Iterator<? extends GrantedAuthority> userRolesItr = userRoles.iterator();
+            Iterator<ConfigAttribute> needRolesItr = needRoles.iterator();
+
+            String needRole = needRolesItr.next().getAttribute();
+            String userRole = userRolesItr.next().getAuthority();
+            while(true){
+                int n = needRole.compareTo(userRole);
+                if(n==0)
+                    return; // 匹配成功 完成认证
+                if(n<0){
+                    if(!needRolesItr.hasNext())
+                        break;
+                    needRole = needRolesItr.next().getAttribute();
+                }else{
+                    if(!userRolesItr.hasNext())
+                        break;
+                    userRole = userRolesItr.next().getAuthority();
+                }
+            }
+        }
+
+        StringBuilder errorMsgBuilder = new StringBuilder("no auth: ").append(packetId).append("; need role: ");
+        boolean firstRole = true;
+        for(ConfigAttribute ca : needRoles){
+            if(firstRole){
+                firstRole = false;
+            } else {
+                errorMsgBuilder.append(", ");
+            }
+            errorMsgBuilder.append(ca.getAttribute().substring(2));
+        }
+        errorMsgBuilder.append(".");
+        throw new ObjectException(ResponseData.HTTP_FORBIDDEN, errorMsgBuilder.toString());
+    }
 
     /**
      * url中的 第一个变量为topUnit 形如 /api/topUnt/模块/字模块/方法名
@@ -38,6 +86,7 @@ public class ApiRouteController extends DoApiController {
         if(apiInfo == null){
             throw new ObjectException(ResponseData.HTTP_NOT_FOUND, "未找到对应的api接口, GET:"+request.getRequestURI());
         }
+        judgePower(apiInfo.getLeft(), request);
         returnObject(apiInfo.getLeft(), ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_GET, request, response);
     }
 
@@ -50,6 +99,7 @@ public class ApiRouteController extends DoApiController {
         if(apiInfo == null){
             throw new ObjectException(ResponseData.HTTP_NOT_FOUND, "未找到对应的api接口, POST:"+request.getRequestURI());
         }
+        judgePower(apiInfo.getLeft(), request);
         returnObject(apiInfo.getLeft(), ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_POST, request, response);
     }
 
@@ -62,6 +112,7 @@ public class ApiRouteController extends DoApiController {
         if(apiInfo == null){
             throw new ObjectException(ResponseData.HTTP_NOT_FOUND, "未找到对应的api接口, PUT:"+request.getRequestURI());
         }
+        judgePower(apiInfo.getLeft(), request);
         returnObject(apiInfo.getLeft(), ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_PUT, request, response);
     }
 
@@ -74,6 +125,7 @@ public class ApiRouteController extends DoApiController {
         if(apiInfo == null){
             throw new ObjectException(ResponseData.HTTP_NOT_FOUND, "未找到对应的api接口, DELETE:"+request.getRequestURI());
         }
+        judgePower(apiInfo.getLeft(), request);
         returnObject(apiInfo.getLeft(), ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_DELETE, request, response);
     }
 
