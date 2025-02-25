@@ -5,6 +5,7 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.security.CentitUserDetails;
@@ -41,6 +42,7 @@ public class SessionDataOperation implements BizOperation {
         }
         //设置用户session可以实现自定义登录
         SecurityContextHolder.getContext().setAuthentication(ud);
+        dataOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, ud);
         return BuiltInOperation.createResponseSuccessData(1);
     }
 }
