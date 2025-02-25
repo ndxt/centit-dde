@@ -14,7 +14,7 @@ public interface DataPacketDraftService {
 
     void createDataPacket(DataPacketDraft dataPacketCopy);
 
-    void updateDataPacket(DataPacketDraft dataPacketCopy);
+    void updateDataPacket(String topUnit, DataPacketDraft dataPacketCopy);
 
     void updateDataPacketOptJson(String packetId, String dataPacketOptJson);
 

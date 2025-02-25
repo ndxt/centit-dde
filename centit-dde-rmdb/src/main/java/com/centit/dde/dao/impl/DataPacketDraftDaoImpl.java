@@ -10,6 +10,7 @@ import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -84,6 +85,19 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
         String sql = "update q_data_packet_draft SET publish_date=?, update_date =?, opt_code=?  WHERE  PACKET_ID=? ";
         this.getJdbcTemplate().update(sql, new Object[]{dataPacketCopy.getPublishDate(), dataPacketCopy.getUpdateDate(),
             optCode, dataPacketCopy.getPacketId()});
+    }
+
+    @Override
+    public String getPacketIdByUrl(String topUnit, String routeUrl) {
+        String packetId = StringBaseOpt.castObjectToString(DatabaseOptUtils.getScalarObjectQuery(this,
+            "select a.packet_id " +
+                "from q_data_packet a join f_os_info b on a.os_id = b.os_id " +
+                "where b.top_unit = ? and a.route_url is not null", new Object[]{topUnit, routeUrl}));
+        if(StringUtils.isNotBlank(packetId)) return  packetId;
+        return StringBaseOpt.castObjectToString(DatabaseOptUtils.getScalarObjectQuery(this,
+            "select a.packet_id " +
+                "from q_data_packet_draft a join f_os_info b on a.os_id = b.os_id " +
+                "where b.top_unit = ? and a.route_url is not null", new Object[]{topUnit, routeUrl}));
     }
 
     @Override

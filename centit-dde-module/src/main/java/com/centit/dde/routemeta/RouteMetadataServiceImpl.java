@@ -3,7 +3,7 @@ package com.centit.dde.routemeta;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.dao.DataPacketDao;
-import com.centit.support.common.CachedObject;
+import com.centit.support.common.CachedMap;
 import com.centit.support.common.ICachedObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -21,9 +21,9 @@ import java.util.List;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class RouteMetadataServiceImpl implements RouteMetadataService{
+public class RouteMetadataServiceImpl implements RouteMetadataService {
     protected static final Logger logger = LoggerFactory.getLogger(RouteMetadataServiceImpl.class);
-    private final CachedObject<ApiRouteTree> optTreeNodeCache;
+    private final CachedMap<String, ApiRouteTree> optTreeNodeCache;
 
     @Autowired
     private DataPacketDao dataPacketDao;
@@ -32,8 +32,15 @@ public class RouteMetadataServiceImpl implements RouteMetadataService{
         String[] uriPieces = uri.split("/");
         List<String> path = new ArrayList<>();
         try {
-            for (String uriPiece : uriPieces) {
-                path.add(URLDecoder.decode(uriPiece, "UTF-8"));
+            int i = 0, n = uriPieces.length;
+            //过滤掉api前面的url，这些可能因为服务的配置不同而不同
+            while (i < n && !"api".equals(uriPieces[i])) {
+                i++;
+            }
+            i++;
+            while (i < n){
+                path.add(URLDecoder.decode(uriPieces[i], "UTF-8"));
+                i++;
             }
         } catch (UnsupportedEncodingException e) {
             return path;
@@ -42,13 +49,13 @@ public class RouteMetadataServiceImpl implements RouteMetadataService{
     }
 
     public RouteMetadataServiceImpl() {
-        optTreeNodeCache = new CachedObject<>(this::buildMetadataTree,
+        optTreeNodeCache = new CachedMap<>(this::buildMetadataTree,
             ICachedObject.DEFAULT_REFRESH_PERIOD);
     }
 
-    private ApiRouteTree buildMetadataTree(){
+    private ApiRouteTree buildMetadataTree(String topUnit){
         final ApiRouteTree routeTree = new ApiRouteTree();
-        JSONArray apiList = dataPacketDao.listApiWithRoute();
+        JSONArray apiList = dataPacketDao.listApiWithRoute(topUnit);
         for (Object obj : apiList){
             if(obj instanceof JSONObject){
                 JSONObject apiJson = (JSONObject) obj;
@@ -86,22 +93,23 @@ public class RouteMetadataServiceImpl implements RouteMetadataService{
     }
 
     @Override
-    public void rebuildMetadataTree(){
-        optTreeNodeCache.evictCache();
+    public void rebuildMetadataTree(String topUnit){
+        optTreeNodeCache.evictIdentifiedCache(topUnit);
     }
 
     @Override
     public Pair<String, List<String>> mapUrlToPacketId(String url, String method) {
         List<String> pieces = praiseUrl(url);
-        ApiRouteTree routeNode = optTreeNodeCache.getCachedTarget();
+        if(pieces==null || pieces.isEmpty()) return null;
+        ApiRouteTree routeNode = optTreeNodeCache.getCachedValue(pieces.get(0));
         ApiRouteTree packetNode = routeNode.getChildNode(method);
         List<String> params = new ArrayList<>();
-        for(String piece: pieces){
+        for(int i=1; i<pieces.size(); i++){
             if(packetNode==null) return null;
-            ApiRouteTree nextNode = packetNode.getChildNode(piece);
+            ApiRouteTree nextNode = packetNode.getChildNode(pieces.get(i));
             if(nextNode == null) {
                 nextNode = packetNode.getChildNode("*");
-                params.add(piece);
+                params.add(pieces.get(i));
             }
             packetNode = nextNode;
         }
@@ -110,18 +118,18 @@ public class RouteMetadataServiceImpl implements RouteMetadataService{
     }
 
     @Override
-    public boolean isExistUrl(String url, String method){
+    public String getPublishPacketId(String topUnit, String url, String method){
         List<String> pieces = praiseUrl(url);
-        ApiRouteTree routeNode = optTreeNodeCache.getCachedTarget();
+        ApiRouteTree routeNode = optTreeNodeCache.getCachedValue(topUnit);
         ApiRouteTree packetNode = routeNode.getChildNode(method);
         for(String piece: pieces){
-            if(packetNode==null) return false;
+            if(packetNode==null) return null;
             ApiRouteTree nextNode = packetNode.getChildNode(piece);
             if(nextNode == null) {
                 nextNode = packetNode.getChildNode("*");
             }
             packetNode = nextNode;
         }
-        return packetNode!=null;
+        return packetNode==null?null:packetNode.getPacketId();
     }
 }

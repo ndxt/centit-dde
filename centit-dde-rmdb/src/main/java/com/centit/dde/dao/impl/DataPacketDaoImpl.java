@@ -114,18 +114,21 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
 
     @Override
     public void updateApplicationLogLevel(int logLevel, String osId){
-        String sql ="UPDATE q_data_packet SET log_level= ? WHERE os_id = ?";
+        String sql = "UPDATE q_data_packet SET log_level= ? WHERE os_id = ?";
         DatabaseOptUtils.doExecuteSql(this, sql, new Object[]{logLevel, osId});
 
-        sql ="UPDATE q_data_packet_draft SET log_level= ? WHERE os_id = ?";
+        sql = "UPDATE q_data_packet_draft SET log_level= ? WHERE os_id = ?";
         DatabaseOptUtils.doExecuteSql(this, sql, new Object[]{logLevel, osId});
     }
 
     @Override
-    public JSONArray listApiWithRoute(){
+    public JSONArray listApiWithRoute(String topUnit){
         return DatabaseOptUtils.listObjectsBySqlAsJson(this,
-            "select packet_id, route_url, taskType from q_data_packet where route_url is not null");
+            "select a.packet_id, a.route_url, a.taskType " +
+                "from q_data_packet a join f_os_info b on a.os_id = b.os_id " +
+                "where b.top_unit = ? and a.route_url is not null", new Object[]{topUnit});
     }
+
     @Override
     public int clearTrashStand(String osId) {
         String delSql ="DELETE FROM q_data_packet WHERE IS_DISABLE = 'T' AND OS_ID=? ";

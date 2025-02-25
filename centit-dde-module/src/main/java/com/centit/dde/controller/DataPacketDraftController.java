@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.adapter.po.DataPacketDraft;
+import com.centit.dde.routemeta.RouteMetadataService;
 import com.centit.dde.services.DataPacketDraftService;
 import com.centit.dde.services.DataPacketService;
 import com.centit.dde.services.DataPacketTemplateService;
@@ -58,6 +59,9 @@ public class DataPacketDraftController extends ResourceBaseController {
     public String getOptId (){
         return "apiDesgin";
     }
+
+    @Autowired
+    private RouteMetadataService routeMetadataService;
 
     @Autowired
     private DataPacketTemplateService dataPacketTemplateService;
@@ -236,7 +240,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         dataPacketDraft.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacketDraft.setPacketId(packetId);
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
-        dataPacketDraftService.updateDataPacket(dataPacketDraft);
+        dataPacketDraftService.updateDataPacket(WebOptUtils.getCurrentTopUnit(request), dataPacketDraft);
     }
 
     @ApiOperation(value = "API网关发布")
@@ -250,6 +254,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         }
         LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
         dataPacketDraftService.publishDataPacket(dataPacketDraft);
+        routeMetadataService.rebuildMetadataTree(WebOptUtils.getCurrentTopUnit(request));
     }
 
     @ApiOperation(value = "API网关按应用批量发布")
@@ -259,6 +264,7 @@ public class DataPacketDraftController extends ResourceBaseController {
     public void batchPublishByOsId(@PathVariable String osId, HttpServletRequest request) {
         LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, osId, request);
         dataPacketDraftService.batchPublishByOsId(osId);
+        routeMetadataService.rebuildMetadataTree(WebOptUtils.getCurrentTopUnit(request));
     }
 
     @ApiOperation(value = "编辑API网关数据处理描述信息")

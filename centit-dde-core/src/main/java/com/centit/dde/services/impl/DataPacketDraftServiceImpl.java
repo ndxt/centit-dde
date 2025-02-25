@@ -11,6 +11,7 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OptMethod;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.UuidOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -98,9 +99,16 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
 
 
     @Override
-    public void updateDataPacket(DataPacketDraft dataPacketCopy) {
+    public void updateDataPacket(String topUnit, DataPacketDraft dataPacketCopy) {
         Date updateTime = DatetimeOpt.truncateToSecond(DatetimeOpt.currentUtilDate());
         dataPacketCopy.setUpdateDate(updateTime);
+        //校验url是否冲突
+        if(StringUtils.isNotBlank(dataPacketCopy.getRouteUrl())){
+            String packetId = dataPacketDraftDao.getPacketIdByUrl(topUnit, dataPacketCopy.getRouteUrl());
+            if(StringUtils.isNotBlank(packetId) && !StringUtils.equals(packetId, dataPacketCopy.getPacketId())){
+                throw new ObjectException("路由地址已经存在，冲突的接口ID为：" + packetId);
+            }
+        }
         dataPacketDraftDao.updateObject(dataPacketCopy);
         dataPacketDraftDao.saveObjectReferences(dataPacketCopy);
         // update error level

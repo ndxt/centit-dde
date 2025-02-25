@@ -104,4 +104,9 @@ public class DataPacketDraftDaoImpl implements DataPacketDraftDao{
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
             "Runtime 运行时环境，不支持元数据的修改!");
     }
+
+    @Override
+    public String getPacketIdByUrl(String topUnit, String routeUrl) {
+        return "";
+    }
 }

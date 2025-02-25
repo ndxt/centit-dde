@@ -41,4 +41,6 @@ public interface DataPacketDraftDao {
     void updateDataPacketOptJson(String packetId, String dataPacketOptJson);
 
     void publishDataPacket(String optCode, DataPacketDraft dataPacketCopy);
+
+    String getPacketIdByUrl(String topUnit, String routeUrl);
 }
