@@ -72,7 +72,7 @@ public class ApiRouteController extends DoApiController {
     }
 
     /**
-     * url中的 第一个变量为topUnit 形如 /api/topUnt/模块/字模块/方法名
+     * url中的 第一个变量为topUnit 形如 /api/topUnit/模块/字模块/方法名
      * @param request HttpServletRequest
      * @param response HttpServletResponse
      * @throws IOException IO异常
