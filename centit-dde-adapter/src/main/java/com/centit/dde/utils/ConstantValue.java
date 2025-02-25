@@ -72,7 +72,7 @@ public class ConstantValue {
     //获取流程待办组件
     public static final String USER_TASK_WORKFLOW ="userTaskWorkflow";
     public static final String INST_NODES_WORKFLOW ="instNodesWorkFlow";
-
+    public static final String FLOW_INSTANCE_TEAM_VAR="flowInstanceTeamVar";
     public static final String WF_TASK_MANAGER ="taskManager";
     //赋值组件
     public static final String ASSIGNMENT = "assignment";
