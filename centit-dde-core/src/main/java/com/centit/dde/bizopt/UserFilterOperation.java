@@ -27,7 +27,7 @@ import java.util.*;
  */
 public class UserFilterOperation implements BizOperation {
 
-    private PlatformEnvironment platformEnvironment;
+    private final PlatformEnvironment platformEnvironment;
 
     public UserFilterOperation(PlatformEnvironment platformEnvironment){
         this.platformEnvironment = platformEnvironment;

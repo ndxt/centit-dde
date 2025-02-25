@@ -29,11 +29,6 @@ import java.util.Set;
  */
 public class UnitFilterOperation implements BizOperation {
 
-    private PlatformEnvironment platformEnvironment;
-
-    public UnitFilterOperation(PlatformEnvironment platformEnvironment){
-        this.platformEnvironment = platformEnvironment;
-    }
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext){
         String topUnit = StringUtils.isBlank(dataOptContext.getTopUnit())? bizModel.fetchTopUnit() : dataOptContext.getTopUnit();

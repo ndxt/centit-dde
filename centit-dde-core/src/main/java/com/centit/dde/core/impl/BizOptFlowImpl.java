@@ -151,8 +151,9 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("sqlS", new RunSqlOperation(sourceInfoMetadata));
         allOperations.put("SSD", new DocReportOperation(fileInfoOpt));
         allOperations.put("optflow", new OptflowSerialNumberOperation(optFlowNoInfoManager));
-        allOperations.put("unit", new UnitFilterOperation(platformEnvironment));
+        allOperations.put("unit", new UnitFilterOperation(/*platformEnvironment*/));
         allOperations.put("user", new UserFilterOperation(platformEnvironment));
+        allOperations.put("session", new SessionDataOperation(platformEnvironment));
 
         allOperations.put("redisRead", new RedisReadOperation(sourceInfoMetadata));
         allOperations.put("redisWrite", new RedisWriteOperation(sourceInfoMetadata));

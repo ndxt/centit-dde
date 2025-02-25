@@ -17,7 +17,6 @@ public class JoinDataOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
 
-
             String sour1DsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source1", null);
             String sour2DsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source2", null);
             String join = BuiltInOperation.getJsonFieldString(bizOptJson, "operation", "join");
