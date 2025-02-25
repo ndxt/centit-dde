@@ -34,7 +34,7 @@ public class RouteMetadataServiceImpl implements RouteMetadataService {
         try {
             int i = 0, n = uriPieces.length;
             //过滤掉api前面的url，这些可能因为服务的配置不同而不同
-            while (i < n && !"api".equals(uriPieces[i])) {
+            while (i < n && !"gateway".equals(uriPieces[i])) {
                 i++;
             }
             i++;

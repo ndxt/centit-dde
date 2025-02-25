@@ -22,9 +22,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-@Api(value = "api路由", tags = "api路由")
+@Api(value = "api网关", tags = "api网关 - gateway")
 @RestController
-@RequestMapping(value = "api")
+@RequestMapping(value = "gateway")
 public class ApiRouteController extends DoApiController {
 
     @Autowired
