@@ -19,10 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ManageFlowInstanceTeamAndVarOperation implements BizOperation {
+public class ManageFlowTeamAndVarOperation implements BizOperation {
     private FlowEngine flowEngine;
 
-    public ManageFlowInstanceTeamAndVarOperation(FlowEngine flowEngine) {
+    public ManageFlowTeamAndVarOperation(FlowEngine flowEngine) {
         this.flowEngine = flowEngine;
     }
 

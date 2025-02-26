@@ -92,6 +92,9 @@ public class HttpServiceOperation implements BizOperation {
                 timeOut = NumberBaseOpt.castObjectToInteger(extProps.get("timeout"), -1);
             }
             soapNameSpace = extProps.get("soapNameSpace");
+            if(StringUtils.endsWith(soapNameSpace, "/")){
+                soapNameSpace = soapNameSpace.substring(0, soapNameSpace.length() - 1);
+            }
         }
         httpExecutorContext.timout(timeOut);
 
@@ -118,7 +121,10 @@ public class HttpServiceOperation implements BizOperation {
 
         String requestServerAddress = sourceInfo.getDatabaseUrl();
         if(ConstantValue.SOAP_REQUEST_TYPE.equals(requestType)){
-            headers.put("SOAPAction", soapNameSpace + transUrl);
+            if(StringUtils.startsWith(transUrl, "/")){
+                transUrl = transUrl.substring(1);
+            }
+            headers.put("SOAPAction", soapNameSpace + "/" + transUrl);
         } else {
             requestServerAddress = sourceInfo.getDatabaseUrl() + transUrl;
         }
@@ -151,11 +157,9 @@ public class HttpServiceOperation implements BizOperation {
         //请求方式
         String requestMode = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post").toLowerCase();
         HttpReceiveJSON receiveJson = null;
-
         switch (requestMode) {
             case "post":
             case "put":
-
                 if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)) { // 发送文件（附件）的请求
                     String source = bizOptJson.getString("source");
                     DataSet dataSet = bizModel.getDataSet(source);
