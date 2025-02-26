@@ -25,7 +25,7 @@ public class SessionDataOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
-        String userNameValue = bizOptJson.getString("userName");
+        String userNameValue = bizOptJson.getString("userId");
         String userName = StringBaseOpt.castObjectToString(
             JSONTransformer.transformer(userNameValue, new BizModelJSONTransform(bizModel)));
         if(StringUtils.isBlank(userName)){
