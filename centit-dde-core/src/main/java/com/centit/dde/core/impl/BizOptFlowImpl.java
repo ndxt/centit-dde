@@ -216,6 +216,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("sqliteIn", new SqliteImportOperation(this.appHome));
         allOperations.put("sqliteOut", new SqliteExportOperation(this.appHome));
         allOperations.put("signature", new SignatureVerifyOperation());
+        //拼接文件、图片
+        allOperations.put("mergeFile", new MergeFileOperation());
         //压缩和解压
         allOperations.put("zip", new ZipUnzipOperation(this.appHome));
 
