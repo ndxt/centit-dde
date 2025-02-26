@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class SubmitWorkFlowBizOperation implements BizOperation {
+public class SubmitWorkFlowOperation implements BizOperation {
 
     private FlowEngine flowEngine;
 
-    public SubmitWorkFlowBizOperation(FlowEngine flowEngine) {
+    public SubmitWorkFlowOperation(FlowEngine flowEngine) {
         this.flowEngine = flowEngine;
     }
 

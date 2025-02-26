@@ -16,12 +16,12 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author zhf
  */
-public class ManagerWorkFlowBizOperation implements BizOperation {
+public class ManagerWorkFlowOperation implements BizOperation {
 
     private FlowManager flowManager;
     private FlowEngine flowEngine;
 
-    public ManagerWorkFlowBizOperation(FlowManager flowManager, FlowEngine flowEngine) {
+    public ManagerWorkFlowOperation(FlowManager flowManager, FlowEngine flowEngine) {
         this.flowEngine = flowEngine;
         this.flowManager = flowManager;
     }

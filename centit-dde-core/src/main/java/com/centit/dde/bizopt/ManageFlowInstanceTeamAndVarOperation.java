@@ -1,19 +1,15 @@
 package com.centit.dde.bizopt;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
-import com.centit.dde.core.DataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
-import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
-import com.centit.workflow.commons.SubmitOptOptions;
 import com.centit.workflow.service.FlowEngine;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutableTriple;
@@ -22,12 +18,11 @@ import org.apache.commons.lang3.tuple.Triple;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-public class ManageFlowInstanceTeamAndVarBizOperation implements BizOperation {
+public class ManageFlowInstanceTeamAndVarOperation implements BizOperation {
     private FlowEngine flowEngine;
 
-    public ManageFlowInstanceTeamAndVarBizOperation(FlowEngine flowEngine) {
+    public ManageFlowInstanceTeamAndVarOperation(FlowEngine flowEngine) {
         this.flowEngine = flowEngine;
     }
 

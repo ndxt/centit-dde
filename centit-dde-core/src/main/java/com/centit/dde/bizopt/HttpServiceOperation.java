@@ -23,6 +23,7 @@ import com.centit.support.compiler.Pretreatment;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.json.JSONTransformer;
 import com.centit.support.network.*;
+import com.centit.support.xml.XMLObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -38,6 +39,7 @@ import java.util.Map;
 
 /**
  * @author zhf
+ * @author codefan 2019-09-05
  */
 public class HttpServiceOperation implements BizOperation {
     private SourceInfoMetadata sourceInfoMetadata;
@@ -66,35 +68,30 @@ public class HttpServiceOperation implements BizOperation {
 
         String transUrl = Pretreatment.mapTemplateString(interfaceAddress, new BizModelJSONTransform(bizModel));
         if(StringUtils.isNotBlank(transUrl)){
-            interfaceAddress = transUrl;
+            transUrl = interfaceAddress;
         }
-        String requestServerAddress = sourceInfo.getDatabaseUrl() + interfaceAddress;
 
         //构建请求头数据
         Map<String, String> headers = new HashMap<>();
-        /* 这个不能使用这个  x-auth-token ; 感觉不合理
-        HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
-        if (request != null) {
-            HttpSession session = request.getSession();
-            headers.put(WebOptUtils.SESSION_ID_TOKEN, session == null ? null : session.getId());
-        }*/
-
+        String requestType = BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
+        String soapNameSpace = null;
         HttpExecutorContext httpExecutorContext = getHttpClientContext(sourceInfo);
         int timeOut = NumberBaseOpt.castObjectToInteger(bizOptJson.get("timeout"), -1);
 
         if (sourceInfo.getExtProps() != null) {
             Map<String, String> extProps = CollectionsOpt.objectMapToStringMap(sourceInfo.getExtProps());
             for(Map.Entry<String, String> ent : extProps.entrySet()) {
-                if(StringUtils.equalsAnyIgnoreCase(ent.getKey(),
-                    "Content-Type", "Accept", "Accept-Encoding", "Accept-Language", "Connection",
+                if(StringUtils.equalsAnyIgnoreCase(ent.getKey(), //"Content-Type",
+                    "Accept", "Accept-Encoding", "Accept-Language", "Connection",
                     "Host", "User-Agent", "Cache-Control", "Date", "Pragma",
                     "Trailer", "Transfer-Encoding", "Via", "Referer", "Cookie")) {
                     headers.put(ent.getKey(), ent.getValue());
                 }
             }
-            if(timeOut== -1){
+            if(timeOut == -1){
                 timeOut = NumberBaseOpt.castObjectToInteger(extProps.get("timeout"), -1);
             }
+            soapNameSpace = extProps.get("soapNameSpace");
         }
         httpExecutorContext.timout(timeOut);
 
@@ -113,12 +110,20 @@ public class HttpServiceOperation implements BizOperation {
                 }
             }
         }
+
         Map<String, Object> localHeaders = getRequestParams(bizOptJson, bizModel, "headList", "headName", "headValue");
         if(!localHeaders.isEmpty()){
             headers.putAll(CollectionsOpt.objectMapToStringMap(localHeaders));
         }
-        httpExecutorContext.headers(headers);
 
+        String requestServerAddress = sourceInfo.getDatabaseUrl();
+        if(ConstantValue.SOAP_REQUEST_TYPE.equals(requestType)){
+            headers.put("SOAPAction", soapNameSpace + transUrl);
+        } else {
+            requestServerAddress = sourceInfo.getDatabaseUrl() + transUrl;
+        }
+
+        httpExecutorContext.headers(headers);
         //构建请求cookies
         Map<String, String> cookies = new HashMap<>();
         boolean inheritCookies = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("inheritCookie"), false);
@@ -146,11 +151,11 @@ public class HttpServiceOperation implements BizOperation {
         //请求方式
         String requestMode = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post").toLowerCase();
         HttpReceiveJSON receiveJson = null;
-        String requestType;
+
         switch (requestMode) {
             case "post":
             case "put":
-                requestType = BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
+
                 if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)) { // 发送文件（附件）的请求
                     String source = bizOptJson.getString("source");
                     DataSet dataSet = bizModel.getDataSet(source);
@@ -178,10 +183,12 @@ public class HttpServiceOperation implements BizOperation {
                         if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPut(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
-                        } /*else if (ConstantValue.SOAP_REQUEST_TYPE.equals(requestType)) {
-                            // WEB SERVICE 请求
-
-                        } */else {
+                        } else if (ConstantValue.SOAP_REQUEST_TYPE.equals(requestType)) {
+                            // WEB SERVICE 请求， 对返回的内容进行 处理
+                            String xmlEntity = buildSoapXml(soapNameSpace, transUrl, requestBody, requestParams);
+                            receiveJson = HttpReceiveJSON.dataOf(XMLObject.xmlStringToObject(
+                                HttpExecutor.xmlPut(httpExecutorContext, requestServerAddress, xmlEntity)));
+                        } else {
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
                         }
@@ -189,6 +196,11 @@ public class HttpServiceOperation implements BizOperation {
                         if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPost(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
+                        } else if (ConstantValue.SOAP_REQUEST_TYPE.equals(requestType)) {
+                            // WEB SERVICE 请求， 对返回的内容进行 处理
+                            String xmlEntity = buildSoapXml(soapNameSpace, transUrl, requestBody, requestParams);
+                            receiveJson = HttpReceiveJSON.dataOf(XMLObject.xmlStringToObject(
+                                HttpExecutor.xmlPost(httpExecutorContext, requestServerAddress, xmlEntity)));
                         } else {
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
@@ -232,6 +244,21 @@ public class HttpServiceOperation implements BizOperation {
         }
     }
 
+    private String buildSoapXml(String soapNameSpace, String actionName, Object requestBody, Map<String, Object> requestParams){
+        String xmlBoday;
+        if(requestBody instanceof Map){
+            xmlBoday = XMLObject.objectToXMLString("act:"+actionName, requestBody, false, false);
+        } else {
+            xmlBoday = XMLObject.objectToXMLString("act:"+actionName, requestParams, false, false);
+        }
+        StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+        sb.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" ")
+            .append("xmlns:act=\"").append(soapNameSpace).append("\" >")
+            .append("<soapenv:Header/> <soapenv:Body/>");
+        sb.append(xmlBoday);
+        sb.append("</soapenv:Body> </soapenv:Envelope>");
+        return sb.toString();
+    }
     private HttpExecutorContext getHttpClientContext(SourceInfo databaseInfo) throws Exception {
         if (databaseInfo != null) {
             HttpExecutorContext executorContext = AbstractSourceConnectThreadHolder.fetchHttpContext(databaseInfo);
@@ -256,6 +283,7 @@ public class HttpServiceOperation implements BizOperation {
         }
         return mapObject;
     }
+
     //计算请求参数列表中的参数
     private Map<String, Object> getRequestParams(JSONObject bizOptJson, BizModel bizModel) {
         return getRequestParams(bizOptJson, bizModel, "parameterList", "urlname", "urlValue");
@@ -276,7 +304,6 @@ public class HttpServiceOperation implements BizOperation {
     }
 
     private FileDataSet fetchFileDataSetByUrl(HttpExecutorContext executorContext, String uri, Map<String, Object> queryParam) throws IOException {
-
         HttpGet httpGet = new HttpGet(UrlOptUtils.appendParamsToUrl(uri, queryParam));
         CloseableHttpClient httpClient = null;
         boolean createSelfClient = executorContext.getHttpclient() == null;
@@ -289,9 +316,7 @@ public class HttpServiceOperation implements BizOperation {
         }
         // 添加对应的参数设置
         HttpExecutor.prepareHttpRequest(executorContext, httpGet);
-
         try (CloseableHttpResponse response = httpClient.execute(httpGet, executorContext.getHttpContext())) {
-
             Header[] contentTypeHeader = response.getHeaders("Content-Type");
             if (contentTypeHeader == null || contentTypeHeader.length < 1 ||
                 StringUtils.indexOf(
@@ -301,13 +326,11 @@ public class HttpServiceOperation implements BizOperation {
                     .handleResponse(response);
                 throw new ObjectException(responseContent);
             }
-
             String fileName = HttpExecutor.extraFileName(response);
             if(StringUtils.isBlank(fileName)){
                 fileName = UrlOptUtils.fetchFilenameFromUrl(uri);
             }
             FileDataSet fileDataSet = new FileDataSet();
-
             try (InputStream inputStream = InputStreamResponseHandler.INSTANCE
                 .handleResponse(response)) {
                 int fileSize = inputStream.available();
