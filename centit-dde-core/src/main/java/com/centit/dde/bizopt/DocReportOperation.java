@@ -1,5 +1,7 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -9,11 +11,13 @@ import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.file.FileIOOpt;
+import com.centit.support.json.JSONTransformer;
 import com.centit.support.report.JsonDocxContext;
 import fr.opensagres.xdocreport.core.XDocReportException;
 import fr.opensagres.xdocreport.document.IXDocReport;
@@ -25,6 +29,7 @@ import fr.opensagres.xdocreport.template.formatter.FieldsMetadata;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -47,14 +52,30 @@ public class DocReportOperation implements BizOperation {
             BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()),
             new BizModelJSONTransform(bizModel));
         if(transToPdf){
-            if(! StringUtils.endsWithIgnoreCase(fileName, ".pdf"))
+            if(! StringUtils.endsWithIgnoreCase(fileName, ".pdf")) {
                 fileName = fileName +".pdf";
+            }
         } else {
-            if(! StringUtils.endsWithIgnoreCase(fileName, ".docx"))
+            if(! StringUtils.endsWithIgnoreCase(fileName, ".docx")) {
                 fileName = fileName +".docx";
+            }
         }
-        Map<String, String> params = BuiltInOperation.jsonArrayToMap(bizOptJson.getJSONArray("config"),
-            "columnName", "cName");
+        JSONArray fieldInfos = bizOptJson.getJSONArray("config");
+        Map<String, String> params =new HashMap<>();
+        if (fieldInfos != null) {
+            for (Object fieldInfo : fieldInfos) {
+                if (fieldInfo instanceof Map) {
+                    Map<String, Object> map = CollectionsOpt.objectToMap(fieldInfo);
+                    String columnName = StringBaseOpt.objectToString(map.get("columnName"));
+                    String expression = StringBaseOpt.objectToString(map.get("expression"));
+                    if (StringUtils.isBlank(expression)) {
+                        continue;
+                    }
+                    String value = StringBaseOpt.objectToString(JSONTransformer.transformer(expression, bizModel));
+                    params.put(columnName, value);
+                }
+            }
+        }
         ByteArrayInputStream in = generateWord(bizModel, fileId, params);
 
         FileDataSet dataSet = transToPdf? new FileDataSet(fileName,
@@ -72,44 +93,17 @@ public class DocReportOperation implements BizOperation {
                 i++;
                 String imageName = map.getKey();
                 String fileFieldPath = map.getValue();
-                int namePos = imageName.indexOf("[*]");
-                int pathPos = fileFieldPath.indexOf("[*]");
-                if (namePos > 0 && pathPos > 0) {
-                    //数组通配符; 目前只能做一维数组，也就是只有一个通配符
-                    String nameH = imageName.substring(0, namePos);
-                    String nameT = imageName.substring(namePos + 3);
-                    String pathH = fileFieldPath.substring(0, pathPos);
-                    String pathT = fileFieldPath.substring(pathPos + 3);
-                    int j = 0;
-                    while (true) {
-                        Object fieldValue = ReflectionOpt.attainExpressionValue(docData, pathH + "[" + j + "]" + pathT);
-                        if (fieldValue == null) {
-                            break;
-                        }
-                        addImageMeta(metadata, docData, fieldValue, nameH + "_" + j + "_" + nameT, "image_" + i + "_" + j);
-                        j++;
-                    }
-                } else {
-                    Object fieldValue = ReflectionOpt.attainExpressionValue(docData, fileFieldPath);
-                    if (fieldValue != null) {
-                        addImageMeta(metadata, docData, fieldValue, imageName, "image_" + i);
-                    }
+                addImageMeta(metadata, docData, fileFieldPath, imageName, "image_" + i);
                 }
             }
-        }
         return metadata;
     }
 
-    private void addImageMeta(FieldsMetadata metadata, JSONObject docData, Object fieldValue,
+    private void addImageMeta(FieldsMetadata metadata, JSONObject docData, String fieldValue,
                               String imageName, String placeholder) throws Exception {
         metadata.addFieldAsImage(imageName, placeholder);
         //书签，数据集+img_+图片字段
-        if (fieldValue instanceof byte[]) {
-            docData.put(placeholder, new ByteArrayImageProvider((byte[]) fieldValue));
-        } else if (fieldValue instanceof String) {
-            String fileId = StringBaseOpt.castObjectToString(fieldValue);
-            docData.put(placeholder, new ByteArrayImageProvider(FileIOOpt.readBytesFromFile(fileInfoOpt.getFile(fileId))));
-        }
+        docData.put(placeholder, new ByteArrayImageProvider(FileIOOpt.readBytesFromFile(fileInfoOpt.getFile(fieldValue))));
     }
 
     private ByteArrayInputStream generateWord(BizModel dataModel, String fileId, Map<String, String> params) throws Exception {

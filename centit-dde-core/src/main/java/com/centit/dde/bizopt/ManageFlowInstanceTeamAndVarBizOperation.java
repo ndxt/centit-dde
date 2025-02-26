@@ -53,7 +53,7 @@ public class ManageFlowInstanceTeamAndVarBizOperation implements BizOperation {
             Object expression = roleMap.get("expression");
             if (expression != null) {
                 List<String> userCodeSet = StringBaseOpt.objectToStringList(JSONTransformer.transformer(expression, bizModelJSONTransform));
-                flowEngine.assignFlowWorkTeam(flowInstId, roleCode, userCodeSet);
+                flowRoleUsers.put(roleCode, userCodeSet);
             }
         }
         flowEngine.updateFlowInstanceTeamAndVar(flowInstId, flowVariables, flowRoleUsers);
