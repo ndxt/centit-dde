@@ -12,11 +12,11 @@ import com.centit.support.json.JSONTransformer;
 import com.centit.workflow.service.FlowManager;
 import org.apache.commons.lang3.StringUtils;
 
-public class DeleteWorkFlowBizOperation implements BizOperation {
+public class DeleteWorkFlowOperation implements BizOperation {
 
     private FlowManager flowManager;
 
-    public DeleteWorkFlowBizOperation(FlowManager flowManager) {
+    public DeleteWorkFlowOperation(FlowManager flowManager) {
         this.flowManager=flowManager;
     }
 

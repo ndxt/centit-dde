@@ -185,24 +185,24 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put(ConstantValue.ASSIGNMENT, new AssignmentOperation());
 
         //注册查询操作类
-        allOperations.put(ConstantValue.CREATE_WORKFLOW, new CreateWorkFlowBizOperation(flowEngine));
+        allOperations.put(ConstantValue.CREATE_WORKFLOW, new CreateWorkFlowOperation(flowEngine));
         //注册插入操作类
-        allOperations.put(ConstantValue.SUBMIT_WORKFLOW, new SubmitWorkFlowBizOperation(flowEngine));
-        allOperations.put(ConstantValue.FLOW_INSTANCE_TEAM_VAR,new ManageFlowInstanceTeamAndVarBizOperation(flowEngine));
+        allOperations.put(ConstantValue.SUBMIT_WORKFLOW, new SubmitWorkFlowOperation(flowEngine));
+        allOperations.put(ConstantValue.FLOW_INSTANCE_TEAM_VAR,new ManageFlowInstanceTeamAndVarOperation(flowEngine));
         //注册删除节点
-        allOperations.put(ConstantValue.DELETE_WORKFLOW, new DeleteWorkFlowBizOperation(flowManager));
+        allOperations.put(ConstantValue.DELETE_WORKFLOW, new DeleteWorkFlowOperation(flowManager));
 
-        allOperations.put(ConstantValue.MANAGER_WORKFLOW, new ManagerWorkFlowBizOperation(flowManager, flowEngine));
+        allOperations.put(ConstantValue.MANAGER_WORKFLOW, new ManagerWorkFlowOperation(flowManager, flowEngine));
         //注册查询待办节点
-        allOperations.put(ConstantValue.USER_TASK_WORKFLOW, new WorkFlowUserTaskBizOperation(flowEngine));
-        allOperations.put(ConstantValue.INST_NODES_WORKFLOW, new WorkFlowInstNodesBizOperation(flowManager));
+        allOperations.put(ConstantValue.USER_TASK_WORKFLOW, new WorkFlowUserTaskOperation(flowEngine));
+        allOperations.put(ConstantValue.INST_NODES_WORKFLOW, new WorkFlowInstNodesOperation(flowManager));
 
         allOperations.put(ConstantValue.WF_TASK_MANAGER, new WorkFlowTaskManagerOperation(flowManager));
 
         //注册FTP下载组件
-        allOperations.put(ConstantValue.FTP_FILE_DOWNLOAD,new FtpDownloadOperationUtil(sourceInfoMetadata));
+        allOperations.put(ConstantValue.FTP_FILE_DOWNLOAD,new FtpDownloadOperation(sourceInfoMetadata));
         //注册FTP上传组件
-        allOperations.put(ConstantValue.FTP_FILE_UPLOAD,new FtpUploadOperationUtil(sourceInfoMetadata));
+        allOperations.put(ConstantValue.FTP_FILE_UPLOAD,new FtpUploadOperation(sourceInfoMetadata));
 
         //注册查询操作类
         allOperations.put(ConstantValue.ELASTICSEARCH_QUERY,

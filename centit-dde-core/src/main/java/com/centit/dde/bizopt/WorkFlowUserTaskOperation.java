@@ -27,11 +27,11 @@ import java.util.Map;
 /**
  * 获取工作流待办组件
  */
-public class WorkFlowUserTaskBizOperation implements BizOperation {
+public class WorkFlowUserTaskOperation implements BizOperation {
 
     private FlowEngine flowEngine;
 
-    public WorkFlowUserTaskBizOperation(FlowEngine flowEngine) {
+    public WorkFlowUserTaskOperation(FlowEngine flowEngine) {
         this.flowEngine = flowEngine;
     }
 

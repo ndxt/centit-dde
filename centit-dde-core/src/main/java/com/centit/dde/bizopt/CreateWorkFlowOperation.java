@@ -27,11 +27,11 @@ import java.util.Set;
 /**
  * 创建工作流节点
  */
-public class CreateWorkFlowBizOperation implements BizOperation {
+public class CreateWorkFlowOperation implements BizOperation {
 
     private FlowEngine flowEngine;
 
-    public CreateWorkFlowBizOperation(FlowEngine flowEngine) {
+    public CreateWorkFlowOperation(FlowEngine flowEngine) {
         this.flowEngine = flowEngine;
     }
 

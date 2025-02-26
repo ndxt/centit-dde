@@ -24,11 +24,11 @@ import java.util.Map;
 /**
  * 获取流程实列组件
  */
-public class WorkFlowInstNodesBizOperation implements BizOperation {
+public class WorkFlowInstNodesOperation implements BizOperation {
 
     private FlowManager flowManager;
 
-    public WorkFlowInstNodesBizOperation(FlowManager flowManager) {
+    public WorkFlowInstNodesOperation(FlowManager flowManager) {
         this.flowManager = flowManager;
     }
 

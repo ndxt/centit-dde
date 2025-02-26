@@ -18,9 +18,9 @@ import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 
-public class FtpUploadOperationUtil extends FtpOperationUtil implements BizOperation {
+public class FtpUploadOperation extends FtpOperationUtil implements BizOperation {
 
-    public FtpUploadOperationUtil(SourceInfoMetadata sourceInfoMetadata) {
+    public FtpUploadOperation(SourceInfoMetadata sourceInfoMetadata) {
         super(sourceInfoMetadata);
     }
 

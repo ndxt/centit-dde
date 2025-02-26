@@ -21,9 +21,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class FtpDownloadOperationUtil extends FtpOperationUtil implements BizOperation {
+public class FtpDownloadOperation extends FtpOperationUtil implements BizOperation {
 
-    public FtpDownloadOperationUtil(SourceInfoMetadata sourceInfoMetadata){
+    public FtpDownloadOperation(SourceInfoMetadata sourceInfoMetadata){
         super(sourceInfoMetadata);
     }
     @Override
