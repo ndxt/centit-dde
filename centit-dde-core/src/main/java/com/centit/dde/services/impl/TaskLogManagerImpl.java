@@ -6,8 +6,6 @@ import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.services.TaskLogManager;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.vo.DelTaskLogParameter;
-import com.centit.dde.vo.StatisticsParameter;
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.database.utils.PageDesc;
@@ -16,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -83,9 +82,8 @@ public class TaskLogManagerImpl implements TaskLogManager {
     }
 
     @Override
-    public Map<String, Object> getLogStatisticsInfo(StatisticsParameter parameter) {
-        Map<String, Object> queryparameter = CollectionsOpt.objectToMap(parameter);
-        return taskLogDao.getLogStatisticsInfo(queryparameter);
+    public Map<String, Long> statApiCallSumByHour(String taskId, Date startDate, Date endDate) {
+        return taskLogDao.statApiCallSumByHour(taskId, startDate, endDate);
     }
 
     @Override

@@ -30,7 +30,7 @@ public interface CallApiLogDao {
 
     List<Map<String, Object>> listLogsByProperties(Map<String, Object> param, PageDesc pageDesc);
 
-    Map<String, Object> getLogStatisticsInfo(Map<String, Object> queryparameter);
+    Map<String, Long> statApiCallSumByHour(String taskId, Date startDate, Date endDate);
 
     int deleteTaskLog(String packetId, Date runBeginTime, boolean isError);
 }

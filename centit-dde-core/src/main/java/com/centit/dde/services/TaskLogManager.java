@@ -3,9 +3,9 @@ package com.centit.dde.services;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.vo.DelTaskLogParameter;
-import com.centit.dde.vo.StatisticsParameter;
 import com.centit.support.database.utils.PageDesc;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +42,7 @@ public interface TaskLogManager{
 
     void deleteTaskLogById(String logId);
 
-    Map<String,Object> getLogStatisticsInfo(StatisticsParameter parameter);
+    Map<String, Long> statApiCallSumByHour(java.lang.String taskId, Date startDate, Date endDate);
 
     int deleteTaskLog(DelTaskLogParameter delTaskLogParameter);
 

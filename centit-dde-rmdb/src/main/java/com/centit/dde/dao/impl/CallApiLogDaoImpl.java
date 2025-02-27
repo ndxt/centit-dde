@@ -13,12 +13,31 @@ import com.centit.search.service.IndexerSearcherFactory;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.lang3.tuple.Pair;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.ParsedValueCount;
+import org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +61,6 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         this.callApiLogDetailIndexer = IndexerSearcherFactory.obtainIndexer(esServerConfig, CallApiLogDetails.class);
         this.callApiLogDetailSearcher = IndexerSearcherFactory.obtainSearcher(esServerConfig, CallApiLogDetails.class);
     }
-
 
     @Override
     public void saveLog(CallApiLog callApiLog) {
@@ -112,8 +130,49 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
     }
 
     @Override
-    public Map<String, Object> getLogStatisticsInfo(Map<String, Object> queryparameter) {
-         return null;
+    public Map<String, Long> statApiCallSumByHour(String taskId, Date startDate, Date endDate){
+        SearchRequest searchRequest = new SearchRequest("callapilog");
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        // 构建过滤条件
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.termQuery("taskId", taskId));
+
+        RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("runBeginTime")
+            .gte(startDate)
+            .lte(endDate);
+        boolQuery.must(rangeQuery);
+
+        sourceBuilder.query(boolQuery);
+
+        // 构建聚合
+        DateHistogramAggregationBuilder dateHistogramAggregation = AggregationBuilders.dateHistogram("hourly")
+            .field("runBeginTime")
+            .interval(360000L);
+        ValueCountAggregationBuilder countAggregation = AggregationBuilders.count("count").field("taskId");
+        dateHistogramAggregation.subAggregation(countAggregation);
+
+        sourceBuilder.aggregation(dateHistogramAggregation);
+
+        searchRequest.source(sourceBuilder);
+        RestHighLevelClient client = null;
+        Map<String, Long> result = new HashMap<>();
+        try {
+            client = callApiLogSearcher.fetchClient(); // 假设 ESSearcher 有 getClient 方法
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            Histogram hourlyHistogram = searchResponse.getAggregations().get("hourly");
+            for (Histogram.Bucket hourlyBucket : hourlyHistogram.getBuckets()) {
+                String keyAsString = hourlyBucket.getKeyAsString();
+                ParsedValueCount count = hourlyBucket.getAggregations().get("count");
+                result.put(keyAsString, count.getValue());
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            if (client != null) {
+                callApiLogSearcher.releaseClient(client);
+            }
+        }
+        return result;
     }
 
     @Override

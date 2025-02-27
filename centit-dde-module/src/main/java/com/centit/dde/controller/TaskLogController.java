@@ -5,11 +5,11 @@ import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.services.TaskLogManager;
 import com.centit.dde.vo.DelTaskLogParameter;
-import com.centit.dde.vo.StatisticsParameter;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -74,11 +75,14 @@ public class TaskLogController extends BaseController {
         return taskLogManager.listLogDetails(logId);
     }
 
-    @PostMapping(value = "/statistics")
+    @GetMapping(value = "/callByHour")
     @ApiOperation(value = "日志统计")
     @WrapUpResponseBody
-    public Map<String, Object> getLogStatisticsInfo(@RequestBody StatisticsParameter parameter){
-        return taskLogManager.getLogStatisticsInfo(parameter);
+    public Map<String, Long> getLogStatisticsInfo(String taskId){
+        Date currentDate = DatetimeOpt.currentUtilDate();
+        return taskLogManager.statApiCallSumByHour(taskId,
+            DatetimeOpt.addDays(currentDate,-1),
+            currentDate );
     }
 
     @PostMapping(value = "delLogInfoAndLogDetail")
