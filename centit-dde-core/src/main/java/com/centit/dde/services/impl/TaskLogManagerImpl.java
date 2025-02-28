@@ -1,5 +1,6 @@
 package com.centit.dde.services.impl;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.adapter.dao.CallApiLogDao;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
@@ -82,7 +83,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
     }
 
     @Override
-    public Map<String, Long> statApiCallSumByHour(String taskId, Date startDate, Date endDate) {
+    public JSONArray statApiCallSumByHour(String taskId, Date startDate, Date endDate) {
         return taskLogDao.statApiCallSumByHour(taskId, startDate, endDate);
     }
 

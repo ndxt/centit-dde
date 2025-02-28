@@ -13,6 +13,7 @@ import com.centit.search.service.IndexerSearcherFactory;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.lang3.tuple.Pair;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -22,13 +23,9 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
-import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.ParsedValueCount;
-import org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.ParsedSum;
+import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +34,6 @@ import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -130,9 +126,10 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
     }
 
     @Override
-    public Map<String, Long> statApiCallSumByHour(String taskId, Date startDate, Date endDate){
+    public JSONArray statApiCallSumByHour(String taskId, Date startDate, Date endDate){
         SearchRequest searchRequest = new SearchRequest("callapilog");
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
         // 构建过滤条件
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         boolQuery.must(QueryBuilders.termQuery("taskId", taskId));
@@ -147,31 +144,39 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         // 构建聚合
         DateHistogramAggregationBuilder dateHistogramAggregation = AggregationBuilders.dateHistogram("hourly")
             .field("runBeginTime")
-            .interval(360000L);
-        ValueCountAggregationBuilder countAggregation = AggregationBuilders.count("count").field("taskId");
-        dateHistogramAggregation.subAggregation(countAggregation);
+            .interval(3600000L) // 3600000 milliseconds = 1 hour
+            .format("yyyy-MM-dd'T'HH:mm:ss.SSSZ"); // 明确日期格式
+
+        SumAggregationBuilder errorPiecesSum = AggregationBuilders.sum("errorPiecesSum").field("errorPieces");
+        SumAggregationBuilder successPiecesSum = AggregationBuilders.sum("successPiecesSum").field("successPieces");
+
+        dateHistogramAggregation.subAggregation(errorPiecesSum);
+        dateHistogramAggregation.subAggregation(successPiecesSum);
 
         sourceBuilder.aggregation(dateHistogramAggregation);
 
         searchRequest.source(sourceBuilder);
-        RestHighLevelClient client = null;
-        Map<String, Long> result = new HashMap<>();
-        try {
-            client = callApiLogSearcher.fetchClient(); // 假设 ESSearcher 有 getClient 方法
+
+        JSONArray result = new JSONArray();
+        try (RestHighLevelClient client = callApiLogSearcher.fetchClient()) { // 使用 try-with-resources
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
             Histogram hourlyHistogram = searchResponse.getAggregations().get("hourly");
             for (Histogram.Bucket hourlyBucket : hourlyHistogram.getBuckets()) {
                 String keyAsString = hourlyBucket.getKeyAsString();
-                ParsedValueCount count = hourlyBucket.getAggregations().get("count");
-                result.put(keyAsString, count.getValue());
+                ParsedSum errorPiecesValue = hourlyBucket.getAggregations().get("errorPiecesSum");
+                ParsedSum successPiecesValue = hourlyBucket.getAggregations().get("successPiecesSum");
+
+                JSONObject sums = new JSONObject();
+                sums.put("runBeginTime", keyAsString); // hourly
+                sums.put("errorPieces", errorPiecesValue.getValue());
+                sums.put("successPieces", successPiecesValue.getValue());
+
+                result.add(sums);
             }
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            if (client != null) {
-                callApiLogSearcher.releaseClient(client);
-            }
+        } catch (IOException | ElasticsearchException e) { // 捕获更广泛的异常
+            logger.error("Error occurred while processing task ID: {}, start date: {}, end date: {}", taskId, startDate, endDate, e);
         }
+
         return result;
     }
 

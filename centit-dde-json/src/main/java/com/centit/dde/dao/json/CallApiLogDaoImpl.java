@@ -1,6 +1,7 @@
 package com.centit.dde.dao.json;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.adapter.dao.CallApiLogDao;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
@@ -64,7 +65,7 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
     }
 
     @Override
-    public Map<String, Long> statApiCallSumByHour(String taskId, Date startDate, Date endDate){
+    public JSONArray statApiCallSumByHour(String taskId, Date startDate, Date endDate){
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
             "Runtime 运行时环境，无法统计运行日志!");
     }

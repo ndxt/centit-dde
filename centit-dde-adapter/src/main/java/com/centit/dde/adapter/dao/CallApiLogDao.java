@@ -1,5 +1,6 @@
 package com.centit.dde.adapter.dao;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.support.database.utils.PageDesc;
@@ -30,7 +31,7 @@ public interface CallApiLogDao {
 
     List<Map<String, Object>> listLogsByProperties(Map<String, Object> param, PageDesc pageDesc);
 
-    Map<String, Long> statApiCallSumByHour(String taskId, Date startDate, Date endDate);
+    JSONArray statApiCallSumByHour(String taskId, Date startDate, Date endDate);
 
     int deleteTaskLog(String packetId, Date runBeginTime, boolean isError);
 }

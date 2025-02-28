@@ -1,5 +1,6 @@
 package com.centit.dde.services;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.vo.DelTaskLogParameter;
@@ -42,7 +43,7 @@ public interface TaskLogManager{
 
     void deleteTaskLogById(String logId);
 
-    Map<String, Long> statApiCallSumByHour(java.lang.String taskId, Date startDate, Date endDate);
+    JSONArray statApiCallSumByHour(java.lang.String taskId, Date startDate, Date endDate);
 
     int deleteTaskLog(DelTaskLogParameter delTaskLogParameter);
 

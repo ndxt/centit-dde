@@ -1,5 +1,6 @@
 package com.centit.dde.controller;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
@@ -78,7 +79,7 @@ public class TaskLogController extends BaseController {
     @GetMapping(value = "/callByHour")
     @ApiOperation(value = "日志统计")
     @WrapUpResponseBody
-    public Map<String, Long> getLogStatisticsInfo(String taskId){
+    public JSONArray getLogStatisticsInfo(String taskId){
         Date currentDate = DatetimeOpt.currentUtilDate();
         return taskLogManager.statApiCallSumByHour(taskId,
             DatetimeOpt.addDays(currentDate,-1),
