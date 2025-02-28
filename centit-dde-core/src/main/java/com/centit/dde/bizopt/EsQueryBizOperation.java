@@ -209,10 +209,14 @@ public class EsQueryBizOperation implements BizOperation {
             for (int i = 0; i < sortColumns.size(); i++) {
                 JSONObject sortField = sortColumns.getJSONObject(i);
                 String sortColumnName = sortField.getString("sortColumnName");
-                Object sortValue = DataSetOptUtil.fetchFieldValue(transform, sortField.getString("sortValue"));
-                if (StringUtils.isNotBlank(sortColumnName) && sortValue != null) {
+                String sortType = sortField.getString("sortValue");
+                if(StringUtils.isNotBlank(sortType) && !StringUtils.equalsAnyIgnoreCase(sortType, "ASC", "DESC")) {
+                    sortType = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform, sortType));
+                }
+                //默认升序
+                if (StringUtils.isNotBlank(sortColumnName) /*&& StringUtils.isNotBlank(sortType)*/) {
                     FieldSortBuilder order = SortBuilders.fieldSort(sortColumnName).order(
-                        "DESC".equals(sortValue) ? SortOrder.DESC : SortOrder.ASC);
+                        "DESC".equalsIgnoreCase(sortType) ? SortOrder.DESC : SortOrder.ASC);
                     sorts.add(order);
                 }
             }
