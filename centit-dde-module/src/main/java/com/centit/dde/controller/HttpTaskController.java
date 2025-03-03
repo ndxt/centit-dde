@@ -36,7 +36,6 @@ public class HttpTaskController extends DoApiController {
     /**
      * 草稿-----------请求方法
      */
-
     @GetMapping(value = "/draft/{packetId}")
     @ApiOperation(value = "草稿：立即执行任务GET")
     public void runGetDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,

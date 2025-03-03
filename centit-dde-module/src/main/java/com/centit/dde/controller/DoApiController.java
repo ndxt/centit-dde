@@ -109,7 +109,8 @@ public abstract class DoApiController extends BaseController {
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED,
                 getI18nMessage("dde.405.request_type_not_match", request, packetId));
         }
-        if (dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()) {
+        if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)
+            && dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()) {
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED,
                 getI18nMessage("dde.405.api_is_disable", request, packetId));
         }
