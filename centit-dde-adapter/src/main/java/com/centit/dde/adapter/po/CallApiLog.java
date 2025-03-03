@@ -106,6 +106,9 @@ public class CallApiLog implements ESDocument, Serializable {
 
     public CallApiLog(){
         this.stepNo = 0;
+        this.successPieces = 0;
+        this.errorPieces = 0;
+        this.apiType = 0;
     }
 
     public int plusStepNo(){
@@ -122,4 +125,5 @@ public class CallApiLog implements ESDocument, Serializable {
     public JSONObject toJSONObject() {
         return (JSONObject) JSON.toJSON(this);
     }
+
 }
