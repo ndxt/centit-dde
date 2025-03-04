@@ -40,28 +40,32 @@ public class HttpTaskController extends DoApiController {
     @ApiOperation(value = "草稿：立即执行任务GET")
     public void runGetDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                         HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_DEBUG, ConstantValue.TASK_TYPE_GET, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_DEBUG, ConstantValue.TASK_TYPE_GET,
+            null, request, response);
     }
 
     @PostMapping(value = "/draft/{packetId}")
     @ApiOperation(value = "草稿：立即执行任务POST")
     public void runPostDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                          HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_DEBUG, ConstantValue.TASK_TYPE_POST, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_DEBUG, ConstantValue.TASK_TYPE_POST,
+            null, request, response);
     }
 
     @PutMapping(value = "/draft/{packetId}")
     @ApiOperation(value = "草稿：立即执行任务PUT")
     public void runPutDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                         HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_DEBUG, ConstantValue.TASK_TYPE_PUT, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_DEBUG, ConstantValue.TASK_TYPE_PUT,
+            null, request, response);
     }
 
     @DeleteMapping(value = "/draft/{packetId}")
     @ApiOperation(value = "草稿：立即执行任务DELETE")
     public void runDelDraftTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                         HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_DEBUG, ConstantValue.TASK_TYPE_DELETE, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_DEBUG, ConstantValue.TASK_TYPE_DELETE,
+            null, request, response);
     }
 
     /**
@@ -72,28 +76,32 @@ public class HttpTaskController extends DoApiController {
     @ApiOperation(value = "发布：立即执行任务GET")
     public void runGetTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                    HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_GET, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_GET,
+            null, request, response);
     }
 
     @PostMapping(value = "/{packetId}")
     @ApiOperation(value = "发布：立即执行任务POST")
     public void runPostTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                     HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_POST, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_POST,
+            null, request, response);
     }
 
     @PutMapping(value = "/{packetId}")
     @ApiOperation(value = "发布：立即执行任务PUT")
     public void runPutTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                    HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_PUT, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_PUT,
+            null, request, response);
     }
 
     @DeleteMapping(value = "/{packetId}")
     @ApiOperation(value = "发布：立即执行任务DELETE")
     public void runDelTaskExchange(@PathVariable String packetId, HttpServletRequest request,
                                    HttpServletResponse response) throws IOException {
-        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_DELETE, request, response);
+        returnObject(packetId, ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_DELETE,
+            null, request, response);
     }
 
     @PostMapping(value = "/testformula")

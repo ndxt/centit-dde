@@ -87,7 +87,8 @@ public class ApiRouteController extends DoApiController {
             throw new ObjectException(ResponseData.HTTP_NOT_FOUND, "未找到对应的api接口, GET:"+request.getRequestURI());
         }
         judgePower(apiInfo.getLeft(), request);
-        returnObject(apiInfo.getLeft(), ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_GET, request, response);
+        returnObject(apiInfo.getLeft(), ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_GET,
+            apiInfo.getRight(), request, response);
     }
 
     @PostMapping(value = "/**")
@@ -100,7 +101,8 @@ public class ApiRouteController extends DoApiController {
             throw new ObjectException(ResponseData.HTTP_NOT_FOUND, "未找到对应的api接口, POST:"+request.getRequestURI());
         }
         judgePower(apiInfo.getLeft(), request);
-        returnObject(apiInfo.getLeft(), ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_POST, request, response);
+        returnObject(apiInfo.getLeft(), ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_POST,
+            apiInfo.getRight(), request, response);
     }
 
     @PutMapping(value = "/**")
@@ -113,7 +115,8 @@ public class ApiRouteController extends DoApiController {
             throw new ObjectException(ResponseData.HTTP_NOT_FOUND, "未找到对应的api接口, PUT:"+request.getRequestURI());
         }
         judgePower(apiInfo.getLeft(), request);
-        returnObject(apiInfo.getLeft(), ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_PUT, request, response);
+        returnObject(apiInfo.getLeft(), ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_PUT,
+            apiInfo.getRight(), request, response);
     }
 
     @DeleteMapping(value = "/**")
@@ -126,7 +129,8 @@ public class ApiRouteController extends DoApiController {
             throw new ObjectException(ResponseData.HTTP_NOT_FOUND, "未找到对应的api接口, DELETE:"+request.getRequestURI());
         }
         judgePower(apiInfo.getLeft(), request);
-        returnObject(apiInfo.getLeft(), ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_DELETE, request, response);
+        returnObject(apiInfo.getLeft(), ConstantValue.RUN_TYPE_NORMAL, ConstantValue.TASK_TYPE_DELETE,
+            apiInfo.getRight(), request, response);
     }
 
 }

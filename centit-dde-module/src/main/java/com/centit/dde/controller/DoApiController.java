@@ -79,8 +79,8 @@ public abstract class DoApiController extends BaseController {
         }
     }
 
-    protected void returnObject(String packetId, String runType, String taskType,
-                              HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void returnObject(String packetId, String runType, String taskType, List<String> urlParams,
+                                HttpServletRequest request, HttpServletResponse response) throws IOException {
         //judgePower(packetId,runType,request);
         DataPacketInterface dataPacketInterface;
         if(ConstantValue.RUN_TYPE_DEBUG.equals(runType)){
@@ -232,6 +232,9 @@ public abstract class DoApiController extends BaseController {
         }
 
         dataOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, params);
+        if(urlParams != null && !urlParams.isEmpty()) {
+            dataOptContext.setStackData(ConstantValue.REQUEST_URL_PARAMS_TAG, urlParams);
+        }
 
         Map<String, String> cookies = WebOptUtils.fetchRequestCookies(request);
         if(cookies!=null){
