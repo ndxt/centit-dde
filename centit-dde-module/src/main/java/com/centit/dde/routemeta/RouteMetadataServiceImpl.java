@@ -28,7 +28,7 @@ public class RouteMetadataServiceImpl implements RouteMetadataService {
     @Autowired
     private DataPacketDao dataPacketDao;
 
-    public static List<String> parseUrl(String uri) {
+    public static List<String> parseRequestUrl(String uri) {
         String[] uriPieces = uri.split("/");
         List<String> path = new ArrayList<>();
         try {
@@ -47,6 +47,17 @@ public class RouteMetadataServiceImpl implements RouteMetadataService {
             }
         } catch (UnsupportedEncodingException e) {
             return path;
+        }
+        return path;
+    }
+
+    public static List<String> parseRouteUrl(String uri) {
+        String[] uriPieces = uri.split("/");
+        List<String> path = new ArrayList<>();
+        for(String piece : uriPieces){
+            if(StringUtils.isNotBlank(piece)) {
+                path.add(piece);
+            }
         }
         return path;
     }
@@ -80,7 +91,7 @@ public class RouteMetadataServiceImpl implements RouteMetadataService {
                 if(StringUtils.isBlank(routeUrl) || StringUtils.isBlank(packetId)) {
                     continue;
                 }
-                List<String> pieces = parseUrl(routeUrl);
+                List<String> pieces = parseRouteUrl(routeUrl);
                 ApiRouteTree packetNode = routeTree.fetchChildNode(method);
                 for(String piece: pieces){
                     packetNode = packetNode.fetchChildNode(piece);
@@ -102,7 +113,7 @@ public class RouteMetadataServiceImpl implements RouteMetadataService {
 
     @Override
     public Pair<String, List<String>> mapUrlToPacketId(String url, String method) {
-        List<String> pieces = parseUrl(url);
+        List<String> pieces = parseRequestUrl(url);
         if(pieces==null || pieces.isEmpty()) return null;
         ApiRouteTree routeNode = optTreeNodeCache.getCachedValue(pieces.get(0));
         ApiRouteTree packetNode = routeNode.getChildNode(method);
@@ -122,7 +133,7 @@ public class RouteMetadataServiceImpl implements RouteMetadataService {
 
     @Override
     public String getPublishPacketId(String topUnit, String url, String method){
-        List<String> pieces = parseUrl(url);
+        List<String> pieces = parseRouteUrl(url);
         ApiRouteTree routeNode = optTreeNodeCache.getCachedValue(topUnit);
         ApiRouteTree packetNode = routeNode.getChildNode(method);
         for(String piece: pieces){
