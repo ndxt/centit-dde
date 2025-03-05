@@ -13,7 +13,6 @@ import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -23,7 +22,6 @@ import java.util.Map;
  * @author zhf
  */
 @Service
-@Transactional(rollbackFor = Exception.class)
 public class TaskLogManagerImpl implements TaskLogManager {
 
     @Autowired
@@ -55,19 +53,6 @@ public class TaskLogManagerImpl implements TaskLogManager {
         if(logLevel == ConstantValue.LOGLEVEL_CHECK_ERROR && detailLogsCount == 0){
             return;
         }
-        /*int maxE = 0, maxS = 0;
-        if(callApiLog.getDetailLogs()!=null){
-            for(CallApiLogDetail dl : callApiLog.getDetailLogs()){
-                if(maxE < dl.getErrorPieces()){
-                    maxE = dl.getErrorPieces();
-                }
-                if(maxS < dl.getSuccessPieces()){
-                    maxS = dl.getSuccessPieces();
-                }
-            }
-        }
-        callApiLog.setErrorPieces(maxE);
-        callApiLog.setSuccessPieces(maxS);*/
         if(StringUtils.isBlank(callApiLog.getLogId())){
             callApiLog.setLogId(UuidOpt.getUuidAsString22());
         }

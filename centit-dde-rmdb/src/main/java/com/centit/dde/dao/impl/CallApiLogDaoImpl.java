@@ -167,7 +167,7 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
                 ParsedSum successPiecesValue = hourlyBucket.getAggregations().get("successPiecesSum");
 
                 JSONObject sums = new JSONObject();
-                sums.put("runBeginTime", keyAsString); // hourly
+                sums.put("runBeginTime", DatetimeOpt.smartPraseDate(keyAsString)); // hourly
                 sums.put("errorPieces", errorPiecesValue.getValue());
                 sums.put("successPieces", successPiecesValue.getValue());
 
