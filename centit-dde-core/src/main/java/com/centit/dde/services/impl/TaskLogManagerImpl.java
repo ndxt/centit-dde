@@ -6,25 +6,73 @@ import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.services.TaskLogManager;
 import com.centit.dde.utils.ConstantValue;
-import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author zhf
  */
 @Service
 public class TaskLogManagerImpl implements TaskLogManager {
+    private static final Logger logger = LoggerFactory.getLogger(TaskLogManagerImpl.class);
+    private static CallApiLogDao backgroundTaskLogDao = null;
+    private static BlockingQueue<CallApiLog> waitingForWriteLogs = new LinkedBlockingQueue<>();
+    private static ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
 
-    @Autowired
+    /**
+     * 异步写入日志
+     */
+    static {
+        // 5秒写入一次
+        executor.scheduleWithFixedDelay(() ->
+        {
+            if(backgroundTaskLogDao == null){
+                return;
+            }
+            int nCount = 100;
+            // 每一百条日志批量写入一次
+            try {
+                while (nCount > 50) {
+                    nCount = 0;
+                    do { //true){//
+                        CallApiLog optLog = waitingForWriteLogs.poll();
+                        if (optLog == null) {
+                            break;
+                        }
+                        // 写入日志
+                        backgroundTaskLogDao.saveLog(optLog);
+                        if(optLog.getDetailLogs() != null && !optLog.getDetailLogs().isEmpty()) {
+                            backgroundTaskLogDao.saveLogDetails(optLog);
+                        }
+                        nCount++;
+                    } while (nCount < 55);
+
+                }
+            } catch (Exception e) {
+                logger.error("日志写入定时器错误：" + e.getMessage());
+            }
+        }, 30, 5, TimeUnit.SECONDS);
+        //默认执行时间间隔为5秒
+    }
+
     protected CallApiLogDao taskLogDao;
+    public TaskLogManagerImpl(@Autowired CallApiLogDao taskLogDao) {
+        this.taskLogDao = taskLogDao;
+        backgroundTaskLogDao = this.taskLogDao;
+    }
 
     @Override
     public CallApiLog getLog(String logId) {
@@ -55,10 +103,11 @@ public class TaskLogManagerImpl implements TaskLogManager {
         if(StringUtils.isBlank(callApiLog.getLogId())){
             callApiLog.setLogId(UuidOpt.getUuidAsString22());
         }
-        this.taskLogDao.saveLog(callApiLog);
+        waitingForWriteLogs.add(callApiLog);
+        /* this.taskLogDao.saveLog(callApiLog);
         if(detailLogsCount > 0) {
             this.taskLogDao.saveLogDetails(callApiLog);
-        }
+        }*/
     }
 
     @Override
