@@ -432,13 +432,14 @@ public class BizOptFlowImpl implements BizOptFlow {
                 response.setData(dataSet.getData());
             }
 
-            if(response.getCode() >= 400){
-                if ((ConstantValue.LOGLEVEL_CHECK_DEBUG & dataOptContext.getLogLevel()) != 0) {
-                    CallApiLogDetail detailLog = BizOptUtils.createLogDetail(stepJson, dataOptContext);
-                    detailLog.setLogInfo(response.toJSONString());
-                }
-                throw new ObjectException(response.getData(), response.getCode(), response.getMessage());
+            if(response.getCode() >= 400 && (ConstantValue.LOGLEVEL_CHECK_DEBUG & dataOptContext.getLogLevel()) != 0 ) {
+                CallApiLogDetail detailLog = BizOptUtils.createLogDetail(stepJson, dataOptContext);
+                detailLog.setLogInfo(response.toJSONString());
             }
+
+            bizModel.getOptResult().setStepResponse(
+                BuiltInOperation.getJsonFieldString(stepJson, "id", "endNode"),
+                response);
 
             bizModel.getOptResult().setResultObject(response);// .addLastStepResult("return", response);
             bizModel.getOptResult().setResultType(DataOptResult.RETURN_CODE_AND_MESSAGE);

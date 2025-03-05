@@ -25,13 +25,10 @@ public interface CallApiLogDao {
 
     void deleteLogById(String logId);
 
-    void deleteLogDetailById(String logId);
-
     List<CallApiLogDetail> listLogDetails(String logId);
 
     List<Map<String, Object>> listLogsByProperties(Map<String, Object> param, PageDesc pageDesc);
 
     JSONArray statApiCallSumByHour(String taskId, Date startDate, Date endDate);
 
-    int deleteTaskLog(String packetId, Date runBeginTime, boolean isError);
 }

@@ -103,12 +103,7 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
 
     @Override
     public void deleteLogById(String logId) {
-        callApiLogIndexer.deleteDocument(logId);
-    }
 
-    @Override
-    public void deleteLogDetailById(String logId) {
-        callApiLogDetailIndexer.deleteDocument(logId);
     }
 
     @Override
@@ -179,12 +174,6 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         }
 
         return result;
-    }
-
-    @Override
-    public int deleteTaskLog(String packetId, Date runBeginTime, boolean isError) {
-
-        return 0;
     }
 
 }

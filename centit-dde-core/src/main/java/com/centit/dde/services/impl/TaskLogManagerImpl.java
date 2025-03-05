@@ -6,7 +6,6 @@ import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.services.TaskLogManager;
 import com.centit.dde.utils.ConstantValue;
-import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.database.utils.PageDesc;
@@ -70,14 +69,6 @@ public class TaskLogManagerImpl implements TaskLogManager {
     @Override
     public JSONArray statApiCallSumByHour(String taskId, Date startDate, Date endDate) {
         return taskLogDao.statApiCallSumByHour(taskId, startDate, endDate);
-    }
-
-    @Override
-    public int deleteTaskLog(DelTaskLogParameter delTaskLogParameter) {
-        return taskLogDao.deleteTaskLog(delTaskLogParameter.getPacketId(),
-            DatetimeOpt.smartPraseDate(delTaskLogParameter.getRunBeginTime()),
-            delTaskLogParameter.getIsError());
-        // delete with detail
     }
 
 }

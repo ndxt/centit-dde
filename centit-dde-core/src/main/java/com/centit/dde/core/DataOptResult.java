@@ -43,7 +43,7 @@ public class DataOptResult implements ToResponseData, Serializable {
 
     public void setStepResponse(String sKey, ResponseData objValue) {
         lastResponse = objValue;
-        if(ResponseData.RESULT_OK != objValue.getCode()) {
+        if(ResponseData.RESULT_OK != objValue.getCode() && objValue.getCode() != ResponseData.HTTP_OK) {
             errorList.add(new LeftRightPair<>(sKey, objValue));
         }
     }

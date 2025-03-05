@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.services.TaskLogManager;
-import com.centit.dde.vo.DelTaskLogParameter;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
@@ -79,23 +78,24 @@ public class TaskLogController extends BaseController {
     @GetMapping(value = "/callByHour")
     @ApiOperation(value = "日志统计")
     @WrapUpResponseBody
-    public JSONArray statApiCallSumByHour(String taskId){
+    public JSONArray statApiCallSumByHour(String taskId, String statType){
+
         Date currentDate = DatetimeOpt.currentUtilDate();
+        if(StringUtils.equalsAnyIgnoreCase(statType , "week")){
+            return taskLogManager.statApiCallSumByHour(taskId,
+                DatetimeOpt.addMonths(currentDate,-1),
+                currentDate );
+        }
+        if(StringUtils.equalsAnyIgnoreCase(statType , "month")){
+            return taskLogManager.statApiCallSumByHour(taskId,
+                DatetimeOpt.addDays(currentDate,-7),
+                currentDate );
+        }
+        // day
         return taskLogManager.statApiCallSumByHour(taskId,
             DatetimeOpt.addDays(currentDate,-1),
             currentDate );
-    }
 
-    @PostMapping(value = "delLogInfoAndLogDetail")
-    @ApiOperation(value = "删除某个时间段之前的日志")
-    @WrapUpResponseBody
-    public ResponseData delLogInfoAndLogDetail(@RequestBody DelTaskLogParameter delTaskLogParameter){
-        if (StringUtils.isBlank(delTaskLogParameter.getPacketId()))return ResponseData.makeErrorMessage("主键不能为空！");
-        if (StringUtils.isBlank(delTaskLogParameter.getRunBeginTime()))return ResponseData.makeErrorMessage("删除时间不能为空！");
-        int taskLogCount = taskLogManager.deleteTaskLog(delTaskLogParameter);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("taskLogCount",taskLogCount);
-        return ResponseData.makeResponseData(jsonObject);
     }
 
 }

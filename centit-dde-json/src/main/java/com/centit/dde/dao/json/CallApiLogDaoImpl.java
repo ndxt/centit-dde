@@ -50,11 +50,6 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
     }
 
     @Override
-    public void deleteLogDetailById(String logId) {
-
-    }
-
-    @Override
     public List<CallApiLogDetail> listLogDetails(String logId) {
         return Collections.emptyList();
     }
@@ -70,8 +65,4 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
             "Runtime 运行时环境，无法统计运行日志!");
     }
 
-    @Override
-    public int deleteTaskLog(String packetId, Date runBeginTime, boolean isError) {
-        return 1;
-    }
 }

@@ -83,9 +83,9 @@ public class TaskRun {
                 callApiLog.setOtherMessage(runResult.makeErrorResponse().getMessage());
                 callApiLog.setErrorPieces(runResult.errorCount());
             } else {
-                //if(callApiLog.getSuccessPieces()<1 && callApiLog.getErrorPieces() < 1) {
-                callApiLog.setSuccessPieces(1);
-                //}
+                if(callApiLog.getSuccessPieces()<1 && callApiLog.getErrorPieces() < 1) {
+                    callApiLog.setSuccessPieces(1);
+                }
                 callApiLog.setOtherMessage("ok！");
             }
             callApiLog.setRunEndTime(new Date());
