@@ -140,11 +140,12 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         boolQuery.must(rangeQuery);
 
         sourceBuilder.query(boolQuery);
-
+        //大于5天按照天聚合， 否则按照小时聚合
+        long intervals = DatetimeOpt.calcSpanDays(startDate, endDate) >= 5 ? 86400000L : 3600000L;
         // 构建聚合
         DateHistogramAggregationBuilder dateHistogramAggregation = AggregationBuilders.dateHistogram("hourly")
             .field("runBeginTime")
-            .interval(3600000L) // 3600000 milliseconds = 1 hour
+            .interval(intervals) // 3600000 milliseconds = 1 hour
             .format("yyyy-MM-dd'T'HH:mm:ss.SSSZ"); // 明确日期格式
 
         SumAggregationBuilder errorPiecesSum = AggregationBuilders.sum("errorPiecesSum").field("errorPieces");
