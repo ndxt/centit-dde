@@ -81,9 +81,11 @@ public class TaskRun {
             updateApiData(dataPacketInterface);//optContext.getRunType(),
             if(runResult.hasErrors()){
                 callApiLog.setOtherMessage(runResult.makeErrorResponse().getMessage());
-                if(callApiLog.getErrorPieces()<1) callApiLog.setErrorPieces(1);
+                callApiLog.setErrorPieces(runResult.errorCount());
             } else {
-                if(callApiLog.getSuccessPieces()<1) callApiLog.setSuccessPieces(1);
+                //if(callApiLog.getSuccessPieces()<1 && callApiLog.getErrorPieces() < 1) {
+                callApiLog.setSuccessPieces(1);
+                //}
                 callApiLog.setOtherMessage("ok！");
             }
             callApiLog.setRunEndTime(new Date());

@@ -112,6 +112,10 @@ public class DataOptResult implements ToResponseData, Serializable {
         return !errorList.isEmpty();
     }
 
+    public int errorCount(){
+        return errorList.size();
+    }
+
     public ResponseData makeErrorResponse(){
         int errorCount = errorList.size();
         if(errorCount==1){

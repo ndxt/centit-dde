@@ -55,7 +55,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
         if(logLevel == ConstantValue.LOGLEVEL_CHECK_ERROR && detailLogsCount == 0){
             return;
         }
-        int maxE = 0, maxS = 0;
+        /*int maxE = 0, maxS = 0;
         if(callApiLog.getDetailLogs()!=null){
             for(CallApiLogDetail dl : callApiLog.getDetailLogs()){
                 if(maxE < dl.getErrorPieces()){
@@ -67,7 +67,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
             }
         }
         callApiLog.setErrorPieces(maxE);
-        callApiLog.setSuccessPieces(maxS);
+        callApiLog.setSuccessPieces(maxS);*/
         if(StringUtils.isBlank(callApiLog.getLogId())){
             callApiLog.setLogId(UuidOpt.getUuidAsString22());
         }

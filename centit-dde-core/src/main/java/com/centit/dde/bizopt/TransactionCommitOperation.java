@@ -27,14 +27,27 @@ public class TransactionCommitOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         JSONArray databaseName = bizOptJson.getJSONArray("databaseName");
         Object[] databaseCodeArr = CollectionsOpt.listToArray(databaseName);
-        if (databaseCodeArr==null || databaseCodeArr.length==0){//默认提交当前线程所有事物
-            AbstractSourceConnectThreadHolder.commitAll();
-            return BuiltInOperation.createResponseSuccessData(0);
-        }
-        for (Object databaseCode : databaseCodeArr) {//提交选中库的事物
-            String databaseCodeStr = StringBaseOpt.castObjectToString(databaseCode);
-            SourceInfo sourceInfo = sourceInfoMetadata.fetchSourceInfo(databaseCodeStr);
-            AbstractSourceConnectThreadHolder.commit(sourceInfo);
+        String optType = bizOptJson.getString("optType");
+        if("rollback".equalsIgnoreCase(optType)){
+            if (databaseCodeArr == null || databaseCodeArr.length == 0) {//默认提交当前线程所有事物
+                AbstractSourceConnectThreadHolder.rollbackAll();
+                return BuiltInOperation.createResponseSuccessData(1);
+            }
+            for (Object databaseCode : databaseCodeArr) {//回滚选中库的事物
+                String databaseCodeStr = StringBaseOpt.castObjectToString(databaseCode);
+                SourceInfo sourceInfo = sourceInfoMetadata.fetchSourceInfo(databaseCodeStr);
+                AbstractSourceConnectThreadHolder.rollback(sourceInfo);
+            }
+        } else {
+            if (databaseCodeArr == null || databaseCodeArr.length == 0) {//默认提交当前线程所有事物
+                AbstractSourceConnectThreadHolder.commitAll();
+                return BuiltInOperation.createResponseSuccessData(1);
+            }
+            for (Object databaseCode : databaseCodeArr) {//提交选中库的事物
+                String databaseCodeStr = StringBaseOpt.castObjectToString(databaseCode);
+                SourceInfo sourceInfo = sourceInfoMetadata.fetchSourceInfo(databaseCodeStr);
+                AbstractSourceConnectThreadHolder.commit(sourceInfo);
+            }
         }
         return BuiltInOperation.createResponseSuccessData(databaseCodeArr.length);
     }
