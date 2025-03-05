@@ -127,6 +127,7 @@ public class TaskRun {
     private void dealException(CallApiLog callApiLog, DataOptContext optContext, Exception e) {
         callApiLog.setOtherMessage(ObjectException.extortExceptionOriginMessage(e));
         callApiLog.setRunEndTime(new Date());
+        callApiLog.setErrorPieces(1);
         CallApiLogDetail detailLog = new CallApiLogDetail();
         detailLog.setRunBeginTime(new Date());
         detailLog.setOptNodeId("api");
