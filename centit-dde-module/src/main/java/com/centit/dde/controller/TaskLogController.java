@@ -81,12 +81,12 @@ public class TaskLogController extends BaseController {
     public JSONArray statApiCallSumByHour(String taskId, String statType){
 
         Date currentDate = DatetimeOpt.currentUtilDate();
-        if(StringUtils.equalsAnyIgnoreCase(statType , "week")){
+        if(StringUtils.equalsAnyIgnoreCase(statType , "month")){
             return taskLogManager.statApiCallSumByHour(taskId,
                 DatetimeOpt.addMonths(currentDate,-1),
                 currentDate );
         }
-        if(StringUtils.equalsAnyIgnoreCase(statType , "month")){
+        if(StringUtils.equalsAnyIgnoreCase(statType , "week")){
             return taskLogManager.statApiCallSumByHour(taskId,
                 DatetimeOpt.addDays(currentDate,-7),
                 currentDate );
