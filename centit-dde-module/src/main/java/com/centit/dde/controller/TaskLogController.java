@@ -79,7 +79,7 @@ public class TaskLogController extends BaseController {
     @GetMapping(value = "/callByHour")
     @ApiOperation(value = "日志统计")
     @WrapUpResponseBody
-    public JSONArray getLogStatisticsInfo(String taskId){
+    public JSONArray statApiCallSumByHour(String taskId){
         Date currentDate = DatetimeOpt.currentUtilDate();
         return taskLogManager.statApiCallSumByHour(taskId,
             DatetimeOpt.addDays(currentDate,-1),
