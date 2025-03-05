@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * @author zhf
@@ -29,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class TaskLogManagerImpl implements TaskLogManager {
     private static final Logger logger = LoggerFactory.getLogger(TaskLogManagerImpl.class);
     private static CallApiLogDao backgroundTaskLogDao = null;
-    private static BlockingQueue<CallApiLog> waitingForWriteLogs = new LinkedBlockingQueue<>();
+    private static ConcurrentLinkedQueue<CallApiLog> waitingForWriteLogs = new ConcurrentLinkedQueue<>();
     private static ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
 
     /**
@@ -42,29 +39,26 @@ public class TaskLogManagerImpl implements TaskLogManager {
             if(backgroundTaskLogDao == null){
                 return;
             }
-            int nCount = 100;
-            // 每一百条日志批量写入一次
+            // 循环写入日志，一个周期最多写入 nCount 条，避免阻塞
+            int nCount = 5000;
             try {
-                while (nCount > 50) {
-                    nCount = 0;
-                    do { //true){//
-                        CallApiLog optLog = waitingForWriteLogs.poll();
-                        if (optLog == null) {
-                            break;
-                        }
-                        // 写入日志
-                        backgroundTaskLogDao.saveLog(optLog);
-                        if(optLog.getDetailLogs() != null && !optLog.getDetailLogs().isEmpty()) {
-                            backgroundTaskLogDao.saveLogDetails(optLog);
-                        }
-                        nCount++;
-                    } while (nCount < 55);
-
+                while (nCount > 0) {
+                    nCount --;
+                    CallApiLog optLog = waitingForWriteLogs.poll();
+                    if (optLog == null) {
+                        break;
+                    }
+                    // 写入日志
+                    backgroundTaskLogDao.saveLog(optLog);
+                    if(optLog.getDetailLogs() != null && !optLog.getDetailLogs().isEmpty()) {
+                        backgroundTaskLogDao.saveLogDetails(optLog);
+                    }
                 }
+                logger.info("成功写入{}条API调用信息。", 5000 - nCount);
             } catch (Exception e) {
-                logger.error("日志写入定时器错误：" + e.getMessage());
+                logger.error("写入API调用信息报错：{}", e.getMessage());
             }
-        }, 30, 5, TimeUnit.SECONDS);
+        }, 37, 5, TimeUnit.SECONDS);
         //默认执行时间间隔为5秒
     }
 
