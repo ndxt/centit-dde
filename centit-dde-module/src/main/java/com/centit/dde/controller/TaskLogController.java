@@ -162,10 +162,11 @@ public class TaskLogController extends BaseController {
     @ApiOperation(value = "应用下面最活跃的应用")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "osId", value = "应用ID，applicationId/osId"),
+        @ApiImplicitParam(name = "topSize", value = ">=5, 根据空间选择， &topSize=15"),
         @ApiImplicitParam(name = "statType", value = "统计类型：month/week/day")})
     @WrapUpResponseBody
     public JSONArray statTopActive(String osId, Integer topSize,  String statType){
-        if(topSize == null || topSize < 10) topSize = 10;
+        if(topSize == null || topSize < 5) topSize = 5;
         Date currentDate = DatetimeOpt.currentUtilDate();
         if(StringUtils.equalsAnyIgnoreCase(statType , "month")){
             return taskLogManager.statTopActive(osId, topSize,
@@ -187,10 +188,11 @@ public class TaskLogController extends BaseController {
     @ApiOperation(value = "应用下面失败的应用")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "osId", value = "应用ID，applicationId/osId"),
+        @ApiImplicitParam(name = "topSize", value = ">=5, 根据空间选择， &topSize=15"),
         @ApiImplicitParam(name = "statType", value = "统计类型：month/week/day")})
     @WrapUpResponseBody
     public JSONArray statTopFailed(String osId, Integer topSize, String statType){
-        if(topSize == null || topSize < 10) topSize = 10;
+        if(topSize == null || topSize < 5) topSize = 5;
         Date currentDate = DatetimeOpt.currentUtilDate();
         if(StringUtils.equalsAnyIgnoreCase(statType , "month")){
             return taskLogManager.statTopFailed(osId, topSize,
