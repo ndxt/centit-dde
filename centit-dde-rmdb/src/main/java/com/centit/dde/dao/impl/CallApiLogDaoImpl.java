@@ -136,21 +136,26 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
 
         sourceBuilder.query(boolQuery);
         //大于5天按照天聚合， 否则按照小时聚合
-        long intervals = DatetimeOpt.calcSpanDays(startDate, endDate) >= 5 ? 86400000L : 3600000L;
+        long intervals; String dateFormate;
+        if(DatetimeOpt.calcSpanDays(startDate, endDate) >= 5 ){
+            intervals = 86400000L;
+            dateFormate = "yyyy-MM-dd";
+        } else {
+            intervals = 3600000L;
+            dateFormate = "yyyy-MM-dd HH:mm:ss";
+        }
         // 构建聚合
         DateHistogramAggregationBuilder dateHistogramAggregation = AggregationBuilders.dateHistogram("hourly")
             .field("runBeginTime")
             .interval(intervals) // 3600000 milliseconds = 1 hour
-            .format("yyyy-MM-dd'T'HH:mm:ss.SSSZ"); // 明确日期格式
+            .format(dateFormate); // 明确日期格式
 
         SumAggregationBuilder errorPiecesSum = AggregationBuilders.sum("errorPiecesSum").field("errorPieces");
         SumAggregationBuilder successPiecesSum = AggregationBuilders.sum("successPiecesSum").field("successPieces");
 
         dateHistogramAggregation.subAggregation(errorPiecesSum);
         dateHistogramAggregation.subAggregation(successPiecesSum);
-
         sourceBuilder.aggregation(dateHistogramAggregation);
-
         searchRequest.source(sourceBuilder);
 
         JSONArray result = new JSONArray();
@@ -163,7 +168,7 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
                 ParsedSum successPiecesValue = hourlyBucket.getAggregations().get("successPiecesSum");
 
                 JSONObject sums = new JSONObject();
-                sums.put("runBeginTime", DatetimeOpt.smartPraseDate(keyAsString)); // hourly
+                sums.put("runBeginTime", keyAsString); // hourly
                 sums.put("errorPieces", errorPiecesValue.getValue());
                 sums.put("successPieces", successPiecesValue.getValue());
 

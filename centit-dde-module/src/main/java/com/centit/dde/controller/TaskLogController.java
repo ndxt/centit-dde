@@ -79,16 +79,15 @@ public class TaskLogController extends BaseController {
     @ApiOperation(value = "日志统计")
     @WrapUpResponseBody
     public JSONArray statApiCallSumByHour(String taskId, String statType){
-
         Date currentDate = DatetimeOpt.currentUtilDate();
         if(StringUtils.equalsAnyIgnoreCase(statType , "month")){
             return taskLogManager.statApiCallSumByHour(taskId,
-                DatetimeOpt.addMonths(currentDate,-1),
+                DatetimeOpt.truncateToDay(DatetimeOpt.addMonths(currentDate,-1)),
                 currentDate );
         }
         if(StringUtils.equalsAnyIgnoreCase(statType , "week")){
             return taskLogManager.statApiCallSumByHour(taskId,
-                DatetimeOpt.addDays(currentDate,-7),
+                DatetimeOpt.truncateToDay(DatetimeOpt.addDays(currentDate,-7)),
                 currentDate );
         }
         // day

@@ -21,6 +21,7 @@ import java.util.concurrent.*;
 
 /**
  * @author zhf
+ * @author codefan@sina.com
  */
 @Service
 public class TaskLogManagerImpl implements TaskLogManager {
@@ -29,13 +30,12 @@ public class TaskLogManagerImpl implements TaskLogManager {
     private static ConcurrentLinkedQueue<CallApiLog> waitingForWriteLogs = new ConcurrentLinkedQueue<>();
     private static ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
 
-    /**
-     * 异步写入日志
+    /*
+     * 异步写入API调用日志
      */
     static {
         // 5秒写入一次
-        executor.scheduleWithFixedDelay(() ->
-        {
+        executor.scheduleWithFixedDelay(() -> {
             if(backgroundTaskLogDao == null){
                 return;
             }
@@ -43,7 +43,6 @@ public class TaskLogManagerImpl implements TaskLogManager {
             int nCount = 5000;
             try {
                 while (nCount > 0) {
-                    nCount --;
                     CallApiLog optLog = waitingForWriteLogs.poll();
                     if (optLog == null) {
                         break;
@@ -53,6 +52,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
                     if(optLog.getDetailLogs() != null && !optLog.getDetailLogs().isEmpty()) {
                         backgroundTaskLogDao.saveLogDetails(optLog);
                     }
+                    nCount --;
                 }
                 logger.info("成功写入{}条API调用信息。", 5000 - nCount);
             } catch (Exception e) {
