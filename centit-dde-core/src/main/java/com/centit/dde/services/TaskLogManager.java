@@ -42,7 +42,11 @@ public interface TaskLogManager{
 
     void deleteTaskLogById(String logId);
 
-    JSONArray statApiCallSumByHour(java.lang.String taskId, Date startDate, Date endDate);
+    JSONArray statApiCallSumByTask(String taskId, Date startDate, Date endDate);
+
+    JSONArray statApiCallSumByApplication(String applicationId, Date startDate, Date endDate);
+
+    JSONArray statApiCallSumByTopUnit(String topUnit, Date startDate, Date endDate);
 
     void saveTaskLog(CallApiLog callApiLog, int logLevel);
 }

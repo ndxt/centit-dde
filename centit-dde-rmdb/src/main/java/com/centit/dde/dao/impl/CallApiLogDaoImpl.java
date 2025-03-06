@@ -121,13 +121,21 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
     }
 
     @Override
-    public JSONArray statApiCallSumByHour(String taskId, Date startDate, Date endDate){
+    public JSONArray statApiCallSum(String statType, String typeId, Date startDate, Date endDate){
         SearchRequest searchRequest = new SearchRequest("callapilog");
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
         // 构建过滤条件
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
-        boolQuery.must(QueryBuilders.termQuery("taskId", taskId));
+        if("topUnit".equalsIgnoreCase(statType)) {
+            boolQuery.must(QueryBuilders.termQuery("topUnit", typeId));
+        } else if("application".equalsIgnoreCase(statType)) {
+            boolQuery.must(QueryBuilders.termQuery("applicationId", typeId));
+        } else if("opt".equalsIgnoreCase(statType)) {
+            boolQuery.must(QueryBuilders.termQuery("optId", typeId));
+        } else {
+            boolQuery.must(QueryBuilders.termQuery("taskId", typeId));
+        }
 
         RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("runBeginTime")
             .gte(startDate)
@@ -175,7 +183,8 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
                 result.add(sums);
             }
         } catch (IOException | ElasticsearchException e) { // 捕获更广泛的异常
-            logger.error("Error occurred while processing task ID: {}, start date: {}, end date: {}", taskId, startDate, endDate, e);
+            logger.error("Error occurred while processing statType: {} param: {}, start date: {}, end date: {}",
+                statType, typeId, startDate, endDate, e);
         }
 
         return result;

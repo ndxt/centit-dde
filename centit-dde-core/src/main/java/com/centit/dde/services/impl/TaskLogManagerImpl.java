@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author zhf
@@ -112,8 +114,18 @@ public class TaskLogManagerImpl implements TaskLogManager {
     }
 
     @Override
-    public JSONArray statApiCallSumByHour(String taskId, Date startDate, Date endDate) {
-        return taskLogDao.statApiCallSumByHour(taskId, startDate, endDate);
+    public JSONArray statApiCallSumByTask(String taskId, Date startDate, Date endDate) {
+        return taskLogDao.statApiCallSum("task", taskId, startDate, endDate);
+    }
+
+    @Override
+    public JSONArray statApiCallSumByApplication(String applicationId, Date startDate, Date endDate) {
+        return taskLogDao.statApiCallSum("application", applicationId, startDate, endDate);
+    }
+
+    @Override
+    public JSONArray statApiCallSumByTopUnit(String topUnit, Date startDate, Date endDate) {
+        return taskLogDao.statApiCallSum("topUnit", topUnit, startDate, endDate);
     }
 
 }

@@ -1,11 +1,10 @@
 package com.centit.dde.controller;
 
 import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.services.TaskLogManager;
-import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
@@ -13,6 +12,7 @@ import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -75,23 +75,75 @@ public class TaskLogController extends BaseController {
         return taskLogManager.listLogDetails(logId);
     }
 
-    @GetMapping(value = "/callByHour")
-    @ApiOperation(value = "日志统计")
+    @GetMapping(value = "/statByTask")
+    @ApiOperation(value = "日志统计,单条API日志")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "taskId", value = "API接口ID"),
+        @ApiImplicitParam(name = "statType", value = "统计类型：month/week/day")})
     @WrapUpResponseBody
-    public JSONArray statApiCallSumByHour(String taskId, String statType){
+    public JSONArray statApiCallSumByTask(String taskId, String statType){
         Date currentDate = DatetimeOpt.currentUtilDate();
         if(StringUtils.equalsAnyIgnoreCase(statType , "month")){
-            return taskLogManager.statApiCallSumByHour(taskId,
+            return taskLogManager.statApiCallSumByTask(taskId,
                 DatetimeOpt.truncateToDay(DatetimeOpt.addMonths(currentDate,-1)),
                 currentDate );
         }
         if(StringUtils.equalsAnyIgnoreCase(statType , "week")){
-            return taskLogManager.statApiCallSumByHour(taskId,
+            return taskLogManager.statApiCallSumByTask(taskId,
                 DatetimeOpt.truncateToDay(DatetimeOpt.addDays(currentDate,-7)),
                 currentDate );
         }
         // day
-        return taskLogManager.statApiCallSumByHour(taskId,
+        return taskLogManager.statApiCallSumByTask(taskId,
+            DatetimeOpt.addDays(currentDate,-1),
+            currentDate );
+
+    }
+
+    @GetMapping(value = "/statByOs")
+    @ApiOperation(value = "日志统计，一个应用下的日志")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "osId", value = "应用ID，applicationId/osId"),
+        @ApiImplicitParam(name = "statType", value = "统计类型：month/week/day")})
+    @WrapUpResponseBody
+    public JSONArray statApiCallSumByApplication(String osId, String statType){
+        Date currentDate = DatetimeOpt.currentUtilDate();
+        if(StringUtils.equalsAnyIgnoreCase(statType , "month")){
+            return taskLogManager.statApiCallSumByApplication(osId,
+                DatetimeOpt.truncateToDay(DatetimeOpt.addMonths(currentDate,-1)),
+                currentDate );
+        }
+        if(StringUtils.equalsAnyIgnoreCase(statType , "week")){
+            return taskLogManager.statApiCallSumByApplication(osId,
+                DatetimeOpt.truncateToDay(DatetimeOpt.addDays(currentDate,-7)),
+                currentDate );
+        }
+        // day
+        return taskLogManager.statApiCallSumByApplication(osId,
+            DatetimeOpt.addDays(currentDate,-1),
+            currentDate );
+
+    }
+
+    @GetMapping(value = "/statByTopUnit")
+    @ApiOperation(value = "日志统计，一个租户下的日志")
+    @ApiImplicitParam(name = "statType", value = "统计类型：month/week/day")
+    @WrapUpResponseBody
+    public JSONArray statApiCallSumByTopUnit(String statType, HttpServletRequest request){
+        Date currentDate = DatetimeOpt.currentUtilDate();
+        String topUnit = WebOptUtils.getCurrentTopUnit(request);
+        if(StringUtils.equalsAnyIgnoreCase(statType , "month")){
+            return taskLogManager.statApiCallSumByTopUnit(topUnit,
+                DatetimeOpt.truncateToDay(DatetimeOpt.addMonths(currentDate,-1)),
+                currentDate );
+        }
+        if(StringUtils.equalsAnyIgnoreCase(statType , "week")){
+            return taskLogManager.statApiCallSumByTopUnit(topUnit,
+                DatetimeOpt.truncateToDay(DatetimeOpt.addDays(currentDate,-7)),
+                currentDate );
+        }
+        // day
+        return taskLogManager.statApiCallSumByTopUnit(topUnit,
             DatetimeOpt.addDays(currentDate,-1),
             currentDate );
 

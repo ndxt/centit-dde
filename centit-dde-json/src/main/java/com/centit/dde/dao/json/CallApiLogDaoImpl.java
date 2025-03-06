@@ -60,7 +60,7 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
     }
 
     @Override
-    public JSONArray statApiCallSumByHour(String taskId, Date startDate, Date endDate){
+    public JSONArray statApiCallSum(String statType, String typeId, Date startDate, Date endDate){
         throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT,
             "Runtime 运行时环境，无法统计运行日志!");
     }

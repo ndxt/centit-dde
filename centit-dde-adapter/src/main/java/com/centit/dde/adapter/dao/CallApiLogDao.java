@@ -29,6 +29,6 @@ public interface CallApiLogDao {
 
     List<Map<String, Object>> listLogsByProperties(Map<String, Object> param, PageDesc pageDesc);
 
-    JSONArray statApiCallSumByHour(String taskId, Date startDate, Date endDate);
+    JSONArray statApiCallSum(String statType, String typeId, Date startDate, Date endDate);
 
 }
