@@ -52,4 +52,8 @@ public interface DataPacketDao {
     JSONArray listApiWithRoute(String topUnit);
 
     int clearTrashStand(String osId);
+
+    Map<String, Object> statApplicationInfo(String applicationId);
+
+    Map<String, String> mapDataPacketName(List<String> packetIds);
 }

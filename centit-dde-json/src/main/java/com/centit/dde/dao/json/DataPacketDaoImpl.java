@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -161,5 +162,15 @@ public class DataPacketDaoImpl implements DataPacketDao {
     @Override
     public int clearTrashStand(String osId) {
         return 1;
+    }
+
+    @Override
+    public Map<String, Object> statApplicationInfo(String applicationId) {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Map<String, String> mapDataPacketName(List<String> packetIds) {
+        return Collections.emptyMap();
     }
 }

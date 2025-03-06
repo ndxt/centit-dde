@@ -31,4 +31,7 @@ public interface CallApiLogDao {
 
     JSONArray statApiCallSum(String statType, String typeId, Date startDate, Date endDate);
 
+    JSONArray statCallSumByOs(String osId, Date startDate, Date endDate);
+
+    JSONArray statTopTask(String osId, String countType, int topSize, Date startDate, Date endDate);
 }

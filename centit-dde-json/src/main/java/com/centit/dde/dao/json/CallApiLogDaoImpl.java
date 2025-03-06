@@ -65,4 +65,14 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
             "Runtime 运行时环境，无法统计运行日志!");
     }
 
+    @Override
+    public JSONArray statCallSumByOs(String osId, Date startDate, Date endDate) {
+        return null;
+    }
+
+    @Override
+    public JSONArray statTopTask(String osId, String countType, int topSize, Date startDate, Date endDate) {
+        return null;
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.centit.dde.controller;
 
 import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.services.TaskLogManager;
@@ -68,7 +69,7 @@ public class TaskLogController extends BaseController {
     }
 
     @GetMapping(value = "/details/{logId}")
-    @ApiOperation(value = "查询单个日志")
+    @ApiOperation(value = "查询单个日志明细")
     @ApiImplicitParam(name = "logId", value = "日志ID")
     @WrapUpResponseBody
     public List<CallApiLogDetail> getTaskLogDetails(@PathVariable String logId){
@@ -147,6 +148,64 @@ public class TaskLogController extends BaseController {
             DatetimeOpt.addDays(currentDate,-1),
             currentDate );
 
+    }
+
+    @GetMapping(value = "/osStatInfo")
+    @ApiOperation(value = "应用下面的统计信息")
+    @ApiImplicitParam(name = "osId", value = "应用ID，applicationId/osId")
+    @WrapUpResponseBody
+    public JSONObject statApplication(String osId){
+        return taskLogManager.statApplicationInfo(osId);
+    }
+
+    @GetMapping(value = "/topActive")
+    @ApiOperation(value = "应用下面最活跃的应用")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "osId", value = "应用ID，applicationId/osId"),
+        @ApiImplicitParam(name = "statType", value = "统计类型：month/week/day")})
+    @WrapUpResponseBody
+    public JSONArray statTopActive(String osId, Integer topSize,  String statType){
+        if(topSize == null || topSize < 10) topSize = 10;
+        Date currentDate = DatetimeOpt.currentUtilDate();
+        if(StringUtils.equalsAnyIgnoreCase(statType , "month")){
+            return taskLogManager.statTopActive(osId, topSize,
+                DatetimeOpt.truncateToDay(DatetimeOpt.addMonths(currentDate,-1)),
+                currentDate );
+        }
+        if(StringUtils.equalsAnyIgnoreCase(statType , "week")){
+            return taskLogManager.statTopActive(osId, topSize,
+                DatetimeOpt.truncateToDay(DatetimeOpt.addDays(currentDate,-7)),
+                currentDate );
+        }
+        // day
+        return taskLogManager.statTopActive(osId, topSize,
+            DatetimeOpt.addDays(currentDate,-1),
+            currentDate );
+    }
+
+    @GetMapping(value = "/topFailed")
+    @ApiOperation(value = "应用下面失败的应用")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "osId", value = "应用ID，applicationId/osId"),
+        @ApiImplicitParam(name = "statType", value = "统计类型：month/week/day")})
+    @WrapUpResponseBody
+    public JSONArray statTopFailed(String osId, Integer topSize, String statType){
+        if(topSize == null || topSize < 10) topSize = 10;
+        Date currentDate = DatetimeOpt.currentUtilDate();
+        if(StringUtils.equalsAnyIgnoreCase(statType , "month")){
+            return taskLogManager.statTopFailed(osId, topSize,
+                DatetimeOpt.truncateToDay(DatetimeOpt.addMonths(currentDate,-1)),
+                currentDate );
+        }
+        if(StringUtils.equalsAnyIgnoreCase(statType , "week")){
+            return taskLogManager.statTopFailed(osId, topSize,
+                DatetimeOpt.truncateToDay(DatetimeOpt.addDays(currentDate,-7)),
+                currentDate );
+        }
+        // day
+        return taskLogManager.statTopFailed(osId, topSize,
+            DatetimeOpt.addDays(currentDate,-1),
+            currentDate );
     }
 
 }

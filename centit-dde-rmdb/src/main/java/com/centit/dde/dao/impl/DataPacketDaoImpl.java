@@ -1,17 +1,20 @@
 package com.centit.dde.dao.impl;
 
 import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.dao.DataPacketDao;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,5 +137,39 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
         String delSql ="DELETE FROM q_data_packet WHERE IS_DISABLE = 'T' AND OS_ID=? ";
         int delCount = DatabaseOptUtils.doExecuteSql(this, delSql, new Object[]{osId});
         return  delCount;
+    }
+
+    @Override
+    public Map<String, Object> statApplicationInfo(String applicationId) {
+        Map<String, Object> map = new HashMap<>(8);
+
+        int apiCount = NumberBaseOpt.castObjectToInteger( DatabaseOptUtils.getScalarObjectQuery(this,
+            "select count(*) as dataSum from q_data_packet where os_id = ?", new Object[]{applicationId}), 0);
+        int pageCount = NumberBaseOpt.castObjectToInteger( DatabaseOptUtils.getScalarObjectQuery(this,
+            "select count(*) as dataSum from m_meta_form_model where os_id = ?", new Object[]{applicationId}), 0);
+        int flowCount = NumberBaseOpt.castObjectToInteger( DatabaseOptUtils.getScalarObjectQuery(this,
+            "select count(distinct flow_code) as dataSum from wf_flow_define where os_id = ?", new Object[]{applicationId}), 0);
+        int moduleCount = NumberBaseOpt.castObjectToInteger( DatabaseOptUtils.getScalarObjectQuery(this,
+            "select count(*) as dataSum from f_optinfo where os_id = ?", new Object[]{applicationId}), 0);
+        map.put("apiCount", apiCount);
+        map.put("pageCount", pageCount);
+        map.put("flowCount", flowCount);
+        map.put("moduleCount", moduleCount);
+        return map;
+    }
+
+    @Override
+    public Map<String, String> mapDataPacketName(List<String> packetIds) {
+        JSONArray jsonArray = DatabaseOptUtils.listObjectsByNamedSqlAsJson(this,
+            "select a.packet_id, a.packet_name " +
+                "from q_data_packet a " +
+                "where a.packet_id in (:ids) ", CollectionsOpt.createHashMap("ids", packetIds));
+        if(jsonArray==null) return Collections.emptyMap();
+        Map<String, String> map = new HashMap<>(jsonArray.size());
+        for (Object obj : jsonArray){
+            JSONObject jsonObject = (JSONObject) obj;
+            map.put(jsonObject.getString("packetId"), jsonObject.getString("packetName"));
+        }
+        return map;
     }
 }

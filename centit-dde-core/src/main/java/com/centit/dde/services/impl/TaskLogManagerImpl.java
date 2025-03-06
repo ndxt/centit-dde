@@ -1,11 +1,16 @@
 package com.centit.dde.services.impl;
 
 import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.dao.CallApiLogDao;
+import com.centit.dde.adapter.dao.DataPacketDao;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.services.TaskLogManager;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +71,9 @@ public class TaskLogManagerImpl implements TaskLogManager {
         }, 37, 5, TimeUnit.SECONDS);
         //默认执行时间间隔为5秒
     }
+
+    @Autowired
+    private DataPacketDao dataPacketDao;
 
     protected CallApiLogDao taskLogDao;
     public TaskLogManagerImpl(@Autowired CallApiLogDao taskLogDao) {
@@ -126,6 +135,78 @@ public class TaskLogManagerImpl implements TaskLogManager {
     @Override
     public JSONArray statApiCallSumByTopUnit(String topUnit, Date startDate, Date endDate) {
         return taskLogDao.statApiCallSum("topUnit", topUnit, startDate, endDate);
+    }
+
+    @Override
+    public JSONObject statApplicationInfo(String osId){
+        JSONObject appInfo = new JSONObject();
+        Date currentDate = DatetimeOpt.currentUtilDate();
+        String today = DatetimeOpt.convertDateToString(currentDate);
+        String yesterday = DatetimeOpt.convertDateToString(DatetimeOpt.addDays(currentDate,-1));
+        String lastWeek = DatetimeOpt.convertDateToString(DatetimeOpt.addDays(currentDate,-7));
+        int lastWeekCallSum = 0;
+        int monthCallSum = 0;
+        JSONArray jsonArray = taskLogDao.statCallSumByOs(osId,
+            DatetimeOpt.truncateToDay(DatetimeOpt.addMonths(currentDate,-1)), currentDate);
+        for(Object obj : jsonArray) {
+            if(obj instanceof Map) {
+                Map<String, Object> map = (Map<String, Object>) obj;
+                String dateS = StringBaseOpt.castObjectToString(map.get("runBeginTime"));
+                int callSum = NumberBaseOpt.castObjectToInteger(map.get("callSum"), 0);
+
+                if (today.equals(dateS)){
+                    appInfo.put("todaySum", callSum);
+                } else if (yesterday.equals(dateS)){
+                    appInfo.put("yesterdaySum", callSum);
+                }
+                if(lastWeek.compareTo(dateS) <= 0){
+                    lastWeekCallSum += callSum;
+                }
+                monthCallSum += callSum;
+            }
+        }
+        appInfo.put("weekSum", lastWeekCallSum);
+        appInfo.put("monthSum", monthCallSum);
+        appInfo.putAll(dataPacketDao.statApplicationInfo(osId));
+        return appInfo;
+    }
+
+    public void appendPacketName(JSONArray jsonArr){
+        List<String> packetIds = new ArrayList<>(50);
+        for(Object obj : jsonArr) {
+            if(obj instanceof Map) {
+                Map<String, Object> map = (Map<String, Object>) obj;
+                String packetId = StringBaseOpt.castObjectToString(map.get("taskId"));
+                if(StringUtils.isNotBlank(packetId)) {
+                    packetIds.add(packetId);
+                }
+            }
+        }
+        Map<String, String> packetNameMap = dataPacketDao.mapDataPacketName(packetIds);
+        for(Object obj : jsonArr) {
+            if(obj instanceof Map) {
+                Map<String, Object> map = (Map<String, Object>) obj;
+                String packetId = StringBaseOpt.castObjectToString(map.get("taskId"));
+                map.put("taskName", packetNameMap.get(packetId));
+            }
+        }
+    }
+
+    @Override
+    public JSONArray statTopActive(String osId, int topSize, Date startDate, Date endDate){
+        JSONArray jsonArr = taskLogDao.statTopTask(osId, "all", topSize,
+            startDate, endDate);
+        appendPacketName(jsonArr);
+        return jsonArr;
+    }
+
+
+    @Override
+    public JSONArray statTopFailed(String osId, int topSize, Date startDate, Date endDate){
+        JSONArray jsonArr = taskLogDao.statTopTask(osId, "failed", topSize,
+            startDate, endDate);
+        appendPacketName(jsonArr);
+        return jsonArr;
     }
 
 }

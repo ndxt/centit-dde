@@ -10,6 +10,7 @@ import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Impl.ESIndexer;
 import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.lang3.tuple.Pair;
@@ -22,8 +23,12 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.ParsedSum;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -147,10 +152,10 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         long intervals; String dateFormate;
         if(DatetimeOpt.calcSpanDays(startDate, endDate) >= 5 ){
             intervals = 86400000L;
-            dateFormate = "yyyy-MM-dd";
+            dateFormate = DatetimeOpt.defaultDatePattern; // "yyyy-MM-dd";
         } else {
             intervals = 3600000L;
-            dateFormate = "yyyy-MM-dd HH:mm:ss";
+            dateFormate = DatetimeOpt.datetimePattern;// "yyyy-MM-dd HH:mm:ss";
         }
         // 构建聚合
         DateHistogramAggregationBuilder dateHistogramAggregation = AggregationBuilders.dateHistogram("hourly")
@@ -160,14 +165,15 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
 
         SumAggregationBuilder errorPiecesSum = AggregationBuilders.sum("errorPiecesSum").field("errorPieces");
         SumAggregationBuilder successPiecesSum = AggregationBuilders.sum("successPiecesSum").field("successPieces");
-
         dateHistogramAggregation.subAggregation(errorPiecesSum);
         dateHistogramAggregation.subAggregation(successPiecesSum);
         sourceBuilder.aggregation(dateHistogramAggregation);
         searchRequest.source(sourceBuilder);
 
         JSONArray result = new JSONArray();
-        try (RestHighLevelClient client = callApiLogSearcher.fetchClient()) { // 使用 try-with-resources
+        RestHighLevelClient client = null;
+        try{ // 使用 try-with-resources
+            client = callApiLogSearcher.fetchClient();
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
             Histogram hourlyHistogram = searchResponse.getAggregations().get("hourly");
             for (Histogram.Bucket hourlyBucket : hourlyHistogram.getBuckets()) {
@@ -185,8 +191,100 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         } catch (IOException | ElasticsearchException e) { // 捕获更广泛的异常
             logger.error("Error occurred while processing statType: {} param: {}, start date: {}, end date: {}",
                 statType, typeId, startDate, endDate, e);
+        } finally {
+            callApiLogSearcher.releaseClient(client);
         }
+        return result;
+    }
 
+    @Override
+    public JSONArray statCallSumByOs(String osId, Date startDate, Date endDate){
+        SearchRequest searchRequest = new SearchRequest("callapilog");
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+        // 构建过滤条件
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.termQuery("applicationId", osId));
+        RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("runBeginTime")
+            .gte(startDate)
+            .lte(endDate);
+        boolQuery.must(rangeQuery);
+        sourceBuilder.query(boolQuery);
+
+        // 构建聚合
+        DateHistogramAggregationBuilder dateHistogramAggregation = AggregationBuilders.dateHistogram("daily")
+            .field("runBeginTime")
+            .interval(86400000L) // 3600000 milliseconds = 1 hour
+            .format(DatetimeOpt.defaultDatePattern); // 明确日期格式 yyyy-MM-dd
+
+        sourceBuilder.aggregation(dateHistogramAggregation);
+        searchRequest.source(sourceBuilder);
+        JSONArray result = new JSONArray();
+        RestHighLevelClient client = null;
+        try{ // 使用 try-with-resources
+            client = callApiLogSearcher.fetchClient();
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            Histogram dailyHistogram = searchResponse.getAggregations().get("daily");
+            for (Histogram.Bucket dailyBucket : dailyHistogram.getBuckets()) {
+                String keyAsString = dailyBucket.getKeyAsString();
+                long docCount = dailyBucket.getDocCount();
+                JSONObject sums = new JSONObject();
+                sums.put("runBeginTime", keyAsString); // daily
+                sums.put("callSum", docCount);
+                result.add(sums);
+            }
+        } catch (IOException | ElasticsearchException e) { // 捕获更广泛的异常
+            logger.error("Error occurred while processing application: {}, start date: {}, end date: {}",
+                osId, startDate, endDate, e);
+        } finally {
+            callApiLogSearcher.releaseClient(client);
+        }
+        return result;
+    }
+
+    @Override
+    public JSONArray statTopTask(String osId, String countType, int topSize, Date startDate, Date endDate)  {
+        SearchRequest searchRequest = new SearchRequest("callapilog");
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        // 构建过滤条件
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.termQuery("applicationId", osId));
+        if("failed".equalsIgnoreCase(countType)) {
+            boolQuery.must( QueryBuilders.rangeQuery("errorPieces").gt(0));
+        }
+        RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("runBeginTime")
+            .gte(startDate)
+            .lte(endDate);
+        boolQuery.must(rangeQuery);
+
+        sourceBuilder.query(boolQuery);
+
+        // 构建聚合
+        TermsAggregationBuilder termsAggregation = AggregationBuilders.terms("top_task_ids")
+            .field("taskId")
+            .size(topSize) // 只取前30个
+            .order(BucketOrder.count(false)); // 按条目数降序排列
+
+        sourceBuilder.aggregation(termsAggregation);
+        JSONArray result = new JSONArray();
+        searchRequest.source(sourceBuilder);
+        RestHighLevelClient client = null;
+        try{ // 使用 try-with-resources
+            client = callApiLogSearcher.fetchClient();
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            ParsedTerms topTaskIds = searchResponse.getAggregations().get("top_task_ids");
+            for (Terms.Bucket bucket : topTaskIds.getBuckets()) {
+                String keyAsString = bucket.getKeyAsString();
+                long docCount = bucket.getDocCount();
+
+                result.add(CollectionsOpt.createHashMap("taskId", keyAsString, "callSum", docCount));
+            }
+        } catch (IOException | ElasticsearchException e) { // 捕获更广泛的异常
+            logger.error("Error occurred while processing application: {}, countType: {}, start date: {}, end date: {}",
+                osId, countType, startDate, endDate, e);
+        } finally {
+            callApiLogSearcher.releaseClient(client);
+        }
         return result;
     }
 

@@ -1,6 +1,7 @@
 package com.centit.dde.services;
 
 import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.support.database.utils.PageDesc;
@@ -49,4 +50,10 @@ public interface TaskLogManager{
     JSONArray statApiCallSumByTopUnit(String topUnit, Date startDate, Date endDate);
 
     void saveTaskLog(CallApiLog callApiLog, int logLevel);
+
+    JSONObject statApplicationInfo(String osId);
+
+    JSONArray statTopActive(String osId, int topSize, Date startDate, Date endDate);
+
+    JSONArray statTopFailed(String osId, int topSize, Date startDate, Date endDate);
 }
