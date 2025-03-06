@@ -54,7 +54,9 @@ public class TaskLogManagerImpl implements TaskLogManager {
                     }
                     nCount --;
                 }
-                logger.info("成功写入{}条API调用信息。", 5000 - nCount);
+                if(5000 > nCount) {
+                    logger.info("成功写入{}条API调用信息。", 5000 - nCount);
+                }
             } catch (Exception e) {
                 logger.error("写入API调用信息报错：{}", e.getMessage());
             }
