@@ -160,7 +160,7 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
 
     @Override
     public Map<String, String> mapDataPacketName(List<String> packetIds) {
-        if(packetIds.isEmpty()) return Collections.emptyMap();
+        if(packetIds == null || packetIds.isEmpty()) return Collections.emptyMap();
         JSONArray jsonArray = DatabaseOptUtils.listObjectsByNamedSqlAsJson(this,
             "select a.packet_id, a.packet_name " +
                 "from q_data_packet a " +
