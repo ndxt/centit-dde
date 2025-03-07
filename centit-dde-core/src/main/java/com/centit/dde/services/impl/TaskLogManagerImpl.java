@@ -172,6 +172,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
     }
 
     public void appendPacketName(JSONArray jsonArr){
+        if(jsonArr == null || jsonArr.isEmpty()) return;
         List<String> packetIds = new ArrayList<>(50);
         for(Object obj : jsonArr) {
             if(obj instanceof Map) {
@@ -182,6 +183,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
                 }
             }
         }
+        if(packetIds.isEmpty()) return;
         Map<String, String> packetNameMap = dataPacketDao.mapDataPacketName(packetIds);
         for(Object obj : jsonArr) {
             if(obj instanceof Map) {
