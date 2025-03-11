@@ -199,36 +199,35 @@ public class HttpServiceOperation implements BizOperation {
                     Object requestBody = getRequestBody(bizOptJson, bizModel);
                     if("put".equals(requestMode)){
                         if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
-
+                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPut(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
-                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
                         } else if (ConstantValue.SOAP_REQUEST_TYPE.equals(requestType)) {
                             // WEB SERVICE 请求， 对返回的内容进行 处理
                             String xmlEntity = buildSoapXml(soapNameSpace, transUrl, requestBody, requestParams);
+                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, null, xmlEntity);
                             receiveJson = HttpReceiveJSON.dataOf(XMLObject.xmlStringToObject(
                                 HttpExecutor.xmlPut(httpExecutorContext, requestServerAddress, xmlEntity)));
-                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, null, xmlEntity);
                         } else {
+                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
-                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
                         }
                     } else {
                         if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
+                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPost(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
-                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
                         } else if (ConstantValue.SOAP_REQUEST_TYPE.equals(requestType)) {
                             // WEB SERVICE 请求， 对返回的内容进行 处理
                             String xmlEntity = buildSoapXml(soapNameSpace, transUrl, requestBody, requestParams);
+                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, null, xmlEntity);
                             receiveJson = HttpReceiveJSON.dataOf(XMLObject.xmlStringToObject(
                                 HttpExecutor.xmlPost(httpExecutorContext, requestServerAddress, xmlEntity)));
-                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, null, xmlEntity);
                         } else {
+                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
-                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
                         }
                     }
                 }
