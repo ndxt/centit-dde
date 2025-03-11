@@ -258,7 +258,7 @@ public class HttpServiceOperation implements BizOperation {
         StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
         sb.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" ")
             .append("xmlns:act=\"").append(soapNameSpace).append("\" >")
-            .append("<soapenv:Header/> <soapenv:Body/>");
+            .append("<soapenv:Header/> <soapenv:Body>");
         sb.append(xmlBoday);
         sb.append("</soapenv:Body> </soapenv:Envelope>");
         return sb.toString();
