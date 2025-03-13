@@ -88,13 +88,14 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
 
     @Override
     public void updatePublishPackedStatus(int logLevel, Boolean isValid, Boolean isDisable, String  packetId){
-        String sql ="UPDATE q_data_packet SET log_level= :logLevel, is_valid = :isValid, is_disable =:isDisable " +
-            " WHERE PACKET_ID = :api ";
+        String sql ="UPDATE q_data_packet SET log_level= :logLevel, is_valid = :isValid, is_disable =:isDisable, " +
+            " publish_date = :toDay WHERE PACKET_ID = :api ";
         DatabaseOptUtils.doExecuteNamedSql(this, sql, CollectionsOpt.createHashMap(
             "logLevel", logLevel,
             "isValid", isValid==null || isValid ?  BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE,
             "isDisable", isDisable!=null && isDisable ? BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE,
             "isDisable", isDisable,
+            "toDay", DatetimeOpt.currentUtilDate(),
             "api", packetId
         ));
     }
