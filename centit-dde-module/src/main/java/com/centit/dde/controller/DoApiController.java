@@ -81,7 +81,8 @@ public abstract class DoApiController extends BaseController {
 
     protected void returnObject(String packetId, String runType, String taskType, List<String> urlParams,
                                 HttpServletRequest request, HttpServletResponse response) throws IOException {
-        //judgePower(packetId,runType,request);
+        // judgePower(packetId,runType,request);
+        // 获取接口信息
         DataPacketInterface dataPacketInterface;
         if(ConstantValue.RUN_TYPE_DEBUG.equals(runType)){
             dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
@@ -114,7 +115,7 @@ public abstract class DoApiController extends BaseController {
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED,
                 getI18nMessage("dde.405.api_is_disable", request, packetId));
         }
-        //根据api默认值初始化
+        //根据api默认值初始化， 并且准备执行上下文环境
         Map<String, Object> params = new HashMap<>(dataPacketInterface.getPacketParamsValue());
         params.putAll(collectRequestParameters(request));
         //保存内部逻辑变量，有些时候需要将某些值传递到其它标签节点，这时候需要用到它
@@ -245,7 +246,6 @@ public abstract class DoApiController extends BaseController {
         if(cookies!=null){
             dataOptContext.setStackData(ConstantValue.REQUEST_HEADERS_TAG, headers);
         }
-
         //request.getCookies().
         OsInfo osInfo = platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
         dataOptContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
@@ -253,15 +253,15 @@ public abstract class DoApiController extends BaseController {
         if(userDetails!=null) {
             dataOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, userDetails);
             dataOptContext.setTopUnit(userDetails.getTopUnitCode());
-        }
-
+        } // 准备运行环境完毕
+        // 调用DDE数据执行引擎
         DataOptResult result = bizmodelService.runBizModel(dataPacketInterface, dataOptContext);
+        // 返回
         if (result.getResultType() == DataOptResult.RETURN_FILE_STREAM) {
-            String fileName = result.getReturnFilename();
             InputStream in = result.getReturnFileStream();
-            if (in != null && fileName != null) {
+            if (in != null /*&& fileName != null*/) {
                 UploadDownloadUtils.downFileRange(request, response, in,
-                    in.available(), fileName, request.getParameter("downloadType"), null);
+                    in.available(), result.getReturnFilename(), request.getParameter("downloadType"), null);
             } else {
                 JsonResultUtils.writeOriginalObject(
                     ResponseData.makeErrorMessage(ObjectException.DATA_NOT_FOUND_EXCEPTION,
