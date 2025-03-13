@@ -114,7 +114,10 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         // update error level
         DataPacket dataPacket = dataPacketDao.getObjectById(dataPacketCopy.getPacketId());
         if(dataPacket != null && !Objects.equals(dataPacket.getLogLevel(), dataPacketCopy.getLogLevel())) {
-            dataPacketDao.updatePublishPackedLogLevel(dataPacketCopy.getLogLevel(), dataPacketCopy.getPacketId());
+
+            dataPacketDao.updatePublishPackedStatus(dataPacketCopy.getLogLevel(),
+                dataPacketCopy.getIsValid(), dataPacketCopy.getIsDisable(),
+                dataPacketCopy.getPacketId());
         }
     }
 

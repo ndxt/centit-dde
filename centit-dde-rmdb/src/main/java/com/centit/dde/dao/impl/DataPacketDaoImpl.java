@@ -6,6 +6,7 @@ import com.centit.dde.adapter.dao.DataPacketDao;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import com.centit.framework.jdbc.dao.DatabaseOptUtils;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -86,10 +87,14 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
     }
 
     @Override
-    public void updatePublishPackedLogLevel(int logLevel, String  packetId){
-        String sql ="UPDATE q_data_packet SET log_level= :logLevel WHERE PACKET_ID = :api ";
+    public void updatePublishPackedStatus(int logLevel, Boolean isValid, Boolean isDisable, String  packetId){
+        String sql ="UPDATE q_data_packet SET log_level= :logLevel, is_valid = :isValid, is_disable =:isDisable " +
+            " WHERE PACKET_ID = :api ";
         DatabaseOptUtils.doExecuteNamedSql(this, sql, CollectionsOpt.createHashMap(
             "logLevel", logLevel,
+            "isValid", isValid==null || isValid ?  BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE,
+            "isDisable", isDisable!=null && isDisable ? BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE,
+            "isDisable", isDisable,
             "api", packetId
         ));
     }

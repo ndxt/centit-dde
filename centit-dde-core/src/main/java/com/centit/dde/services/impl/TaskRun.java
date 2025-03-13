@@ -73,6 +73,8 @@ public class TaskRun {
     }
 
     public DataOptResult runTask(DataPacketInterface dataPacketInterface, DataOptContext optContext) {
+        //设置 调用的接口信息
+        optContext.setStackData(ConstantValue.API_INFO_TAG, dataPacketInterface);
         CallApiLog callApiLog = buildLogInfo(optContext, dataPacketInterface);
         optContext.setCallApiLog(callApiLog);
         try {
@@ -174,7 +176,7 @@ public class TaskRun {
      */
     private void updateApiData(DataPacketInterface dataPacketInterface) throws Exception {
         if (ConstantValue.TASK_TYPE_AGENT.equals(dataPacketInterface.getTaskType())
-           && dataPacketInterface instanceof DataPacket && dataPacketInterface.getIsValid()
+           && dataPacketInterface instanceof DataPacket && dataPacketInterface.canRunAsNormal()
             && StringUtils.isNotBlank(dataPacketInterface.getTaskCron())) {
             dataPacketInterface.setLastRunTime(new Date());
             CronExpression cronExpression = new CronExpression(dataPacketInterface.getTaskCron());

@@ -141,6 +141,7 @@ public class ConstantValue {
     public static final String SESSION_DATA_TAG = "__session_data";
     public static final String MESSAGE_QUEUE_TAG = "__queue_message";
     public static final String MODULE_CALL_TAG = "__module_params";
+    public static final String API_INFO_TAG = "__api_info";
     public static final String LAST_ERROR_TAG = "__last_error";
 
     public static final String LAST_RETURN_TAG = "__last_return";

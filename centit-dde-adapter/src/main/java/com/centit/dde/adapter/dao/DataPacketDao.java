@@ -43,7 +43,7 @@ public interface DataPacketDao {
 
     void batchDeleteByPacketIds(String[] packetIds);
 
-    void updatePublishPackedLogLevel(int logLevel, String  packetId);
+    void updatePublishPackedStatus(int logLevel, Boolean isValid, Boolean isDisable, String  packetId);
 
     void updatePackedLogLevel(int logLevel, List<String>  packetIds);
 

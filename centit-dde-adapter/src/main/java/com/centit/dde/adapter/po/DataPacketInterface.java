@@ -61,4 +61,10 @@ public interface DataPacketInterface {
     Boolean getIsDisable();
 
     DataOptStep attainDataOptStep();
+
+    default boolean canRunAsNormal() {
+        boolean disable = getIsDisable() != null && getIsDisable();
+        boolean valid = getIsValid() == null || getIsValid();
+        return !disable && valid;
+    }
 }

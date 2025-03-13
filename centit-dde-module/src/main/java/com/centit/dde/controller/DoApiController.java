@@ -110,8 +110,7 @@ public abstract class DoApiController extends BaseController {
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED,
                 getI18nMessage("dde.405.request_type_not_match", request, packetId));
         }
-        if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)
-            && dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()) {
+        if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)  && ! dataPacketInterface.canRunAsNormal()) {
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED,
                 getI18nMessage("dde.405.api_is_disable", request, packetId));
         }
@@ -254,6 +253,7 @@ public abstract class DoApiController extends BaseController {
             dataOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, userDetails);
             dataOptContext.setTopUnit(userDetails.getTopUnitCode());
         } // 准备运行环境完毕
+
         // 调用DDE数据执行引擎
         DataOptResult result = bizmodelService.runBizModel(dataPacketInterface, dataOptContext);
         // 返回
