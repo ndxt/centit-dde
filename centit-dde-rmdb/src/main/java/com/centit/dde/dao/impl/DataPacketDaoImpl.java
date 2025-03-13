@@ -107,9 +107,10 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
      */
     @Override
     public void updatePackedLogLevel(int logLevel, List<String>  packetIds){
-        String sql ="UPDATE q_data_packet SET log_level= :logLevel WHERE PACKET_ID in (:apis) ";
+        String sql ="UPDATE q_data_packet SET log_level = :logLevel, publish_date = :toDay WHERE PACKET_ID in (:apis) ";
         DatabaseOptUtils.doExecuteNamedSql(this, sql, CollectionsOpt.createHashMap(
             "logLevel", logLevel,
+            "toDay", DatetimeOpt.currentUtilDate(),
             "apis", packetIds
         ));
 
@@ -122,10 +123,11 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
 
     @Override
     public void updateApplicationLogLevel(int logLevel, String osId){
-        String sql = "UPDATE q_data_packet SET log_level= ? WHERE os_id = ?";
-        DatabaseOptUtils.doExecuteSql(this, sql, new Object[]{logLevel, osId});
+        String sql = "UPDATE q_data_packet SET log_level = ?, publish_date = ? WHERE os_id = ?";
+        DatabaseOptUtils.doExecuteSql(this, sql, new Object[]
+            {logLevel,DatetimeOpt.currentUtilDate(), osId});
 
-        sql = "UPDATE q_data_packet_draft SET log_level= ? WHERE os_id = ?";
+        sql = "UPDATE q_data_packet_draft SET log_level = ? WHERE os_id = ?";
         DatabaseOptUtils.doExecuteSql(this, sql, new Object[]{logLevel, osId});
     }
 
