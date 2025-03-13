@@ -94,7 +94,6 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
             "logLevel", logLevel,
             "isValid", isValid==null || isValid ?  BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE,
             "isDisable", isDisable!=null && isDisable ? BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE,
-            "isDisable", isDisable,
             "toDay", DatetimeOpt.currentUtilDate(),
             "api", packetId
         ));
