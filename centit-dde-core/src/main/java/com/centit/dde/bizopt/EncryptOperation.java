@@ -99,13 +99,13 @@ public class EncryptOperation  implements BizOperation {
                         dataSet.toJSONString().getBytes(StandardCharsets.UTF_8));
                     break;
                 case "AES_CBC": {
-                    Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "AES");
+                    Pair<byte[], byte[]> keyAndIv = SecurityOptUtils.makeCbcKey(password, "AES");
                     cipherText = AESSecurityUtils.encryptAsCBCType(dataSet.toJSONString().getBytes(StandardCharsets.UTF_8),
                         keyAndIv.getKey(), keyAndIv.getValue());
                     }
                     break;
                 case "SM4_CBC": {
-                    Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "SM4");
+                    Pair<byte[], byte[]> keyAndIv = SecurityOptUtils.makeCbcKey(password, "SM4");
                     cipherText = SM4Util.encryptAsCBCType(dataSet.toJSONString().getBytes(StandardCharsets.UTF_8),
                         keyAndIv.getKey(), keyAndIv.getValue());
                     }
@@ -161,13 +161,13 @@ public class EncryptOperation  implements BizOperation {
                                 ByteBaseOpt.castObjectToBytes(mw));
                             break;
                         case "AES_CBC": {
-                            Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "AES");
+                            Pair<byte[], byte[]> keyAndIv = SecurityOptUtils.makeCbcKey(password, "AES");
                             cipherText = AESSecurityUtils.encryptAsCBCType(ByteBaseOpt.castObjectToBytes(mw),
                                 keyAndIv.getKey(), keyAndIv.getValue());
                         }
                         break;
                         case "SM4_CBC": {
-                            Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "SM4");
+                            Pair<byte[], byte[]> keyAndIv = SecurityOptUtils.makeCbcKey(password, "SM4");
                             cipherText = SM4Util.encryptAsCBCType(ByteBaseOpt.castObjectToBytes(mw),
                                 keyAndIv.getKey(), keyAndIv.getValue());
                         }

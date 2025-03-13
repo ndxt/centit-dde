@@ -108,7 +108,7 @@ public class SqlDataSetReader implements DataSetReader {
         //debug模式下，添加日志，显示sql语句
         if(ConstantValue.RUN_TYPE_DEBUG.equals(dataOptContext.getRunType()) ||
             (ConstantValue.LOGLEVEL_CHECK_DEBUG & dataOptContext.getLogLevel()) != 0){
-            CallApiLogDetail detailLog = BizOptUtils.createLogDetail( this.bizOptStepJson, dataOptContext);
+            CallApiLogDetail detailLog = BizOptUtils.createLogDetail(this.bizOptStepJson, dataOptContext);
             detailLog.setLogInfo(qap.toString());
         }
 

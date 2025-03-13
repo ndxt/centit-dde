@@ -113,13 +113,13 @@ public class DecipherOperation implements BizOperation {
                         cipherBytes);
                     break;
                 case "AES_CBC": {
-                    Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "AES");
+                    Pair<byte[], byte[]> keyAndIv = SecurityOptUtils.makeCbcKey(password, "AES");
                     objectText = AESSecurityUtils.decryptAsCBCType(cipherBytes,
                         keyAndIv.getKey(), keyAndIv.getValue());
                 }
                     break;
                 case "SM4_CBC": {
-                    Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "SM4");
+                    Pair<byte[], byte[]> keyAndIv = SecurityOptUtils.makeCbcKey(password, "SM4");
                     objectText = SM4Util.decryptAsCBCType(cipherBytes,
                         keyAndIv.getKey(), keyAndIv.getValue());
                 }
@@ -169,13 +169,13 @@ public class DecipherOperation implements BizOperation {
                                 cipherBytes);
                             break;
                         case "AES_CBC": {
-                            Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "AES");
+                            Pair<byte[], byte[]> keyAndIv = SecurityOptUtils.makeCbcKey(password, "AES");
                             objectText = AESSecurityUtils.decryptAsCBCType(cipherBytes,
                                 keyAndIv.getKey(), keyAndIv.getValue());
                         }
                         break;
                         case "SM4_CBC": {
-                            Pair<String, String> keyAndIv = SecurityOptUtils.makeCbcKey(password, "SM4");
+                            Pair<byte[], byte[]> keyAndIv = SecurityOptUtils.makeCbcKey(password, "SM4");
                             objectText = SM4Util.decryptAsCBCType(cipherBytes,
                                 keyAndIv.getKey(), keyAndIv.getValue());
                         }

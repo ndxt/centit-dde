@@ -2,12 +2,14 @@ package com.centit.dde.bizopt;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.centit.dde.adapter.po.CallApiLogDetail;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.BizOptUtils;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.dde.utils.FileDataSetOptUtil;
 import com.centit.framework.appclient.HttpReceiveJSON;
@@ -46,6 +48,18 @@ public class HttpServiceOperation implements BizOperation {
 
     public HttpServiceOperation(SourceInfoMetadata sourceInfoMetadata) {
         this.sourceInfoMetadata = sourceInfoMetadata;
+    }
+
+    private void saveDebugLog(JSONObject bizOptJson, DataOptContext dataOptContext,
+                              String url, Map<String, Object> requestParams, Object requestBody){
+        //debug模式下，添加put 和 post 的日志
+        if(ConstantValue.RUN_TYPE_DEBUG.equals(dataOptContext.getRunType()) ||
+            (ConstantValue.LOGLEVEL_CHECK_DEBUG & dataOptContext.getLogLevel()) != 0){
+            CallApiLogDetail detailLog = BizOptUtils.createLogDetail(bizOptJson, dataOptContext);
+            detailLog.setLogInfo(JSON.toJSONString(CollectionsOpt.createHashMap(
+                "url", UrlOptUtils.appendParamsToUrl(url, requestParams),
+                       "requestBody", requestBody)));
+        }
     }
 
     @Override
@@ -185,27 +199,33 @@ public class HttpServiceOperation implements BizOperation {
                     Object requestBody = getRequestBody(bizOptJson, bizModel);
                     if("put".equals(requestMode)){
                         if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
+                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPut(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
                         } else if (ConstantValue.SOAP_REQUEST_TYPE.equals(requestType)) {
                             // WEB SERVICE 请求， 对返回的内容进行 处理
                             String xmlEntity = buildSoapXml(soapNameSpace, transUrl, requestBody, requestParams);
+                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, null, xmlEntity);
                             receiveJson = HttpReceiveJSON.dataOf(XMLObject.xmlStringToObject(
                                 HttpExecutor.xmlPut(httpExecutorContext, requestServerAddress, xmlEntity)));
                         } else {
+                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
                         }
                     } else {
                         if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
+                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPost(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
                         } else if (ConstantValue.SOAP_REQUEST_TYPE.equals(requestType)) {
                             // WEB SERVICE 请求， 对返回的内容进行 处理
                             String xmlEntity = buildSoapXml(soapNameSpace, transUrl, requestBody, requestParams);
+                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, null, xmlEntity);
                             receiveJson = HttpReceiveJSON.dataOf(XMLObject.xmlStringToObject(
                                 HttpExecutor.xmlPost(httpExecutorContext, requestServerAddress, xmlEntity)));
                         } else {
+                            saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
                             receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
                         }
@@ -258,11 +278,14 @@ public class HttpServiceOperation implements BizOperation {
         StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
         sb.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" ")
             .append("xmlns:act=\"").append(soapNameSpace).append("\" >")
-            .append("<soapenv:Header/> <soapenv:Body/>");
-        sb.append(xmlBoday);
-        sb.append("</soapenv:Body> </soapenv:Envelope>");
+                .append("<soapenv:Header/> ")
+                .append("<soapenv:Body>")
+                    .append(xmlBoday)
+                .append("</soapenv:Body>")
+            .append("</soapenv:Envelope>");
         return sb.toString();
     }
+
     private HttpExecutorContext getHttpClientContext(SourceInfo databaseInfo) throws Exception {
         if (databaseInfo != null) {
             HttpExecutorContext executorContext = AbstractSourceConnectThreadHolder.fetchHttpContext(databaseInfo);
