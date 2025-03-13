@@ -26,7 +26,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author zhf
@@ -69,6 +71,7 @@ public class TaskRun {
         userInfo.setPrimaryUnit(osInfo.getTopUnit());
         userDetails.setUserInfo(userInfo);
         optContext.setStackData(ConstantValue.SESSION_DATA_TAG, userDetails);
+        optContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, dataPacket.getPacketParamsValue());
         runTask(dataPacket, optContext);
     }
 
