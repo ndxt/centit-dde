@@ -88,12 +88,17 @@ public abstract class DoApiController extends BaseController {
             dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
         } else {
             DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
-            DataPacket cachedPacket = dataPacketCachedMap.get(packetId);
-            if(cachedPacket == null || DatetimeOpt.compareTwoDate(dataPacket.getPublishDate(), cachedPacket.getPublishDate()) != 0){
-                dataPacketInterface = dataPacket;
-                dataPacketCachedMap.put(packetId, dataPacket);
+            if(dataPacket==null){
+                dataPacketCachedMap.remove(packetId);
+                dataPacketInterface = null;
             } else {
-                dataPacketInterface = cachedPacket;
+                DataPacket cachedPacket = dataPacketCachedMap.get(packetId);
+                if (cachedPacket == null || DatetimeOpt.compareTwoDate(dataPacket.getPublishDate(), cachedPacket.getPublishDate()) != 0) {
+                    dataPacketInterface = dataPacket;
+                    dataPacketCachedMap.put(packetId, dataPacket);
+                } else {
+                    dataPacketInterface = cachedPacket;
+                }
             }
         }
 
