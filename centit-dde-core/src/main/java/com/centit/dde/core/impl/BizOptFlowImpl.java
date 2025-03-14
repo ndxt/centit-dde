@@ -392,6 +392,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                         SecurityContextUtils.SecurityContextTokenName, dataOptContext.getSessionId(),
                         SecurityContextUtils.SecurityContextUserInfo, dataOptContext.getCurrentUserDetail().toJsonWithoutSensitive()
                     ));
+                    bizModel.getOptResult().setResultType(DataOptResult.RETURN_OPT_DATA);
                 } else {
                     bizModel.getOptResult().setResultObject(dataSet.getData());
                     //这段代码是为了兼容以前的文件类型返回值，后面应该不需要了
