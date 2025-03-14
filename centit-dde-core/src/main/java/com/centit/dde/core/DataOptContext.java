@@ -2,6 +2,7 @@ package com.centit.dde.core;
 
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.utils.ConstantValue;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
@@ -74,7 +75,6 @@ public class DataOptContext {
         return this.callApiLog.plusStepNo();
     }
 
-
     //String runType = StringBaseOpt.castObjectToString(bizModel.getStackData(ConstantValue.RUN_TYPE_TAG));
     public String getRunType() {
         return ConstantValue.RUN_TYPE_DEBUG.equals(runType) ? runType : ConstantValue.RUN_TYPE_NORMAL;
@@ -100,6 +100,11 @@ public class DataOptContext {
         }else{
             return null;
         }
+    }
+    public String getSessionId(){
+        Map<String, String> headers = (Map<String, String>) getStackData(ConstantValue.REQUEST_HEADERS_TAG);
+        if(headers == null) return null;
+        return headers.get(WebOptUtils.SESSION_ID_TOKEN);
     }
 
     public String getLoginIp(){

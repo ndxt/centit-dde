@@ -16,6 +16,7 @@ import com.centit.framework.common.ResponseSingleData;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.security.SecurityContextUtils;
 import com.centit.product.metadata.service.*;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.product.oa.service.OptFlowNoInfoManager;
@@ -385,20 +386,28 @@ public class BizOptFlowImpl implements BizOptFlow {
                 CallApiLogDetail detailLog = BizOptUtils.createLogDetail(stepJson, dataOptContext);
                 detailLog.setLogInfo(dataOptContext.getI18nMessage("dde.604.data_source_not_found2", dataSetId));
             } else {
-                bizModel.getOptResult().setResultObject(dataSet.getData());
-                //这段代码是为了兼容以前的文件类型返回值，后面应该不需要了
-                if (RETURN_RESULT_DATASET.equals(type)) {
-                    Map<String, Object> mapFirstRow = dataSet.getFirstRow();
-                    if (!mapFirstRow.isEmpty()) {
-                        Object fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
-                        if (fileData instanceof OutputStream || fileData instanceof InputStream || fileData instanceof byte[]) {
-                            bizModel.getOptResult().setResultFile(mapFirstRow);
-                            return;
-                        }
-                    }
-                    bizModel.getOptResult().setResultType(DataOptResult.RETURN_OPT_DATA);
+                //返回session数据
+                if(ConstantValue.SESSION_DATA_TAG.equals(dataSetId)){
+                    bizModel.getOptResult().setResultObject(CollectionsOpt.createHashMap(
+                        SecurityContextUtils.SecurityContextTokenName, dataOptContext.getSessionId(),
+                        SecurityContextUtils.SecurityContextUserInfo, dataOptContext.getCurrentUserDetail().toJsonWithoutSensitive()
+                    ));
                 } else {
-                    bizModel.getOptResult().setResultType(DataOptResult.RETURN_DATA_AS_RAW);
+                    bizModel.getOptResult().setResultObject(dataSet.getData());
+                    //这段代码是为了兼容以前的文件类型返回值，后面应该不需要了
+                    if (RETURN_RESULT_DATASET.equals(type)) {
+                        Map<String, Object> mapFirstRow = dataSet.getFirstRow();
+                        if (!mapFirstRow.isEmpty()) {
+                            Object fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
+                            if (fileData instanceof OutputStream || fileData instanceof InputStream || fileData instanceof byte[]) {
+                                bizModel.getOptResult().setResultFile(mapFirstRow);
+                                return;
+                            }
+                        }
+                        bizModel.getOptResult().setResultType(DataOptResult.RETURN_OPT_DATA);
+                    } else {
+                        bizModel.getOptResult().setResultType(DataOptResult.RETURN_DATA_AS_RAW);
+                    }
                 }
             }
             return;
