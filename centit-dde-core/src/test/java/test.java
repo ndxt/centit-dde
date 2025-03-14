@@ -1,12 +1,23 @@
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.centit.framework.model.basedata.UserInfo;
+import com.centit.framework.model.security.CentitUserDetails;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 
 public class test {
+
     public static void main(String[] args) {
+        JSONObject object = JSONObject.parseObject("{\"accountNonExpired\":true,\"accountNonLocked\":true,\"authenticated\":true,\"credentialsNonExpired\":true,\"enabled\":true,\"name\":\"\",\"userInfo\":{\"isValid\":\"T\",\"loginName\":\"\",\"userCode\":\"admin\",\"userName\":\"管理员\",\"userOrder\":1000,\"userType\":\"U\"},\"userOptList\":{},\"userSettings\":{},\"username\":\"\"}");
+        CentitUserDetails userDetails = object.toJavaObject(CentitUserDetails.class);
+
+
+        System.out.println(JSON.toJSONString(userDetails));
+    }
+    public static void main2(String[] args) {
 
         ArrayDeque<Integer> intDeque = new ArrayDeque<>();
         intDeque.push(1);
