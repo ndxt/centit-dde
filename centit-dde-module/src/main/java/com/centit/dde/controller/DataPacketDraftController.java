@@ -292,10 +292,11 @@ public class DataPacketDraftController extends ResourceBaseController {
         if (dataPacketDraft == null) {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "删除数据不存在！");
         }
-        LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
-        platformEnvironment.deleteOptMethod(dataPacketDraft.getOptCode());
+        LoginUserPermissionCheck.loginUserPermissionCheck(this,
+            platformEnvironment, dataPacketDraft.getOsId(), request);
         dataPacketService.deleteDataPacket(packetId);
         dataPacketDraftService.deleteDataPacket(packetId);
+        platformEnvironment.deleteOptMethod(dataPacketDraft.getOptCode());
     }
 
     @ApiOperation(value = "修改API可用状态(T:禁用，F:启用)")
