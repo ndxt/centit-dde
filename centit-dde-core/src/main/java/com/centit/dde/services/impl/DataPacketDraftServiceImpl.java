@@ -186,7 +186,6 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         dataPacketDraftDao.updateDataPacketOptJson(packetId, dataPacketOptJson);
     }
 
-
     @Override
     public void deleteDataPacket(String packetId) {
         DataPacketDraft dataPacketCopy = dataPacketDraftDao.getObjectWithReferences(packetId);
