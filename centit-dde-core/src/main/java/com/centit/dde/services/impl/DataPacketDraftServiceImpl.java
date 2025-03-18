@@ -190,8 +190,10 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
     @Override
     public void deleteDataPacket(String packetId) {
         DataPacketDraft dataPacketCopy = dataPacketDraftDao.getObjectWithReferences(packetId);
-        dataPacketDraftDao.deleteObjectById(packetId);
-        dataPacketDraftDao.deleteObjectReferences(dataPacketCopy);
+        if(dataPacketCopy!=null) {
+            dataPacketDraftDao.deleteObjectReferences(dataPacketCopy);
+            dataPacketDraftDao.deleteObjectById(packetId);
+        }
     }
 
    /* @Override

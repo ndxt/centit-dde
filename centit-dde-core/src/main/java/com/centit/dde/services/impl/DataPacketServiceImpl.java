@@ -48,9 +48,10 @@ public class DataPacketServiceImpl implements DataPacketService {
     @Override
     public void deleteDataPacket(String packetId) {
         DataPacket dataPacket = dataPacketDao.getObjectWithReferences(packetId);
-        dataPacketDao.deleteObjectReferences(dataPacket);
-        dataPacketDao.deleteObjectById(packetId);
-
+        if(dataPacket != null) {
+            dataPacketDao.deleteObjectReferences(dataPacket);
+            dataPacketDao.deleteObjectById(packetId);
+        }
     }
 
     @Override
