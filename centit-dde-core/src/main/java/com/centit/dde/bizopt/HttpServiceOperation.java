@@ -81,10 +81,6 @@ public class HttpServiceOperation implements BizOperation {
             return ResponseData.makeErrorMessage(ResponseData.ERROR_PRECONDITION_FAILED, "无效请求地址！");
 
         String transUrl = Pretreatment.mapUrlTemplateAsFormula(interfaceAddress, new BizModelJSONTransform(bizModel));
-        if(StringUtils.isNotBlank(transUrl)){
-            transUrl = interfaceAddress;
-        }
-
         //构建请求头数据
         Map<String, String> headers = new HashMap<>();
         String requestType = BuiltInOperation.getJsonFieldString(bizOptJson, "requestType", "");
