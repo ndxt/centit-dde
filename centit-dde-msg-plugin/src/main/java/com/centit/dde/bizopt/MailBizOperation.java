@@ -35,13 +35,13 @@ public class MailBizOperation implements BizOperation {
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         String sendType = bizOptJson.getString("sendType");
         String id=bizOptJson.getString("id");
-        SourceInfo sourceInfo = sourceInfoMetadata.fetchSourceInfo(bizOptJson.getString("mailServer"));
         BizModelJSONTransform jsonTransform = new BizModelJSONTransform(bizModel);
         Set<String> optUsers = CollectionsOpt.createHashSet(
             StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("optUsers"), jsonTransform)));
         String subject = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("subject"), jsonTransform));
         String content = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("content"), jsonTransform));
         if (SEND_TYPE_MAIL.equals(sendType)) {
+            SourceInfo sourceInfo = sourceInfoMetadata.fetchSourceInfo(bizOptJson.getString("mailServer"));
             EMailMsgPusher messageManager = new EMailMsgPusher();
             messageManager.setEmailServerHost(sourceInfo.getDatabaseUrl());
             messageManager.setEmailServerUser(sourceInfo.getUsername());
