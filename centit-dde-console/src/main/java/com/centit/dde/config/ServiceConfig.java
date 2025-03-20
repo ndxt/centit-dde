@@ -15,11 +15,15 @@ import com.centit.framework.dubbo.config.DubboConfig;
 import com.centit.framework.dubbo.config.IpServerDubboClientConfig;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
+import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.redis.config.RedisClientConfig;
 import com.centit.framework.security.StandardPasswordEncoderImpl;
+import com.centit.msgpusher.plugins.EMailMsgPusher;
+import com.centit.msgpusher.plugins.SystemUserEmailSupport;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.utils.ImagePdfTextExtractor;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.security.SecurityOptUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -99,9 +103,33 @@ public class ServiceConfig implements EnvironmentAware {
     }
 
     @Bean
-    public NotificationCenter notificationCenter() {
+    public NotificationCenter notificationCenter(@Autowired PlatformEnvironment platformEnvironment) {
+        String serverEmail = env.getProperty("pusher.email.server.host");
+        String serverEmailPwd ,serverEmailUser;
+        int serverEmailPort = 25;
+        if(StringUtils.isBlank(serverEmail)){
+            serverEmail = "mail.centit.com";
+            serverEmailUser = "alertmail2@centit.com";
+            serverEmailPwd = SecurityOptUtils.decodeSecurityString("aescbc:Q1nnNW1UcabHqNobleuLkg==");
+        } else{
+            serverEmailPwd = SecurityOptUtils.decodeSecurityString(
+                env.getProperty("pusher.email.server.password"));
+            serverEmailUser = env.getProperty("pusher.email.server.user");
+            serverEmailPort = NumberBaseOpt.castObjectToInteger(env.getProperty("pusher.email.server.port"), 25);
+        }
+
+        EMailMsgPusher messageManager = new EMailMsgPusher();
+        messageManager.setEmailServerHost(serverEmail);
+        messageManager.setEmailServerPort(serverEmailPort);
+        messageManager.setEmailServerUser(serverEmailUser);
+        messageManager.setEmailServerPwd(serverEmailPwd);
+
+        messageManager.setUserEmailSupport(new SystemUserEmailSupport());
         NotificationCenterImpl notificationCenter = new NotificationCenterImpl();
-        notificationCenter.initDummyMsgSenders();
+        notificationCenter.setPlatformEnvironment(platformEnvironment);
+        //禁用发送email
+        notificationCenter.registerMessageSender("email", messageManager);
+        notificationCenter.appointDefaultSendType("email");
         ///notificationCenter.registerMessageSender("innerMsg",innerMessageManager);
         return notificationCenter;
     }
