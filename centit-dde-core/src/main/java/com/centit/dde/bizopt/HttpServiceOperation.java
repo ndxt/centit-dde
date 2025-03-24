@@ -258,7 +258,7 @@ public class HttpServiceOperation implements BizOperation {
             }
             String id = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
             bizModel.putDataSet(id, dataSet);
-            return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+            return BuiltInOperation.createResponseData(dataSet.getSize(), 0, receiveJson.getCode(), receiveJson.getMessage());
         } else {
             return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION, "无数据");
         }
