@@ -42,7 +42,6 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 @Repository(value = "callApiLogDao")
 public class CallApiLogDaoImpl implements CallApiLogDao {
@@ -163,7 +162,8 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         DateHistogramAggregationBuilder dateHistogramAggregation = AggregationBuilders.dateHistogram("hourly")
             .field("runBeginTime")
             .interval(intervals) // 3600000 milliseconds = 1 hour
-            .format(dateFormate).timeZone(ZoneId.systemDefault()); // 明确日期格式
+            .format(dateFormate) // 明确日期格式
+            .timeZone(ZoneId.systemDefault()); // 设置时区
 
         SumAggregationBuilder errorPiecesSum = AggregationBuilders.sum("errorPiecesSum").field("errorPieces");
         SumAggregationBuilder successPiecesSum = AggregationBuilders.sum("successPiecesSum").field("successPieces");
@@ -217,7 +217,8 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         DateHistogramAggregationBuilder dateHistogramAggregation = AggregationBuilders.dateHistogram("daily")
             .field("runBeginTime")
             .interval(86400000L) // 3600000 milliseconds = 1 hour
-            .format(DatetimeOpt.defaultDatePattern); // 明确日期格式 yyyy-MM-dd
+            .format(DatetimeOpt.defaultDatePattern) // 明确日期格式 yyyy-MM-dd
+            .timeZone(ZoneId.systemDefault()); // 设置时区
 
         sourceBuilder.aggregation(dateHistogramAggregation);
         searchRequest.source(sourceBuilder);

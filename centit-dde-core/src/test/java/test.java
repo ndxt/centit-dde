@@ -1,7 +1,6 @@
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.centit.framework.model.basedata.UserInfo;
 import com.centit.framework.model.security.CentitUserDetails;
 
 import java.util.ArrayDeque;
