@@ -62,6 +62,14 @@ public class HttpServiceOperation implements BizOperation {
         }
     }
 
+    private HttpReceiveJSON stringToReceiveJson(String jsonStr, boolean unpacked){
+        if(unpacked){
+            return HttpReceiveJSON.valueOfJson(jsonStr);
+        }else{
+            return HttpReceiveJSON.dataOfJson(jsonStr);
+        }
+    }
+
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         //请求服务ip地址
@@ -166,6 +174,7 @@ public class HttpServiceOperation implements BizOperation {
         // requestParams.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
         //请求方式
         String requestMode = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post").toLowerCase();
+        boolean autoUnpack = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("autoUnpack"), false);
         HttpReceiveJSON receiveJson = null;
         switch (requestMode) {
             case "post":
@@ -182,13 +191,13 @@ public class HttpServiceOperation implements BizOperation {
                     InputStream fileIS = fileInfo.getFileInputStream();
                     if (fileIS != null) {
                         if("put".equals(requestMode)){
-                            receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUploadPut(httpExecutorContext,
+                            receiveJson = stringToReceiveJson(HttpExecutor.inputStreamUploadPut(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), fileIS,
-                                "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()));
+                                "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()), autoUnpack);
                         } else {
-                            receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
+                            receiveJson = stringToReceiveJson(HttpExecutor.inputStreamUpload(httpExecutorContext,
                                 UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), fileIS,
-                                "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()));
+                                "file", ContentType.APPLICATION_OCTET_STREAM, fileInfo.getFileName()), autoUnpack);
                         }
                     }
                 } else { // json 或者 form
@@ -196,8 +205,8 @@ public class HttpServiceOperation implements BizOperation {
                     if("put".equals(requestMode)){
                         if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
                             saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
-                            receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPut(httpExecutorContext,
-                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
+                            receiveJson = stringToReceiveJson(HttpExecutor.formPut(httpExecutorContext,
+                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody), autoUnpack);
                         } else if (ConstantValue.SOAP_REQUEST_TYPE.equals(requestType)) {
                             // WEB SERVICE 请求， 对返回的内容进行 处理
                             String xmlEntity = buildSoapXml(soapNameSpace, transUrl, requestBody, requestParams);
@@ -206,14 +215,14 @@ public class HttpServiceOperation implements BizOperation {
                                 HttpExecutor.xmlPut(httpExecutorContext, requestServerAddress, xmlEntity)));
                         } else {
                             saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
-                            receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPut(httpExecutorContext,
-                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody));
+                            receiveJson = stringToReceiveJson(HttpExecutor.jsonPut(httpExecutorContext,
+                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody), autoUnpack);
                         }
                     } else {
                         if (ConstantValue.FORM_REQUEST_TYPE.equals(requestType)) {
                             saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
-                            receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.formPost(httpExecutorContext,
-                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
+                            receiveJson = stringToReceiveJson(HttpExecutor.formPost(httpExecutorContext,
+                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false), autoUnpack);
                         } else if (ConstantValue.SOAP_REQUEST_TYPE.equals(requestType)) {
                             // WEB SERVICE 请求， 对返回的内容进行 处理
                             String xmlEntity = buildSoapXml(soapNameSpace, transUrl, requestBody, requestParams);
@@ -222,8 +231,8 @@ public class HttpServiceOperation implements BizOperation {
                                 HttpExecutor.xmlPost(httpExecutorContext, requestServerAddress, xmlEntity)));
                         } else {
                             saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, requestBody);
-                            receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.jsonPost(httpExecutorContext,
-                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false));
+                            receiveJson = stringToReceiveJson(HttpExecutor.jsonPost(httpExecutorContext,
+                                UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams), requestBody, false), autoUnpack);
                         }
                     }
                 }
@@ -237,13 +246,13 @@ public class HttpServiceOperation implements BizOperation {
                     bizModel.putDataSet(id, fileDataSet);
                     return BuiltInOperation.createResponseSuccessData(1);
                 }
-                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleGet(httpExecutorContext, requestServerAddress, requestParams));
+                receiveJson = stringToReceiveJson(HttpExecutor.simpleGet(httpExecutorContext, requestServerAddress, requestParams), autoUnpack);
                 if (receiveJson.getCode() != ResponseData.RESULT_OK && receiveJson.getCode() != ResponseData.HTTP_OK) {
                     return BuiltInOperation.createResponseData(0, 1, receiveJson.getCode(), receiveJson.getMessage());
                 }
                 break;
             case "delete":
-                receiveJson = HttpReceiveJSON.valueOfJson(HttpExecutor.simpleDelete(httpExecutorContext, requestServerAddress, requestParams));
+                receiveJson = stringToReceiveJson(HttpExecutor.simpleDelete(httpExecutorContext, requestServerAddress, requestParams), autoUnpack);
                 break;
             default:
                 return BuiltInOperation.createResponseData(0, 1, 500, "无效请求！");
@@ -258,7 +267,11 @@ public class HttpServiceOperation implements BizOperation {
             }
             String id = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
             bizModel.putDataSet(id, dataSet);
-            return BuiltInOperation.createResponseData(dataSet.getSize(), 0, receiveJson.getCode(), receiveJson.getMessage());
+            if(autoUnpack) {
+                return BuiltInOperation.createResponseData(dataSet.getSize(), 0, receiveJson.getCode(), receiveJson.getMessage());
+            } else {
+                return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+            }
         } else {
             return BuiltInOperation.createResponseData(0, 1, ResponseData.ERROR_OPERATION, "无数据");
         }
