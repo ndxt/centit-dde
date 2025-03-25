@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +47,6 @@ public class ApiRouteController extends DoApiController {
                 int n = needRole.compareTo(userRole);
                 if(n==0)
                     return; // 匹配成功 完成认证
-                if(SecurityContextUtils.ANONYMOUS_ROLE_CODE.equals(needRole)) return;
                 if(n<0){
                     if(!needRolesItr.hasNext())
                         break;
@@ -58,7 +58,10 @@ public class ApiRouteController extends DoApiController {
                 }
             }
         }
-
+        //匿名用户放行
+        if(needRoles.contains(new SecurityConfig(SecurityContextUtils.ANONYMOUS_ROLE_CODE))){
+            return;
+        }
         StringBuilder errorMsgBuilder = new StringBuilder("no auth: ").append(packetId).append("; need role: ");
         boolean firstRole = true;
         for(ConfigAttribute ca : needRoles){
