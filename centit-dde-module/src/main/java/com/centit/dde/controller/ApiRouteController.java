@@ -6,6 +6,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.security.CentitSecurityMetadata;
+import com.centit.framework.security.SecurityContextUtils;
 import com.centit.support.common.ObjectException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -45,6 +46,7 @@ public class ApiRouteController extends DoApiController {
                 int n = needRole.compareTo(userRole);
                 if(n==0)
                     return; // 匹配成功 完成认证
+                if(SecurityContextUtils.ANONYMOUS_ROLE_CODE.equals(needRole)) return;
                 if(n<0){
                     if(!needRolesItr.hasNext())
                         break;
