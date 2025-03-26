@@ -86,7 +86,7 @@ public class HttpServiceOperation implements BizOperation {
 
         SourceInfo sourceInfo = sourceInfoMetadata.fetchSourceInfo(serverIpAddressId);
         if (sourceInfo == null)
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_PRECONDITION_FAILED, "无效请求地址！");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_PRECONDITION_FAILED, "无效请求Restful服务！");
 
         String transUrl = Pretreatment.mapUrlTemplateAsFormula(interfaceAddress, new BizModelJSONTransform(bizModel));
         //构建请求头数据
