@@ -7,6 +7,7 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.json.JSONTransformer;
@@ -28,18 +29,45 @@ public class ManageFlowTeamAndVarOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
-        String flowInstIdDesc = bizOptJson.getString("flowInstId");
-        if (StringUtils.isBlank(flowInstIdDesc)) {
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
-                dataOptContext.getI18nMessage("error.701.field_is_blank", "flowInstId"));
-        }
+        String flowInstId, nodeInstId;
+        String setType = bizOptJson.getString("setType"); // byFlow byNode
         BizModelJSONTransform bizModelJSONTransform = new BizModelJSONTransform(bizModel);
-        String flowInstId = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowInstIdDesc, bizModelJSONTransform));
-        List<Triple<String, String, String>> flowVariables = CollectionsOpt.mapCollectionToList(
-            bizOptJson.getJSONArray("flowVariables"),
-            (a) -> new MutableTriple<>(JSONObject.from(a).getString("variableName"),
-                StringBaseOpt.objectToString(JSONTransformer.transformer(JSONObject.from(a).getString("token"), bizModelJSONTransform)),
-                StringBaseOpt.objectToString(JSONTransformer.transformer(JSONObject.from(a).getString("expression"), bizModelJSONTransform))));
+        if("byNode".equalsIgnoreCase(setType)){
+            String nodeInstIdDesc = bizOptJson.getString("nodeInstId");
+            if (StringUtils.isBlank(nodeInstIdDesc)) {
+                return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                    dataOptContext.getI18nMessage("error.701.field_is_blank", "nodeInstId"));
+            }
+            nodeInstId = StringBaseOpt.castObjectToString(JSONTransformer.transformer(nodeInstIdDesc, bizModelJSONTransform));
+            flowInstId = "";
+        }else {
+            String flowInstIdDesc = bizOptJson.getString("flowInstId");
+            if (StringUtils.isBlank(flowInstIdDesc)) {
+                return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                    dataOptContext.getI18nMessage("error.701.field_is_blank", "flowInstId"));
+            }
+            flowInstId = StringBaseOpt.castObjectToString(JSONTransformer.transformer(flowInstIdDesc, bizModelJSONTransform));
+            nodeInstId = "";
+        }
+
+        Map<String, String> variables = new HashMap<>();
+        JSONArray flowVariables = bizOptJson.getJSONArray("flowVariables");
+        if (flowVariables != null) {
+            for (Object flowVariableInfo : flowVariables) {
+                Map<String, Object> flowVariable = CollectionsOpt.objectToMap(flowVariableInfo);
+                //字段名
+                String variableName = StringBaseOpt.objectToString(flowVariable.get("variableName"));
+                //字段值
+                Object expression = flowVariable.get("expression");
+                if (expression != null) {
+                    Object transform = JSONTransformer.transformer(expression, bizModelJSONTransform);
+                    variables.put(variableName, StringBaseOpt.objectToString(transform));
+                } else {
+                    variables.put(variableName, "");
+                }
+            }
+        }
+
         JSONArray roleInfo = bizOptJson.getJSONArray("role");
         Map<String, List<String>> flowRoleUsers = new HashMap<>();
         for (Object role : roleInfo) {
@@ -51,7 +79,7 @@ public class ManageFlowTeamAndVarOperation implements BizOperation {
                 flowRoleUsers.put(roleCode, userCodeSet);
             }
         }
-        flowEngine.updateFlowInstanceTeamAndVar(flowInstId, flowVariables, flowRoleUsers);
+        flowEngine.updateFlowInstanceTeamAndVar(flowInstId, nodeInstId, variables, flowRoleUsers);
         return BuiltInOperation.createResponseSuccessData(1);
     }
 }
