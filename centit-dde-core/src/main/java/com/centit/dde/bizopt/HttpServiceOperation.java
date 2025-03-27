@@ -180,7 +180,7 @@ public class HttpServiceOperation implements BizOperation {
         // requestParams.putAll(CollectionsOpt.objectToMap(bizModel.getStackData(ConstantValue.REQUEST_PARAMS_TAG)));
         //请求方式
         String requestMode = BuiltInOperation.getJsonFieldString(bizOptJson, "requestMode", "post").toLowerCase();
-        boolean autoUnpack = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("autoUnpack"), false);
+        boolean autoUnpack = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("autoUnpack"), true);
         HttpReceiveJSON receiveJson = null;
         switch (requestMode) {
             case "post":
