@@ -142,7 +142,13 @@ public class HttpServiceOperation implements BizOperation {
             if(StringUtils.startsWith(transUrl, "/")){
                 transUrl = transUrl.substring(1);
             }
-            headers.put("SOAPAction", soapNameSpace + "/" + transUrl);
+            int p = transUrl.indexOf(":");
+            if(p>0) { // actionName : inputName
+                headers.put("SOAPAction", soapNameSpace + "/" + transUrl.substring(0, p));
+                transUrl = transUrl.substring(p + 1); // inputName
+            }else {
+                headers.put("SOAPAction", soapNameSpace + "/" + transUrl);
+            }
         } else {
             requestServerAddress = sourceInfo.getDatabaseUrl() + transUrl;
         }
@@ -278,21 +284,12 @@ public class HttpServiceOperation implements BizOperation {
     }
 
     private String buildSoapXml(String soapNameSpace, String actionName, Object requestBody, Map<String, Object> requestParams){
-        String xmlBoday;
-        if(requestBody instanceof Map){
-            xmlBoday = XMLObject.objectToXMLString("act:"+actionName, requestBody, false, false);
-        } else {
-            xmlBoday = XMLObject.objectToXMLString("act:"+actionName, requestParams, false, false);
+        if(requestBody instanceof Map) {
+            Map<?, ?> requestBodyMap = (Map<?, ?>) requestBody;
+            if (!requestBodyMap.isEmpty())
+                return SoapWsdlParser.buildSoapXml(soapNameSpace, actionName, requestBody);
         }
-        StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
-        sb.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" ")
-            .append("xmlns:act=\"").append(soapNameSpace).append("\" >")
-                .append("<soapenv:Header/> ")
-                .append("<soapenv:Body>")
-                    .append(xmlBoday)
-                .append("</soapenv:Body>")
-            .append("</soapenv:Envelope>");
-        return sb.toString();
+        return SoapWsdlParser.buildSoapXml(soapNameSpace, actionName, requestParams);
     }
 
     private HttpExecutorContext getHttpClientContext(SourceInfo databaseInfo) throws Exception {
