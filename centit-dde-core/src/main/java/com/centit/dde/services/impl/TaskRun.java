@@ -56,6 +56,10 @@ public class TaskRun {
     public void agentRunTask(String dataPacketId) {
         DataPacket dataPacket = dataPacketDao.getObjectById(dataPacketId);
 //        CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
+        if(!dataPacket.canRunAsNormal()) {
+            log.error("定时任务：{}，已被禁用不能执行，请联系开发人员。", dataPacket.getPacketName());
+            return;
+        }
         DataOptContext optContext = new DataOptContext(messageSource, Locale.SIMPLIFIED_CHINESE);
         OsInfo osInfo = platformEnvironment.getOsInfo(dataPacket.getOsId());
         optContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
