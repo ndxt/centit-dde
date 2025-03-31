@@ -111,7 +111,6 @@ public class EsQueryBizOperation implements BizOperation {
                                       ESSearcher esSearcher, JSONObject bizOptJson, BizModelJSONTransform transform){
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-
         for (Map.Entry<String, Object> entry : queryParam.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
@@ -121,24 +120,19 @@ public class EsQueryBizOperation implements BizOperation {
         }
 
         esSearcher.initTypeFields(indexFile?FileDocument.class:ObjectDocument.class);
-
         if (StringUtils.isNotBlank(keyword)){
-            QueryStringQueryBuilder multiMatchQueryBuilder = QueryBuilders.queryStringQuery(
-                keyword).fields(esSearcher.getQueryFields());
+            QueryStringQueryBuilder stringQueryBuilder =
+                QueryBuilders.queryStringQuery(keyword).fields(esSearcher.getQueryFields());
                 //QueryBuilders.multiMatchQuery(keyword, esSearcher.getQueryFields());
             if (bizOptJson.getBoolean("custom")){
-
                 String analyzer = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform,
                     bizOptJson.getString("analyzer")));
-
                 String minimumShouldMatch = StringBaseOpt.castObjectToString(
                     DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("minimumShouldMatch")));
-
-                if (StringUtils.isNotBlank(analyzer)) multiMatchQueryBuilder.analyzer(analyzer);
-
-                if (StringUtils.isNotBlank(minimumShouldMatch)) multiMatchQueryBuilder.minimumShouldMatch(minimumShouldMatch);
+                if (StringUtils.isNotBlank(analyzer)) stringQueryBuilder.analyzer(analyzer);
+                if (StringUtils.isNotBlank(minimumShouldMatch)) stringQueryBuilder.minimumShouldMatch(minimumShouldMatch);
             }
-            boolQueryBuilder.must(multiMatchQueryBuilder);
+            boolQueryBuilder.must(stringQueryBuilder);
         }
         return boolQueryBuilder;
     }
