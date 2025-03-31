@@ -123,9 +123,9 @@ public class EsQueryBizOperation implements BizOperation {
         esSearcher.initTypeFields(indexFile?FileDocument.class:ObjectDocument.class);
 
         if (StringUtils.isNotBlank(keyword)){
-
-            MultiMatchQueryBuilder multiMatchQueryBuilder = QueryBuilders.multiMatchQuery(keyword, esSearcher.getQueryFields());
-
+            QueryStringQueryBuilder multiMatchQueryBuilder = QueryBuilders.queryStringQuery(
+                keyword).fields(esSearcher.getQueryFields());
+                //QueryBuilders.multiMatchQuery(keyword, esSearcher.getQueryFields());
             if (bizOptJson.getBoolean("custom")){
 
                 String analyzer = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform,
@@ -183,17 +183,21 @@ public class EsQueryBizOperation implements BizOperation {
             }
         }
 
-        Object queryWord =JSONTransformer.transformer(bizOptJson.getString("queryParameter"), transform);
-        if (queryWord != null){
+        String queryWord = StringBaseOpt.castObjectToString(
+            JSONTransformer.transformer(bizOptJson.getString("queryParameter"), transform));
+        if (StringUtils.isNotBlank(queryWord)){
             //添加查询关键字
-            MultiMatchQueryBuilder multiMatchQueryBuilder = queryColumnList != null && queryColumnList.length > 0 ?
-                QueryBuilders.multiMatchQuery(queryWord, queryColumnList) :
-                QueryBuilders.multiMatchQuery(queryWord);
+            QueryStringQueryBuilder stringQueryBuilder = QueryBuilders.queryStringQuery(queryWord);
+            if(queryColumnList != null){
+                for(String s : queryColumnList){
+                    stringQueryBuilder.field(s);
+                }
+            }
             //最小匹配度 百分比
             int minimumShouldMatch = bizOptJson.getIntValue("minimumShouldMath");
-            if (minimumShouldMatch>0) multiMatchQueryBuilder.minimumShouldMatch(minimumShouldMatch+"%");
-            boolQueryBuilder.must(multiMatchQueryBuilder);
-        }else {
+            if (minimumShouldMatch>0) stringQueryBuilder.minimumShouldMatch(minimumShouldMatch+"%");
+            boolQueryBuilder.must(stringQueryBuilder);
+        } else { // TODO 这个不懂
             MatchAllQueryBuilder matchAllQueryBuilder = QueryBuilders.matchAllQuery();
             boolQueryBuilder.must(matchAllQueryBuilder);
         }
