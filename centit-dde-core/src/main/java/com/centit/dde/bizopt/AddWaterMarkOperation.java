@@ -69,8 +69,8 @@ public class AddWaterMarkOperation implements BizOperation {
                 dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
         }
         int  page = NumberBaseOpt.castObjectToInteger(bizOptJson.get("page"), -1);
-        float  x = NumberBaseOpt.castObjectToFloat(bizOptJson.get("x"), 0f);
-        float  y = NumberBaseOpt.castObjectToFloat(bizOptJson.get("y"), 0f);
+        float  x = NumberBaseOpt.castObjectToFloat(bizOptJson.get("x"), 0.5f);
+        float  y = NumberBaseOpt.castObjectToFloat(bizOptJson.get("y"), 0.5f);
         float  w = NumberBaseOpt.castObjectToFloat(bizOptJson.get("width"), -1f);
         float  h = NumberBaseOpt.castObjectToFloat(bizOptJson.get("height"), -1f);
         float opacity = NumberBaseOpt.castObjectToFloat(bizOptJson.get("opacity"), 0.5f);
@@ -140,7 +140,7 @@ public class AddWaterMarkOperation implements BizOperation {
     }
 
     private ResponseData addImageWaterMark(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
-        //获取参数 BufferedImage image, String waterMark, String fontName, Color color, int size, int x, int y
+        //获取参数 BufferedImage image, String waterMark, String fontName, Color color, int size, float x, float y
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String sourDsName = bizOptJson.getString("source");
         DataSet dataSet = bizModel.getDataSet(sourDsName);
@@ -164,8 +164,8 @@ public class AddWaterMarkOperation implements BizOperation {
                     if(StringUtils.isNotBlank(transMark)){
                         text = transMark;
                     }
-                    textList.add(ImageOpt.createImageText(textObj.getIntValue("x"),
-                        textObj.getIntValue("y"), text ));
+                    textList.add(ImageOpt.createImageText(textObj.getFloatValue("x"),
+                        textObj.getFloatValue("y"), text ));
                 }
             }
         }
@@ -188,7 +188,7 @@ public class AddWaterMarkOperation implements BizOperation {
                     imageType = imageType.toLowerCase();
                 }
                 if(ImageOpt.addTextToImage(fileDataSet.getFileInputStream(), imageType, imageFile,
-                    font, markColor, fontSize,textList)) {
+                    font, markColor, fontSize, textList)) {
                     FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
                         imageFile.size(), imageFile);
                     bizModel.putDataSet(targetDsName, pdfDataset);
