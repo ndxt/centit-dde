@@ -169,8 +169,8 @@ public class AddWaterMarkOperation implements BizOperation {
                 }
             }
         }
-
-        Color markColor = ImageOpt.castObjectToColor(color, Color.WHITE);
+        //文字默认为黑色
+        Color markColor = ImageOpt.castObjectToColor(color, Color.BLACK);
         if(dataSet.getSize() == 1) {
             FileDataSet fileDataSet;
             if (dataSet instanceof FileDataSet) {
