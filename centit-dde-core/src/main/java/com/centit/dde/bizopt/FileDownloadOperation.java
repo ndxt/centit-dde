@@ -44,7 +44,8 @@ public class FileDownloadOperation implements BizOperation {
         String fileName = BuiltInOperation.getJsonFieldString(bizOptJson, ConstantValue.FILE_NAME, "");
 
         DataSet dataSet = bizModel.getDataSet(sourDsName);
-        BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel, dataSet);
+        BizModelJSONTransform transformer = dataSet==null? new BizModelJSONTransform(bizModel)
+             : new BizModelJSONTransform(bizModel, dataSet.getData());
 
         ArrayList<String> fileIds = new ArrayList<>();
         if(StringUtils.isNotBlank(fileId)){
