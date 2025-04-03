@@ -8,13 +8,11 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
-import com.centit.dde.utils.DatasetVariableTranslate;
 import com.centit.fileserver.common.FileBaseInfo;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.ZipCompressor;
-import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileType;
 import org.apache.commons.lang3.StringUtils;
@@ -44,19 +42,15 @@ public class FileDownloadOperation implements BizOperation {
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         String fileId = BuiltInOperation.getJsonFieldString(bizOptJson, "fileId", "");
         String fileName = BuiltInOperation.getJsonFieldString(bizOptJson, ConstantValue.FILE_NAME, "");
-        DataSet dataSet = bizModel.getDataSet(sourDsName);
-        if (dataSet == null) {
-            return BuiltInOperation.createResponseData(0, 1,
-                ObjectException.DATA_NOT_FOUND_EXCEPTION,
-                dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
-        }
-        ArrayList<String> fileIds = new ArrayList<>();
 
-        Map<String, Object> mapFirstRow = dataSet.getFirstRow();
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
+        BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel, dataSet);
+
+        ArrayList<String> fileIds = new ArrayList<>();
         if(StringUtils.isNotBlank(fileId)){
-            Object idObj = new DatasetVariableTranslate(dataSet).attainExpressionValue(fileId);
+            Object idObj = transformer.attainExpressionValue(fileId);
             if(idObj instanceof Collection){
-                for(Object obj :(Collection<Object>) idObj){
+                for(Object obj :(Collection<?>) idObj){
                     String fid = StringBaseOpt.castObjectToString(obj);
                     if(StringUtils.isNotBlank(fid)) {
                         fileIds.add(fid);
@@ -75,12 +69,14 @@ public class FileDownloadOperation implements BizOperation {
                 }
             }
         } else {
+            Map<String, Object> mapFirstRow = dataSet.getFirstRow();
             fileIds.add(StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_ID)));
         }
 
         if(StringUtils.isNotBlank(fileName)){
-            fileName = new BizModelJSONTransform(bizModel).mapTemplateString(fileName);
+            fileName = transformer.mapTemplateString(fileName);
         } else {
+            Map<String, Object> mapFirstRow = dataSet.getFirstRow();
             fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
         }
 
