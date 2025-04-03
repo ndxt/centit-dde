@@ -179,7 +179,7 @@ public class DataSet implements DataSetReader, Serializable {
         }
         if (this.data instanceof Collection) {
             Collection<?> objects = (Collection<?>) this.data;
-            if (objects.size() == 0) {
+            if (objects.isEmpty()) {
                 return Collections.emptyMap();
             }
             return CollectionsOpt.objectToMap(objects.iterator().next());
