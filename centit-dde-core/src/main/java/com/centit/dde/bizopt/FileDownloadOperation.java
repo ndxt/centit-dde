@@ -70,9 +70,15 @@ public class FileDownloadOperation implements BizOperation {
             }
         } else {
             Map<String, Object> mapFirstRow = dataSet.getFirstRow();
-            fileIds.add(StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_ID)));
+            String temFileId = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_ID));
+            if(StringUtils.isNotBlank(temFileId))
+                fileIds.add(temFileId);
         }
 
+        if(fileIds.isEmpty()){
+            return BuiltInOperation.createResponseData(0, 1, 404,
+                "找不到和"+ fileId + "对应为文件id值。" );
+        }
         if(StringUtils.isNotBlank(fileName)){
             fileName = transformer.mapTemplateString(fileName);
         } else {
@@ -83,12 +89,10 @@ public class FileDownloadOperation implements BizOperation {
         FileDataSet objectToDataSet = new FileDataSet();
         if(fileIds.size()==1) {
             FileBaseInfo fileInfo = fileInfoOpt.getFileInfo(fileIds.get(0));
-
             if(fileInfo!=null) {
                 if (StringUtils.isBlank(fileName))
                     fileName = fileInfo.getFileName();
                 objectToDataSet.setFileInfo(fileInfo);
-
             }
             try(InputStream inputStream = fileInfoOpt.loadFileStream(fileIds.get(0))) {
                 ByteArrayOutputStream outs = new ByteArrayOutputStream();
