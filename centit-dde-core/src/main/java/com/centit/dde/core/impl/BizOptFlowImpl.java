@@ -388,10 +388,9 @@ public class BizOptFlowImpl implements BizOptFlow {
             } else {
                 //返回session数据
                 if(ConstantValue.SESSION_DATA_TAG.equals(dataSetId)){
-                    bizModel.getOptResult().setResultObject(CollectionsOpt.createHashMap(
-                        SecurityContextUtils.SecurityContextTokenName, dataOptContext.getSessionId(),
-                        SecurityContextUtils.SecurityContextUserInfo, dataOptContext.getCurrentUserDetail().toJsonWithoutSensitive()
-                    ));
+                    JSONObject sessionData = dataOptContext.getCurrentUserDetail().toJsonWithoutSensitive();
+                    sessionData.put(SecurityContextUtils.SecurityContextTokenName, dataOptContext.getSessionId());
+                    bizModel.getOptResult().setResultObject(sessionData);
                     bizModel.getOptResult().setResultType(DataOptResult.RETURN_OPT_DATA);
                 } else {
                     bizModel.getOptResult().setResultObject(dataSet.getData());
