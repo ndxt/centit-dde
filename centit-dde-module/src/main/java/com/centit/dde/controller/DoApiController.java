@@ -18,6 +18,7 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OsInfo;
 import com.centit.framework.model.basedata.WorkGroup;
 import com.centit.framework.model.security.CentitUserDetails;
+import com.centit.framework.security.SecurityContextUtils;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
@@ -253,6 +254,7 @@ public abstract class DoApiController extends BaseController {
             }
         }
 
+        params.put(SecurityContextUtils.SecurityContextTokenName, request.getSession().getId());
         dataOptContext.setStackData(ConstantValue.REQUEST_PARAMS_TAG, params);
         if(urlParams != null && !urlParams.isEmpty()) {
             dataOptContext.setStackData(ConstantValue.REQUEST_URL_PARAMS_TAG, urlParams);
