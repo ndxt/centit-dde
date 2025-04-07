@@ -151,26 +151,30 @@ public abstract class DoApiController extends BaseController {
                     }
                 }
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, bodyMap);
-            }  else if(StringUtils.contains(contentType, "application/octet-stream")){
-                String fileName = request.getHeader("filename");
-                String fileName2 = StringBaseOpt.castObjectToString(params.get("fileName"));
-                if (StringUtils.isBlank(fileName)) {
-                    fileName = request.getHeader("fileName");
-                    if(StringUtils.isBlank(fileName)) {
-                        if (StringUtils.isNotBlank(fileName2)) {
-                            fileName = fileName2;
-                        }
+            } else if(StringUtils.contains(contentType, "application/octet-stream")){
+                String filename = request.getHeader("filename");
+                if (StringUtils.isBlank(filename)) {
+                    filename = request.getHeader("fileName");
+                    if (StringUtils.isBlank(filename)) {
+                        filename = StringBaseOpt.castObjectToString(params.get("filename"));
                     }
                 }
-                if (StringUtils.isNotBlank(fileName) && StringUtils.isBlank(fileName2)) {
-                    params.put("fileName", fileName);
+                String fileName2 = StringBaseOpt.castObjectToString(params.get("fileName"));
+                if (StringUtils.isNotBlank(filename) && StringUtils.isBlank(fileName2)) {
+                    params.put("fileName", filename);
+                }
+                if (StringUtils.isBlank(filename)) {
+                    filename = fileName2;
+                    if (StringUtils.isBlank(filename)) {
+                        filename = "attachment.dat";
+                    }
                 }
 
                 InputStream inputStream = UploadDownloadUtils.fetchInputStreamFromMultipartResolver(request).getRight();
                 if (inputStream != null) {
                     dataOptContext.setStackData(ConstantValue.REQUEST_FILE_TAG,
                         CollectionsOpt.createHashMap(
-                            "fileName", fileName,
+                            "fileName", filename,
                             "fileSize", inputStream.available(),
                             "fileContent", inputStream));
                 }
