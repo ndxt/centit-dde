@@ -26,6 +26,7 @@ import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileIOOpt;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.InvalidFileNameException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -201,16 +202,26 @@ public abstract class DoApiController extends BaseController {
                     String fieldName = fi.getFieldName();
                     String itemType = fi.getHeaders().getHeader("Content-Type");
                     if (!fi.isFormField() || itemType.contains("application/octet-stream")) {
-                        String filename = fi.getHeaders().getHeader("filename");
-                        if (StringUtils.isBlank(filename)) {
-                            filename = StringBaseOpt.castObjectToString(params.get("filename"));
-                            if (StringUtils.isBlank(filename)) {
-                                filename = StringBaseOpt.castObjectToString(params.get("fileName"));
-                            }
+                        String filename = null;
+                        try{
+                            filename = fi.getName();
+                        } catch (InvalidFileNameException e){
+                            logger.error(e.getMessage());
                         }
-                        String fileName2 = StringBaseOpt.castObjectToString(params.get("fileName"));
-                        if (StringUtils.isNotBlank(filename) && StringUtils.isBlank(fileName2)) {
-                            params.put("fileName", filename);
+                        if (StringUtils.isBlank(filename)) {
+                            filename = fi.getHeaders().getHeader("filename");
+                            if (StringUtils.isBlank(filename)) {
+                                filename = fi.getHeaders().getHeader("fileName");
+                                if (StringUtils.isBlank(filename)) {
+                                    filename = StringBaseOpt.castObjectToString(params.get("filename"));
+                                    if (StringUtils.isBlank(filename)) {
+                                        filename = StringBaseOpt.castObjectToString(params.get("fileName"));
+                                        if (StringUtils.isBlank(filename)) {
+                                            filename = "attachment.dat";
+                                        }
+                                    }
+                                }
+                            }
                         }
                         InputStream inputStream = fi.getInputStream();
                         if (inputStream != null) {
@@ -219,7 +230,9 @@ public abstract class DoApiController extends BaseController {
                                 "fileSize", inputStream.available(),
                                 "fileContent", inputStream);
                             dataOptContext.setStackData(ConstantValue.REQUEST_FILE_TAG, fileData);
-                            bodyMap.put(fieldName, fileData);
+                            if(StringUtils.isNotBlank(fieldName)) {
+                                bodyMap.put(fieldName, fileData);
+                            }
                         }
                     } else if (itemType.contains("application/json")) {
                         String bodyString = fi.getString();
