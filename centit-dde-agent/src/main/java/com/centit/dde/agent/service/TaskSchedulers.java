@@ -167,9 +167,9 @@ public class TaskSchedulers {
     }
 
     /**
-     * 5minute
+     * 2 minute
      */
-    @Scheduled(fixedDelay = 1000 * 50)
+    @Scheduled(fixedDelay = 1000 * 120)
     public void work() {
         refreshTask();
     }

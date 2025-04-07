@@ -6,12 +6,14 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.security.CentitSecurityMetadata;
+import com.centit.framework.security.SecurityContextUtils;
 import com.centit.support.common.ObjectException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,7 +58,10 @@ public class ApiRouteController extends DoApiController {
                 }
             }
         }
-
+        //匿名用户放行
+        if(needRoles.contains(new SecurityConfig(SecurityContextUtils.ANONYMOUS_ROLE_CODE))){
+            return;
+        }
         StringBuilder errorMsgBuilder = new StringBuilder("no auth: ").append(packetId).append("; need role: ");
         boolean firstRole = true;
         for(ConfigAttribute ca : needRoles){

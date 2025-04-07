@@ -8,7 +8,6 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
-import com.centit.dde.utils.DatasetVariableTranslate;
 import com.centit.fileserver.common.FileBaseInfo;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
@@ -44,19 +43,20 @@ public class FileDownloadOperation implements BizOperation {
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", sourDsName);
         String fileId = BuiltInOperation.getJsonFieldString(bizOptJson, "fileId", "");
         String fileName = BuiltInOperation.getJsonFieldString(bizOptJson, ConstantValue.FILE_NAME, "");
+
         DataSet dataSet = bizModel.getDataSet(sourDsName);
         if (dataSet == null) {
             return BuiltInOperation.createResponseData(0, 1,
                 ObjectException.DATA_NOT_FOUND_EXCEPTION,
                 dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
         }
-        ArrayList<String> fileIds = new ArrayList<>();
+        BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel, dataSet.getData());
 
-        Map<String, Object> mapFirstRow = dataSet.getFirstRow();
+        ArrayList<String> fileIds = new ArrayList<>();
         if(StringUtils.isNotBlank(fileId)){
-            Object idObj = new DatasetVariableTranslate(dataSet).attainExpressionValue(fileId);
+            Object idObj = transformer.attainExpressionValue(fileId);
             if(idObj instanceof Collection){
-                for(Object obj :(Collection<Object>) idObj){
+                for(Object obj :(Collection<?>) idObj){
                     String fid = StringBaseOpt.castObjectToString(obj);
                     if(StringUtils.isNotBlank(fid)) {
                         fileIds.add(fid);
@@ -75,24 +75,30 @@ public class FileDownloadOperation implements BizOperation {
                 }
             }
         } else {
-            fileIds.add(StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_ID)));
+            Map<String, Object> mapFirstRow = dataSet.getFirstRow();
+            String temFileId = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_ID));
+            if(StringUtils.isNotBlank(temFileId))
+                fileIds.add(temFileId);
         }
 
+        if(fileIds.isEmpty()){
+            return BuiltInOperation.createResponseData(0, 1, 404,
+                "找不到和"+ fileId + "对应为文件id值。" );
+        }
         if(StringUtils.isNotBlank(fileName)){
-            fileName = new BizModelJSONTransform(bizModel).mapTemplateString(fileName);
+            fileName = transformer.mapTemplateString(fileName);
         } else {
+            Map<String, Object> mapFirstRow = dataSet.getFirstRow();
             fileName = StringBaseOpt.castObjectToString(mapFirstRow.get(ConstantValue.FILE_NAME));
         }
 
         FileDataSet objectToDataSet = new FileDataSet();
         if(fileIds.size()==1) {
             FileBaseInfo fileInfo = fileInfoOpt.getFileInfo(fileIds.get(0));
-
             if(fileInfo!=null) {
                 if (StringUtils.isBlank(fileName))
                     fileName = fileInfo.getFileName();
                 objectToDataSet.setFileInfo(fileInfo);
-
             }
             try(InputStream inputStream = fileInfoOpt.loadFileStream(fileIds.get(0))) {
                 ByteArrayOutputStream outs = new ByteArrayOutputStream();

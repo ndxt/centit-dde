@@ -111,7 +111,6 @@ public class EsQueryBizOperation implements BizOperation {
                                       ESSearcher esSearcher, JSONObject bizOptJson, BizModelJSONTransform transform){
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-
         for (Map.Entry<String, Object> entry : queryParam.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
@@ -121,24 +120,19 @@ public class EsQueryBizOperation implements BizOperation {
         }
 
         esSearcher.initTypeFields(indexFile?FileDocument.class:ObjectDocument.class);
-
         if (StringUtils.isNotBlank(keyword)){
-
-            MultiMatchQueryBuilder multiMatchQueryBuilder = QueryBuilders.multiMatchQuery(keyword, esSearcher.getQueryFields());
-
+            QueryStringQueryBuilder stringQueryBuilder =
+                QueryBuilders.queryStringQuery(keyword).fields(esSearcher.getQueryFields());
+                //QueryBuilders.multiMatchQuery(keyword, esSearcher.getQueryFields());
             if (bizOptJson.getBoolean("custom")){
-
                 String analyzer = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform,
                     bizOptJson.getString("analyzer")));
-
                 String minimumShouldMatch = StringBaseOpt.castObjectToString(
                     DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("minimumShouldMatch")));
-
-                if (StringUtils.isNotBlank(analyzer)) multiMatchQueryBuilder.analyzer(analyzer);
-
-                if (StringUtils.isNotBlank(minimumShouldMatch)) multiMatchQueryBuilder.minimumShouldMatch(minimumShouldMatch);
+                if (StringUtils.isNotBlank(analyzer)) stringQueryBuilder.analyzer(analyzer);
+                if (StringUtils.isNotBlank(minimumShouldMatch)) stringQueryBuilder.minimumShouldMatch(minimumShouldMatch);
             }
-            boolQueryBuilder.must(multiMatchQueryBuilder);
+            boolQueryBuilder.must(stringQueryBuilder);
         }
         return boolQueryBuilder;
     }
@@ -183,17 +177,21 @@ public class EsQueryBizOperation implements BizOperation {
             }
         }
 
-        Object queryWord =JSONTransformer.transformer(bizOptJson.getString("queryParameter"), transform);
-        if (queryWord != null){
+        String queryWord = StringBaseOpt.castObjectToString(
+            JSONTransformer.transformer(bizOptJson.getString("queryParameter"), transform));
+        if (StringUtils.isNotBlank(queryWord)){
             //添加查询关键字
-            MultiMatchQueryBuilder multiMatchQueryBuilder = queryColumnList != null && queryColumnList.length > 0 ?
-                QueryBuilders.multiMatchQuery(queryWord, queryColumnList) :
-                QueryBuilders.multiMatchQuery(queryWord);
+            QueryStringQueryBuilder stringQueryBuilder = QueryBuilders.queryStringQuery(queryWord);
+            if(queryColumnList != null){
+                for(String s : queryColumnList){
+                    stringQueryBuilder.field(s);
+                }
+            }
             //最小匹配度 百分比
             int minimumShouldMatch = bizOptJson.getIntValue("minimumShouldMath");
-            if (minimumShouldMatch>0) multiMatchQueryBuilder.minimumShouldMatch(minimumShouldMatch+"%");
-            boolQueryBuilder.must(multiMatchQueryBuilder);
-        }else {
+            if (minimumShouldMatch>0) stringQueryBuilder.minimumShouldMatch(minimumShouldMatch+"%");
+            boolQueryBuilder.must(stringQueryBuilder);
+        } else { // TODO 这个不懂
             MatchAllQueryBuilder matchAllQueryBuilder = QueryBuilders.matchAllQuery();
             boolQueryBuilder.must(matchAllQueryBuilder);
         }
