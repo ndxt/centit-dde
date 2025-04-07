@@ -201,7 +201,7 @@ public abstract class DoApiController extends BaseController {
                     String fieldName = fi.getFieldName();
                     String itemType = fi.getHeaders().getHeader("Content-Type");
                     if (!fi.isFormField() || itemType.contains("application/octet-stream")) {
-                        String filename = fi.getHeaders().getHeader("filename");
+                        String filename = fi.getName();
                         if (StringUtils.isBlank(filename)) {
                             filename = StringBaseOpt.castObjectToString(params.get("filename"));
                             if (StringUtils.isBlank(filename)) {
