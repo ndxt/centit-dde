@@ -275,7 +275,6 @@ public abstract class DoApiController extends BaseController {
             dataOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, userDetails);
             dataOptContext.setTopUnit(userDetails.getTopUnitCode());
         } // 准备运行环境完毕
-
         // 调用DDE数据执行引擎
         DataOptResult result = bizmodelService.runBizModel(dataPacketInterface, dataOptContext);
         // 返回
