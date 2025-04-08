@@ -399,6 +399,7 @@ public class BizOptFlowImpl implements BizOptFlow {
                     detailLog.setLogInfo(dataOptContext.getI18nMessage("dde.604.data_source_not_found2", dataSetId));
                     return;
                 }
+
                 Map<String, Object> mapFirstRow = dataSet.getFirstRow();
                 if (RETURN_RESULT_DATASET.equals(type) && !mapFirstRow.isEmpty()) {
                     Object fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
@@ -407,7 +408,6 @@ public class BizOptFlowImpl implements BizOptFlow {
                         return;
                     }
                 }
-
                 bizModel.getOptResult().setResultObject(dataSet.getData());
             }
             //这段代码是为了兼容以前的文件类型返回值，后面应该不需要了
