@@ -16,6 +16,7 @@ import com.centit.framework.common.ResponseSingleData;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.security.SecurityContextUtils;
 import com.centit.product.metadata.service.*;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
@@ -40,7 +41,6 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.*;
 
 /**
@@ -375,40 +375,36 @@ public class BizOptFlowImpl implements BizOptFlow {
 
         if (RETURN_RESULT_DATASET.equals(type) || RETURN_RESULT_ORIGIN.equals(type)) {
             dataSetId = BuiltInOperation.getJsonFieldString(stepJson, "source", "");
-            DataSet dataSet = bizModel.getDataSet(dataSetId);
-            if (dataSet == null) {
-                bizModel.getOptResult().setStepResponse(
-                    BuiltInOperation.getJsonFieldString(stepJson, "id", "endNode"),
-                    ResponseData.makeErrorMessage(ObjectException.DATA_NOT_FOUND_EXCEPTION,
-                        dataOptContext.getI18nMessage("dde.604.data_source_not_found2", dataSetId)));
-
-                //添加错误日志
-                CallApiLogDetail detailLog = BizOptUtils.createLogDetail(stepJson, dataOptContext);
-                detailLog.setLogInfo(dataOptContext.getI18nMessage("dde.604.data_source_not_found2", dataSetId));
-            } else {
-                //返回session数据
-                if(ConstantValue.SESSION_DATA_TAG.equals(dataSetId)){
-                    JSONObject sessionData = dataOptContext.getCurrentUserDetail().toJsonWithoutSensitive();
-                    sessionData.put(SecurityContextUtils.SecurityContextTokenName, dataOptContext.getSessionId());
-                    bizModel.getOptResult().setResultObject(sessionData);
-                    bizModel.getOptResult().setResultType(DataOptResult.RETURN_OPT_DATA);
+            //返回session数据
+            if(ConstantValue.SESSION_DATA_TAG.equals(dataSetId)){
+                CentitUserDetails userDetails = dataOptContext.getCurrentUserDetail();
+                JSONObject sessionData;
+                if(userDetails == null){
+                    sessionData = new JSONObject();
                 } else {
-                    bizModel.getOptResult().setResultObject(dataSet.getData());
-                    //这段代码是为了兼容以前的文件类型返回值，后面应该不需要了
-                    if (RETURN_RESULT_DATASET.equals(type)) {
-                        Map<String, Object> mapFirstRow = dataSet.getFirstRow();
-                        if (!mapFirstRow.isEmpty()) {
-                            Object fileData = mapFirstRow.get(ConstantValue.FILE_CONTENT);
-                            if (fileData instanceof OutputStream || fileData instanceof InputStream || fileData instanceof byte[]) {
-                                bizModel.getOptResult().setResultFile(mapFirstRow);
-                                return;
-                            }
-                        }
-                        bizModel.getOptResult().setResultType(DataOptResult.RETURN_OPT_DATA);
-                    } else {
-                        bizModel.getOptResult().setResultType(DataOptResult.RETURN_DATA_AS_RAW);
-                    }
+                    sessionData = userDetails.toJsonWithoutSensitive();
                 }
+                sessionData.put(SecurityContextUtils.SecurityContextTokenName, dataOptContext.getSessionId());
+                bizModel.getOptResult().setResultObject(sessionData);
+            } else {
+                DataSet dataSet = bizModel.getDataSet(dataSetId);
+                if (dataSet == null) {
+                    bizModel.getOptResult().setStepResponse(
+                        BuiltInOperation.getJsonFieldString(stepJson, "id", "endNode"),
+                        ResponseData.makeErrorMessage(ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                            dataOptContext.getI18nMessage("dde.604.data_source_not_found2", dataSetId)));
+                    //添加错误日志
+                    CallApiLogDetail detailLog = BizOptUtils.createLogDetail(stepJson, dataOptContext);
+                    detailLog.setLogInfo(dataOptContext.getI18nMessage("dde.604.data_source_not_found2", dataSetId));
+                    return;
+                }
+                bizModel.getOptResult().setResultObject(dataSet.getData());
+            }
+            //这段代码是为了兼容以前的文件类型返回值，后面应该不需要了
+            if (RETURN_RESULT_DATASET.equals(type)) {
+                bizModel.getOptResult().setResultType(DataOptResult.RETURN_OPT_DATA);
+            } else {
+                bizModel.getOptResult().setResultType(DataOptResult.RETURN_DATA_AS_RAW);
             }
             return;
         }
