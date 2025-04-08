@@ -10,6 +10,7 @@ import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.security.CentitUserDetails;
+import com.centit.framework.security.SecurityContextUtils;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.json.JSONTransformer;
@@ -63,6 +64,8 @@ public class SessionDataOperation implements BizOperation {
             }
         }
         //设置用户session可以实现自定义登录
+        SecurityContextUtils.setLastLoginInfo(ud,
+            dataOptContext.getLogId(), dataOptContext.getSessionId(), platformEnvironment);
         SecurityContextHolder.getContext().setAuthentication(ud);
         dataOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, ud);
         return BuiltInOperation.createResponseSuccessData(1);
