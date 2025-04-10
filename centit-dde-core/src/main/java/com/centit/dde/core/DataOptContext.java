@@ -4,11 +4,13 @@ import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.model.security.CentitUserDetails;
+import com.centit.framework.security.SecurityContextUtils;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.network.HardWareUtils;
 import lombok.Data;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 
 import java.net.InetAddress;
@@ -101,10 +103,16 @@ public class DataOptContext {
             return null;
         }
     }
+
     public String getSessionId(){
         Map<String, String> headers = (Map<String, String>) getStackData(ConstantValue.REQUEST_HEADERS_TAG);
-        if(headers == null) return null;
-        return headers.get(WebOptUtils.SESSION_ID_TOKEN);
+        if(headers != null) {
+            String sid = headers.get(WebOptUtils.SESSION_ID_TOKEN);
+            if(StringUtils.isNotBlank(sid))
+                return sid;
+        }
+        Map<String, Object> params = (Map<String, Object>) getStackData(ConstantValue.REQUEST_PARAMS_TAG);
+        return StringBaseOpt.castObjectToString(params.get(SecurityContextUtils.SecurityContextTokenName));
     }
 
     public String getLoginIp(){
