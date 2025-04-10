@@ -104,6 +104,7 @@ public class DataOptContext {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public String getSessionId(){
         Map<String, String> headers = (Map<String, String>) getStackData(ConstantValue.REQUEST_HEADERS_TAG);
         if(headers != null) {
