@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,12 +37,14 @@ public class TaskLogManagerImpl implements TaskLogManager {
     private static final Logger logger = LoggerFactory.getLogger(TaskLogManagerImpl.class);
     private static CallApiLogDao backgroundTaskLogDao = null;
     private static final ConcurrentLinkedQueue<CallApiLog> waitingForWriteLogs = new ConcurrentLinkedQueue<>();
-    private static final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
+    private static final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(11);
 
     /*
      * 异步写入API调用日志
      */
     static {
+        executor.setMaximumPoolSize(70);
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
         // 5秒写入一次
         executor.scheduleWithFixedDelay(() -> {
             if(backgroundTaskLogDao == null){
