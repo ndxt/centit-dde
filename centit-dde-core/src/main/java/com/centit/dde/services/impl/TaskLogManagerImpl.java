@@ -39,6 +39,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
     private static final ConcurrentLinkedQueue<CallApiLog> waitingForWriteLogs = new ConcurrentLinkedQueue<>();
     private static final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(11);
 
+    private static final int MAX_LOG_COUNT_ONE_TIME = 5000;
     /*
      * 异步写入API调用日志
      */
@@ -51,7 +52,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
                 return;
             }
             // 循环写入日志，一个周期最多写入 nCount 条，避免阻塞
-            int nCount = 5000;
+            int nCount = MAX_LOG_COUNT_ONE_TIME;
             try {
                 while (nCount > 0) {
                     CallApiLog optLog = waitingForWriteLogs.poll();
@@ -65,8 +66,8 @@ public class TaskLogManagerImpl implements TaskLogManager {
                     }
                     nCount --;
                 }
-                if(5000 > nCount) {
-                    logger.info("成功写入{}条API调用信息。", 5000 - nCount);
+                if(MAX_LOG_COUNT_ONE_TIME > nCount) {
+                    logger.info("成功写入{}条API调用信息。", MAX_LOG_COUNT_ONE_TIME - nCount);
                 }
             } catch (Exception e) {
                 logger.error("写入API调用信息报错：{}", e.getMessage());
