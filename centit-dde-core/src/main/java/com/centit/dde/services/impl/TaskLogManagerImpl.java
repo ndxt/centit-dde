@@ -35,8 +35,8 @@ import java.util.concurrent.TimeUnit;
 public class TaskLogManagerImpl implements TaskLogManager {
     private static final Logger logger = LoggerFactory.getLogger(TaskLogManagerImpl.class);
     private static CallApiLogDao backgroundTaskLogDao = null;
-    private static ConcurrentLinkedQueue<CallApiLog> waitingForWriteLogs = new ConcurrentLinkedQueue<>();
-    private static ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
+    private static final ConcurrentLinkedQueue<CallApiLog> waitingForWriteLogs = new ConcurrentLinkedQueue<>();
+    private static final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
 
     /*
      * 异步写入API调用日志
@@ -68,8 +68,8 @@ public class TaskLogManagerImpl implements TaskLogManager {
             } catch (Exception e) {
                 logger.error("写入API调用信息报错：{}", e.getMessage());
             }
-        }, 37, 5, TimeUnit.SECONDS);
-        //默认执行时间间隔为5秒
+        }, 23, 7, TimeUnit.SECONDS);
+        //默认执行时间间隔为7秒
     }
 
     @Autowired
