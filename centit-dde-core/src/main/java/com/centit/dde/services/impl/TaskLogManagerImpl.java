@@ -37,14 +37,14 @@ public class TaskLogManagerImpl implements TaskLogManager {
     private static final Logger logger = LoggerFactory.getLogger(TaskLogManagerImpl.class);
     private static CallApiLogDao backgroundTaskLogDao = null;
     private static final ConcurrentLinkedQueue<CallApiLog> waitingForWriteLogs = new ConcurrentLinkedQueue<>();
-    private static final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(11);
+    private static final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 
-    private static final int MAX_LOG_COUNT_ONE_TIME = 5000;
+    private static final int MAX_LOG_COUNT_ONE_TIME = 500;
     /*
      * 异步写入API调用日志
      */
     static {
-        executor.setMaximumPoolSize(70);
+        executor.setMaximumPoolSize(1);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
         // 5秒写入一次
         executor.scheduleWithFixedDelay(() -> {
