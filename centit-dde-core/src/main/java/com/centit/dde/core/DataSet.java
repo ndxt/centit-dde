@@ -12,7 +12,7 @@ import java.util.*;
 /**
  * 数据集 虚拟类
  */
-public class DataSet implements DataSetReader, Serializable {
+public class DataSet implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -201,22 +201,17 @@ public class DataSet implements DataSetReader, Serializable {
         return this.data;
     }
 
-    /**
-     * 读取 dataSet 数据集
-     *
-     * @param params 模块的自定义参数
-     * @return dataSet 数据集
-     */
-    @Override
-    public DataSet load(Map<String, Object> params, DataOptContext dataOptContext) {
-        return this;
-    }
+
 
     public String toJSONString(){
         return JSON.toJSONString(this.data);
     }
 
     public String toDebugString(){
-        return JSON.toJSONString(this.data);
+        String jsonStr = JSON.toJSONString(this.data);
+        if(jsonStr.length()<=1024){
+            return jsonStr;
+        }
+        return "DataSet content is to large";
     }
 }

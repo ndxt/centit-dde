@@ -39,6 +39,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +76,18 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         details.setLogId(callApiLog.getLogId());
         details.setTaskId(callApiLog.getTaskId());
         details.setRunBeginTime(callApiLog.getRunBeginTime());
-        details.setDetailLogs(callApiLog.getDetailLogs());
+        int logDetailCount = callApiLog.getDetailLogs().size();
+        //保留最后20条日志明细
+        if(logDetailCount > 20){
+            List<CallApiLogDetail> detailLogs = new ArrayList<>();
+            detailLogs.add(callApiLog.getDetailLogs().get(0));
+            for(int i=19; i>=1; i--){
+                detailLogs.add(callApiLog.getDetailLogs().get(logDetailCount-i));
+            }
+            details.setDetailLogs(detailLogs);
+        } else {
+            details.setDetailLogs(callApiLog.getDetailLogs());
+        }
         callApiLogDetailIndexer.saveNewDocument(details);
     }
 

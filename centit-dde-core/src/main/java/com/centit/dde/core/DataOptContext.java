@@ -166,8 +166,8 @@ public class DataOptContext {
             }
         }
         CentitUserDetails userDetails = this.getCurrentUserDetail();
-        if(userDetails != null) {
-            objectMap.put(ConstantValue.SESSION_DATA_TAG, userDetails.getUserInfo());
+        if(userDetails != null && userDetails.getUserInfo() != null) {
+            objectMap.put(ConstantValue.SESSION_DATA_TAG, userDetails.getUserInfo().toJsonWithoutSensitive());
             objectMap.put("currentUnit", userDetails.getCurrentUnitCode());
         }
         return objectMap;

@@ -121,7 +121,7 @@ public class FileDataSet extends DataSet {
         JSONObject obj = new JSONObject();
         for(Map.Entry<String, Object> ent : ((Map<String, Object>)this.data).entrySet()){
             if(ConstantValue.FILE_CONTENT.equals(ent.getKey())){
-                obj.put(ConstantValue.FILE_CONTENT, "File content is too large.");
+                obj.put(ConstantValue.FILE_CONTENT, "File content is ignored.");
             }else {
                 obj.put(ent.getKey(), ent.getValue());
             }
