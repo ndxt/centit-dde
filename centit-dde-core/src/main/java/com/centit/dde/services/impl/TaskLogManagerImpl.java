@@ -42,7 +42,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
      */
     static {
         //executor.setMaximumPoolSize(1);
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+        //executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
         // 5秒写入一次
         executor.scheduleWithFixedDelay(() -> {
             if(backgroundTaskLogDao == null){
