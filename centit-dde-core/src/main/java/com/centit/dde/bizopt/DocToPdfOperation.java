@@ -12,6 +12,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileType;
+import com.centit.support.office.OfdUtils;
 import com.centit.support.office.OfficeToPdf;
 import org.apache.commons.lang3.StringUtils;
 
@@ -56,7 +57,10 @@ public class DocToPdfOperation implements BizOperation {
                     OfficeToPdf.word2Pdf(fileDataSet.getFileInputStream(), pdfFile, extName.toLowerCase() );
                 } else if("xls".equalsIgnoreCase(extName) || "xlsx".equalsIgnoreCase(extName)) {
                     OfficeToPdf.excel2Pdf(fileDataSet.getFileInputStream(), pdfFile);
-                } else {
+                } else if("ofd".equalsIgnoreCase(extName)){
+                    OfdUtils.ofd2Pdf(fileDataSet.getFileInputStream(), pdfFile);
+                }
+                else {
                     return BuiltInOperation.createResponseData(0, 1,
                         ObjectException.FUNCTION_NOT_SUPPORT,
                         dataOptContext.getI18nMessage("dde.613.file_type_not_support"));
@@ -85,7 +89,10 @@ public class DocToPdfOperation implements BizOperation {
                         OfficeToPdf.word2Pdf(fileDataSet.getFileInputStream(), pdfFile, extName.toLowerCase() );
                     } else if("xls".equalsIgnoreCase(extName) || "xlsx".equalsIgnoreCase(extName)) {
                         OfficeToPdf.excel2Pdf(fileDataSet.getFileInputStream(), pdfFile);
-                    } else {
+                    }else if("ofd".equalsIgnoreCase(extName)){
+                        OfdUtils.ofd2Pdf(fileDataSet.getFileInputStream(), pdfFile);
+                    }
+                    else {
                         continue;
                     }
                     fileList.add(CollectionsOpt.createHashMap(
