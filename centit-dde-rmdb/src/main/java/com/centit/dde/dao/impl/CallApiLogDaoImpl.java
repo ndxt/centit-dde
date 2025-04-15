@@ -13,6 +13,7 @@ import com.centit.search.service.IndexerSearcherFactory;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.database.utils.PageDesc;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequest;
@@ -67,6 +68,10 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
 
     @Override
     public void saveLog(CallApiLog callApiLog) {
+        if(StringUtils.length(callApiLog.getOtherMessage())> 10240){
+            logger.error("日志信息 ：" + callApiLog.getOptId()+
+                " otherMessage length is ：" + StringUtils.length(callApiLog.getOtherMessage()));
+        }
         callApiLogIndexer.saveNewDocument(callApiLog);
     }
 
