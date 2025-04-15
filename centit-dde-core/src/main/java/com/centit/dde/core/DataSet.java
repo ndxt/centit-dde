@@ -1,6 +1,7 @@
 package com.centit.dde.core;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -209,8 +210,22 @@ public class DataSet implements Serializable {
 
     public String toDebugString(){
         String jsonStr = JSON.toJSONString(this.data);
-        if(jsonStr.length()<=1024){
+        if(jsonStr.length()<=30*1024){
             return jsonStr;
+        }
+        if(this.data instanceof List){
+            List<?> list = (List<?>)this.data;
+            int s = list.size();
+            if(s<=1) return "DataSet content is to large";
+            s = 20*1024 * s / jsonStr.length();
+            JSONArray jsonArray = new JSONArray(s);
+            for(int i=0;i<s;i++){
+                jsonArray.add(list.get(i));
+            }
+            jsonStr = jsonArray.toJSONString();
+            if(jsonStr.length()<=30*1024){
+                return jsonStr;
+            }
         }
         return "DataSet content is to large";
     }

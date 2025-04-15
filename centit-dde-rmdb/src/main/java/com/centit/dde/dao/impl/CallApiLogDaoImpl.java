@@ -78,10 +78,13 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         details.setRunBeginTime(callApiLog.getRunBeginTime());
         int logDetailCount = callApiLog.getDetailLogs().size();
         //保留最后20条日志明细
-        if(logDetailCount > 20){
+        if(logDetailCount > 100){
             List<CallApiLogDetail> detailLogs = new ArrayList<>();
+            for(int i=0; i<10; i++){
+                detailLogs.add(callApiLog.getDetailLogs().get(i));
+            }
             detailLogs.add(callApiLog.getDetailLogs().get(0));
-            for(int i=19; i>=1; i--){
+            for(int i=90; i>=1; i--){
                 detailLogs.add(callApiLog.getDetailLogs().get(logDetailCount-i));
             }
             details.setDetailLogs(detailLogs);

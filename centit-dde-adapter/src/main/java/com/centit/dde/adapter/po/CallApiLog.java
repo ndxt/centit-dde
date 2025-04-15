@@ -71,7 +71,7 @@ public class CallApiLog implements ESDocument, Serializable {
     @ApiModelProperty(value = "执行人员")
     private String runner;
 
-    @ESField(type = "keyword") //(name="other_message")
+    @ESField(type = "text") //(name="other_message")
     @ApiModelProperty(value = "其他提示信息", required = true)
     private String otherMessage;
 

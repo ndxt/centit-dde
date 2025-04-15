@@ -28,7 +28,7 @@ public class CallApiLogDetails implements ESDocument, Serializable {
     @ApiModelProperty(value = "执行开始时间")
     private Date runBeginTime;
 
-    @ESField(type = "text")
+    @ESField(type = "text", index = false)
     private List<CallApiLogDetail> detailLogs;
 
     @Override
