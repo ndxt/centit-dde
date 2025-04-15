@@ -11,7 +11,9 @@ import com.centit.dde.utils.FileDataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.common.ObjectException;
+import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileType;
+import com.centit.support.office.OfdUtils;
 import com.centit.support.office.OfficeToPdf;
 import org.apache.commons.lang3.StringUtils;
 
@@ -21,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 将 word、excel、html、ppt 转换为 pdf
+ * 将 word、excel、html、ppt、ofd 转换为 pdf
  */
 public class DocToPdfOperation implements BizOperation {
 
@@ -56,6 +58,10 @@ public class DocToPdfOperation implements BizOperation {
                     OfficeToPdf.word2Pdf(fileDataSet.getFileInputStream(), pdfFile, extName.toLowerCase() );
                 } else if("xls".equalsIgnoreCase(extName) || "xlsx".equalsIgnoreCase(extName)) {
                     OfficeToPdf.excel2Pdf(fileDataSet.getFileInputStream(), pdfFile);
+                } else if("ofd".equalsIgnoreCase(extName)) {
+                    OfdUtils.ofd2Pdf(fileDataSet.getFileInputStream(), pdfFile);
+                } else if("pdf".equalsIgnoreCase(extName)) {
+                    FileIOOpt.writeInputStreamToOutputStream(fileDataSet.getFileInputStream(), pdfFile);
                 } else {
                     return BuiltInOperation.createResponseData(0, 1,
                         ObjectException.FUNCTION_NOT_SUPPORT,
@@ -85,6 +91,10 @@ public class DocToPdfOperation implements BizOperation {
                         OfficeToPdf.word2Pdf(fileDataSet.getFileInputStream(), pdfFile, extName.toLowerCase() );
                     } else if("xls".equalsIgnoreCase(extName) || "xlsx".equalsIgnoreCase(extName)) {
                         OfficeToPdf.excel2Pdf(fileDataSet.getFileInputStream(), pdfFile);
+                    } else if("ofd".equalsIgnoreCase(extName)) {
+                        OfdUtils.ofd2Pdf(fileDataSet.getFileInputStream(), pdfFile);
+                    } else if("pdf".equalsIgnoreCase(extName)) {
+                        FileIOOpt.writeInputStreamToOutputStream(fileDataSet.getFileInputStream(), pdfFile);
                     } else {
                         continue;
                     }
