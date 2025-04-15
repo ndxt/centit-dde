@@ -51,7 +51,7 @@ public class WriteExcelOperation implements BizOperation {
         Map<String, String> mapInfoDesc = BuiltInOperation.jsonArrayToMap(
             bizOptJson.getJSONArray("config"), "columnName", "expression");
         String sheetName = bizOptJson.getString("sheetName");
-        if(StringUtils.isBlank(sheetName)){
+        if (StringUtils.isBlank(sheetName)) {
             sheetName = "Sheet1";
         }
         boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), false);
@@ -59,7 +59,7 @@ public class WriteExcelOperation implements BizOperation {
         String optType = bizOptJson.getString("fileType");
         int mergeColCell = NumberBaseOpt.castObjectToInteger(bizOptJson.getString("mergeColCell"), -1);
 
-        if("append".equals(optType)) {
+        if ("append".equals(optType)) {
             String fileDataSetName = bizOptJson.getString("fileDataSet");
             DataSet dataSet2 = bizModel.getDataSet(fileDataSetName);
             if (!(dataSet2 instanceof FileDataSet)) {
@@ -87,7 +87,7 @@ public class WriteExcelOperation implements BizOperation {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             xssfWorkbook.write(byteArrayOutputStream);
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            if(transToPdf){
+            if (transToPdf) {
                 fileDataSet.setFileData(excel2pdf(byteArrayInputStream));
             } else {
                 fileDataSet.setFileData(byteArrayInputStream);
@@ -98,17 +98,17 @@ public class WriteExcelOperation implements BizOperation {
         }
 
         String fileName = null;
-        if(StringUtils.isNotBlank(bizOptJson.getString("fileName"))) {
+        if (StringUtils.isNotBlank(bizOptJson.getString("fileName"))) {
             fileName = StringBaseOpt.castObjectToString(JSONTransformer.transformer(
-                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel, dataSet.getData()))) ;
+                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel, dataSet.getData())));
         }
-        if(StringUtils.isBlank(fileName)) {
-            fileName = DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(),"yyyyMMDD_HHmm");
+        if (StringUtils.isBlank(fileName)) {
+            fileName = DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), "yyyyMMDD_HHmm");
         }
 
-        if(transToPdf){
-            if(!fileName.endsWith(".pdf")) {
-                fileName = (fileName.endsWith(".xlsx") ? fileName.substring(0, fileName.length() - 5) : fileName ) + ".pdf";
+        if (transToPdf) {
+            if (!fileName.endsWith(".pdf")) {
+                fileName = (fileName.endsWith(".xlsx") ? fileName.substring(0, fileName.length() - 5) : fileName) + ".pdf";
             }
         } else {
             fileName = fileName.endsWith(".xlsx") ? fileName : fileName + ".xlsx";
@@ -116,7 +116,7 @@ public class WriteExcelOperation implements BizOperation {
         //模板文件id
         String templateFileId = bizOptJson.getString("templateFileId");
         //根据模板生成
-        if (StringUtils.equalsAny(optType,"jxls","excel") && StringUtils.isNotBlank(templateFileId)) {
+        if (StringUtils.equalsAny(optType, "jxls", "excel") && StringUtils.isNotBlank(templateFileId)) {
             InputStream inputStream = fileInfoOpt.loadFileStream(templateFileId);
             if (inputStream == null) {
                 return BuiltInOperation.createResponseData(0, 1,
@@ -124,7 +124,7 @@ public class WriteExcelOperation implements BizOperation {
                     dataOptContext.getI18nMessage("error.701.field_is_blank", "excel template"));
             }
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            if("jxls".equals(optType)){
+            if ("jxls".equals(optType)) {
                 ExcelReportUtil.exportExcel(inputStream, byteArrayOutputStream, dataSet.getFirstRow());
             } else {
                 //从第几行开始插入
@@ -132,7 +132,11 @@ public class WriteExcelOperation implements BizOperation {
                 //指定写入第几个sheet中
                 XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
                 XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
-
+                if (sheet == null) {
+                    return BuiltInOperation.createResponseData(0, 1,
+                        ObjectException.NULL_EXCEPTION,
+                        dataOptContext.getI18nMessage("dde.604.data_source_not_found2", sheetName));
+                }
                 Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
                 ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
 
@@ -141,8 +145,8 @@ public class WriteExcelOperation implements BizOperation {
             }
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
 
-            FileDataSet objectToDataSet =  transToPdf?
-                new FileDataSet(fileName, -1, excel2pdf(byteArrayInputStream))  :
+            FileDataSet objectToDataSet = transToPdf ?
+                new FileDataSet(fileName, -1, excel2pdf(byteArrayInputStream)) :
                 new FileDataSet(fileName, byteArrayInputStream.available(), byteArrayInputStream);
             bizModel.putDataSet(id, objectToDataSet);
             byteArrayOutputStream.close();
@@ -152,7 +156,7 @@ public class WriteExcelOperation implements BizOperation {
         String[] titles = mapInfoDesc.keySet().toArray(new String[0]);
         String[] fields = mapInfoDesc.values().toArray(new String[0]);
         InputStream inputStream = ExcelExportUtil.generateExcelStream(sheetName, dataAsList, titles, fields);
-        FileDataSet objectToDataSet = transToPdf? new FileDataSet(fileName,
+        FileDataSet objectToDataSet = transToPdf ? new FileDataSet(fileName,
             -1, excel2pdf(inputStream)) : new FileDataSet(fileName, inputStream.available(), inputStream);
         bizModel.putDataSet(id, objectToDataSet);
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
