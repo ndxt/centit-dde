@@ -66,8 +66,9 @@ public abstract class DoApiController extends BaseController {
 
     protected Map<String, DataPacket> dataPacketCachedMap = new ConcurrentHashMap<>(10000);
 
-    private void judgePower(@PathVariable String packetId, String loginUser, String runType, HttpServletRequest request) {
+    private void judgeDebugPower(@PathVariable String packetId, String runType, HttpServletRequest request) {
         if (ConstantValue.RUN_TYPE_DEBUG.equals(runType)) {
+            String loginUser = WebOptUtils.getCurrentUserCode(request);
             if (StringUtils.isBlank(loginUser)) {
                 throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,
                     getI18nMessage( "error.302.user_not_login", request));
@@ -83,10 +84,10 @@ public abstract class DoApiController extends BaseController {
 
     protected void returnObject(String packetId, String runType, String taskType, List<String> urlParams,
                                 HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // judgePower(packetId,runType,request);
         // 获取接口信息
         DataPacketInterface dataPacketInterface;
         if(ConstantValue.RUN_TYPE_DEBUG.equals(runType)){
+            //judgeDebugPower(packetId,runType,request); //  注释掉是因为要普通员工可以在debug模式下测试， 理论上是不需要的
             dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
         } else {
             DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
