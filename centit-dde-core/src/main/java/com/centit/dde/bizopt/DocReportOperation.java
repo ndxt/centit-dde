@@ -46,7 +46,7 @@ public class DocReportOperation implements BizOperation {
         String fileId = bizOptJson.getString("fileId");
         boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), true);
 
-        String fileName = Pretreatment.mapTemplateString(
+        String fileName = Pretreatment.mapTemplateStringAsFormula(
             BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()),
             new BizModelJSONTransform(bizModel));
         if(transToPdf){
