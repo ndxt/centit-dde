@@ -67,9 +67,9 @@ public class RouteMetadataServiceImpl implements RouteMetadataService {
             ICachedObject.DEFAULT_REFRESH_PERIOD);
     }
 
-    private ApiRouteTree buildMetadataTree(String topUnit){
+    private ApiRouteTree buildMetadataTree(String osId){
         final ApiRouteTree routeTree = new ApiRouteTree();
-        JSONArray apiList = dataPacketDao.listApiWithRoute(topUnit);
+        JSONArray apiList = dataPacketDao.listApiWithRoute(osId);
         for (Object obj : apiList){
             if(obj instanceof JSONObject){
                 JSONObject apiJson = (JSONObject) obj;
@@ -86,9 +86,6 @@ public class RouteMetadataServiceImpl implements RouteMetadataService {
                 } else if("6".equals(method)){
                     method = "DELETE";
                 } else {
-                  continue;
-                }
-                if(StringUtils.isBlank(routeUrl) || StringUtils.isBlank(packetId)) {
                     continue;
                 }
                 List<String> pieces = parseRouteUrl(routeUrl);

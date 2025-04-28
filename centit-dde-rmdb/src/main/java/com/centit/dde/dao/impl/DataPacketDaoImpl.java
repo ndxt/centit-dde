@@ -132,11 +132,15 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
     }
 
     @Override
-    public JSONArray listApiWithRoute(String topUnit){
+    public JSONArray listApiWithRoute(String osId){
         return DatabaseOptUtils.listObjectsBySqlAsJson(this,
             "select a.packet_id, a.route_url, a.task_type " +
+                "from q_data_packet a " +
+                "where a.os_id = ? and a.route_url is not null", new Object[]{osId});
+        /*return DatabaseOptUtils.listObjectsBySqlAsJson(this,
+            "select a.packet_id, a.route_url, a.task_type " +
                 "from q_data_packet a join f_os_info b on a.os_id = b.os_id " +
-                "where b.top_unit = ? and a.route_url is not null", new Object[]{topUnit});
+                "where b.top_unit = ? and a.route_url is not null", new Object[]{topUnit});*/
     }
 
     @Override

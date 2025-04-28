@@ -111,15 +111,15 @@ public class DataPacketDraftController extends ResourceBaseController {
         for (Object node : nodes) {
             JSONObject nodeData = (JSONObject) node;
             JSONObject properties = nodeData.getJSONObject("properties");
-            if ("htts".equals(properties.getString("type"))) {
+            if ("http".equals(properties.getString("type"))) {
                 if (StringUtils.isNotBlank(httpParames.getRequestBody())) {
-                    properties.put("querySQL", httpParames.getRequestBody());
+                    properties.put("requestBody", httpParames.getRequestBody());
                 }
                 if (httpParames.getParamesList() != null && httpParames.getParamesList().length > 0) {
                     properties.put("parameterList", httpParames.getParamesList());
                 }
                 properties.put("httpUrl", httpParames.getMethodName());
-                properties.put("loginService", httpParames.getLoginUrlCode());
+                //properties.put("loginService", httpParames.getLoginUrlCode());
                 properties.put("requestMode", httpParames.getMethodType());
                 properties.put("databaseId", httpParames.getHttpUrlCode());
             }
@@ -240,7 +240,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         dataPacketDraft.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacketDraft.setPacketId(packetId);
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
-        dataPacketDraftService.updateDataPacket(WebOptUtils.getCurrentTopUnit(request), dataPacketDraft);
+        dataPacketDraftService.updateDataPacket(dataPacketDraft);
     }
 
     @ApiOperation(value = "API网关发布")

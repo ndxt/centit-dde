@@ -42,5 +42,5 @@ public interface DataPacketDraftDao {
 
     void publishDataPacket(String optCode, DataPacketDraft dataPacketCopy);
 
-    String getPacketIdByUrl(String topUnit, String routeUrl);
+    String getPacketIdByUrl(String osId, String routeUrl);
 }

@@ -49,7 +49,7 @@ public interface DataPacketDao {
 
     void updateApplicationLogLevel(int logLevel, String osId);
 
-    JSONArray listApiWithRoute(String topUnit);
+    JSONArray listApiWithRoute(String osId);
 
     int clearTrashStand(String osId);
 

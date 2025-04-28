@@ -88,16 +88,16 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
     }
 
     @Override
-    public String getPacketIdByUrl(String topUnit, String routeUrl) {
+    public String getPacketIdByUrl(String osId, String routeUrl) {
         String packetId = StringBaseOpt.castObjectToString(DatabaseOptUtils.getScalarObjectQuery(this,
             "select a.packet_id " +
-                "from q_data_packet a join f_os_info b on a.os_id = b.os_id " +
-                "where b.top_unit = ? and a.route_url = ?", new Object[]{topUnit, routeUrl}));
+                "from q_data_packet a  " +
+                "where a.os_id = ? and a.route_url = ?", new Object[]{osId, routeUrl}));
         if(StringUtils.isNotBlank(packetId)) return  packetId;
         return StringBaseOpt.castObjectToString(DatabaseOptUtils.getScalarObjectQuery(this,
             "select a.packet_id " +
-                "from q_data_packet_draft a join f_os_info b on a.os_id = b.os_id " +
-                "where b.top_unit = ? and a.route_url = ?", new Object[]{topUnit, routeUrl}));
+                "from q_data_packet_draft a   " +
+                "where a.os_id = ? and a.route_url = ?", new Object[]{osId, routeUrl}));
     }
 
     @Override
