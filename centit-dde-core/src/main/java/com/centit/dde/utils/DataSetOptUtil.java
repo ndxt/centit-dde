@@ -89,6 +89,7 @@ public abstract class DataSetOptUtil {
                             if(dataPiece!=null) value = dataPiece.getDataDesc();
                             break;
 
+                        case "code":
                         case "dataCode":
                             value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang, keepNull?null:str);
                             break;
@@ -101,7 +102,7 @@ public abstract class DataSetOptUtil {
                                 value = str;
                             }
                             break;
-
+                        case "value":
                         case "dataValue":
                         case "localDataValue":
                         default:
