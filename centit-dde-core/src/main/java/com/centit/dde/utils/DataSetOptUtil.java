@@ -60,6 +60,10 @@ public abstract class DataSetOptUtil {
                         dictField = "auto";
                     }
                 }
+                boolean keepNull = false;
+                if(a.length > 3 ) {
+                    keepNull = BooleanBaseOpt.castObjectToBoolean(a[3], false);
+                }
                 DataDictionary dataPiece;
                 for (String tempStr : strings) {
                     String str = tempStr.trim();
@@ -86,19 +90,22 @@ public abstract class DataSetOptUtil {
                             break;
 
                         case "dataCode":
-                            value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang);
+                            value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang, keepNull?null:str);
                             break;
 
                         case "auto":
-                            value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang);
-                            if(StringUtils.isBlank(value) || StringUtils.equals(str, value))
-                                value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang);
+                            value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang, null);
+                            if(StringUtils.isBlank(value))
+                                value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang, null);
+                            if(value==null && !keepNull){
+                                value = str;
+                            }
                             break;
 
                         case "dataValue":
                         case "localDataValue":
                         default:
-                            value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang);
+                            value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang, keepNull?null:str);
                             break;
                     }
 
