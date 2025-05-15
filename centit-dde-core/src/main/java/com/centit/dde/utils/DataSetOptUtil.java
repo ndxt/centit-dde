@@ -45,7 +45,6 @@ public abstract class DataSetOptUtil {
         extendFuncs.put("dict", (a) -> {
             String topUnit = WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest());
             String lang = WebOptUtils.getCurrentLang(RequestThreadLocal.getLocalThreadWrapperRequest());
-
             if (a != null && a.length > 1) {
                 String regex = ",";
                 String strData = StringBaseOpt.objectToString(a[1]);
@@ -91,17 +90,15 @@ public abstract class DataSetOptUtil {
 
                         case "code":
                         case "dataCode":
-                            value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang, keepNull?null:str);
+                            value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang, null);
                             break;
 
                         case "auto":
                             value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang, null);
-                            if(StringUtils.isBlank(value))
+                            if(value == null)
                                 value = CodeRepositoryUtil.getCode(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang, null);
-                            if(value==null && !keepNull){
-                                value = str;
-                            }
                             break;
+
                         case "value":
                         case "dataValue":
                         case "localDataValue":
@@ -109,20 +106,21 @@ public abstract class DataSetOptUtil {
                             value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang, keepNull?null:str);
                             break;
                     }
-
-                    if (stringBuilder.length() > 0) {
-                        stringBuilder.append(regex);
+                    if(value == null && !keepNull) {
+                        value = str;
                     }
-                    if(StringUtils.isBlank(value))
-                        stringBuilder.append(str);
-                    else
+                    if(StringUtils.isNotBlank(value)) {
+                        if (stringBuilder.length() > 0) {
+                            stringBuilder.append(regex);
+                        }
                         stringBuilder.append(value);
+                    }
                 }
-                return stringBuilder.toString();
-
-            } else {
-                return null;
+                if (stringBuilder.length() > 0) {
+                    return stringBuilder.toString();
+                }
             }
+            return null;
         });
 
         extendFuncs.put("dictTrans", (a) -> {
