@@ -103,7 +103,7 @@ public abstract class DataSetOptUtil {
                         case "dataValue":
                         case "localDataValue":
                         default:
-                            value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang, keepNull?null:str);
+                            value = CodeRepositoryUtil.getValue(StringBaseOpt.castObjectToString(a[0]), str, topUnit, lang,null);
                             break;
                     }
                     if(value == null && !keepNull) {
