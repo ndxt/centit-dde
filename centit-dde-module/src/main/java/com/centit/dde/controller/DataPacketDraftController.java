@@ -239,6 +239,7 @@ public class DataPacketDraftController extends ResourceBaseController {
         LoginUserPermissionCheck.loginUserPermissionCheck(this, platformEnvironment, dataPacketDraft.getOsId(), request);
         dataPacketDraft.setRecorder(WebOptUtils.getCurrentUserCode(request));
         dataPacketDraft.setPacketId(packetId);
+        dataPacketDraft.setOptCode(packetId);
         dataPacketDraft.setDataOptDescJson(dataPacketDraft.getDataOptDescJson());
         dataPacketDraftService.updateDataPacket(dataPacketDraft);
     }
