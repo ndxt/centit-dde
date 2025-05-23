@@ -68,8 +68,8 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
 
     @Override
     public void updateDisableStatus(String packetId, String disable) {
-        String sql ="UPDATE q_data_packet SET is_disable= ? WHERE PACKET_ID = ? ";
-        this.getJdbcTemplate().update(sql, new Object[]{disable, packetId});
+        String sql ="UPDATE q_data_packet SET is_disable= ?,PUBLISH_DATE =? WHERE PACKET_ID = ? ";
+        this.getJdbcTemplate().update(sql, new Object[]{disable,DatetimeOpt.currentSqlTimeStamp(), packetId});
     }
 
     @Override
