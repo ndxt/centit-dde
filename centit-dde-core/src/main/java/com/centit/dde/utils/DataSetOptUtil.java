@@ -161,7 +161,7 @@ public abstract class DataSetOptUtil {
                 return null;
             }
         });
-        extendFuncs.put("getUserByName", (a) -> {
+        extendFuncs.put("userByName", (a) -> {
             if (a == null || a.length < 1)
                 return null;
             String userName = StringBaseOpt.castObjectToString(a[0]);
