@@ -297,7 +297,6 @@ public class DataPacketDraftController extends ResourceBaseController {
             platformEnvironment, dataPacketDraft.getOsId(), request);
         dataPacketService.deleteDataPacket(packetId);
         dataPacketDraftService.deleteDataPacket(packetId);
-        platformEnvironment.deleteOptMethod(dataPacketDraft.getOptCode());
     }
 
     @ApiOperation(value = "修改API可用状态(T:禁用，F:启用)")
@@ -319,10 +318,6 @@ public class DataPacketDraftController extends ResourceBaseController {
             dataPacketDraftService.updateDisableStatus(packetId, disableType);
         } else {
             throw new ObjectException(ResponseData.HTTP_PRECONDITION_FAILED, "非法传参，参数必须为T或F,传入的参数为：" + disableType);
-        }
-        //删除权限数据
-        if(dataPacketDraft.getOptCode()!=null) {
-            platformEnvironment.deleteOptMethod(dataPacketDraft.getOptCode());
         }
     }
 

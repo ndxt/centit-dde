@@ -4,6 +4,7 @@ import com.centit.dde.adapter.dao.DataPacketDao;
 import com.centit.dde.adapter.po.DataPacket;
 import com.centit.dde.services.DataPacketService;
 import com.centit.framework.components.CodeRepositoryUtil;
+import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OptInfo;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -26,6 +27,8 @@ public class DataPacketServiceImpl implements DataPacketService {
     private final static String OPTINFO_FORMCODE_COMMON = "C";
     @Autowired
     private DataPacketDao dataPacketDao;
+    @Autowired
+    private PlatformEnvironment platformEnvironment;
 
     @Override
     public void createDataPacket(DataPacket dataPacket) {
@@ -52,6 +55,7 @@ public class DataPacketServiceImpl implements DataPacketService {
             dataPacketDao.deleteObjectReferences(dataPacket);
             dataPacketDao.deleteObjectById(packetId);
         }
+        platformEnvironment.deleteOptMethod(packetId);
     }
 
     @Override
@@ -103,8 +107,11 @@ public class DataPacketServiceImpl implements DataPacketService {
     }
 
     @Override
-    public void batchDeleteByPacketIds(String[] packetIds) {;
+    public void batchDeleteByPacketIds(String[] packetIds) {
         dataPacketDao.batchDeleteByPacketIds(packetIds);
+        for(String packetId : packetIds){
+            platformEnvironment.deleteOptMethod(packetId);
+        }
     }
 
     /**
@@ -125,6 +132,11 @@ public class DataPacketServiceImpl implements DataPacketService {
 
     @Override
     public int clearTrashStand(String osId) {
-        return dataPacketDao.clearTrashStand(osId);
+        List<DataPacket> dataPacketList  = dataPacketDao.listObjectsByProperties(CollectionsOpt.createHashMap("osId", osId,"isDisable","T"));
+        int i= dataPacketDao.clearTrashStand(osId);
+        for (DataPacket dataPacket : dataPacketList){
+            platformEnvironment.deleteOptMethod(dataPacket.getPacketId());
+        }
+        return i;
     }
 }
