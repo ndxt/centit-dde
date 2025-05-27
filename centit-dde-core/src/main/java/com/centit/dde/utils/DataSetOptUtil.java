@@ -180,6 +180,9 @@ public abstract class DataSetOptUtil {
             if(a.length>2){
                 includeSubUnits = BooleanBaseOpt.castObjectToBoolean(a[2], false);
             }
+            if(StringUtils.isBlank(topUnit) || StringUtils.isBlank(userName)) {
+                return null;
+            }
             Set<UserInfo> users = CodeRepositoryUtil.getUsersByUserName(topUnit, unitCode, userName, includeSubUnits);
             if(users!=null && !users.isEmpty()){
                 return users.iterator().next().getUserCode();
