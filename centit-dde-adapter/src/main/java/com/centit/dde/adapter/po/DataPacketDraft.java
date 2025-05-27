@@ -3,6 +3,7 @@ package com.centit.dde.adapter.po;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.centit.framework.core.dao.DictionaryMap;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.database.orm.GeneratorTime;
@@ -184,6 +185,14 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
 
     public void setDataOptDescJson(JSONObject dataOptDescJson) {
         this.dataOptDescJson = dataOptDescJson;
+    }
+
+    public void setIsValid(Object valid) {
+        isValid = BooleanBaseOpt.castObjectToBoolean(valid, true);
+    }
+
+    public void setIsDisable(Object disable) {
+        isDisable = BooleanBaseOpt.castObjectToBoolean(disable, false);
     }
 
     @Override

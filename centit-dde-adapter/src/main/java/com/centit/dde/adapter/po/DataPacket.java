@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.core.dao.DictionaryMap;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.database.orm.GeneratorTime;
@@ -175,6 +176,14 @@ public class DataPacket implements Serializable, DataPacketInterface {
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private DataOptStep innerDataOptStep;
+
+    public void setIsValid(Object valid) {
+        isValid = BooleanBaseOpt.castObjectToBoolean(valid, true);
+    }
+
+    public void setIsDisable(Object disable) {
+        isDisable = BooleanBaseOpt.castObjectToBoolean(disable, false);
+    }
 
     public void setDataOptDescJson(JSONObject dataOptDescJson) {
         this.dataOptDescJson = dataOptDescJson;
