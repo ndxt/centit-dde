@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -176,6 +177,11 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
 
     @ApiModelProperty(hidden = true)
     private Object optMethod;
+
+    @ApiModelProperty(value = "标签")
+    @Column(name = "PACKET_TAG")
+    @Length(max = 200)
+    private String packetTag;
 
     @Transient
     @JSONField(serialize = false, deserialize = false)
