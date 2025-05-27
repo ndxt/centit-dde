@@ -17,6 +17,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -166,6 +167,11 @@ public class DataPacket implements Serializable, DataPacketInterface {
     @ApiModelProperty(value = "降级等级")
     @Column(name = "FALL_BACK_LEVEL")
     private String fallBackLevel;
+
+    @ApiModelProperty(value = "标签")
+    @Column(name = "PACKET_TAG")
+    @Length(max = 200)
+    private String packetTag;
 
     @OneToMany(targetEntity = DataPacketParam.class)
     @JoinColumn(name = "packetId", referencedColumnName = "packetId")
