@@ -234,8 +234,7 @@ public class DataPacket implements Serializable, DataPacketInterface {
     //日志记录级别，1=ERROR,3=INFO,7=DEBUG"
     public static int mapLogLevel(String logLevel){
         if(StringUtils.equalsAny(logLevel,"1","2","3","4","5","6","7"))
-            return Integer.valueOf(logLevel);
-
+            return Integer.parseInt(logLevel);
         if("ERROR".equalsIgnoreCase(logLevel))
             return ConstantValue.LOGLEVEL_TYPE_ERROR;
         if("INFO".equalsIgnoreCase(logLevel))
@@ -243,7 +242,7 @@ public class DataPacket implements Serializable, DataPacketInterface {
         if("DEBUG".equalsIgnoreCase(logLevel))
             return ConstantValue.LOGLEVEL_TYPE_DEBUG;
 
-        return -1;
+        return 0;
     }
 
 }
