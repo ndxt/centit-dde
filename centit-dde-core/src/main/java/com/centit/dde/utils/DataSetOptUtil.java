@@ -200,7 +200,13 @@ public abstract class DataSetOptUtil {
             } else {
                 topUnit = WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest());
             }
-            String unitCode =  CodeRepositoryUtil.getUserPrimaryUnitCode(topUnit, userCode);
+            if(StringUtils.isBlank(topUnit)) {
+                return null;
+            }
+            String unitCode = CodeRepositoryUtil.getUserPrimaryUnitCode(topUnit, userCode);
+            if(StringUtils.isBlank(unitCode)) {
+                return null;
+            }
             return CodeRepositoryUtil.getUnitInfoByCode(topUnit, unitCode);
         });
     }
