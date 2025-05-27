@@ -9,6 +9,7 @@ import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.basedata.DataDictionary;
+import com.centit.framework.model.basedata.UserInfo;
 import com.centit.framework.security.StandardPasswordEncoderImpl;
 import com.centit.search.utils.TikaTextExtractor;
 import com.centit.support.algorithm.*;
@@ -159,6 +160,31 @@ public abstract class DataSetOptUtil {
                 logger.error("扩展函数fileToText中文件转换失败："+e.getMessage(), e);
                 return null;
             }
+        });
+        extendFuncs.put("userNameToCode", (a) -> {
+            if (a == null || a.length < 1)
+                return null;
+            String userName = StringBaseOpt.castObjectToString(a[0]);
+            String unitCode, topUnit;
+            if(a.length>3){
+                topUnit = StringBaseOpt.castObjectToString(a[3]);
+            } else {
+                topUnit = WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest());;
+            }
+            if(a.length>1){
+                unitCode = StringBaseOpt.castObjectToString(a[1]);
+            }else{
+                unitCode = topUnit;
+            }
+            boolean includeSubUnits = false;
+            if(a.length>2){
+                includeSubUnits = BooleanBaseOpt.castObjectToBoolean(a[2], false);
+            }
+            Set<UserInfo> users = CodeRepositoryUtil.getUsersByUserName(topUnit, unitCode, userName, includeSubUnits);
+            if(users!=null && !users.isEmpty()){
+                return users.iterator().next().getUserCode();
+            }
+            return null;
         });
     }
 
