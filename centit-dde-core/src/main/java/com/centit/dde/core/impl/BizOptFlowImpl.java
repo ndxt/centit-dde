@@ -18,6 +18,7 @@ import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.security.SecurityContextUtils;
+import com.centit.framework.session.CentitSessionRepo;
 import com.centit.product.metadata.service.*;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.product.oa.service.OptFlowNoInfoManager;
@@ -108,6 +109,9 @@ public class BizOptFlowImpl implements BizOptFlow {
     @Autowired
     private PlatformEnvironment platformEnvironment;
 
+    @Autowired(required = false)
+    private CentitSessionRepo centitSessionRepo;
+
     @Autowired
     ESServerConfig esServerConfig;
 
@@ -155,8 +159,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("optflow", new OptflowSerialNumberOperation(optFlowNoInfoManager));
         allOperations.put("unit", new UnitFilterOperation(/*platformEnvironment*/));
         allOperations.put("user", new UserFilterOperation(platformEnvironment));
-        allOperations.put("session", new SessionDataOperation(platformEnvironment));
-
+        allOperations.put("session", new SessionDataOperation(this.platformEnvironment, this.centitSessionRepo));
         allOperations.put("redisRead", new RedisReadOperation(sourceInfoMetadata));
         allOperations.put("redisWrite", new RedisWriteOperation(sourceInfoMetadata));
         allOperations.put("logWrite", new OptLogOperation());

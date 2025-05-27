@@ -8,27 +8,55 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.security.SecurityContextUtils;
+import com.centit.framework.session.CentitSessionRepo;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.servlet.http.HttpServletRequest;
+
 public class SessionDataOperation implements BizOperation {
 
     private final PlatformEnvironment platformEnvironment;
-
-    public SessionDataOperation(PlatformEnvironment platformEnvironment){
+    private final CentitSessionRepo centitSessionRepo;
+    public SessionDataOperation(PlatformEnvironment platformEnvironment, CentitSessionRepo centitSessionRepo){
         this.platformEnvironment = platformEnvironment;
+        this.centitSessionRepo = centitSessionRepo;
     }
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         // session 数据类型 sessionData ， systemUserId
-        String sessionDateType = bizOptJson.getString("dataType");
+        String sessionDateType = bizOptJson.getString("dataType"); // logout  kickOthers
+
+        if("logout".equals(sessionDateType)){ // 登出
+            HttpServletRequest request = RequestThreadLocal.getLocalThreadWrapperRequest();
+            if(request == null){
+                return BuiltInOperation.createResponseSuccessData(0);
+            }
+            SecurityContextHolder.getContext().setAuthentication(null);
+            request.getSession().invalidate();
+            return BuiltInOperation.createResponseSuccessData(1);
+        }
+
+        if("kickOthers".equals(sessionDateType)){ // 踢掉其他用户
+            if(this.centitSessionRepo!=null) {
+                String sessionId = dataOptContext.getSessionId();
+                String loginName = dataOptContext.getCurrentUserDetail().getUserInfo().getLoginName();
+                this.centitSessionRepo.kickSessionByName(loginName, sessionId);
+                return BuiltInOperation.createResponseSuccessData(1);
+            }else{
+                return BuiltInOperation.createResponseSuccessData(0);
+            }
+        }
+
         CentitUserDetails ud;
         if("sessionData".equals(sessionDateType)){
             String jsonValue = bizOptJson.getString("sessionData");
@@ -46,7 +74,7 @@ public class SessionDataOperation implements BizOperation {
                     ud.setUserRoles(userDetails.getUserRoles());
                 }
             }
-        } else {
+        } else { // login
             String userNameValue = bizOptJson.getString("userId");
             String userName = StringBaseOpt.castObjectToString(
                 JSONTransformer.transformer(userNameValue, new BizModelJSONTransform(bizModel)));

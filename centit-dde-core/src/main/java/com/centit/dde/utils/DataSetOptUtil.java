@@ -169,7 +169,7 @@ public abstract class DataSetOptUtil {
             if(a.length>3){
                 topUnit = StringBaseOpt.castObjectToString(a[3]);
             } else {
-                topUnit = WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest());;
+                topUnit = WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest());
             }
             if(a.length>1){
                 unitCode = StringBaseOpt.castObjectToString(a[1]);
