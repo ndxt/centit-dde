@@ -161,7 +161,7 @@ public abstract class DataSetOptUtil {
                 return null;
             }
         });
-        extendFuncs.put("userNameToCode", (a) -> {
+        extendFuncs.put("getUserByName", (a) -> {
             if (a == null || a.length < 1)
                 return null;
             String userName = StringBaseOpt.castObjectToString(a[0]);
@@ -185,7 +185,7 @@ public abstract class DataSetOptUtil {
             }
             Set<UserInfo> users = CodeRepositoryUtil.getUsersByUserName(topUnit, unitCode, userName, includeSubUnits);
             if(users!=null && !users.isEmpty()){
-                return users.iterator().next().getUserCode();
+                return users.iterator().next();
             }
             return null;
         });
