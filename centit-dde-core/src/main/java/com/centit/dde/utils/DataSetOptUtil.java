@@ -189,6 +189,20 @@ public abstract class DataSetOptUtil {
             }
             return null;
         });
+
+        extendFuncs.put("primaryUnit", (a) -> {
+            if (a == null || a.length < 1)
+                return null;
+            String userCode = StringBaseOpt.castObjectToString(a[0]);
+            String topUnit;
+            if(a.length>1){
+                topUnit = StringBaseOpt.castObjectToString(a[1]);
+            } else {
+                topUnit = WebOptUtils.getCurrentTopUnit(RequestThreadLocal.getLocalThreadWrapperRequest());
+            }
+            String unitCode =  CodeRepositoryUtil.getUserPrimaryUnitCode(topUnit, userCode);
+            return CodeRepositoryUtil.getUnitInfoByCode(topUnit, unitCode);
+        });
     }
 
     /**
