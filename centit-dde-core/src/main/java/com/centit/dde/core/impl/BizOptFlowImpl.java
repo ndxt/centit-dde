@@ -161,7 +161,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("sqlS", new RunSqlOperation(sourceInfoMetadata));
         allOperations.put("SSD", new DocReportOperation(fileInfoOpt));
         allOperations.put("optflow", new OptflowSerialNumberOperation(optFlowNoInfoManager));
-        allOperations.put("workDay", new WorkDayOperation(workDayManager));
+        allOperations.put("workday", new WorkDayOperation(workDayManager));
         allOperations.put("unit", new UnitFilterOperation(/*platformEnvironment*/));
         allOperations.put("user", new UserFilterOperation(platformEnvironment));
         allOperations.put("session", new SessionDataOperation(this.platformEnvironment, this.centitSessionRepo));
