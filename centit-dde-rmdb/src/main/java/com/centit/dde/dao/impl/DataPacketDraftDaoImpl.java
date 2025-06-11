@@ -51,7 +51,7 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
         String sqlSen = "select a.packet_id, a.packet_name, a.packet_desc, a.owner_type, a.owner_code, " +
             "a.recorder, a.record_date, a.update_date, a.os_id, a.opt_id, " +
             "a.task_type, a.task_cron, a.is_valid, a.publish_date, a.opt_code," +
-            "a.log_level, a.is_disable, b.last_run_time, b.next_run_time " +
+            "a.log_level, a.is_disable, b.last_run_time, b.next_run_time,a.packet_tag " +
             " from q_data_packet_draft a left join q_data_packet b on a.packet_id=b.packet_id" +
             " where 1=1 [:(like)packetName | and (a.packet_name like :packetName or a.packet_id like :packetName) ]" +
             " [:osId| and a.os_id=:osId]"+

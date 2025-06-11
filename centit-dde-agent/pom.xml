@@ -201,6 +201,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>centit-dde-msg-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
