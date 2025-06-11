@@ -22,6 +22,7 @@ import com.centit.framework.session.CentitSessionRepo;
 import com.centit.product.metadata.service.*;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.product.oa.service.OptFlowNoInfoManager;
+import com.centit.product.oa.service.WorkDayManager;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.utils.ImagePdfTextExtractor;
 import com.centit.support.algorithm.*;
@@ -100,6 +101,9 @@ public class BizOptFlowImpl implements BizOptFlow {
     @Autowired(required = false)
     private OptFlowNoInfoManager optFlowNoInfoManager;
 
+    @Autowired(required = false)
+    private WorkDayManager workDayManager;
+
     @Autowired
     private FlowEngine flowEngine;
 
@@ -157,6 +161,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("sqlS", new RunSqlOperation(sourceInfoMetadata));
         allOperations.put("SSD", new DocReportOperation(fileInfoOpt));
         allOperations.put("optflow", new OptflowSerialNumberOperation(optFlowNoInfoManager));
+        allOperations.put("workDay", new WorkDayOperation(workDayManager));
         allOperations.put("unit", new UnitFilterOperation(/*platformEnvironment*/));
         allOperations.put("user", new UserFilterOperation(platformEnvironment));
         allOperations.put("session", new SessionDataOperation(this.platformEnvironment, this.centitSessionRepo));

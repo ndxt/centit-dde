@@ -12,6 +12,7 @@ import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,6 +33,9 @@ public class OptflowSerialNumberOperation implements BizOperation {
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
+        if(optFlowNoInfoManager==null){
+            throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT, "平台不支持获取序列号服务。");
+        }
         String codeCode = bizOptJson.getString("codeCode");
         if (StringUtils.isBlank(codeCode)) {
             return ResponseData.makeErrorMessage(

@@ -13,20 +13,33 @@ import com.centit.product.oa.service.WorkDayManager;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.DateTimeSpan;
+import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
  * @author codefan@sina.com
- * 工作日组件，暂未启用，根据业务的需求再做优化
+ * 工作日组件，后期可能需要根据业务的需求再做优化
  */
 public class WorkDayOperation implements BizOperation {
     private WorkDayManager workDayManager;
 
     public WorkDayOperation(WorkDayManager workDayManager) {
         this.workDayManager = workDayManager;
+    }
+
+    private List<Date> toDateList(List<WorkDay> workDays) {
+        final List<Date> dateList = new ArrayList<>();
+        if(workDays == null) {
+            return dateList;
+        }
+        for (WorkDay workDay : workDays) {
+            dateList.add(workDay.getWorkDate());
+        }
+        return dateList;
     }
     /*
         boolean isWorkDay(String topUnit, Date startDate);
@@ -38,6 +51,9 @@ public class WorkDayOperation implements BizOperation {
     */
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
+        if(workDayManager==null){
+            throw new ObjectException(ObjectException.FUNCTION_NOT_SUPPORT, "平台不支持获取工作日服务。");
+        }
         String calcType = bizOptJson.getString("calcType");
         if(!StringUtils.equalsAny(calcType, "isWorkDay","calcHolidays","calcWorkDays",
             "calcWorkingDeadline","rangeHolidays","rangeWorkDays")) {
@@ -86,12 +102,12 @@ public class WorkDayOperation implements BizOperation {
             }
             case "rangeHolidays":{
                 List<WorkDay> workdays = workDayManager.rangeHolidays(topUnit, currDate, endDate);
-                bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(workdays));
+                bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(toDateList(workdays)));
                 return BuiltInOperation.createResponseSuccessData(1);
             }
             case "rangeWorkDays":{
                 List<WorkDay> workdays = workDayManager.rangeWorkDays(topUnit, currDate, endDate);
-                bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(workdays));
+                bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(toDateList(workdays)));
                 return BuiltInOperation.createResponseSuccessData(1);
             }
         }
