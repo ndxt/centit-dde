@@ -115,8 +115,7 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @Autowired(required = false)
     private CentitSessionRepo centitSessionRepo;
-    @Autowired
-    private WorkDayManager workDayManager;
+
     @Autowired
     ESServerConfig esServerConfig;
 
@@ -173,7 +172,6 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("qrCode", new QrCodeOperation(fileInfoOpt));
         allOperations.put("dictionary", new DataDictionaryOperation());
         allOperations.put("desensitize", (bizModel, bizOptJson, dataOptContext) -> BuiltInOperation.runDesensitize(bizModel, bizOptJson));
-        allOperations.put("workday", new WorkDayOperation(workDayManager));
         allOperations.put(ConstantValue.ENCRYPT, new EncryptOperation());
         allOperations.put(ConstantValue.DECIPHER, new DecipherOperation());
         allOperations.put(ConstantValue.GENERATE_CSV, new WriteCsvOperation());
