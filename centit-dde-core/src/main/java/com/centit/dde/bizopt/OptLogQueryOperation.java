@@ -21,7 +21,6 @@ import java.util.Map;
 
 /**
  * 日志查询，这个按道理只能查当前租户的日志
- *
  */
 public class OptLogQueryOperation implements BizOperation {
 
@@ -40,7 +39,7 @@ public class OptLogQueryOperation implements BizOperation {
 
         Object optTag = transform.attainExpressionValue(bizOptJson.getString("optTag"));
 
-        Object userCode =transform.attainExpressionValue(bizOptJson.getString("userCode"));
+        Object userCode = transform.attainExpressionValue(bizOptJson.getString("userCode"));
 
         Object optTimeGe = transform.attainExpressionValue(bizOptJson.getString("optTime_ge"));
 
@@ -48,32 +47,41 @@ public class OptLogQueryOperation implements BizOperation {
 
         Object optContent = transform.attainExpressionValue(bizOptJson.getString("optContent"));
 
-        int pageNo  = NumberBaseOpt.castObjectToInteger(transform.attainExpressionValue(bizOptJson.getString("pageNo")),1);
+        Object optMethod = transform.attainExpressionValue(bizOptJson.getString("optMethod"));
+        Object loginIp = transform.attainExpressionValue(bizOptJson.getString("loginIp"));
+        Object newValue = transform.attainExpressionValue(bizOptJson.getString("newValue"));
+        Object oldValue = transform.attainExpressionValue(bizOptJson.getString("oldValue"));
 
-        int pageSize = NumberBaseOpt.castObjectToInteger(transform.attainExpressionValue(bizOptJson.getString("pageSize")),20);
+        int pageNo = NumberBaseOpt.castObjectToInteger(transform.attainExpressionValue(bizOptJson.getString("pageNo")), 1);
+
+        int pageSize = NumberBaseOpt.castObjectToInteger(transform.attainExpressionValue(bizOptJson.getString("pageSize")), 20);
 
         Map<String, Object> filterMap = new HashMap<>();
 
         String osId = dataOptContext.getOsId();
-        filterMap.put("osId",osId);
+        filterMap.put("osId", osId);
 
         String topUnit = bizModel.fetchTopUnit(); //  dataOptContext.getTopUnit();
-        if(StringUtils.isBlank(topUnit)){
+        if (StringUtils.isBlank(topUnit)) {
             topUnit = bizModel.fetchTopUnit();
         }
-        filterMap.put("topUnit",topUnit);
+        filterMap.put("topUnit", topUnit);
 
-        if (optTag != null ) filterMap.put("optTag",optTag);
+        if (optTag != null) filterMap.put("optTag", optTag);
 
-        if (userCode != null ) filterMap.put("userCode",userCode);
+        if (userCode != null) filterMap.put("userCode", userCode);
 
-        if (optTimeGe != null ) filterMap.put("optTime_ge",optTimeGe);
+        if (optTimeGe != null) filterMap.put("optTime_ge", optTimeGe);
 
-        if (optTimeLe != null ) filterMap.put("optTime_le",optTimeLe);
+        if (optTimeLe != null) filterMap.put("optTime_le", optTimeLe);
 
-        if (optContent != null ) filterMap.put("optContent",optContent);
+        if (optContent != null) filterMap.put("optContent", optContent);
+        if (optMethod != null) filterMap.put("optMethod", optMethod);
+        if (loginIp != null) filterMap.put("loginIp_lk", loginIp);
+        if (newValue != null) filterMap.put("newValue", newValue);
+        if (oldValue != null) filterMap.put("oldValue", oldValue);
 
-        List<? extends OperationLog> operationLogs = operationLogWriter.listOptLog(optId, filterMap, pageNo,pageSize);
+        List<? extends OperationLog> operationLogs = operationLogWriter.listOptLog(optId, filterMap, pageNo, pageSize);
 
         int count = operationLogWriter.countOptLog(optId, filterMap);
 
@@ -84,7 +92,7 @@ public class OptLogQueryOperation implements BizOperation {
 
         PageQueryResult<? extends OperationLog> result = PageQueryResult.createResult(operationLogs, pageDesc);
 
-        bizModel.putDataSet(bizOptJson.getString("id"),new DataSet(result));
+        bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(result));
 
         return BuiltInOperation.createResponseSuccessData(count);
     }
