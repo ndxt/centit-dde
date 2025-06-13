@@ -54,11 +54,13 @@ public class SubmitWorkFlowOperation implements BizOperation {
         String nodeInstId = StringBaseOpt.castObjectToString(JSONTransformer.transformer(nodeInstIdDesc, bizModelJSONTransform));
         String unitCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(unitCodeDesc, bizModelJSONTransform));
         String userCode = StringBaseOpt.castObjectToString(JSONTransformer.transformer(userCodeDesc, bizModelJSONTransform));
+        String flowOptName = StringBaseOpt.castObjectToString(JSONTransformer.transformer(bizOptJson.getString("flowOptName"), bizModelJSONTransform));
         submitOptOptions.setNodeInstId(nodeInstId);
         submitOptOptions.setUnitCode(unitCode);
         submitOptOptions.setUserCode(userCode);
         submitOptOptions.setClientLocale(dataOptContext.getLocale());
         submitOptOptions.setLoginIp(dataOptContext.getLoginIp());
+        submitOptOptions.setFlowOptName(flowOptName);
         //根据表达式获取流程变量信息
         //根据表达式    获取流程变量信息(非必填参数)
         JSONArray flowVariables = bizOptJson.getJSONArray("flowVariables");
