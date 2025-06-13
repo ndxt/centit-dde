@@ -90,7 +90,7 @@ public class OptLogQueryOperation implements BizOperation {
         pageDesc.setPageSize(pageSize);
         pageDesc.setTotalRows(count);
 
-        PageQueryResult<? extends OperationLog> result = PageQueryResult.createResult(operationLogs, pageDesc);
+        PageQueryResult<? extends OperationLog> result = PageQueryResult.createResultMapDict(operationLogs, pageDesc);
 
         bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(result));
 
