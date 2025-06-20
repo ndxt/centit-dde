@@ -140,6 +140,9 @@ public abstract class DoApiController extends BaseController {
         if (ConstantValue.TASK_TYPE_POST.equals(taskType) || ConstantValue.TASK_TYPE_PUT.equals(taskType) ||
             "POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
             String contentType = request.getHeader("Content-Type");
+            if (StringBaseOpt.isNvl(contentType)) {
+               contentType="application/json";
+            }
             if (StringUtils.contains(contentType, "application/json")) {
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(), String.valueOf(StandardCharsets.UTF_8));
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, JSON.parse(bodyString));
@@ -180,7 +183,7 @@ public abstract class DoApiController extends BaseController {
                             "fileSize", inputStream.available(),
                             "fileContent", inputStream));
                 }
-            } else if(StringUtils.contains(contentType, "text/plain")){
+            } else if(StringUtils.contains(contentType, "text/plain") || StringUtils.contains(contentType, "application/vnd.")){
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(),
                     String.valueOf(StandardCharsets.UTF_8));
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, bodyString);
