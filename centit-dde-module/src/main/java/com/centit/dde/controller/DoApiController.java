@@ -183,7 +183,7 @@ public abstract class DoApiController extends BaseController {
                             "fileSize", inputStream.available(),
                             "fileContent", inputStream));
                 }
-            } else if(StringUtils.contains(contentType, "text/plain") || StringUtils.contains(contentType, "application/vnd.")){
+            } else if(StringUtils.contains(contentType, "text/plain")){
                 String bodyString = FileIOOpt.readStringFromInputStream(request.getInputStream(),
                     String.valueOf(StandardCharsets.UTF_8));
                 dataOptContext.setStackData(ConstantValue.REQUEST_BODY_TAG, bodyString);
