@@ -50,11 +50,11 @@ public class WorkFlowUserTaskOperation implements BizOperation {
             }
         }
         String sortField = bizOptJson.getString(GeneralJsonObjectDao.TABLE_SORT_FIELD);
-        if(StringUtils.isNotBlank(sortField)){
+        if (StringUtils.isNotBlank(sortField)) {
             queryParam.put(GeneralJsonObjectDao.TABLE_SORT_FIELD, sortField);
         }
         String orderField = bizOptJson.getString(GeneralJsonObjectDao.TABLE_SORT_ORDER);
-        if(StringUtils.isNotBlank(orderField)){
+        if (StringUtils.isNotBlank(orderField)) {
             queryParam.put(GeneralJsonObjectDao.TABLE_SORT_ORDER, orderField);
         }
 
@@ -70,7 +70,7 @@ public class WorkFlowUserTaskOperation implements BizOperation {
         Integer taskType = bizOptJson.getInteger("taskType");
 
         String topUnit = dataOptContext.getTopUnit();
-        if(StringUtils.isBlank(topUnit)){
+        if (StringUtils.isBlank(topUnit)) {
             topUnit = bizModel.fetchTopUnit();
         }
         queryParam.put("topUnit", topUnit);
@@ -82,7 +82,7 @@ public class WorkFlowUserTaskOperation implements BizOperation {
                 break;
             //委托待办
             case 2:
-                responseData =flowEngine.dubboUserGrantorTask(queryParam, pageDesc);
+                responseData = flowEngine.dubboUserGrantorTask(queryParam, pageDesc);
                 bizModel.putDataSet(id, new DataSet(responseData.getData()));
                 break;
             //岗位待办
@@ -119,6 +119,11 @@ public class WorkFlowUserTaskOperation implements BizOperation {
                 }
                 List<UserTask> userTask = flowEngine.listFlowActiveNodeOperators(flowInstId);
                 bizModel.putDataSet(id, new DataSet(DictionaryMapUtils.objectsToJSONArray(userTask)));
+                break;
+            //获取机构下面的待办
+            case 7:
+                responseData = flowEngine.dubboUnitTask(queryParam, pageDesc);
+                bizModel.putDataSet(id, new DataSet(responseData.getData()));
                 break;
             default:
                 return ResponseData.makeErrorMessage(ObjectException.PARAMETER_NOT_CORRECT,
