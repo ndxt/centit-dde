@@ -754,8 +754,12 @@ public class BizOptFlowImpl implements BizOptFlow {
                 dataOptContext.getI18nMessage("dde.405.cant_request_schedule_task"));
         }
         if (dataPacketInterface.getIsDisable() != null && dataPacketInterface.getIsDisable()) {
+            String errorPacket=packetId;
+            if(dataPacketInterface.getIsDisable()){
+                errorPacket="在回收站："+packetId+dataPacketInterface.getPacketName();
+            }
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED,
-                dataOptContext.getI18nMessage("dde.405.api_is_disable", packetId));
+                dataOptContext.getI18nMessage("dde.405.api_is_disable", errorPacket));
         }
         DataOptContext moduleOptContext = new DataOptContext(dataOptContext.getMessageSource(), dataOptContext.getLocale());
         moduleOptContext.setCallApiLog(dataOptContext.getCallApiLog());

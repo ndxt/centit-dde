@@ -119,8 +119,12 @@ public abstract class DoApiController extends BaseController {
                 getI18nMessage("dde.405.request_type_not_match", request, packetId));
         }
         if (ConstantValue.RUN_TYPE_NORMAL.equals(runType)  && ! dataPacketInterface.canRunAsNormal()) {
+            String errorPacket=packetId;
+            if(dataPacketInterface.getIsDisable()){
+                errorPacket="在回收站："+packetId+dataPacketInterface.getPacketName();
+            }
             throw new ObjectException(ResponseData.HTTP_METHOD_NOT_ALLOWED,
-                getI18nMessage("dde.405.api_is_disable", request, packetId));
+                getI18nMessage("dde.405.api_is_disable", request, errorPacket));
         }
         //根据api默认值初始化， 并且准备执行上下文环境
         Map<String, Object> params = new HashMap<>(dataPacketInterface.getPacketParamsValue());
