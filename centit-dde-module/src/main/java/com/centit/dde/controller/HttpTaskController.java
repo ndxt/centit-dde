@@ -14,6 +14,7 @@ import com.centit.support.compiler.VariableFormula;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.text.StringEscapeUtils;
+import org.quartz.CronExpression;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.util.*;
 
 /**
  * @author zhf
@@ -224,6 +224,24 @@ public class HttpTaskController extends DoApiController {
     @WrapUpResponseBody
     public List<ConfigAttribute> getRolesWithApiId(@PathVariable String apiId) {
         return platformEnvironment.getRolesWithApiId(apiId);
+    }
+
+    @ApiOperation(value = "查询近5次cron运行时间")
+    @GetMapping(value = "/testCron")
+    @WrapUpResponseBody
+    public List<String> testCron(String cron) {
+        List<String> result = new ArrayList<>();
+        try {
+            CronExpression cc = new CronExpression(cron);
+            Date next = new Date();
+            for (int i = 0; i < 5; i++) {
+                next = cc.getNextValidTimeAfter(next);
+                result.add(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(next));
+            }
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
     }
 
 }
