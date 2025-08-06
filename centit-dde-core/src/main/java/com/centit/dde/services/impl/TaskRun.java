@@ -170,7 +170,7 @@ public class TaskRun {
         callApiLog.setRequestIp(context.getLoginIp());
         if(dataPacketInterface.getTaskType().equals(ConstantValue.TASK_TYPE_POST) ||
             dataPacketInterface.getTaskType().equals(ConstantValue.TASK_TYPE_PUT)){
-            callApiLog.setRequestParams(StringBaseOpt.castObjectToString(context.getStackData(ConstantValue.REQUEST_BODY_TAG)));
+            callApiLog.setRequestParams(StringBaseOpt.castObjectToString(context.getStackData(ConstantValue.REQUEST_BODY_TAG),""));
         }else {
             callApiLog.setRequestParams(context.getRequestParams());
         }

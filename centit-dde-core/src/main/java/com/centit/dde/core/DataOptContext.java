@@ -145,7 +145,7 @@ public class DataOptContext {
 
     public String getRequestParams (){
         return StringBaseOpt.castObjectToString(
-            this.getStackData(ConstantValue.REQUEST_PARAMS_TAG));
+            this.getStackData(ConstantValue.REQUEST_PARAMS_TAG),"");
     }
 
     /**
