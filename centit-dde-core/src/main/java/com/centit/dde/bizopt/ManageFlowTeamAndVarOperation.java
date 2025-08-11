@@ -59,8 +59,6 @@ public class ManageFlowTeamAndVarOperation implements BizOperation {
                 if (expression != null) {
                     Object transform = JSONTransformer.transformer(expression, bizModelJSONTransform);
                     variables.put(variableName, StringBaseOpt.objectToString(transform));
-                } else {
-                    variables.put(variableName, "");
                 }
             }
         }
