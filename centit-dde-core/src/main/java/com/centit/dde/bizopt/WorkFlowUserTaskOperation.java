@@ -113,11 +113,17 @@ public class WorkFlowUserTaskOperation implements BizOperation {
             //获取流程所有活动节点的任务列表
             case 6:
                 String flowInstId = StringBaseOpt.castObjectToString(queryParam.get("flowInstId"));
-                if (StringUtils.isBlank(flowInstId)) {
+                String nodeInstId = StringBaseOpt.castObjectToString(queryParam.get("nodeInstId"));
+                if (StringUtils.isBlank(flowInstId) || StringUtils.isBlank(nodeInstId)) {
                     return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
-                        dataOptContext.getI18nMessage("error.701.field_is_blank", "flowInstId"));
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "flowInstId or nodeInstId"));
                 }
-                List<UserTask> userTask = flowEngine.listFlowActiveNodeOperators(flowInstId);
+                List<UserTask> userTask;
+                if(StringUtils.isNotBlank(nodeInstId)){
+                    userTask = flowEngine.listNodeOperators(nodeInstId);
+                }else {
+                    userTask = flowEngine.listFlowActiveNodeOperators(flowInstId);
+                }
                 bizModel.putDataSet(id, new DataSet(DictionaryMapUtils.objectsToJSONArray(userTask)));
                 break;
             //获取机构下面的待办
