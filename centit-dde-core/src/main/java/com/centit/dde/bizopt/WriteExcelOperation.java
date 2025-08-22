@@ -7,12 +7,10 @@ import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
-import com.centit.support.algorithm.BooleanBaseOpt;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.*;
 import com.centit.support.common.ObjectException;
 import com.centit.support.json.JSONTransformer;
 import com.centit.support.report.ExcelExportUtil;
@@ -48,8 +46,17 @@ public class WriteExcelOperation implements BizOperation {
                 dataOptContext.getI18nMessage("dde.604.data_source_not_found2", source));
         }
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
-        Map<String, String> mapInfoDesc = BuiltInOperation.jsonArrayToMap(
-            bizOptJson.getJSONArray("config"), "columnName", "expression");
+        boolean columnDescInValue = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("columnDescInValue"), false);
+        Map<String, String> mapInfoDesc;
+        if(columnDescInValue){
+            String columnDescValue = bizOptJson.getString("columnDescValue");
+            Object obj = DataSetOptUtil.fetchFieldValue(new BizModelJSONTransform(bizModel, dataSet.getData()), columnDescValue);
+            mapInfoDesc =CollectionsOpt.objectMapToStringMap(CollectionsOpt.objectToMap(obj)) ;
+        } else {
+            mapInfoDesc = BuiltInOperation.jsonArrayToMap(
+                bizOptJson.getJSONArray("config"), "columnName", "expression");
+        }
+
         String sheetName = bizOptJson.getString("sheetName");
         if (StringUtils.isBlank(sheetName)) {
             sheetName = "Sheet1";
