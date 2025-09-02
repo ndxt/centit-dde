@@ -53,7 +53,7 @@ public class DataPacketDraftDaoImpl extends BaseDaoImpl<DataPacketDraft, String>
             "a.task_type, a.task_cron, a.is_valid, a.publish_date, a.opt_code," +
             "a.log_level, a.is_disable, b.last_run_time, b.next_run_time,a.packet_tag " +
             " from q_data_packet_draft a left join q_data_packet b on a.packet_id=b.packet_id" +
-            " where 1=1 [:(like)packetName | and (a.packet_name like :packetName or a.packet_id like :packetName) ]" +
+            " where 1=1 [:(like)packetName | and (a.packet_name like :packetName or a.packet_id like :packetName or a.route_url like :packetName) ]" +
             " [:osId| and a.os_id=:osId]"+
             " [:optId| and a.opt_id=:optId]"+
             " [:isDisable| and a.is_disable=:isDisable]"+
