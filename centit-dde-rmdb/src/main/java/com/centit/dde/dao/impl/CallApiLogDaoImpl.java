@@ -138,13 +138,10 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
 
     @Override
     public List<Map<String, Object>> listLogsByProperties(Map<String, Object> param, PageDesc pageDesc) {
-        Object beginTime = param.get("runBeginTime_ge");
-        if(beginTime!=null){
-            param.put("runBeginTime_ge", convertLocalToUTC(beginTime.toString()));
-        }
-        Object endTime = param.get("runBeginTime_le");
-        if(beginTime!=null){
-            param.put("runBeginTime_le", convertLocalToUTC(endTime.toString()));
+        for(String sKey : param.keySet()){
+            if(sKey.startsWith("runBeginTime") || sKey.startsWith("runEndTime")){
+                param.computeIfPresent(sKey, (k, timeValue) -> convertLocalToUTC(timeValue.toString()));
+            }
         }
         Pair<Long, List<Map<String, Object>>> queryOut =
             callApiLogSearcher.search(param, StringBaseOpt.objectToString(param.get("query")), pageDesc.getPageNo(), pageDesc.getPageSize());
@@ -157,20 +154,17 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         }
         return objectList;
     }
+
     private  String convertLocalToUTC(String localDateTimeStr) {
         // 解析本地时间
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime localDateTime = LocalDateTime.parse(localDateTimeStr, formatter);
-
         // 假设输入是系统默认时区的时间
         ZonedDateTime zonedLocalTime = localDateTime.atZone(ZoneId.systemDefault());
-
         // 转换为UTC时区
         ZonedDateTime utcTime = zonedLocalTime.withZoneSameInstant(ZoneId.of("UTC"));
-
         // 添加毫秒部分（示例中为331）
         ZonedDateTime utcTimeWithMillis = utcTime.withNano(331 * 1_000_000);
-
         // 格式化为ISO 8601格式
         return utcTimeWithMillis.format(DateTimeFormatter.ISO_INSTANT);
     }
