@@ -11,6 +11,7 @@ import com.centit.dde.utils.FileDataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.service.SourceInfoMetadata;
+import com.centit.product.metadata.transaction.AbstractEsClientPools;
 import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder;
 import com.centit.search.document.FileDocument;
 import com.centit.search.document.ObjectDocument;
@@ -95,25 +96,28 @@ public class EsWriteBizOperation implements BizOperation {
         if (StringUtils.isBlank(indexName)) return ResponseData.makeErrorMessage(
             ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
             dataOptContext.getI18nMessage("error.701.field_is_blank", "indexName"));
-
         RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
-        if("delete".equals(operationType)){
-            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
-            String documentId = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("documentId")));
-            if (StringUtils.isBlank(documentId))
+        try{
+            if ("delete".equals(operationType)) {
+                BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
+                String documentId = StringBaseOpt.castObjectToString(transform.attainExpressionValue(bizOptJson.getString("documentId")));
+                if (StringUtils.isBlank(documentId))
+                    return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "documentId"));
+                return deleteCustomDocument(esClient, indexName, documentId);
+            }
+            DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
+            if (dataSet == null)
+                return ResponseData.makeErrorMessage(ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                    dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
+            String primaryKeyName = bizOptJson.getString("primaryKey");
+            if (StringUtils.isBlank(primaryKeyName))
                 return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
-                    dataOptContext.getI18nMessage("error.701.field_is_blank", "documentId"));
-            return deleteCustomDocument(esClient, indexName, documentId);
+                    dataOptContext.getI18nMessage("error.701.field_is_blank", "primaryKeyName"));
+            return batchSaveDocuments(esClient, dataSet.getDataAsList(), indexName, primaryKeyName, operationType, dataOptContext);
+        }finally {
+            AbstractEsClientPools.returnClient(esInfo,esClient);
         }
-        DataSet dataSet = bizModel.getDataSet(bizOptJson.getString("source"));
-        if (dataSet == null )
-            return ResponseData.makeErrorMessage(ObjectException.DATA_NOT_FOUND_EXCEPTION,
-                dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
-        String primaryKeyName = bizOptJson.getString("primaryKey");
-        if (StringUtils.isBlank(primaryKeyName))
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
-                dataOptContext.getI18nMessage("error.701.field_is_blank", "primaryKeyName"));
-        return batchSaveDocuments(esClient, dataSet.getDataAsList(), indexName, primaryKeyName, operationType, dataOptContext);
     }
 
     //es 文件文档操作
