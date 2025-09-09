@@ -85,7 +85,7 @@ public abstract class BuiltInOperation {
         //当前用户信息
         dpf.put("currentUser", userInfo);
         dpf.put("currentStation", userDetails.getCurrentStation());
-        //当前用户主机构信息
+        //当前用户主机构信息-- 当前机构
         dpf.put("primaryUnit", CodeRepositoryUtil
             .getUnitInfoByCode(userDetails.getUserInfo().getTopUnit(),
                 userDetails.getUserInfo().getPrimaryUnit()));
