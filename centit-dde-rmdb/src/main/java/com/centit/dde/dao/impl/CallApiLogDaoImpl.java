@@ -12,6 +12,7 @@ import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -39,7 +40,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -134,8 +138,16 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
 
     @Override
     public List<Map<String, Object>> listLogsByProperties(Map<String, Object> param, PageDesc pageDesc) {
+        Object beginTime = param.get("runBeginTime_ge");
+        if(beginTime!=null){
+            param.put("runBeginTime_ge", convertLocalToUTC(beginTime.toString()));
+        }
+        Object endTime = param.get("runBeginTime_le");
+        if(beginTime!=null){
+            param.put("runBeginTime_le", convertLocalToUTC(endTime.toString()));
+        }
         Pair<Long, List<Map<String, Object>>> queryOut =
-            callApiLogSearcher.search(param, null, pageDesc.getPageNo(), pageDesc.getPageSize());
+            callApiLogSearcher.search(param, StringBaseOpt.objectToString(param.get("query")), pageDesc.getPageNo(), pageDesc.getPageSize());
         pageDesc.setTotalRows(queryOut.getLeft().intValue());
         List<Map<String, Object>> objectList =  queryOut.getRight();
         if(objectList==null) return null;
@@ -144,6 +156,23 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
             obj.put("runEndTime", DatetimeOpt.smartPraseDate((String)obj.get("runEndTime")));
         }
         return objectList;
+    }
+    private  String convertLocalToUTC(String localDateTimeStr) {
+        // 解析本地时间
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime localDateTime = LocalDateTime.parse(localDateTimeStr, formatter);
+
+        // 假设输入是系统默认时区的时间
+        ZonedDateTime zonedLocalTime = localDateTime.atZone(ZoneId.systemDefault());
+
+        // 转换为UTC时区
+        ZonedDateTime utcTime = zonedLocalTime.withZoneSameInstant(ZoneId.of("UTC"));
+
+        // 添加毫秒部分（示例中为331）
+        ZonedDateTime utcTimeWithMillis = utcTime.withNano(331 * 1_000_000);
+
+        // 格式化为ISO 8601格式
+        return utcTimeWithMillis.format(DateTimeFormatter.ISO_INSTANT);
     }
 
     @Override

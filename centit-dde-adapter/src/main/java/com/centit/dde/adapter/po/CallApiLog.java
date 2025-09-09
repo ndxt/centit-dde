@@ -47,11 +47,11 @@ public class CallApiLog implements ESDocument, Serializable {
     @ApiModelProperty(value = "菜单ID", hidden = true)
     private String topUnit;
 
-    @ESField(type = "keyword")
+    @ESField(type = "keyword",query = true, highlight = true, analyzer = "ik_smart")
     @ApiModelProperty(value = "请求方地址")
     private String requestIp;
 
-    @ESField(type = "keyword")
+    @ESField(type = "text",query = true, highlight = true, analyzer = "ik_smart")
     @ApiModelProperty(value = "请求参数")
     private String requestParams;
 
@@ -71,7 +71,7 @@ public class CallApiLog implements ESDocument, Serializable {
     @ApiModelProperty(value = "执行人员")
     private String runner;
 
-    @ESField(type = "text") //(name="other_message")
+    @ESField(type = "text",query = true, highlight = true, analyzer = "ik_smart") //(name="other_message")
     @ApiModelProperty(value = "其他提示信息", required = true)
     private String otherMessage;
 
