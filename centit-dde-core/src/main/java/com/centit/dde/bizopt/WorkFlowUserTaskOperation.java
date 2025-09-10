@@ -114,7 +114,7 @@ public class WorkFlowUserTaskOperation implements BizOperation {
             case 6:
                 String flowInstId = StringBaseOpt.castObjectToString(queryParam.get("flowInstId"));
                 String nodeInstId = StringBaseOpt.castObjectToString(queryParam.get("nodeInstId"));
-                if (StringUtils.isBlank(flowInstId) || StringUtils.isBlank(nodeInstId)) {
+                if (StringUtils.isBlank(flowInstId) && StringUtils.isBlank(nodeInstId)) {
                     return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
                         dataOptContext.getI18nMessage("error.701.field_is_blank", "flowInstId or nodeInstId"));
                 }
