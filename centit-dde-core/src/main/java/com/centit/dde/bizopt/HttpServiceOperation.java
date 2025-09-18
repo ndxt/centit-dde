@@ -411,7 +411,7 @@ public class HttpServiceOperation implements BizOperation {
     private static MultipartEntityBuilder buildMultiPartEntity(Object requestBody, List<FileDataSet> files) {
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setBoundary(HttpExecutor.BOUNDARY);
-        builder.setMode(HttpMultipartMode.RFC6532);
+        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
         if(requestBody instanceof Map) {
             Map<String, Object> formObjects = CollectionsOpt.objectToMap(requestBody);
             if (formObjects != null) {
@@ -428,7 +428,7 @@ public class HttpServiceOperation implements BizOperation {
                 String contentType = FileType.getFileMimeType(file.getFileName());
                 String fieldName = fileInd > 0 ? "file" + fileInd : "file";
                 fileInd++;
-                builder.addBinaryBody(fieldName, file.getFileInputStream(), ContentType.create(contentType), file.getFileName());
+                builder.addBinaryBody(fieldName, file.getFileInputStream(), ContentType.create(contentType, Consts.UTF_8), file.getFileName());
             }
         }
         return builder;
