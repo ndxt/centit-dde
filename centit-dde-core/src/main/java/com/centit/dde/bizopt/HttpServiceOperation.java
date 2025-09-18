@@ -23,20 +23,29 @@ import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.file.FileIOOpt;
+import com.centit.support.file.FileType;
+import com.centit.support.json.JSONOpt;
 import com.centit.support.json.JSONTransformer;
 import com.centit.support.network.*;
 import com.centit.support.xml.XMLObject;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -185,7 +194,23 @@ public class HttpServiceOperation implements BizOperation {
         switch (requestMode) {
             case "post":
             case "put":
-                if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)) { // 发送文件（附件）的请求
+                if(ConstantValue.MULTI_FORM_REQUEST_TYPE.equals(requestType)){
+                    String source = bizOptJson.getString("source");
+                    DataSet dataSet = bizModel.getDataSet(source);
+                    Object requestBody = getRequestBody(bizOptJson, bizModel);
+                    MultipartEntityBuilder builder = buildMultiPartEntity(requestBody, FileDataSetOptUtil.fetchFiles(dataSet, bizOptJson));
+                    if("put".equals(requestMode)){
+                        HttpPut httpPut = new HttpPut(UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams));
+                        httpPut.setHeader("Content-Type", HttpExecutor.multiPartTypeHead);
+                        httpPut.setEntity(builder.build());
+                        receiveJson = stringToReceiveJson(HttpExecutor.httpExecute(httpExecutorContext, httpPut), autoUnpack);
+                    } else {
+                        HttpPost httpPost = new HttpPost(UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams));
+                        httpPost.setHeader("Content-Type", HttpExecutor.multiPartTypeHead);
+                        httpPost.setEntity(builder.build());
+                        receiveJson = stringToReceiveJson(HttpExecutor.httpExecute(httpExecutorContext, httpPost), autoUnpack);
+                    }
+                } else if (ConstantValue.FILE_REQUEST_TYPE.equals(requestType)) { // 发送文件（附件）的请求
                     String source = bizOptJson.getString("source");
                     DataSet dataSet = bizModel.getDataSet(source);
                     if (dataSet == null){
@@ -383,4 +408,31 @@ public class HttpServiceOperation implements BizOperation {
             }
         }
     }
+
+    private static MultipartEntityBuilder buildMultiPartEntity(Object requestBody, List<FileDataSet> files) {
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.setBoundary(HttpExecutor.BOUNDARY);
+        builder.setMode(HttpMultipartMode.RFC6532);
+        if(requestBody instanceof Map) {
+            Map<String, Object> formObjects = CollectionsOpt.objectToMap(requestBody);
+            if (formObjects != null) {
+                ContentType contentType = ContentType.create("text/plain", Consts.UTF_8);
+                for (Map.Entry<String, Object> param : formObjects.entrySet()) {
+                    builder.addTextBody(param.getKey(),
+                        JSONOpt.objectToJSONString(param.getValue()), contentType);
+                }
+            }
+        }
+        if(!files.isEmpty()){
+            int fileInd = 0;
+            for(FileDataSet file : files){
+                String contentType = FileType.mapExtNameToMimeType(FileType.getFileExtName(file.getFileName()));
+                String filedName = fileInd > 0 ? "file" + fileInd : "file";
+                fileInd++;
+                builder.addBinaryBody(filedName, file.getFileInputStream(), ContentType.parse(contentType), file.getFileName());
+            }
+        }
+        return builder;
+    }
+
 }

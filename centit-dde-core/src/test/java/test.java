@@ -2,6 +2,8 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.framework.model.security.CentitUserDetails;
+import com.centit.support.file.FileType;
+import org.apache.http.entity.ContentType;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -10,6 +12,9 @@ import java.util.Map;
 public class test {
 
     public static void main(String[] args) {
+
+        System.out.println(ContentType.parse(FileType.mapExtNameToMimeType(FileType.getFileExtName("你好.png"))));
+
         JSONObject object = JSONObject.parseObject("{\"accountNonExpired\":true,\"accountNonLocked\":true,\"authenticated\":true,\"credentialsNonExpired\":true,\"enabled\":true,\"name\":\"\",\"userInfo\":{\"isValid\":\"T\",\"loginName\":\"\",\"userCode\":\"admin\",\"userName\":\"管理员\",\"userOrder\":1000,\"userType\":\"U\"},\"userOptList\":{},\"userSettings\":{},\"username\":\"\"}");
         CentitUserDetails userDetails = object.toJavaObject(CentitUserDetails.class);
 
