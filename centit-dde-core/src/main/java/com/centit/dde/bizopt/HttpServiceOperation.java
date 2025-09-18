@@ -425,10 +425,10 @@ public class HttpServiceOperation implements BizOperation {
         if(!files.isEmpty()){
             int fileInd = 0;
             for(FileDataSet file : files){
-                String contentType = FileType.mapExtNameToMimeType(FileType.getFileExtName(file.getFileName()));
-                String filedName = fileInd > 0 ? "file" + fileInd : "file";
+                String contentType = FileType.getFileMimeType(file.getFileName());
+                String fieldName = fileInd > 0 ? "file" + fileInd : "file";
                 fileInd++;
-                builder.addBinaryBody(filedName, file.getFileInputStream(), ContentType.parse(contentType), file.getFileName());
+                builder.addBinaryBody(fieldName, file.getFileInputStream(), ContentType.create(contentType), file.getFileName());
             }
         }
         return builder;
