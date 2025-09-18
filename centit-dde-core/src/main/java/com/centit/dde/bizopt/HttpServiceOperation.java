@@ -200,12 +200,12 @@ public class HttpServiceOperation implements BizOperation {
                     MultipartEntityBuilder builder = buildMultiPartEntity(requestBody, FileDataSetOptUtil.fetchFiles(dataSet, bizOptJson));
                     if("put".equals(requestMode)){
                         HttpPut httpPut = new HttpPut(UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams));
-                        httpPut.setHeader("Content-Type", HttpExecutor.multiPartTypeHead);
+                        httpPut.setHeader("Content-Type", "multipart/form-data; boundary=" + HttpExecutor.BOUNDARY);
                         httpPut.setEntity(builder.build());
                         receiveJson = stringToReceiveJson(HttpExecutor.httpExecute(httpExecutorContext, httpPut), autoUnpack);
                     } else {
                         HttpPost httpPost = new HttpPost(UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams));
-                        httpPost.setHeader("Content-Type", HttpExecutor.multiPartTypeHead);
+                        httpPost.setHeader("Content-Type", "multipart/form-data; boundary=" + HttpExecutor.BOUNDARY);
                         httpPost.setEntity(builder.build());
                         receiveJson = stringToReceiveJson(HttpExecutor.httpExecute(httpExecutorContext, httpPost), autoUnpack);
                     }
@@ -428,7 +428,7 @@ public class HttpServiceOperation implements BizOperation {
                 String contentType = FileType.getFileMimeType(file.getFileName());
                 String fieldName = fileInd > 0 ? "file" + fileInd : "file";
                 fileInd++;
-                builder.addBinaryBody(fieldName, file.getFileInputStream(), ContentType.create(contentType, Consts.UTF_8), file.getFileName());
+                builder.addBinaryBody(fieldName, file.getFileInputStream(), ContentType.create(contentType), file.getFileName());
             }
         }
         return builder;
