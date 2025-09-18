@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -51,10 +52,15 @@ public class WriteExcelOperation implements BizOperation {
         if(columnDescInValue){
             String columnDescValue = bizOptJson.getString("columnDescValue");
             Object obj = DataSetOptUtil.fetchFieldValue(new BizModelJSONTransform(bizModel, dataSet.getData()), columnDescValue);
-            mapInfoDesc =CollectionsOpt.objectMapToStringMap(CollectionsOpt.objectToMap(obj)) ;
+            mapInfoDesc = CollectionsOpt.objectMapToStringMap(CollectionsOpt.objectToMap(obj)) ;
         } else {
             mapInfoDesc = BuiltInOperation.jsonArrayToMap(
                 bizOptJson.getJSONArray("config"), "columnName", "expression");
+        }
+        if(mapInfoDesc == null){
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found2", "columnDescValue"));
         }
 
         String sheetName = bizOptJson.getString("sheetName");
@@ -135,7 +141,7 @@ public class WriteExcelOperation implements BizOperation {
                 ExcelReportUtil.exportExcel(inputStream, byteArrayOutputStream, dataSet.getFirstRow());
             } else {
                 //从第几行开始插入
-                Integer beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
+                int beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
                 //指定写入第几个sheet中
                 XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
                 XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
