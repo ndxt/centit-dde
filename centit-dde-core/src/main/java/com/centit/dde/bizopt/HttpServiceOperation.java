@@ -41,7 +41,6 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -194,7 +193,7 @@ public class HttpServiceOperation implements BizOperation {
         switch (requestMode) {
             case "post":
             case "put":
-                if(ConstantValue.MULTI_FORM_REQUEST_TYPE.equals(requestType)){
+                if(ConstantValue.MULTIPART_REQUEST_TYPE.equals(requestType)){
                     String source = bizOptJson.getString("source");
                     DataSet dataSet = bizModel.getDataSet(source);
                     Object requestBody = getRequestBody(bizOptJson, bizModel);
