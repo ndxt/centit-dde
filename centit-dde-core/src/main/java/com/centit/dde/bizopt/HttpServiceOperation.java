@@ -417,7 +417,6 @@ public class HttpServiceOperation implements BizOperation {
 
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
         String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_CONTENT, "");
-        int fileInd = 0;
         for(Map<String, Object> objectMap : dataSet.getDataAsList()){
             FileDataSet fileDataSet = FileDataSetOptUtil.mapDataToFile(objectMap, fileNameDesc, fileContentDesc);
             if(fileDataSet != null){
@@ -426,7 +425,6 @@ public class HttpServiceOperation implements BizOperation {
                     fileFieldName = fieldName; // 多个文件相同的名称，会转换为文件数组
                 }
                 files.put(fileFieldName, fileDataSet);
-                fileInd ++;
             }
         }
         return files;
