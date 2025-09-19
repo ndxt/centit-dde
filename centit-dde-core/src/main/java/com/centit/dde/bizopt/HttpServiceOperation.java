@@ -20,6 +20,7 @@ import com.centit.product.metadata.transaction.AbstractSourceConnectThreadHolder
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.file.FileIOOpt;
@@ -43,9 +44,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author zhf
@@ -197,7 +196,8 @@ public class HttpServiceOperation implements BizOperation {
                     String source = bizOptJson.getString("source");
                     DataSet dataSet = bizModel.getDataSet(source);
                     Object requestBody = getRequestBody(bizOptJson, bizModel);
-                    MultipartEntityBuilder builder = buildMultiPartEntity(requestBody, FileDataSetOptUtil.fetchFiles(dataSet, bizOptJson));
+                    String fieldName = BuiltInOperation.getJsonFieldString(bizOptJson, "fileFieldName", "file");
+                    MultipartEntityBuilder builder = buildMultiPartEntity(requestBody, fetchMultiFiles(dataSet, bizOptJson, fieldName));
                     if("put".equals(requestMode)){
                         HttpPut httpPut = new HttpPut(UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams));
                         httpPut.setHeader("Content-Type", "multipart/form-data; boundary=" + HttpExecutor.BOUNDARY);
@@ -408,7 +408,31 @@ public class HttpServiceOperation implements BizOperation {
         }
     }
 
-    private static MultipartEntityBuilder buildMultiPartEntity(Object requestBody, List<FileDataSet> files) {
+    public static Map<String, FileDataSet> fetchMultiFiles(DataSet dataSet, JSONObject jsonStep, String fieldName) {
+        Map<String, FileDataSet>  files = new LinkedHashMap<>();
+        if(dataSet instanceof FileDataSet){
+            files.put(fieldName, (FileDataSet) dataSet);
+            return files;
+        }
+
+        String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
+        String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_CONTENT, "");
+        int fileInd = 0;
+        for(Map<String, Object> objectMap : dataSet.getDataAsList()){
+            FileDataSet fileDataSet = FileDataSetOptUtil.mapDataToFile(objectMap, fileNameDesc, fileContentDesc);
+            if(fileDataSet != null){
+                String fileFieldName = StringBaseOpt.objectToString(objectMap.get(fieldName));
+                if(StringUtils.isBlank(fileFieldName)){
+                    fileFieldName = fileInd > 0 ? fieldName + fileInd: fieldName;
+                }
+                files.put(fileFieldName, fileDataSet);
+                fileInd ++;
+            }
+        }
+        return files;
+    }
+
+    private static MultipartEntityBuilder buildMultiPartEntity(Object requestBody, Map<String, FileDataSet> files) {
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setMode(HttpMultipartMode.RFC6532);
         builder.setBoundary(HttpExecutor.BOUNDARY);
@@ -423,12 +447,11 @@ public class HttpServiceOperation implements BizOperation {
             }
         }
         if(!files.isEmpty()){
-            int fileInd = 0;
-            for(FileDataSet file : files){
-                String contentType = FileType.getFileMimeType(file.getFileName());
-                String fieldName = fileInd > 0 ? "files" + fileInd : "files";
-                fileInd++;
-                builder.addBinaryBody(fieldName, file.getFileInputStream(), ContentType.create(contentType), file.getFileName());
+            for(Map.Entry<String, FileDataSet> ent : files.entrySet()){
+                String contentType = FileType.getFileMimeType(ent.getValue().getFileName());
+                builder.addBinaryBody(ent.getKey(), ent.getValue().getFileInputStream(),
+                    ContentType.create(contentType),
+                    ent.getValue().getFileName());
             }
         }
         return builder;
