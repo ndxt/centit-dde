@@ -423,7 +423,7 @@ public class HttpServiceOperation implements BizOperation {
             if(fileDataSet != null){
                 String fileFieldName = StringBaseOpt.objectToString(objectMap.get(fieldName));
                 if(StringUtils.isBlank(fileFieldName)){
-                    fileFieldName = fileInd > 0 ? fieldName + fileInd: fieldName;
+                    fileFieldName = fieldName; // 多个文件相同的名称，会转换为文件数组
                 }
                 files.put(fileFieldName, fileDataSet);
                 fileInd ++;
