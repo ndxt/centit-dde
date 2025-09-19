@@ -410,8 +410,8 @@ public class HttpServiceOperation implements BizOperation {
 
     private static MultipartEntityBuilder buildMultiPartEntity(Object requestBody, List<FileDataSet> files) {
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.setBoundary(HttpExecutor.BOUNDARY);
         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+        builder.setBoundary(HttpExecutor.BOUNDARY);
         if(requestBody instanceof Map) {
             Map<String, Object> formObjects = CollectionsOpt.objectToMap(requestBody);
             if (formObjects != null) {
