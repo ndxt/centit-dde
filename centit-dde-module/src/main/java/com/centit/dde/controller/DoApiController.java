@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -244,7 +245,19 @@ public abstract class DoApiController extends BaseController {
                                 "fileContent", inputStream);
                             dataOptContext.setStackData(ConstantValue.REQUEST_FILE_TAG, fileData);
                             if(StringUtils.isNotBlank(fieldName)) {
-                                bodyMap.put(fieldName, fileData);
+                                Object object = bodyMap.get(fieldName);
+                                if(object == null) {
+                                    bodyMap.put(fieldName, fileData);
+                                } else if(object instanceof Map){
+                                    List<Object> fileList = new ArrayList<>();
+                                    fileList.add(object);
+                                    fileList.add(fileData);
+                                    bodyMap.put(fieldName, fileList);
+                                } else if(object instanceof List){
+                                    ((List<Object>) object).add(fileData);
+                                } else {
+                                    bodyMap.put(fieldName, fileData);
+                                }
                             }
                         }
                     } else if (itemType.contains("application/json")) {
