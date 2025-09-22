@@ -63,9 +63,16 @@ public class HttpServiceOperation implements BizOperation {
         if(ConstantValue.RUN_TYPE_DEBUG.equals(dataOptContext.getRunType()) ||
             (ConstantValue.LOGLEVEL_CHECK_DEBUG & dataOptContext.getLogLevel()) != 0){
             CallApiLogDetail detailLog = BizOptUtils.createLogDetail(bizOptJson, dataOptContext);
-            detailLog.setLogInfo(JSON.toJSONString(CollectionsOpt.createHashMap(
-                "url", UrlOptUtils.appendParamsToUrl(url, requestParams),
-                       "requestBody", requestBody)));
+            Map<String, Object> paramsMap = CollectionsOpt.createHashMap(
+                "url", UrlOptUtils.appendParamsToUrl(url, requestParams));
+            if(requestBody != null){
+                if(requestBody instanceof DataSet){
+                    paramsMap.put("requestBody", ((DataSet) requestBody).toDebugString());
+                }else {
+                    paramsMap.put("requestBody", requestBody);
+                }
+            }
+            detailLog.setLogInfo(JSON.toJSONString(paramsMap));
         }
     }
 
@@ -198,6 +205,7 @@ public class HttpServiceOperation implements BizOperation {
                     Object requestBody = getRequestBody(bizOptJson, bizModel);
                     String fieldName = BuiltInOperation.getJsonFieldString(bizOptJson, "fileFieldName", "file");
                     MultipartEntityBuilder builder = buildMultiPartEntity(requestBody, fetchMultiFiles(dataSet, bizOptJson, fieldName));
+                    saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, dataSet);
                     if("put".equals(requestMode)){
                         HttpPut httpPut = new HttpPut(UrlOptUtils.appendParamsToUrl(requestServerAddress, requestParams));
                         httpPut.setHeader("Content-Type", "multipart/form-data; boundary=" + HttpExecutor.BOUNDARY);
@@ -219,6 +227,7 @@ public class HttpServiceOperation implements BizOperation {
                     }
                     FileDataSet fileInfo = FileDataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, false);
                     InputStream fileIS = fileInfo.getFileInputStream();
+                    saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, fileInfo);
                     if (fileIS != null) {
                         if("put".equals(requestMode)){
                             receiveJson = stringToReceiveJson(HttpExecutor.inputStreamUploadPut(httpExecutorContext,
@@ -268,6 +277,7 @@ public class HttpServiceOperation implements BizOperation {
                 }
                 break;
             case "get":
+                saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, null);
                 Boolean returnAsFile = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getString("returnAsFile"), false);
                 //TODO 添加 是否是获取 文件的参数, 需要验证
                 if(returnAsFile){
@@ -282,6 +292,7 @@ public class HttpServiceOperation implements BizOperation {
                 }
                 break;
             case "delete":
+                saveDebugLog(bizOptJson, dataOptContext, requestServerAddress, requestParams, null);
                 receiveJson = stringToReceiveJson(HttpExecutor.simpleDelete(httpExecutorContext, requestServerAddress, requestParams), autoUnpack);
                 break;
             default:

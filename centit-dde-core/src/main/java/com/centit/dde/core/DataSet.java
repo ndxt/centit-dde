@@ -210,20 +210,21 @@ public class DataSet implements Serializable {
 
     public String toDebugString(){
         String jsonStr = JSON.toJSONString(this.data);
-        if(jsonStr.length()<=30*1024){
+        if(jsonStr.length()<=10*1024){
             return jsonStr;
         }
         if(this.data instanceof List){
             List<?> list = (List<?>)this.data;
             int s = list.size();
             if(s<=1) return "DataSet content is to large";
-            s = 20*1024 * s / jsonStr.length();
+            s = 6*1024 * s / jsonStr.length();
+            if(s<1) s = 1;
             JSONArray jsonArray = new JSONArray(s);
             for(int i=0;i<s;i++){
                 jsonArray.add(list.get(i));
             }
             jsonStr = jsonArray.toJSONString();
-            if(jsonStr.length()<=30*1024){
+            if(jsonStr.length()<=10*1024){
                 return jsonStr;
             }
         }
