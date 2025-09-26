@@ -70,7 +70,7 @@ public class WriteExcelOperation implements BizOperation {
         boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), false);
         /**fileType（生成方式） ： none, append, excel, jxls；*/
         String optType = bizOptJson.getString("fileType");
-        int mergeColCell = NumberBaseOpt.castObjectToInteger(bizOptJson.getString("mergeColCell"), -1);
+        String mergeColCell = bizOptJson.getString("mergeColCell");
 
         if ("append".equals(optType)) {
             String fileDataSetName = bizOptJson.getString("fileDataSet");
