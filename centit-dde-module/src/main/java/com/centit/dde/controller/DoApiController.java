@@ -16,8 +16,8 @@ import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OsInfo;
-import com.centit.framework.model.basedata.WorkGroup;
 import com.centit.framework.model.security.CentitUserDetails;
+import com.centit.framework.security.CentitSecurityMetadata;
 import com.centit.framework.security.SecurityContextUtils;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
@@ -25,12 +25,13 @@ import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileIOOpt;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.InvalidFileNameException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.access.SecurityConfig;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
@@ -42,10 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -67,6 +65,54 @@ public abstract class DoApiController extends BaseController {
 
     protected Map<String, DataPacket> dataPacketCachedMap = new ConcurrentHashMap<>(10000);
 
+    private void judgePower(String packetId, CentitUserDetails ud, HttpServletRequest request){
+        List<ConfigAttribute> needRoles = CentitSecurityMetadata.getApiRoleList(packetId);
+        if (needRoles==null || needRoles.isEmpty() ){
+            if(ud != null)  return;
+        } else if(needRoles.contains(new SecurityConfig(SecurityContextUtils.ANONYMOUS_ROLE_CODE))){ //匿名用户放行
+            return;
+        }
+        if(ud == null){ // 未登录
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,
+                getI18nMessage(ResponseData.ERROR_NOT_LOGIN_MSG, request) );
+        }
+        Collection<? extends GrantedAuthority> userRoles = ud.getAuthorities();
+        if(userRoles!=null){
+            Iterator<? extends GrantedAuthority> userRolesItr = userRoles.iterator();
+            Iterator<ConfigAttribute> needRolesItr = needRoles.iterator();
+            String needRole = needRolesItr.next().getAttribute();
+            String userRole = userRolesItr.next().getAuthority();
+            while(true){
+                int n = needRole.compareTo(userRole);
+                if(n==0)
+                    return; // 匹配成功 完成认证
+                if(n<0){
+                    if(!needRolesItr.hasNext())
+                        break;
+                    needRole = needRolesItr.next().getAttribute();
+                }else{
+                    if(!userRolesItr.hasNext())
+                        break;
+                    userRole = userRolesItr.next().getAuthority();
+                }
+            }
+        }
+
+        StringBuilder errorMsgBuilder = new StringBuilder("no auth: ").append(packetId).append("; need role: ");
+        boolean firstRole = true;
+        for(ConfigAttribute ca : needRoles){
+            if(firstRole){
+                firstRole = false;
+            } else {
+                errorMsgBuilder.append(", ");
+            }
+            errorMsgBuilder.append(ca.getAttribute().substring(2));
+        }
+        errorMsgBuilder.append(".");
+        throw new ObjectException(ResponseData.HTTP_FORBIDDEN, errorMsgBuilder.toString());
+    }
+
+    /*
     private void judgeDebugPower(@PathVariable String packetId, String runType, HttpServletRequest request) {
         if (ConstantValue.RUN_TYPE_DEBUG.equals(runType)) {
             String loginUser = WebOptUtils.getCurrentUserCode(request);
@@ -81,14 +127,15 @@ public abstract class DoApiController extends BaseController {
                     getI18nMessage( "error.403.access_forbidden", request));
             }
         }
-    }
+    }*/
 
     protected void returnObject(String packetId, String runType, String taskType, List<String> urlParams,
                                 HttpServletRequest request, HttpServletResponse response) throws IOException {
+        CentitUserDetails userDetails = WebOptUtils.getCurrentUserDetails(request);
+        judgePower(packetId, userDetails, request);
         // 获取接口信息
         DataPacketInterface dataPacketInterface;
         if(ConstantValue.RUN_TYPE_DEBUG.equals(runType)){
-            //judgeDebugPower(packetId,runType,request); //  注释掉是因为要普通员工可以在debug模式下测试， 理论上是不需要的
             dataPacketInterface = dataPacketDraftService.getDataPacket(packetId);
         } else {
             DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
@@ -293,7 +340,6 @@ public abstract class DoApiController extends BaseController {
         //request.getCookies().
         OsInfo osInfo = platformEnvironment.getOsInfo(dataPacketInterface.getOsId());
         dataOptContext.setStackData(ConstantValue.APPLICATION_INFO_TAG, osInfo);
-        CentitUserDetails userDetails = WebOptUtils.getCurrentUserDetails(request);
         if(userDetails!=null) {
             dataOptContext.setStackData(ConstantValue.SESSION_DATA_TAG, userDetails);
             dataOptContext.setTopUnit(userDetails.getTopUnitCode());
