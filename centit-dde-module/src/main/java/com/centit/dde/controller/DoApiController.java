@@ -69,7 +69,7 @@ public abstract class DoApiController extends BaseController {
         List<ConfigAttribute> needRoles = CentitSecurityMetadata.getApiRoleList(packetId);
         if (needRoles==null || needRoles.isEmpty() ){
             if(ud != null)  return;
-        } else if(needRoles.contains(new SecurityConfig(SecurityContextUtils.ANONYMOUS_ROLE_CODE))){ //匿名用户放行
+        } else if(needRoles.contains(new SecurityConfig(SecurityContextUtils.SPRING_ANONYMOUS_ROLE_CODE))){ //匿名用户放行
             return;
         }
         if(ud == null){ // 未登录
