@@ -67,12 +67,12 @@ public abstract class DoApiController extends BaseController {
 
     private void judgePower(String packetId, CentitUserDetails ud, HttpServletRequest request){
         List<ConfigAttribute> needRoles = CentitSecurityMetadata.getApiRoleList(packetId);
-        if (needRoles==null || needRoles.isEmpty() ){
-            if(ud != null)  return;
+        if (needRoles==null || needRoles.isEmpty() ){ // 没有配置角色，后面如果严格就抛无权限
+            if(ud != null)  return; // 没有配置角色，对于已登录用户放行
         } else if(needRoles.contains(new SecurityConfig(SecurityContextUtils.SPRING_ANONYMOUS_ROLE_CODE))){ //匿名用户放行
             return;
         }
-        if(ud == null){ // 未登录
+        if(ud == null){ // 抛未登录异常
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,
                 getI18nMessage(ResponseData.ERROR_NOT_LOGIN_MSG, request) );
         }
