@@ -86,14 +86,23 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         details.setTaskId(callApiLog.getTaskId());
         details.setRunBeginTime(callApiLog.getRunBeginTime());
         int logDetailCount = callApiLog.getDetailLogs().size();
-        //保留最后20条日志明细
+        //保留100条日志明细, 前90条，后10条
         if(logDetailCount > 100){
             List<CallApiLogDetail> detailLogs = new ArrayList<>();
-            for(int i=0; i<10; i++){
+            for(int i=0; i<90; i++){
                 detailLogs.add(callApiLog.getDetailLogs().get(i));
             }
-            detailLogs.add(callApiLog.getDetailLogs().get(0));
-            for(int i=90; i>=1; i--){
+            CallApiLogDetail separate = new CallApiLogDetail();
+            separate.setStepNo(91);
+            separate.setOptNodeId("separate line");
+            separate.setLogType("info");
+            separate.setRunBeginTime(new Date());
+            separate.setRunEndTime(new Date());
+            separate.setLogInfo("日志明细共"+logDetailCount+"条，中间"+(logDetailCount-100)+"条被截断，仅保留90条，前90条，后10条");
+            separate.setErrorPieces(0);
+            separate.setSuccessPieces(0);
+            detailLogs.add(separate);
+            for(int i=10; i>=1; i--){
                 detailLogs.add(callApiLog.getDetailLogs().get(logDetailCount-i));
             }
             details.setDetailLogs(detailLogs);
