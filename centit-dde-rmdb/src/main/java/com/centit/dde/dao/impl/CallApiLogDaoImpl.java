@@ -98,7 +98,7 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
             separate.setLogType("info");
             separate.setRunBeginTime(new Date());
             separate.setRunEndTime(new Date());
-            separate.setLogInfo("日志明细共"+logDetailCount+"条，中间"+(logDetailCount-100)+"条被截断，仅保留90条，前90条，后10条");
+            separate.setLogInfo("日志明细共"+logDetailCount+"条，中间"+(logDetailCount-100)+"条被截断，仅保留100条，前90条，后10条");
             separate.setErrorPieces(0);
             separate.setSuccessPieces(0);
             detailLogs.add(separate);
