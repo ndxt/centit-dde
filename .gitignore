@@ -13,3 +13,5 @@ mvn*
 **/~$*
 out.*
 .flattened-pom.xml
+**/deploy
+
