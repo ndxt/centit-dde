@@ -345,18 +345,18 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
 
     /**
      * 根据optId统计接口的响应时间和成功率（整体统计）
-     * @param optId 接口ID
+     * @param taskId 接口ID
      * @param startDate 开始时间
      * @param endDate 结束时间
      * @return 统计结果
      */
-    public JSONObject statApiEfficiency(String optId, Date startDate, Date endDate){
+    public JSONObject statApiEfficiency(String taskId, Date startDate, Date endDate){
         SearchRequest searchRequest = new SearchRequest("callapilog");
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
         // 构建过滤条件
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
-        boolQuery.must(QueryBuilders.termQuery("optId", optId));
+        boolQuery.must(QueryBuilders.termQuery("taskId", taskId));
         RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("runBeginTime")
             .gte(startDate)
             .lte(endDate);
@@ -416,8 +416,8 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
             result.put("totalCount", totalCount);
 
         } catch (IOException | ElasticsearchException e) {
-            logger.error("Error occurred while processing optId: {}, start date: {}, end date: {}",
-                optId, startDate, endDate, e);
+            logger.error("Error occurred while processing taskId: {}, start date: {}, end date: {}",
+                taskId, startDate, endDate, e);
         } finally {
             callApiLogSearcher.releaseClient(client);
         }

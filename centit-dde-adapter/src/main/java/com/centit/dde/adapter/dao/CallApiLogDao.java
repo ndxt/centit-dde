@@ -36,5 +36,5 @@ public interface CallApiLogDao {
 
     JSONArray statTopTask(String osId, String countType, int topSize, Date startDate, Date endDate);
 
-    JSONObject statApiEfficiency(String optId, Date startDate, Date endDate);
+    JSONObject statApiEfficiency(String taskId, Date startDate, Date endDate);
 }

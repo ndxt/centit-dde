@@ -141,8 +141,8 @@ public class TaskLogManagerImpl implements TaskLogManager {
     }
 
     @Override
-    public JSONObject statApiEfficiency(String optId, Date startDate, Date endDate) {
-        return taskLogDao.statApiEfficiency( optId, startDate, endDate);
+    public JSONObject statApiEfficiency(String taskId, Date startDate, Date endDate) {
+        return taskLogDao.statApiEfficiency(taskId, startDate, endDate);
     }
 
     @Override

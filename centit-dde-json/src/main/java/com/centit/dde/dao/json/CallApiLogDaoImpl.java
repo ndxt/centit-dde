@@ -77,7 +77,7 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
     }
 
     @Override
-    public JSONObject statApiEfficiency(String optId, Date startDate, Date endDate) {
+    public JSONObject statApiEfficiency(String taskId, Date startDate, Date endDate) {
         return null;
     }
 
