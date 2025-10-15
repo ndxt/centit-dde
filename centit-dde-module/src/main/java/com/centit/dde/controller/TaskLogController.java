@@ -150,6 +150,17 @@ public class TaskLogController extends BaseController {
 
     }
 
+    @GetMapping(value = "/apiEfficiency")
+    @ApiOperation(value = "日志统计，根据optId统计接口响应时间和成功率")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "optId", value = "接口ID"),
+        @ApiImplicitParam(name = "startDate", value = "开始时间"),
+        @ApiImplicitParam(name = "endDate", value = "结束时间")})
+    @WrapUpResponseBody
+    public JSONObject statApiEfficiency(String optId, Date startDate, Date endDate){
+        return taskLogManager.statApiEfficiency(optId, startDate, endDate);
+    }
+
     @GetMapping(value = "/osStatInfo")
     @ApiOperation(value = "应用下面的统计信息")
     @ApiImplicitParam(name = "osId", value = "应用ID，applicationId/osId")

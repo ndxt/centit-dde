@@ -343,4 +343,84 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         return result;
     }
 
+    /**
+     * 根据optId统计接口的响应时间和成功率（整体统计）
+     * @param optId 接口ID
+     * @param startDate 开始时间
+     * @param endDate 结束时间
+     * @return 统计结果
+     */
+    public JSONObject statApiEfficiency(String optId, Date startDate, Date endDate){
+        SearchRequest searchRequest = new SearchRequest("callapilog");
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+        // 构建过滤条件
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.termQuery("optId", optId));
+        RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("runBeginTime")
+            .gte(startDate)
+            .lte(endDate);
+        boolQuery.must(rangeQuery);
+
+        sourceBuilder.query(boolQuery);
+        sourceBuilder.fetchSource(new String[]{"runBeginTime", "runEndTime", "successPieces", "errorPieces"}, null);
+
+        searchRequest.source(sourceBuilder);
+
+        JSONObject result = new JSONObject();
+        RestHighLevelClient client = null;
+        long totalResponseTime = 0;
+        long totalCount = 0;
+        long totalSuccessPieces = 0;
+        long totalErrorPieces = 0;
+
+        try {
+            client = callApiLogSearcher.fetchClient();
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+
+            // 遍历所有匹配的文档，计算总响应时间和成功率相关数据
+            for (org.elasticsearch.search.SearchHit hit : searchResponse.getHits().getHits()) {
+                Map<String, Object> source = hit.getSourceAsMap();
+
+                // 计算响应时间
+                Long runBeginTime = (Long) source.get("runBeginTime");
+                Long runEndTime = (Long) source.get("runEndTime");
+                if (runBeginTime != null && runEndTime != null) {
+                    totalResponseTime += (runEndTime - runBeginTime);
+                    totalCount++;
+                }
+
+                // 累加成功率相关数据
+                Integer successPieces = (Integer) source.get("successPieces");
+                Integer errorPieces = (Integer) source.get("errorPieces");
+                if (successPieces != null) {
+                    totalSuccessPieces += successPieces;
+                }
+                if (errorPieces != null) {
+                    totalErrorPieces += errorPieces;
+                }
+            }
+
+            // 计算平均响应时间（毫秒）
+            double avgResponseTime = totalCount > 0 ?
+                (double) totalResponseTime / totalCount : 0;
+            result.put("avgResponseTime", avgResponseTime);
+
+            // 计算成功率
+            long totalPieces = totalSuccessPieces + totalErrorPieces;
+            double successRate = totalPieces > 0 ?
+                (double) totalSuccessPieces / totalPieces : 0;
+            result.put("successRate", successRate);
+
+            // 添加总请求数
+            result.put("totalCount", totalCount);
+
+        } catch (IOException | ElasticsearchException e) {
+            logger.error("Error occurred while processing optId: {}, start date: {}, end date: {}",
+                optId, startDate, endDate, e);
+        } finally {
+            callApiLogSearcher.releaseClient(client);
+        }
+        return result;
+    }
 }

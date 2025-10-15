@@ -2,6 +2,7 @@ package com.centit.dde.dao.json;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.dao.CallApiLogDao;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.adapter.po.CallApiLogDetail;
@@ -72,6 +73,11 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
 
     @Override
     public JSONArray statTopTask(String osId, String countType, int topSize, Date startDate, Date endDate) {
+        return null;
+    }
+
+    @Override
+    public JSONObject statApiEfficiency(String optId, Date startDate, Date endDate) {
         return null;
     }
 

@@ -141,6 +141,11 @@ public class TaskLogManagerImpl implements TaskLogManager {
     }
 
     @Override
+    public JSONObject statApiEfficiency(String optId, Date startDate, Date endDate) {
+        return taskLogDao.statApiEfficiency( optId, startDate, endDate);
+    }
+
+    @Override
     public JSONObject statApplicationInfo(String osId){
         JSONObject appInfo = new JSONObject();
         Date currentDate = DatetimeOpt.currentUtilDate();

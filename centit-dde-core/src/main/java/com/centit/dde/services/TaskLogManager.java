@@ -49,6 +49,9 @@ public interface TaskLogManager{
 
     JSONArray statApiCallSumByTopUnit(String topUnit, Date startDate, Date endDate);
 
+    // 添加新的统计方法，用于统计特定optId的响应时间和成功率
+    JSONObject statApiEfficiency(String optId, Date startDate, Date endDate);
+
     void saveTaskLog(CallApiLog callApiLog, int logLevel);
 
     JSONObject statApplicationInfo(String osId);
