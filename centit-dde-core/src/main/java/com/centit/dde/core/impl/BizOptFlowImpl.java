@@ -229,6 +229,8 @@ public class BizOptFlowImpl implements BizOptFlow {
         allOperations.put("mergeFile", new MergeFileOperation());
         //压缩和解压
         allOperations.put("zip", new ZipUnzipOperation(this.appHome));
+        allOperations.put("fileCheck", new FileCheckOperation(this.fileInfoOpt));
+        allOperations.put("chart", new ChartImageOperation());
 
         //--------添加 文件获取函数，用于 excel中的图片加载
         DataSetOptUtil.extendFuncs.put("loadFile", (a) -> {
