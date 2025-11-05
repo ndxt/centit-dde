@@ -157,8 +157,20 @@ public class TaskLogController extends BaseController {
         @ApiImplicitParam(name = "startDate", value = "开始时间"),
         @ApiImplicitParam(name = "endDate", value = "结束时间")})
     @WrapUpResponseBody
-    public JSONObject statApiEfficiency(String taskId, Date startDate, Date endDate){
-        return taskLogManager.statApiEfficiency(taskId, startDate, endDate);
+    public JSONObject statApiEfficiency(String taskId,String statType){
+        Date currentDate = DatetimeOpt.currentUtilDate();
+        if(StringUtils.equalsAnyIgnoreCase(statType , "month")) {
+            return taskLogManager.statApiEfficiency(taskId, DatetimeOpt.truncateToDay(DatetimeOpt.addMonths(currentDate,-1)),
+                currentDate);
+        }
+        if(StringUtils.equalsAnyIgnoreCase(statType , "week")){
+            return taskLogManager.statApiEfficiency(taskId,
+                DatetimeOpt.truncateToDay(DatetimeOpt.addDays(currentDate,-7)),
+                currentDate);
+        }
+        return taskLogManager.statApiEfficiency(taskId,
+            DatetimeOpt.addDays(currentDate,-1),
+            currentDate);
     }
 
     @GetMapping(value = "/osStatInfo")

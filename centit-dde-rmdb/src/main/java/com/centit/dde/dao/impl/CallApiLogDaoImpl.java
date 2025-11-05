@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -353,7 +354,7 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
     public JSONObject statApiEfficiency(String taskId, Date startDate, Date endDate){
         SearchRequest searchRequest = new SearchRequest("callapilog");
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-
+        sourceBuilder.size(1000);
         // 构建过滤条件
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         boolQuery.must(QueryBuilders.termQuery("taskId", taskId));
@@ -377,16 +378,19 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
         try {
             client = callApiLogSearcher.fetchClient();
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
             // 遍历所有匹配的文档，计算总响应时间和成功率相关数据
             for (org.elasticsearch.search.SearchHit hit : searchResponse.getHits().getHits()) {
                 Map<String, Object> source = hit.getSourceAsMap();
 
                 // 计算响应时间
-                Long runBeginTime = (Long) source.get("runBeginTime");
-                Long runEndTime = (Long) source.get("runEndTime");
-                if (runBeginTime != null && runEndTime != null) {
-                    totalResponseTime += (runEndTime - runBeginTime);
+                String runBeginTimeStr = (String) source.get("runBeginTime");
+                String runEndTimeStr = (String) source.get("runEndTime");
+                if (runBeginTimeStr != null && runEndTimeStr != null) {
+                    Instant startInstant = Instant.from(formatter.parse(runBeginTimeStr));
+                    Instant endInstant = Instant.from(formatter.parse(runEndTimeStr));
+                    long diffInMillis = endInstant.toEpochMilli() - startInstant.toEpochMilli();
+                    totalResponseTime += diffInMillis;
                     totalCount++;
                 }
 
