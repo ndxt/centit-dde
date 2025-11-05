@@ -38,13 +38,12 @@ public class FileCheckOperation implements BizOperation {
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         //参数 文件类型 fileType 通用 *, xml, jpg/jepg
-        //参数 检测类型 checkType： 针对通用 检测文件大小 checkFileSize,  文件大小表达式 fileSizeExpr
+        //参数 检测类型 checkType： 针对通用 检测文件大小 checkFileSize,  文件大小表达式 ruleExpr
          //   针对xml 检测xml是否符合XMLSchema checkXMLSchema ,  schema文件Id
-        //  针对图片文件 检测图片文件格式 checkImageSize,  分辨率大小表达式 imageSizeExpr
+        //  针对图片文件 检测图片文件格式 checkImageSize,  分辨率大小表达式 ruleExpr
         String targetDsName = bizOptJson.getString("id");
         //String fileType = bizOptJson.getString("fileType");
         String checkType = bizOptJson.getString("checkType");
-        String errorMsg = bizOptJson.getString("errorMsg");
         //获取文件数据集
         String sourDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "source","");
         DataSet dataSet = bizModel.getDataSet(sourDsName);
@@ -57,7 +56,7 @@ public class FileCheckOperation implements BizOperation {
         ResponseData responseData = null;
         switch (checkType){
             case "checkFileSize": {
-                String fileSizeExpr = bizOptJson.getString("fileSizeExpr");
+                String fileSizeExpr = bizOptJson.getString("ruleExpr");
                 Object res = VariableFormula.calculate(fileSizeExpr, CollectionsOpt.createHashMap("fileSize", fileInfo.getSize()));
                 if (BooleanBaseOpt.castObjectToBoolean(res, false)) {
                     responseData = ResponseData.makeSuccessResponse();
@@ -75,7 +74,7 @@ public class FileCheckOperation implements BizOperation {
                 break;
             }
             case "checkImageSize": {
-                String imageSizeExpr = bizOptJson.getString("imageSizeExpr");
+                String imageSizeExpr = bizOptJson.getString("ruleExpr");
                 BufferedImage image = ImageIO.read(fileInfo.getFileInputStream());
                 Object res = VariableFormula.calculate(imageSizeExpr, CollectionsOpt.createHashMap(
                     "width", image.getWidth(), "height", image.getHeight()));
@@ -88,9 +87,9 @@ public class FileCheckOperation implements BizOperation {
                 }
                 break;
             }
-            //  针对图片文件 检测图片文件格式 checkImageDpi,  分辨率大小表达式 imageDpiExpr
+            //  针对图片文件 检测图片文件格式 checkImageDpi,  分辨率大小表达式 ruleExpr
             /*case "checkImageDpi": {
-                String imageDpiExpr = bizOptJson.getString("imageDpiExpr");
+                String imageDpiExpr = bizOptJson.getString("ruleExpr");
                 BufferedImage image = ImageIO.read(fileInfo.getFileInputStream());
                 Object res = VariableFormula.calculate(imageDpiExpr, CollectionsOpt.createHashMap(
                     "dpi", image.get);
