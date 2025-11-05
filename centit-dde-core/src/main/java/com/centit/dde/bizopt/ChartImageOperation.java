@@ -4,9 +4,11 @@ import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.image.ImageOpt;
 import com.centit.support.report.ChartImageUtils;
 
@@ -32,8 +34,16 @@ public class ChartImageOperation implements BizOperation {
         String chartType = bizOptJson.getString("chartType");
         int imageWidth = NumberBaseOpt.castObjectToInteger(bizOptJson.get("width"), 400);
         int imageHeight = NumberBaseOpt.castObjectToInteger(bizOptJson.get("height"), 300);
-        JSONObject chartData = bizOptJson.getJSONObject("data");
+        String source = bizOptJson.getString("source");
+        DataSet dataSet = bizModel.getDataSet(source);
+        if (dataSet == null || !(dataSet.getData() instanceof JSONObject)) {
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found2", source));
+        }
+        JSONObject chartData = (JSONObject)dataSet.getData();
         JSONObject chartStyle = bizOptJson.getJSONObject("style");
+
         BufferedImage image = ChartImageUtils.createChartImage(chartType, title, imageWidth, imageHeight, chartData, chartStyle);
         ByteArrayInputStream imageIS = ImageOpt.imageToInputStream( image);
         bizModel.putDataSet(targetDsName, new FileDataSet(title+".jpg", imageIS.available(), imageIS));
