@@ -146,7 +146,9 @@ public class DataSet implements Serializable {
                 for (int i = 0; i < len; i++) {
                     objList.add(CollectionsOpt.objectToMap(Array.get(this.data, i)));
                 }
+                return objList;
             }
+            return Collections.emptyList();
         }
 
         return CollectionsOpt.createList(CollectionsOpt.objectToMap(this.data));
