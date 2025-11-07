@@ -5,8 +5,10 @@ import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
+import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.FileDataSet;
 import com.centit.dde.utils.BizModelJSONTransform;
+import com.centit.dde.utils.FileDataSetOptUtil;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.BooleanBaseOpt;
@@ -34,7 +36,7 @@ import java.util.Map;
  * @author zhf
  */
 public class DocReportOperation implements BizOperation {
-    private FileInfoOpt fileInfoOpt;
+    private final FileInfoOpt fileInfoOpt;
 
     public DocReportOperation(FileInfoOpt fileInfoOpt) {
         this.fileInfoOpt = fileInfoOpt;
@@ -69,8 +71,7 @@ public class DocReportOperation implements BizOperation {
                     if (StringUtils.isBlank(expression)) {
                         continue;
                     }
-                    String value = StringBaseOpt.objectToString(JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel)));
-                    params.put(columnName, value);
+                    params.put(columnName, expression);
                 }
             }
         }
@@ -83,32 +84,39 @@ public class DocReportOperation implements BizOperation {
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
     }
 
-    private FieldsMetadata getFieldsMetadata(Map<String, String> params, JSONObject docData) throws Exception {
+    private FieldsMetadata getFieldsMetadata(BizModel dataModel, Map<String, String> params, JSONObject docData) throws Exception {
         FieldsMetadata metadata = new FieldsMetadata();
         if (params != null) {
             int i = 0;
             for (Map.Entry<String, String> map : params.entrySet()) {
                 i++;
-                String imageName = map.getKey();
-                String fileFieldPath = map.getValue();
-                addImageMeta(metadata, docData, fileFieldPath, imageName, "image_" + i);
+                addImageMeta(dataModel, metadata, docData, map.getValue(), map.getKey(), "image_" + i);
                 }
             }
         return metadata;
     }
 
-    private void addImageMeta(FieldsMetadata metadata, JSONObject docData, String fieldValue,
+    private void addImageMeta(BizModel dataModel, FieldsMetadata metadata, JSONObject docData, String fileIdOrDataset,
                               String imageName, String placeholder) throws Exception {
         metadata.addFieldAsImage(imageName, placeholder);
         //书签，数据集+img_+图片字段
-        docData.put(placeholder, new ByteArrayImageProvider(FileIOOpt.readBytesFromFile(fileInfoOpt.getFile(fieldValue))));
+        InputStream inputStream ;
+        DataSet fieldValue = dataModel.getDataSet(fileIdOrDataset);
+        if(fieldValue != null){
+            inputStream = FileDataSetOptUtil.castToFileDataSet(fieldValue).getFileInputStream();
+        }else{
+            String fileId = StringBaseOpt.castObjectToString(
+                JSONTransformer.transformer(fileIdOrDataset, new BizModelJSONTransform(dataModel)), fileIdOrDataset);
+            inputStream = fileInfoOpt.loadFileStream(fileId);
+        }
+        docData.put(placeholder, new ByteArrayImageProvider(FileIOOpt.readBytesFromInputStream(inputStream)));
     }
 
     private ByteArrayInputStream generateWord(BizModel dataModel, String fileId, Map<String, String> params) throws Exception {
         JSONObject docData = dataModel.toJsonObject(false);
         // 准备图片元数据
-        FieldsMetadata metadata = getFieldsMetadata(params, docData);
-        try (InputStream in = new FileInputStream(fileInfoOpt.getFile(fileId))) {
+        FieldsMetadata metadata = getFieldsMetadata(dataModel, params, docData);
+        try (InputStream in = fileInfoOpt.loadFileStream(fileId)) {
             // 1) Load ODT file and set Velocity template engine and cache it to the registry
             IXDocReport report = XDocReportRegistry.getRegistry().loadReport(in, TemplateEngineKind.Freemarker, false);
             // 2) Create Java model context
