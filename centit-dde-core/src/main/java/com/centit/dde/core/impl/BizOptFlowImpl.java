@@ -300,7 +300,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             return;
         }
         if (ConstantValue.BRANCH.equals(stepType)) {
-            calcBatchStep(bizModel, dataOptStep, dataOptContext);
+            calcBranchStep(bizModel, dataOptStep, dataOptContext);
             return;
         }
         // 模块调用
@@ -329,12 +329,6 @@ public class BizOptFlowImpl implements BizOptFlow {
 
             if (isBreak) {
                 String currentNodeId = stepJson.getString("id");
-                dataOptStep.getCurrentStep().getJSONObject("properties").put("resultOptions", "1");
-                String source = stepJson.getString("source");
-                //设置返回节点  内部方法会通过这个source 来判断返回具体的某个节点 这个只能重置为当前ID 下面再重置回去
-                dataOptStep.getCurrentStep().getJSONObject("properties").put("source", stepJson.getString("id"));
-                //恢复原始JSON数据，否则后面更新的时候会将原本的数据替换为当前节点id
-                dataOptStep.getCurrentStep().getJSONObject("properties").put("source", source);
                 JSONObject bizData = new JSONObject();
                 JSONObject dump = new JSONObject();
                 dump.put("allNodeData", bizModel.getBizData());
@@ -493,7 +487,7 @@ public class BizOptFlowImpl implements BizOptFlow {
         bizModel.getOptResult().setResultType(DataOptResult.RETURN_OPT_DATA);
     }
 
-    private void calcBatchStep(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) {
+    private void calcBranchStep(BizModel bizModel, DataOptStep dataOptStep, DataOptContext dataOptContext) {
         JSONObject stepJson = dataOptStep.getCurrentStep();
         stepJson = stepJson.getJSONObject("properties");
         String stepId = stepJson.getString("id");
