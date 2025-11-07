@@ -69,7 +69,7 @@ public class DocReportOperation implements BizOperation {
                     if (StringUtils.isBlank(expression)) {
                         continue;
                     }
-                    String value = StringBaseOpt.objectToString(JSONTransformer.transformer(expression, bizModel));
+                    String value = StringBaseOpt.objectToString(JSONTransformer.transformer(expression, new BizModelJSONTransform(bizModel)));
                     params.put(columnName, value);
                 }
             }
