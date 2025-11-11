@@ -597,7 +597,7 @@ public abstract class DataSetOptUtil {
      * @param inData 输入数据集
      * @param colHeaderFields 列头信息
      * @param rowHeaderFields 行头信息
-     * @oaram fieldContainColumn 生成的新字段中是否保留原有老字段部分
+     * @param fieldContainColumn 生成的新字段中是否保留原有老字段部分
      * 比如： 新字段值为  name:动态值:fieldName  当fieldContainColumn=false时  name:部分将不会被保留
      * @param concatStr 字段名连接字符
      * @param statType 统计方式 0 none 没有 1 only total 只有总计 2 cube 明细和和总计， 有多个分组时有效
