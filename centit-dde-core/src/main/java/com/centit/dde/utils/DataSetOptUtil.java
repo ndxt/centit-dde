@@ -363,7 +363,7 @@ public abstract class DataSetOptUtil {
                                                       Map<String, Object> preRow,
                                                       Map<String, List<Object>> tempData) {
         Map<String, Object> newRow = new HashMap<>(groupByFields.size());
-        if (groupByFields.size() > 0) {
+        if (!groupByFields.isEmpty()) {
             for (String field : groupByFields) {
                 newRow.put(field, preRow.get(field));
             }
@@ -429,14 +429,21 @@ public abstract class DataSetOptUtil {
                     break;
                 /* percentile 这个没有实现*/
                 case "concat": //连接字符串
-                case "splitJ":
+                case "splitJ": {
                     List<Object> objects = tempData.get(tr.getLeft());
                     StringBuilder builder = new StringBuilder();
                     for (Object object : objects) {
                         builder.append(object);//.append(";");
                     }
                     db = builder.toString();
+                }
                     break;
+                case "countDistinct": { // distinct count
+                    List<Object> objects = tempData.get(tr.getLeft());
+                    Set<Object> objSet = CollectionsOpt.mapCollectionToSet(objects, (a)-> a );
+                    db = objSet.size();
+                    break;
+                }
                 default: // count
                     db = tempData.get(tr.getLeft()).size();
                     break;
