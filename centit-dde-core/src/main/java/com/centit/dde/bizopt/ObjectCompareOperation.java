@@ -38,6 +38,7 @@ public class ObjectCompareOperation implements BizOperation {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("fieldName",newKey);
                 jsonObject.put("newValue",newValue);
+                compareResult.add(jsonObject);
             } else {
                 Object oldValue = oldObject.get(newKey);
                 if(GeneralAlgorithm.compareTwoObject(oldValue, newValue)!=0){
