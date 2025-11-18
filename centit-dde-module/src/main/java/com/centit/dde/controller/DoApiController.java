@@ -13,6 +13,7 @@ import com.centit.fileserver.utils.UploadDownloadUtils;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.OsInfo;
@@ -97,8 +98,14 @@ public abstract class DoApiController extends BaseController {
                 }
             }
         }
-
-        StringBuilder errorMsgBuilder = new StringBuilder("no auth: ").append(packetId).append("; need role: ");
+        String packName;
+        DataPacket dataPacket = dataPacketService.getDataPacket(packetId);
+        if(dataPacket!=null){
+            packName = dataPacket.getPacketName() + "(" + dataPacket.getOptId() + ")";
+        }else{
+            packName = packetId;
+        }
+        StringBuilder errorMsgBuilder = new StringBuilder("  用户没有权限: ").append(packName).append(";\r\n需要角色: ");
         boolean firstRole = true;
         for(ConfigAttribute ca : needRoles){
             if(firstRole){
@@ -106,7 +113,9 @@ public abstract class DoApiController extends BaseController {
             } else {
                 errorMsgBuilder.append(", ");
             }
-            errorMsgBuilder.append(ca.getAttribute().substring(2));
+            String roleCode = ca.getAttribute().substring(2);
+            errorMsgBuilder.append(CodeRepositoryUtil.getValue(CodeRepositoryUtil.ROLE_CODE, roleCode,
+                WebOptUtils.getCurrentTopUnit(request), WebOptUtils.getCurrentLang(request), roleCode));
         }
         errorMsgBuilder.append(".");
         throw new ObjectException(ResponseData.HTTP_FORBIDDEN, errorMsgBuilder.toString());
