@@ -1,5 +1,6 @@
 package com.centit.dde.core;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.adapter.po.CallApiLog;
 import com.centit.dde.utils.ConstantValue;
 import com.centit.framework.common.WebOptUtils;
@@ -152,24 +153,31 @@ public class DataOptContext {
      * 用于记录日志
      * @return callStackData 的部分内容
      */
-    public Map<String, Object> getContextData(){
+    public String toDebugString(){
         //MODULE_CALL_TAG
-        Map<String, Object> objectMap = new HashMap<>();
+        JSONObject objectMap = new JSONObject();
         Object modulaTag = callStackData.get(ConstantValue.MODULE_CALL_TAG);
         if(modulaTag != null){
             objectMap.put(ConstantValue.MODULE_CALL_TAG, modulaTag);
-            return objectMap;
+            return objectMap.toJSONString();
         }
+
         for(String key : callStackData.keySet()){
-            if(key.startsWith("__request_")){
+            if(StringUtils.equalsAny(key, ConstantValue.REQUEST_PARAMS_TAG, ConstantValue.REQUEST_HEADERS_TAG,
+                ConstantValue.REQUEST_URL_PARAMS_TAG)){
                 objectMap.put(key, callStackData.get(key));
             }
+        }
+        //避免文件上传作为数据记录到日志中
+        if(!callStackData.containsKey(ConstantValue.REQUEST_FILE_TAG)){
+            objectMap.put(ConstantValue.REQUEST_BODY_TAG, callStackData.get(ConstantValue.REQUEST_BODY_TAG));
         }
         CentitUserDetails userDetails = this.getCurrentUserDetail();
         if(userDetails != null && userDetails.getUserInfo() != null) {
             objectMap.put(ConstantValue.SESSION_DATA_TAG, userDetails.getUserInfo().toJsonWithoutSensitive());
             objectMap.put("currentUnit", userDetails.getCurrentUnitCode());
         }
-        return objectMap;
+        return objectMap.toJSONString();
     }
+
 }

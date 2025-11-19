@@ -700,7 +700,7 @@ public class BizOptFlowImpl implements BizOptFlow {
             }
 
             if ("start".equals(optType)) {
-                detailLog.setLogInfo(JSON.toJSONString(dataOptContext.getContextData()));
+                detailLog.setLogInfo(dataOptContext.toDebugString());
             } else {
                 DataSet dataSet;
                 if ("append".equals(optType) || "desensitize".equals(optType)) { // 派生 和 脱敏
