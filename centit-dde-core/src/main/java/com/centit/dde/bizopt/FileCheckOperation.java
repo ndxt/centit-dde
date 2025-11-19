@@ -68,8 +68,8 @@ public class FileCheckOperation implements BizOperation {
             }
             case "checkXMLSchema": {
                 String schemaFileId = bizOptJson.getString("schemaFileId");
-                InputStream inputStream = fileInfoOpt.loadFileStream(schemaFileId);
-                JSONObject jsonObj = XMLSchemaValidationUtil.validate(fileInfo.getFileInputStream(), inputStream);
+                InputStream inputStreamXsd = fileInfoOpt.loadFileStream(schemaFileId);
+                JSONObject jsonObj = XMLSchemaValidationUtil.validate(inputStreamXsd,fileInfo.getFileInputStream());
                 responseData = HttpReceiveJSON.valueOf(jsonObj).toResponseData();
                 break;
             }
