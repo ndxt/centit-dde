@@ -14,84 +14,86 @@ import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileSystemOpt;
 import com.centit.support.file.FileType;
 import com.centit.support.json.JSONTransformer;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+
 import java.util.zip.ZipOutputStream;
 
 public abstract class FileDataSetOptUtil {
 
     public static FileDataSet mapDataToFile(Map<String, Object> objectMap,
-                                            String fileNameDesc, String fileContentDesc){
-        if(objectMap==null)
+                                            String fileNameDesc, String fileContentDesc) {
+        if (objectMap == null)
             return null;
 
         String fileName = null;
-        if(StringUtils.isNotBlank(fileNameDesc)) {
+        if (StringUtils.isNotBlank(fileNameDesc)) {
             fileName = StringBaseOpt.castObjectToString(objectMap.get(fileNameDesc));
         }
         if (StringUtils.isBlank(fileName)) {
             fileName = StringBaseOpt.castObjectToString(objectMap.get(ConstantValue.FILE_NAME));
         }
 
-        Object fileData =null;
-        if(StringUtils.isNotBlank(fileContentDesc)) {
+        Object fileData = null;
+        if (StringUtils.isNotBlank(fileContentDesc)) {
             fileData = objectMap.get(fileContentDesc);
         }
         if (fileData == null) {
             fileData = objectMap.get(ConstantValue.FILE_CONTENT);
         }
 
-        if(fileData == null)
+        if (fileData == null)
             return null;
 
         HashMap<String, Object> fileInfo = new HashMap<>();
-        for(Map.Entry<String, Object> entry : objectMap.entrySet()){
-            if(! StringUtils.equalsAny(entry.getKey(),
-                ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT, fileNameDesc, fileContentDesc)){
+        for (Map.Entry<String, Object> entry : objectMap.entrySet()) {
+            if (!StringUtils.equalsAny(entry.getKey(),
+                ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT, fileNameDesc, fileContentDesc)) {
                 fileInfo.put(entry.getKey(), entry.getValue());
             }
         }
-        FileDataSet fileDataset =  new FileDataSet();
+        FileDataSet fileDataset = new FileDataSet();
         fileDataset.setFileInfo(fileInfo);
 
         fileDataset.setFileContent(fileName,
-            NumberBaseOpt.castObjectToLong(objectMap.get(ConstantValue.FILE_SIZE), -1l),
+            NumberBaseOpt.castObjectToLong(objectMap.get(ConstantValue.FILE_SIZE), -1L),
             fileData);
         return fileDataset;
     }
 
-    public static FileDataSet castToFileDataSet(DataSet dataSet){
-        if(dataSet==null){
+    public static FileDataSet castToFileDataSet(DataSet dataSet) {
+        if (dataSet == null) {
             return null;
         }
-        if(dataSet instanceof FileDataSet)
+        if (dataSet instanceof FileDataSet)
             return (FileDataSet) dataSet;
         return mapDataToFile(dataSet.getFirstRow(), null, null);
     }
 
-    public static InputStream getInputStreamFormFile(Map<String, Object> fileInfo){
+    public static InputStream getInputStreamFormFile(Map<String, Object> fileInfo) {
         Object data = fileInfo.get(ConstantValue.FILE_CONTENT);
         return FileIOOpt.castObjectToInputStream(data);
     }
 
-    public static InputStream getInputStreamFormDataSet(DataSet dataSet){
-        if(dataSet instanceof FileDataSet){
-            return ((FileDataSet)dataSet).getFileInputStream();
+    public static InputStream getInputStreamFormDataSet(DataSet dataSet) {
+        if (dataSet instanceof FileDataSet) {
+            return ((FileDataSet) dataSet).getFileInputStream();
         }
         return getInputStreamFormFile(dataSet.getFirstRow());
     }
 
-    public static FileDataSet zipFileDatasetList(String fileName, List<FileDataSet> files){
+    public static FileDataSet zipFileDatasetList(String fileName, List<FileDataSet> files) {
         FileDataSet fileDataset = new FileDataSet();
         ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
-        try(ZipOutputStream out = ZipCompressor.convertToZipOutputStream(outBuf)) {
+        try (ZipOutputStream out = ZipCompressor.convertToZipOutputStream(outBuf)) {
             Map<String, Integer> fileNameMap = new HashMap<>(files.size() + 4);
             for (FileDataSet ds : files) {
                 InputStream inputStream = ds.getFileInputStream();
@@ -105,23 +107,31 @@ public abstract class FileDataSetOptUtil {
                 ZipCompressor.compressFile(inputStream, fn, out, "");
             }
         } catch (IOException e) {
-            throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED, "压缩多个文件时报错："+ e.getMessage(), e);
+            throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED, "压缩多个文件时报错：" + e.getMessage(), e);
         }
         fileDataset.setFileContent(fileName, outBuf.size(), outBuf);
         return fileDataset;
     }
 
-    public static List<FileDataSet> unzipFileDatasetList(String tempPath, FileDataSet zipFileDataset) throws IOException{
-        String fileName = tempPath + File.separatorChar + UuidOpt.getUuidAsString32()+".zip";
+    public static List<FileDataSet> unzipFileDatasetList(String tempPath, FileDataSet zipFileDataset) throws IOException {
+        String fileName = tempPath + File.separatorChar + UuidOpt.getUuidAsString32() + ".zip";
         FileIOOpt.writeInputStreamToFile(zipFileDataset.getFileInputStream(), fileName);
         List<FileDataSet> files = new ArrayList<>();
-        try (ZipFile zip = new ZipFile(fileName)) {
-            for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements(); ) {
-                ZipEntry entry = entries.nextElement();
+
+        // 使用 Apache Commons Compress，自动处理编码问题
+        try (ZipFile zip =
+                 new ZipFile(new File(fileName))) {
+
+            // 使用 Enumeration 的传统遍历方式
+            Enumeration<ZipArchiveEntry> entries = zip.getEntries();
+            while (entries.hasMoreElements()) {
+                ZipArchiveEntry entry = entries.nextElement();
                 String zipEntryName = entry.getName();
-                if(entry.isDirectory()) continue;
+                if (entry.isDirectory()) continue;
+
                 try (InputStream in = zip.getInputStream(entry);
                      ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
                     byte[] buf1 = new byte[1024];
                     int len;
                     while ((len = in.read(buf1)) > 0) {
@@ -129,58 +139,65 @@ public abstract class FileDataSetOptUtil {
                     }
                     FileDataSet fileDataSet = new FileDataSet(zipEntryName, out.size(), out);
                     files.add(fileDataSet);
+                } catch (Exception e) {
+                    // 处理单个文件异常，继续处理其他文件
+                    continue;
                 }
             }
         }
-        //删除临时文件
+
+        // 删除临时文件
         FileSystemOpt.deleteFile(fileName);
         return files;
     }
 
+
+
+
     public static List<FileDataSet> fetchFiles(DataSet dataSet, JSONObject jsonStep) {
         List<FileDataSet> files = new ArrayList<>();
-        if(dataSet instanceof FileDataSet){
+        if (dataSet instanceof FileDataSet) {
             files.add((FileDataSet) dataSet);
             return files;
         }
 
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
         String fileContentDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_CONTENT, "");
-        for(Map<String, Object> objectMap : dataSet.getDataAsList()){
+        for (Map<String, Object> objectMap : dataSet.getDataAsList()) {
             FileDataSet fileDataSet = mapDataToFile(objectMap, fileNameDesc, fileContentDesc);
-            if(fileDataSet != null){
+            if (fileDataSet != null) {
                 files.add(fileDataSet);
             }
         }
         return files;
     }
 
-    public static FileDataSet attainFileDataset(BizModel bizModel, DataSet dataSet, JSONObject jsonStep, boolean singleFile){
+    public static FileDataSet attainFileDataset(BizModel bizModel, DataSet dataSet, JSONObject jsonStep, boolean singleFile) {
         String fileNameDesc = BuiltInOperation.getJsonFieldString(jsonStep, ConstantValue.FILE_NAME, "");
         BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel, dataSet.getData());
         String fileName = null;
-        if(StringUtils.isNotBlank(fileNameDesc)){
+        if (StringUtils.isNotBlank(fileNameDesc)) {
             fileName = StringBaseOpt.objectToString(JSONTransformer.transformer(fileNameDesc, transformer));
         }
 
         List<FileDataSet> files = fetchFiles(dataSet, jsonStep);
-        if(files.isEmpty()){
+        if (files.isEmpty()) {
             throw new ObjectException(ObjectException.EMPTY_RESULT_EXCEPTION, "文件数据获取失败");
         }
 
-        if(singleFile || files.size() == 1){
+        if (singleFile || files.size() == 1) {
             FileDataSet ds = files.get(0);
             String currentFileName = ds.getFileName();
-            if(StringUtils.isNotBlank(fileName) && (StringUtils.isBlank(currentFileName) || StringUtils.equals(
-                FileType.getFileExtName(currentFileName), FileType.getFileExtName(fileName))) ){
+            if (StringUtils.isNotBlank(fileName) && (StringUtils.isBlank(currentFileName) || StringUtils.equals(
+                FileType.getFileExtName(currentFileName), FileType.getFileExtName(fileName)))) {
                 ds.setFileName(fileName);
             }
             return ds;
         }
 
-        if(StringUtils.isBlank(fileName)){
-            fileName ="download.zip";
-        } else if(!fileName.toLowerCase().endsWith(".zip")) {
+        if (StringUtils.isBlank(fileName)) {
+            fileName = "download.zip";
+        } else if (!fileName.toLowerCase().endsWith(".zip")) {
             fileName = fileName + ".zip";
         }
         return zipFileDatasetList(fileName, files);
