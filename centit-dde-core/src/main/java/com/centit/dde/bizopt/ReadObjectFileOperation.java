@@ -42,11 +42,11 @@ public class ReadObjectFileOperation implements BizOperation {
         if (inputStream != null) {
             DataSet simpleDataSet;
             if("xml".equalsIgnoreCase(fileType)) {
-                simpleDataSet = new DataSet(JSON.parse(FileIOOpt.readStringFromInputStream(inputStream)));
-            } else {
                 String objString = FileIOOpt.readStringFromInputStream(inputStream);
                 Object obj = StringUtils.isBlank(objString)? null : XMLObject.xmlStringToObject(objString);
                 simpleDataSet = new DataSet(obj);
+            } else {
+                simpleDataSet = new DataSet(JSON.parse(FileIOOpt.readStringFromInputStream(inputStream)));
             }
             bizModel.putDataSet(targetDsName, simpleDataSet);
             return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
