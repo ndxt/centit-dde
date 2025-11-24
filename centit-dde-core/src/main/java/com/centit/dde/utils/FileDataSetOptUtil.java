@@ -15,6 +15,7 @@ import com.centit.support.file.FileSystemOpt;
 import com.centit.support.file.FileType;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.lang3.StringUtils;
 
@@ -93,18 +94,41 @@ public abstract class FileDataSetOptUtil {
     public static FileDataSet zipFileDatasetList(String fileName, List<FileDataSet> files) {
         FileDataSet fileDataset = new FileDataSet();
         ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
-        try (ZipOutputStream out = ZipCompressor.convertToZipOutputStream(outBuf)) {
+        // 使用 Apache Commons Compress 创建 ZipArchiveOutputStream
+        try (ZipArchiveOutputStream out = new ZipArchiveOutputStream(outBuf)) {
+            out.setEncoding("UTF-8"); // 设置编码
+            out.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS); // 支持 Unicode 文件名
             Map<String, Integer> fileNameMap = new HashMap<>(files.size() + 4);
             for (FileDataSet ds : files) {
                 InputStream inputStream = ds.getFileInputStream();
                 String fn = ds.getFileName();
+                // 处理重复文件名
                 while (fileNameMap.containsKey(fn)) {
                     int copies = fileNameMap.get(fn) + 1;
                     fileNameMap.put(fn, copies);
                     fn = FileType.truncateFileExtNameWithPath(fn) + "(" + copies + ")." + FileType.getFileExtName(fn);
                 }
                 fileNameMap.put(fn, 1);
-                ZipCompressor.compressFile(inputStream, fn, out, "");
+                try {
+                    // 创建 ZipArchiveEntry
+                    ZipArchiveEntry zipEntry = new ZipArchiveEntry(fn);
+                    out.putArchiveEntry(zipEntry);
+                    // 复制文件内容
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    while ((len = inputStream.read(buffer)) > 0) {
+                        out.write(buffer, 0, len);
+                    }
+                    out.closeArchiveEntry();
+                } catch (Exception e) {
+                    throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED, "压缩文件报错：" + e.getMessage(), e);
+                } finally {
+                    if (inputStream != null) {
+                        try {
+                            inputStream.close();
+                        } catch (IOException ignored) {}
+                    }
+                }
             }
         } catch (IOException e) {
             throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED, "压缩多个文件时报错：" + e.getMessage(), e);
@@ -112,6 +136,7 @@ public abstract class FileDataSetOptUtil {
         fileDataset.setFileContent(fileName, outBuf.size(), outBuf);
         return fileDataset;
     }
+
 
     public static List<FileDataSet> unzipFileDatasetList(String tempPath, FileDataSet zipFileDataset) throws IOException {
         String fileName = tempPath + File.separatorChar + UuidOpt.getUuidAsString32() + ".zip";
@@ -150,8 +175,6 @@ public abstract class FileDataSetOptUtil {
         FileSystemOpt.deleteFile(fileName);
         return files;
     }
-
-
 
 
     public static List<FileDataSet> fetchFiles(DataSet dataSet, JSONObject jsonStep) {
