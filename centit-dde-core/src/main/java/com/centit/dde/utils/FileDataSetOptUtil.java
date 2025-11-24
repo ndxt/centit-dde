@@ -92,16 +92,17 @@ public abstract class FileDataSetOptUtil {
     }
 
     public static FileDataSet zipFileDatasetList(String fileName, List<FileDataSet> files) {
-        FileDataSet fileDataset = new FileDataSet();
-        ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
-        // 提升缓冲区作用域，复用缓冲区减少内存分配
-        byte[] buffer = new byte[8192]; // 在循环外创建缓冲区
-        try (ZipArchiveOutputStream out = new ZipArchiveOutputStream(outBuf)) {
-            out.setEncoding("UTF-8");
-            out.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS);
-            Map<String, Integer> fileNameMap = new HashMap<>(files.size() + 4);
-            for (FileDataSet ds : files) {
-                InputStream inputStream = ds.getFileInputStream();
+    FileDataSet fileDataset = new FileDataSet();
+    ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
+    // 提升缓冲区作用域，复用缓冲区减少内存分配
+    byte[] buffer = new byte[8192]; // 在循环外创建缓冲区
+    try (ZipArchiveOutputStream out = new ZipArchiveOutputStream(outBuf)) {
+        out.setEncoding("UTF-8");
+        out.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS);
+        Map<String, Integer> fileNameMap = new HashMap<>(files.size() + 4);
+        for (FileDataSet ds : files) {
+            // 使用 try-with-resources 确保 inputStream 正确关闭
+            try (InputStream inputStream = ds.getFileInputStream()) {
                 // 检查inputStream是否为空
                 if (inputStream == null) {
                     continue; // 跳过空的输入流
@@ -125,13 +126,17 @@ public abstract class FileDataSetOptUtil {
                 } catch (Exception e) {
                     throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED, "压缩文件报错：" + e.getMessage(), e);
                 }
+            } catch (IOException e) {
+                throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED, "处理文件流时报错：" + e.getMessage(), e);
             }
-        } catch (IOException e) {
-            throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED, "压缩多个文件时报错：" + e.getMessage(), e);
         }
-        fileDataset.setFileContent(fileName, outBuf.size(), outBuf);
-        return fileDataset;
+    } catch (IOException e) {
+        throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED, "压缩多个文件时报错：" + e.getMessage(), e);
     }
+    fileDataset.setFileContent(fileName, outBuf.size(), outBuf);
+    return fileDataset;
+}
+
 
 
     public static List<FileDataSet> unzipFileDatasetList(String tempPath, FileDataSet zipFileDataset) throws IOException {
