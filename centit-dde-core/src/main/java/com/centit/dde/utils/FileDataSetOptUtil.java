@@ -94,15 +94,19 @@ public abstract class FileDataSetOptUtil {
     public static FileDataSet zipFileDatasetList(String fileName, List<FileDataSet> files) {
         FileDataSet fileDataset = new FileDataSet();
         ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
-        // 使用 Apache Commons Compress 创建 ZipArchiveOutputStream
+        // 提升缓冲区作用域，复用缓冲区减少内存分配
+        byte[] buffer = new byte[8192]; // 在循环外创建缓冲区
         try (ZipArchiveOutputStream out = new ZipArchiveOutputStream(outBuf)) {
-            out.setEncoding("UTF-8"); // 设置编码
-            out.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS); // 支持 Unicode 文件名
+            out.setEncoding("UTF-8");
+            out.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS);
             Map<String, Integer> fileNameMap = new HashMap<>(files.size() + 4);
             for (FileDataSet ds : files) {
                 InputStream inputStream = ds.getFileInputStream();
+                // 检查inputStream是否为空
+                if (inputStream == null) {
+                    continue; // 跳过空的输入流
+                }
                 String fn = ds.getFileName();
-                // 处理重复文件名
                 while (fileNameMap.containsKey(fn)) {
                     int copies = fileNameMap.get(fn) + 1;
                     fileNameMap.put(fn, copies);
@@ -110,11 +114,9 @@ public abstract class FileDataSetOptUtil {
                 }
                 fileNameMap.put(fn, 1);
                 try {
-                    // 创建 ZipArchiveEntry
                     ZipArchiveEntry zipEntry = new ZipArchiveEntry(fn);
                     out.putArchiveEntry(zipEntry);
-                    // 复制文件内容
-                    byte[] buffer = new byte[1024];
+                    // 复用外部缓冲区
                     int len;
                     while ((len = inputStream.read(buffer)) > 0) {
                         out.write(buffer, 0, len);
@@ -122,12 +124,6 @@ public abstract class FileDataSetOptUtil {
                     out.closeArchiveEntry();
                 } catch (Exception e) {
                     throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED, "压缩文件报错：" + e.getMessage(), e);
-                } finally {
-                    if (inputStream != null) {
-                        try {
-                            inputStream.close();
-                        } catch (IOException ignored) {}
-                    }
                 }
             }
         } catch (IOException e) {
