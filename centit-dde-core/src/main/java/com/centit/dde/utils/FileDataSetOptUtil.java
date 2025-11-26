@@ -8,7 +8,6 @@ import com.centit.dde.dataset.FileDataSet;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
-import com.centit.support.algorithm.ZipCompressor;
 import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileSystemOpt;
@@ -19,14 +18,11 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
+import java.nio.file.Files;
 import java.util.*;
 
-import java.util.zip.ZipOutputStream;
 
 public abstract class FileDataSetOptUtil {
 
@@ -92,51 +88,80 @@ public abstract class FileDataSetOptUtil {
     }
 
     public static FileDataSet zipFileDatasetList(String fileName, List<FileDataSet> files) {
-    FileDataSet fileDataset = new FileDataSet();
-    ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
-    // 提升缓冲区作用域，复用缓冲区减少内存分配
-    byte[] buffer = new byte[8192]; // 在循环外创建缓冲区
-    try (ZipArchiveOutputStream out = new ZipArchiveOutputStream(outBuf)) {
-        out.setEncoding("UTF-8");
-        out.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS);
-        Map<String, Integer> fileNameMap = new HashMap<>(files.size() + 4);
-        for (FileDataSet ds : files) {
-            // 使用 try-with-resources 确保 inputStream 正确关闭
-            try (InputStream inputStream = ds.getFileInputStream()) {
-                // 检查inputStream是否为空
-                if (inputStream == null) {
-                    continue; // 跳过空的输入流
-                }
-                String fn = ds.getFileName();
-                while (fileNameMap.containsKey(fn)) {
-                    int copies = fileNameMap.get(fn) + 1;
-                    fileNameMap.put(fn, copies);
-                    fn = FileType.truncateFileExtNameWithPath(fn) + "(" + copies + ")." + FileType.getFileExtName(fn);
-                }
-                fileNameMap.put(fn, 1);
-                try {
-                    ZipArchiveEntry zipEntry = new ZipArchiveEntry(fn);
-                    out.putArchiveEntry(zipEntry);
-                    // 复用外部缓冲区
-                    int len;
-                    while ((len = inputStream.read(buffer)) > 0) {
-                        out.write(buffer, 0, len);
+        FileDataSet fileDataset = new FileDataSet();
+        // 使用临时文件进行流式处理，避免内存溢出
+        File tempZipFile = null;
+        try {
+            tempZipFile = File.createTempFile("zip_", ".tmp");
+            try (FileOutputStream fos = new FileOutputStream(tempZipFile);
+                 ZipArchiveOutputStream out = new ZipArchiveOutputStream(fos)) {
+
+                out.setEncoding("UTF-8");
+                out.setCreateUnicodeExtraFields(ZipArchiveOutputStream.UnicodeExtraFieldPolicy.ALWAYS);
+                Map<String, Integer> fileNameMap = new HashMap<>(files.size() + 4);
+
+                // 缓冲区复用
+                byte[] buffer = new byte[8192];
+
+                for (FileDataSet ds : files) {
+                    try (InputStream inputStream = ds.getFileInputStream()) {
+                        if (inputStream == null) {
+                            continue;
+                        }
+
+                        String fn = ds.getFileName();
+                        while (fileNameMap.containsKey(fn)) {
+                            int copies = fileNameMap.get(fn) + 1;
+                            fileNameMap.put(fn, copies);
+                            fn = FileType.truncateFileExtNameWithPath(fn) + "(" + copies + ")." +
+                                FileType.getFileExtName(fn);
+                        }
+                        fileNameMap.put(fn, 1);
+
+                        ZipArchiveEntry zipEntry = new ZipArchiveEntry(fn);
+                        out.putArchiveEntry(zipEntry);
+
+                        int len;
+                        while ((len = inputStream.read(buffer)) > 0) {
+                            out.write(buffer, 0, len);
+                        }
+                        out.closeArchiveEntry();
+                    } catch (Exception e) {
+                        throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED,
+                            "压缩文件报错：" + e.getMessage(), e);
                     }
-                    out.closeArchiveEntry();
-                } catch (Exception e) {
-                    throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED, "压缩文件报错：" + e.getMessage(), e);
                 }
             } catch (IOException e) {
-                throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED, "处理文件流时报错：" + e.getMessage(), e);
+                throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED,
+                    "压缩多个文件时报错：" + e.getMessage(), e);
+            }
+            // 将临时文件内容读取到内存中返回
+            try (FileInputStream fis = new FileInputStream(tempZipFile);
+                 ByteArrayOutputStream outBuf = new ByteArrayOutputStream()) {
+
+                byte[] buffer = new byte[8192];
+                int len;
+                while ((len = fis.read(buffer)) > 0) {
+                    outBuf.write(buffer, 0, len);
+                }
+                fileDataset.setFileContent(fileName, outBuf.size(), outBuf);
+            }
+
+        } catch (IOException e) {
+            throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED,
+                "创建临时文件失败：" + e.getMessage(), e);
+        } finally {
+            // 确保临时文件被删除
+            if (tempZipFile != null && tempZipFile.exists()) {
+                try {
+                    Files.delete(tempZipFile.toPath());
+                } catch (IOException e) {
+                    // 记录日志但不中断流程
+                }
             }
         }
-    } catch (IOException e) {
-        throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED, "压缩多个文件时报错：" + e.getMessage(), e);
+        return fileDataset;
     }
-    fileDataset.setFileContent(fileName, outBuf.size(), outBuf);
-    return fileDataset;
-}
-
 
 
     public static List<FileDataSet> unzipFileDatasetList(String tempPath, FileDataSet zipFileDataset) throws IOException {
