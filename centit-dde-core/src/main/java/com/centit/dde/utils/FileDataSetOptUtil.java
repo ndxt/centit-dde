@@ -88,6 +88,22 @@ public abstract class FileDataSetOptUtil {
     }
 
     public static FileDataSet zipFileDatasetList(String fileName, List<FileDataSet> files) {
+        long totalSize = 0;
+        // 计算总文件大小并检查限制
+        for (FileDataSet ds : files) {
+            long fileSize = ds.getFileSize();
+            if (fileSize > 0) {
+                totalSize += fileSize;
+            }
+            // 单个文件大小检查可在此添加
+        }
+        // 检查可用内存
+        Runtime runtime = Runtime.getRuntime();
+        long availableMemory = runtime.maxMemory() - (runtime.totalMemory() - runtime.freeMemory());
+        if (totalSize > availableMemory * 0.8) { // 使用不超过80%可用内存
+            throw new ObjectException(ObjectException.DATA_NOT_INTEGRATED,
+                "可用内存不足，无法完成压缩操作");
+        }
         FileDataSet fileDataset = new FileDataSet();
         // 使用临时文件进行流式处理，避免内存溢出
         File tempZipFile = null;
