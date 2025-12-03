@@ -21,8 +21,8 @@ import com.centit.support.database.utils.PageDesc;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -38,7 +38,7 @@ import java.util.Map;
  * @author codefan@sina.com
  */
 public class SqlDataSetReader implements DataSetReader {
-    public static final Log log = LogFactory.getLog(SqlDataSetReader.class);
+    public static final Logger log = LoggerFactory.getLogger(SqlDataSetReader.class);
     private ISourceInfo databaseInfo;
     /**
      * 参数驱动sql

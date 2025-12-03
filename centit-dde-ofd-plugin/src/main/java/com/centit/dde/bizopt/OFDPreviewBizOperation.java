@@ -8,8 +8,8 @@ import com.centit.dde.core.DataSet;
 import com.centit.dde.vo.OFDPreviewVo;
 import com.centit.framework.common.ResponseData;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -28,7 +28,7 @@ import java.io.OutputStream;
  */
 public class OFDPreviewBizOperation implements BizOperation {
 
-    public static final Log log = LogFactory.getLog(OFDPreviewBizOperation.class);
+    public static final Logger log = LoggerFactory.getLogger(OFDPreviewBizOperation.class);
 
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
