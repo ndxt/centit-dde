@@ -27,8 +27,8 @@ import java.util.Map;
  * @author zhf
  */
 public class PersistenceDBOperation implements BizOperation {
-    private static String WRITER_ERROR_TAG = "__rmdb_writer_result";
-    private static String WRITER_ERROR_MSG = "__rmdb_writer_result_msg";
+    private static final String WRITER_ERROR_TAG = "__rmdb_writer_result";
+    private static final String WRITER_ERROR_MSG = "__rmdb_writer_result_msg";
     private static final String WRITER_INDICATE_APPEND = "append";
     private static final String WRITER_INDICATE_MERGE = "merge";
     private static final String WRITER_INDICATE_UPDATE = "update";
