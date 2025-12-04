@@ -38,7 +38,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
     private static final ConcurrentLinkedQueue<CallApiLog> waitingForWriteLogs = new ConcurrentLinkedQueue<>();
     private static final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
     //ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    private static final int MAX_LOG_COUNT_ONE_TIME = 300;
+    private static final int MAX_LOG_COUNT_ONE_TIME = 500;
     /*
      * 异步写入API调用日志
      */
