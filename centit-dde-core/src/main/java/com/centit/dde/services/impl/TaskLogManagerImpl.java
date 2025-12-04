@@ -38,7 +38,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
     private static final ConcurrentLinkedQueue<CallApiLog> waitingForWriteLogs = new ConcurrentLinkedQueue<>();
     private static final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
     //ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    private static final int MAX_LOG_COUNT_ONE_TIME = 500;
+    private static final int MAX_LOG_COUNT_ONE_TIME = 800;
     /*
      * 异步写入API调用日志
      */
@@ -71,7 +71,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
             } catch (Exception e) {
                 logger.error("写入API调用信息报错：{}", e.getMessage());
             }
-        }, 23, 7, TimeUnit.SECONDS);
+        }, 23, 3, TimeUnit.SECONDS);
         //默认执行时间间隔为7秒
     }
 
