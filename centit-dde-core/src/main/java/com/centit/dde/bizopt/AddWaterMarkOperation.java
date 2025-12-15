@@ -19,6 +19,7 @@ import com.centit.support.common.ObjectException;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileType;
 import com.centit.support.image.ImageOpt;
+import com.centit.support.office.DocOptUtil;
 import com.centit.support.office.Watermark4Pdf;
 import com.itextpdf.text.Image;
 import org.apache.commons.lang3.StringUtils;
@@ -50,6 +51,8 @@ public class AddWaterMarkOperation implements BizOperation {
             return addPdfWaterMark(bizModel, bizOptJson, dataOptContext);
         } else if("pdfImage".equalsIgnoreCase(fileType)){
             return addImage2Pdf(bizModel, bizOptJson, dataOptContext);
+        } else if("pdfShade".equalsIgnoreCase(fileType)){
+            return addShade2Pdf(bizModel, bizOptJson, dataOptContext);
         } else {
             return BuiltInOperation.createResponseData(0, 1,
                 ObjectException.FUNCTION_NOT_SUPPORT,
@@ -284,6 +287,78 @@ public class AddWaterMarkOperation implements BizOperation {
                     ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
                     Watermark4Pdf.addWatermark4Pdf(fileDataSet.getFileInputStream(),
                         pdfFile, waterMarkStr, opacity, rotation, fontSize, isRepeat);
+                    fileList.add(CollectionsOpt.createHashMap(
+                        ConstantValue.FILE_NAME, fileDataSet.getFileName(),
+                        ConstantValue.FILE_SIZE, pdfFile.size(),
+                        ConstantValue.FILE_CONTENT, pdfFile
+                    ));
+                }
+            }
+            bizModel.putDataSet(targetDsName, new DataSet(fileList));
+            return BuiltInOperation.createResponseSuccessData(fileList.size());
+        }
+        return BuiltInOperation.createResponseSuccessData(0);
+    }
+
+    private ResponseData addShade2Pdf(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception{
+        //获取参数
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
+        String waterMarkStr = bizOptJson.getString("waterMark");
+        String color = bizOptJson.getString("color");
+        //底纹默认为黄色
+        Color shadeColor = ImageOpt.castObjectToColor(color, Color.YELLOW);
+
+        String sourDsName = bizOptJson.getString("source");
+        DataSet dataSet = bizModel.getDataSet(sourDsName);
+        if (dataSet == null){
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
+        }
+        if(StringUtils.isNotBlank(waterMarkStr)){
+            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel, dataSet.getData());
+            String transMark = StringBaseOpt.castObjectToString(
+                DataSetOptUtil.fetchFieldValue(transform, waterMarkStr));
+            if(StringUtils.isNotBlank(transMark)){
+                waterMarkStr = transMark;
+            }
+        } else {
+            return BuiltInOperation.createResponseData(0, 1,
+                ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                dataOptContext.getI18nMessage("dde.604.data_source_not_found2", "color"));
+        }
+        List<String> keyWords = CollectionsOpt.arrayToList(waterMarkStr.split(","));
+        if(dataSet.getSize() == 1) {
+            FileDataSet fileDataSet;
+            if (dataSet instanceof FileDataSet) {
+                fileDataSet = (FileDataSet) dataSet;
+            } else {
+                fileDataSet = FileDataSetOptUtil.mapDataToFile(dataSet.getFirstRow(),
+                    ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
+            }
+            if(fileDataSet!=null) {
+                ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
+                DocOptUtil.pdfHighlightKeywords(fileDataSet.getFileInputStream(),
+                    pdfFile, keyWords, shadeColor);
+
+                FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
+                    pdfFile.size(), pdfFile);
+                bizModel.putDataSet(targetDsName, pdfDataset);
+                return BuiltInOperation.createResponseSuccessData(1);
+            } else {
+                return BuiltInOperation.createResponseSuccessData(0);
+            }
+        }
+        //文件列表
+        if(dataSet.getSize() > 1) {
+            List<Map<String, Object>> fileList = new ArrayList<>();
+            for(Map<String, Object> rowData : dataSet.getDataAsList()){
+                FileDataSet fileDataSet = FileDataSetOptUtil.mapDataToFile(rowData,
+                    ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
+                if(fileDataSet!=null){
+                    ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
+                    DocOptUtil.pdfHighlightKeywords(fileDataSet.getFileInputStream(),
+                        pdfFile, keyWords, shadeColor);
                     fileList.add(CollectionsOpt.createHashMap(
                         ConstantValue.FILE_NAME, fileDataSet.getFileName(),
                         ConstantValue.FILE_SIZE, pdfFile.size(),
