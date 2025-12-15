@@ -113,18 +113,25 @@ public class FileCheckOperation implements BizOperation {
                 info.dpi = 72; // 默认DPI
 
                 // 如果需要从元数据获取实际DPI
-                ImageInputStream iis = ImageIO.createImageInputStream(inputStream);
-                Iterator<ImageReader> readers = ImageIO.getImageReaders(image);
-
-                if (readers.hasNext()) {
-                    ImageReader reader = readers.next();
-                    reader.setInput(iis);
-                    IIOMetadata metadata = reader.getImageMetadata(0);
-
-                    if (metadata != null) {
-                        info.dpi = parseStandardDpi(metadata);
+                try (ImageInputStream iis = ImageIO.createImageInputStream(inputStream)) {
+                    Iterator<ImageReader> readers = ImageIO.getImageReaders(image);
+                    if (readers.hasNext()) {
+                        ImageReader reader = readers.next();
+                        try {
+                            reader.setInput(iis);
+                            IIOMetadata metadata = reader.getImageMetadata(0);
+                            if (metadata != null) {
+                                info.dpi = parseStandardDpi(metadata);
+                            }
+                        } finally {
+                            reader.dispose(); // 手动释放资源
+                        }
                     }
+                } catch (Exception e) {
+                    // 记录日志或者适当处理异常
+                    e.printStackTrace();
                 }
+
 
                 return info;
             }
