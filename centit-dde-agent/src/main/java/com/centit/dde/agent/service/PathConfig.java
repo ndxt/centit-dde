@@ -17,5 +17,6 @@ public class PathConfig {
 
     private String useDataMoving;
 
-    private String[] optId;
+    private String[] includeOs;
+    private String[] excludeOs;
 }

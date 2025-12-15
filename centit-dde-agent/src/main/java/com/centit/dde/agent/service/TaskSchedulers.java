@@ -60,8 +60,11 @@ public class TaskSchedulers {
         queryParams.put("taskType", ConstantValue.TASK_TYPE_AGENT);
         queryParams.put("isValid", true);
         queryParams.put("isDisable", false);
-        if (pathConfig.getOptId() != null && pathConfig.getOptId().length > 0) {
-            queryParams.put("optId_in", pathConfig.getOptId());
+        if (pathConfig.getIncludeOs() != null && pathConfig.getIncludeOs().length > 0) {
+            queryParams.put("osId_in", pathConfig.getIncludeOs());
+        }
+        if (pathConfig.getExcludeOs() != null && pathConfig.getExcludeOs().length > 0) {
+            queryParams.put("osId_ni", pathConfig.getExcludeOs());
         }
     }
 

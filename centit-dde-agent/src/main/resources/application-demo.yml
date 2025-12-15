@@ -21,7 +21,10 @@ centit:
   useDataMoving: false
   dataMovingPath: D:\centit-dde-datamoving-5.4-SNAPSHOT.jar
   logs: D:/Projects/RunData/dde/log
-  optId: ''
+  includeOs:
+      - 档案系统ID
+  excludeOs:
+      - 档案系统ID
 
 logging:
   path: D:/Projects/RunData/dde/log
