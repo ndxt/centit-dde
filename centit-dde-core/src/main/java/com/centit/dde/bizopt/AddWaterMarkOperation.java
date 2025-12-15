@@ -51,7 +51,7 @@ public class AddWaterMarkOperation implements BizOperation {
             return addPdfWaterMark(bizModel, bizOptJson, dataOptContext);
         } else if("pdfImage".equalsIgnoreCase(fileType)){
             return addImage2Pdf(bizModel, bizOptJson, dataOptContext);
-        } else if("pdfShade".equalsIgnoreCase(fileType)){
+        } else if("textShade".equalsIgnoreCase(fileType)){
             return addShade2Pdf(bizModel, bizOptJson, dataOptContext);
         } else {
             return BuiltInOperation.createResponseData(0, 1,
@@ -303,7 +303,7 @@ public class AddWaterMarkOperation implements BizOperation {
     private ResponseData addShade2Pdf(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception{
         //获取参数
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
-        String waterMarkStr = bizOptJson.getString("keywords");
+        String waterMarkStr = bizOptJson.getString("text");
         String color = bizOptJson.getString("color");
         //底纹默认为黄色
         Color shadeColor = ImageOpt.castObjectToColor(color, Color.YELLOW);
