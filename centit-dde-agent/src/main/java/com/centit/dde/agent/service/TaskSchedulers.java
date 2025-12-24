@@ -63,8 +63,14 @@ public class TaskSchedulers {
         if (pathConfig.getIncludeOs() != null && pathConfig.getIncludeOs().length > 0) {
             queryParams.put("osId_in", pathConfig.getIncludeOs());
         }
+        if (pathConfig.getIncludeOpt() != null && pathConfig.getIncludeOpt().length > 0) {
+            queryParams.put("optId_in", pathConfig.getIncludeOpt());
+        }
         if (pathConfig.getExcludeOs() != null && pathConfig.getExcludeOs().length > 0) {
             queryParams.put("osId_ni", pathConfig.getExcludeOs());
+        }
+        if (pathConfig.getExcludeOpt() != null && pathConfig.getExcludeOpt().length > 0) {
+            queryParams.put("optId_ni", pathConfig.getExcludeOpt());
         }
     }
 
