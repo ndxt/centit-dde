@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.bizopt.BuiltInOperation;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.dataset.FileDataSet;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.filter.RequestThreadLocal;
@@ -25,6 +26,7 @@ import org.apache.commons.math3.stat.StatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -155,7 +157,18 @@ public abstract class DataSetOptUtil {
                 return null;
             Object file = a[0];
             try {
-                return TikaTextExtractor.extractInputStreamText(FileIOOpt.castObjectToInputStream(file));
+                InputStream fileInputStream;
+                if(file instanceof FileDataSet){
+                    fileInputStream = ((FileDataSet)file).getFileInputStream();
+                }else if (file instanceof Map){
+                    fileInputStream = FileIOOpt.castObjectToInputStream(((Map<?, ?>) file).get(ConstantValue.FILE_CONTENT));
+                }else {
+                    fileInputStream = FileIOOpt.castObjectToInputStream(file);
+                }
+                if(fileInputStream==null){
+                    return null;
+                }
+                return TikaTextExtractor.extractInputStreamText(fileInputStream);
             } catch (Exception e) {
                 logger.error("扩展函数fileToText中文件转换失败："+e.getMessage(), e);
                 return null;
