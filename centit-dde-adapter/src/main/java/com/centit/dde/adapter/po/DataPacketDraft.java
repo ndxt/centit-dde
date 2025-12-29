@@ -200,7 +200,13 @@ public class DataPacketDraft implements Serializable, DataPacketInterface {
     public void setIsDisable(Object disable) {
         isDisable = BooleanBaseOpt.castObjectToBoolean(disable, false);
     }
+    public void setIsValid(Boolean valid) {
+        isValid = BooleanBaseOpt.castObjectToBoolean(valid, true);
+    }
 
+    public void setIsDisable(Boolean disable) {
+        isDisable = BooleanBaseOpt.castObjectToBoolean(disable, false);
+    }
     @Override
     public DataOptStep attainDataOptStep() {
         if (innerDataOptStep == null) {
