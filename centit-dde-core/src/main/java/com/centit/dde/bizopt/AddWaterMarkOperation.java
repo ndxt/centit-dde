@@ -303,7 +303,7 @@ public class AddWaterMarkOperation implements BizOperation {
     private ResponseData addShade2Pdf(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception{
         //获取参数
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
-        String waterMarkStr = bizOptJson.getString("text");
+        String waterMarkStr = bizOptJson.getString("waterText");
         String color = bizOptJson.getString("color");
         //底纹默认为黄色
         Color shadeColor = ImageOpt.castObjectToColor(color, Color.YELLOW);
