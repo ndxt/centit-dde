@@ -90,7 +90,10 @@ public class ManagerWorkFlowOperation implements BizOperation {
                         ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
                         dataOptContext.getI18nMessage("error.701.field_is_blank", "nodeInstId"));
                 }
-                flowManager.resetFlowToThisNode(nodeInstId, dataOptContext.getCurrentUserDetail());
+                String closeNodeType = StringBaseOpt.castObjectToString(
+                    JSONTransformer.transformer(
+                        bizOptJson.getString("closeNodeType"), transformer), "A");
+                flowManager.resetFlowToThisNode(nodeInstId, closeNodeType, dataOptContext.getCurrentUserDetail());
                 break;
             default:
                 break;
