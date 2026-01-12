@@ -357,13 +357,18 @@ public class EsQueryBizOperation implements BizOperation {
                 boolQueryBuilder.must(QueryBuilders.rangeQuery(field).lte(filterValue));
                 break;
             default:
-                if (StringUtils.isNotBlank(filterValue)){
-                    if (filterValue.contains(",")){
-                        TermsQueryBuilder termsQuery = QueryBuilders.termsQuery(field, filterValue.split(","));
-                        boolQueryBuilder.must(termsQuery);
-                    }else {
-                        TermQueryBuilder termQuery = QueryBuilders.termQuery(field, filterValue);
-                        boolQueryBuilder.must(termQuery);
+                if (filterValue == null || filterValue.equals("null") || filterValue.isEmpty()) {
+                    // 处理字段为空的情况
+                    boolQueryBuilder.mustNot(QueryBuilders.existsQuery(field));
+                } else {
+                    if (StringUtils.isNotBlank(filterValue)) {
+                        if (filterValue.contains(",")) {
+                            TermsQueryBuilder termsQuery = QueryBuilders.termsQuery(field, filterValue.split(","));
+                            boolQueryBuilder.must(termsQuery);
+                        } else {
+                            TermQueryBuilder termQuery = QueryBuilders.termQuery(field, filterValue);
+                            boolQueryBuilder.must(termQuery);
+                        }
                     }
                 }
         }
