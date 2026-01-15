@@ -19,6 +19,7 @@ import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Impl.ESIndexer;
 import com.centit.search.service.IndexerSearcherFactory;
 import com.centit.search.utils.ImagePdfTextExtractor;
+import com.centit.search.utils.IndexContentUtil;
 import com.centit.search.utils.TikaTextExtractor;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
@@ -277,6 +278,7 @@ public class EsWriteBizOperation implements BizOperation {
 
         for (Map<String, Object> jsonData : jsonDatas) {
             String documentId = StringBaseOpt.castObjectToString(jsonData.get(primaryKeyName));
+            IndexContentUtil.truncateIndexObject(jsonData);
             if (StringUtils.isBlank(documentId))
                 return BuiltInOperation.createResponseData(0, jsonDatas.size(),
                     ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
@@ -307,7 +309,7 @@ public class EsWriteBizOperation implements BizOperation {
         }
         int updateCount=0;
         int addCount=0;
-        int faildCount=0;
+        int failedCount=0;
         BulkResponse bulkResponse = restHighLevelClient.bulk(requestBulk, RequestOptions.DEFAULT);
         //成功返回
         JSONObject result = new JSONObject();
@@ -321,16 +323,16 @@ public class EsWriteBizOperation implements BizOperation {
                 updateCount++;
             }
             if(bulkItemResponse.isFailed()){
-                faildCount++;
+                failedCount++;
                 faildData.put(bulkItemResponse.getId(),bulkItemResponse.getFailureMessage());
             }
         }
         result.put("success", addCount + updateCount);
-        result.put("error", faildCount);
+        result.put("error", failedCount);
         result.put("addCount",addCount);
         result.put("updateCount",updateCount);
-        result.put("faildCount",faildCount);
-        if (faildCount>0){
+        result.put("failedCount",failedCount);
+        if (failedCount>0){
             result.put("errorData",faildData);
         }
         return ResponseData.makeResponseData(result);
