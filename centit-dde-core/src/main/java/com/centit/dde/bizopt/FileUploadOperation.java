@@ -14,6 +14,8 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.InputStream;
+
 /**
  * 文件上传节点
  */
@@ -55,10 +57,15 @@ public class FileUploadOperation implements BizOperation {
         }
         long fileSize = mapFileInfo.getFileSize();
         if(fileSize<=0){
-            fileSize = mapFileInfo.getFileInputStream().available();
+            try (InputStream inputStream = mapFileInfo.getFileInputStream()) {
+                fileSize = inputStream.available();
+            }
         }
         fileInfo.setFileSize(fileSize);
-        String fileId = fileInfoOpt.saveFile(fileInfo, fileSize, mapFileInfo.getFileInputStream());
+        String fileId;
+        try (InputStream inputStream = mapFileInfo.getFileInputStream()) {
+            fileId = fileInfoOpt.saveFile(fileInfo, fileSize, inputStream);
+        }
         fileInfo.setFileId(fileId);
         bizModel.putDataSet(targetDsName, new DataSet(fileInfo));
         return BuiltInOperation.createResponseSuccessData(dataSet.getSize());

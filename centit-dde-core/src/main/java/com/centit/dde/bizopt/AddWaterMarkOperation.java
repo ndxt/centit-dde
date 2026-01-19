@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ import java.util.Map;
  */
 public class AddWaterMarkOperation implements BizOperation {
 
-    private FileInfoOpt fileInfoOpt;
+    private final FileInfoOpt fileInfoOpt;
 
     public AddWaterMarkOperation(FileInfoOpt fileInfoOpt) {
         this.fileInfoOpt = fileInfoOpt;
@@ -82,15 +83,18 @@ public class AddWaterMarkOperation implements BizOperation {
         String imageDate = bizOptJson.getString("imageDataset");
         if(StringUtils.isBlank(imageDate)){
             String imageFileId = bizOptJson.getString("imageFileId");
-            InputStream inputStream = fileInfoOpt.loadFileStream(imageFileId);
-            image = Watermark4Pdf.createPdfImage(
-                FileIOOpt.readBytesFromInputStream(inputStream));
+            try (InputStream inputStream = fileInfoOpt.loadFileStream(imageFileId)) {
+                image = Watermark4Pdf.createPdfImage(
+                    FileIOOpt.readBytesFromInputStream(inputStream));
+            }
         } else {
             DataSet idataSet = bizModel.getDataSet(imageDate);
             if(idataSet != null) {
                 FileDataSet imageDataset = FileDataSetOptUtil.castToFileDataSet(idataSet);
-                image = Watermark4Pdf.createPdfImage(
-                    FileIOOpt.readBytesFromInputStream(imageDataset.getFileInputStream()));
+                try (InputStream inputStream = imageDataset.getFileInputStream()) {
+                    image = Watermark4Pdf.createPdfImage(
+                        FileIOOpt.readBytesFromInputStream(inputStream));
+                }
             }
         }
         if (image == null) {
@@ -108,8 +112,10 @@ public class AddWaterMarkOperation implements BizOperation {
             }
             if(fileDataSet!=null) {
                 ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
-                Watermark4Pdf.addImage2Pdf(fileDataSet.getFileInputStream(),
-                    pdfFile, page, image, opacity, x, y, w, h);
+                try (InputStream inputStream = fileDataSet.getFileInputStream()) {
+                    Watermark4Pdf.addImage2Pdf(inputStream,
+                        pdfFile, page, image, opacity, x, y, w, h);
+                }
 
                 FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
                     pdfFile.size(), pdfFile);
@@ -127,8 +133,10 @@ public class AddWaterMarkOperation implements BizOperation {
                     ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
                 if(fileDataSet!=null){
                     ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
-                    Watermark4Pdf.addImage2Pdf(fileDataSet.getFileInputStream(),
-                        pdfFile, page, image, opacity, x, y, w, h);
+                    try (InputStream inputStream = fileDataSet.getFileInputStream()) {
+                        Watermark4Pdf.addImage2Pdf(inputStream,
+                            pdfFile, page, image, opacity, x, y, w, h);
+                    }
                     fileList.add(CollectionsOpt.createHashMap(
                         ConstantValue.FILE_NAME, fileDataSet.getFileName(),
                         ConstantValue.FILE_SIZE, pdfFile.size(),
@@ -142,7 +150,7 @@ public class AddWaterMarkOperation implements BizOperation {
         return BuiltInOperation.createResponseSuccessData(0);
     }
 
-    private ResponseData addImageWaterMark(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
+    private ResponseData addImageWaterMark(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {
         //获取参数 BufferedImage image, String waterMark, String fontName, Color color, int size, float x, float y
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String sourDsName = bizOptJson.getString("source");
@@ -190,12 +198,14 @@ public class AddWaterMarkOperation implements BizOperation {
                 }else {
                     imageType = imageType.toLowerCase();
                 }
-                if(ImageOpt.addTextToImage(fileDataSet.getFileInputStream(), imageType, imageFile,
-                    font, markColor, fontSize, textList)) {
-                    FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
-                        imageFile.size(), imageFile);
-                    bizModel.putDataSet(targetDsName, pdfDataset);
-                    return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+                try (InputStream inputStream = fileDataSet.getFileInputStream()) {
+                    if(ImageOpt.addTextToImage(inputStream, imageType, imageFile,
+                        font, markColor, fontSize, textList)) {
+                        FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
+                            imageFile.size(), imageFile);
+                        bizModel.putDataSet(targetDsName, pdfDataset);
+                        return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+                    }
                 }
             }
             return BuiltInOperation.createResponseSuccessData(0);
@@ -214,13 +224,15 @@ public class AddWaterMarkOperation implements BizOperation {
                         imageType = imageType.toLowerCase();
                     }
                     ByteArrayOutputStream imageFile = new ByteArrayOutputStream();
-                    if(ImageOpt.addTextToImage(fileDataSet.getFileInputStream(), imageType, imageFile,
-                        font, markColor, fontSize, textList)) {
-                        fileList.add(CollectionsOpt.createHashMap(
-                            ConstantValue.FILE_NAME, fileDataSet.getFileName(),
-                            ConstantValue.FILE_SIZE, imageFile.size(),
-                            ConstantValue.FILE_CONTENT, imageFile
-                        ));
+                    try (InputStream inputStream = fileDataSet.getFileInputStream()) {
+                        if(ImageOpt.addTextToImage(inputStream, imageType, imageFile,
+                            font, markColor, fontSize, textList)) {
+                            fileList.add(CollectionsOpt.createHashMap(
+                                ConstantValue.FILE_NAME, fileDataSet.getFileName(),
+                                ConstantValue.FILE_SIZE, imageFile.size(),
+                                ConstantValue.FILE_CONTENT, imageFile
+                            ));
+                        }
                     }
                 }
             }
@@ -230,7 +242,7 @@ public class AddWaterMarkOperation implements BizOperation {
         return BuiltInOperation.createResponseSuccessData(0);
     }
 
-    private ResponseData addPdfWaterMark(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
+    private ResponseData addPdfWaterMark(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws IOException {
         //获取参数
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String waterMarkStr = bizOptJson.getString("waterMark");
@@ -266,8 +278,12 @@ public class AddWaterMarkOperation implements BizOperation {
             }
             if(fileDataSet!=null) {
                 ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
-                Watermark4Pdf.addWatermark4Pdf(fileDataSet.getFileInputStream(),
-                    pdfFile, waterMarkStr, opacity, rotation, fontSize, isRepeat);
+                try (InputStream inputStream = fileDataSet.getFileInputStream()) {
+                    Watermark4Pdf.addWatermark4Pdf(inputStream,
+                        pdfFile, waterMarkStr, opacity, rotation, fontSize, isRepeat);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
                 FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
                     pdfFile.size(), pdfFile);
@@ -285,8 +301,10 @@ public class AddWaterMarkOperation implements BizOperation {
                     ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
                 if(fileDataSet!=null){
                     ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
-                    Watermark4Pdf.addWatermark4Pdf(fileDataSet.getFileInputStream(),
-                        pdfFile, waterMarkStr, opacity, rotation, fontSize, isRepeat);
+                    try (InputStream inputStream = fileDataSet.getFileInputStream()) {
+                        Watermark4Pdf.addWatermark4Pdf(inputStream,
+                            pdfFile, waterMarkStr, opacity, rotation, fontSize, isRepeat);
+                    }
                     fileList.add(CollectionsOpt.createHashMap(
                         ConstantValue.FILE_NAME, fileDataSet.getFileName(),
                         ConstantValue.FILE_SIZE, pdfFile.size(),
@@ -338,8 +356,10 @@ public class AddWaterMarkOperation implements BizOperation {
             }
             if(fileDataSet!=null) {
                 ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
-                DocOptUtil.pdfHighlightKeywords(fileDataSet.getFileInputStream(),
-                    pdfFile, keyWords, shadeColor);
+                try (InputStream inputStream = fileDataSet.getFileInputStream()) {
+                    DocOptUtil.pdfHighlightKeywords(inputStream,
+                        pdfFile, keyWords, shadeColor);
+                }
 
                 FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
                     pdfFile.size(), pdfFile);
@@ -357,8 +377,10 @@ public class AddWaterMarkOperation implements BizOperation {
                     ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
                 if(fileDataSet!=null){
                     ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
-                    DocOptUtil.pdfHighlightKeywords(fileDataSet.getFileInputStream(),
-                        pdfFile, keyWords, shadeColor);
+                    try (InputStream inputStream = fileDataSet.getFileInputStream()) {
+                        DocOptUtil.pdfHighlightKeywords(inputStream,
+                            pdfFile, keyWords, shadeColor);
+                    }
                     fileList.add(CollectionsOpt.createHashMap(
                         ConstantValue.FILE_NAME, fileDataSet.getFileName(),
                         ConstantValue.FILE_SIZE, pdfFile.size(),

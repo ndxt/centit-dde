@@ -86,12 +86,13 @@ public class QrCodeOperation  implements BizOperation {
                     qrCodeFileName = StringUtils.isNotBlank(qrCodeFileName) ? ( qrCodeFileName.endsWith(".jpg") ?
                         qrCodeFileName : qrCodeFileName + ".jpg")
                         : System.currentTimeMillis() + ".jpg";
-                    InputStream inputStream = ImageOpt.imageToInputStream(bufferedImage);
-                    Map<String, Object> mapData = new HashMap<>();
-                    mapData.put(ConstantValue.FILE_NAME, qrCodeFileName);
-                    mapData.put(ConstantValue.FILE_SIZE, inputStream.available());
-                    mapData.put(ConstantValue.FILE_CONTENT, inputStream);
-                    resultData.add(mapData);
+                    try (InputStream inputStream = ImageOpt.imageToInputStream(bufferedImage)) {
+                        Map<String, Object> mapData = new HashMap<>();
+                        mapData.put(ConstantValue.FILE_NAME, qrCodeFileName);
+                        mapData.put(ConstantValue.FILE_SIZE, inputStream.available());
+                        mapData.put(ConstantValue.FILE_CONTENT, inputStream);
+                        resultData.add(mapData);
+                    }
                 }
             }catch (IOException | WriterException e){
                 logger.error(e.getMessage());

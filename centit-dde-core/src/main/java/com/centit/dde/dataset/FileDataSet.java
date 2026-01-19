@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("ALL")
-public class FileDataSet extends DataSet {
+public class FileDataSet extends DataSet implements AutoCloseable {
 
     public static String FILE_DATA_SET_DEFAULT_NAME = "fileInfo";
     public FileDataSet() {
@@ -112,6 +112,15 @@ public class FileDataSet extends DataSet {
         }
         Object fileObj = ((Map<String, Object>)this.data).get(ConstantValue.FILE_CONTENT);
         return FileIOOpt.castObjectToInputStream(fileObj);
+    }
+
+    /**
+     * 关闭文件输入流（如果需要）
+     * 注意：FileDataSet 本身不持有 InputStream，所以这个方法主要是为了兼容性
+     */
+    @Override
+    public void close() {
+        // FileDataSet 不直接持有 InputStream，所以不需要关闭
     }
 
     @Override

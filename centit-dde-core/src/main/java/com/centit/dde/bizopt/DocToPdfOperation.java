@@ -18,6 +18,7 @@ import com.centit.support.office.OfficeToPdf;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,18 +55,20 @@ public class DocToPdfOperation implements BizOperation {
                 if(StringUtils.isBlank(extName)){//|| !"ext".equalsIgnoreCase(fileType)
                     extName = fileType;
                 }
-                if("doc".equalsIgnoreCase(extName) || "docx".equalsIgnoreCase(extName)) {
-                    OfficeToPdf.word2Pdf(fileDataSet.getFileInputStream(), pdfFile, extName.toLowerCase() );
-                } else if("xls".equalsIgnoreCase(extName) || "xlsx".equalsIgnoreCase(extName)) {
-                    OfficeToPdf.excel2Pdf(fileDataSet.getFileInputStream(), pdfFile);
-                } else if("ofd".equalsIgnoreCase(extName)) {
-                    OfdUtils.ofd2Pdf(fileDataSet.getFileInputStream(), pdfFile);
-                } else if("pdf".equalsIgnoreCase(extName)) {
-                    FileIOOpt.writeInputStreamToOutputStream(fileDataSet.getFileInputStream(), pdfFile);
-                } else {
-                    return BuiltInOperation.createResponseData(0, 1,
-                        ObjectException.FUNCTION_NOT_SUPPORT,
-                        dataOptContext.getI18nMessage("dde.613.file_type_not_support"));
+                try (InputStream inputStream = fileDataSet.getFileInputStream()) {
+                    if("doc".equalsIgnoreCase(extName) || "docx".equalsIgnoreCase(extName)) {
+                        OfficeToPdf.word2Pdf(inputStream, pdfFile, extName.toLowerCase() );
+                    } else if("xls".equalsIgnoreCase(extName) || "xlsx".equalsIgnoreCase(extName)) {
+                        OfficeToPdf.excel2Pdf(inputStream, pdfFile);
+                    } else if("ofd".equalsIgnoreCase(extName)) {
+                        OfdUtils.ofd2Pdf(inputStream, pdfFile);
+                    } else if("pdf".equalsIgnoreCase(extName)) {
+                        FileIOOpt.writeInputStreamToOutputStream(inputStream, pdfFile);
+                    } else {
+                        return BuiltInOperation.createResponseData(0, 1,
+                            ObjectException.FUNCTION_NOT_SUPPORT,
+                            dataOptContext.getI18nMessage("dde.613.file_type_not_support"));
+                    }
                 }
                 FileDataSet pdfDataset = new FileDataSet(FileType.truncateFileExtNameWithPath(fileDataSet.getFileName()) + ".pdf",
                     pdfFile.size(), pdfFile);
@@ -87,16 +90,18 @@ public class DocToPdfOperation implements BizOperation {
                         extName = fileType;
                     }
                     ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
-                    if("doc".equalsIgnoreCase(extName) || "docx".equalsIgnoreCase(extName)) {
-                        OfficeToPdf.word2Pdf(fileDataSet.getFileInputStream(), pdfFile, extName.toLowerCase() );
-                    } else if("xls".equalsIgnoreCase(extName) || "xlsx".equalsIgnoreCase(extName)) {
-                        OfficeToPdf.excel2Pdf(fileDataSet.getFileInputStream(), pdfFile);
-                    } else if("ofd".equalsIgnoreCase(extName)) {
-                        OfdUtils.ofd2Pdf(fileDataSet.getFileInputStream(), pdfFile);
-                    } else if("pdf".equalsIgnoreCase(extName)) {
-                        FileIOOpt.writeInputStreamToOutputStream(fileDataSet.getFileInputStream(), pdfFile);
-                    } else {
-                        continue;
+                    try (InputStream inputStream = fileDataSet.getFileInputStream()) {
+                        if("doc".equalsIgnoreCase(extName) || "docx".equalsIgnoreCase(extName)) {
+                            OfficeToPdf.word2Pdf(inputStream, pdfFile, extName.toLowerCase() );
+                        } else if("xls".equalsIgnoreCase(extName) || "xlsx".equalsIgnoreCase(extName)) {
+                            OfficeToPdf.excel2Pdf(inputStream, pdfFile);
+                        } else if("ofd".equalsIgnoreCase(extName)) {
+                            OfdUtils.ofd2Pdf(inputStream, pdfFile);
+                        } else if("pdf".equalsIgnoreCase(extName)) {
+                            FileIOOpt.writeInputStreamToOutputStream(inputStream, pdfFile);
+                        } else {
+                            continue;
+                        }
                     }
                     fileList.add(CollectionsOpt.createHashMap(
                         ConstantValue.FILE_NAME, FileType.truncateFileExtNameWithPath(fileDataSet.getFileName()) + ".pdf",

@@ -83,8 +83,9 @@ public class WriteExcelOperation implements BizOperation {
                     dataOptContext.getI18nMessage("dde.604.data_source_not_found2", fileDataSetName));
             }
             FileDataSet fileDataSet = (FileDataSet) dataSet2;
-            XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileDataSet.getFileInputStream());
-            XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
+            try (InputStream inputStream = fileDataSet.getFileInputStream()) {
+                XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
+                XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
 
             boolean asTemplate = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getString("asTemplate"), false);
             if (asTemplate) {
@@ -110,6 +111,7 @@ public class WriteExcelOperation implements BizOperation {
             byteArrayOutputStream.close();
             xssfWorkbook.close();
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+            }
         }
 
         String fileName = null;
@@ -132,49 +134,51 @@ public class WriteExcelOperation implements BizOperation {
         String templateFileId = bizOptJson.getString("templateFileId");
         //根据模板生成
         if (StringUtils.equalsAny(optType, "jxls", "excel") && StringUtils.isNotBlank(templateFileId)) {
-            InputStream inputStream = fileInfoOpt.loadFileStream(templateFileId);
-            if (inputStream == null) {
-                return BuiltInOperation.createResponseData(0, 1,
-                    ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
-                    dataOptContext.getI18nMessage("error.701.field_is_blank", "excel template"));
-            }
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            if ("jxls".equals(optType)) {
-                ExcelReportUtil.exportExcel(inputStream, byteArrayOutputStream, dataSet.getFirstRow());
-            } else {
-                //从第几行开始插入
-                int beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
-                //指定写入第几个sheet中
-                XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
-                XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
-                if (sheet == null) {
+            try (InputStream inputStream = fileInfoOpt.loadFileStream(templateFileId)) {
+                if (inputStream == null) {
                     return BuiltInOperation.createResponseData(0, 1,
-                        ObjectException.NULL_EXCEPTION,
-                        dataOptContext.getI18nMessage("dde.604.data_source_not_found2", sheetName));
+                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "excel template"));
                 }
-                Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
-                ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                if ("jxls".equals(optType)) {
+                    ExcelReportUtil.exportExcel(inputStream, byteArrayOutputStream, dataSet.getFirstRow());
+                } else {
+                    //从第几行开始插入
+                    int beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
+                    //指定写入第几个sheet中
+                    XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
+                    XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
+                    if (sheet == null) {
+                        return BuiltInOperation.createResponseData(0, 1,
+                            ObjectException.NULL_EXCEPTION,
+                            dataOptContext.getI18nMessage("dde.604.data_source_not_found2", sheetName));
+                    }
+                    Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
+                    ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
 
-                xssfWorkbook.write(byteArrayOutputStream);
-                xssfWorkbook.close();
+                    xssfWorkbook.write(byteArrayOutputStream);
+                    xssfWorkbook.close();
+                }
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+
+                FileDataSet objectToDataSet = transToPdf ?
+                    new FileDataSet(fileName, -1, excel2pdf(byteArrayInputStream)) :
+                    new FileDataSet(fileName, byteArrayInputStream.available(), byteArrayInputStream);
+                bizModel.putDataSet(id, objectToDataSet);
+                byteArrayOutputStream.close();
+                return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
             }
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-
-            FileDataSet objectToDataSet = transToPdf ?
-                new FileDataSet(fileName, -1, excel2pdf(byteArrayInputStream)) :
-                new FileDataSet(fileName, byteArrayInputStream.available(), byteArrayInputStream);
-            bizModel.putDataSet(id, objectToDataSet);
-            byteArrayOutputStream.close();
-            return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
         //获取表达式信息
         String[] titles = mapInfoDesc.keySet().toArray(new String[0]);
         String[] fields = mapInfoDesc.values().toArray(new String[0]);
-        InputStream inputStream = ExcelExportUtil.generateExcelStream(sheetName, dataAsList, titles, fields);
-        FileDataSet objectToDataSet = transToPdf ? new FileDataSet(fileName,
-            -1, excel2pdf(inputStream)) : new FileDataSet(fileName, inputStream.available(), inputStream);
-        bizModel.putDataSet(id, objectToDataSet);
-        return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+        try (InputStream inputStream = ExcelExportUtil.generateExcelStream(sheetName, dataAsList, titles, fields)) {
+            FileDataSet objectToDataSet = transToPdf ? new FileDataSet(fileName,
+                -1, excel2pdf(inputStream)) : new FileDataSet(fileName, inputStream.available(), inputStream);
+            bizModel.putDataSet(id, objectToDataSet);
+            return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+        }
     }
 
     private OutputStream excel2pdf(InputStream in) {

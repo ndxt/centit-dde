@@ -42,11 +42,12 @@ public class WriteCsvOperation implements BizOperation {
                 + ".csv";
         }
 
-        InputStream inputStream = CsvDataSet.createCsvStream(dataSet, bizOptJson);
-        FileDataSet objectToDataSet = new FileDataSet(fileName.endsWith(".csv")?fileName:fileName+".csv",
-            inputStream.available(), inputStream);
-        bizModel.putDataSet(targetDsName,objectToDataSet);
+        try (InputStream inputStream = CsvDataSet.createCsvStream(dataSet, bizOptJson)) {
+            FileDataSet objectToDataSet = new FileDataSet(fileName.endsWith(".csv")?fileName:fileName+".csv",
+                inputStream.available(), inputStream);
+            bizModel.putDataSet(targetDsName, objectToDataSet);
 
-        return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+            return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+        }
     }
 }

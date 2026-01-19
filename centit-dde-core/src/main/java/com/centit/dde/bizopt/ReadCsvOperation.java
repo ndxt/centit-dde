@@ -30,17 +30,18 @@ public class ReadCsvOperation implements BizOperation {
                 dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
         }
         FileDataSet fileInfo = FileDataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, true);
-        InputStream inputStream = fileInfo.getFileInputStream();
-        if (inputStream != null) {
-            CsvDataSet csvDataSet = new CsvDataSet();
-            csvDataSet.setInputStream(inputStream);
-            DataSet simpleDataSet = csvDataSet.load(bizOptJson, dataOptContext);
-            bizModel.putDataSet(targetDsName, simpleDataSet);
-            return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
-        } else {
-            return BuiltInOperation.createResponseData(0, 1,
-                ObjectException.DATA_NOT_FOUND_EXCEPTION,
-                dataOptContext.getI18nMessage("dde.604.data_source_not_found2", sourDsName));
+        try (InputStream inputStream = fileInfo.getFileInputStream()) {
+            if (inputStream != null) {
+                CsvDataSet csvDataSet = new CsvDataSet();
+                csvDataSet.setInputStream(inputStream);
+                DataSet simpleDataSet = csvDataSet.load(bizOptJson, dataOptContext);
+                bizModel.putDataSet(targetDsName, simpleDataSet);
+                return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
+            } else {
+                return BuiltInOperation.createResponseData(0, 1,
+                    ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                    dataOptContext.getI18nMessage("dde.604.data_source_not_found2", sourDsName));
+            }
         }
     }
 }

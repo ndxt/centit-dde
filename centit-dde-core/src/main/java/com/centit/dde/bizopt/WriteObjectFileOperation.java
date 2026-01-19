@@ -68,11 +68,12 @@ public class WriteObjectFileOperation implements BizOperation {
             + "."+fileType;
         }
 
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(objBytes);
-        FileDataSet objectToDataSet =new FileDataSet(fileName,
-            inputStream.available(), inputStream);
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(objBytes)) {
+            FileDataSet objectToDataSet = new FileDataSet(fileName,
+                inputStream.available(), inputStream);
 
-        bizModel.putDataSet(targetDsName,objectToDataSet);
-        return BuiltInOperation.createResponseSuccessData(objectToDataSet.getSize());
+            bizModel.putDataSet(targetDsName, objectToDataSet);
+            return BuiltInOperation.createResponseSuccessData(objectToDataSet.getSize());
+        }
     }
 }

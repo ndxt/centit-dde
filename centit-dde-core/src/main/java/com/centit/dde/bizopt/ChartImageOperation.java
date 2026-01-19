@@ -45,10 +45,11 @@ public class ChartImageOperation implements BizOperation {
         JSONObject chartStyle = bizOptJson.getJSONObject("style");
 
         BufferedImage image = ChartImageUtils.createChartImage(chartType, title, imageWidth, imageHeight, chartData, chartStyle);
-        ByteArrayInputStream imageIS = ImageOpt.imageToInputStream( image);
-        bizModel.putDataSet(targetDsName, new FileDataSet(title+".jpg", imageIS.available(), imageIS));
-        // 直接用 BufferedImage 创建数据集应该也可以，不知道report中怎么用
-        //bizModel.putDataSet(targetDsName, new FileDataSet(title+".jpg", (long) imageWidth * imageHeight, image));
-        return BuiltInOperation.createResponseSuccessData(1);
+        try (ByteArrayInputStream imageIS = ImageOpt.imageToInputStream(image)) {
+            bizModel.putDataSet(targetDsName, new FileDataSet(title+".jpg", imageIS.available(), imageIS));
+            // 直接用 BufferedImage 创建数据集应该也可以，不知道report中怎么用
+            //bizModel.putDataSet(targetDsName, new FileDataSet(title+".jpg", (long) imageWidth * imageHeight, image));
+            return BuiltInOperation.createResponseSuccessData(1);
+        }
     }
 }

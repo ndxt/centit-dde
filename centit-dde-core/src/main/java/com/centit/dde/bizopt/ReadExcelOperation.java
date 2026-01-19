@@ -46,7 +46,6 @@ public class ReadExcelOperation implements BizOperation {
         }
 
         FileDataSet fileInfo = FileDataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, true);
-        InputStream inputStream = fileInfo.getFileInputStream();
 
         int beginRow = NumberBaseOpt.castObjectToInteger(
             modelTrasform.attainExpressionValue(bizOptJson.getString("beginRow")), 0);
@@ -56,55 +55,57 @@ public class ReadExcelOperation implements BizOperation {
         boolean useMergeCell = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("useMergeCell"), false);
 
         boolean headerInRow = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("headerInRow"), true);
-        if(headerInRow){
-            String startColumnNumber =
-                StringBaseOpt.castObjectToString(modelTrasform.attainExpressionValue(bizOptJson.getString("startColumnNumber")));
-            int beginColumn =  StringUtils.isBlank(startColumnNumber)? 0 : ExcelImportUtil.mapColumnIndex(startColumnNumber);
+        try (InputStream inputStream = fileInfo.getFileInputStream()) {
+            if(headerInRow){
+                String startColumnNumber =
+                    StringBaseOpt.castObjectToString(modelTrasform.attainExpressionValue(bizOptJson.getString("startColumnNumber")));
+                int beginColumn =  StringUtils.isBlank(startColumnNumber)? 0 : ExcelImportUtil.mapColumnIndex(startColumnNumber);
 
-            String endColumnNumber =
-                StringBaseOpt.castObjectToString(modelTrasform.attainExpressionValue(bizOptJson.getString("endColumnNumber")));
-            int endColumn =  StringUtils.isBlank(endColumnNumber)? 0 : ExcelImportUtil.mapColumnIndex(endColumnNumber);
-            Integer headerRow =  NumberBaseOpt.castObjectToInteger(bizOptJson.getString("headerRow"), 0);
+                String endColumnNumber =
+                    StringBaseOpt.castObjectToString(modelTrasform.attainExpressionValue(bizOptJson.getString("endColumnNumber")));
+                int endColumn =  StringUtils.isBlank(endColumnNumber)? 0 : ExcelImportUtil.mapColumnIndex(endColumnNumber);
+                Integer headerRow =  NumberBaseOpt.castObjectToInteger(bizOptJson.getString("headerRow"), 0);
 
-            List<Map<String, Object>> datas;
-            if(useMergeCell){
-                datas = StringUtils.isNotBlank(sheetName)?
-                    ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(inputStream,sheetName,headerRow,beginRow,endRow,beginColumn,endColumn):
-                    ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(inputStream,0,headerRow,beginRow,endRow,beginColumn,endColumn);
-            } else {
-                datas = StringUtils.isNotBlank(sheetName)?
-                    ExcelImportUtil.loadMapFromExcelSheet(inputStream,sheetName,headerRow,beginRow,endRow,beginColumn,endColumn):
-                    ExcelImportUtil.loadMapFromExcelSheet(inputStream,0,headerRow,beginRow,endRow,beginColumn,endColumn);
-            }
-
-            DataSet simpleDataSet= new DataSet(datas);
-            bizModel.putDataSet(id, simpleDataSet);
-            return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
-
-        } else {
-            Map<String, String> headers = CollectionsOpt.mapCollectionToMap(bizOptJson.getJSONArray("headers"),
-                (a) -> ((JSONObject) a).getString("columnName"),  (a) -> ((JSONObject) a).getString("fieldName"));
-            List<Map<String, Object>> datas;
-            if(headers ==null || headers.size()==0){
-                datas = StringUtils.isNotBlank(sheetName) ?
-                    ExcelImportUtil.loadMapFromExcelSheetUseIndexAsKey(inputStream, sheetName, beginRow, endRow, useMergeCell) :
-                    ExcelImportUtil.loadMapFromExcelSheetUseIndexAsKey(inputStream, 0, beginRow, endRow, useMergeCell);
-            } else {
-                Map<Integer, String> headDesc = ExcelImportUtil.mapColumnIndex(headers);
-
-                if (useMergeCell) {
-                    datas = StringUtils.isNotBlank(sheetName) ?
-                        ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(inputStream, sheetName, headDesc, beginRow, endRow) :
-                        ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(inputStream, 0, headDesc, beginRow, endRow);
+                List<Map<String, Object>> datas;
+                if(useMergeCell){
+                    datas = StringUtils.isNotBlank(sheetName)?
+                        ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(inputStream,sheetName,headerRow,beginRow,endRow,beginColumn,endColumn):
+                        ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(inputStream,0,headerRow,beginRow,endRow,beginColumn,endColumn);
                 } else {
-                    datas = StringUtils.isNotBlank(sheetName) ?
-                        ExcelImportUtil.loadMapFromExcelSheet(inputStream, sheetName, headDesc, beginRow, endRow) :
-                        ExcelImportUtil.loadMapFromExcelSheet(inputStream, 0, headDesc, beginRow, endRow);
+                    datas = StringUtils.isNotBlank(sheetName)?
+                        ExcelImportUtil.loadMapFromExcelSheet(inputStream,sheetName,headerRow,beginRow,endRow,beginColumn,endColumn):
+                        ExcelImportUtil.loadMapFromExcelSheet(inputStream,0,headerRow,beginRow,endRow,beginColumn,endColumn);
                 }
+
+                DataSet simpleDataSet= new DataSet(datas);
+                bizModel.putDataSet(id, simpleDataSet);
+                return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
+
+            } else {
+                Map<String, String> headers = CollectionsOpt.mapCollectionToMap(bizOptJson.getJSONArray("headers"),
+                    (a) -> ((JSONObject) a).getString("columnName"),  (a) -> ((JSONObject) a).getString("fieldName"));
+                List<Map<String, Object>> datas;
+                if(headers ==null || headers.size()==0){
+                    datas = StringUtils.isNotBlank(sheetName) ?
+                        ExcelImportUtil.loadMapFromExcelSheetUseIndexAsKey(inputStream, sheetName, beginRow, endRow, useMergeCell) :
+                        ExcelImportUtil.loadMapFromExcelSheetUseIndexAsKey(inputStream, 0, beginRow, endRow, useMergeCell);
+                } else {
+                    Map<Integer, String> headDesc = ExcelImportUtil.mapColumnIndex(headers);
+
+                    if (useMergeCell) {
+                        datas = StringUtils.isNotBlank(sheetName) ?
+                            ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(inputStream, sheetName, headDesc, beginRow, endRow) :
+                            ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(inputStream, 0, headDesc, beginRow, endRow);
+                    } else {
+                        datas = StringUtils.isNotBlank(sheetName) ?
+                            ExcelImportUtil.loadMapFromExcelSheet(inputStream, sheetName, headDesc, beginRow, endRow) :
+                            ExcelImportUtil.loadMapFromExcelSheet(inputStream, 0, headDesc, beginRow, endRow);
+                    }
+                }
+                DataSet simpleDataSet = new DataSet(datas);
+                bizModel.putDataSet(id, simpleDataSet);
+                return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
             }
-            DataSet simpleDataSet = new DataSet(datas);
-            bizModel.putDataSet(id, simpleDataSet);
-            return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
         }
     }
 }

@@ -112,15 +112,16 @@ public class FileDownloadOperation implements BizOperation {
             for(String fid : fileIds) {
                 FileBaseInfo fileInfo = fileInfoOpt.getFileInfo(fid);
                 if(fileInfo!=null) {
-                    InputStream inputStream = fileInfoOpt.loadFileStream(fid);
-                    String fn = fileInfo.getFileName();
-                    while(fileNameMap.containsKey(fn)){
-                        int copies = fileNameMap.get(fn)+1;
-                        fileNameMap.put(fn, copies);
-                        fn = FileType.truncateFileExtNameWithPath(fn) +"("+copies+")." + FileType.getFileExtName(fn);
+                    try (InputStream inputStream = fileInfoOpt.loadFileStream(fid)) {
+                        String fn = fileInfo.getFileName();
+                        while(fileNameMap.containsKey(fn)){
+                            int copies = fileNameMap.get(fn)+1;
+                            fileNameMap.put(fn, copies);
+                            fn = FileType.truncateFileExtNameWithPath(fn) +"("+copies+")." + FileType.getFileExtName(fn);
+                        }
+                        fileNameMap.put(fn, 1);
+                        ZipCompressor.compressFile(inputStream, fn, out, "");
                     }
-                    fileNameMap.put(fn, 1);
-                    ZipCompressor.compressFile(inputStream, fn, out, "");
                 }
             }
             out.close();

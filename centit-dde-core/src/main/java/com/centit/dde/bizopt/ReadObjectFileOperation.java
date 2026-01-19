@@ -38,22 +38,23 @@ public class ReadObjectFileOperation implements BizOperation {
                 dataOptContext.getI18nMessage("dde.604.data_source_not_found"));
         }
         FileDataSet fileInfo = FileDataSetOptUtil.attainFileDataset(bizModel, dataSet, bizOptJson, true);
-        InputStream inputStream = fileInfo.getFileInputStream();
-        if (inputStream != null) {
-            DataSet simpleDataSet;
-            if("xml".equalsIgnoreCase(fileType)) {
-                String objString = FileIOOpt.readStringFromInputStream(inputStream);
-                Object obj = StringUtils.isBlank(objString)? null : XMLObject.xmlStringToObject(objString);
-                simpleDataSet = new DataSet(obj);
+        try (InputStream inputStream = fileInfo.getFileInputStream()) {
+            if (inputStream != null) {
+                DataSet simpleDataSet;
+                if("xml".equalsIgnoreCase(fileType)) {
+                    String objString = FileIOOpt.readStringFromInputStream(inputStream);
+                    Object obj = StringUtils.isBlank(objString)? null : XMLObject.xmlStringToObject(objString);
+                    simpleDataSet = new DataSet(obj);
+                } else {
+                    simpleDataSet = new DataSet(JSON.parse(FileIOOpt.readStringFromInputStream(inputStream)));
+                }
+                bizModel.putDataSet(targetDsName, simpleDataSet);
+                return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
             } else {
-                simpleDataSet = new DataSet(JSON.parse(FileIOOpt.readStringFromInputStream(inputStream)));
+                return BuiltInOperation.createResponseData(0, 1,
+                    ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                    dataOptContext.getI18nMessage("dde.604.data_source_not_found2", sourDsName));
             }
-            bizModel.putDataSet(targetDsName, simpleDataSet);
-            return BuiltInOperation.createResponseSuccessData(simpleDataSet.getSize());
-        } else {
-            return BuiltInOperation.createResponseData(0, 1,
-                ObjectException.DATA_NOT_FOUND_EXCEPTION,
-                dataOptContext.getI18nMessage("dde.604.data_source_not_found2", sourDsName));
         }
     }
 }
