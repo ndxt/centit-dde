@@ -76,12 +76,15 @@ public class DocReportOperation implements BizOperation {
             }
         }
         ByteArrayInputStream in = generateWord(bizModel, fileId, params);
-
-        FileDataSet dataSet = transToPdf? new FileDataSet(fileName,
-            -1, word2Pdf(in)) : new FileDataSet(fileName, -1, in);
-
-        bizModel.putDataSet(targetDsName, dataSet);
-        return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+        try {
+            FileDataSet dataSet = transToPdf ? new FileDataSet(fileName, -1, word2Pdf(in)) : new FileDataSet(fileName, -1, in);
+            bizModel.putDataSet(targetDsName, dataSet);
+            return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+        }
     }
 
     private FieldsMetadata getFieldsMetadata(BizModel dataModel, Map<String, String> params, JSONObject docData) throws Exception {
@@ -100,16 +103,24 @@ public class DocReportOperation implements BizOperation {
                               String imageName, String placeholder) throws Exception {
         metadata.addFieldAsImage(imageName, placeholder);
         //书签，数据集+img_+图片字段
-        InputStream inputStream ;
-        DataSet fieldValue = dataModel.getDataSet(fileIdOrDataset);
-        if(fieldValue != null){
-            inputStream = FileDataSetOptUtil.castToFileDataSet(fieldValue).getFileInputStream();
-        }else{
-            String fileId = StringBaseOpt.castObjectToString(
-                JSONTransformer.transformer(fileIdOrDataset, new BizModelJSONTransform(dataModel)), fileIdOrDataset);
-            inputStream = fileInfoOpt.loadFileStream(fileId);
+        InputStream inputStream = null;
+        try {
+            DataSet fieldValue = dataModel.getDataSet(fileIdOrDataset);
+            if(fieldValue != null){
+                inputStream = FileDataSetOptUtil.castToFileDataSet(fieldValue).getFileInputStream();
+            }else{
+                String fileId = StringBaseOpt.castObjectToString(
+                    JSONTransformer.transformer(fileIdOrDataset, new BizModelJSONTransform(dataModel)), fileIdOrDataset);
+                inputStream = fileInfoOpt.loadFileStream(fileId);
+            }
+            if (inputStream != null) {
+                docData.put(placeholder, new ByteArrayImageProvider(FileIOOpt.readBytesFromInputStream(inputStream)));
+            }
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
         }
-        docData.put(placeholder, new ByteArrayImageProvider(FileIOOpt.readBytesFromInputStream(inputStream)));
     }
 
     private ByteArrayInputStream generateWord(BizModel dataModel, String fileId, Map<String, String> params) throws Exception {
@@ -122,9 +133,10 @@ public class DocReportOperation implements BizOperation {
             // 2) Create Java model context
             IContext context = new JsonDocxContext(docData);
             report.setFieldsMetadata(metadata);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            report.process(context, out);
-            return new ByteArrayInputStream(out.toByteArray());
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                report.process(context, out);
+                return new ByteArrayInputStream(out.toByteArray());
+            }
         } catch (IOException | XDocReportException e) {
             throw new ObjectException(ResponseData.ERROR_PROCESS_FAILED, e.getMessage());
         }
