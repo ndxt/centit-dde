@@ -357,7 +357,7 @@ public class EsQueryBizOperation implements BizOperation {
                 boolQueryBuilder.must(QueryBuilders.rangeQuery(field).lte(filterValue));
                 break;
             default:
-                if (filterValue == null || filterValue.equals("null") || filterValue.isEmpty()) {
+                if (filterValue == null || filterValue.equals("null")) {
                     // 处理字段为空的情况
                     boolQueryBuilder.mustNot(QueryBuilders.existsQuery(field));
                 } else {
