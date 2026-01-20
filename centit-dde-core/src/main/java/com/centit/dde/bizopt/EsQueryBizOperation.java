@@ -361,7 +361,7 @@ public class EsQueryBizOperation implements BizOperation {
                     // 处理字段为空的情况
                     boolQueryBuilder.mustNot(QueryBuilders.existsQuery(field));
                 } else {
-                    if (StringUtils.isNotBlank(filterValue)) {
+                    if (StringUtils.isNotEmpty(filterValue)) {
                         if (filterValue.contains(",")) {
                             TermsQueryBuilder termsQuery = QueryBuilders.termsQuery(field, filterValue.split(","));
                             boolQueryBuilder.must(termsQuery);
