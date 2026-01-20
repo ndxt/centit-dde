@@ -55,7 +55,7 @@ public class EsQueryBizOperation implements BizOperation {
 
     private final ESServerConfig esServerConfig;
 
-    private  SourceInfoMetadata sourceInfoMetadata;
+    private SourceInfoMetadata sourceInfoMetadata;
 
     public EsQueryBizOperation(ESServerConfig esServerConfig, SourceInfoMetadata sourceInfoMetadata) {
         this.esServerConfig = esServerConfig;
@@ -63,26 +63,26 @@ public class EsQueryBizOperation implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext)throws Exception{
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception {
         BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
 
-        int pageNo  = NumberBaseOpt.castObjectToInteger(DataSetOptUtil.fetchFieldValue(
-            transform, bizOptJson.getString("pageNo")),1);
+        int pageNo = NumberBaseOpt.castObjectToInteger(DataSetOptUtil.fetchFieldValue(
+            transform, bizOptJson.getString("pageNo")), 1);
         int pageSize = NumberBaseOpt.castObjectToInteger(DataSetOptUtil.fetchFieldValue(
-            transform, bizOptJson.getString("pageSize")),20);
+            transform, bizOptJson.getString("pageSize")), 20);
         String indexType = bizOptJson.getString("indexType");
-        if("custom".equals(indexType)){
+        if ("custom".equals(indexType)) {
             return customQueryOperation(bizModel, bizOptJson, transform, pageNo, pageSize, dataOptContext);
         } else {
-            Map<String,Object> queryParam = new HashMap<>(6);
-            queryParam.put("osId",dataOptContext.getOsId());
-            if (!bizOptJson.getBoolean("queryAll")){
+            Map<String, Object> queryParam = new HashMap<>(6);
+            queryParam.put("osId", dataOptContext.getOsId());
+            if (!bizOptJson.getBoolean("queryAll")) {
                 Object optTag = DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("optTag"));
-                if (optTag != null ) queryParam.put("optTag", optTag);
+                if (optTag != null) queryParam.put("optTag", optTag);
                 Object unitCode = DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("unitCode"));
-                if (unitCode != null ) queryParam.put("unitCode", unitCode);
+                if (unitCode != null) queryParam.put("unitCode", unitCode);
                 Object userCode = DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("userCode"));
-                if (userCode != null )  queryParam.put("userCode",userCode);
+                if (userCode != null) queryParam.put("userCode", userCode);
             }
             boolean indexFile = "indexFile".equals(indexType);
             ESSearcher esSearcher = indexFile ?
@@ -107,30 +107,31 @@ public class EsQueryBizOperation implements BizOperation {
         }
     }
 
-    private QueryBuilder queryBuilder(Map<String,Object> queryParam, String keyword, Boolean indexFile,
-                                      ESSearcher esSearcher, JSONObject bizOptJson, BizModelJSONTransform transform){
+    private QueryBuilder queryBuilder(Map<String, Object> queryParam, String keyword, Boolean indexFile,
+                                      ESSearcher esSearcher, JSONObject bizOptJson, BizModelJSONTransform transform) {
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         for (Map.Entry<String, Object> entry : queryParam.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
             if (StringUtils.isNotBlank(key) && value != null) {
-                boolQueryBuilder.must(QueryBuilders.termsQuery(key,value));
+                boolQueryBuilder.must(QueryBuilders.termsQuery(key, value));
             }
         }
 
-        esSearcher.initTypeFields(indexFile?FileDocument.class:ObjectDocument.class);
-        if (StringUtils.isNotBlank(keyword)){
+        esSearcher.initTypeFields(indexFile ? FileDocument.class : ObjectDocument.class);
+        if (StringUtils.isNotBlank(keyword)) {
             QueryStringQueryBuilder stringQueryBuilder =
                 QueryBuilders.queryStringQuery(keyword).fields(esSearcher.getQueryFields());
-                //QueryBuilders.multiMatchQuery(keyword, esSearcher.getQueryFields());
-            if (bizOptJson.getBoolean("custom")){
+            //QueryBuilders.multiMatchQuery(keyword, esSearcher.getQueryFields());
+            if (bizOptJson.getBoolean("custom")) {
                 String analyzer = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform,
                     bizOptJson.getString("analyzer")));
                 String minimumShouldMatch = StringBaseOpt.castObjectToString(
                     DataSetOptUtil.fetchFieldValue(transform, bizOptJson.getString("minimumShouldMatch")));
                 if (StringUtils.isNotBlank(analyzer)) stringQueryBuilder.analyzer(analyzer);
-                if (StringUtils.isNotBlank(minimumShouldMatch)) stringQueryBuilder.minimumShouldMatch(minimumShouldMatch);
+                if (StringUtils.isNotBlank(minimumShouldMatch))
+                    stringQueryBuilder.minimumShouldMatch(minimumShouldMatch);
             }
             boolQueryBuilder.must(stringQueryBuilder);
         }
@@ -138,11 +139,11 @@ public class EsQueryBizOperation implements BizOperation {
     }
 
     private ResponseData customQueryOperation(BizModel bizModel, JSONObject bizOptJson, BizModelJSONTransform transform,
-                                              Integer pageNo, Integer pageSize, DataOptContext dataOptContext ) throws Exception {
+                                              Integer pageNo, Integer pageSize, DataOptContext dataOptContext) throws Exception {
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", null);
         SourceInfo esInfo = sourceInfoMetadata.fetchSourceInfo(databaseCode);
         String indexName = BuiltInOperation.getJsonFieldString(bizOptJson, "indexName", null);
-        if (StringUtils.isBlank(indexName)){
+        if (StringUtils.isBlank(indexName)) {
             return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
                 dataOptContext.getI18nMessage("error.701.field_is_blank", "indexName"));
         }
@@ -150,7 +151,7 @@ public class EsQueryBizOperation implements BizOperation {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         //过滤条件 filterColumnName  filterValue
         JSONArray filterList = bizOptJson.getJSONArray("filterList");
-        if (filterList != null){
+        if (filterList != null) {
             for (int i = 0; i < filterList.size(); i++) {
                 JSONObject filterInfo = filterList.getJSONObject(i);
                 Object filterValue = JSONTransformer.transformer(filterInfo.getString("filterValue"), transform);
@@ -164,14 +165,14 @@ public class EsQueryBizOperation implements BizOperation {
         //前端页面加个高级选项，选项里面加指定的查询列 查询列默认高亮显示 是个数组 queryColumnName
         JSONArray queryColumns = bizOptJson.getJSONArray("queryColumns");
         String[] queryColumnList = null;
-        if (queryColumns != null){
+        if (queryColumns != null) {
             queryColumnList = new String[queryColumns.size()];
             for (int i = 0; i < queryColumns.size(); i++) {
                 JSONObject fieldObj = queryColumns.getJSONObject(i);
-                queryColumnList[i] =fieldObj.getString("queryColumnName");
+                queryColumnList[i] = fieldObj.getString("queryColumnName");
                 String isHighLight = fieldObj.getString("isHighLight");
                 //先全部不返回，用于测试
-                if(BooleanBaseOpt.castObjectToBoolean(isHighLight, true)) {
+                if (BooleanBaseOpt.castObjectToBoolean(isHighLight, true)) {
                     highLightFields.add(queryColumnList[i]);
                 }
             }
@@ -179,17 +180,17 @@ public class EsQueryBizOperation implements BizOperation {
 
         String queryWord = StringBaseOpt.castObjectToString(
             JSONTransformer.transformer(bizOptJson.getString("queryParameter"), transform));
-        if (StringUtils.isNotBlank(queryWord)){
+        if (StringUtils.isNotBlank(queryWord)) {
             //添加查询关键字
             QueryStringQueryBuilder stringQueryBuilder = QueryBuilders.queryStringQuery(queryWord);
-            if(queryColumnList != null){
-                for(String s : queryColumnList){
+            if (queryColumnList != null) {
+                for (String s : queryColumnList) {
                     stringQueryBuilder.field(s);
                 }
             }
             //最小匹配度 百分比
             int minimumShouldMatch = bizOptJson.getIntValue("minimumShouldMath");
-            if (minimumShouldMatch>0) stringQueryBuilder.minimumShouldMatch(minimumShouldMatch+"%");
+            if (minimumShouldMatch > 0) stringQueryBuilder.minimumShouldMatch(minimumShouldMatch + "%");
             boolQueryBuilder.must(stringQueryBuilder);
         } else { // TODO 这个不懂
             MatchAllQueryBuilder matchAllQueryBuilder = QueryBuilders.matchAllQuery();
@@ -203,12 +204,12 @@ public class EsQueryBizOperation implements BizOperation {
         JSONArray sortColumns = bizOptJson.getJSONArray("sortColumns");
         //设置排序字段
         List<SortBuilder<?>> sorts = new ArrayList<>();
-        if (sortColumns != null){
+        if (sortColumns != null) {
             for (int i = 0; i < sortColumns.size(); i++) {
                 JSONObject sortField = sortColumns.getJSONObject(i);
                 String sortColumnName = sortField.getString("sortColumnName");
                 String sortType = sortField.getString("sortValue");
-                if(StringUtils.isNotBlank(sortType) && !StringUtils.equalsAnyIgnoreCase(sortType, "ASC", "DESC")) {
+                if (StringUtils.isNotBlank(sortType) && !StringUtils.equalsAnyIgnoreCase(sortType, "ASC", "DESC")) {
                     sortType = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform, sortType));
                 }
                 //默认升序
@@ -238,8 +239,8 @@ public class EsQueryBizOperation implements BizOperation {
             for (String hlf : highLightFields) {
                 highlightBuilder.field(hlf);
             }
-            String color = StringBaseOpt.castObjectToString(bizOptJson.getString("color"),"red");
-            highlightBuilder.preTags("<span style='color:"+color+"'>").postTags("</span>");
+            String color = StringBaseOpt.castObjectToString(bizOptJson.getString("color"), "red");
+            highlightBuilder.preTags("<span style='color:" + color + "'>").postTags("</span>");
             highlightBuilder.highlighterType("unified");
             highlightBuilder.requireFieldMatch(true);
             //下面这两项,如果你要高亮如文字内容等有很多字的字段,必须配置,不然会导致高亮不全,文章内容缺失等
@@ -261,9 +262,9 @@ public class EsQueryBizOperation implements BizOperation {
             returnData.put("data", resultPart(searchResponse, true));
         }
         //分页设置
-        returnData.put("pageInfo",pageInfo(indexName,pageNo,pageSize, boolQueryBuilder, esClient));
+        returnData.put("pageInfo", pageInfo(indexName, pageNo, pageSize, boolQueryBuilder, esClient));
         String id = bizOptJson.getString("id");
-        bizModel.putDataSet(id,new DataSet(returnData));
+        bizModel.putDataSet(id, new DataSet(returnData));
         return ResponseData.makeResponseData(returnData.getJSONArray("data").size());
     }
 
@@ -320,7 +321,7 @@ public class EsQueryBizOperation implements BizOperation {
         return resultArrays;
     }
 
-    private static JSONObject pageInfo(String indexName, int pageNo,int pageSize,QueryBuilder queryBuilder,
+    private static JSONObject pageInfo(String indexName, int pageNo, int pageSize, QueryBuilder queryBuilder,
                                        RestHighLevelClient restHighLevelClient) throws IOException {
         CountRequest countRequest = new CountRequest(indexName);
         SearchSourceBuilder countSearchSourceBuilder = new SearchSourceBuilder();
@@ -337,10 +338,10 @@ public class EsQueryBizOperation implements BizOperation {
         return jsonObject;
     }
 
-    private void makeFilterCondition(String field, String filterValue,BoolQueryBuilder boolQueryBuilder){
+    private void makeFilterCondition(String field, String filterValue, BoolQueryBuilder boolQueryBuilder) {
         String fieldSuffix = "";
-        if(field.endsWith("_gt") || field.endsWith("_ge") || field.endsWith("_lt") || field.endsWith("_le") ){
-            field =  field.substring(0,field.length() - 4);
+        if (field.endsWith("_gt") || field.endsWith("_ge") || field.endsWith("_lt") || field.endsWith("_le")) {
+            field = field.substring(0, field.length() - 4);
             fieldSuffix = field.substring(field.length() - 3).toLowerCase();
         }
         switch (fieldSuffix) {
@@ -361,14 +362,12 @@ public class EsQueryBizOperation implements BizOperation {
                     // 处理字段为空的情况
                     boolQueryBuilder.mustNot(QueryBuilders.existsQuery(field));
                 } else {
-                    if (StringUtils.isNotEmpty(filterValue)) {
-                        if (filterValue.contains(",")) {
-                            TermsQueryBuilder termsQuery = QueryBuilders.termsQuery(field, filterValue.split(","));
-                            boolQueryBuilder.must(termsQuery);
-                        } else {
-                            TermQueryBuilder termQuery = QueryBuilders.termQuery(field, filterValue);
-                            boolQueryBuilder.must(termQuery);
-                        }
+                    if (filterValue.contains(",")) {
+                        TermsQueryBuilder termsQuery = QueryBuilders.termsQuery(field, filterValue.split(","));
+                        boolQueryBuilder.must(termsQuery);
+                    } else {
+                        TermQueryBuilder termQuery = QueryBuilders.termQuery(field, filterValue);
+                        boolQueryBuilder.must(termQuery);
                     }
                 }
         }
