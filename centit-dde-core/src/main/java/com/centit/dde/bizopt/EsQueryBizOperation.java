@@ -365,6 +365,11 @@ public class EsQueryBizOperation implements BizOperation {
                     if (filterValue.contains(",")) {
                         TermsQueryBuilder termsQuery = QueryBuilders.termsQuery(field, filterValue.split(","));
                         boolQueryBuilder.must(termsQuery);
+                    } else if (filterValue.isEmpty()) {
+                        // 空字符串查询：查询字段值为空字符串的文档
+                        // 使用 termQuery 查询空字符串，如果字段是 keyword 类型可以正常查询
+                        // 如果字段是 text 类型，可能需要使用 wildcardQuery 或 matchQuery
+                        boolQueryBuilder.must(QueryBuilders.termQuery(field, ""));
                     } else {
                         TermQueryBuilder termQuery = QueryBuilders.termQuery(field, filterValue);
                         boolQueryBuilder.must(termQuery);

@@ -626,7 +626,10 @@ public abstract class DataSetOptUtil {
             return inData;
         }
         if (rowHeaderFields.size() + colHeaderFields.size() >= data.get(0).size()) {
-            throw new RuntimeException("数据不合法");
+            throw new RuntimeException(String.format(
+                "交叉制表数据不合法：行头字段(%d) + 列头字段(%d) >= 总字段数(%d)，没有剩余字段用于显示值",
+                rowHeaderFields.size(), colHeaderFields.size(), data.get(0).size()
+            ));
         }
         int colHeaderCount = colHeaderFields.size();
         List<String> keyRows = ListUtils.union(rowHeaderFields, colHeaderFields);
