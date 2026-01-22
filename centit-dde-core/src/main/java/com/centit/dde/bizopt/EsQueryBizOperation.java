@@ -341,8 +341,8 @@ public class EsQueryBizOperation implements BizOperation {
     private void makeFilterCondition(String field, String filterValue, BoolQueryBuilder boolQueryBuilder) {
         String fieldSuffix = "";
         if (field.endsWith("_gt") || field.endsWith("_ge") || field.endsWith("_lt") || field.endsWith("_le")) {
-            field = field.substring(0, field.length() - 4);
             fieldSuffix = field.substring(field.length() - 3).toLowerCase();
+            field = field.substring(0, field.length() - 3);
         }
         switch (fieldSuffix) {
             case "_gt":
