@@ -34,19 +34,6 @@
             <groupId>com.centit.product</groupId>
             <artifactId>database-metadata</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.lettuce</groupId>
-                    <artifactId>lettuce-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!--添加版本号，避免和spring-boot冲突-->
-        <dependency>
-            <groupId>io.lettuce</groupId>
-            <artifactId>lettuce-core</artifactId>
-            <version>6.1.8.RELEASE</version>
         </dependency>
 
         <dependency>
