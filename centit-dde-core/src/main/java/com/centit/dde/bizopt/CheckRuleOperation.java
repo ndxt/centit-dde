@@ -6,14 +6,12 @@ import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
-import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.po.DataCheckRule;
 import com.centit.product.metadata.service.DataCheckRuleService;
 import com.centit.product.metadata.utils.DataCheckResult;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
-import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -50,44 +48,45 @@ public class CheckRuleOperation implements BizOperation {
         //是否返回校验结果
         boolean isReturnCheckResult = checkRuleMsg.contains("checkRuleResultField");
         //校验信息挂载字段
-        String checkRuleResultMsgField =bizOptJson.getString("checkRuleResultMsgField");
+        String checkRuleResultMsgField = bizOptJson.getString("checkRuleResultMsgField");
         //校验结果挂载字段
-        String checkRuleResultField =bizOptJson.getString("checkRuleResultField");
+        String checkRuleResultField = bizOptJson.getString("checkRuleResultField");
         //获取所有的校验规则id
-        List<String>  ruleIds = new ArrayList<>();
+        List<String> ruleIds = new ArrayList<>();
         JSONArray rulesJson = bizOptJson.getJSONArray("config");
         for (Object ruleInfo : rulesJson) {
-            JSONObject  dataCheckRuleInfo = (JSONObject)ruleInfo;
+            JSONObject dataCheckRuleInfo = (JSONObject) ruleInfo;
             String ruleId = dataCheckRuleInfo.getJSONObject("checkType").getString("key");
             if (StringUtils.isNotBlank(ruleId)) {
                 ruleIds.add(ruleId);
             }
         }
         //这样只需要查询一次
-        Map<String,Object> queryParam = new HashMap<>();
-        queryParam.put("ruleId_in",ruleIds);
+        Map<String, Object> queryParam = new HashMap<>();
+        queryParam.put("ruleId_in", ruleIds);
         List<DataCheckRule> dataCheckRuleList = dataCheckRuleService.listObjectsByProperties(queryParam);
-        Map<String,DataCheckRule> dataCheckRuleMap = new HashMap<>();
+        Map<String, DataCheckRule> dataCheckRuleMap = new HashMap<>();
         for (DataCheckRule dataCheckRule : dataCheckRuleList) {
-            dataCheckRuleMap.put(dataCheckRule.getRuleId(),dataCheckRule);
+            dataCheckRuleMap.put(dataCheckRule.getRuleId(), dataCheckRule);
         }
 
         DataCheckResult result = DataCheckResult.create();
-        for(Map<String, Object> dataInfo : dataSet.getDataAsList()){
-            if(dataInfo == null) continue;
+        for (Map<String, Object> dataInfo : dataSet.getDataAsList()) {
+            if (dataInfo == null) {
+                continue;
+            }
             for (Object ruleInfo : rulesJson) {
-                JSONObject  dataCheckRuleInfo = (JSONObject)ruleInfo;
+                JSONObject dataCheckRuleInfo = (JSONObject) ruleInfo;
                 //组装校验参数
                 Map<String, String> paramMap = new HashMap<>(4);
                 JSONArray checkParams = dataCheckRuleInfo.getJSONArray("checkParams");
-                if (checkParams != null){
+                if (checkParams != null) {
                     for (Object o : checkParams) {
                         JSONObject temp = (JSONObject) o;
                         String paramName = temp.getString("label");
                         Object paramValue = temp.get("value");
                         if (StringUtils.isNotBlank(paramName) && paramValue != null) {
-                            Object transformer = JSONTransformer.transformer(paramValue, new BizModelJSONTransform(bizModel, dataSet.getData()));
-                            String valueTrans = StringBaseOpt.castObjectToString(transformer);
+                            String valueTrans = StringBaseOpt.castObjectToString(paramValue);
                             paramMap.put(paramName, valueTrans);
                         }
                     }
@@ -97,16 +96,18 @@ public class CheckRuleOperation implements BizOperation {
                 DataCheckRule dataCheckRule = dataCheckRuleMap.get(ruleId);
 
                 String checkField = dataCheckRuleInfo.getString("checkField");
-                String checkFieldValue = StringBaseOpt.castObjectToString(JSONTransformer.transformer(checkField, dataInfo));
-                paramMap.put(DataCheckRule.CHECK_VALUE_TAG,checkFieldValue);
-
-                DataCheckResult dataCheckResult = result.checkData(dataInfo, dataCheckRule, paramMap, isReturnCheckMsg, true);
-                //Map<String, Object> map = CollectionsOpt.objectToMap(dataInfo);
-                if (isReturnCheckResult){
+                paramMap.put(DataCheckRule.CHECK_VALUE_TAG, checkField);
+                DataCheckResult dataCheckResult;
+                if (dataCheckRule.getRuleFormula().toLowerCase().contains("isnotempty(")) {
+                    dataCheckResult = result.checkData(dataInfo, dataCheckRule, paramMap, isReturnCheckMsg, false);
+                } else {
+                    dataCheckResult = result.checkData(dataInfo, dataCheckRule, paramMap, isReturnCheckMsg, true);
+                }
+                if (isReturnCheckResult) {
                     dataInfo.put(checkRuleResultField, dataCheckResult.getResult());
                 }
-                if (isReturnCheckMsg){
-                    dataInfo.put(checkRuleResultMsgField,dataCheckResult.getErrorMessage());
+                if (isReturnCheckMsg) {
+                    dataInfo.put(checkRuleResultMsgField, dataCheckResult.getErrorMessage());
                 }
             }
             //清除上个对象的校验结果信息
