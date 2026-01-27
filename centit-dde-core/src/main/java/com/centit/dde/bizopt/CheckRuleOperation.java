@@ -106,8 +106,8 @@ public class CheckRuleOperation implements BizOperation {
                 if (isReturnCheckResult) {
                     dataInfo.put(checkRuleResultField, dataCheckResult.getResult());
                 }
-                if (isReturnCheckMsg) {
-                    dataInfo.put(checkRuleResultMsgField, dataCheckResult.getErrorMessage());
+                if (isReturnCheckMsg && StringUtils.isNotBlank(dataCheckResult.getErrorMessage())) {
+                    dataInfo.put(checkRuleResultMsgField, "检验"+ checkField + "出错：" +dataCheckResult.getErrorMessage());
                 }
             }
             //清除上个对象的校验结果信息
