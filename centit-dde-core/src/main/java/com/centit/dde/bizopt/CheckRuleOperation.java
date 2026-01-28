@@ -10,7 +10,9 @@ import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.po.DataCheckRule;
 import com.centit.product.metadata.service.DataCheckRuleService;
 import com.centit.product.metadata.utils.DataCheckResult;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.LeftRightPair;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -55,7 +57,7 @@ public class CheckRuleOperation implements BizOperation {
         //收集校验规则 和 校验规则参数
         List<String> ruleIds = new ArrayList<>();
         JSONArray rulesJson = bizOptJson.getJSONArray("config");
-        Map<String, Map<String, String> > ruleCheckParams = new HashMap<>();
+        List<LeftRightPair<String, Map<String, String> > > ruleCheckParams = new ArrayList<>();
         for (Object ruleInfo : rulesJson) {
             JSONObject dataCheckRuleInfo = (JSONObject) ruleInfo;
             String ruleId = dataCheckRuleInfo.getJSONObject("checkType").getString("key");
@@ -76,22 +78,24 @@ public class CheckRuleOperation implements BizOperation {
                 }
                 String checkField = dataCheckRuleInfo.getString("checkField");
                 paramMap.put(DataCheckRule.CHECK_VALUE_TAG, checkField);
-                ruleCheckParams.put(ruleId, paramMap);
+                ruleCheckParams.add(LeftRightPair.of(ruleId, paramMap));
             }
         }
         //这样只需要查询一次
         Map<String, Object> queryParam = new HashMap<>();
         queryParam.put("ruleId_in", ruleIds);
         List<DataCheckRule> dataCheckRuleList = dataCheckRuleService.listObjectsByProperties(queryParam);
-
+        Map<String, DataCheckRule> ruleMap = CollectionsOpt
+            .mapCollectionToMap(dataCheckRuleList, DataCheckRule::getRuleId, (a)->a);
         DataCheckResult result = DataCheckResult.create();
         for (Map<String, Object> dataInfo : dataSet.getDataAsList()) {
             if (dataInfo == null) {
                 continue;
             }
-            for (DataCheckRule dataCheckRule : dataCheckRuleList) {
+            for (LeftRightPair<String, Map<String, String> > ruleCheckParam : ruleCheckParams) {
                 //组装校验参数
-                Map<String, String> paramMap = ruleCheckParams.get(dataCheckRule.getRuleId());
+                Map<String, String> paramMap = ruleCheckParam.getRight();
+                DataCheckRule dataCheckRule = ruleMap.get(ruleCheckParam.getLeft());
                 result.checkData(dataInfo, dataCheckRule, paramMap, isReturnCheckMsg,
                     !dataCheckRule.getRuleFormula().toLowerCase().contains("isnotempty("));
             }
