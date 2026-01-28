@@ -16,10 +16,7 @@ import com.centit.support.common.LeftRightPair;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CheckRuleOperation implements BizOperation {
 
@@ -55,7 +52,7 @@ public class CheckRuleOperation implements BizOperation {
         String checkRuleResultField = bizOptJson.getString("checkRuleResultField");
         //获取所有的校验规则id
         //收集校验规则 和 校验规则参数
-        List<String> ruleIds = new ArrayList<>();
+        Set<String> ruleIds = new HashSet<>();
         JSONArray rulesJson = bizOptJson.getJSONArray("config");
         List<LeftRightPair<String, Map<String, String> > > ruleCheckParams = new ArrayList<>();
         for (Object ruleInfo : rulesJson) {
