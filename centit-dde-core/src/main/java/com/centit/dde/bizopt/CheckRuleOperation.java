@@ -100,6 +100,7 @@ public class CheckRuleOperation implements BizOperation {
                     JSONObject errorData = new JSONObject();
                     errorData.put("data", dataInfo);
                     errorData.put("ruleId", ruleCheckParam.getLeft());
+                    errorData.put("ruleName", dataCheckRule.getRuleName());
                     errorData.put("fieldName", ruleCheckParam.getMiddle());
                     errorData.put("errorMsg", result.getLastError());
                     errorDataList.add(errorData);
