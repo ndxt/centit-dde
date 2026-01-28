@@ -93,8 +93,7 @@ public class CheckRuleOperation implements BizOperation {
                 //组装校验参数
                 Map<String, String> paramMap = ruleCheckParam.getRight();
                 DataCheckRule dataCheckRule = ruleMap.get(ruleCheckParam.getLeft());
-                result.checkData(dataInfo, dataCheckRule, paramMap, isReturnCheckMsg,
-                    !dataCheckRule.getRuleFormula().toLowerCase().contains("isnotempty("));
+                result.checkData(dataInfo, dataCheckRule, paramMap, isReturnCheckMsg, false);
             }
 
             if (isReturnCheckResult) {
