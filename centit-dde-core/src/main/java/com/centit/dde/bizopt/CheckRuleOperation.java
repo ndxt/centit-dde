@@ -15,6 +15,7 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.*;
 
@@ -54,7 +55,7 @@ public class CheckRuleOperation implements BizOperation {
         //收集校验规则 和 校验规则参数
         Set<String> ruleIds = new HashSet<>();
         JSONArray rulesJson = bizOptJson.getJSONArray("config");
-        List<LeftRightPair<String, Map<String, String> > > ruleCheckParams = new ArrayList<>();
+        List<Triple<String,  String, Map<String, String> >> ruleCheckParams = new ArrayList<>();
         for (Object ruleInfo : rulesJson) {
             JSONObject dataCheckRuleInfo = (JSONObject) ruleInfo;
             String ruleId = dataCheckRuleInfo.getJSONObject("checkType").getString("key");
@@ -75,7 +76,7 @@ public class CheckRuleOperation implements BizOperation {
                 }
                 String checkField = dataCheckRuleInfo.getString("checkField");
                 paramMap.put(DataCheckRule.CHECK_VALUE_TAG, checkField);
-                ruleCheckParams.add(LeftRightPair.of(ruleId, paramMap));
+                ruleCheckParams.add(Triple.of(ruleId, checkField, paramMap));
             }
         }
         //这样只需要查询一次
@@ -85,15 +86,24 @@ public class CheckRuleOperation implements BizOperation {
         Map<String, DataCheckRule> ruleMap = CollectionsOpt
             .mapCollectionToMap(dataCheckRuleList, DataCheckRule::getRuleId, (a)->a);
         DataCheckResult result = DataCheckResult.create();
+        JSONArray errorDataList = new JSONArray();
         for (Map<String, Object> dataInfo : dataSet.getDataAsList()) {
             if (dataInfo == null) {
                 continue;
             }
-            for (LeftRightPair<String, Map<String, String> > ruleCheckParam : ruleCheckParams) {
+            for (Triple<String, String, Map<String, String> > ruleCheckParam : ruleCheckParams) {
                 //组装校验参数
                 Map<String, String> paramMap = ruleCheckParam.getRight();
                 DataCheckRule dataCheckRule = ruleMap.get(ruleCheckParam.getLeft());
-                result.checkData(dataInfo, dataCheckRule, paramMap, isReturnCheckMsg, false);
+                boolean checkResult = result.checkData(dataInfo, dataCheckRule, paramMap, isReturnCheckMsg, false);
+                if(!checkResult){
+                    JSONObject errorData = new JSONObject();
+                    errorData.put("data", dataInfo);
+                    errorData.put("ruleId", ruleCheckParam.getLeft());
+                    errorData.put("fieldName", ruleCheckParam.getMiddle());
+                    errorData.put("errorMsg", result.getLastError());
+                    errorDataList.add(errorData);
+                }
             }
 
             if (isReturnCheckResult) {
@@ -105,6 +115,9 @@ public class CheckRuleOperation implements BizOperation {
             //清除上个对象的校验结果信息
             result.reset();
         }
-        return BuiltInOperation.createResponseSuccessData(0);
+        String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", "checkDataUrl");
+        DataSet objectToDataSet = new DataSet(errorDataList);
+        bizModel.putDataSet(targetDsName, objectToDataSet);
+        return BuiltInOperation.createResponseSuccessData(objectToDataSet.getSize());
     }
 }
