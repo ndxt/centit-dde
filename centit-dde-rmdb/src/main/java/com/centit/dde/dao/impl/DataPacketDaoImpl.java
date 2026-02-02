@@ -136,7 +136,7 @@ public class DataPacketDaoImpl extends BaseDaoImpl<DataPacket, String> implement
         return DatabaseOptUtils.listObjectsBySqlAsJson(this,
             "select a.packet_id, a.route_url, a.task_type " +
                 "from q_data_packet a " +
-                "where a.os_id = ? and a.route_url is not null and trim(route_url)<>''", new Object[]{osId});
+                "where a.os_id = ? and a.route_url is not null and length(trim(route_url))>0", new Object[]{osId});
         /*return DatabaseOptUtils.listObjectsBySqlAsJson(this,
             "select a.packet_id, a.route_url, a.task_type " +
                 "from q_data_packet a join f_os_info b on a.os_id = b.os_id " +
