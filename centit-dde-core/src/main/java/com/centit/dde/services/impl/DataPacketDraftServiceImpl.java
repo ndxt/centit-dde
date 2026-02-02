@@ -104,7 +104,15 @@ public class DataPacketDraftServiceImpl implements DataPacketDraftService {
         dataPacketCopy.setUpdateDate(updateTime);
         //校验url是否冲突
         if(StringUtils.isNotBlank(dataPacketCopy.getRouteUrl())){
-            String packetId = dataPacketDraftDao.getPacketIdByUrl(dataPacketCopy.getOsId(), dataPacketCopy.getRouteUrl());
+            String sUrl=dataPacketCopy.getRouteUrl();
+            // 处理多个连续的/开头情况
+            while (sUrl.startsWith("//")) {
+                sUrl = sUrl.substring(1);
+            }
+            if (!sUrl.startsWith("/")) {
+                sUrl= "/" + sUrl;
+            }
+            String packetId = dataPacketDraftDao.getPacketIdByUrl(dataPacketCopy.getOsId(), sUrl);
             if(StringUtils.isNotBlank(packetId) && !StringUtils.equals(packetId, dataPacketCopy.getPacketId())){
                 throw new ObjectException("路由地址已经存在，冲突的接口ID为：" + packetId);
             }
