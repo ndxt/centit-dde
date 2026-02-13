@@ -157,7 +157,7 @@ public class EsQueryBizOperation implements BizOperation {
                 Object filterValue = JSONTransformer.transformer(filterInfo.getString("filterValue"), transform);
                 if (filterValue != null) {
                     String columnName = filterInfo.getString("filterColumnName");
-                    makeFilterCondition(columnName, StringBaseOpt.castObjectToString(filterValue), boolQueryBuilder);
+                    makeFilterCondition(columnName, filterValue, boolQueryBuilder);
                 }
             }
         }
@@ -338,9 +338,10 @@ public class EsQueryBizOperation implements BizOperation {
         return jsonObject;
     }
 
-    private void makeFilterCondition(String field, String filterValue, BoolQueryBuilder boolQueryBuilder) {
+    private void makeFilterCondition(String field, Object filterValue, BoolQueryBuilder boolQueryBuilder) {
         String fieldSuffix = "";
-        if (field.endsWith("_gt") || field.endsWith("_ge") || field.endsWith("_lt") || field.endsWith("_le")) {
+        if (field.endsWith("_gt") || field.endsWith("_ge") || field.endsWith("_lt") || field.endsWith("_le")
+            || field.endsWith("_in") || field.endsWith("_ni")) {
             fieldSuffix = field.substring(field.length() - 3).toLowerCase();
             field = field.substring(0, field.length() - 3);
         }
@@ -357,24 +358,32 @@ public class EsQueryBizOperation implements BizOperation {
             case "_le":
                 boolQueryBuilder.must(QueryBuilders.rangeQuery(field).lte(filterValue));
                 break;
+            case "_in": // in
+                if (filterValue == null || filterValue.equals("null")) {
+                    boolQueryBuilder.mustNot(QueryBuilders.existsQuery(field));
+                } else {
+                    String[] values = StringBaseOpt.objectToStringArray(filterValue);
+                    boolQueryBuilder.must(QueryBuilders.termsQuery(field, values));
+                }
+                break;
+            case "_ni": // not in
+                if (filterValue == null || filterValue.equals("null")) {
+                    boolQueryBuilder.must(QueryBuilders.existsQuery(field));
+                } else {
+                    String[] values = StringBaseOpt.objectToStringArray(filterValue);
+                    boolQueryBuilder.mustNot(QueryBuilders.termsQuery(field, values));
+                }
+                break;
             default:
                 if (filterValue == null || filterValue.equals("null")) {
                     // 处理字段为空的情况
                     boolQueryBuilder.mustNot(QueryBuilders.existsQuery(field));
                 } else {
-                    if (filterValue.contains(",")) {
-                        TermsQueryBuilder termsQuery = QueryBuilders.termsQuery(field, filterValue.split(","));
-                        boolQueryBuilder.must(termsQuery);
-                    } else if (filterValue.isEmpty()) {
-                        // 空字符串查询：查询字段值为空字符串的文档
-                        // 使用 termQuery 查询空字符串，如果字段是 keyword 类型可以正常查询
-                        // 如果字段是 text 类型，可能需要使用 wildcardQuery 或 matchQuery
-                        boolQueryBuilder.must(QueryBuilders.termQuery(field, ""));
-                    } else {
-                        TermQueryBuilder termQuery = QueryBuilders.termQuery(field, filterValue);
-                        boolQueryBuilder.must(termQuery);
-                    }
+                    String[] values = StringBaseOpt.objectToStringArray(filterValue);
+                    TermQueryBuilder termQuery = QueryBuilders.termQuery(field, values);
+                    boolQueryBuilder.must(termQuery);
                 }
+                break;
         }
     }
     //时间字段处理
