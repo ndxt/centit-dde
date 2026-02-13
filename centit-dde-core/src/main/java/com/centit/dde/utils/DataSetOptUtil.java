@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import com.centit.support.database.utils.FieldType;
 
 /**
  * @author codefan@sina.com
@@ -221,6 +222,32 @@ public abstract class DataSetOptUtil {
                 return null;
             }
             return CodeRepositoryUtil.getUnitInfoByCode(topUnit, unitCode);
+        });
+        extendFuncs.put("mapToHumpName", (a) -> {
+            if (a == null || a.length < 1) {
+                return null;
+            }
+            String columnName = StringBaseOpt.castObjectToString(a[0]);
+            boolean firstUpCase=false, ignoreSingleCharPrefix=false;
+
+            if(a.length>1){
+                firstUpCase = BooleanBaseOpt.castObjectToBoolean(a[1],false);
+            }
+            if(a.length>2){
+                ignoreSingleCharPrefix = BooleanBaseOpt.castObjectToBoolean(a[2], false);
+            }
+            return FieldType.mapToHumpName(columnName,firstUpCase,ignoreSingleCharPrefix);
+        });
+        extendFuncs.put("humpNameToColumn", (a) -> {
+            if (a == null || a.length < 1) {
+                return null;
+            }
+            String columnName = StringBaseOpt.castObjectToString(a[0]);
+            boolean upCase=false;
+            if(a.length>1){
+                upCase = BooleanBaseOpt.castObjectToBoolean(a[1],false);
+            }
+            return FieldType.humpNameToColumn(columnName,upCase);
         });
     }
 
