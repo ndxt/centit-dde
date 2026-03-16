@@ -216,7 +216,7 @@ public class EsQueryBizOperation implements BizOperation {
                 }
             }
             // 最后按相关性评分排序
-            searchSourceBuilder.sort(SortBuilders.scoreSort());
+            // searchSourceBuilder.sort(SortBuilders.scoreSort());
         }
         searchSourceBuilder.from((pageNo - 1) * pageSize);
         searchSourceBuilder.size(pageSize);
@@ -248,7 +248,7 @@ public class EsQueryBizOperation implements BizOperation {
         searchSourceBuilder.highlighter(highlightBuilder);
         searchSourceBuilder.query(boolQueryBuilder);
         searchRequest.source(searchSourceBuilder);
-
+        System.out.println("ES Query: " + searchSourceBuilder.toString());
         RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
         SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
         JSONObject returnData = new JSONObject();
