@@ -40,8 +40,6 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 
@@ -203,7 +201,6 @@ public class EsQueryBizOperation implements BizOperation {
         //排序字段 sortColumnName    sortValue
         JSONArray sortColumns = bizOptJson.getJSONArray("sortColumns");
         //设置排序字段
-        List<SortBuilder<?>> sorts = new ArrayList<>();
         if (sortColumns != null) {
             for (int i = 0; i < sortColumns.size(); i++) {
                 JSONObject sortField = sortColumns.getJSONObject(i);
@@ -213,15 +210,12 @@ public class EsQueryBizOperation implements BizOperation {
                     sortType = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFieldValue(transform, sortType));
                 }
                 //默认升序
-                if (StringUtils.isNotBlank(sortColumnName) /*&& StringUtils.isNotBlank(sortType)*/) {
-                    FieldSortBuilder order = SortBuilders.fieldSort(sortColumnName).order(
-                        "DESC".equalsIgnoreCase(sortType) ? SortOrder.DESC : SortOrder.ASC);
-                    sorts.add(order);
+                if (StringUtils.isNotBlank(sortColumnName)) {
+                    searchSourceBuilder.sort(SortBuilders.fieldSort(sortColumnName).order(
+                        "DESC".equalsIgnoreCase(sortType) ? SortOrder.DESC : SortOrder.ASC));
                 }
             }
         }
-
-        searchSourceBuilder.sort(sorts);
         searchSourceBuilder.from((pageNo - 1) * pageSize);
         searchSourceBuilder.size(pageSize);
 
