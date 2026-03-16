@@ -201,7 +201,7 @@ public class EsQueryBizOperation implements BizOperation {
         //排序字段 sortColumnName    sortValue
         JSONArray sortColumns = bizOptJson.getJSONArray("sortColumns");
         //设置排序字段
-        if (sortColumns != null) {
+        if (sortColumns != null && !sortColumns.isEmpty()) {
             for (int i = 0; i < sortColumns.size(); i++) {
                 JSONObject sortField = sortColumns.getJSONObject(i);
                 String sortColumnName = sortField.getString("sortColumnName");
@@ -215,6 +215,8 @@ public class EsQueryBizOperation implements BizOperation {
                         "DESC".equalsIgnoreCase(sortType) ? SortOrder.DESC : SortOrder.ASC));
                 }
             }
+            // 最后按相关性评分排序
+            searchSourceBuilder.sort(SortBuilders.scoreSort());
         }
         searchSourceBuilder.from((pageNo - 1) * pageSize);
         searchSourceBuilder.size(pageSize);
