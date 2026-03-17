@@ -211,8 +211,9 @@ public class EsQueryBizOperation implements BizOperation {
                 }
                 //默认升序
                 if (StringUtils.isNotBlank(sortColumnName)) {
-                    searchSourceBuilder.sort(SortBuilders.fieldSort(sortColumnName).order(
-                        "DESC".equalsIgnoreCase(sortType) ? SortOrder.DESC : SortOrder.ASC));
+                    searchSourceBuilder.sort(SortBuilders.fieldSort(sortColumnName)
+                        .order("DESC".equalsIgnoreCase(sortType) ? SortOrder.DESC : SortOrder.ASC)
+                        .missing("_last"));
                 }
             }
             // 最后按相关性评分排序
@@ -337,7 +338,7 @@ public class EsQueryBizOperation implements BizOperation {
     private void makeFilterCondition(String field, Object filterValue, BoolQueryBuilder boolQueryBuilder) {
         String fieldSuffix = "";
         if (field.endsWith("_gt") || field.endsWith("_ge") || field.endsWith("_lt") || field.endsWith("_le")
-            || field.endsWith("_in") || field.endsWith("_ni")) {
+            || field.endsWith("_in") || field.endsWith("_ni") || field.endsWith("_ne")) {
             fieldSuffix = field.substring(field.length() - 3).toLowerCase();
             field = field.substring(0, field.length() - 3);
         }
@@ -354,14 +355,6 @@ public class EsQueryBizOperation implements BizOperation {
             case "_le":
                 boolQueryBuilder.must(QueryBuilders.rangeQuery(field).lte(filterValue));
                 break;
-            case "_in": // in
-                if (filterValue == null || filterValue.equals("null")) {
-                    boolQueryBuilder.mustNot(QueryBuilders.existsQuery(field));
-                } else {
-                    String[] values = StringBaseOpt.objectToStringArray(filterValue);
-                    boolQueryBuilder.must(QueryBuilders.termsQuery(field, values));
-                }
-                break;
             case "_ni": // not in
                 if (filterValue == null || filterValue.equals("null")) {
                     boolQueryBuilder.must(QueryBuilders.existsQuery(field));
@@ -370,25 +363,33 @@ public class EsQueryBizOperation implements BizOperation {
                     boolQueryBuilder.mustNot(QueryBuilders.termsQuery(field, values));
                 }
                 break;
-            default:
+            case "_ne": // not equal
+                if (filterValue == null || filterValue.equals("null")) {
+                    boolQueryBuilder.must(QueryBuilders.existsQuery(field));
+                } else {
+                    String value = StringBaseOpt.objectToString(filterValue);
+                    boolQueryBuilder.mustNot(QueryBuilders.termQuery(field, value));
+                }
+                break;
+            case "_in": // in
+            default: //_eq equal
                 if (filterValue == null || filterValue.equals("null")) {
                     // 处理字段为空的情况
                     boolQueryBuilder.mustNot(QueryBuilders.existsQuery(field));
                 } else {
                     String[] values = StringBaseOpt.objectToStringArray(filterValue);
-                    if(values.length == 1){
-                       if (values[0].isEmpty()) {
+                    if (values.length == 1) {
+                        if (values[0].isEmpty()) {
                             // 空字符串查询：查询字段值为空字符串的文档
                             // 使用 termQuery 查询空字符串，如果字段是 keyword 类型可以正常查询
                             // 如果字段是 text 类型，可能需要使用 wildcardQuery 或 matchQuery
                             boolQueryBuilder.must(QueryBuilders.termQuery(field, ""));
                         } else {
-                            TermQueryBuilder termQuery = QueryBuilders.termQuery(field, values[0]);
-                            boolQueryBuilder.must(termQuery);
+                            boolQueryBuilder.must(QueryBuilders.termQuery(field, values[0]));
                         }
                     } else {
-                        TermQueryBuilder termQuery = QueryBuilders.termQuery(field, values);
-                        boolQueryBuilder.must(termQuery);
+                        // 多值使用 termsQuery
+                        boolQueryBuilder.must(QueryBuilders.termsQuery(field, values));
                     }
                 }
                 break;
