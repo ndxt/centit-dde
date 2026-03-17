@@ -248,7 +248,7 @@ public class EsQueryBizOperation implements BizOperation {
         searchSourceBuilder.highlighter(highlightBuilder);
         searchSourceBuilder.query(boolQueryBuilder);
         searchRequest.source(searchSourceBuilder);
-        System.out.println("ES Query: " + searchSourceBuilder.toString());
+        // System.out.println("ES Query: " + searchSourceBuilder.toString());
         RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
         SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
         JSONObject returnData = new JSONObject();
@@ -376,8 +376,20 @@ public class EsQueryBizOperation implements BizOperation {
                     boolQueryBuilder.mustNot(QueryBuilders.existsQuery(field));
                 } else {
                     String[] values = StringBaseOpt.objectToStringArray(filterValue);
-                    TermQueryBuilder termQuery = QueryBuilders.termQuery(field, values);
-                    boolQueryBuilder.must(termQuery);
+                    if(values.length == 1){
+                       if (values[0].isEmpty()) {
+                            // 空字符串查询：查询字段值为空字符串的文档
+                            // 使用 termQuery 查询空字符串，如果字段是 keyword 类型可以正常查询
+                            // 如果字段是 text 类型，可能需要使用 wildcardQuery 或 matchQuery
+                            boolQueryBuilder.must(QueryBuilders.termQuery(field, ""));
+                        } else {
+                            TermQueryBuilder termQuery = QueryBuilders.termQuery(field, values[0]);
+                            boolQueryBuilder.must(termQuery);
+                        }
+                    } else {
+                        TermQueryBuilder termQuery = QueryBuilders.termQuery(field, values);
+                        boolQueryBuilder.must(termQuery);
+                    }
                 }
                 break;
         }

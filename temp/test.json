@@ -1,0 +1,69 @@
+{
+  "from": 0,
+  "size": 20,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "fileType": {
+              "value": [
+                "1"
+              ],
+              "boost": 1.0
+            }
+          }
+        },
+        {
+          "query_string": {
+            "query": "刘斌",
+            "fields": [
+              "content^1.0",
+              "wjmc^1.0"
+            ],
+            "type": "best_fields",
+            "default_operator": "or",
+            "max_determinized_states": 10000,
+            "enable_position_increments": true,
+            "fuzziness": "AUTO",
+            "fuzzy_prefix_length": 0,
+            "fuzzy_max_expansions": 50,
+            "phrase_slop": 0,
+            "minimum_should_match": "100%",
+            "escape": false,
+            "auto_generate_synonyms_phrase_query": true,
+            "fuzzy_transpositions": true,
+            "boost": 1.0
+          }
+        }
+      ],
+      "adjust_pure_negative": true,
+      "boost": 1.0
+    }
+  },
+  "explain": false,
+  "sort": [
+    {
+      "fileType.keyword": {
+        "order": "asc"
+      }
+    }
+  ],
+  "track_total_hits": 2147483647,
+  "highlight": {
+    "pre_tags": [
+      "<span style='color:orange'>"
+    ],
+    "post_tags": [
+      "</span>"
+    ],
+    "fragment_size": 200,
+    "number_of_fragments": 2,
+    "type": "unified",
+    "require_field_match": true,
+    "fields": {
+      "wjmc": {},
+      "content": {}
+    }
+  }
+}
