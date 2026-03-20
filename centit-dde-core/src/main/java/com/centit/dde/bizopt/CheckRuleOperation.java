@@ -1,11 +1,13 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.framework.common.ResponseData;
 import com.centit.product.metadata.po.DataCheckRule;
 import com.centit.product.metadata.service.DataCheckRuleService;
@@ -79,12 +81,43 @@ public class CheckRuleOperation implements BizOperation {
                 ruleCheckParams.add(Triple.of(ruleId, checkField, paramMap));
             }
         }
+
+        String extCheckRules = bizOptJson.getString("extCheckRules");
+        if(StringUtils.isNotBlank(extCheckRules)){
+            //添加额外的校验规则，必须有 fieldName， ruleId 两个字段
+            BizModelJSONTransform transform = new BizModelJSONTransform(bizModel);
+            Object checkRuleObj = transform.attainExpressionValue(extCheckRules);
+            if(checkRuleObj instanceof Collection){
+                for(Object o : (Collection<?>)checkRuleObj){
+                    if(o instanceof JSONObject) {
+                        JSONObject temp = (JSONObject) o;
+                        String ruleId = temp.getString("ruleId");
+                        String fieldName = temp.getString("fieldName");
+                        if (StringUtils.isNotBlank(ruleId) && StringUtils.isNotBlank(fieldName)) {
+                            ruleIds.add(ruleId);
+                            Map<String, String> paramMap = new HashMap<>(4);
+                            Object paramValue = temp.get("checkParams");
+                            if(paramValue instanceof String){
+                                paramValue = JSON.parse((String)paramValue);
+                            }
+                            if(paramValue instanceof JSONObject){
+                                paramMap = CollectionsOpt.objectMapToStringMap((JSONObject)paramValue);
+                            }
+                            paramMap.put(DataCheckRule.CHECK_VALUE_TAG, fieldName);
+                            ruleCheckParams.add(Triple.of(ruleId, fieldName, paramMap));
+                        }
+                    }
+                }
+            }
+        }
+
         //这样只需要查询一次
         Map<String, Object> queryParam = new HashMap<>();
         queryParam.put("ruleId_in", ruleIds);
         List<DataCheckRule> dataCheckRuleList = dataCheckRuleService.listObjectsByProperties(queryParam);
         Map<String, DataCheckRule> ruleMap = CollectionsOpt
             .mapCollectionToMap(dataCheckRuleList, DataCheckRule::getRuleId, (a)->a);
+
         DataCheckResult result = DataCheckResult.create();
         JSONArray errorDataList = new JSONArray();
         for (Map<String, Object> dataInfo : dataSet.getDataAsList()) {
