@@ -95,6 +95,22 @@ public class ManagerWorkFlowOperation implements BizOperation {
                         bizOptJson.getString("closeNodeType"), transformer), "A");
                 flowManager.resetFlowToThisNode(nodeInstId, closeNodeType, dataOptContext.getCurrentUserDetail());
                 break;
+            case ConstantValue.SUSPEND_NODE:
+                if (StringUtils.isBlank(nodeInstId)) {
+                    return ResponseData.makeErrorMessage(
+                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "nodeInstId"));
+                }
+                flowManager.updateNodeState(nodeInstId, "P",dataOptContext.getCurrentUserDetail());
+                break;
+            case ConstantValue.ACTIVE_NODE:
+                if (StringUtils.isBlank(nodeInstId)) {
+                    return ResponseData.makeErrorMessage(
+                        ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                        dataOptContext.getI18nMessage("error.701.field_is_blank", "nodeInstId"));
+                }
+                flowManager.updateNodeState(nodeInstId,"N", dataOptContext.getCurrentUserDetail());
+                break;
             default:
                 break;
         }
