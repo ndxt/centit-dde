@@ -29,7 +29,7 @@ public class ManagerWorkFlowOperation implements BizOperation {
     }
 
     @Override
-    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
+    public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) throws Exception{
         BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel);
         String id = bizOptJson.getString("id");
         String flowInstId = StringBaseOpt.objectToString(
