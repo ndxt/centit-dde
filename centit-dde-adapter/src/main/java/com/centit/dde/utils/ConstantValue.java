@@ -151,6 +151,8 @@ public class ConstantValue {
     public static final int ROLLBACK_NODE=4;
     public static final int RECLAIM_NODE=5;
     public static final int RESET_NODE=6;
+    public static final int SUSPEND_NODE=7;
+    public static final int ACTIVE_NODE=8;
 
     public static final String DOUBLE_UNDERLINE = "__";
     public static final String FILE_REQUEST_TYPE="file";
