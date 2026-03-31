@@ -338,7 +338,7 @@ public class EsQueryBizOperation implements BizOperation {
     private void makeFilterCondition(String field, Object filterValue, BoolQueryBuilder boolQueryBuilder) {
         String fieldSuffix = "";
         if (field.endsWith("_gt") || field.endsWith("_ge") || field.endsWith("_lt") || field.endsWith("_le")
-            || field.endsWith("_in") || field.endsWith("_ni") || field.endsWith("_ne")) {
+            || field.endsWith("_lk") || field.endsWith("_in") || field.endsWith("_ni") || field.endsWith("_ne")) {
             fieldSuffix = field.substring(field.length() - 3).toLowerCase();
             field = field.substring(0, field.length() - 3);
         }
@@ -371,6 +371,12 @@ public class EsQueryBizOperation implements BizOperation {
                     boolQueryBuilder.mustNot(QueryBuilders.termQuery(field, value));
                 }
                 break;
+            case "_lk":{ // like 模糊查询
+                String value = StringBaseOpt.objectToString(filterValue);
+                // 使用通配符查询，支持 * 和 ? 通配符
+                boolQueryBuilder.must(QueryBuilders.wildcardQuery(field, value));
+                break;
+            }
             case "_in": // in
             default: //_eq equal
                 if (filterValue == null || filterValue.equals("null")) {
