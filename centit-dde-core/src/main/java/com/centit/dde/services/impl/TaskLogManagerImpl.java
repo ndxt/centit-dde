@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,15 +37,21 @@ public class TaskLogManagerImpl implements TaskLogManager {
     private static final Logger logger = LoggerFactory.getLogger(TaskLogManagerImpl.class);
     private static CallApiLogDao backgroundTaskLogDao = null;
     private static final ConcurrentLinkedQueue<CallApiLog> waitingForWriteLogs = new ConcurrentLinkedQueue<>();
-    private static final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-    //ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private static final ScheduledThreadPoolExecutor executor =new ScheduledThreadPoolExecutor(
+        1,  // 只需要 1 个线程执行定时任务
+        r -> {
+            Thread t = new Thread(r, "DdeOptLog-Writer");
+            t.setDaemon(true);  // 设置为守护线程，不阻止 JVM 退出
+            return t;
+        }
+    );
     private static final int MAX_LOG_COUNT_ONE_TIME = 500;
     /*
      * 异步写入API调用日志
      */
     static {
         //executor.setMaximumPoolSize(1);
-        //executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
         // 5秒写入一次
         executor.scheduleWithFixedDelay(() -> {
             if(backgroundTaskLogDao == null){
@@ -71,7 +78,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
             } catch (Throwable e) {
                 logger.error("写入API调用信息报错：{}", e.getMessage());
             }
-        }, 23, 1, TimeUnit.SECONDS);
+        }, 3, 1, TimeUnit.SECONDS);
         //默认执行时间间隔为7秒
     }
 
