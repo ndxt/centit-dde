@@ -68,7 +68,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
                 if(MAX_LOG_COUNT_ONE_TIME > nCount) {
                     logger.info("成功写入{}条API调用信息。", MAX_LOG_COUNT_ONE_TIME - nCount);
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.error("写入API调用信息报错：{}", e.getMessage());
             }
         }, 23, 1, TimeUnit.SECONDS);
