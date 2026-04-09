@@ -72,6 +72,10 @@ public abstract class DataSetOptUtil {
                     String str = tempStr.trim();
                     String value = null;
                     switch (dictField){
+                        case "dataOrder":
+                            dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
+                            if(dataPiece!=null) value = StringBaseOpt.castObjectToString(dataPiece.getDataOrder(),"0");
+                            break;
                         case "dataTag":
                             dataPiece = CodeRepositoryUtil.getDataPiece(StringBaseOpt.castObjectToString(a[0]), str, topUnit);
                             if(dataPiece!=null) value = dataPiece.getDataTag();
