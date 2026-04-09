@@ -92,7 +92,7 @@ public class CheckRuleOperation implements BizOperation {
                     if(o instanceof JSONObject) {
                         JSONObject temp = (JSONObject) o;
                         String ruleId = temp.getString("ruleId");
-                        String fieldName = temp.getString("fieldName");
+                        String fieldName = temp.getString("checkField");
                         if (StringUtils.isNotBlank(ruleId) && StringUtils.isNotBlank(fieldName)) {
                             ruleIds.add(ruleId);
                             Map<String, String> paramMap = new HashMap<>(4);
