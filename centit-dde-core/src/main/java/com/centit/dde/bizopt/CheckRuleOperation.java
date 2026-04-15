@@ -13,6 +13,7 @@ import com.centit.product.metadata.po.DataCheckRule;
 import com.centit.product.metadata.service.DataCheckRuleService;
 import com.centit.product.metadata.utils.DataCheckResult;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.common.ObjectException;
@@ -135,6 +136,7 @@ public class CheckRuleOperation implements BizOperation {
                     errorData.put("ruleId", ruleCheckParam.getLeft());
                     errorData.put("ruleName", dataCheckRule.getRuleName());
                     errorData.put("fieldName", ruleCheckParam.getMiddle());
+                    errorData.put("checkValue", ReflectionOpt.attainExpressionValue(dataInfo, ruleCheckParam.getMiddle()));
                     errorData.put("errorMsg", result.getLastError());
                     errorDataList.add(errorData);
                 }
