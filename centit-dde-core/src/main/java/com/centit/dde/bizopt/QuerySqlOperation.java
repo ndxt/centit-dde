@@ -15,6 +15,7 @@ import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -38,12 +39,20 @@ public class QuerySqlOperation implements BizOperation {
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", "");
         String condition = BuiltInOperation.getJsonFieldString(bizOptJson, "condition", "false");
         boolean isDynamicSql = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("isDynamicSql"), false);
-        String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
+        String sqlSen = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
         if(isDynamicSql){
-            sql = StringBaseOpt.castObjectToString(
-                DataSetOptUtil.fetchFieldValue( new BizModelJSONTransform(bizModel), sql));
+            sqlSen = StringBaseOpt.castObjectToString(
+                DataSetOptUtil.fetchFieldValue( new BizModelJSONTransform(bizModel), sqlSen));
+            if(StringUtils.isBlank(sqlSen) ||
+                !StringUtils.startsWithIgnoreCase(sqlSen, "select") ){
+                throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "动态sql语句必须以select开头!");
+            }
         }
-
+        if(StringUtils.isBlank(sqlSen) ||
+            StringUtils.containsAnyIgnoreCase(sqlSen, ";",
+                "update", "delete", "insert", "drop", "create")) {
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "查询语句中不能包括dml关键字!");
+        }
         Map<String, Object> parames = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
 
         SourceInfo databaseInfo = sourceInfoMetadata.fetchSourceInfo(databaseCode);
@@ -54,7 +63,7 @@ public class QuerySqlOperation implements BizOperation {
         }
         SqlDataSetReader sqlDsr = new SqlDataSetReader(bizOptJson);
         sqlDsr.setDataSource(databaseInfo);
-        sqlDsr.setSqlSen(sql);
+        sqlDsr.setSqlSen(sqlSen);
         sqlDsr.setQueryDataScopeFilter(queryDataScopeFilter);
         sqlDsr.setOptId(dataOptContext.getOptId());
         if ("true".equals(condition) ){//&& StringUtils.isNotBlank(conditionSet) && bizModel.getDataSet(conditionSet) != null) {
