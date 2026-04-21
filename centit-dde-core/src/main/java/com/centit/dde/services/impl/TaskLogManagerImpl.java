@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -35,8 +35,10 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class TaskLogManagerImpl implements TaskLogManager {
     private static final Logger logger = LoggerFactory.getLogger(TaskLogManagerImpl.class);
+    private static final int MAX_LOG_COUNT_ONE_TIME = 500;
+    private static final int MAX_WAIT_WRITE_LOG_COUNT = 1000;
     private static CallApiLogDao backgroundTaskLogDao = null;
-    private static final ConcurrentLinkedQueue<CallApiLog> waitingForWriteLogs = new ConcurrentLinkedQueue<>();
+    private static final LinkedBlockingQueue<CallApiLog> waitingForWriteLogs = new LinkedBlockingQueue<>(MAX_WAIT_WRITE_LOG_COUNT);
     private static final ScheduledThreadPoolExecutor executor =new ScheduledThreadPoolExecutor(
         1,  // 只需要 1 个线程执行定时任务
         r -> {
@@ -45,7 +47,7 @@ public class TaskLogManagerImpl implements TaskLogManager {
             return t;
         }
     );
-    private static final int MAX_LOG_COUNT_ONE_TIME = 500;
+
     /*
      * 异步写入API调用日志
      */
@@ -120,11 +122,9 @@ public class TaskLogManagerImpl implements TaskLogManager {
         if(StringUtils.isBlank(callApiLog.getLogId())){
             callApiLog.setLogId(UuidOpt.getUuidAsString22());
         }
-        waitingForWriteLogs.offer(callApiLog);
-        /* this.taskLogDao.saveLog(callApiLog);
-        if(detailLogsCount > 0) {
-            this.taskLogDao.saveLogDetails(callApiLog);
-        }*/
+        if (!waitingForWriteLogs.offer(callApiLog)) {
+            logger.warn("API调用日志写入队列已满，舍弃日志");
+        }
     }
 
     @Override
