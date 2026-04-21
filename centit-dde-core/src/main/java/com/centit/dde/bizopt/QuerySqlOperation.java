@@ -48,10 +48,15 @@ public class QuerySqlOperation implements BizOperation {
                 throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "动态sql语句必须以select开头!");
             }
         }
-        if(StringUtils.isBlank(sqlSen) ||
-            StringUtils.containsAnyIgnoreCase(sqlSen, ";",
-                "update", "delete", "insert", "drop", "create")) {
-            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "查询语句中不能包括dml关键字!");
+        // SQL注入防护:检查是否包含危险的SQL命令
+        if(StringUtils.isBlank(sqlSen)) {
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "查询语句不能为空!");
+        }
+        // 使用正则表达式匹配完整的SQL命令关键字(单词边界)
+        String upperSql = sqlSen.toUpperCase().trim();
+        if(upperSql.matches("(?i).*\\b(UPDATE|DELETE|INSERT|DROP|CREATE|ALTER|TRUNCATE)\\b.*") || 
+           sqlSen.contains(";")) {
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "查询语句中不能包括DML/DDL关键字!");
         }
         Map<String, Object> parames = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
 
