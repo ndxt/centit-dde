@@ -6,12 +6,14 @@ import com.centit.dde.core.BizOperation;
 import com.centit.dde.core.DataOptContext;
 import com.centit.dde.core.DataSet;
 import com.centit.dde.dataset.SqlDataSetReader;
+import com.centit.dde.utils.BizModelJSONTransform;
 import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.service.DataScopePowerManager;
 import com.centit.product.metadata.po.SourceInfo;
 import com.centit.product.metadata.service.SourceInfoMetadata;
 import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 
 import java.util.Map;
@@ -35,7 +37,12 @@ public class QuerySqlOperation implements BizOperation {
         String id = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String databaseCode = BuiltInOperation.getJsonFieldString(bizOptJson, "databaseName", "");
         String condition = BuiltInOperation.getJsonFieldString(bizOptJson, "condition", "false");
+        boolean isDynamicSql = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("isDynamicSql"), false);
         String sql = BuiltInOperation.getJsonFieldString(bizOptJson, "querySQL", "");
+        if(isDynamicSql){
+            sql = StringBaseOpt.castObjectToString(
+                DataSetOptUtil.fetchFieldValue( new BizModelJSONTransform(bizModel), sql));
+        }
 
         Map<String, Object> parames = DataSetOptUtil.getDataSetParames(bizModel, bizOptJson);
 
