@@ -92,7 +92,8 @@ public class FileCheckOperation implements BizOperation {
                     responseData = ResponseData.makeSuccessResponse();
                 } else {
                     responseData = ResponseData.makeErrorMessage(ObjectException.DATA_VALIDATE_ERROR,
-                        "图像大小为：" + imageInfo.width + "*" + imageInfo.height + "分辨率为：" + imageInfo.dpi + "，大小不符合：" + imageSizeExpr);
+                        String.format("图像DPI为：%d，不满足打印要求的%d DPI标准。图片尺寸：%dx%d",
+                            imageInfo.dpi, imageSizeExpr, imageInfo.width, imageInfo.height));
                 }
                 break;
             }
@@ -103,18 +104,34 @@ public class FileCheckOperation implements BizOperation {
         return BuiltInOperation.createResponseSuccessData(1);
     }
 
+    /**
+     * 获取图片信息(宽度、高度、DPI)
+     * @param inputStream 图片输入流
+     * @return 图片信息对象
+     */
     private ImageInfo getImageInfo(InputStream inputStream) {
         try {
-            BufferedImage image = ImageIO.read(inputStream);
+            // 先将InputStream读入字节数组,以便多次读取
+            byte[] imageBytes = readAllBytes(inputStream);
+
+            // 第一次读取:获取图片尺寸
+            BufferedImage image;
+            try (java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(imageBytes)) {
+                image = ImageIO.read(bais);
+            }
+
             if (image != null) {
                 ImageInfo info = new ImageInfo();
                 info.width = image.getWidth();
                 info.height = image.getHeight();
                 info.dpi = 72; // 默认DPI
 
-                // 如果需要从元数据获取实际DPI
-                try (ImageInputStream iis = ImageIO.createImageInputStream(inputStream)) {
-                    Iterator<ImageReader> readers = ImageIO.getImageReaders(image);
+                // 第二次读取:从元数据获取实际DPI
+                try (java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(imageBytes);
+                     ImageInputStream iis = ImageIO.createImageInputStream(bais)) {
+
+                    Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
+
                     if (readers.hasNext()) {
                         ImageReader reader = readers.next();
                         try {
@@ -124,22 +141,33 @@ public class FileCheckOperation implements BizOperation {
                                 info.dpi = parseStandardDpi(metadata);
                             }
                         } finally {
-                            reader.dispose(); // 手动释放资源
+                            reader.dispose();
                         }
                     }
                 } catch (Exception e) {
-                    // 记录日志或者适当处理异常
                     e.printStackTrace();
                 }
-
 
                 return info;
             }
         } catch (Exception e) {
-            // 异常处理
             e.printStackTrace();
         }
         return new ImageInfo(0, 0, 72); // 默认值
+    }
+
+    /**
+     * 读取InputStream所有字节
+     */
+    private byte[] readAllBytes(InputStream inputStream) throws Exception {
+        java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
+        byte[] data = new byte[4096];
+        int nRead;
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        buffer.flush();
+        return buffer.toByteArray();
     }
 
     // 内部类用于封装图片信息
