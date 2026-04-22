@@ -87,30 +87,30 @@ public class WriteExcelOperation implements BizOperation {
                 XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
                 XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
 
-            boolean asTemplate = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getString("asTemplate"), false);
-            if (asTemplate) {
-                //从第几行开始插入
-                int beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
-                Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
-                ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
-            } else {
-                //获取表达式信息
-                String[] titles = mapInfoDesc.keySet().toArray(new String[0]);
-                String[] fields = mapInfoDesc.values().toArray(new String[0]);
-                ExcelExportUtil.generateExcelSheet(sheet, dataAsList, titles, fields);
-            }
+                boolean asTemplate = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getString("asTemplate"), false);
+                if (asTemplate) {
+                    //从第几行开始插入
+                    int beginRow = bizOptJson.getInteger("beginRow") == null ? 0 : bizOptJson.getInteger("beginRow");
+                    Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
+                    ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
+                } else {
+                    //获取表达式信息
+                    String[] titles = mapInfoDesc.keySet().toArray(new String[0]);
+                    String[] fields = mapInfoDesc.values().toArray(new String[0]);
+                    ExcelExportUtil.generateExcelSheet(sheet, dataAsList, titles, fields);
+                }
 
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            xssfWorkbook.write(byteArrayOutputStream);
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            if (transToPdf) {
-                fileDataSet.setFileData(excel2pdf(byteArrayInputStream));
-            } else {
-                fileDataSet.setFileData(byteArrayInputStream);
-            }
-            byteArrayOutputStream.close();
-            xssfWorkbook.close();
-            return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                xssfWorkbook.write(byteArrayOutputStream);
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                if (transToPdf) {
+                    fileDataSet.setFileData(excel2pdf(byteArrayInputStream));
+                } else {
+                    fileDataSet.setFileData(byteArrayInputStream);
+                }
+                byteArrayOutputStream.close();
+                xssfWorkbook.close();
+                return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
             }
         }
 
