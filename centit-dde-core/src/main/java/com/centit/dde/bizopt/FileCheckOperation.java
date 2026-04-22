@@ -15,17 +15,10 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.xml.XMLSchemaValidationUtil;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
-import java.util.Iterator;
 
 public class FileCheckOperation implements BizOperation {
 
@@ -85,14 +78,26 @@ public class FileCheckOperation implements BizOperation {
             case "checkImageSize": {
                 String imageSizeExpr = bizOptJson.getString("ruleExpr");
                 ImageInfo imageInfo = getImageInfo(fileInfo.getFileInputStream());
+
+                // 计算图片打印A4纸的等效DPI
+                // A4纸尺寸: 210mm × 297mm = 8.27英寸 × 11.69英寸
+                final double A4_WIDTH_INCH = 8.27;
+                final double A4_HEIGHT_INCH = 11.69;
+                double a4DpiByWidth = imageInfo.width / A4_WIDTH_INCH;
+                double a4DpiByHeight = imageInfo.height / A4_HEIGHT_INCH;
+                double a4EquivalentDpi = Math.min(a4DpiByWidth, a4DpiByHeight);
+
                 Object res = VariableFormula.calculate(imageSizeExpr, CollectionsOpt.createHashMap(
-                    "width", imageInfo.width, "height", imageInfo.height, "dpi", imageInfo.dpi));
+                    "width", imageInfo.width,
+                    "height", imageInfo.height,
+                    "a4Dpi", a4EquivalentDpi));
 
                 if (BooleanBaseOpt.castObjectToBoolean(res, false)) {
                     responseData = ResponseData.makeSuccessResponse();
                 } else {
                     responseData = ResponseData.makeErrorMessage(ObjectException.DATA_VALIDATE_ERROR,
-                        "图像大小为：" + imageInfo.width + "*" + imageInfo.height + "分辨率为：" + imageInfo.dpi + "，大小不符合：" + imageSizeExpr);
+                        String.format("图像信息 - A4等效DPI：%.1f，图片尺寸：%dx%d，不满足条件：%s",
+                            a4EquivalentDpi, imageInfo.width, imageInfo.height, imageSizeExpr));
                 }
                 break;
             }
@@ -103,109 +108,32 @@ public class FileCheckOperation implements BizOperation {
         return BuiltInOperation.createResponseSuccessData(1);
     }
 
+    /**
+     * 获取图片信息(宽度、高度)
+     *
+     * @param inputStream 图片输入流
+     * @return 图片信息对象
+     */
     private ImageInfo getImageInfo(InputStream inputStream) {
         try {
             BufferedImage image = ImageIO.read(inputStream);
             if (image != null) {
-                ImageInfo info = new ImageInfo();
-                info.width = image.getWidth();
-                info.height = image.getHeight();
-                info.dpi = 72; // 默认DPI
-
-                // 如果需要从元数据获取实际DPI
-                try (ImageInputStream iis = ImageIO.createImageInputStream(inputStream)) {
-                    Iterator<ImageReader> readers = ImageIO.getImageReaders(image);
-                    if (readers.hasNext()) {
-                        ImageReader reader = readers.next();
-                        try {
-                            reader.setInput(iis);
-                            IIOMetadata metadata = reader.getImageMetadata(0);
-                            if (metadata != null) {
-                                info.dpi = parseStandardDpi(metadata);
-                            }
-                        } finally {
-                            reader.dispose(); // 手动释放资源
-                        }
-                    }
-                } catch (Exception e) {
-                    // 记录日志或者适当处理异常
-                    e.printStackTrace();
-                }
-
-
-                return info;
+                return new ImageInfo(image.getWidth(), image.getHeight());
             }
         } catch (Exception e) {
-            // 异常处理
             e.printStackTrace();
         }
-        return new ImageInfo(0, 0, 72); // 默认值
+        return new ImageInfo(0, 0);
     }
 
     // 内部类用于封装图片信息
     private static class ImageInfo {
         int width;
         int height;
-        int dpi;
 
-        ImageInfo() {
-        }
-
-        ImageInfo(int width, int height, int dpi) {
+        ImageInfo(int width, int height) {
             this.width = width;
             this.height = height;
-            this.dpi = dpi;
-        }
-    }
-
-    private int parseStandardDpi(IIOMetadata metadata) {
-        try {
-            Node root = metadata.getAsTree("javax_imageio_1.0");
-            NodeList childNodes = root.getChildNodes();
-
-            for (int i = 0; i < childNodes.getLength(); i++) {
-                Node node = childNodes.item(i);
-                if ("Dimension".equals(node.getNodeName())) {
-                    return parseDimensionNode(node);
-                }
-            }
-        } catch (Exception e) {
-            // 异常处理
-        }
-        return 72;
-    }
-
-    private int parseDimensionNode(Node dimensionNode) {
-        try {
-            NodeList dimensionNodes = dimensionNode.getChildNodes();
-            double pixelSizeX = 0.28; // 默认值 1/25.4 inch
-            double pixelSizeY = 0.28;
-
-            for (int j = 0; j < dimensionNodes.getLength(); j++) {
-                Node dimNode = dimensionNodes.item(j);
-                if ("HorizontalPixelSize".equals(dimNode.getNodeName())) {
-                    NamedNodeMap attrs = dimNode.getAttributes();
-                    Node value = attrs.getNamedItem("value");
-                    if (value != null) {
-                        pixelSizeX = Double.parseDouble(value.getNodeValue());
-                    }
-                } else if ("VerticalPixelSize".equals(dimNode.getNodeName())) {
-                    NamedNodeMap attrs = dimNode.getAttributes();
-                    Node value = attrs.getNamedItem("value");
-                    if (value != null) {
-                        pixelSizeY = Double.parseDouble(value.getNodeValue());
-                    }
-                }
-            }
-
-            // 计算DPI并返回代表性值
-            int dpiX = (int) Math.round(25.4 / pixelSizeX);
-            int dpiY = (int) Math.round(25.4 / pixelSizeY);
-
-            // 返回平均DPI值作为代表性DPI
-            return (dpiX + dpiY) / 2;
-        } catch (Exception e) {
-            return 72;
         }
     }
 }
