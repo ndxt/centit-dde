@@ -30,6 +30,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.InvalidFileNameException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.core.GrantedAuthority;
@@ -63,6 +65,10 @@ public abstract class DoApiController extends BaseController {
 
     @Autowired
     protected BizModelService bizmodelService;
+
+    @Autowired(required = false)
+    @Qualifier("asyncTaskExecutor")
+    protected TaskExecutor asyncTaskExecutor;
 
     protected Map<String, DataPacket> dataPacketCachedMap = new ConcurrentHashMap<>(10000);
 
@@ -354,6 +360,21 @@ public abstract class DoApiController extends BaseController {
             dataOptContext.setTopUnit(userDetails.getTopUnitCode());
         } // 准备运行环境完毕
         // 调用DDE数据执行引擎
+        if(asyncTaskExecutor != null && StringUtils.equals(request.getParameter("__run_async") ,"true")){
+            asyncTaskExecutor.execute(()->{
+            try {
+                bizmodelService.runBizModel(dataPacketInterface, dataOptContext);
+                logger.info("异步执行API完成{}({})", dataPacketInterface.getPacketName(), dataPacketInterface.getPacketId());
+            } catch (Exception e) {
+                logger.error("异步执行API失败{}({}):{}", dataPacketInterface.getPacketName(), dataPacketInterface.getPacketId(),
+                    e.getMessage(), e);
+            }});
+            // 立即返回成功响应
+            JsonResultUtils.writeOriginalObject(
+                ResponseData.makeErrorMessage(ResponseData.RESULT_OK, "任务已提交，后台执行中"), response);
+            return;
+        }
+        //同步执行
         DataOptResult result = bizmodelService.runBizModel(dataPacketInterface, dataOptContext);
         // 返回
         if (result.getResultType() == DataOptResult.RETURN_FILE_STREAM) {
