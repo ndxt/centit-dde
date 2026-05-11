@@ -356,13 +356,18 @@ public class AddWaterMarkOperation implements BizOperation {
             }
             if(fileDataSet!=null) {
                 ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
+                boolean isHigh;
                 try (InputStream inputStream = fileDataSet.getFileInputStream()) {
-                    DocOptUtil.pdfHighlightKeywords(inputStream,
+                    isHigh=DocOptUtil.pdfHighlightKeywords(inputStream,
                         pdfFile, keyWords, shadeColor);
                 }
 
                 FileDataSet pdfDataset = new FileDataSet(fileDataSet.getFileName(),
                     pdfFile.size(), pdfFile);
+                // 添加 isHigh 属性到 pdfDataset
+                if(pdfDataset.getData() instanceof Map) {
+                    ((Map<String, Object>)pdfDataset.getData()).put("isHighLight", isHigh);
+                }
                 bizModel.putDataSet(targetDsName, pdfDataset);
                 return BuiltInOperation.createResponseSuccessData(1);
             } else {
@@ -377,15 +382,19 @@ public class AddWaterMarkOperation implements BizOperation {
                     ConstantValue.FILE_NAME, ConstantValue.FILE_CONTENT);
                 if(fileDataSet!=null){
                     ByteArrayOutputStream pdfFile = new ByteArrayOutputStream();
+                    boolean isHigh;
                     try (InputStream inputStream = fileDataSet.getFileInputStream()) {
-                        DocOptUtil.pdfHighlightKeywords(inputStream,
+                        isHigh = DocOptUtil.pdfHighlightKeywords(inputStream,
                             pdfFile, keyWords, shadeColor);
                     }
-                    fileList.add(CollectionsOpt.createHashMap(
+                    Map<String, Object> fileInfo = CollectionsOpt.createHashMap(
                         ConstantValue.FILE_NAME, fileDataSet.getFileName(),
                         ConstantValue.FILE_SIZE, pdfFile.size(),
                         ConstantValue.FILE_CONTENT, pdfFile
-                    ));
+                    );
+                    // 添加 isHigh 属性到文件信息
+                    fileInfo.put("isHighLight", isHigh);
+                    fileList.add(fileInfo);
                 }
             }
             bizModel.putDataSet(targetDsName, new DataSet(fileList));
