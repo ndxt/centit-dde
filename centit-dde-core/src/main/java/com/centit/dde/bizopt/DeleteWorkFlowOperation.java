@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class DeleteWorkFlowOperation implements BizOperation {
 
-    private FlowManager flowManager;
+    private final FlowManager flowManager;
 
     public DeleteWorkFlowOperation(FlowManager flowManager) {
         this.flowManager=flowManager;

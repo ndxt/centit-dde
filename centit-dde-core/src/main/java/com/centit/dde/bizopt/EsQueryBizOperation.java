@@ -53,7 +53,7 @@ public class EsQueryBizOperation implements BizOperation {
 
     private final ESServerConfig esServerConfig;
 
-    private SourceInfoMetadata sourceInfoMetadata;
+    private final SourceInfoMetadata sourceInfoMetadata;
 
     public EsQueryBizOperation(ESServerConfig esServerConfig, SourceInfoMetadata sourceInfoMetadata) {
         this.esServerConfig = esServerConfig;

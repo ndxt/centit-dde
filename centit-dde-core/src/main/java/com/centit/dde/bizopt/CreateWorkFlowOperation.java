@@ -29,7 +29,7 @@ import java.util.Set;
  */
 public class CreateWorkFlowOperation implements BizOperation {
 
-    private FlowEngine flowEngine;
+    private final FlowEngine flowEngine;
 
     public CreateWorkFlowOperation(FlowEngine flowEngine) {
         this.flowEngine = flowEngine;
