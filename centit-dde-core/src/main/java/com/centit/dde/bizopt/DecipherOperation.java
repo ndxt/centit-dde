@@ -135,7 +135,14 @@ public class DecipherOperation implements BizOperation {
             }
             //整个数据集都是以json形式存储的
             String jsonString = new String(objectText);
-            DataSet objectToDataSet = new DataSet(JSON.parse(jsonString));
+            Object parsedData;
+            try {
+                parsedData = JSON.parse(jsonString);
+            } catch (Exception e) {
+                // 如果不是有效的JSON格式，则将其作为普通字符串处理
+                parsedData = jsonString;
+            }
+            DataSet objectToDataSet = new DataSet(parsedData);
             bizModel.putDataSet(targetDsName, objectToDataSet);
             return BuiltInOperation.createResponseSuccessData(objectToDataSet.getSize());
         } else {
@@ -191,7 +198,15 @@ public class DecipherOperation implements BizOperation {
                     if("file".equals(cipherDataType)) {
                         map.put(cipherField, objectText);// objectText);
                     } else {
-                        map.put(cipherField, JSON.parse(StringBaseOpt.castObjectToString(objectText)));// objectText);
+                        String decryptedText = StringBaseOpt.castObjectToString(objectText);
+                        Object parsedValue;
+                        try {
+                            parsedValue = JSON.parse(decryptedText);
+                        } catch (Exception e) {
+                            // 如果不是有效的JSON格式，则将其作为普通字符串处理
+                            parsedValue = decryptedText;
+                        }
+                        map.put(cipherField, parsedValue);
                     }
                 }
             }
