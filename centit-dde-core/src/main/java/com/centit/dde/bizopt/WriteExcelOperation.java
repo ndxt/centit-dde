@@ -1,5 +1,6 @@
 package com.centit.dde.bizopt;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.dde.core.BizModel;
 import com.centit.dde.core.BizOperation;
@@ -27,6 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +56,30 @@ public class WriteExcelOperation implements BizOperation {
         if(columnDescInValue){
             String columnDescValue = bizOptJson.getString("columnDescValue");
             Object obj = DataSetOptUtil.fetchFieldValue(new BizModelJSONTransform(bizModel, dataSet.getData()), columnDescValue);
-            mapInfoDesc = CollectionsOpt.objectMapToStringMap(CollectionsOpt.objectToMap(obj)) ;
+            // 如果obj本身就是Map类型，直接转换
+            if(obj instanceof Map) {
+                Map<?, ?> sourceMap = (Map<?, ?>) obj;
+                Map<String, String> stringMap = new LinkedHashMap<>();
+                for(Map.Entry<?, ?> ent : sourceMap.entrySet()){
+                    stringMap.put(StringBaseOpt.objectToString(ent.getKey()),
+                        StringBaseOpt.objectToString(ent.getValue()));
+                }
+                mapInfoDesc = stringMap;
+            } else {
+                // 否则将JSONArray转换为Map，取每个JSONObject的第一个属性作为key和value
+                JSONArray jsonArray = JSONArray.from(obj);
+                Map<String, String> stringMap = new LinkedHashMap<>();
+                for(int i = 0; i < jsonArray.size(); i++){
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    if(jsonObject != null && !jsonObject.isEmpty()){
+                        // 获取第一个键值对
+                        String firstKey = jsonObject.keySet().iterator().next();
+                        String firstValue = StringBaseOpt.objectToString(jsonObject.get(firstKey));
+                        stringMap.put(firstKey, firstValue);
+                    }
+                }
+                mapInfoDesc = stringMap;
+            }
         } else {
             mapInfoDesc = BuiltInOperation.jsonArrayToMap(
                 bizOptJson.getJSONArray("config"), "columnName", "expression");
@@ -64,11 +89,10 @@ public class WriteExcelOperation implements BizOperation {
                 ObjectException.DATA_NOT_FOUND_EXCEPTION,
                 dataOptContext.getI18nMessage("dde.604.data_source_not_found2", "columnDescValue"));
         }
-
-        String sheetName = bizOptJson.getString("sheetName");
-        if (StringUtils.isBlank(sheetName)) {
-            sheetName = "Sheet1";
-        }
+        BizModelJSONTransform transformer = new BizModelJSONTransform(bizModel);
+        String sheetName = StringBaseOpt.castObjectToString(
+            JSONTransformer.transformer(
+                bizOptJson.getString("sheetName"), transformer),StringBaseOpt.isNvl(bizOptJson.getString("sheetName"))?"Sheet1":bizOptJson.getString("sheetName"));
         boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), false);
         /**fileType（生成方式） ： none, append, excel, jxls；*/
         String optType = bizOptJson.getString("fileType");
@@ -86,6 +110,9 @@ public class WriteExcelOperation implements BizOperation {
             try (InputStream inputStream = fileDataSet.getFileInputStream()) {
                 XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
                 XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
+                if (sheet == null) {
+                    sheet = xssfWorkbook.createSheet(sheetName);
+                }
 
                 boolean asTemplate = BooleanBaseOpt.castObjectToBoolean(bizOptJson.getString("asTemplate"), false);
                 if (asTemplate) {
@@ -150,9 +177,7 @@ public class WriteExcelOperation implements BizOperation {
                     XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
                     XSSFSheet sheet = xssfWorkbook.getSheet(sheetName);
                     if (sheet == null) {
-                        return BuiltInOperation.createResponseData(0, 1,
-                            ObjectException.NULL_EXCEPTION,
-                            dataOptContext.getI18nMessage("dde.604.data_source_not_found2", sheetName));
+                        sheet = xssfWorkbook.createSheet(sheetName);
                     }
                     Map<Integer, String> mapInfo = ExcelImportUtil.mapColumnIndex(mapInfoDesc);
                     ExcelExportUtil.saveObjectsToExcelSheet(sheet, dataAsList, mapInfo, beginRow, true, mergeColCell);
