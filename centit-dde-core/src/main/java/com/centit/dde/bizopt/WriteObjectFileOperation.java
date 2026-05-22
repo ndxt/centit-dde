@@ -48,7 +48,9 @@ public class WriteObjectFileOperation implements BizOperation {
                     bizOptJson.getString("addTypeAttr"), true);
             boolean fieldAsKey = BooleanBaseOpt.castObjectToBoolean(
                 bizOptJson.getString("fieldAsKey"), true);
-            objBytes = XMLObject.objectToXMLString(rootName, data, addAttr, fieldAsKey).getBytes();
+            boolean flattenArray = BooleanBaseOpt.castObjectToBoolean(
+                bizOptJson.getString("flattenArray"), true);
+            objBytes = XMLObject.objectToXMLString(rootName, data, addAttr, fieldAsKey, flattenArray).getBytes();
         }else {
             if(data instanceof String){
                 objBytes =((String) data).getBytes();
