@@ -104,6 +104,7 @@ public abstract class DBBatchUtils {
         Map<String, Object> currentOptData = null;
         if(tableInfo.hasGeneratedKeys()){ //批量插入 并找回主键
             MetaColumn column = tableInfo.fetchGeneratedKey();
+            List<Map<String, Object>> batchErrorObjects = new ArrayList<>(INT_BATCH_NUM);
             try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft(), Statement.RETURN_GENERATED_KEYS)) {
                 List<Map<String, Object>> savedObjects = new ArrayList<>(INT_BATCH_NUM);
                 for (Map<String, Object> object : objects) {
@@ -112,45 +113,72 @@ public abstract class DBBatchUtils {
                             DataSetOptUtil.mapDataRow(bizModel, object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
                     savedObjects.add(object);
                     currentOptData = objectForSave;
+                    batchErrorObjects.add(objectForSave);
                     DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), objectForSave);
                     rowIndex++;
                     stmt.addBatch();
                     if (rowIndex % INT_BATCH_NUM == 0) {
-                        stmt.executeBatch();
+                        try {
+                            stmt.executeBatch();
+                        } catch (SQLException e) {
+                            currentOptData = locateFailingObject(conn, sqlPair.getLeft(), sqlPair.getRight(), batchErrorObjects);
+                            throw e;
+                        }
                         ResultSet rs = stmt.getGeneratedKeys();
                         fetchObjectsId(savedObjects, rs, column);
                         savedObjects.clear();
+                        batchErrorObjects.clear();
                         stmt.clearBatch();
                     }
                 }
                 if(rowIndex % INT_BATCH_NUM > 0) {
-                    stmt.executeBatch();
+                    try {
+                        stmt.executeBatch();
+                    } catch (SQLException e) {
+                        currentOptData = locateFailingObject(conn, sqlPair.getLeft(), sqlPair.getRight(), batchErrorObjects);
+                        throw e;
+                    }
                     ResultSet rs = stmt.getGeneratedKeys();
                     fetchObjectsId(savedObjects, rs, column);
                     savedObjects.clear();
+                    batchErrorObjects.clear();
                     stmt.clearBatch();
                 }
             } catch (SQLException e) {
                 throw DatabaseAccess.createAccessExceptionWithData(sqlPair.getLeft(), e, currentOptData);
             }
         } else { //批量插入
+            List<Map<String, Object>> batchErrorObjects = new ArrayList<>(INT_BATCH_NUM);
             try (PreparedStatement stmt = conn.prepareStatement(sqlPair.getLeft())) {
                 for (Map<String, Object> object : objects) {
                     Map<String, Object> objectForSave =
                         prepareObjectForSave(tableInfo, fieldsMap != null  && fieldsMap.size()>0?
                             DataSetOptUtil.mapDataRow(bizModel, object, rowIndex, rowCount, fieldsMap.entrySet()) : object);
                     currentOptData = objectForSave;
+                    batchErrorObjects.add(objectForSave);
                     DatabaseAccess.setQueryStmtParameters(stmt, sqlPair.getRight(), objectForSave);
                     rowIndex++;
                     stmt.addBatch();
                     if (rowIndex % INT_BATCH_NUM == 0) {
-                        stmt.executeBatch();
+                        try {
+                            stmt.executeBatch();
+                        } catch (SQLException e) {
+                            currentOptData = locateFailingObject(conn, sqlPair.getLeft(), sqlPair.getRight(), batchErrorObjects);
+                            throw e;
+                        }
                         stmt.clearBatch();
+                        batchErrorObjects.clear();
                     }
                 }
                 if (rowIndex % INT_BATCH_NUM > 0) {
-                    stmt.executeBatch();
+                    try {
+                        stmt.executeBatch();
+                    } catch (SQLException e) {
+                        currentOptData = locateFailingObject(conn, sqlPair.getLeft(), sqlPair.getRight(), batchErrorObjects);
+                        throw e;
+                    }
                     stmt.clearBatch();
+                    batchErrorObjects.clear();
                 }
             } catch (SQLException e) {
                 throw DatabaseAccess.createAccessExceptionWithData(sqlPair.getLeft(), e, currentOptData);
@@ -256,6 +284,9 @@ public abstract class DBBatchUtils {
         PreparedStatement insertStmt = null;
         PreparedStatement updateStmt = null;
         Map<String, Object> currentOptData = null;
+        String lastErrorSql = null;
+        List<Map<String, Object>> updateBatchObjects = new ArrayList<>(INT_BATCH_NUM);
+        List<Map<String, Object>> insertBatchObjects = new ArrayList<>(INT_BATCH_NUM);
         MetaColumn column = tableInfo.fetchGeneratedKey();
         boolean needFetchId = tableInfo.hasGeneratedKeys() && column!=null;
         try (PreparedStatement checkStmt = conn.prepareStatement(checkSqlPair.getLeft())) {
@@ -301,10 +332,18 @@ public abstract class DBBatchUtils {
                         DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), objectForSave);
                         if (StringUtils.isNotBlank(updateSqlPair.getLeft())) {
                             update++;
+                            updateBatchObjects.add(objectForSave);
                             updateStmt.addBatch();
                             if (update % INT_BATCH_NUM == 0) {
-                                updateStmt.executeBatch();
+                                try {
+                                    updateStmt.executeBatch();
+                                } catch (SQLException e) {
+                                    currentOptData = locateFailingObject(conn, updateSqlPair.getLeft(), updateSqlPair.getRight(), updateBatchObjects);
+                                    lastErrorSql = updateSqlPair.getLeft();
+                                    throw e;
+                                }
                                 updateStmt.clearBatch();
+                                updateBatchObjects.clear();
                             }
                         }
                     }
@@ -314,39 +353,60 @@ public abstract class DBBatchUtils {
                         savedObjects.add(object);
                     }
                     insert++;
+                    insertBatchObjects.add(objectForSave);
                     insertStmt.addBatch();
                     if (insert % INT_BATCH_NUM == 0) {
-                        insertStmt.executeBatch();
+                        try {
+                            insertStmt.executeBatch();
+                        } catch (SQLException e) {
+                            currentOptData = locateFailingObject(conn, insertSqlPair.getLeft(), insertSqlPair.getRight(), insertBatchObjects);
+                            lastErrorSql = insertSqlPair.getLeft();
+                            throw e;
+                        }
                         if(needFetchId){
                             ResultSet idRs = insertStmt.getGeneratedKeys();
                             fetchObjectsId(savedObjects, idRs, column);
                             savedObjects.clear();
                         }
                         insertStmt.clearBatch();
+                        insertBatchObjects.clear();
                     }
                 }
             }
 
             if (updateStmt != null && update % INT_BATCH_NUM > 0){
-                updateStmt.executeBatch();
+                try {
+                    updateStmt.executeBatch();
+                } catch (SQLException e) {
+                    currentOptData = locateFailingObject(conn, updateSqlPair.getLeft(), updateSqlPair.getRight(), updateBatchObjects);
+                    lastErrorSql = updateSqlPair.getLeft();
+                    throw e;
+                }
                 updateStmt.clearBatch();
+                updateBatchObjects.clear();
             }
 
             if (insertStmt != null && insert % INT_BATCH_NUM > 0){
-                insertStmt.executeBatch();
+                try {
+                    insertStmt.executeBatch();
+                } catch (SQLException e) {
+                    currentOptData = locateFailingObject(conn, insertSqlPair.getLeft(), insertSqlPair.getRight(), insertBatchObjects);
+                    lastErrorSql = insertSqlPair.getLeft();
+                    throw e;
+                }
                 if(needFetchId){
                     ResultSet idRs = insertStmt.getGeneratedKeys();
                     fetchObjectsId(savedObjects, idRs, column);
                     savedObjects.clear();
                 }
                 insertStmt.clearBatch();
+                insertBatchObjects.clear();
             }
         } catch (SQLException e) {
-            if (exists) {
-                throw DatabaseAccess.createAccessExceptionWithData(updateSqlPair.getLeft(), e, currentOptData);
-            } else {
-                throw DatabaseAccess.createAccessExceptionWithData(insertSqlPair.getLeft(), e, currentOptData);
+            if (lastErrorSql != null) {
+                throw DatabaseAccess.createAccessExceptionWithData(lastErrorSql, e, currentOptData);
             }
+            throw DatabaseAccess.createAccessExceptionWithData(checkSqlPair.getLeft(), e, currentOptData);
         }finally {
             if (updateStmt != null){
                 try {
@@ -364,6 +424,20 @@ public abstract class DBBatchUtils {
             }
         }
         return n;
+    }
+
+    private static Map<String, Object> locateFailingObject(Connection conn, String sql,
+                                                            List<String> sqlParams,
+                                                            List<Map<String, Object>> batchObjects) {
+        for (Map<String, Object> object : batchObjects) {
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                DatabaseAccess.setQueryStmtParameters(stmt, sqlParams, object);
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                return object;
+            }
+        }
+        return batchObjects.isEmpty() ? null : batchObjects.get(batchObjects.size() - 1);
     }
 
     private static Map<String, Object> prepareObjectForSave(TableInfo tableInfo, Map<String, Object> object) {
