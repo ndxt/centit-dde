@@ -121,7 +121,7 @@ public abstract class DBBatchUtils {
                         try {
                             stmt.executeBatch();
                         } catch (SQLException e) {
-                            currentOptData = locateFailingObject(conn, sqlPair.getLeft(), sqlPair.getRight(), batchErrorObjects);
+                            currentOptData = locateFailingObject(e, batchErrorObjects);
                             throw e;
                         }
                         ResultSet rs = stmt.getGeneratedKeys();
@@ -135,7 +135,7 @@ public abstract class DBBatchUtils {
                     try {
                         stmt.executeBatch();
                     } catch (SQLException e) {
-                        currentOptData = locateFailingObject(conn, sqlPair.getLeft(), sqlPair.getRight(), batchErrorObjects);
+                        currentOptData = locateFailingObject(e, batchErrorObjects);
                         throw e;
                     }
                     ResultSet rs = stmt.getGeneratedKeys();
@@ -163,7 +163,7 @@ public abstract class DBBatchUtils {
                         try {
                             stmt.executeBatch();
                         } catch (SQLException e) {
-                            currentOptData = locateFailingObject(conn, sqlPair.getLeft(), sqlPair.getRight(), batchErrorObjects);
+                            currentOptData = locateFailingObject(e, batchErrorObjects);
                             throw e;
                         }
                         stmt.clearBatch();
@@ -174,7 +174,7 @@ public abstract class DBBatchUtils {
                     try {
                         stmt.executeBatch();
                     } catch (SQLException e) {
-                        currentOptData = locateFailingObject(conn, sqlPair.getLeft(), sqlPair.getRight(), batchErrorObjects);
+                        currentOptData = locateFailingObject(e, batchErrorObjects);
                         throw e;
                     }
                     stmt.clearBatch();
@@ -338,7 +338,7 @@ public abstract class DBBatchUtils {
                                 try {
                                     updateStmt.executeBatch();
                                 } catch (SQLException e) {
-                                    currentOptData = locateFailingObject(conn, updateSqlPair.getLeft(), updateSqlPair.getRight(), updateBatchObjects);
+                                    currentOptData = locateFailingObject(e, updateBatchObjects);
                                     lastErrorSql = updateSqlPair.getLeft();
                                     throw e;
                                 }
@@ -359,7 +359,7 @@ public abstract class DBBatchUtils {
                         try {
                             insertStmt.executeBatch();
                         } catch (SQLException e) {
-                            currentOptData = locateFailingObject(conn, insertSqlPair.getLeft(), insertSqlPair.getRight(), insertBatchObjects);
+                            currentOptData = locateFailingObject(e, insertBatchObjects);
                             lastErrorSql = insertSqlPair.getLeft();
                             throw e;
                         }
@@ -378,7 +378,7 @@ public abstract class DBBatchUtils {
                 try {
                     updateStmt.executeBatch();
                 } catch (SQLException e) {
-                    currentOptData = locateFailingObject(conn, updateSqlPair.getLeft(), updateSqlPair.getRight(), updateBatchObjects);
+                    currentOptData = locateFailingObject(e, updateBatchObjects);
                     lastErrorSql = updateSqlPair.getLeft();
                     throw e;
                 }
@@ -390,7 +390,7 @@ public abstract class DBBatchUtils {
                 try {
                     insertStmt.executeBatch();
                 } catch (SQLException e) {
-                    currentOptData = locateFailingObject(conn, insertSqlPair.getLeft(), insertSqlPair.getRight(), insertBatchObjects);
+                    currentOptData = locateFailingObject(e, insertBatchObjects);
                     lastErrorSql = insertSqlPair.getLeft();
                     throw e;
                 }
@@ -426,18 +426,23 @@ public abstract class DBBatchUtils {
         return n;
     }
 
-    private static Map<String, Object> locateFailingObject(Connection conn, String sql,
-                                                            List<String> sqlParams,
+    private static Map<String, Object> locateFailingObject(SQLException batchException,
                                                             List<Map<String, Object>> batchObjects) {
-        for (Map<String, Object> object : batchObjects) {
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                DatabaseAccess.setQueryStmtParameters(stmt, sqlParams, object);
-                stmt.executeUpdate();
-            } catch (SQLException e) {
-                return object;
+        if (batchObjects.isEmpty()) {
+            return null;
+        }
+        if (batchException instanceof BatchUpdateException) {
+            int[] updateCounts = ((BatchUpdateException) batchException).getUpdateCounts();
+            if (updateCounts != null && updateCounts.length > 0) {
+                for (int i = 0; i < updateCounts.length && i < batchObjects.size(); i++) {
+                    if (updateCounts[i] == Statement.EXECUTE_FAILED) {
+                        return batchObjects.get(i);
+                    }
+                }
+                return batchObjects.get(Math.min(updateCounts.length, batchObjects.size()) - 1);
             }
         }
-        return batchObjects.isEmpty() ? null : batchObjects.get(batchObjects.size() - 1);
+        return batchObjects.get(batchObjects.size() - 1);
     }
 
     private static Map<String, Object> prepareObjectForSave(TableInfo tableInfo, Map<String, Object> object) {
