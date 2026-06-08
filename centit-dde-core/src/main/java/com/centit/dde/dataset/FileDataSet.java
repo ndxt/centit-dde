@@ -11,8 +11,6 @@ import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.file.FileIOOpt;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +19,7 @@ import java.util.Map;
 public class FileDataSet extends DataSet implements AutoCloseable {
 
     public static String FILE_DATA_SET_DEFAULT_NAME = "fileInfo";
+
     public FileDataSet() {
         this.dataSetName = FileDataSet.FILE_DATA_SET_DEFAULT_NAME;
         this.data = null;// Collections.emptyList();
@@ -45,89 +44,74 @@ public class FileDataSet extends DataSet implements AutoCloseable {
 
     @Override
     public void setData(Object dataobj) {
-        if(dataobj instanceof Map) {
+        if (dataobj instanceof Map) {
             this.data = dataobj;
         }
     }
 
     public void setFileInfo(FileBaseInfo fileInfo) {
-        JSONObject obj = (JSONObject)JSON.toJSON(fileInfo);
+        JSONObject obj = (JSONObject) JSON.toJSON(fileInfo);
         setFileInfo(obj);
     }
 
     public void setFileInfo(Map<String, Object> fileInfo) {
-        if(this.data == null || !(this.data instanceof Map)){
+        if (this.data == null || !(this.data instanceof Map)) {
             this.data = fileInfo;
         } else {
             this.data = CollectionsOpt.unionTwoMap(
-                fileInfo , (Map<String, Object>) this.data);
+                fileInfo, (Map<String, Object>) this.data);
         }
     }
 
-    public void setFileContent(String fileName, long fileSize, Object fileData){
-        if(this.data == null || !(this.data instanceof Map)){
+    public void setFileContent(String fileName, long fileSize, Object fileData) {
+        if (this.data == null || !(this.data instanceof Map)) {
             this.data = new HashMap<>(20);
         }
-        ((Map<String, Object>)this.data).put(ConstantValue.FILE_NAME, fileName);
-        if(fileSize > 0) {
+        ((Map<String, Object>) this.data).put(ConstantValue.FILE_NAME, fileName);
+        if (fileSize > 0) {
             ((Map<String, Object>) this.data).put(ConstantValue.FILE_SIZE, fileSize);
         }
-        ((Map<String, Object>)this.data).put(ConstantValue.FILE_CONTENT, fileData);
+        ((Map<String, Object>) this.data).put(ConstantValue.FILE_CONTENT, fileData);
     }
 
-    public void setFileData(Object fileData){
-        if(this.data == null || !(this.data instanceof Map)){
+    public void setFileData(Object fileData) {
+        if (this.data == null || !(this.data instanceof Map)) {
             this.data = new HashMap<>(20);
         }
-        ((Map<String, Object>)this.data).put(ConstantValue.FILE_CONTENT, fileData);
+        ((Map<String, Object>) this.data).put(ConstantValue.FILE_CONTENT, fileData);
     }
 
-    public void setFileName(String fileName){
-        if(this.data == null || !(this.data instanceof Map)){
+    public void setFileName(String fileName) {
+        if (this.data == null || !(this.data instanceof Map)) {
             this.data = new HashMap<>(20);
         }
-        ((Map<String, Object>)this.data).put(ConstantValue.FILE_NAME, fileName);
+        ((Map<String, Object>) this.data).put(ConstantValue.FILE_NAME, fileName);
     }
 
     @JSONField(serialize = false)
-    public String getFileName(){
-        if(this.data==null){
+    public String getFileName() {
+        if (this.data == null) {
             return null;
         }
         return StringBaseOpt.castObjectToString(
-            ((Map<String, Object>)this.data).get(ConstantValue.FILE_NAME));
+            ((Map<String, Object>) this.data).get(ConstantValue.FILE_NAME));
     }
 
     @JSONField(serialize = false)
-    public long getFileSize(){
-        if(this.data==null){
+    public long getFileSize() {
+        if (this.data == null) {
             return 0;
         }
         return NumberBaseOpt.castObjectToInteger(
-            ((Map<String, Object>)this.data).get(ConstantValue.FILE_SIZE),0);
+            ((Map<String, Object>) this.data).get(ConstantValue.FILE_SIZE), 0);
     }
 
     @JSONField(serialize = false)
-    public InputStream getFileInputStream(){
-        if(this.data==null){
+    public InputStream getFileInputStream() {
+        if (this.data == null) {
             return null;
         }
-        Object fileObj = ((Map<String, Object>)this.data).get(ConstantValue.FILE_CONTENT);
-        if (fileObj instanceof InputStream) {
-            try (InputStream sourceStream = (InputStream) fileObj;
-                 ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-                byte[] buf = new byte[4096];
-                int len;
-                while ((len = sourceStream.read(buf)) > 0) {
-                    buffer.write(buf, 0, len);
-                }
-                byte[] bytes = buffer.toByteArray();
-                ((Map<String, Object>) this.data).put(ConstantValue.FILE_CONTENT, bytes);
-                return new ByteArrayInputStream(bytes);
-            } catch (Exception e) {
-                throw new RuntimeException("读取文件输入流失败", e);
-            }
-        }
+        Object fileObj = ((Map<String, Object>) this.data).get(ConstantValue.FILE_CONTENT);
         return FileIOOpt.castObjectToInputStream(fileObj);
     }
 
@@ -141,14 +125,14 @@ public class FileDataSet extends DataSet implements AutoCloseable {
     }
 
     @Override
-    public String toDebugString(){
-        if(this.getFileSize()<=1024)
+    public String toDebugString() {
+        if (this.getFileSize() <= 1024)
             return JSON.toJSONString(this.data);
         JSONObject obj = new JSONObject();
-        for(Map.Entry<String, Object> ent : ((Map<String, Object>)this.data).entrySet()){
-            if(ConstantValue.FILE_CONTENT.equals(ent.getKey())){
+        for (Map.Entry<String, Object> ent : ((Map<String, Object>) this.data).entrySet()) {
+            if (ConstantValue.FILE_CONTENT.equals(ent.getKey())) {
                 obj.put(ConstantValue.FILE_CONTENT, "File content is ignored.");
-            }else {
+            } else {
                 obj.put(ent.getKey(), ent.getValue());
             }
         }
