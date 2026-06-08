@@ -11,6 +11,8 @@ import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.file.FileIOOpt;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -111,6 +113,21 @@ public class FileDataSet extends DataSet implements AutoCloseable {
             return null;
         }
         Object fileObj = ((Map<String, Object>)this.data).get(ConstantValue.FILE_CONTENT);
+        if (fileObj instanceof InputStream) {
+            try (InputStream sourceStream = (InputStream) fileObj;
+                 ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+                byte[] buf = new byte[4096];
+                int len;
+                while ((len = sourceStream.read(buf)) > 0) {
+                    buffer.write(buf, 0, len);
+                }
+                byte[] bytes = buffer.toByteArray();
+                ((Map<String, Object>) this.data).put(ConstantValue.FILE_CONTENT, bytes);
+                return new ByteArrayInputStream(bytes);
+            } catch (Exception e) {
+                throw new RuntimeException("读取文件输入流失败", e);
+            }
+        }
         return FileIOOpt.castObjectToInputStream(fileObj);
     }
 
