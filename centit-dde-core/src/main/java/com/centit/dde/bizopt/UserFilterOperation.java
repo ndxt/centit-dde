@@ -14,11 +14,13 @@ import com.centit.framework.components.SysUserFilterEngine;
 import com.centit.framework.components.impl.UserUnitMapTranslate;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.UserInfo;
+import com.centit.framework.model.basedata.UserUnit;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.compiler.Pretreatment;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 
@@ -38,6 +40,30 @@ public class UserFilterOperation implements BizOperation {
         param.put(key, CollectionsOpt.createHashSet(value));
         return param;
     }
+
+    private JSONObject buildUserJson(CentitUserDetails ud ){
+        if(ud.getUserInfo()==null) return null;
+        JSONObject userJson = JSONObject.from(ud.getUserInfo());
+        String topUnit = ud.getTopUnitCode();
+        userJson.put("topUnit", topUnit);
+        userJson.put("currentUnitCode",  ud.getCurrentUnitCode());
+        String affiliatedUnit = ud.getUserInfo().getPrimaryUnit();
+        List<UserUnit> userUnits = new ArrayList<>();
+        if(ud.getUserUnits()!=null && !ud.getUserUnits().isEmpty()) {
+            for(UserUnit uu: ud.getUserUnits()){
+                if(StringUtils.equals(topUnit, uu.getTopUnit())){
+                    userUnits.add(uu);
+                    if("T".equals(uu.getRelType())){
+                        affiliatedUnit = uu.getUnitCode();
+                    }
+                }
+            }
+        }
+        userJson.put("affiliatedUnit", affiliatedUnit);
+        userJson.put("userUnits", userUnits);
+        return userJson;
+    }
+
     @Override
     public ResponseData runOpt(BizModel bizModel, JSONObject bizOptJson, DataOptContext dataOptContext) {
         String topUnit = StringUtils.isBlank(dataOptContext.getTopUnit())? bizModel.fetchTopUnit() : dataOptContext.getTopUnit();
@@ -55,42 +81,40 @@ public class UserFilterOperation implements BizOperation {
             if(StringUtils.isNotBlank(pv)){
                 propValue = pv;
             }
-            UserInfo userInfo = null;
-            CentitUserDetails ud ;
+
+            CentitUserDetails ud = null ;
             switch (propName){
                 case "loginName":
                     ud =  this.platformEnvironment.loadUserDetailsByLoginName(propValue);
-                    if(ud != null){
-                        userInfo = ud.getUserInfo();
-                    }
                     break;
                 case "regEmail":
                     ud =  this.platformEnvironment.loadUserDetailsByRegEmail(propValue);
-                    if(ud != null){
-                        userInfo = ud.getUserInfo();
-                    }
                     break;
                 case "cellPhone":
                     ud =  this.platformEnvironment.loadUserDetailsByRegCellPhone(propValue);
-                    if(ud != null){
-                        userInfo = ud.getUserInfo();
+                    break;
+                case "userWord": {
+                        UserInfo userInfo = this.platformEnvironment.getUserInfoByUserWord(propValue);
+                        if(userInfo!=null) {
+                            ud = new CentitUserDetails();
+                            ud.setUserInfo(userInfo);
+                        }
                     }
                     break;
-                case "userWord":
-                    userInfo = this.platformEnvironment.getUserInfoByUserWord(propValue);
-                    break;
-                case "idCardNo":
-                    userInfo = this.platformEnvironment.getUserInfoByIdCardNo(propValue);
+                case "idCardNo": {
+                        UserInfo userInfo = this.platformEnvironment.getUserInfoByIdCardNo(propValue);
+                        if(userInfo!=null) {
+                            ud = new CentitUserDetails();
+                            ud.setUserInfo(userInfo);
+                        }
+                    }
                     break;
                 default:
                     ud =  this.platformEnvironment.loadUserDetailsByUserCode(propValue);
-                    if(ud != null){
-                        userInfo = ud.getUserInfo();
-                    }
                     break;
             }
-            if(userInfo!=null) {
-                bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(JSON.toJSON(userInfo)));
+            if(ud!=null) {
+                bizModel.putDataSet(bizOptJson.getString("id"), new DataSet(buildUserJson(ud)));
                 return BuiltInOperation.createResponseSuccessData(1);
             } else {
                 bizModel.putDataSet(bizOptJson.getString("id"), new DataSet());
