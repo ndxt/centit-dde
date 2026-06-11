@@ -29,7 +29,7 @@ public class SqlDataSetWriter implements DataSetWriter {
 
     private ISourceInfo dataSource;
     private MetaTable tableInfo;
-    private Map fieldsMap;
+    private Map<String, String> fieldsMap;
     private int successNums;
     private int errorNums;
     private StringBuilder operateMessage;
@@ -38,7 +38,7 @@ public class SqlDataSetWriter implements DataSetWriter {
 
     private BizModel bizModel;
 
-    public void setFieldsMap(Map fieldsMap) {
+    public void setFieldsMap(Map<String, String> fieldsMap) {
         this.fieldsMap = fieldsMap;
     }
 
@@ -129,14 +129,14 @@ public class SqlDataSetWriter implements DataSetWriter {
      * @param dataSet 数据集
      */
     @Override
-    public void merge(DataSet dataSet) {
+    public void merge(DataSet dataSet, boolean mergeData) {
         if (connection == null) {
             fetchConnect();
         }
         if (this.saveAsWhole) {
             try {
                 DBBatchUtils.batchMergeObjects(bizModel, connection,
-                    tableInfo, dataSet.getDataAsList(), fieldsMap);
+                    tableInfo, mergeData, dataSet.getDataAsList(), fieldsMap);
                 successNums = 0;
                 errorNums = 0;
                 for (Map<String, Object> row : dataSet.getDataAsList()) {
@@ -152,7 +152,7 @@ public class SqlDataSetWriter implements DataSetWriter {
             for (Map<String, Object> row : dataSet.getDataAsList()) {
                 try {
                     int iResult = DBBatchUtils.mergeObject(bizModel, connection,
-                        tableInfo, row, fieldsMap);
+                        tableInfo, mergeData, row, fieldsMap);
                     connection.commit();
                     if (iResult > 0) {
                         dealResultMsg(row);
@@ -166,7 +166,6 @@ public class SqlDataSetWriter implements DataSetWriter {
                     row.put(writeTag,false);
                     row.put(writeMsg, e.getMessage());
                     errorNums++;
-
                     operateMessage.append(e.getMessage()).append("\r\n")
                         .append(JSON.toJSONString(row)).append("\r\n");
 

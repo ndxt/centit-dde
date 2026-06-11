@@ -52,7 +52,7 @@ public abstract class DBBatchUtils {
                                    final MetaTable tableInfo,
                                    final Map<String, Object> object, Map fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
-        if (fieldsMap == null || fieldsMap.size()==0) {
+        if (fieldsMap == null || fieldsMap.isEmpty()) {
             fields.addAll(object.keySet());
         } else {
             Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
@@ -188,8 +188,8 @@ public abstract class DBBatchUtils {
     }
 
     public static int mergeObject(final BizModel bizModel, final Connection conn,
-                                        final MetaTable tableInfo,
-                                        final Map<String, Object> object, Map fieldsMap) throws SQLException {
+                                        final MetaTable tableInfo, boolean mergeData,
+                                        final Map<String, Object> object, Map<String, String> fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
         if (fieldsMap == null || fieldsMap.size()==0) {
             fields.addAll(object.keySet());
@@ -218,16 +218,18 @@ public abstract class DBBatchUtils {
             }
 
             if (exists) {
-                sql = GeneralJsonObjectDao.buildUpdateSql(tableInfo, fields);
-                if (null != sql) {
-                    sql += " where " + GeneralJsonObjectDao.buildFilterSqlByPkUseColumnName(tableInfo, null);
-                    LeftRightPair<String, List<String>> updateSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
-                    try (PreparedStatement updateStmt = conn.prepareStatement(updateSqlPair.getLeft())) {
-                        DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), objectForSave);
-                        updateStmt.executeUpdate();
+                if(mergeData) {
+                    sql = GeneralJsonObjectDao.buildUpdateSql(tableInfo, fields);
+                    if (null != sql) {
+                        sql += " where " + GeneralJsonObjectDao.buildFilterSqlByPkUseColumnName(tableInfo, null);
+                        LeftRightPair<String, List<String>> updateSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
+                        try (PreparedStatement updateStmt = conn.prepareStatement(updateSqlPair.getLeft())) {
+                            DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), objectForSave);
+                            updateStmt.executeUpdate();
+                        }
+                    } else {
+                        throw new SQLException("update 数据库字段为空，无法生成正确的sql语句！");
                     }
-                } else {
-                    throw new SQLException("update 数据库字段为空，无法生成正确的sql语句！");
                 }
             } else {
                 MetaColumn column = tableInfo.fetchGeneratedKey();
@@ -258,14 +260,14 @@ public abstract class DBBatchUtils {
 
 
     public static int batchMergeObjects(final BizModel bizModel, final Connection conn,
-                                        final MetaTable tableInfo,
+                                        final MetaTable tableInfo, boolean mergeData,
                                         final List<Map<String, Object>> objects,
-                                        Map fieldsMap) throws SQLException {
+                                        Map<String, String> fieldsMap) throws SQLException {
         List<String> fields = new ArrayList<>();
-        if (fieldsMap == null || fieldsMap.size()==0) {
+        if (fieldsMap == null || fieldsMap.isEmpty()) {
             fields = achieveAllFields(objects);
         } else {
-            Collections.addAll(fields, (String[]) fieldsMap.keySet().toArray(new String[0]));
+            Collections.addAll(fields, fieldsMap.keySet().toArray(new String[0]));
         }
         String sql = GeneralJsonObjectDao.buildInsertSql(tableInfo, fields);
         LeftRightPair<String, List<String>> insertSqlPair = QueryUtils.transNamedParamSqlToParamSql(sql);
@@ -298,7 +300,7 @@ public abstract class DBBatchUtils {
                 }
             }
 
-            if (StringUtils.isNotBlank(updateSqlPair.getLeft())){
+            if (mergeData && StringUtils.isNotBlank(updateSqlPair.getLeft())){
                 updateStmt = conn.prepareStatement(updateSqlPair.getLeft());
             }
 
@@ -328,7 +330,7 @@ public abstract class DBBatchUtils {
                 }
                 n++;
                 if (exists) {
-                    if(updateStmt != null ){
+                    if(mergeData && updateStmt != null ){
                         DatabaseAccess.setQueryStmtParameters(updateStmt, updateSqlPair.getRight(), objectForSave);
                         if (StringUtils.isNotBlank(updateSqlPair.getLeft())) {
                             update++;
@@ -374,7 +376,7 @@ public abstract class DBBatchUtils {
                 }
             }
 
-            if (updateStmt != null && update % INT_BATCH_NUM > 0){
+            if (mergeData && updateStmt != null && update % INT_BATCH_NUM > 0){
                 try {
                     updateStmt.executeBatch();
                 } catch (SQLException e) {

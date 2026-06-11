@@ -29,9 +29,10 @@ import java.util.Map;
 public class PersistenceDBOperation implements BizOperation {
     private static final String WRITER_ERROR_TAG = "__rmdb_writer_result";
     private static final String WRITER_ERROR_MSG = "__rmdb_writer_result_msg";
-    private static final String WRITER_INDICATE_APPEND = "append";
+    private static final String WRITER_INDICATE_APPEND = "append"; // insert
     private static final String WRITER_INDICATE_MERGE = "merge";
     private static final String WRITER_INDICATE_UPDATE = "update";
+    private static final String WRITER_INDICATE_INSERT_IGNORE = "insertIgnore"; // 插入忽略已存在的记录
 
     private SourceInfoMetadata sourceInfoMetadata;
     private MetaDataService metaDataService;
@@ -116,7 +117,10 @@ public class PersistenceDBOperation implements BizOperation {
                 break;
             case WRITER_INDICATE_MERGE:
             case WRITER_INDICATE_UPDATE:
-                dataSetWriter.merge(dataSet);
+                dataSetWriter.merge(dataSet, true);
+                break;
+            case WRITER_INDICATE_INSERT_IGNORE:
+                dataSetWriter.merge(dataSet, false);
                 break;
             default:
                 dataSetWriter.save(dataSet);

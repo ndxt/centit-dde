@@ -24,7 +24,7 @@ public interface DataSetWriter {
      * 对于数据库类型的持久化来说可以有差别，比如合并，以避免主键冲突
      * @param dataSet 数据集
      */
-    default void merge(DataSet dataSet){
+    default void merge(DataSet dataSet, boolean mergeData){
         save(dataSet);
     }
 }
