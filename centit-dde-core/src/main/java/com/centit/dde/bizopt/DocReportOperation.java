@@ -47,6 +47,7 @@ public class DocReportOperation implements BizOperation {
         String targetDsName = BuiltInOperation.getJsonFieldString(bizOptJson, "id", bizModel.getModelName());
         String fileId = bizOptJson.getString("fileId");
         boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), true);
+        boolean manualMode = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("manualMode"), false);
 
         String fileName = Pretreatment.mapTemplateStringAsFormula(
             BuiltInOperation.getJsonFieldString(bizOptJson, "documentName", bizModel.getModelName()),
@@ -77,7 +78,7 @@ public class DocReportOperation implements BizOperation {
         }
         ByteArrayInputStream in = generateWord(bizModel, fileId, params);
         try {
-            FileDataSet dataSet = transToPdf ? new FileDataSet(fileName, -1, word2Pdf(in)) : new FileDataSet(fileName, -1, in);
+            FileDataSet dataSet = transToPdf ? new FileDataSet(fileName, -1, word2Pdf(in, manualMode)) : new FileDataSet(fileName, -1, in);
             bizModel.putDataSet(targetDsName, dataSet);
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         } finally {
@@ -142,9 +143,13 @@ public class DocReportOperation implements BizOperation {
         }
     }
 
-    private OutputStream word2Pdf(InputStream in) {
+    private OutputStream word2Pdf(InputStream in, boolean manualMode) {
         OutputStream outPdf = new ByteArrayOutputStream();
-        com.centit.support.office.OfficeToPdf.word2Pdf(in, outPdf, "docx");
+        if (manualMode) {
+            com.centit.support.office.OfficeToPdf.word2PdfManualMode(in, outPdf);
+        } else {
+            com.centit.support.office.OfficeToPdf.word2Pdf(in, outPdf, "docx");
+        }
         return outPdf;
     }
 }
