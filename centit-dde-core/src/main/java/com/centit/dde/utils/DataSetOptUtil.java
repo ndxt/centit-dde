@@ -1164,4 +1164,14 @@ public abstract class DataSetOptUtil {
         }
         return JSONTransformer.transformer(fieldFormula, data);
     }
+
+    public static Object fetchFileName(BizModelJSONTransform data, String fieldFormula){
+        if(StringUtils.isBlank(fieldFormula)){
+            return null;
+        }
+        if(fieldFormula.charAt(0) == '@'){
+            return data.mapTemplateString(fieldFormula.substring(1));
+        }
+        return data.attainExpressionValue(fieldFormula);
+    }
 }

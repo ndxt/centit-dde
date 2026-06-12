@@ -12,7 +12,6 @@ import com.centit.dde.utils.DataSetOptUtil;
 import com.centit.fileserver.common.FileInfoOpt;
 import com.centit.framework.common.ResponseData;
 import com.centit.support.algorithm.BooleanBaseOpt;
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
@@ -143,8 +142,8 @@ public class WriteExcelOperation implements BizOperation {
 
         String fileName = null;
         if (StringUtils.isNotBlank(bizOptJson.getString("fileName"))) {
-            fileName = StringBaseOpt.castObjectToString(JSONTransformer.transformer(
-                bizOptJson.getString("fileName"), new BizModelJSONTransform(bizModel, dataSet.getData())));
+            fileName = StringBaseOpt.castObjectToString(DataSetOptUtil.fetchFileName(
+                new BizModelJSONTransform(bizModel, dataSet.getData()), bizOptJson.getString("fileName")));
         }
         if (StringUtils.isBlank(fileName)) {
             fileName = DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), "yyyyMMDD_HHmm");
