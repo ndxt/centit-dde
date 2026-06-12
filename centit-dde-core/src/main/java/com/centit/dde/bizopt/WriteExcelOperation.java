@@ -33,7 +33,7 @@ import java.util.Map;
 
 public class WriteExcelOperation implements BizOperation {
 
-    private FileInfoOpt fileInfoOpt;
+    private final FileInfoOpt fileInfoOpt;
 
     public WriteExcelOperation(FileInfoOpt fileInfoOpt) {
         this.fileInfoOpt = fileInfoOpt;
@@ -51,7 +51,7 @@ public class WriteExcelOperation implements BizOperation {
         }
         List<Map<String, Object>> dataAsList = dataSet.getDataAsList();
         boolean columnDescInValue = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("columnDescInValue"), false);
-        Map<String, String> mapInfoDesc;
+        Map<String, String> mapInfoDesc = null;
         if(columnDescInValue){
             String columnDescValue = bizOptJson.getString("columnDescValue");
             Object obj = DataSetOptUtil.fetchFieldValue(new BizModelJSONTransform(bizModel, dataSet.getData()), columnDescValue);
@@ -83,7 +83,17 @@ public class WriteExcelOperation implements BizOperation {
             mapInfoDesc = BuiltInOperation.jsonArrayToMap(
                 bizOptJson.getJSONArray("config"), "columnName", "expression");
         }
-        if(mapInfoDesc == null){
+        /*fileType（生成方式） ： none, append, excel, jxls；*/
+        String optType = bizOptJson.getString("fileType");
+        if("none".equals(optType) && (mapInfoDesc==null || mapInfoDesc.isEmpty())){
+            mapInfoDesc = new LinkedHashMap<>();
+            for(Map<String, Object> entry : dataAsList){
+                for (String key : entry.keySet()){
+                    mapInfoDesc.put(key, key);
+                }
+            }
+        }
+        if(!"jxls".equals(optType) && (mapInfoDesc==null || mapInfoDesc.isEmpty())){
             return BuiltInOperation.createResponseData(0, 1,
                 ObjectException.DATA_NOT_FOUND_EXCEPTION,
                 dataOptContext.getI18nMessage("dde.604.data_source_not_found2", "columnDescValue"));
@@ -93,10 +103,8 @@ public class WriteExcelOperation implements BizOperation {
             JSONTransformer.transformer(
                 bizOptJson.getString("sheetName"), transformer),StringBaseOpt.isNvl(bizOptJson.getString("sheetName"))?"Sheet1":bizOptJson.getString("sheetName"));
         boolean transToPdf = BooleanBaseOpt.castObjectToBoolean(bizOptJson.get("transToPdf"), false);
-        /**fileType（生成方式） ： none, append, excel, jxls；*/
-        String optType = bizOptJson.getString("fileType");
-        String mergeColCell = bizOptJson.getString("mergeColCell");
 
+        String mergeColCell = bizOptJson.getString("mergeColCell");
         if ("append".equals(optType)) {
             String fileDataSetName = bizOptJson.getString("fileDataSet");
             DataSet dataSet2 = bizModel.getDataSet(fileDataSetName);
