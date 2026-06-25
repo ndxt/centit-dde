@@ -73,9 +73,10 @@ public class CallApiLogDaoImpl implements CallApiLogDao {
 
     @Override
     public void saveLog(CallApiLog callApiLog) {
-        if(StringUtils.length(callApiLog.getOtherMessage())> 10240){
+        if(StringUtils.length(callApiLog.getOtherMessage()) > 10240){
             logger.error("日志信息 ：" + callApiLog.getOptId()+
-                " otherMessage length is ：" + StringUtils.length(callApiLog.getOtherMessage()));
+                " otherMessage length is ：" + StringUtils.length(callApiLog.getOtherMessage()) + "，已截断至 10240 字符");
+            callApiLog.setOtherMessage(callApiLog.getOtherMessage().substring(0, 10240));
         }
         callApiLogIndexer.saveNewDocument(callApiLog);
     }
