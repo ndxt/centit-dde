@@ -75,15 +75,15 @@ public class SessionDataOperation implements BizOperation {
             }
         } else { // login
             String userNameValue = bizOptJson.getString("userId");
-            String userName = StringBaseOpt.castObjectToString(
+            String userId = StringBaseOpt.castObjectToString(
                 JSONTransformer.transformer(userNameValue, new BizModelJSONTransform(bizModel)));
-            if (StringUtils.isBlank(userName)) {
+            if (StringUtils.isBlank(userId)) {
                 return BuiltInOperation.createResponseData(0, 1,
-                    ObjectException.DATA_VALIDATE_ERROR, "用户名设置不正确！");
+                    ObjectException.DATA_VALIDATE_ERROR, "用户标识设置不正确！");
             }
-            ud = platformEnvironment.loadUserDetailsByUserCode(userName);
+            ud = platformEnvironment.loadUserDetailsByUserCode(userId);
             if (ud == null) {
-                ud = platformEnvironment.loadUserDetailsByLoginName(userName);
+                ud = platformEnvironment.loadUserDetailsByLoginName(userId);
             }
             if (ud == null) {
                 return BuiltInOperation.createResponseData(0, 1,
