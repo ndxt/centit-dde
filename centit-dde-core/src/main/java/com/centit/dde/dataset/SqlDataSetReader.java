@@ -92,7 +92,7 @@ public class SqlDataSetReader implements DataSetReader {
                 topUnit = currentUserDetails.getTopUnitCode();
             }
             String userCode = currentUserDetails.getUserCode();
-            if (StringUtils.isNotBlank(userCode)) {
+            if (StringUtils.isNotBlank(userCode) && StringUtils.isNotBlank(topUnit)) {
                 List<String> filters = queryDataScopeFilter.listUserDataFiltersByOptIdAndMethod(topUnit, userCode, optId, "api");
                 if (filters != null) {
                     DataPowerFilter dataPowerFilter = queryDataScopeFilter.createUserDataPowerFilter(currentUserDetails);
