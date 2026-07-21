@@ -51,6 +51,12 @@ import java.util.Map;
 
 public class EsQueryBizOperation implements BizOperation {
 
+    /**
+     * Elasticsearch's default index.max_result_window.  Queries using from/size
+     * cannot address a result beyond this window.
+     */
+    private static final int MAX_RESULT_WINDOW = 10_000;
+
     private final ESServerConfig esServerConfig;
 
     private final SourceInfoMetadata sourceInfoMetadata;
@@ -68,6 +74,8 @@ public class EsQueryBizOperation implements BizOperation {
             transform, bizOptJson.getString("pageNo")), 1);
         int pageSize = NumberBaseOpt.castObjectToInteger(DataSetOptUtil.fetchFieldValue(
             transform, bizOptJson.getString("pageSize")), 20);
+        ResponseData paginationError = validatePagination(pageNo, pageSize);
+        if (paginationError != null) return paginationError;
         String indexType = bizOptJson.getString("indexType");
         if ("custom".equals(indexType)) {
             return customQueryOperation(bizModel, bizOptJson, transform, pageNo, pageSize, dataOptContext);
@@ -103,6 +111,26 @@ public class EsQueryBizOperation implements BizOperation {
             bizModel.putDataSet(bizOptJson.getString("id"), dataSet);
             return BuiltInOperation.createResponseSuccessData(dataSet.getSize());
         }
+    }
+
+    /**
+     * Validate the complete from/size window before either search implementation
+     * is called.  trackTotalHits only controls the total-hit count and does not
+     * raise Elasticsearch's max_result_window limit.
+     */
+    private static ResponseData validatePagination(int pageNo, int pageSize) {
+        if (pageNo < 1 || pageSize < 1) {
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                "页码和每页条数必须大于 0");
+        }
+        long from = (long) (pageNo - 1) * pageSize;
+        long resultWindow = from + pageSize;
+        if (resultWindow > MAX_RESULT_WINDOW) {
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,
+                "Elasticsearch 分页结果不能超过 " + MAX_RESULT_WINDOW
+                    + " 条，请减小页码或每页条数；如需深分页，请使用 search_after 或 scroll");
+        }
+        return null;
     }
 
     private QueryBuilder queryBuilder(Map<String, Object> queryParam, String keyword, Boolean indexFile,
