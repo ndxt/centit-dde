@@ -46,9 +46,10 @@ public class GenerateFieldsServiceImpl implements GenerateFieldsService {
     public JSONArray queryViewSqlData(String databaseCode, String sql, Map<String, Object> params) {
         SourceInfo sourceInfo = sourceInfoMetadata.fetchSourceInfo(databaseCode);
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(QueryUtils.translateQuery(sql, params));
-        try {
-            Connection conn=AbstractSourceConnectThreadHolder.fetchConnect(sourceInfo);
-            return  DatabaseAccess.findObjectsAsJSON(conn,
+        // 该方法由 Controller 直接调用，既不在 @MetadataJdbcTransaction 切面内，也不在 BizOptFlow.run 边界内，
+        // 必须用 try-with-resources 立即归还连接，否则连接会一直挂在 ThreadLocal 上导致连接池耗尽。
+        try (Connection conn = AbstractSourceConnectThreadHolder.fetchConnect(sourceInfo)) {
+            return DatabaseAccess.findObjectsAsJSON(conn,
                     QueryUtils.buildLimitQuerySQL(qap.getQuery(), 0, 20, false,
                         DBType.mapDBType(sourceInfo.getDatabaseUrl())),
                     qap.getParams());
