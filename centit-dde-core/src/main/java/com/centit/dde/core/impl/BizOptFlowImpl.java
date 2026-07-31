@@ -264,13 +264,23 @@ public class BizOptFlowImpl implements BizOptFlow {
 
     @Override
     public DataOptResult run(DataPacketInterface dataPacket, DataOptContext dataOptContext) throws Exception {
+        boolean success = false;
         try {
             DataOptResult result = runInner(dataPacket, dataOptContext);
-            AbstractSourceConnectThreadHolder.commitAndRelease();
+            success = true;
             return result;
-        } catch (Exception exception) {
-            AbstractSourceConnectThreadHolder.rollbackAndRelease();
-            throw exception;
+        } finally {
+            try {
+                if (success) {
+                    AbstractSourceConnectThreadHolder.commitAndRelease();
+                } else {
+                    AbstractSourceConnectThreadHolder.rollbackAndRelease();
+                }
+            } catch (Exception | Error releaseEx) {
+                if (success) {
+                    throw releaseEx;
+                }
+            }
         }
     }
 
