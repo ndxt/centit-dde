@@ -232,6 +232,9 @@ public abstract class DataSetOptUtil {
                 return null;
             }
             String columnName = StringBaseOpt.castObjectToString(a[0]);
+            if(StringUtils.isBlank(columnName)){
+                return null;
+            }
             boolean firstUpCase=false, ignoreSingleCharPrefix=false;
 
             if(a.length>1){
@@ -247,6 +250,9 @@ public abstract class DataSetOptUtil {
                 return null;
             }
             String columnName = StringBaseOpt.castObjectToString(a[0]);
+            if(StringUtils.isBlank(columnName)){
+                return null;
+            }
             boolean upCase=false;
             if(a.length>1){
                 upCase = BooleanBaseOpt.castObjectToBoolean(a[1],false);
