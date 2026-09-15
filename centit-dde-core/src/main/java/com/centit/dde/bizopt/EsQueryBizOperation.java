@@ -23,10 +23,12 @@ import com.centit.search.service.Searcher;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -279,7 +281,21 @@ public class EsQueryBizOperation implements BizOperation {
         searchRequest.source(searchSourceBuilder);
         // System.out.println("ES Query: " + searchSourceBuilder.toString());
         RestHighLevelClient esClient = AbstractSourceConnectThreadHolder.fetchESClient(esInfo);
-        SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
+        SearchResponse searchResponse;
+        try {
+            searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
+        } catch (ElasticsearchException e) {
+            // "all shards failed" 只是摘要，真正的失败原因在 root_cause(以 suppressed 形式携带)里，
+            // 连同查询 DSL 一起抛出，否则无法定位是排序字段、过滤条件还是查询语法的问题
+            StringBuilder detail = new StringBuilder(512)
+                .append("ES 查询失败 [index=").append(indexName).append("]: ")
+                .append(e.getDetailedMessage());
+            for (Throwable suppressed : e.getSuppressed()) {
+                detail.append("; root cause: ").append(suppressed.getMessage());
+            }
+            detail.append("; query DSL: ").append(searchSourceBuilder.toString());
+            throw new ObjectException(ResponseData.ERROR_OPERATION, detail.toString(), e);
+        }
         JSONObject returnData = new JSONObject();
         if (searchSourceBuilder.highlighter() != null && !searchSourceBuilder.highlighter().fields().isEmpty()) {
             returnData.put("data", returnHighlightResult(searchResponse, true));
