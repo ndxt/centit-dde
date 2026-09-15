@@ -28,7 +28,9 @@ import com.centit.support.database.utils.PageDesc;
 import com.centit.support.json.JSONTransformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -44,6 +46,8 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,6 +56,8 @@ import java.util.List;
 import java.util.Map;
 
 public class EsQueryBizOperation implements BizOperation {
+
+    private static final Logger logger = LoggerFactory.getLogger(EsQueryBizOperation.class);
 
     /**
      * Elasticsearch's default index.max_result_window.  Queries using from/size
@@ -148,6 +154,7 @@ public class EsQueryBizOperation implements BizOperation {
         }
 
         esSearcher.initTypeFields(indexFile ? FileDocument.class : ObjectDocument.class);
+        keyword = normalizeQueryKeyword(keyword);
         if (StringUtils.isNotBlank(keyword)) {
             QueryStringQueryBuilder stringQueryBuilder =
                 QueryBuilders.queryStringQuery(keyword).fields(esSearcher.getQueryFields());
@@ -208,18 +215,13 @@ public class EsQueryBizOperation implements BizOperation {
 
         String queryWord = StringBaseOpt.castObjectToString(
             JSONTransformer.transformer(bizOptJson.getString("queryParameter"), transform));
+        queryWord = normalizeQueryKeyword(queryWord);
+        QueryStringQueryBuilder keywordQuery = null;
         if (StringUtils.isNotBlank(queryWord)) {
             //添加查询关键字
-            QueryStringQueryBuilder stringQueryBuilder = QueryBuilders.queryStringQuery(queryWord);
-            if (queryColumnList != null) {
-                for (String s : queryColumnList) {
-                    stringQueryBuilder.field(s);
-                }
-            }
-            //最小匹配度 百分比
-            int minimumShouldMatch = bizOptJson.getIntValue("minimumShouldMath");
-            if (minimumShouldMatch > 0) stringQueryBuilder.minimumShouldMatch(minimumShouldMatch + "%");
-            boolQueryBuilder.must(stringQueryBuilder);
+            keywordQuery = buildKeywordQuery(queryWord, queryColumnList,
+                bizOptJson.getIntValue("minimumShouldMath"));
+            boolQueryBuilder.must(keywordQuery);
         } else { // TODO 这个不懂
             MatchAllQueryBuilder matchAllQueryBuilder = QueryBuilders.matchAllQuery();
             boolQueryBuilder.must(matchAllQueryBuilder);
@@ -284,17 +286,23 @@ public class EsQueryBizOperation implements BizOperation {
         SearchResponse searchResponse;
         try {
             searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
-        } catch (ElasticsearchException e) {
-            // "all shards failed" 只是摘要，真正的失败原因在 root_cause(以 suppressed 形式携带)里，
-            // 连同查询 DSL 一起抛出，否则无法定位是排序字段、过滤条件还是查询语法的问题
-            StringBuilder detail = new StringBuilder(512)
-                .append("ES 查询失败 [index=").append(indexName).append("]: ")
-                .append(e.getDetailedMessage());
-            for (Throwable suppressed : e.getSuppressed()) {
-                detail.append("; root cause: ").append(suppressed.getMessage());
+        } catch (ElasticsearchStatusException e) {
+            // query_string 语法错误(最常见: 引号/括号不配对), 把关键字整体转义为字面量重试一次
+            if (e.status() == RestStatus.BAD_REQUEST && keywordQuery != null
+                && StringUtils.isNotBlank(queryWord)) {
+                logger.warn("ES 查询关键字 [{}] 不符合 query_string 语法, 转义为字面量后重试: {}",
+                    queryWord, e.getDetailedMessage());
+                boolQueryBuilder.must().remove(keywordQuery);
+                boolQueryBuilder.must(buildKeywordQuery(QueryParser.escape(queryWord), queryColumnList,
+                    bizOptJson.getIntValue("minimumShouldMath")));
+                searchSourceBuilder.query(boolQueryBuilder);
+                searchRequest.source(searchSourceBuilder);
+                searchResponse = doSearch(esClient, searchRequest, indexName);
+            } else {
+                throw esQueryException(indexName, e, searchSourceBuilder);
             }
-            detail.append("; query DSL: ").append(searchSourceBuilder.toString());
-            throw new ObjectException(ResponseData.ERROR_OPERATION, detail.toString(), e);
+        } catch (ElasticsearchException e) {
+            throw esQueryException(indexName, e, searchSourceBuilder);
         }
         JSONObject returnData = new JSONObject();
         if (searchSourceBuilder.highlighter() != null && !searchSourceBuilder.highlighter().fields().isEmpty()) {
@@ -307,6 +315,58 @@ public class EsQueryBizOperation implements BizOperation {
         String id = bizOptJson.getString("id");
         bizModel.putDataSet(id, new DataSet(returnData));
         return ResponseData.makeResponseData(returnData.getJSONArray("data").size());
+    }
+
+    /**
+     * 关键字预处理：中文输入法常把引号输成全角 “ ”，而 Lucene query_string 只认 ASCII 引号，
+     * 半角开引号 + 全角闭引号会在所有分片上抛 EOF 解析错误(all shards failed)
+     */
+    private static String normalizeQueryKeyword(String keyword) {
+        if (keyword == null) {
+            return null;
+        }
+        return keyword.replace('“', '"').replace('”', '"');
+    }
+
+    private static QueryStringQueryBuilder buildKeywordQuery(String queryWord, String[] fields,
+                                                             int minimumShouldMatch) {
+        QueryStringQueryBuilder stringQueryBuilder = QueryBuilders.queryStringQuery(queryWord);
+        if (fields != null) {
+            for (String field : fields) {
+                stringQueryBuilder.field(field);
+            }
+        }
+        //最小匹配度 百分比
+        if (minimumShouldMatch > 0) {
+            stringQueryBuilder.minimumShouldMatch(minimumShouldMatch + "%");
+        }
+        return stringQueryBuilder;
+    }
+
+    private static SearchResponse doSearch(RestHighLevelClient esClient, SearchRequest searchRequest,
+                                           String indexName) throws IOException {
+        try {
+            return esClient.search(searchRequest, RequestOptions.DEFAULT);
+        } catch (ElasticsearchException e) {
+            throw esQueryException(indexName, e, searchRequest.source());
+        }
+    }
+
+    /**
+     * "all shards failed" 只是摘要，真正的失败原因在 root_cause(以 suppressed 形式携带)里，
+     * 连同查询 DSL 一起抛出，否则无法定位是排序字段、过滤条件还是查询语法的问题
+     */
+    private static ObjectException esQueryException(String indexName, ElasticsearchException e,
+                                                    SearchSourceBuilder sourceBuilder) {
+        StringBuilder detail = new StringBuilder(512)
+            .append("ES 查询失败 [index=").append(indexName).append("]: ")
+            .append(e.getDetailedMessage());
+        for (Throwable suppressed : e.getSuppressed()) {
+            detail.append("; root cause: ").append(suppressed.getMessage());
+        }
+        detail.append("; query DSL: ")
+            .append(sourceBuilder != null ? sourceBuilder.toString() : "");
+        return new ObjectException(ResponseData.ERROR_OPERATION, detail.toString(), e);
     }
 
     /*
