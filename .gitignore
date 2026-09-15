@@ -14,4 +14,5 @@ mvn*
 out.*
 .flattened-pom.xml
 **/deploy
-
+.DS_Store
+**/\${project.build.directory}
